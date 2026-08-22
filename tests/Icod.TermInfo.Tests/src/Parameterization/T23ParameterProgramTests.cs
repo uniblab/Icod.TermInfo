@@ -7,7 +7,7 @@ namespace Icod.TermInfo.Tests;
 public sealed class T23ParameterProgramTests
 {
     [Fact]
-    public void AssemblyIdentifiesT23DevelopmentVersion()
+    public void AssemblyIdentifies08DevelopmentVersion()
     {
         Assembly assembly = typeof(TermInfoParameterProgram).Assembly;
         string? informationalVersion =
@@ -18,7 +18,7 @@ public sealed class T23ParameterProgramTests
         Assert.NotNull(informationalVersion);
         Assert.True(
             informationalVersion!.StartsWith(
-                "0.8.0-alpha.3",
+                "0.8.0",
                 StringComparison.Ordinal),
             $"Unexpected informational version '{informationalVersion}'.");
     }
