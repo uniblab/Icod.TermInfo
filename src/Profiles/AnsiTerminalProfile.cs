@@ -10,8 +10,7 @@ internal static class AnsiTerminalProfile
             .SetBoolean(BooleanCapability.MoveInsertMode)
             .SetNumber(NumericCapability.Columns, 80)
             .SetNumber(NumericCapability.Lines, 24)
-            .SetNumber(NumericCapability.Colors, 8)
-            .SetNumber(NumericCapability.ColorPairs, 64)
+            .ApplyAnsiIndexed(8, 64)
             .SetNumber(NumericCapability.InitialTabWidth, 8)
             .SetNumber(NumericCapability.NoColorVideo, 3)
             .SetString(StringCapability.Bell, "\a")
@@ -79,12 +78,6 @@ internal static class AnsiTerminalProfile
                 + "%?%p4%t;5%;%?%p6%t;1%;%?%p7%t;8%;"
                 + "%?%p9%t;11%;m")
             .SetString(StringCapability.ExitAttributeMode, "\x1b[0;10m")
-            .SetString(
-                StringCapability.SetForegroundColor,
-                "\x1b[3%p1%dm")
-            .SetString(
-                StringCapability.SetBackgroundColor,
-                "\x1b[4%p1%dm")
             .SetString(
                 StringCapability.OriginalColorPair,
                 "\x1b[39;49m")
