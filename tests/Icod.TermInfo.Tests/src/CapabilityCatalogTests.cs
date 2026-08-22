@@ -219,6 +219,10 @@ public sealed class CapabilityCatalogTests
             ("kNXT", StringCapability.KeyShiftNextPage),
             ("kPRV", StringCapability.KeyShiftPreviousPage),
             ("kRIT", StringCapability.KeyShiftRight),
+            ("kfnd", StringCapability.KeyFind),
+            ("khlp", StringCapability.KeyHelp),
+            ("krdo", StringCapability.KeyRedo),
+            ("kslt", StringCapability.KeySelect),
         ];
 
         Assert.Equal(Enum.GetValues<StringCapability>().Length, cases.Length);

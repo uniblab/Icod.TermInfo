@@ -719,4 +719,24 @@ public enum StringCapability
     /// Shifted right-arrow key sequence (<c>kRIT</c>).
     /// </summary>
     KeyShiftRight,
+
+    /// <summary>
+    /// Find key sequence (<c>kfnd</c>).
+    /// </summary>
+    KeyFind,
+
+    /// <summary>
+    /// Help key sequence (<c>khlp</c>).
+    /// </summary>
+    KeyHelp,
+
+    /// <summary>
+    /// Redo key sequence (<c>krdo</c>).
+    /// </summary>
+    KeyRedo,
+
+    /// <summary>
+    /// Select key sequence (<c>kslt</c>).
+    /// </summary>
+    KeySelect,
 }

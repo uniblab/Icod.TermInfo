@@ -176,6 +176,10 @@ internal static class CapabilityCatalog
             ["kNXT"] = StringCapability.KeyShiftNextPage,
             ["kPRV"] = StringCapability.KeyShiftPreviousPage,
             ["kRIT"] = StringCapability.KeyShiftRight,
+            ["kfnd"] = StringCapability.KeyFind,
+            ["khlp"] = StringCapability.KeyHelp,
+            ["krdo"] = StringCapability.KeyRedo,
+            ["kslt"] = StringCapability.KeySelect,
         };
 
     internal static bool IsStandardName(string name)

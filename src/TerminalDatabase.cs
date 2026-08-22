@@ -42,6 +42,8 @@ public sealed class TerminalDatabase
                     new[]
                     {
                         TerminalProfiles.Xterm,
+                        TerminalProfiles.Vt220,
+                        TerminalProfiles.Vt102,
                         TerminalProfiles.Ansi,
                         TerminalProfiles.Vt100,
                         TerminalProfiles.Dumb,

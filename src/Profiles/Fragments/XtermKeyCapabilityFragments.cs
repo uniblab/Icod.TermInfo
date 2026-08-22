@@ -7,17 +7,15 @@ internal static class XtermKeyCapabilityFragments
     {
         ArgumentNullException.ThrowIfNull(builder);
 
+        builder.ApplyVt220PcEditingKeys();
+
         builder
             .SetString(StringCapability.KeyBackspace, "\b")
             .SetString(StringCapability.KeyBackTab, "\u001b[Z")
             .SetString(StringCapability.KeyBegin, "\u001bOE")
-            .SetString(StringCapability.KeyDeleteCharacter, "\u001b[3~")
             .SetString(StringCapability.KeyEnd, "\u001bOF")
             .SetString(StringCapability.KeyEnter, "\u001bOM")
             .SetString(StringCapability.KeyHome, "\u001bOH")
-            .SetString(StringCapability.KeyInsertCharacter, "\u001b[2~")
-            .SetString(StringCapability.KeyNextPage, "\u001b[6~")
-            .SetString(StringCapability.KeyPreviousPage, "\u001b[5~")
             .SetString(StringCapability.KeyCursorDown, "\u001bOB")
             .SetString(StringCapability.KeyCursorLeft, "\u001bOD")
             .SetString(StringCapability.KeyCursorRight, "\u001bOC")

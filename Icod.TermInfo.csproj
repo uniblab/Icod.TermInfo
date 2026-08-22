@@ -12,7 +12,7 @@
     <AssemblyName>Icod.TermInfo</AssemblyName>
     <RootNamespace>Icod.TermInfo</RootNamespace>
     <Configurations>Debug;Release;Staging</Configurations>
-    <Version>0.7.0-alpha.5</Version>
+    <Version>0.7.0-alpha.6</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(PlatformTarget)' == '' ">
@@ -52,12 +52,12 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageVersion>0.7.0-alpha.5</PackageVersion>
+    <PackageVersion>0.7.0-alpha.6</PackageVersion>
     <PackageId>Icod.TermInfo</PackageId>
     <Title>Icod.TermInfo</Title>
     <Authors>Timothy J. Bruce</Authors>
-    <Description>Managed .NET terminal capability information with an extensible terminfo-style model for ANSI/VT100-focused applications.</Description>
-    <PackageReleaseNotes>T15: add the authoritative built-in xterm core profile with current ncurses full-screen, key, color, mouse, focus, paste, reporting, cursor-style, and clipboard metadata.</PackageReleaseNotes>
+    <Description>Managed .NET terminal capability information with an extensible terminfo-style model for ANSI, DEC VT, and xterm-family applications.</Description>
+    <PackageReleaseNotes>T15½: add authoritative VT102/VT220 built-ins, reusable DEC terminal fragments, and xterm reuse of the canonical VT220 PC editing-key fragment.</PackageReleaseNotes>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
@@ -66,7 +66,7 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <Deterministic>true</Deterministic>
-    <PackageTags>terminfo;libtinfo;terminal;ansi;vt100;console;cross-platform;dotnet;csharp</PackageTags>
+    <PackageTags>terminfo;libtinfo;terminal;ansi;vt100;vt102;vt220;xterm;console;cross-platform;dotnet;csharp</PackageTags>
     <RepositoryUrl>https://github.com/uniblab/Icod.TermInfo</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <GenerateAppxPackageOnBuild>false</GenerateAppxPackageOnBuild>

@@ -24,6 +24,18 @@ public static class TerminalProfiles
         Vt100TerminalProfile.Create();
 
     /// <summary>
+    /// Gets the canonical DEC VT102 profile.
+    /// </summary>
+    public static TerminalDescription Vt102 { get; } =
+        Vt102TerminalProfile.Create();
+
+    /// <summary>
+    /// Gets the canonical seven-bit DEC VT220 profile.
+    /// </summary>
+    public static TerminalDescription Vt220 { get; } =
+        Vt220TerminalProfile.Create();
+
+    /// <summary>
     /// Gets the lowest-common-denominator <c>dumb</c> terminal profile.
     /// </summary>
     public static TerminalDescription Dumb { get; } =

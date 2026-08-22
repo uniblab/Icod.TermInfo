@@ -4,7 +4,7 @@
 **Package:** `Icod.TermInfo`  
 **Target framework:** `net10.0`  
 **Language:** C# 13  
-**Status:** Implementation in progress — T15<br>
+**Status:** Implementation in progress — T15½<br>
 **Previous contract:** `0.6.0` — complete and frozen  
 **Contract target:** `0.7.0`  
 **Initial development version:** `0.7.0-alpha.1`
@@ -622,6 +622,16 @@ The following retain their established semantics:
 | `vt100-am` | alias of `vt100` |
 | `ansi` | traditional eight-color ANSI/pc-term-compatible profile |
 
+T15½ additionally adopts these authoritative DEC foundation identities:
+
+| Name | 0.7.0 role |
+| --- | --- |
+| `vt102` | DEC VT102, retaining VT100 semantics plus the canonical insert/delete editing delta |
+| `vt220` | canonical seven-bit DEC VT220 baseline used to model later DEC/xterm capability fragments |
+| `vt200` | authoritative alias of `vt220` |
+
+Wide-mode, 8-bit, `vt220d`, and later DEC terminal identities remain outside this tranche.
+
 ## 10.2 xterm family
 
 Version 0.7.0 SHALL add a deliberate xterm family.
@@ -781,6 +791,8 @@ The goal is to avoid a situation where `Icod.TermInfo` claims to support `xterm`
 # 13. Terminal Resolution
 
 Built-in lookup remains exact and conservative.
+
+After T15½, the DEC foundation names `vt102`, `vt220`, and `vt200` SHALL resolve exactly. Nearby wide-mode, 8-bit, and later DEC identities SHALL remain unsupported unless deliberately added by a later contract.
 
 After the relevant xterm tranche, the following names SHALL resolve if included in the final built-in matrix:
 
@@ -1270,6 +1282,35 @@ T15 is complete when:
 
 ---
 
+## T15½ — DEC VT102/VT220 Foundations and xterm Composition Audit
+
+### Work
+
+- add first-class built-in `vt102`;
+- add first-class built-in `vt220` with authoritative `vt200` alias;
+- preserve `vt100` behavior exactly while factoring its data into reusable internal DEC capability fragments;
+- model the canonical VT102 insert/delete editing delta without broadening `vt100`;
+- model the canonical seven-bit VT220 base, DEC editing keypad, unshifted function-key layout, and DECTCEM cursor visibility;
+- add typed standard capability identifiers for `kfnd`, `khlp`, `krdo`, and `kslt`;
+- factor the authoritative `vt220+pcedit` mapping for reuse by xterm's PC editing-key composition;
+- regression-test the completed T15 `xterm` profile so the refactor changes composition but not advertised behavior;
+- keep wide-mode, 8-bit, `vt220d`, VT320+, and unrelated historical DEC variants out of this tranche.
+
+### Acceptance gate
+
+T15½ is complete when:
+
+- `TERM=vt102` resolves exactly and remains monochrome;
+- `TERM=vt220` and its `vt200` alias resolve to the same immutable profile;
+- `vt100` remains behaviorally identical to its pre-T15½ contract;
+- VT102 exposes exactly the canonical VT100-plus-editing delta represented by the library;
+- VT220 carries the selected canonical seven-bit DEC editing/function-key and cursor-visibility behavior;
+- xterm reuses the VT220 PC editing-key fragment without changing its T15 golden behavior;
+- nearby unimplemented DEC identities continue to fail conservatively;
+- no DEC- or xterm-specific branch is added to generic parameter expansion or output.
+
+---
+
 ## T16 — xterm Indexed-Color Family
 
 ### Work
@@ -1401,6 +1442,8 @@ Before tagging `0.7.0`, perform a final audit.
 - 0.6.0 profiles remain compatible;
 - `dumb` remains safe/minimal;
 - `vt100` remains monochrome;
+- `vt102` remains monochrome and resolves exactly;
+- `vt220`/`vt200` remain monochrome and resolve exactly;
 - `ansi` remains traditional eight-color;
 - synthetic/provider 4-color support passes;
 - 16-color support passes;
