@@ -1,9 +1,11 @@
-name: main release build
+name: build and validate
 
 on:
   push:
     branches:
       - main
+      - 0.7.0
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -11,9 +13,9 @@ permissions:
 jobs:
   build-and-test:
     strategy:
-      fail-fast: false
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
+        configuration: [Release]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -22,14 +24,31 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      - name: Clean
-        run: dotnet clean Icod.TermInfo.sln -c Release
+      - run: dotnet clean Icod.TermInfo.sln -c ${{ matrix.configuration }}
+      - run: dotnet restore Icod.TermInfo.sln
+      - run: dotnet build Icod.TermInfo.sln -c ${{ matrix.configuration }} --no-restore -p:ContinuousIntegrationBuild=true
+      - run: dotnet test Icod.TermInfo.sln -c ${{ matrix.configuration }} --no-build --logger trx
 
-      - name: Restore
-        run: dotnet restore Icod.TermInfo.sln
+  package-validation:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-      - name: Build Release
-        run: dotnet build Icod.TermInfo.sln -c Release --no-restore
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
 
-      - name: Test Release
-        run: dotnet test Icod.TermInfo.sln -c Release --no-build --logger trx
+      - run: dotnet restore Icod.TermInfo.sln
+      - run: dotnet build Icod.TermInfo.sln -c Release --no-restore -p:ContinuousIntegrationBuild=true
+      - run: dotnet test Icod.TermInfo.sln -c Release --no-build --logger trx
+      - run: dotnet pack Icod.TermInfo.csproj -c Release --no-build --output artifacts
+      - run: bash .github/scripts/verify-release-package.sh artifacts
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: icod-terminfo-packages
+          path: |
+            artifacts/*.nupkg
+            artifacts/*.snupkg
+          if-no-files-found: error

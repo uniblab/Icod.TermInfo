@@ -1,12 +1,12 @@
 namespace Icod.TermInfo;
 
-internal static class Vt100TerminalProfile
+internal static class Vt102TerminalProfile
 {
     internal static TerminalDescription Create()
     {
-        return new TerminalDescriptionBuilder("vt100")
-            .AddAlias("vt100-am")
+        return new TerminalDescriptionBuilder("vt102")
             .ApplyVt100Core()
+            .ApplyVt102Editing()
             .Build();
     }
 }

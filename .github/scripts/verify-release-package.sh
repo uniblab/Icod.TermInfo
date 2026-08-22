@@ -23,7 +23,7 @@ test -f "${nupkg}"
 test -f "${snupkg}"
 
 if grep -R -n -E \
-  'AnsiTerminalProfile|Vt100TerminalProfile|TerminalProfiles\.(Ansi|Vt100)' \
+  'TerminalProfiles\.|TerminalProfile' \
   src/Parameterization; then
   echo "The generic parameterization layer contains a terminal-profile-specific reference." >&2
   exit 1
@@ -176,15 +176,75 @@ static void Require(bool condition, string message)
 TerminalDescription ansi = TerminalDatabase.BuiltIn.Load("ansi");
 TerminalDescription vt100 = TerminalDatabase.BuiltIn.Load("vt100");
 TerminalDescription vt100Alias = TerminalDatabase.BuiltIn.Load("vt100-am");
+TerminalDescription xterm = TerminalDatabase.BuiltIn.Load("xterm");
+TerminalDescription xterm16 = TerminalDatabase.BuiltIn.Load("xterm-16color");
+TerminalDescription xterm88 = TerminalDatabase.BuiltIn.Load("xterm-88color");
+TerminalDescription xterm256 = TerminalDatabase.BuiltIn.Load("xterm-256color");
+TerminalDescription xtermDirect = TerminalDatabase.BuiltIn.Load("xterm-direct");
+TerminalDescription xtermDirect16 = TerminalDatabase.BuiltIn.Load("xterm-direct16");
+TerminalDescription xtermDirect256 = TerminalDatabase.BuiltIn.Load("xterm-direct256");
 TerminalDescription dumb = TerminalDatabase.BuiltIn.Load("dumb");
 
 Require(ReferenceEquals(vt100, vt100Alias), "vt100-am must resolve to vt100.");
+Require(
+    xterm.GetString(StringCapability.EnterCursorAddressingMode) is not null,
+    "xterm must advertise cursor-addressing entry.");
+Require(
+    xterm.GetString(StringCapability.ExitCursorAddressingMode) is not null,
+    "xterm must advertise cursor-addressing exit.");
+Require(
+    xterm.TryGetExtendedString("XM", out string? mouseMode),
+    "xterm must carry XM mouse-mode metadata.");
+Require(
+    TermInfoParameterExpander.Expand(mouseMode!, 1) == "\x1b[?1006;1000h",
+    "xterm XM enable expansion changed.");
+Require(
+    xterm.TryGetExtendedString("BE", out string? pasteEnable)
+        && pasteEnable == "\x1b[?2004h",
+    "xterm bracketed-paste enable metadata changed.");
+Require(
+    xterm.TryGetExtendedString("fe", out string? focusEnable)
+        && focusEnable == "\x1b[?1004h",
+    "xterm focus-enable metadata changed.");
+Require(
+    xterm.TryGetExtendedString("Ms", out string? clipboard),
+    "xterm must carry clipboard metadata.");
+Require(
+    TermInfoParameterExpander.Expand(clipboard!, "c", "YWJj")
+        == "\x1b]52;c;YWJj\x1b\\",
+    "xterm clipboard metadata expansion changed.");
 Require(ansi.GetNumber(NumericCapability.Colors) == 8, "ANSI must advertise eight colors.");
 Require(vt100.GetNumber(NumericCapability.Colors) is null, "VT100 must remain monochrome.");
+Require(xterm16.GetNumber(NumericCapability.Colors) == 16, "xterm-16color must advertise 16 colors.");
+Require(xterm88.GetNumber(NumericCapability.Colors) == 88, "xterm-88color must advertise 88 colors.");
+Require(xterm88.GetNumber(NumericCapability.ColorPairs) == 7744, "xterm-88color must advertise 7744 pairs.");
+Require(xterm256.GetNumber(NumericCapability.Colors) == 256, "xterm-256color must advertise 256 colors.");
+Require(xterm256.GetNumber(NumericCapability.ColorPairs) == 65536, "xterm-256color must advertise 65536 pairs.");
+Require(
+    TerminalColors.ExpandForeground(xterm256, 255) == "\x1b[38;5;255m",
+    "xterm-256color foreground expansion changed.");
+Require(
+    xtermDirect.GetNumber(NumericCapability.Colors) == (1 << 24),
+    "xterm-direct must advertise the direct RGB color space.");
+Require(
+    TerminalColors.GetColorSupport(xtermDirect256).Model == TerminalColorModel.DirectRgb,
+    "xterm-direct256 must classify as direct RGB.");
+Require(
+    TerminalColors.GetColorSupport(xtermDirect256).IndexedColorCount == 256,
+    "xterm-direct256 must retain 256 indexed colors.");
+Require(
+    TerminalColors.ExpandForeground(xtermDirect16, 15) == "\x1b[97m",
+    "xterm-direct16 indexed foreground expansion changed.");
+Require(
+    TerminalColors.ExpandForeground(
+        xtermDirect256,
+        new TerminalRgbColor(0x12, 0x34, 0x56))
+        == "\x1b[38:2::18:52:86m",
+    "xterm-direct256 RGB foreground expansion changed.");
 Require(dumb.Name == "dumb", "The dumb fallback profile must be available.");
 Require(
-    !TerminalDatabase.BuiltIn.TryLoad("xterm-256color", out _),
-    "Unsupported terminal names must not silently resolve.");
+    !TerminalDatabase.BuiltIn.TryLoad("xterm-mono", out _),
+    "Unselected terminal names must not silently resolve.");
 
 string cup = ansi.Expand(StringCapability.CursorAddress, 0, 0);
 Require(cup == "\x1b[1;1H", "ANSI cursor addressing expansion changed.");
@@ -215,3 +275,8 @@ dotnet restore "${smoke_root}/PackageSmoke.csproj" \
 dotnet run --project "${smoke_root}/PackageSmoke.csproj" \
   -c Release \
   --no-restore
+
+# The repository sample must have a non-interactive path suitable for CI.
+dotnet run --project samples/Icod.TermInfo.Sample/Icod.TermInfo.Sample.csproj \
+  -c Release \
+  -- --describe-only --profile xterm-direct256

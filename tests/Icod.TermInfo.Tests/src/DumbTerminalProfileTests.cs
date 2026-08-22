@@ -100,7 +100,7 @@ public sealed class DumbTerminalProfileTests
     {
         Assert.False(
             TerminalDatabase.BuiltIn.TryLoad(
-                "xterm-256color",
+                "xterm-mono",
                 out TerminalDescription? terminal));
 
         Assert.Null(terminal);
@@ -111,7 +111,7 @@ public sealed class DumbTerminalProfileTests
     {
         TerminalDescription terminal =
             TerminalDatabase.BuiltIn.Resolve(
-                "xterm-256color",
+                "xterm-mono",
                 TerminalProfiles.Dumb);
 
         Assert.Same(TerminalProfiles.Dumb, terminal);

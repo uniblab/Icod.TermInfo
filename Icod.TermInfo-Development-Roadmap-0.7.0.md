@@ -4,7 +4,7 @@
 **Package:** `Icod.TermInfo`  
 **Target framework:** `net10.0`  
 **Language:** C# 13  
-**Status:** Draft contract for implementation  
+**Status:** Implementation complete — T20 release candidate<br>
 **Previous contract:** `0.6.0` — complete and frozen  
 **Contract target:** `0.7.0`  
 **Initial development version:** `0.7.0-alpha.1`
@@ -622,6 +622,16 @@ The following retain their established semantics:
 | `vt100-am` | alias of `vt100` |
 | `ansi` | traditional eight-color ANSI/pc-term-compatible profile |
 
+T15½ additionally adopts these authoritative DEC foundation identities:
+
+| Name | 0.7.0 role |
+| --- | --- |
+| `vt102` | DEC VT102, retaining VT100 semantics plus the canonical insert/delete editing delta |
+| `vt220` | canonical seven-bit DEC VT220 baseline used to model later DEC/xterm capability fragments |
+| `vt200` | authoritative alias of `vt220` |
+
+Wide-mode, 8-bit, `vt220d`, and later DEC terminal identities remain outside this tranche.
+
 ## 10.2 xterm family
 
 Version 0.7.0 SHALL add a deliberate xterm family.
@@ -781,6 +791,8 @@ The goal is to avoid a situation where `Icod.TermInfo` claims to support `xterm`
 # 13. Terminal Resolution
 
 Built-in lookup remains exact and conservative.
+
+After T15½, the DEC foundation names `vt102`, `vt220`, and `vt200` SHALL resolve exactly. Nearby wide-mode, 8-bit, and later DEC identities SHALL remain unsupported unless deliberately added by a later contract.
 
 After the relevant xterm tranche, the following names SHALL resolve if included in the final built-in matrix:
 
@@ -1270,18 +1282,79 @@ T15 is complete when:
 
 ---
 
+## T15½ — DEC VT102/VT220 Foundations and xterm Composition Audit
+
+### Work
+
+- add first-class built-in `vt102`;
+- add first-class built-in `vt220` with authoritative `vt200` alias;
+- preserve `vt100` behavior exactly while factoring its data into reusable internal DEC capability fragments;
+- model the canonical VT102 insert/delete editing delta without broadening `vt100`;
+- model the canonical seven-bit VT220 base, DEC editing keypad, unshifted function-key layout, and DECTCEM cursor visibility;
+- add typed standard capability identifiers for `kfnd`, `khlp`, `krdo`, and `kslt`;
+- factor the authoritative `vt220+pcedit` mapping for reuse by xterm's PC editing-key composition;
+- regression-test the completed T15 `xterm` profile so the refactor changes composition but not advertised behavior;
+- keep wide-mode, 8-bit, `vt220d`, VT320+, and unrelated historical DEC variants out of this tranche.
+
+### Acceptance gate
+
+T15½ is complete when:
+
+- `TERM=vt102` resolves exactly and remains monochrome;
+- `TERM=vt220` and its `vt200` alias resolve to the same immutable profile;
+- `vt100` remains behaviorally identical to its pre-T15½ contract;
+- VT102 exposes exactly the canonical VT100-plus-editing delta represented by the library;
+- VT220 carries the selected canonical seven-bit DEC editing/function-key and cursor-visibility behavior;
+- xterm reuses the VT220 PC editing-key fragment without changing its T15 golden behavior;
+- nearby unimplemented DEC identities continue to fail conservatively;
+- no DEC- or xterm-specific branch is added to generic parameter expansion or output.
+
+---
+
+## T15¾ — xterm Composition Refactor Before Indexed Family
+
+### Work
+
+- separate the modern xterm common control/attribute/screen capability layer from the ordinary eight-color palette and selector layer;
+- move `colors#8`, `pairs#64`, `setaf`, `setab`, and the legacy `setf`/`setb` mappings out of the common xterm fragment;
+- keep common capabilities such as `bce` and `op` where the authoritative indexed xterm variants inherit them unchanged;
+- compose the built-in `xterm` profile from the common layer plus an explicit ordinary eight-color fragment;
+- preserve every T15/T15½ advertised `xterm` capability and golden value exactly;
+- add internal composition tests proving the common layer does not itself choose an indexed palette or selectors;
+- do not add any new `$TERM` identity in this tranche;
+- defer the final `xterm-mono` decision to T16 because the authoritative ncurses `xterm-mono` entry derives from the historical `xterm-r6` family rather than from modern `xterm-new` with color merely removed.
+
+### Acceptance gate
+
+T15¾ is complete when:
+
+- `TERM=xterm` remains behaviorally identical to T15½ and all existing xterm golden tests still pass;
+- the reusable xterm common fragment does not set `colors`, `pairs`, `setaf`, `setab`, `setf`, or `setb`;
+- the explicit xterm ordinary-eight-color fragment reconstructs the current `xterm` color behavior exactly;
+- the refactor changes no public API and introduces no new resolvable terminal name;
+- T16 can select 16/88/256-color data without first installing and then overriding the eight-color selector layer.
+
+---
+
 ## T16 — xterm Indexed-Color Family
 
 ### Work
 
-Implement and golden-test:
+Build on the T15¾ common/color split and implement and golden-test:
 
 - `xterm-mono` if retained by final review;
 - `xterm-16color`;
 - `xterm-88color`;
 - `xterm-256color`.
 
-Reuse the xterm core and color fragments.
+Final T16 review does **not** retain `xterm-mono`. The authoritative ncurses
+entry intentionally derives from the historical `xterm-r6` family, whose
+function-key, mouse, and control behavior differs from the modern `xterm-new`
+family used by T15/T15¾. Modeling it as merely "modern xterm without color"
+would therefore be inaccurate. It remains unsupported unless a later contract
+deliberately adds that historical family.
+
+Reuse the T15¾ xterm common fragment and compose each selected indexed-color layer explicitly.
 
 ### Acceptance gate
 
@@ -1306,6 +1379,15 @@ Implement direct-color xterm fragments and profiles selected for the contract, e
 - `xterm-direct256`.
 
 Implement current `RGB`/`CO` semantics required by those profiles.
+
+Final T17 review retains all three direct-color identities. Against ncurses
+`terminfo.src` revision 1.1267 (2026-08-14), each advertises
+`colors#0x1000000`, `pairs#0x10000`, and Boolean `RGB`; their numeric `CO`
+values are respectively 8, 16, and 256. `CO` is the retained indexed-color
+prefix before the packed 8/8/8 RGB parameter space. The selected direct
+selectors use the current colon-separated `38:2::R:G:B` / `48:2::R:G:B`
+form. These profiles do not synthesize palette-changing `ccc`/`initc`/`oc`
+capabilities which the authoritative direct-color entries do not advertise.
 
 Golden-test direct-color selector programs.
 
@@ -1334,6 +1416,21 @@ Complete the descriptive metadata required by the selected modern xterm baseline
 - bracketed-paste enable/disable and begin/end metadata;
 - extended modified key strings;
 - authoritative clipboard/selection extension metadata already present in the selected profile, where appropriate.
+
+Final T18 review confirms that T15 seeded the selected metadata early so later
+xterm profiles could compose correctly, and T18 now freezes that data against
+ncurses `terminfo.src` revision 1.1267 (2026-08-14). The contract retains
+standard `kmous`; the SGR-1006 `XM`/`xm` programs; `XF`, `fe`, `fd`, `kxIN`,
+and `kxOUT` focus metadata; `BE`, `BD`, `PS`, and `PE` bracketed-paste
+metadata; the selected PC-style modified-key and X11 three-key extensions; and
+the `xterm+tmux2` cursor/clipboard strings `Cr`, `Cs`, `Ms`, `Se`, and `Ss`,
+together with `RV`/`rv` and `XR`/`xr` reporting metadata. Every built-in xterm
+color variant inherits the same descriptive metadata, and parameterized values
+continue to expand through the shared T2 engine.
+
+These capabilities remain descriptive data only. T18 introduces no mouse,
+focus, or paste event decoder; no clipboard execution; no probing; no event
+loop; and no live terminal-session state.
 
 Document but DO NOT implement:
 
@@ -1375,6 +1472,18 @@ T18 is complete when:
 - update package metadata and release notes;
 - ensure sample project demonstrates new features without requiring an interactive CI terminal.
 
+Final T19 review freezes the 0.7 public surface represented by
+`PublicApiSurfaceTests`; no additional public type is required for this tranche.
+The README and sample are rewritten around the completed 0.7 capability/color
+model, the sample gains a `--describe-only` path for non-interactive validation,
+and `docs/0.7.0-CONTRACT-AUDIT.md` records the pre-T20 API/scope evidence.
+
+T19 also hardens repository validation: pull requests and `main` validate Debug
+and Release on Windows/Linux/macOS, while `main` additionally packs the Release
+artifacts, runs the fresh-package verifier, exercises the non-interactive sample,
+and uploads the resulting package artifacts without publishing them. Final
+versioning, tagging, and publication remain the responsibility of T20.
+
 ### Acceptance gate
 
 T19 is complete when:
@@ -1391,6 +1500,19 @@ T19 is complete when:
 
 Before tagging `0.7.0`, perform a final audit.
 
+Final T20 implementation review closes the repository-side 0.7.0 contract. The
+release candidate carries the final `0.7.0` package/assembly version, adds
+explicit final-version and reserved-0.8 profile gates, and verifies that all
+selected xterm variants retain their cursor-addressing and cursor-visibility
+primitives. The existing validation workflow now also runs on pushes to the
+`0.7.0` release branch and through `workflow_dispatch`, so the exact candidate
+can produce the six cross-platform Debug/Release results and validated package
+artifacts required before tagging.
+
+Tagging and registry publication remain deliberately separate release actions.
+They must use the exact commit/artifacts which pass the T20 workflow; no source
+change may occur between successful final validation and the `v0.7.0` tag.
+
 ### Required checks
 
 - all Windows/Linux/macOS CI jobs pass;
@@ -1401,6 +1523,8 @@ Before tagging `0.7.0`, perform a final audit.
 - 0.6.0 profiles remain compatible;
 - `dumb` remains safe/minimal;
 - `vt100` remains monochrome;
+- `vt102` remains monochrome and resolves exactly;
+- `vt220`/`vt200` remain monochrome and resolve exactly;
 - `ansi` remains traditional eight-color;
 - synthetic/provider 4-color support passes;
 - 16-color support passes;
@@ -1428,12 +1552,19 @@ Before tagging `0.7.0`, perform a final audit.
 
 ### Completion
 
-When every T20 item passes:
+The repository-side 0.7.0 implementation contract is complete in this T20
+release candidate. Final release sign-off is intentionally evidence-driven:
 
-- set/confirm both version elements as `0.7.0`;
-- tag `v0.7.0`;
-- publish the same package to NuGet and GitHub Packages;
-- mark this roadmap's 0.7.0 contract complete.
+- confirm both version elements are exactly `0.7.0`;
+- require all six Windows/Linux/macOS Debug/Release jobs and package validation
+  to pass for the exact release commit;
+- tag that exact commit `v0.7.0`;
+- publish the same validated package to NuGet and GitHub Packages, together
+  with its matching symbol package;
+- confirm the published package restores in a fresh consumer.
+
+Any source/package change after validation reopens the gate and requires a new
+T20 validation run before tagging.
 
 ---
 

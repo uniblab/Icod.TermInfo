@@ -11,6 +11,8 @@ public sealed class TerminalDescriptionBuilder
     private readonly HashSet<BooleanCapability> _booleanCapabilities = [];
     private readonly Dictionary<NumericCapability, int> _numericCapabilities = [];
     private readonly Dictionary<StringCapability, string> _stringCapabilities = [];
+    private readonly Dictionary<string, TermInfoCapabilityValue> _extendedCapabilities =
+        new(StringComparer.Ordinal);
 
     /// <summary>
     /// Initializes a builder for the specified canonical terminal name.
@@ -121,6 +123,86 @@ public sealed class TerminalDescriptionBuilder
     }
 
     /// <summary>
+    /// Sets an extended Boolean capability by its case-sensitive name. A
+    /// <see langword="false"/> value removes the capability.
+    /// </summary>
+    public TerminalDescriptionBuilder SetExtendedBoolean(
+        string name,
+        bool value = true)
+    {
+        ValidateExtendedCapabilityName(name);
+
+        if (value)
+        {
+            _extendedCapabilities[name] = new TermInfoCapabilityValue(true);
+        }
+        else
+        {
+            _extendedCapabilities.Remove(name);
+        }
+
+        return this;
+    }
+
+    /// <summary>
+    /// Sets an extended numeric capability by its case-sensitive name.
+    /// </summary>
+    public TerminalDescriptionBuilder SetExtendedNumber(
+        string name,
+        int value)
+    {
+        ValidateExtendedCapabilityName(name);
+        _extendedCapabilities[name] = new TermInfoCapabilityValue(value);
+        return this;
+    }
+
+    /// <summary>
+    /// Sets an extended string capability by its case-sensitive name.
+    /// </summary>
+    public TerminalDescriptionBuilder SetExtendedString(
+        string name,
+        string value)
+    {
+        ValidateExtendedCapabilityName(name);
+        ArgumentNullException.ThrowIfNull(value);
+
+        _extendedCapabilities[name] = new TermInfoCapabilityValue(value);
+        return this;
+    }
+
+    /// <summary>
+    /// Sets an extended capability by its case-sensitive name. A Boolean
+    /// <see langword="false"/> value removes the capability.
+    /// </summary>
+    public TerminalDescriptionBuilder SetExtended(
+        string name,
+        TermInfoCapabilityValue value)
+    {
+        ValidateExtendedCapabilityName(name);
+
+        if (value.IsBoolean && !value.BooleanValue)
+        {
+            _extendedCapabilities.Remove(name);
+        }
+        else
+        {
+            _extendedCapabilities[name] = value;
+        }
+
+        return this;
+    }
+
+    /// <summary>
+    /// Removes an extended capability from the description being built.
+    /// </summary>
+    public TerminalDescriptionBuilder RemoveExtended(string name)
+    {
+        ValidateExtendedCapabilityName(name);
+        _extendedCapabilities.Remove(name);
+        return this;
+    }
+
+    /// <summary>
     /// Creates an immutable snapshot of the current builder state.
     /// </summary>
     public TerminalDescription Build()
@@ -130,7 +212,8 @@ public sealed class TerminalDescriptionBuilder
             _aliases,
             _booleanCapabilities,
             _numericCapabilities,
-            _stringCapabilities);
+            _stringCapabilities,
+            _extendedCapabilities);
     }
 
     private static void Validate(BooleanCapability capability)
@@ -154,6 +237,25 @@ public sealed class TerminalDescriptionBuilder
         if (!Enum.IsDefined(typeof(StringCapability), capability))
         {
             throw new ArgumentOutOfRangeException(nameof(capability));
+        }
+    }
+
+    private static void ValidateExtendedCapabilityName(string name)
+    {
+        ArgumentNullException.ThrowIfNull(name);
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException(
+                "The extended capability name cannot be empty or whitespace.",
+                nameof(name));
+        }
+
+        if (CapabilityCatalog.IsStandardName(name))
+        {
+            throw new ArgumentException(
+                $"'{name}' is a standard terminfo capability name and cannot be shadowed by an extended capability.",
+                nameof(name));
         }
     }
 

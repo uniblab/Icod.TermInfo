@@ -73,15 +73,58 @@ public sealed class CompletionGateTests
         Assert.Null(
             TerminalProfiles.Vt100.GetNumber(NumericCapability.ColorPairs));
         Assert.Equal("dumb", TerminalProfiles.Dumb.Name);
+        Assert.Equal("xterm", TerminalProfiles.Xterm.Name);
+        Assert.Equal("xterm-16color", TerminalProfiles.Xterm16Color.Name);
+        Assert.Equal("xterm-88color", TerminalProfiles.Xterm88Color.Name);
+        Assert.Equal("xterm-256color", TerminalProfiles.Xterm256Color.Name);
+        Assert.Equal("xterm-direct", TerminalProfiles.XtermDirect.Name);
+        Assert.Equal("xterm-direct16", TerminalProfiles.XtermDirect16.Name);
+        Assert.Equal("xterm-direct256", TerminalProfiles.XtermDirect256.Name);
+        Assert.Equal("vt102", TerminalProfiles.Vt102.Name);
+        Assert.Equal("vt220", TerminalProfiles.Vt220.Name);
 
         Assert.Same(
             TerminalProfiles.Vt100,
             TerminalDatabase.BuiltIn.Load("vt100-am"));
+        Assert.Same(
+            TerminalProfiles.Vt102,
+            TerminalDatabase.BuiltIn.Load("vt102"));
+        Assert.Same(
+            TerminalProfiles.Vt220,
+            TerminalDatabase.BuiltIn.Load("vt220"));
+        Assert.Same(
+            TerminalProfiles.Vt220,
+            TerminalDatabase.BuiltIn.Load("vt200"));
+        Assert.Same(
+            TerminalProfiles.Xterm,
+            TerminalDatabase.BuiltIn.Load("xterm"));
+        Assert.Same(
+            TerminalProfiles.Xterm16Color,
+            TerminalDatabase.BuiltIn.Load("xterm-16color"));
+        Assert.Same(
+            TerminalProfiles.Xterm88Color,
+            TerminalDatabase.BuiltIn.Load("xterm-88color"));
+        Assert.Same(
+            TerminalProfiles.Xterm256Color,
+            TerminalDatabase.BuiltIn.Load("xterm-256color"));
+        Assert.Same(
+            TerminalProfiles.XtermDirect,
+            TerminalDatabase.BuiltIn.Load("xterm-direct"));
+        Assert.Same(
+            TerminalProfiles.XtermDirect16,
+            TerminalDatabase.BuiltIn.Load("xterm-direct16"));
+        Assert.Same(
+            TerminalProfiles.XtermDirect256,
+            TerminalDatabase.BuiltIn.Load("xterm-direct256"));
 
         string[] unsupportedNames =
         [
-            "xterm",
-            "xterm-256color",
+            "vt102-w",
+            "vt220-w",
+            "vt220-8",
+            "vt220d",
+            "vt320",
+            "xterm-mono",
             "screen",
             "tmux",
             "linux",
@@ -104,6 +147,15 @@ public sealed class CompletionGateTests
     {
         TerminalDescription[] terminals =
         [
+            TerminalProfiles.XtermDirect256,
+            TerminalProfiles.XtermDirect16,
+            TerminalProfiles.XtermDirect,
+            TerminalProfiles.Xterm256Color,
+            TerminalProfiles.Xterm88Color,
+            TerminalProfiles.Xterm16Color,
+            TerminalProfiles.Xterm,
+            TerminalProfiles.Vt220,
+            TerminalProfiles.Vt102,
             TerminalProfiles.Ansi,
             TerminalProfiles.Vt100,
             TerminalProfiles.Dumb,

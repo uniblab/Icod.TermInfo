@@ -197,8 +197,7 @@ public sealed class AnsiTerminalProfileTests
     }
 
     [Theory]
-    [InlineData("xterm")]
-    [InlineData("xterm-256color")]
+    [InlineData("xterm-mono")]
     [InlineData("screen")]
     [InlineData("tmux")]
     [InlineData("linux")]

@@ -1,90 +1,109 @@
 # Releasing Icod.TermInfo
 
-This document describes the publication path for Icod.TermInfo 0.6.0 and later releases using the same repository workflows.
+This document describes the current validation and publication procedure for `Icod.TermInfo` 0.7.0 and later releases built from the same repository structure.
 
 ## Release principles
 
-- `<Version />` and `<PackageVersion />` in `Icod.TermInfo.csproj` must always be identical.
+- `<Version />` and `<PackageVersion />` in `Icod.TermInfo.csproj` must always be present and identical.
 - A release tag must be exactly `v<PackageVersion>`.
-- Release validation must pass on Windows, Linux, and macOS.
-- The package is packed once after validation; that same `.nupkg` is published to GitHub Packages and NuGet.org.
-- Release builds use the repository's deterministic/continuous-integration build settings and .NET SDK Source Link support.
-- The `.snupkg` generated beside the primary package is retained as a release artifact and published to the NuGet.org symbol server through `dotnet nuget push`.
-- Publication never occurs merely because `main` changed.
+- Debug and Release validation must pass on Windows, Linux, and macOS before a final tag is created.
+- The package must pass `.github/scripts/verify-release-package.sh` before publication.
+- Release packages must retain deterministic build metadata, repository commit metadata, portable symbols, and Source Link information.
+- The `.nupkg` and `.snupkg` produced for a version are immutable release artifacts. If package contents change, increment the version rather than replacing a published package.
+- A push to `main` validates and packages the project but does not publish it automatically.
 
-## One-time GitHub repository setup
+## Repository CI
 
-The release workflow uses the repository `GITHUB_TOKEN` for GitHub Packages and GitHub Releases. Its job-level permissions request only the scopes needed for those operations.
+### Pull requests
 
-No long-lived GitHub Packages token is required for the repository's own package.
+`.github/workflows/pr-build-and-test.yaml` runs the solution in both Debug and Release on:
 
-## One-time NuGet.org trusted-publishing setup
+- `windows-latest`;
+- `ubuntu-latest`;
+- `macos-latest`.
 
-The release workflow uses NuGet.org trusted publishing so no long-lived NuGet API key is stored in GitHub.
+Each matrix job cleans, restores, builds, and tests the whole solution, including the sample project.
 
-On NuGet.org, create a trusted-publishing policy for:
+### Pushes to main and the 0.7.0 release branch
 
-- repository owner: `uniblab`;
-- repository: `Icod.TermInfo`;
-- workflow file: `release.yml`;
-- environment: leave blank unless the workflow is deliberately changed to use a GitHub environment.
+`.github/workflows/push-main.yaml` runs for pushes to `main` and `0.7.0`, and may also be started with `workflow_dispatch`. It repeats the Debug/Release three-OS build/test matrix. After that matrix succeeds, an Ubuntu package-validation job:
 
-In the GitHub repository, create a secret named `NUGET_USER` containing the NuGet.org profile/user name that owns or is permitted to publish `Icod.TermInfo`. It is a user name, not an email address.
+1. restores and builds Release with `ContinuousIntegrationBuild=true`;
+2. runs the Release test suite;
+3. packs `Icod.TermInfo.csproj` into `artifacts`;
+4. runs `.github/scripts/verify-release-package.sh artifacts`;
+5. uploads the `.nupkg` and `.snupkg` as workflow artifacts.
 
-The `NuGet/login@v1` action exchanges the GitHub OIDC identity for a short-lived NuGet.org API key during the publish job.
+The verifier checks package structure, dependency closure, portable symbols, Source Link/repository metadata, a fresh local-package consumer, and the sample's non-interactive `--describe-only` path.
 
-## Publishing to GitHub Packages manually
+## Local release validation
 
-The `publish-github-packages.yml` workflow is manually invoked with `workflow_dispatch`.
-
-It:
-
-1. restores the solution;
-2. builds and tests Release;
-3. packs `Icod.TermInfo.csproj`;
-4. runs the T10 release-package verifier, including the fresh-consumer local-package smoke test;
-5. uploads the `.nupkg` and `.snupkg` as workflow artifacts;
-6. publishes the primary `.nupkg` to the repository owner's GitHub Packages NuGet feed using `GITHUB_TOKEN`.
-
-The workflow uses `--skip-duplicate`, so re-running it for an already-published version does not replace an immutable package version.
-
-## Publishing a tagged release
-
-Before tagging:
-
-1. confirm the intended version in both `<Version />` and `<PackageVersion />`;
-2. run Debug and Release builds/tests locally;
-3. pack locally if desired and run `.github/scripts/verify-release-package.sh artifacts`;
-4. merge the release-ready commit to the desired branch;
-5. confirm the normal GitHub Actions build, test, package-validation, and fresh-consumer checks are green;
-6. create and push an annotated or lightweight tag named exactly `v<PackageVersion>`.
-
-For the 0.6.0 contract release:
+Before any final release tag, run:
 
 ```text
-git tag v0.6.0
-git push origin v0.6.0
+dotnet restore Icod.TermInfo.sln
+
+dotnet build Icod.TermInfo.sln -c Debug
+dotnet test Icod.TermInfo.sln -c Debug
+
+dotnet build Icod.TermInfo.sln -c Release
+dotnet test Icod.TermInfo.sln -c Release
+
+dotnet pack Icod.TermInfo.csproj -c Release --output artifacts
+bash .github/scripts/verify-release-package.sh artifacts
 ```
 
-The `release.yml` workflow then:
+On Windows, run the PowerShell/cmd equivalents for the build/test/pack commands. The package verifier itself is a Bash script and is also exercised by the Ubuntu GitHub Actions package job.
 
-1. validates Release builds/tests on Windows, Linux, and macOS;
-2. rejects the tag if it does not match `<PackageVersion />`;
-3. packs once on Ubuntu after all validation jobs succeed;
-4. runs the T10 release-package verifier against the exact artifacts that will be published;
-5. publishes the same `.nupkg` to GitHub Packages;
-6. obtains a temporary NuGet.org API key through OIDC trusted publishing;
-7. publishes the `.nupkg` and associated `.snupkg` to NuGet.org;
-8. creates a GitHub Release for the existing tag and attaches both package files.
+## 0.7.0 completion gate
 
-If any publication step fails, correct the configuration or transient problem and re-run the failed job. Do not change package contents for a version that has already been successfully published; increment the prerelease/final version instead.
+T20 sets both version fields to the final `0.7.0` value and freezes the repository-side release candidate. `T20CompletionGateTests` supplements the existing API/profile/color/metadata tests with final-version, reserved-0.8-name, and xterm screen-primitive assertions.
 
-## Final 0.6.0 release
+The final candidate must still pass the exact release workflow before it is tagged. Push the candidate to `0.7.0` (or run the validation workflow manually) and require:
 
-The T10 release-ready commit sets both version elements to `0.6.0`. Before tagging, require the normal `main` build workflow to be green; its package job performs package validation, artifact inspection, Source Link metadata checks, and a fresh-consumer restore/build/run using only the local `.nupkg`. Then tag exactly:
+- three-OS Debug/Release CI;
+- package validation;
+- public API baseline validation;
+- fresh-package consumer smoke tests;
+- compatibility checks for the retained 0.6.0 profiles;
+- xterm indexed/direct-color and metadata checks;
+- scope checks proving that no system terminfo loader, live session manager, input decoder, Windows Console profile, or Windows Terminal profile slipped into 0.7.0.
 
-```text
-v0.6.0
-```
+The final evidence map is in `docs/0.7.0-CONTRACT-AUDIT.md`. Do not create `v0.7.0` until the workflow for the exact release commit is green.
 
-Do not create the tag if the T10 checks are not green. See `docs/0.6.0-CONTRACT-AUDIT.md` for the complete gate-to-evidence mapping. After `v0.6.0` is published, public API changes should be treated as deliberate contract changes and reviewed against the T8 API baseline.
+## Publishing
+
+The current repository intentionally separates validation from publication. The committed workflows validate and upload package artifacts but do not push them to package registries automatically.
+
+For the T20 release candidate:
+
+1. confirm both `<Version />` and `<PackageVersion />` are exactly `0.7.0`;
+2. push the release-ready commit to `0.7.0` (and merge it through the normal repository process when appropriate);
+3. require the six Windows/Linux/macOS Debug/Release jobs and the package-validation job for the exact release commit to finish successfully;
+4. download the `.nupkg` and `.snupkg` artifacts produced by that validated commit, or reproduce them from that same commit with the documented deterministic build;
+5. create and push tag `v0.7.0` at that exact release-ready commit;
+6. publish the same `.nupkg` to NuGet.org and GitHub Packages using the repository owner's normal authenticated package-publishing procedure;
+7. publish the `.snupkg` to the NuGet.org symbol server when pushing the NuGet package;
+8. optionally attach both artifacts to a GitHub Release for the tag.
+
+Do not publish a package built from a different commit than the one that passed the final T20 validation.
+
+## NuGet.org authentication
+
+If NuGet.org trusted publishing is used, configure the NuGet.org policy and GitHub OIDC workflow before enabling any automated publication job. Do not commit a long-lived NuGet API key to the repository.
+
+If publication remains manual, use a short-lived/appropriately protected credential according to NuGet.org policy and never store it in source control.
+
+## GitHub Packages authentication
+
+For GitHub Actions publication, prefer the repository `GITHUB_TOKEN` with the minimum required `packages: write` permission. For manual publication, use an appropriately scoped credential according to GitHub Packages policy.
+
+## After publication
+
+After `v0.7.0` is published:
+
+- confirm the package and symbols are visible on NuGet.org;
+- confirm the same package version is visible in GitHub Packages;
+- confirm a fresh consumer can restore the public package;
+- mark the 0.7.0 roadmap complete;
+- treat subsequent public API changes as deliberate contract changes for the next version.
