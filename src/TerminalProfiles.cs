@@ -12,6 +12,12 @@ public static class TerminalProfiles
         AnsiTerminalProfile.Create();
 
     /// <summary>
+    /// Gets the DEC VT100 profile with the advanced-video option.
+    /// </summary>
+    public static TerminalDescription Vt100 { get; } =
+        Vt100TerminalProfile.Create();
+
+    /// <summary>
     /// Gets the lowest-common-denominator <c>dumb</c> terminal profile.
     /// </summary>
     public static TerminalDescription Dumb { get; } =

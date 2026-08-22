@@ -42,6 +42,7 @@ public sealed class TerminalDatabase
                     new[]
                     {
                         TerminalProfiles.Ansi,
+                        TerminalProfiles.Vt100,
                         TerminalProfiles.Dumb,
                     }),
             });

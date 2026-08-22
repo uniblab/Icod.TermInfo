@@ -12,12 +12,14 @@ The current prerelease foundation provides:
 - typed and traditional short-name capability lookup;
 - a terminal-description builder;
 - ordered terminal-description providers;
-- built-in `ansi` and `dumb` terminal profiles;
+- built-in `ansi`, `vt100`, and `dumb` terminal profiles;
 - classic eight-color ANSI foreground/background capabilities;
 - ANSI cursor movement, screen editing, tabs, rendition controls, and cursor-key strings;
+- DEC VT100 advanced-video, scroll-region, alternate-character-set, keypad, cursor-key, and PF-key capabilities;
+- historical VT100 terminfo padding annotations preserved for the output layer;
 - a reusable terminfo parameter-expansion engine, including stack operations, formatting, variables, `%i`, and conditionals.
 
-The DEC VT100 profile is the next profile-level milestone and is not yet built in.
+The next milestone is the padding-aware output layer. Until then, VT100 strings retain their `$<...>` annotations so no timing information is lost.
 
 ## Requirements
 
@@ -61,6 +63,20 @@ string moveToHome =
 string redForeground =
     terminal.Expand(StringCapability.SetForegroundColor, 1);
 ```
+
+The DEC VT100 profile is also available by canonical name or its historical
+`vt100-am` alias:
+
+```csharp
+TerminalDescription vt100 = TerminalDatabase.BuiltIn.Load("vt100");
+
+string move =
+    vt100.Expand(StringCapability.CursorAddress, 10, 20);
+// ESC[11;21H$<5>
+```
+
+The `$<5>` suffix is a terminfo padding annotation. T4 deliberately preserves
+it; the T5 output layer is responsible for removing or honoring padding.
 
 Unsupported terminal names do not silently become ANSI, VT100, or `dumb`. A fallback is always an explicit caller decision.
 
