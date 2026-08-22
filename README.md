@@ -8,10 +8,10 @@ The package targets `net10.0`, uses C# 13, contains no native ncurses/terminfo p
 
 ## Install
 
-NuGet.org prerelease:
+NuGet.org (after the `v0.6.0` release is published):
 
 ```text
-dotnet add package Icod.TermInfo --version 0.6.0-alpha.10
+dotnet add package Icod.TermInfo --version 0.6.0
 ```
 
 GitHub Packages uses the same package ID and package contents. Configure the `uniblab` GitHub NuGet feed and authenticate according to your GitHub Packages policy, then install `Icod.TermInfo` normally.
@@ -287,16 +287,16 @@ dotnet test Icod.TermInfo.sln -c Release
 dotnet pack Icod.TermInfo.csproj -c Release --output artifacts
 ```
 
-Release packages produce both `.nupkg` and `.snupkg` artifacts. The .NET SDK supplies Source Link support, and GitHub Actions builds set `ContinuousIntegrationBuild` so repository/commit information and deterministic source mapping are emitted for package debugging.
+Release packages produce both `.nupkg` and `.snupkg` artifacts. The .NET SDK supplies Source Link support, and GitHub Actions builds set `ContinuousIntegrationBuild` so repository/commit information and deterministic source mapping are emitted for package debugging. The T10 package job also inspects the packed artifacts and installs the package into a fresh `net10.0` application using only the local artifact directory as a NuGet source.
 
 ## Publishing
 
 The repository has two publication paths:
 
-- `publish-github-packages.yml` is a manually invoked prerelease/package workflow for GitHub Packages;
+- `publish-github-packages.yml` is a manually invoked GitHub Packages workflow;
 - `release.yml` is tag-driven and validates on Windows, Linux, and macOS, packs once, publishes the same `.nupkg` to GitHub Packages and NuGet.org, and creates a GitHub Release containing the package and symbol package.
 
-See `docs/RELEASING.md` for the one-time NuGet trusted-publishing setup and release procedure.
+See `docs/RELEASING.md` for the one-time NuGet trusted-publishing setup and release procedure, and `docs/0.6.0-CONTRACT-AUDIT.md` for the final T10 contract evidence.
 
 ## Scope
 

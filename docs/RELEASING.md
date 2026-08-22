@@ -1,6 +1,6 @@
 # Releasing Icod.TermInfo
 
-This document describes the publication path for the 0.6.0 prerelease and final contract releases.
+This document describes the publication path for Icod.TermInfo 0.6.0 and later releases using the same repository workflows.
 
 ## Release principles
 
@@ -33,7 +33,7 @@ In the GitHub repository, create a secret named `NUGET_USER` containing the NuGe
 
 The `NuGet/login@v1` action exchanges the GitHub OIDC identity for a short-lived NuGet.org API key during the publish job.
 
-## Publishing a GitHub Packages prerelease manually
+## Publishing to GitHub Packages manually
 
 The `publish-github-packages.yml` workflow is manually invoked with `workflow_dispatch`.
 
@@ -42,8 +42,8 @@ It:
 1. restores the solution;
 2. builds and tests Release;
 3. packs `Icod.TermInfo.csproj`;
-4. verifies that both `.nupkg` and `.snupkg` exist;
-5. uploads those files as a workflow artifact;
+4. runs the T10 release-package verifier, including the fresh-consumer local-package smoke test;
+5. uploads the `.nupkg` and `.snupkg` as workflow artifacts;
 6. publishes the primary `.nupkg` to the repository owner's GitHub Packages NuGet feed using `GITHUB_TOKEN`.
 
 The workflow uses `--skip-duplicate`, so re-running it for an already-published version does not replace an immutable package version.
@@ -54,15 +54,16 @@ Before tagging:
 
 1. confirm the intended version in both `<Version />` and `<PackageVersion />`;
 2. run Debug and Release builds/tests locally;
-3. merge the release-ready commit to the desired branch;
-4. confirm normal GitHub Actions validation is green;
-5. create and push an annotated or lightweight tag named exactly `v<PackageVersion>`.
+3. pack locally if desired and run `.github/scripts/verify-release-package.sh artifacts`;
+4. merge the release-ready commit to the desired branch;
+5. confirm the normal GitHub Actions build, test, package-validation, and fresh-consumer checks are green;
+6. create and push an annotated or lightweight tag named exactly `v<PackageVersion>`.
 
-Example for `0.6.0-alpha.10`:
+For the 0.6.0 contract release:
 
 ```text
-git tag v0.6.0-alpha.10
-git push origin v0.6.0-alpha.10
+git tag v0.6.0
+git push origin v0.6.0
 ```
 
 The `release.yml` workflow then:
@@ -70,7 +71,7 @@ The `release.yml` workflow then:
 1. validates Release builds/tests on Windows, Linux, and macOS;
 2. rejects the tag if it does not match `<PackageVersion />`;
 3. packs once on Ubuntu after all validation jobs succeed;
-4. verifies the `.nupkg` and `.snupkg` names;
+4. runs the T10 release-package verifier against the exact artifacts that will be published;
 5. publishes the same `.nupkg` to GitHub Packages;
 6. obtains a temporary NuGet.org API key through OIDC trusted publishing;
 7. publishes the `.nupkg` and associated `.snupkg` to NuGet.org;
@@ -80,10 +81,10 @@ If any publication step fails, correct the configuration or transient problem an
 
 ## Final 0.6.0 release
 
-For the final contract release, set both version elements to `0.6.0`, complete the T10 gate, and tag exactly:
+The T10 release-ready commit sets both version elements to `0.6.0`. Before tagging, require the normal `main` build workflow to be green; its package job performs package validation, artifact inspection, Source Link metadata checks, and a fresh-consumer restore/build/run using only the local `.nupkg`. Then tag exactly:
 
 ```text
 v0.6.0
 ```
 
-Beginning with release-candidate work, public API changes should be treated as deliberate contract changes and reviewed against the T8 API baseline.
+Do not create the tag if the T10 checks are not green. See `docs/0.6.0-CONTRACT-AUDIT.md` for the complete gate-to-evidence mapping. After `v0.6.0` is published, public API changes should be treated as deliberate contract changes and reviewed against the T8 API baseline.

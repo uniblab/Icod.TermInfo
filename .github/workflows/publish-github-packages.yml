@@ -31,13 +31,9 @@ jobs:
       - name: Pack
         run: dotnet pack Icod.TermInfo.csproj -c Release --no-build --output artifacts
 
-      - name: Verify package artifacts
+      - name: T10 package and fresh-consumer verification
         shell: bash
-        run: |
-          version="$(sed -n 's:.*<PackageVersion>\(.*\)</PackageVersion>.*:\1:p' Icod.TermInfo.csproj | head -n 1)"
-          test -n "${version}"
-          test -f "artifacts/Icod.TermInfo.${version}.nupkg"
-          test -f "artifacts/Icod.TermInfo.${version}.snupkg"
+        run: .github/scripts/verify-release-package.sh artifacts
 
       - name: Upload package artifact
         uses: actions/upload-artifact@v4
