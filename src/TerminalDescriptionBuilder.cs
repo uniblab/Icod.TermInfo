@@ -14,6 +14,11 @@ public sealed class TerminalDescriptionBuilder
     private readonly Dictionary<StringCapability, string> _stringCapabilities = [];
     private readonly Dictionary<string, TermInfoCapabilityValue> _extendedCapabilities =
         new(StringComparer.Ordinal);
+    private readonly HashSet<BooleanCapability> _canceledBooleanCapabilities = [];
+    private readonly HashSet<NumericCapability> _canceledNumericCapabilities = [];
+    private readonly HashSet<StringCapability> _canceledStringCapabilities = [];
+    private readonly HashSet<string> _canceledExtendedCapabilities =
+        new(StringComparer.Ordinal);
 
     /// <summary>
     /// Initializes a builder for the specified canonical terminal name.
@@ -81,11 +86,13 @@ public sealed class TerminalDescriptionBuilder
 
         if (value)
         {
+            _canceledBooleanCapabilities.Remove(capability);
             _booleanCapabilities.Add(capability);
         }
         else
         {
             _booleanCapabilities.Remove(capability);
+            _canceledBooleanCapabilities.Remove(capability);
         }
 
         return this;
@@ -99,6 +106,7 @@ public sealed class TerminalDescriptionBuilder
         int value)
     {
         Validate(capability);
+        _canceledNumericCapabilities.Remove(capability);
         _numericCapabilities[capability] = value;
         return this;
     }
@@ -111,6 +119,7 @@ public sealed class TerminalDescriptionBuilder
     {
         Validate(capability);
         _numericCapabilities.Remove(capability);
+        _canceledNumericCapabilities.Remove(capability);
         return this;
     }
 
@@ -124,6 +133,7 @@ public sealed class TerminalDescriptionBuilder
         Validate(capability);
         ArgumentNullException.ThrowIfNull(value);
 
+        _canceledStringCapabilities.Remove(capability);
         _stringCapabilities[capability] = value;
         return this;
     }
@@ -136,6 +146,7 @@ public sealed class TerminalDescriptionBuilder
     {
         Validate(capability);
         _stringCapabilities.Remove(capability);
+        _canceledStringCapabilities.Remove(capability);
         return this;
     }
 
@@ -151,11 +162,13 @@ public sealed class TerminalDescriptionBuilder
 
         if (value)
         {
+            _canceledExtendedCapabilities.Remove(name);
             _extendedCapabilities[name] = new TermInfoCapabilityValue(true);
         }
         else
         {
             _extendedCapabilities.Remove(name);
+            _canceledExtendedCapabilities.Remove(name);
         }
 
         return this;
@@ -169,6 +182,7 @@ public sealed class TerminalDescriptionBuilder
         int value)
     {
         ValidateExtendedCapabilityName(name);
+        _canceledExtendedCapabilities.Remove(name);
         _extendedCapabilities[name] = new TermInfoCapabilityValue(value);
         return this;
     }
@@ -183,6 +197,7 @@ public sealed class TerminalDescriptionBuilder
         ValidateExtendedCapabilityName(name);
         ArgumentNullException.ThrowIfNull(value);
 
+        _canceledExtendedCapabilities.Remove(name);
         _extendedCapabilities[name] = new TermInfoCapabilityValue(value);
         return this;
     }
@@ -200,9 +215,11 @@ public sealed class TerminalDescriptionBuilder
         if (value.IsBoolean && !value.BooleanValue)
         {
             _extendedCapabilities.Remove(name);
+            _canceledExtendedCapabilities.Remove(name);
         }
         else
         {
+            _canceledExtendedCapabilities.Remove(name);
             _extendedCapabilities[name] = value;
         }
 
@@ -216,7 +233,111 @@ public sealed class TerminalDescriptionBuilder
     {
         ValidateExtendedCapabilityName(name);
         _extendedCapabilities.Remove(name);
+        _canceledExtendedCapabilities.Remove(name);
         return this;
+    }
+
+    internal TerminalDescriptionBuilder Inherit(TerminalDescription source)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+
+        foreach (BooleanCapability capability in source.BooleanCapabilities)
+        {
+            if (!_booleanCapabilities.Contains(capability)
+                && !_canceledBooleanCapabilities.Contains(capability))
+            {
+                _booleanCapabilities.Add(capability);
+            }
+        }
+
+        foreach (KeyValuePair<NumericCapability, int> pair in source.NumericCapabilities)
+        {
+            if (!_numericCapabilities.ContainsKey(pair.Key)
+                && !_canceledNumericCapabilities.Contains(pair.Key))
+            {
+                _numericCapabilities[pair.Key] = pair.Value;
+            }
+        }
+
+        foreach (KeyValuePair<StringCapability, string> pair in source.StringCapabilities)
+        {
+            if (!_stringCapabilities.ContainsKey(pair.Key)
+                && !_canceledStringCapabilities.Contains(pair.Key))
+            {
+                _stringCapabilities[pair.Key] = pair.Value;
+            }
+        }
+
+        foreach (KeyValuePair<string, TermInfoCapabilityValue> pair
+            in source.ExtendedCapabilities)
+        {
+            if (!_extendedCapabilities.ContainsKey(pair.Key)
+                && !_canceledExtendedCapabilities.Contains(pair.Key))
+            {
+                _extendedCapabilities[pair.Key] = pair.Value;
+            }
+        }
+
+        return this;
+    }
+
+    internal TerminalDescriptionBuilder CancelBoolean(
+        BooleanCapability capability)
+    {
+        Validate(capability);
+        _booleanCapabilities.Remove(capability);
+        _canceledBooleanCapabilities.Add(capability);
+        return this;
+    }
+
+    internal TerminalDescriptionBuilder CancelNumber(
+        NumericCapability capability)
+    {
+        Validate(capability);
+        _numericCapabilities.Remove(capability);
+        _canceledNumericCapabilities.Add(capability);
+        return this;
+    }
+
+    internal TerminalDescriptionBuilder CancelString(
+        StringCapability capability)
+    {
+        Validate(capability);
+        _stringCapabilities.Remove(capability);
+        _canceledStringCapabilities.Add(capability);
+        return this;
+    }
+
+    internal TerminalDescriptionBuilder CancelExtended(string name)
+    {
+        ValidateExtendedCapabilityName(name);
+        _extendedCapabilities.Remove(name);
+        _canceledExtendedCapabilities.Add(name);
+        return this;
+    }
+
+    internal bool IsBooleanCanceled(BooleanCapability capability)
+    {
+        Validate(capability);
+        return _canceledBooleanCapabilities.Contains(capability);
+    }
+
+    internal bool IsNumberCanceled(NumericCapability capability)
+    {
+        Validate(capability);
+        return _canceledNumericCapabilities.Contains(capability);
+    }
+
+    internal bool IsStringCanceled(StringCapability capability)
+    {
+        Validate(capability);
+        return _canceledStringCapabilities.Contains(capability);
+    }
+
+    internal bool IsExtendedCanceled(string name)
+    {
+        ValidateExtendedCapabilityName(name);
+        return _canceledExtendedCapabilities.Contains(name);
     }
 
     /// <summary>

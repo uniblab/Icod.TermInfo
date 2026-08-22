@@ -4,7 +4,7 @@
 **Package:** `Icod.TermInfo`  
 **Target framework:** `net10.0`  
 **Language:** C# 13  
-**Status:** Implementation in progress — T25 byte and output fidelity<br>
+**Status:** Implementation in progress — T26 profile composition and cancellation fidelity<br>
 **Previous contract:** `0.7.0` — complete and frozen  
 **Contract target:** `0.8.0`  
 **Initial development version:** `0.8.0-alpha.1`
