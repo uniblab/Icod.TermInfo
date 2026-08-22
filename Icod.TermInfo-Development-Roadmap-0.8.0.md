@@ -4,7 +4,7 @@
 **Package:** `Icod.TermInfo`  
 **Target framework:** `net10.0`  
 **Language:** C# 13  
-**Status:** Contract approved — implementation not yet started  
+**Status:** Implementation in progress — T21 foundation  
 **Previous contract:** `0.7.0` — complete and frozen  
 **Contract target:** `0.8.0`  
 **Initial development version:** `0.8.0-alpha.1`

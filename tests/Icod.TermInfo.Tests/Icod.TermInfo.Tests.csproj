@@ -28,6 +28,10 @@
     <ProjectReference Include="..\..\Icod.TermInfo.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="fixtures/**/*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>2</WarningLevel>
