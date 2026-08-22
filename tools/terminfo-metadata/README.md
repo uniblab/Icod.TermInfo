@@ -4,8 +4,8 @@ This directory contains the deterministic source and maintenance tooling for
 the complete standard capability model introduced by T22.
 
 Runtime code remains under `src/Capabilities/`. Nothing in this directory is a
-runtime package dependency, and normal build/test does not require Python,
-ncurses, or network access.
+runtime package dependency. The repository's metadata workflow uses the .NET
+SDK already required by `Icod.TermInfo`; Python is not required.
 
 ## Canonical table
 
@@ -35,12 +35,31 @@ The `ManagedName` column deliberately preserves every public 0.7 enum member
 name and supplies append-only names for capabilities first exposed in 0.8.
 Managed enum numeric values are **not** binary table indices.
 
-## Generated runtime table
+## Automatic validation
+
+The normal C# test suite copies `standard-capabilities.tsv` into its test
+assets and compares every canonical row with `StandardCapabilityCatalog`.
+Therefore:
+
+```text
+dotnet test Icod.TermInfo.sln
+```
+
+verifies that the checked-in runtime metadata still matches the canonical TSV.
+No separate scripting runtime is required.
+
+## Regenerating the runtime table
+
+A dependency-free `net10.0` maintenance utility is included in the solution:
+
+```text
+tools/terminfo-metadata/Icod.TermInfo.MetadataGenerator.csproj
+```
 
 Run:
 
 ```text
-python tools/terminfo-metadata/generate.py
+dotnet run --project tools/terminfo-metadata/Icod.TermInfo.MetadataGenerator.csproj
 ```
 
 to regenerate:
@@ -52,22 +71,23 @@ src/Capabilities/StandardCapabilityDefinitions.Generated.cs
 Use:
 
 ```text
-python tools/terminfo-metadata/generate.py --check
+dotnet run --project tools/terminfo-metadata/Icod.TermInfo.MetadataGenerator.csproj -- --check
 ```
 
-to verify that the checked-in generated file matches the canonical TSV and
-that every managed name maps to exactly one enum member.
+for a non-mutating consistency check. The generator normalizes line endings
+when checking so Windows Git checkout policy does not cause false mismatches.
 
-The generator is a maintainer tool only. Generated runtime output is checked in
-so package builds remain deterministic and dependency-free.
+Generated runtime output is checked in so package builds remain deterministic
+and dependency-free.
 
 ## Rules
 
-- No network access is required by normal build or test.
+- No network access is required by normal build, test, validation, or regeneration.
+- No Python installation is required.
 - Upstream provenance is recorded with imported capability tables.
 - Existing 0.7 enum numeric values are immutable.
 - New capability enum members are append-only.
 - Managed enum numeric values are never compiled terminfo binary indices.
 - The canonical metadata record owns the future binary index.
 - Generated output used by the runtime is checked in and reviewable.
-- Regeneration is deterministic.
+- Regeneration is deterministic and emits LF line endings.

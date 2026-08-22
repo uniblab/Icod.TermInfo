@@ -30,6 +30,9 @@
 
   <ItemGroup>
     <None Update="fixtures/**/*" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../tools/terminfo-metadata/standard-capabilities.tsv"
+          Link="metadata/standard-capabilities.tsv"
+          CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
