@@ -123,6 +123,40 @@ public sealed class TerminalDescription
     }
 
     /// <summary>
+    /// Expands a parameterized string capability using isolated variable storage.
+    /// </summary>
+    public string Expand(
+        StringCapability capability,
+        params TermInfoParameter[] parameters)
+    {
+        Validate(capability);
+        ArgumentNullException.ThrowIfNull(parameters);
+
+        return TermInfoParameterExpander.Expand(
+            GetRequiredString(capability),
+            parameters);
+    }
+
+    /// <summary>
+    /// Expands a parameterized string capability using the supplied context for
+    /// persistent uppercase variables.
+    /// </summary>
+    public string Expand(
+        StringCapability capability,
+        TermInfoExpansionContext context,
+        params TermInfoParameter[] parameters)
+    {
+        Validate(capability);
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(parameters);
+
+        return TermInfoParameterExpander.Expand(
+            GetRequiredString(capability),
+            context,
+            parameters);
+    }
+
+    /// <summary>
     /// Looks up a boolean capability by its traditional terminfo short name.
     /// </summary>
     /// <remarks>

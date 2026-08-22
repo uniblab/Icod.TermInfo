@@ -51,10 +51,11 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageVersion>0.6.0-alpha.2</PackageVersion>
+    <PackageVersion>0.6.0-alpha.3</PackageVersion>
     <Authors>Timothy J. Bruce</Authors>
     <Description>Managed .NET terminal capability information with an extensible terminfo-style model for ANSI/VT100-focused applications.</Description>
-    <PackageReleaseNotes>Tranche 2: terminal-description builder, provider architecture, ordered database composition, and expanded ANSI/VT100 capability catalog.</PackageReleaseNotes>
+    <PackageReleaseNotes>Tranche 3: close T0 infrastructure gaps and implement the T2 terminfo parameter-expansion engine.</PackageReleaseNotes>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <IncludeSymbols>true</IncludeSymbols>
@@ -72,6 +73,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="README.md" Pack="true" PackagePath="\" />
     <Content Include="LICENSE">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <TargetPath>$(AssemblyName).LICENSE.txt</TargetPath>
