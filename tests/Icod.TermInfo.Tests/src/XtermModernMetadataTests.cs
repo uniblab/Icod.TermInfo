@@ -31,10 +31,10 @@ public sealed class XtermModernMetadataTests
             "\u001b[?1006;1000l",
             TermInfoParameterExpander.Expand(mode!, 0));
         Assert.Equal(
-            "\u001b[<0;5;10M",
+            "\u001b[<0;5;10;M",
             TermInfoParameterExpander.Expand(eventProgram!, 4, 9, 0, 1));
         Assert.Equal(
-            "\u001b[<3;1;1m",
+            "\u001b[<3;1;1;m",
             TermInfoParameterExpander.Expand(eventProgram!, 0, 0, 3, 0));
     }
 
