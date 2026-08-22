@@ -99,6 +99,15 @@ internal static class CapabilityCatalog
             ["tbc"] = StringCapability.ClearAllTabs,
         };
 
+    internal static bool IsStandardName(string name)
+    {
+        ArgumentNullException.ThrowIfNull(name);
+
+        return BooleanCapabilities.ContainsKey(name)
+            || NumericCapabilities.ContainsKey(name)
+            || StringCapabilities.ContainsKey(name);
+    }
+
     internal static bool TryGetBoolean(
         string name,
         out BooleanCapability capability)

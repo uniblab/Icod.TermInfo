@@ -11,19 +11,22 @@ public sealed class TerminalDescription
     private readonly HashSet<BooleanCapability> _booleanCapabilities;
     private readonly IReadOnlyDictionary<NumericCapability, int> _numericCapabilities;
     private readonly IReadOnlyDictionary<StringCapability, string> _stringCapabilities;
+    private readonly IReadOnlyDictionary<string, TermInfoCapabilityValue> _extendedCapabilities;
 
     internal TerminalDescription(
         string name,
         IEnumerable<string> aliases,
         IEnumerable<BooleanCapability> booleanCapabilities,
         IDictionary<NumericCapability, int> numericCapabilities,
-        IDictionary<StringCapability, string> stringCapabilities)
+        IDictionary<StringCapability, string> stringCapabilities,
+        IDictionary<string, TermInfoCapabilityValue> extendedCapabilities)
     {
         ArgumentNullException.ThrowIfNull(name);
         ArgumentNullException.ThrowIfNull(aliases);
         ArgumentNullException.ThrowIfNull(booleanCapabilities);
         ArgumentNullException.ThrowIfNull(numericCapabilities);
         ArgumentNullException.ThrowIfNull(stringCapabilities);
+        ArgumentNullException.ThrowIfNull(extendedCapabilities);
 
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -45,6 +48,13 @@ public sealed class TerminalDescription
             }
         }
 
+        foreach (string extendedName in extendedCapabilities.Keys)
+        {
+            ValidateExtendedCapabilityName(
+                extendedName,
+                nameof(extendedCapabilities));
+        }
+
         Aliases = Array.AsReadOnly(aliasArray);
         _booleanCapabilities = new HashSet<BooleanCapability>(booleanCapabilities);
         _numericCapabilities =
@@ -53,6 +63,11 @@ public sealed class TerminalDescription
         _stringCapabilities =
             new ReadOnlyDictionary<StringCapability, string>(
                 new Dictionary<StringCapability, string>(stringCapabilities));
+        _extendedCapabilities =
+            new ReadOnlyDictionary<string, TermInfoCapabilityValue>(
+                new Dictionary<string, TermInfoCapabilityValue>(
+                    extendedCapabilities,
+                    StringComparer.Ordinal));
     }
 
     /// <summary>
@@ -64,6 +79,13 @@ public sealed class TerminalDescription
     /// Gets the aliases accepted for the terminal profile.
     /// </summary>
     public IReadOnlyList<string> Aliases { get; }
+
+    /// <summary>
+    /// Gets the immutable, case-sensitive extended capabilities advertised by
+    /// this terminal description.
+    /// </summary>
+    public IReadOnlyDictionary<string, TermInfoCapabilityValue> ExtendedCapabilities =>
+        _extendedCapabilities;
 
     /// <summary>
     /// Gets whether the profile advertises the specified boolean capability.
@@ -222,6 +244,92 @@ public sealed class TerminalDescription
         return value is not null;
     }
 
+    /// <summary>
+    /// Looks up an extended capability by its case-sensitive name.
+    /// </summary>
+    public bool TryGetExtendedCapability(
+        string name,
+        out TermInfoCapabilityValue value)
+    {
+        ValidateCapabilityName(name);
+        return _extendedCapabilities.TryGetValue(name, out value);
+    }
+
+    /// <summary>
+    /// Looks up an extended Boolean capability by its case-sensitive name.
+    /// </summary>
+    /// <remarks>
+    /// A missing name returns <see langword="false"/>. If the name exists with a
+    /// different value kind, this method throws <see cref="InvalidOperationException"/>.
+    /// </remarks>
+    public bool TryGetExtendedBoolean(
+        string name,
+        out bool value)
+    {
+        ValidateCapabilityName(name);
+
+        if (!_extendedCapabilities.TryGetValue(
+                name,
+                out TermInfoCapabilityValue capability))
+        {
+            value = default;
+            return false;
+        }
+
+        value = capability.BooleanValue;
+        return true;
+    }
+
+    /// <summary>
+    /// Looks up an extended numeric capability by its case-sensitive name.
+    /// </summary>
+    /// <remarks>
+    /// A missing name returns <see langword="false"/>. If the name exists with a
+    /// different value kind, this method throws <see cref="InvalidOperationException"/>.
+    /// </remarks>
+    public bool TryGetExtendedNumber(
+        string name,
+        out int value)
+    {
+        ValidateCapabilityName(name);
+
+        if (!_extendedCapabilities.TryGetValue(
+                name,
+                out TermInfoCapabilityValue capability))
+        {
+            value = default;
+            return false;
+        }
+
+        value = capability.NumberValue;
+        return true;
+    }
+
+    /// <summary>
+    /// Looks up an extended string capability by its case-sensitive name.
+    /// </summary>
+    /// <remarks>
+    /// A missing name returns <see langword="false"/>. If the name exists with a
+    /// different value kind, this method throws <see cref="InvalidOperationException"/>.
+    /// </remarks>
+    public bool TryGetExtendedString(
+        string name,
+        [NotNullWhen(true)] out string? value)
+    {
+        ValidateCapabilityName(name);
+
+        if (!_extendedCapabilities.TryGetValue(
+                name,
+                out TermInfoCapabilityValue capability))
+        {
+            value = null;
+            return false;
+        }
+
+        value = capability.StringValue;
+        return true;
+    }
+
     private static ArgumentException CreateUnknownCapabilityException(
         string kind,
         string name)
@@ -264,6 +372,27 @@ public sealed class TerminalDescription
             throw new ArgumentException(
                 "The capability name cannot be empty or whitespace.",
                 nameof(name));
+        }
+    }
+
+    private static void ValidateExtendedCapabilityName(
+        string name,
+        string parameterName)
+    {
+        ArgumentNullException.ThrowIfNull(name, parameterName);
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException(
+                "Extended capability names cannot be empty or whitespace.",
+                parameterName);
+        }
+
+        if (CapabilityCatalog.IsStandardName(name))
+        {
+            throw new ArgumentException(
+                $"'{name}' is a standard terminfo capability name and cannot be shadowed by an extended capability.",
+                parameterName);
         }
     }
 }
