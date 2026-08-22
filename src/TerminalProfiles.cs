@@ -6,6 +6,12 @@ namespace Icod.TermInfo;
 public static class TerminalProfiles
 {
     /// <summary>
+    /// Gets the color-capable ANSI/PC-terminal profile.
+    /// </summary>
+    public static TerminalDescription Ansi { get; } =
+        AnsiTerminalProfile.Create();
+
+    /// <summary>
     /// Gets the lowest-common-denominator <c>dumb</c> terminal profile.
     /// </summary>
     public static TerminalDescription Dumb { get; } =

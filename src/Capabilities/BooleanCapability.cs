@@ -29,4 +29,9 @@ public enum BooleanCapability
     /// The terminal uses XON/XOFF flow control (<c>xon</c>).
     /// </summary>
     XonXoff,
+
+    /// <summary>
+    /// Moving the cursor is safe while insert mode is active (<c>mir</c>).
+    /// </summary>
+    MoveInsertMode,
 }

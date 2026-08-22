@@ -339,4 +339,14 @@ public enum StringCapability
     /// Reset string 2 (<c>rs2</c>).
     /// </summary>
     ResetString2,
+
+    /// <summary>
+    /// Erase a parameterized number of characters (<c>ech</c>).
+    /// </summary>
+    EraseCharacters,
+
+    /// <summary>
+    /// Clear all hardware tab stops (<c>tbc</c>).
+    /// </summary>
+    ClearAllTabs,
 }

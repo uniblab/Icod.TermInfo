@@ -41,6 +41,7 @@ public sealed class TerminalDatabase
                 new InMemoryTerminalDescriptionProvider(
                     new[]
                     {
+                        TerminalProfiles.Ansi,
                         TerminalProfiles.Dumb,
                     }),
             });

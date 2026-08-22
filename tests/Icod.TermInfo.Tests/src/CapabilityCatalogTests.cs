@@ -15,6 +15,7 @@ public sealed class CapabilityCatalogTests
             ("msgr", BooleanCapability.MoveStandoutMode),
             ("xenl", BooleanCapability.EatNewlineGlitch),
             ("xon", BooleanCapability.XonXoff),
+            ("mir", BooleanCapability.MoveInsertMode),
         ];
 
         Assert.Equal(Enum.GetValues<BooleanCapability>().Length, cases.Length);
@@ -44,6 +45,7 @@ public sealed class CapabilityCatalogTests
             ("pairs", NumericCapability.ColorPairs),
             ("it", NumericCapability.InitialTabWidth),
             ("vt", NumericCapability.VirtualTerminal),
+            ("ncv", NumericCapability.NoColorVideo),
         ];
 
         Assert.Equal(Enum.GetValues<NumericCapability>().Length, cases.Length);
@@ -136,6 +138,8 @@ public sealed class CapabilityCatalogTests
             ("kf3", StringCapability.KeyF3),
             ("kf4", StringCapability.KeyF4),
             ("rs2", StringCapability.ResetString2),
+            ("ech", StringCapability.EraseCharacters),
+            ("tbc", StringCapability.ClearAllTabs),
         ];
 
         Assert.Equal(Enum.GetValues<StringCapability>().Length, cases.Length);

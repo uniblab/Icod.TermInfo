@@ -34,4 +34,10 @@ public enum NumericCapability
     /// The terminal's virtual-terminal number (<c>vt</c>).
     /// </summary>
     VirtualTerminal,
+
+    /// <summary>
+    /// Bit mask of video attributes unavailable while colors are active
+    /// (<c>ncv</c>).
+    /// </summary>
+    NoColorVideo,
 }

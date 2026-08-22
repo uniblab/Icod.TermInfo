@@ -10,6 +10,7 @@ internal static class CapabilityCatalog
             ["msgr"] = BooleanCapability.MoveStandoutMode,
             ["xenl"] = BooleanCapability.EatNewlineGlitch,
             ["xon"] = BooleanCapability.XonXoff,
+            ["mir"] = BooleanCapability.MoveInsertMode,
         };
 
     private static readonly IReadOnlyDictionary<string, NumericCapability> NumericCapabilities =
@@ -21,6 +22,7 @@ internal static class CapabilityCatalog
             ["pairs"] = NumericCapability.ColorPairs,
             ["it"] = NumericCapability.InitialTabWidth,
             ["vt"] = NumericCapability.VirtualTerminal,
+            ["ncv"] = NumericCapability.NoColorVideo,
         };
 
     private static readonly IReadOnlyDictionary<string, StringCapability> StringCapabilities =
@@ -93,6 +95,8 @@ internal static class CapabilityCatalog
             ["kf3"] = StringCapability.KeyF3,
             ["kf4"] = StringCapability.KeyF4,
             ["rs2"] = StringCapability.ResetString2,
+            ["ech"] = StringCapability.EraseCharacters,
+            ["tbc"] = StringCapability.ClearAllTabs,
         };
 
     internal static bool TryGetBoolean(

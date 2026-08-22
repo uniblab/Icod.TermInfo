@@ -12,10 +12,12 @@ The current prerelease foundation provides:
 - typed and traditional short-name capability lookup;
 - a terminal-description builder;
 - ordered terminal-description providers;
-- the built-in `dumb` terminal profile;
+- built-in `ansi` and `dumb` terminal profiles;
+- classic eight-color ANSI foreground/background capabilities;
+- ANSI cursor movement, screen editing, tabs, rendition controls, and cursor-key strings;
 - a reusable terminfo parameter-expansion engine, including stack operations, formatting, variables, `%i`, and conditionals.
 
-ANSI and VT100 profiles are the next profile-level milestones and are not yet built in.
+The DEC VT100 profile is the next profile-level milestone and is not yet built in.
 
 ## Requirements
 
@@ -45,13 +47,19 @@ dotnet pack Icod.TermInfo.csproj -c Release
 ```csharp
 using Icod.TermInfo;
 
-TerminalDescription terminal = TerminalDatabase.BuiltIn.Load("dumb");
+TerminalDescription terminal = TerminalDatabase.BuiltIn.Load("ansi");
 
 bool automaticMargins =
     terminal.GetBoolean(BooleanCapability.AutoRightMargin);
 
 int? columns =
     terminal.GetNumber(NumericCapability.Columns);
+
+string moveToHome =
+    terminal.Expand(StringCapability.CursorAddress, 0, 0);
+
+string redForeground =
+    terminal.Expand(StringCapability.SetForegroundColor, 1);
 ```
 
 Unsupported terminal names do not silently become ANSI, VT100, or `dumb`. A fallback is always an explicit caller decision.
