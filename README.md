@@ -2,176 +2,219 @@
 
 `Icod.TermInfo` is a managed, dependency-free .NET implementation of the low-level terminal-capability model traditionally supplied by `libtinfo`.
 
-The 0.6.0 contract is intentionally narrow: ANSI/ECMA-48, DEC VT100, and a safe `dumb` profile. Broader terminal families can be added later through the provider architecture without changing the generic capability or parameter-expansion engines.
+The 0.6.0 contract is intentionally narrow: ANSI/ECMA-48, DEC VT100, and a safe `dumb` profile. Broader terminal families can be added later through the provider architecture without changing the generic capability, parameter-expansion, padding, or output engines.
 
-## Current development state
+The package targets `net10.0`, uses C# 13, contains no native ncurses/terminfo payload, and is intended to run on Windows, Linux, and macOS.
 
-The current prerelease foundation provides:
+## Install
+
+NuGet.org prerelease:
+
+```text
+dotnet add package Icod.TermInfo --version 0.6.0-alpha.10
+```
+
+GitHub Packages uses the same package ID and package contents. Configure the `uniblab` GitHub NuGet feed and authenticate according to your GitHub Packages policy, then install `Icod.TermInfo` normally.
+
+For repository development, reference `Icod.TermInfo.csproj` directly as the sample project does.
+
+## What 0.6.0 provides
 
 - immutable terminal descriptions;
 - typed and traditional short-name capability lookup;
-- a terminal-description builder;
-- ordered terminal-description providers;
-- built-in `ansi`, `vt100`, and `dumb` terminal profiles;
-- classic eight-color ANSI foreground/background capabilities;
-- ANSI cursor movement, screen editing, tabs, rendition controls, and cursor-key strings;
-- DEC VT100 advanced-video, scroll-region, alternate-character-set, keypad, cursor-key, and PF-key capabilities;
-- a reusable terminfo parameter-expansion engine, including stack operations, formatting, variables, `%i`, and conditionals;
-- padding-aware `tputs`/`putp`-style output with ignore and delay modes;
-- synchronous and asynchronous `TextWriter` output;
-- byte-stream output with caller-selected encoding;
-- character-callback output;
-- injectable delay handling for physical or serial terminals;
-- conservative `TERM` resolution and standard-stream redirection inspection;
+- `TerminalDescriptionBuilder` and pluggable terminal-description providers;
+- built-in `ansi`, `vt100`/`vt100-am`, and `dumb` profiles;
+- classic eight-color ANSI capabilities;
+- DEC VT100 advanced-video, alternate-character-set, keypad, cursor-key, PF-key, scrolling, and historical padding capabilities;
+- a real stack-oriented terminfo parameter-expansion engine;
+- padding-aware `tputs`/`putp`-style output;
+- managed `tigetflag`, `tigetnum`, `tigetstr`, `tparm`/`tiparm`, `tputs`, and `putp`-shaped compatibility operations;
+- conservative `TERM` resolution and explicit fallback behavior;
+- redirection inspection;
 - live terminal-size queries on Windows, Linux, and macOS;
-- explicit `COLUMNS`/`LINES` and profile-dimension fallback APIs;
-- explicit, reversible Windows virtual-terminal output enablement.
+- explicit environment/profile size fallbacks;
+- explicit and reversible Windows virtual-terminal output enablement.
 
-## Requirements
+## Getting started
 
-- .NET 10 SDK
-- C# 13
-
-The library targets `net10.0` and is intended to run on Windows, Linux, and macOS.
-
-## Build and test
-
-```text
-dotnet restore Icod.TermInfo.sln
-dotnet build Icod.TermInfo.sln -c Debug
-dotnet test Icod.TermInfo.sln -c Debug
-dotnet build Icod.TermInfo.sln -c Release
-dotnet test Icod.TermInfo.sln -c Release
-```
-
-Create a package with:
-
-```text
-dotnet pack Icod.TermInfo.csproj -c Release
-```
-
-## Basic capability lookup
+Terminal resolution is intentionally conservative. An unknown `TERM` value never silently becomes ANSI or VT100, so applications should choose their fallback explicitly:
 
 ```csharp
 using Icod.TermInfo;
 
-TerminalDescription terminal = TerminalDatabase.BuiltIn.Load("ansi");
+TerminalDescription terminal =
+    TerminalEnvironment.Resolve(
+        TerminalDatabase.BuiltIn,
+        TerminalProfiles.Dumb);
 
+Console.WriteLine($"Terminal profile: {terminal.Name}");
+```
+
+To require a specific built-in profile instead:
+
+```csharp
+TerminalDescription ansi = TerminalDatabase.BuiltIn.Load("ansi");
+TerminalDescription vt100 = TerminalDatabase.BuiltIn.Load("vt100");
+```
+
+The historical `vt100-am` alias resolves to the same immutable VT100 description.
+
+## Capabilities
+
+Typed lookup is the normal managed API:
+
+```csharp
 bool automaticMargins =
     terminal.GetBoolean(BooleanCapability.AutoRightMargin);
 
 int? columns =
     terminal.GetNumber(NumericCapability.Columns);
 
-string moveToHome =
-    terminal.Expand(StringCapability.CursorAddress, 0, 0);
-
-string redForeground =
-    terminal.Expand(StringCapability.SetForegroundColor, 1);
+string? clear =
+    terminal.GetString(StringCapability.ClearScreen);
 ```
 
-The DEC VT100 profile is also available by canonical name or its historical
-`vt100-am` alias:
+Traditional short-name lookup is also available:
 
 ```csharp
-TerminalDescription vt100 = TerminalDatabase.BuiltIn.Load("vt100");
-
-string move =
-    vt100.Expand(StringCapability.CursorAddress, 10, 20);
-// ESC[11;21H$<5>
+bool hasColors = terminal.TryGetNumber("colors", out int colors);
+bool hasClear = terminal.TryGetString("clear", out string? clear);
 ```
 
-The `$<5>` suffix is a terminfo padding annotation. Parameter expansion preserves
-it so the output layer can remove or honor the delay.
+A recognized but absent capability returns the managed absent result appropriate to its type. An unknown capability short name is rejected rather than silently treated as absent.
 
-## Padding-aware output
+## Cursor positioning and clearing
 
-Modern terminal emulators normally do not need historical hardware delays.
-`PaddingMode.Ignore` is therefore the default and removes padding annotations
-without writing them:
+Parameterized capabilities use the shared terminfo expansion engine:
 
 ```csharp
-using StringWriter writer = new();
+TerminalDescription ansi = TerminalProfiles.Ansi;
+
+string clear =
+    ansi.GetRequiredString(StringCapability.ClearScreen);
 
 string move =
-    vt100.Expand(StringCapability.CursorAddress, 10, 20);
+    ansi.Expand(
+        StringCapability.CursorAddress,
+        10,
+        20);
 
+TermInfoOutput.PutP(clear, Console.Out);
+TermInfoOutput.PutP(move, Console.Out);
+```
+
+The cursor coordinates passed to `Expand` are zero-based terminfo parameters. The ANSI/VT100 `cup` capability performs the required `%i` adjustment itself.
+
+## ANSI attributes and color
+
+The built-in ANSI profile deliberately stops at the traditional eight colors:
+
+```csharp
+TerminalDescription ansi = TerminalProfiles.Ansi;
+
+string red =
+    ansi.Expand(StringCapability.SetForegroundColor, 1);
+
+string bold =
+    ansi.GetRequiredString(StringCapability.EnterBoldMode);
+
+string normal =
+    ansi.GetRequiredString(StringCapability.ExitAttributeMode);
+
+TermInfoOutput.PutP(red, Console.Out);
+TermInfoOutput.PutP(bold, Console.Out);
+Console.Write("important");
+TermInfoOutput.PutP(normal, Console.Out);
+```
+
+The 0.6.0 contract does not advertise 16-color, 256-color, or true-color extensions.
+
+## VT100 and padding
+
+VT100 strings preserve their historical terminfo padding annotations through parameter expansion:
+
+```csharp
+TerminalDescription vt100 = TerminalProfiles.Vt100;
+
+string move =
+    vt100.Expand(
+        StringCapability.CursorAddress,
+        10,
+        20);
+
+// move contains ESC[11;21H$<5>
+```
+
+Applications should emit capability strings through the output layer. Modern terminals normally use the default `PaddingMode.Ignore`, which removes delay annotations without writing them literally:
+
+```csharp
 TermInfoOutput.TPuts(
     move,
     affectedLines: 1,
-    writer);
-
-// writer contains ESC[11;21H
+    Console.Out);
 ```
 
-A physical or serial terminal can opt into real delays:
+Physical or serial terminals can opt into delays:
 
 ```csharp
 TermInfoOutput.TPuts(
     move,
     affectedLines: 1,
-    writer,
+    Console.Out,
     PaddingMode.Delay);
 ```
 
-Padding directives with `*` are multiplied by the supplied affected-line count.
-The `/` suffix is retained as `TermInfoDelay.IsMandatory` when an
-`ITermInfoDelayProvider` is used. The library also provides asynchronous,
-byte-stream, and character-callback output overloads.
+The output API also supports asynchronous `TextWriter` output, byte streams with a caller-selected encoding, character callbacks, and an injectable `ITermInfoDelayProvider` for deterministic applications and tests.
 
-`TermInfoOutput.PutP` is a convenience form equivalent to `TPuts` with one
-affected line.
+## Compatibility-shaped API
 
-## Terminal environment and size
-
-`TerminalEnvironment` reads `TERM` conservatively. Only names actually present in
-the configured `TerminalDatabase` resolve; an unknown name is never silently
-treated as ANSI or VT100:
+`TermInfoCompatibility` provides familiar terminfo operation names while retaining managed semantics and explicit terminal ownership:
 
 ```csharp
-if (TerminalEnvironment.TryResolve(
-        TerminalDatabase.BuiltIn,
-        out TerminalDescription? current))
-{
-    // current is ansi, vt100/vt100-am, or dumb in the built-in database.
-}
+bool am =
+    TermInfoCompatibility.TiGetFlag(ansi, "am");
 
-TerminalDescription withFallback =
-    TerminalEnvironment.Resolve(
-        TerminalDatabase.BuiltIn,
-        TerminalProfiles.Dumb);
+int? colorCount =
+    TermInfoCompatibility.TiGetNum(ansi, "colors");
+
+string? cup =
+    TermInfoCompatibility.TiGetStr(ansi, "cup");
+
+string expanded =
+    TermInfoCompatibility.TParm(
+        "\x1b[%i%p1%d;%p2%dH",
+        4,
+        12);
 ```
 
-Standard-stream redirection is exposed explicitly:
+There is no process-global `cur_term`, no sentinel pointer result, and no hidden persistent expansion state. Persistent uppercase `%P/%g` variables require an explicit caller-owned `TermInfoExpansionContext`.
+
+## Terminal size
+
+Live dimensions are distinct from configured and profile-default dimensions:
 
 ```csharp
-bool redirected = TerminalEnvironment.IsOutputRedirected;
-```
+TerminalSize size;
 
-Live dimensions are separate from configured and profile defaults:
-
-```csharp
-if (TerminalEnvironment.TryGetLiveSize(out TerminalSize live))
+if (TerminalEnvironment.TryGetLiveSize(out size))
 {
-    // live came from the operating system.
+    Console.WriteLine($"Live: {size.Columns}x{size.Rows}");
 }
-else if (TerminalEnvironment.TryGetEnvironmentSize(out TerminalSize configured))
+else if (TerminalEnvironment.TryGetEnvironmentSize(out size))
 {
-    // configured came from positive COLUMNS and LINES values.
+    Console.WriteLine($"Configured: {size.Columns}x{size.Rows}");
 }
-else if (TerminalEnvironment.TryGetProfileSize(vt100, out TerminalSize profile))
+else if (TerminalEnvironment.TryGetProfileSize(terminal, out size))
 {
-    // profile is the terminfo definition default, such as 80x24.
+    Console.WriteLine($"Profile default: {size.Columns}x{size.Rows}");
 }
 ```
 
-A failed live query never substitutes `COLUMNS`/`LINES` or profile dimensions.
-That fallback order remains an explicit caller decision.
+A failed live query never substitutes `COLUMNS`/`LINES` or a profile's default dimensions. The fallback order belongs to the caller.
 
 ## Windows virtual-terminal output
 
-On Windows, applications can explicitly enable console virtual-terminal output
-processing without changing unrelated console-mode flags:
+Windows VT mode is always opt-in:
 
 ```csharp
 using IDisposable? mode =
@@ -179,52 +222,87 @@ using IDisposable? mode =
 
 if (mode is not null)
 {
-    // ANSI/VT control sequences written to stdout are processed by the console.
+    TermInfoOutput.PutP(
+        TerminalProfiles.Ansi.GetRequiredString(
+            StringCapability.ClearScreen),
+        Console.Out);
 }
 ```
 
-Disposing the returned lease restores the mode that was present before the
-library changed it. If virtual-terminal processing was already enabled, disposing
-the lease leaves the existing mode untouched.
+The helper returns `null` on non-Windows systems, redirected output, non-console handles, or when Windows refuses the mode change. When it changes console mode, disposing the returned lease restores the exact previous mode. Merely loading a terminal profile never changes console state.
 
-The helper never enables VT mode merely because a terminal profile is loaded.
-It returns `null` on non-Windows systems, redirected streams, non-console handles,
-or when Windows refuses the mode change. Standard error can be selected
-explicitly:
+## Custom terminal providers
+
+Applications can add terminal descriptions without changing the built-in database or generic engines:
 
 ```csharp
-using IDisposable? errorMode =
-    WindowsVirtualTerminal.TryEnableOutput(
-        TerminalStandardStream.Error);
+TerminalDescription example =
+    new TerminalDescriptionBuilder("example-terminal")
+        .SetBoolean(BooleanCapability.AutoRightMargin)
+        .SetNumber(NumericCapability.Columns, 80)
+        .SetNumber(NumericCapability.Lines, 24)
+        .SetString(
+            StringCapability.CursorAddress,
+            "\x1b[%i%p1%d;%p2%dH")
+        .Build();
+
+ITerminalDescriptionProvider provider =
+    new InMemoryTerminalDescriptionProvider(
+        new[] { example });
+
+TerminalDatabase database =
+    new(new[] { provider });
 ```
 
-Unsupported terminal names do not silently become ANSI, VT100, or `dumb`. A fallback is always an explicit caller decision.
+For larger integrations, implement `ITerminalDescriptionProvider` directly. Provider ordering is explicit and deterministic; the first provider that resolves a name wins.
 
-## Parameter expansion
+## Sample application
 
-Terminfo parameter strings use a small stack language. They can be expanded directly:
+`samples/Icod.TermInfo.Sample` demonstrates:
 
-```csharp
-string cursorAddress = TermInfoParameterExpander.Expand(
-    "\x1b[%i%p1%d;%p2%dH",
-    4,
-    12);
+- conservative environment resolution with an explicit `dumb` fallback;
+- live/configured/profile size selection;
+- redirection handling;
+- explicit Windows VT enablement;
+- clearing, cursor movement, attributes, and ANSI color when the selected profile supports them;
+- a custom provider implementation.
+
+Run it from the repository with:
+
+```text
+dotnet run --project samples/Icod.TermInfo.Sample/Icod.TermInfo.Sample.csproj
 ```
 
-or parsed once and reused:
+## Build, test, and pack
 
-```csharp
-TermInfoParameterProgram program =
-    TermInfoParameterProgram.Parse("%p1%{1}%+%d");
+```text
+dotnet restore Icod.TermInfo.sln
 
-string result = program.Expand(41);
+dotnet build Icod.TermInfo.sln -c Debug
+dotnet test Icod.TermInfo.sln -c Debug
+
+dotnet build Icod.TermInfo.sln -c Release
+dotnet test Icod.TermInfo.sln -c Release
+
+dotnet pack Icod.TermInfo.csproj -c Release --output artifacts
 ```
 
-Lowercase variables (`a-z`) are scoped to one expansion. Uppercase variables (`A-Z`) persist only when the caller explicitly reuses a `TermInfoExpansionContext`; there is no hidden process-global terminfo state.
+Release packages produce both `.nupkg` and `.snupkg` artifacts. The .NET SDK supplies Source Link support, and GitHub Actions builds set `ContinuousIntegrationBuild` so repository/commit information and deterministic source mapping are emitted for package debugging.
+
+## Publishing
+
+The repository has two publication paths:
+
+- `publish-github-packages.yml` is a manually invoked prerelease/package workflow for GitHub Packages;
+- `release.yml` is tag-driven and validates on Windows, Linux, and macOS, packs once, publishes the same `.nupkg` to GitHub Packages and NuGet.org, and creates a GitHub Release containing the package and symbol package.
+
+See `docs/RELEASING.md` for the one-time NuGet trusted-publishing setup and release procedure.
 
 ## Scope
 
-`Icod.TermInfo` is not curses, a terminal emulator, a PTY implementation, or a general terminal UI toolkit. See `Icod.TermInfo-Development-Roadmap.md` for the complete 0.6.0 contract and exclusions.
+`Icod.TermInfo` is not curses, a terminal emulator, a PTY implementation, a termios wrapper, a keyboard event parser, or a general terminal UI toolkit. Version 0.6.0 also deliberately excludes loading the host operating system's compiled terminfo database and modern terminal-family aliases such as `xterm-256color`, `screen`, `tmux`, or `linux`.
+
+See `Icod.TermInfo-Development-Roadmap.md` for the complete 0.6.0 contract.
 
 ## License
 
