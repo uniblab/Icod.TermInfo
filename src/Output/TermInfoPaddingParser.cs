@@ -4,11 +4,19 @@ namespace Icod.TermInfo;
 
 internal static class TermInfoPaddingParser
 {
+    internal const int MaximumSourceLength = 1_048_576;
     internal const decimal MaximumDelayMilliseconds = 30000m;
 
     internal static IReadOnlyList<TermInfoOutputSegment> Parse(string value)
     {
         ArgumentNullException.ThrowIfNull(value);
+
+        if (value.Length > MaximumSourceLength)
+        {
+            throw CreateFormatException(
+                MaximumSourceLength,
+                $"A padding source cannot exceed {MaximumSourceLength} characters.");
+        }
 
         List<TermInfoOutputSegment> segments = [];
         int scan = 0;
@@ -109,9 +117,8 @@ internal static class TermInfoPaddingParser
             }
         }
 
-        string numberText = value[numberStart..index];
         if (!decimal.TryParse(
-            numberText,
+            value.AsSpan(numberStart, index - numberStart),
             NumberStyles.AllowDecimalPoint,
             CultureInfo.InvariantCulture,
             out decimal milliseconds))

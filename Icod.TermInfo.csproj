@@ -12,7 +12,7 @@
     <AssemblyName>Icod.TermInfo</AssemblyName>
     <RootNamespace>Icod.TermInfo</RootNamespace>
     <Configurations>Debug;Release;Staging</Configurations>
-    <Version>0.8.0-alpha.4</Version>
+    <Version>0.8.0-alpha.5</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(PlatformTarget)' == '' ">
@@ -52,12 +52,12 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageVersion>0.8.0-alpha.4</PackageVersion>
+    <PackageVersion>0.8.0-alpha.5</PackageVersion>
     <PackageId>Icod.TermInfo</PackageId>
     <Title>Icod.TermInfo</Title>
     <Authors>Timothy J. Bruce</Authors>
     <Description>Managed .NET terminal capability information with an extensible terminfo-style model for ANSI, DEC VT, and xterm-family applications.</Description>
-    <PackageReleaseNotes>0.8.0-alpha.4: add bounded per-description lazy parameter-program reuse and explicit context-aware extended string expansion.</PackageReleaseNotes>
+    <PackageReleaseNotes>0.8.0-alpha.5: freeze Latin-1 capability-byte fidelity and add hardened terminal-aware tputs padding semantics with explicit transport facts.</PackageReleaseNotes>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>

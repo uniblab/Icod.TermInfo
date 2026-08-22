@@ -38,6 +38,7 @@ public sealed class PublicApiSurfaceTests
         "Icod.TermInfo.TermInfoExpansionContext",
         "Icod.TermInfo.TermInfoFormatException",
         "Icod.TermInfo.TermInfoOutput",
+        "Icod.TermInfo.TermInfoOutputOptions",
         "Icod.TermInfo.TermInfoPaddingFormatException",
         "Icod.TermInfo.TermInfoParameter",
         "Icod.TermInfo.TermInfoParameterExpander",
@@ -46,7 +47,7 @@ public sealed class PublicApiSurfaceTests
     ];
 
     [Fact]
-    public void ExportedTypeSetMatchesT22Baseline()
+    public void ExportedTypeSetMatchesT25Baseline()
     {
         string[] actual =
             typeof(TerminalDescription).Assembly
