@@ -4,23 +4,13 @@ internal static class DumbTerminalProfile
 {
     internal static TerminalDescription Create()
     {
-        return new TerminalDescription(
-            name: "dumb",
-            aliases: Array.Empty<string>(),
-            booleanCapabilities:
-            [
-                BooleanCapability.AutoRightMargin,
-            ],
-            numericCapabilities: new Dictionary<NumericCapability, int>
-            {
-                [NumericCapability.Columns] = 80,
-            },
-            stringCapabilities: new Dictionary<StringCapability, string>
-            {
-                [StringCapability.Bell] = "\a",
-                [StringCapability.CarriageReturn] = "\r",
-                [StringCapability.CursorDownOne] = "\n",
-                [StringCapability.ScrollForward] = "\n",
-            });
+        return new TerminalDescriptionBuilder("dumb")
+            .SetBoolean(BooleanCapability.AutoRightMargin)
+            .SetNumber(NumericCapability.Columns, 80)
+            .SetString(StringCapability.Bell, "\a")
+            .SetString(StringCapability.CarriageReturn, "\r")
+            .SetString(StringCapability.CursorDownOne, "\n")
+            .SetString(StringCapability.ScrollForward, "\n")
+            .Build();
     }
 }

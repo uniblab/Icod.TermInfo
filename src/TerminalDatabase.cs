@@ -3,33 +3,32 @@ using System.Diagnostics.CodeAnalysis;
 namespace Icod.TermInfo;
 
 /// <summary>
-/// Resolves terminal descriptions by canonical name or alias.
+/// Resolves terminal descriptions from an ordered set of providers.
 /// </summary>
 public sealed class TerminalDatabase
 {
-    private readonly IReadOnlyDictionary<string, TerminalDescription> _terminals;
+    private readonly IReadOnlyList<ITerminalDescriptionProvider> _providers;
 
-    private TerminalDatabase(
-        IEnumerable<TerminalDescription> terminals)
+    /// <summary>
+    /// Initializes a database from providers consulted in the supplied order.
+    /// </summary>
+    public TerminalDatabase(
+        IEnumerable<ITerminalDescriptionProvider> providers)
     {
-        ArgumentNullException.ThrowIfNull(terminals);
+        ArgumentNullException.ThrowIfNull(providers);
 
-        Dictionary<string, TerminalDescription> byName =
-            new(StringComparer.Ordinal);
-
-        foreach (TerminalDescription terminal in terminals)
+        ITerminalDescriptionProvider[] providerArray = providers.ToArray();
+        for (int i = 0; i < providerArray.Length; i++)
         {
-            ArgumentNullException.ThrowIfNull(terminal);
-
-            AddName(byName, terminal.Name, terminal);
-
-            foreach (string alias in terminal.Aliases)
+            if (providerArray[i] is null)
             {
-                AddName(byName, alias, terminal);
+                throw new ArgumentException(
+                    "Terminal providers cannot contain null entries.",
+                    nameof(providers));
             }
         }
 
-        _terminals = byName;
+        _providers = Array.AsReadOnly(providerArray);
     }
 
     /// <summary>
@@ -37,15 +36,20 @@ public sealed class TerminalDatabase
     /// </summary>
     public static TerminalDatabase BuiltIn { get; } =
         new(
-        [
-            TerminalProfiles.Dumb,
-        ]);
+            new ITerminalDescriptionProvider[]
+            {
+                new InMemoryTerminalDescriptionProvider(
+                    new[]
+                    {
+                        TerminalProfiles.Dumb,
+                    }),
+            });
 
     /// <summary>
     /// Loads a terminal profile by canonical name or alias.
     /// </summary>
     /// <exception cref="KeyNotFoundException">
-    /// No built-in terminal profile has the requested name.
+    /// No configured provider has the requested terminal profile.
     /// </exception>
     public TerminalDescription Load(string name)
     {
@@ -63,13 +67,32 @@ public sealed class TerminalDatabase
     /// <summary>
     /// Attempts to load a terminal profile by canonical name or alias.
     /// </summary>
+    /// <remarks>
+    /// Providers are consulted in constructor order. The first provider which
+    /// resolves the requested name wins.
+    /// </remarks>
     public bool TryLoad(
         string name,
         [NotNullWhen(true)] out TerminalDescription? terminal)
     {
         ValidateTerminalName(name);
 
-        return _terminals.TryGetValue(name, out terminal);
+        foreach (ITerminalDescriptionProvider provider in _providers)
+        {
+            if (provider.TryLoad(name, out terminal))
+            {
+                if (terminal is null)
+                {
+                    throw new InvalidOperationException(
+                        $"Terminal provider '{provider.GetType().FullName}' returned success without a terminal description.");
+                }
+
+                return true;
+            }
+        }
+
+        terminal = null;
+        return false;
     }
 
     /// <summary>
@@ -93,25 +116,6 @@ public sealed class TerminalDatabase
         }
 
         return fallback;
-    }
-
-    private static void AddName(
-        IDictionary<string, TerminalDescription> terminals,
-        string name,
-        TerminalDescription terminal)
-    {
-        ArgumentNullException.ThrowIfNull(terminals);
-        ArgumentNullException.ThrowIfNull(name);
-        ArgumentNullException.ThrowIfNull(terminal);
-
-        if (terminals.ContainsKey(name))
-        {
-            throw new ArgumentException(
-                $"Duplicate terminal name or alias '{name}'.",
-                nameof(name));
-        }
-
-        terminals.Add(name, terminal);
     }
 
     private static void ValidateTerminalName(string name)

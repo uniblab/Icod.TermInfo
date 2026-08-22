@@ -51,10 +51,10 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageVersion>0.6.0-alpha.1</PackageVersion>
+    <PackageVersion>0.6.0-alpha.2</PackageVersion>
     <Authors>Timothy J. Bruce</Authors>
     <Description>Managed .NET terminal capability information with an extensible terminfo-style model for ANSI/VT100-focused applications.</Description>
-    <PackageReleaseNotes>Initial 0.6.0 foundation: core capability lookup and the built-in dumb terminal profile.</PackageReleaseNotes>
+    <PackageReleaseNotes>Tranche 2: terminal-description builder, provider architecture, ordered database composition, and expanded ANSI/VT100 capability catalog.</PackageReleaseNotes>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <IncludeSymbols>true</IncludeSymbols>

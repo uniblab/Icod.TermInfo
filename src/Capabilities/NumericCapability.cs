@@ -24,4 +24,14 @@ public enum NumericCapability
     /// The number of supported color pairs (<c>pairs</c>).
     /// </summary>
     ColorPairs,
+
+    /// <summary>
+    /// The number of spaces between hardware tab stops (<c>it</c>).
+    /// </summary>
+    InitialTabWidth,
+
+    /// <summary>
+    /// The terminal's virtual-terminal number (<c>vt</c>).
+    /// </summary>
+    VirtualTerminal,
 }
