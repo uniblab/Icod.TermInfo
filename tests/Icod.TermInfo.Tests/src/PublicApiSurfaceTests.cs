@@ -15,11 +15,17 @@ public sealed class PublicApiSurfaceTests
         "Icod.TermInfo.NumericCapability",
         "Icod.TermInfo.PaddingMode",
         "Icod.TermInfo.StringCapability",
+        "Icod.TermInfo.TerminalColorModel",
+        "Icod.TermInfo.TerminalColorSupport",
+        "Icod.TermInfo.TerminalColorTier",
+        "Icod.TermInfo.TerminalColors",
         "Icod.TermInfo.TerminalDatabase",
         "Icod.TermInfo.TerminalDescription",
         "Icod.TermInfo.TerminalDescriptionBuilder",
         "Icod.TermInfo.TerminalEnvironment",
         "Icod.TermInfo.TerminalProfiles",
+        "Icod.TermInfo.TerminalRgbColor",
+        "Icod.TermInfo.TerminalRgbLayout",
         "Icod.TermInfo.TerminalSize",
         "Icod.TermInfo.TerminalStandardStream",
         "Icod.TermInfo.TermInfoCapabilityValue",
@@ -38,7 +44,7 @@ public sealed class PublicApiSurfaceTests
     ];
 
     [Fact]
-    public void ExportedTypeSetMatchesT11Baseline()
+    public void ExportedTypeSetMatchesT13Baseline()
     {
         string[] actual =
             typeof(TerminalDescription).Assembly
