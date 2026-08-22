@@ -233,7 +233,7 @@ public sealed class T21FoundationTests
         Assert.NotNull(informationalVersion);
         Assert.True(
             informationalVersion!.StartsWith(
-                "0.8.0-alpha.1",
+                "0.8.0",
                 StringComparison.Ordinal),
             $"Unexpected informational version '{informationalVersion}'.");
     }

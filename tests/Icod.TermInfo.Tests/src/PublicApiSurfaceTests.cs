@@ -14,6 +14,8 @@ public sealed class PublicApiSurfaceTests
         "Icod.TermInfo.InMemoryTerminalDescriptionProvider",
         "Icod.TermInfo.NumericCapability",
         "Icod.TermInfo.PaddingMode",
+        "Icod.TermInfo.StandardCapabilityCatalog",
+        "Icod.TermInfo.StandardCapabilityMetadata`1",
         "Icod.TermInfo.StringCapability",
         "Icod.TermInfo.TerminalColorModel",
         "Icod.TermInfo.TerminalColorSupport",
@@ -44,7 +46,7 @@ public sealed class PublicApiSurfaceTests
     ];
 
     [Fact]
-    public void ExportedTypeSetMatchesT19Baseline()
+    public void ExportedTypeSetMatchesT22Baseline()
     {
         string[] actual =
             typeof(TerminalDescription).Assembly

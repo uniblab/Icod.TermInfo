@@ -1,7 +1,7 @@
 namespace Icod.TermInfo;
 
 /// <summary>
-/// Identifies the value kind of an extended or user-defined terminfo capability.
+/// Identifies the value kind of a terminfo capability.
 /// </summary>
 public enum TermInfoCapabilityValueKind
 {

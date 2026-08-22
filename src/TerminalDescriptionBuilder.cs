@@ -6,6 +6,7 @@ namespace Icod.TermInfo;
 public sealed class TerminalDescriptionBuilder
 {
     private readonly string _name;
+    private string? _description;
     private readonly List<string> _aliases = [];
     private readonly HashSet<string> _aliasSet = new(StringComparer.Ordinal);
     private readonly HashSet<BooleanCapability> _booleanCapabilities = [];
@@ -27,6 +28,22 @@ public sealed class TerminalDescriptionBuilder
     /// Gets the canonical terminal name being built.
     /// </summary>
     public string Name => _name;
+
+    /// <summary>
+    /// Sets or clears the terminal's verbose descriptive name.
+    /// </summary>
+    public TerminalDescriptionBuilder SetDescription(string? description)
+    {
+        if (description is not null && string.IsNullOrWhiteSpace(description))
+        {
+            throw new ArgumentException(
+                "The terminal description cannot be empty or whitespace.",
+                nameof(description));
+        }
+
+        _description = description;
+        return this;
+    }
 
     /// <summary>
     /// Adds an alternate terminal name.
@@ -209,6 +226,7 @@ public sealed class TerminalDescriptionBuilder
     {
         return new TerminalDescription(
             _name,
+            _description,
             _aliases,
             _booleanCapabilities,
             _numericCapabilities,

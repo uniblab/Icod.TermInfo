@@ -12,9 +12,13 @@ public sealed class TerminalDescription
     private readonly IReadOnlyDictionary<NumericCapability, int> _numericCapabilities;
     private readonly IReadOnlyDictionary<StringCapability, string> _stringCapabilities;
     private readonly IReadOnlyDictionary<string, TermInfoCapabilityValue> _extendedCapabilities;
+    private readonly IReadOnlyList<BooleanCapability> _booleanCapabilityList;
+    private readonly IReadOnlyList<KeyValuePair<NumericCapability, int>> _numericCapabilityList;
+    private readonly IReadOnlyList<KeyValuePair<StringCapability, string>> _stringCapabilityList;
 
     internal TerminalDescription(
         string name,
+        string? description,
         IEnumerable<string> aliases,
         IEnumerable<BooleanCapability> booleanCapabilities,
         IDictionary<NumericCapability, int> numericCapabilities,
@@ -35,7 +39,15 @@ public sealed class TerminalDescription
                 nameof(name));
         }
 
+        if (description is not null && string.IsNullOrWhiteSpace(description))
+        {
+            throw new ArgumentException(
+                "The terminal description cannot be empty or whitespace.",
+                nameof(description));
+        }
+
         Name = name;
+        Description = description;
 
         string[] aliasArray = aliases.ToArray();
         for (int i = 0; i < aliasArray.Length; i++)
@@ -68,6 +80,28 @@ public sealed class TerminalDescription
                 new Dictionary<string, TermInfoCapabilityValue>(
                     extendedCapabilities,
                     StringComparer.Ordinal));
+
+        _booleanCapabilityList = Array.AsReadOnly(
+            _booleanCapabilities
+                .OrderBy(capability =>
+                    StandardCapabilityCatalog
+                        .GetMetadata(capability)
+                        .BinaryIndex)
+                .ToArray());
+        _numericCapabilityList = Array.AsReadOnly(
+            _numericCapabilities
+                .OrderBy(pair =>
+                    StandardCapabilityCatalog
+                        .GetMetadata(pair.Key)
+                        .BinaryIndex)
+                .ToArray());
+        _stringCapabilityList = Array.AsReadOnly(
+            _stringCapabilities
+                .OrderBy(pair =>
+                    StandardCapabilityCatalog
+                        .GetMetadata(pair.Key)
+                        .BinaryIndex)
+                .ToArray());
     }
 
     /// <summary>
@@ -76,9 +110,35 @@ public sealed class TerminalDescription
     public string Name { get; }
 
     /// <summary>
+    /// Gets the terminal's verbose descriptive name, when one is available.
+    /// </summary>
+    public string? Description { get; }
+
+    /// <summary>
     /// Gets the aliases accepted for the terminal profile.
     /// </summary>
     public IReadOnlyList<string> Aliases { get; }
+
+    /// <summary>
+    /// Gets the effectively present standard Boolean capabilities in compiled
+    /// table order.
+    /// </summary>
+    public IReadOnlyList<BooleanCapability> BooleanCapabilities =>
+        _booleanCapabilityList;
+
+    /// <summary>
+    /// Gets the effectively present standard numeric capabilities and values in
+    /// compiled-table order.
+    /// </summary>
+    public IReadOnlyList<KeyValuePair<NumericCapability, int>> NumericCapabilities =>
+        _numericCapabilityList;
+
+    /// <summary>
+    /// Gets the effectively present standard string capabilities and values in
+    /// compiled-table order.
+    /// </summary>
+    public IReadOnlyList<KeyValuePair<StringCapability, string>> StringCapabilities =>
+        _stringCapabilityList;
 
     /// <summary>
     /// Gets the immutable, case-sensitive extended capabilities advertised by

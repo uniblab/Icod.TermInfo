@@ -12,7 +12,7 @@
     <AssemblyName>Icod.TermInfo</AssemblyName>
     <RootNamespace>Icod.TermInfo</RootNamespace>
     <Configurations>Debug;Release;Staging</Configurations>
-    <Version>0.8.0-alpha.1</Version>
+    <Version>0.8.0-alpha.2</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(PlatformTarget)' == '' ">
@@ -52,12 +52,12 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageVersion>0.8.0-alpha.1</PackageVersion>
+    <PackageVersion>0.8.0-alpha.2</PackageVersion>
     <PackageId>Icod.TermInfo</PackageId>
     <Title>Icod.TermInfo</Title>
     <Authors>Timothy J. Bruce</Authors>
     <Description>Managed .NET terminal capability information with an extensible terminfo-style model for ANSI, DEC VT, and xterm-family applications.</Description>
-    <PackageReleaseNotes>0.8.0-alpha.1: establish the 0.8 semantic-completion foundation, freeze 0.7 compatibility baselines, and reserve arbitrary compiled/system terminfo support for required 0.9 work.</PackageReleaseNotes>
+    <PackageReleaseNotes>0.8.0-alpha.2: complete the standard terminfo capability model, canonical metadata/enumeration, verbose descriptions, and signed 32-bit numeric semantics.</PackageReleaseNotes>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
