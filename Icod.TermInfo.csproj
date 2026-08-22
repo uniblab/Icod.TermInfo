@@ -12,6 +12,7 @@
     <AssemblyName>Icod.TermInfo</AssemblyName>
     <RootNamespace>Icod.TermInfo</RootNamespace>
     <Configurations>Debug;Release;Staging</Configurations>
+    <Version>0.6.0-alpha.4</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(PlatformTarget)' == '' ">
