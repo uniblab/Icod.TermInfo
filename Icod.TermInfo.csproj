@@ -12,7 +12,7 @@
     <AssemblyName>Icod.TermInfo</AssemblyName>
     <RootNamespace>Icod.TermInfo</RootNamespace>
     <Configurations>Debug;Release;Staging</Configurations>
-    <Version>0.7.0-alpha.1</Version>
+    <Version>0.7.0-alpha.2</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(PlatformTarget)' == '' ">
@@ -52,12 +52,12 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageVersion>0.7.0-alpha.1</PackageVersion>
+    <PackageVersion>0.7.0-alpha.2</PackageVersion>
     <PackageId>Icod.TermInfo</PackageId>
     <Title>Icod.TermInfo</Title>
     <Authors>Timothy J. Bruce</Authors>
     <Description>Managed .NET terminal capability information with an extensible terminfo-style model for ANSI/VT100-focused applications.</Description>
-    <PackageReleaseNotes>T11: begin 0.7.0 with immutable extended/user-defined Boolean, numeric, and string capabilities, collision-safe builder/lookup/enumeration APIs, and updated API-baseline coverage.</PackageReleaseNotes>
+    <PackageReleaseNotes>T12: expand the typed standard terminfo vocabulary for color, full-screen/cursor visibility, scrolling, initialization/reset, mouse-prefix, navigation/edit, and function-key primitives needed by the 0.7 xterm work.</PackageReleaseNotes>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
