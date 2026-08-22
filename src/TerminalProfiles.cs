@@ -6,6 +6,12 @@ namespace Icod.TermInfo;
 public static class TerminalProfiles
 {
     /// <summary>
+    /// Gets the selected modern <c>xterm</c> core profile.
+    /// </summary>
+    public static TerminalDescription Xterm { get; } =
+        XtermTerminalProfile.Create();
+
+    /// <summary>
     /// Gets the color-capable ANSI/PC-terminal profile.
     /// </summary>
     public static TerminalDescription Ansi { get; } =

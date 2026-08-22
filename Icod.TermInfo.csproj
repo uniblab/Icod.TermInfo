@@ -12,7 +12,7 @@
     <AssemblyName>Icod.TermInfo</AssemblyName>
     <RootNamespace>Icod.TermInfo</RootNamespace>
     <Configurations>Debug;Release;Staging</Configurations>
-    <Version>0.7.0-alpha.4</Version>
+    <Version>0.7.0-alpha.5</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(PlatformTarget)' == '' ">
@@ -52,12 +52,12 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageVersion>0.7.0-alpha.4</PackageVersion>
+    <PackageVersion>0.7.0-alpha.5</PackageVersion>
     <PackageId>Icod.TermInfo</PackageId>
     <Title>Icod.TermInfo</Title>
     <Authors>Timothy J. Bruce</Authors>
     <Description>Managed .NET terminal capability information with an extensible terminfo-style model for ANSI/VT100-focused applications.</Description>
-    <PackageReleaseNotes>T14: add reusable ANSI/aixterm/xterm indexed-color capability fragments, complete 4/8/16/88/256 golden coverage, and validate palette alteration/reset behavior through the shared parameter engine.</PackageReleaseNotes>
+    <PackageReleaseNotes>T15: add the authoritative built-in xterm core profile with current ncurses full-screen, key, color, mouse, focus, paste, reporting, cursor-style, and clipboard metadata.</PackageReleaseNotes>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>

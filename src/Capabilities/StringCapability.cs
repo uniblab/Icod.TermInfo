@@ -644,4 +644,79 @@ public enum StringCapability
     /// Function key 24 sequence (<c>kf24</c>).
     /// </summary>
     KeyF24,
+
+    /// <summary>
+    /// Upper-left keypad key sequence (<c>ka1</c>).
+    /// </summary>
+    KeyA1,
+
+    /// <summary>
+    /// Upper-right keypad key sequence (<c>ka3</c>).
+    /// </summary>
+    KeyA3,
+
+    /// <summary>
+    /// Center keypad key sequence (<c>kb2</c>).
+    /// </summary>
+    KeyB2,
+
+    /// <summary>
+    /// Lower-left keypad key sequence (<c>kc1</c>).
+    /// </summary>
+    KeyC1,
+
+    /// <summary>
+    /// Lower-right keypad key sequence (<c>kc3</c>).
+    /// </summary>
+    KeyC3,
+
+    /// <summary>
+    /// Scroll-forward key sequence (<c>kind</c>).
+    /// </summary>
+    KeyScrollForward,
+
+    /// <summary>
+    /// Scroll-backward key sequence (<c>kri</c>).
+    /// </summary>
+    KeyScrollReverse,
+
+    /// <summary>
+    /// Shifted delete-character key sequence (<c>kDC</c>).
+    /// </summary>
+    KeyShiftDeleteCharacter,
+
+    /// <summary>
+    /// Shifted End key sequence (<c>kEND</c>).
+    /// </summary>
+    KeyShiftEnd,
+
+    /// <summary>
+    /// Shifted Home key sequence (<c>kHOM</c>).
+    /// </summary>
+    KeyShiftHome,
+
+    /// <summary>
+    /// Shifted insert-character key sequence (<c>kIC</c>).
+    /// </summary>
+    KeyShiftInsertCharacter,
+
+    /// <summary>
+    /// Shifted left-arrow key sequence (<c>kLFT</c>).
+    /// </summary>
+    KeyShiftLeft,
+
+    /// <summary>
+    /// Shifted next-page key sequence (<c>kNXT</c>).
+    /// </summary>
+    KeyShiftNextPage,
+
+    /// <summary>
+    /// Shifted previous-page key sequence (<c>kPRV</c>).
+    /// </summary>
+    KeyShiftPreviousPage,
+
+    /// <summary>
+    /// Shifted right-arrow key sequence (<c>kRIT</c>).
+    /// </summary>
+    KeyShiftRight,
 }

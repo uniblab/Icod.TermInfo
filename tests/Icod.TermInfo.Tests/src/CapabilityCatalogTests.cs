@@ -204,6 +204,21 @@ public sealed class CapabilityCatalogTests
             ("kf22", StringCapability.KeyF22),
             ("kf23", StringCapability.KeyF23),
             ("kf24", StringCapability.KeyF24),
+            ("ka1", StringCapability.KeyA1),
+            ("ka3", StringCapability.KeyA3),
+            ("kb2", StringCapability.KeyB2),
+            ("kc1", StringCapability.KeyC1),
+            ("kc3", StringCapability.KeyC3),
+            ("kind", StringCapability.KeyScrollForward),
+            ("kri", StringCapability.KeyScrollReverse),
+            ("kDC", StringCapability.KeyShiftDeleteCharacter),
+            ("kEND", StringCapability.KeyShiftEnd),
+            ("kHOM", StringCapability.KeyShiftHome),
+            ("kIC", StringCapability.KeyShiftInsertCharacter),
+            ("kLFT", StringCapability.KeyShiftLeft),
+            ("kNXT", StringCapability.KeyShiftNextPage),
+            ("kPRV", StringCapability.KeyShiftPreviousPage),
+            ("kRIT", StringCapability.KeyShiftRight),
         ];
 
         Assert.Equal(Enum.GetValues<StringCapability>().Length, cases.Length);

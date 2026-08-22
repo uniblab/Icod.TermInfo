@@ -73,14 +73,19 @@ public sealed class CompletionGateTests
         Assert.Null(
             TerminalProfiles.Vt100.GetNumber(NumericCapability.ColorPairs));
         Assert.Equal("dumb", TerminalProfiles.Dumb.Name);
+        Assert.Equal("xterm", TerminalProfiles.Xterm.Name);
 
         Assert.Same(
             TerminalProfiles.Vt100,
             TerminalDatabase.BuiltIn.Load("vt100-am"));
+        Assert.Same(
+            TerminalProfiles.Xterm,
+            TerminalDatabase.BuiltIn.Load("xterm"));
 
         string[] unsupportedNames =
         [
-            "xterm",
+            "xterm-16color",
+            "xterm-88color",
             "xterm-256color",
             "screen",
             "tmux",
@@ -104,6 +109,7 @@ public sealed class CompletionGateTests
     {
         TerminalDescription[] terminals =
         [
+            TerminalProfiles.Xterm,
             TerminalProfiles.Ansi,
             TerminalProfiles.Vt100,
             TerminalProfiles.Dumb,
