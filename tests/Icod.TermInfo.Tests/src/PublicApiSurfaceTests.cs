@@ -44,7 +44,7 @@ public sealed class PublicApiSurfaceTests
     ];
 
     [Fact]
-    public void ExportedTypeSetMatchesT13Baseline()
+    public void ExportedTypeSetMatchesT19Baseline()
     {
         string[] actual =
             typeof(TerminalDescription).Assembly
@@ -69,6 +69,76 @@ public sealed class PublicApiSurfaceTests
         Assert.All(
             types,
             type => Assert.Equal("Icod.TermInfo", type.Namespace));
+    }
+
+    [Fact]
+    public void TerminalProfilesExposeOnlyContractedBuiltIns()
+    {
+        string[] expected =
+        [
+            "Ansi",
+            "Dumb",
+            "Vt100",
+            "Vt102",
+            "Vt220",
+            "Xterm",
+            "Xterm16Color",
+            "Xterm88Color",
+            "Xterm256Color",
+            "XtermDirect",
+            "XtermDirect16",
+            "XtermDirect256",
+        ];
+
+        PropertyInfo[] properties =
+            typeof(TerminalProfiles)
+                .GetProperties(
+                    BindingFlags.Public
+                    | BindingFlags.Static
+                    | BindingFlags.DeclaredOnly);
+
+        Assert.All(
+            properties,
+            property =>
+            {
+                Assert.Equal(typeof(TerminalDescription), property.PropertyType);
+                Assert.True(property.CanRead);
+                Assert.False(property.CanWrite);
+            });
+
+        Assert.Equal(
+            expected.OrderBy(value => value, StringComparer.Ordinal).ToArray(),
+            properties
+                .Select(property => property.Name)
+                .OrderBy(value => value, StringComparer.Ordinal)
+                .ToArray());
+    }
+
+    [Fact]
+    public void ColorFacadeContainsOnlyIntendedOperations()
+    {
+        string[] expected =
+        [
+            "ExpandBackground(TerminalDescription,Int32)",
+            "ExpandBackground(TerminalDescription,TerminalRgbColor)",
+            "ExpandForeground(TerminalDescription,Int32)",
+            "ExpandForeground(TerminalDescription,TerminalRgbColor)",
+            "GetColorSupport(TerminalDescription)",
+        ];
+
+        string[] actual =
+            typeof(TerminalColors)
+                .GetMethods(
+                    BindingFlags.Public
+                    | BindingFlags.Static
+                    | BindingFlags.DeclaredOnly)
+                .Select(FormatMethod)
+                .OrderBy(value => value, StringComparer.Ordinal)
+                .ToArray();
+
+        Assert.Equal(
+            expected.OrderBy(value => value, StringComparer.Ordinal).ToArray(),
+            actual);
     }
 
     [Fact]
@@ -160,5 +230,10 @@ public sealed class PublicApiSurfaceTests
                 .OrderBy(value => value, StringComparer.Ordinal)
                 .ToArray(),
             actualBuilder);
+    }
+
+    private static string FormatMethod(MethodInfo method)
+    {
+        return $"{method.Name}({string.Join(",", method.GetParameters().Select(parameter => parameter.ParameterType.Name))})";
     }
 }

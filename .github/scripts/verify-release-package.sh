@@ -23,7 +23,7 @@ test -f "${nupkg}"
 test -f "${snupkg}"
 
 if grep -R -n -E \
-  'AnsiTerminalProfile|Vt100TerminalProfile|TerminalProfiles\.(Ansi|Vt100)' \
+  'TerminalProfiles\.|TerminalProfile' \
   src/Parameterization; then
   echo "The generic parameterization layer contains a terminal-profile-specific reference." >&2
   exit 1
@@ -176,6 +176,7 @@ static void Require(bool condition, string message)
 TerminalDescription ansi = TerminalDatabase.BuiltIn.Load("ansi");
 TerminalDescription vt100 = TerminalDatabase.BuiltIn.Load("vt100");
 TerminalDescription vt100Alias = TerminalDatabase.BuiltIn.Load("vt100-am");
+TerminalDescription xterm = TerminalDatabase.BuiltIn.Load("xterm");
 TerminalDescription xterm16 = TerminalDatabase.BuiltIn.Load("xterm-16color");
 TerminalDescription xterm88 = TerminalDatabase.BuiltIn.Load("xterm-88color");
 TerminalDescription xterm256 = TerminalDatabase.BuiltIn.Load("xterm-256color");
@@ -185,6 +186,33 @@ TerminalDescription xtermDirect256 = TerminalDatabase.BuiltIn.Load("xterm-direct
 TerminalDescription dumb = TerminalDatabase.BuiltIn.Load("dumb");
 
 Require(ReferenceEquals(vt100, vt100Alias), "vt100-am must resolve to vt100.");
+Require(
+    xterm.GetString(StringCapability.EnterCursorAddressingMode) is not null,
+    "xterm must advertise cursor-addressing entry.");
+Require(
+    xterm.GetString(StringCapability.ExitCursorAddressingMode) is not null,
+    "xterm must advertise cursor-addressing exit.");
+Require(
+    xterm.TryGetExtendedString("XM", out string? mouseMode),
+    "xterm must carry XM mouse-mode metadata.");
+Require(
+    TermInfoParameterExpander.Expand(mouseMode!, 1) == "\x1b[?1006;1000h",
+    "xterm XM enable expansion changed.");
+Require(
+    xterm.TryGetExtendedString("BE", out string? pasteEnable)
+        && pasteEnable == "\x1b[?2004h",
+    "xterm bracketed-paste enable metadata changed.");
+Require(
+    xterm.TryGetExtendedString("fe", out string? focusEnable)
+        && focusEnable == "\x1b[?1004h",
+    "xterm focus-enable metadata changed.");
+Require(
+    xterm.TryGetExtendedString("Ms", out string? clipboard),
+    "xterm must carry clipboard metadata.");
+Require(
+    TermInfoParameterExpander.Expand(clipboard!, "c", "YWJj")
+        == "\x1b]52;c;YWJj\x1b\\",
+    "xterm clipboard metadata expansion changed.");
 Require(ansi.GetNumber(NumericCapability.Colors) == 8, "ANSI must advertise eight colors.");
 Require(vt100.GetNumber(NumericCapability.Colors) is null, "VT100 must remain monochrome.");
 Require(xterm16.GetNumber(NumericCapability.Colors) == 16, "xterm-16color must advertise 16 colors.");
@@ -247,3 +275,8 @@ dotnet restore "${smoke_root}/PackageSmoke.csproj" \
 dotnet run --project "${smoke_root}/PackageSmoke.csproj" \
   -c Release \
   --no-restore
+
+# The repository sample must have a non-interactive path suitable for CI.
+dotnet run --project samples/Icod.TermInfo.Sample/Icod.TermInfo.Sample.csproj \
+  -c Release \
+  -- --describe-only --profile xterm-direct256

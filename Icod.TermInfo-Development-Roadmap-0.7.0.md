@@ -4,7 +4,7 @@
 **Package:** `Icod.TermInfo`  
 **Target framework:** `net10.0`  
 **Language:** C# 13  
-**Status:** Implementation in progress — T18<br>
+**Status:** Implementation in progress — T19<br>
 **Previous contract:** `0.6.0` — complete and frozen  
 **Contract target:** `0.7.0`  
 **Initial development version:** `0.7.0-alpha.1`
@@ -1471,6 +1471,18 @@ T18 is complete when:
 - document 0.8 reservation;
 - update package metadata and release notes;
 - ensure sample project demonstrates new features without requiring an interactive CI terminal.
+
+Final T19 review freezes the 0.7 public surface represented by
+`PublicApiSurfaceTests`; no additional public type is required for this tranche.
+The README and sample are rewritten around the completed 0.7 capability/color
+model, the sample gains a `--describe-only` path for non-interactive validation,
+and `docs/0.7.0-CONTRACT-AUDIT.md` records the pre-T20 API/scope evidence.
+
+T19 also hardens repository validation: pull requests and `main` validate Debug
+and Release on Windows/Linux/macOS, while `main` additionally packs the Release
+artifacts, runs the fresh-package verifier, exercises the non-interactive sample,
+and uploads the resulting package artifacts without publishing them. Final
+versioning, tagging, and publication remain the responsibility of T20.
 
 ### Acceptance gate
 

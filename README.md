@@ -2,42 +2,48 @@
 
 `Icod.TermInfo` is a managed, dependency-free .NET implementation of the low-level terminal-capability model traditionally supplied by `libtinfo`.
 
-The 0.6.0 contract is intentionally narrow: ANSI/ECMA-48, DEC VT100, and a safe `dumb` profile. Broader terminal families can be added later through the provider architecture without changing the generic capability, parameter-expansion, padding, or output engines.
+Version 0.7.0 expands the deliberately small 0.6.0 ANSI/VT100 contract into a modern terminal-description library while preserving the same capability-driven architecture: immutable descriptions, generic parameter expansion, padding-aware output, conservative terminal resolution, and no process-global current terminal.
 
 The package targets `net10.0`, uses C# 13, contains no native ncurses/terminfo payload, and is intended to run on Windows, Linux, and macOS.
 
 ## Install
 
-NuGet.org (after the `v0.6.0` release is published):
+During 0.7 development, use the prerelease version that matches the branch/package you are testing:
 
 ```text
-dotnet add package Icod.TermInfo --version 0.6.0
+dotnet add package Icod.TermInfo --version 0.7.0-alpha.11
 ```
 
-GitHub Packages uses the same package ID and package contents. Configure the `uniblab` GitHub NuGet feed and authenticate according to your GitHub Packages policy, then install `Icod.TermInfo` normally.
+After the final `v0.7.0` release is published:
+
+```text
+dotnet add package Icod.TermInfo --version 0.7.0
+```
 
 For repository development, reference `Icod.TermInfo.csproj` directly as the sample project does.
 
-## What 0.6.0 provides
+## What 0.7.0 provides
 
-- immutable terminal descriptions;
-- typed and traditional short-name capability lookup;
-- `TerminalDescriptionBuilder` and pluggable terminal-description providers;
-- built-in `ansi`, `vt100`/`vt100-am`, and `dumb` profiles;
-- classic eight-color ANSI capabilities;
-- DEC VT100 advanced-video, alternate-character-set, keypad, cursor-key, PF-key, scrolling, and historical padding capabilities;
-- a real stack-oriented terminfo parameter-expansion engine;
+- immutable terminal descriptions and deterministic provider composition;
+- typed standard capability lookup plus generic extended Boolean, numeric, and string capabilities;
+- a stack-oriented terminfo parameter-expansion engine shared by every built-in profile;
 - padding-aware `tputs`/`putp`-style output;
-- managed `tigetflag`, `tigetnum`, `tigetstr`, `tparm`/`tiparm`, `tputs`, and `putp`-shaped compatibility operations;
-- conservative `TERM` resolution and explicit fallback behavior;
-- redirection inspection;
-- live terminal-size queries on Windows, Linux, and macOS;
-- explicit environment/profile size fallbacks;
+- conservative `TERM` resolution with explicit caller-selected fallback behavior;
+- built-in `dumb`, `ansi`, `vt100`/`vt100-am`, `vt102`, and `vt220`/`vt200` profiles;
+- built-in modern `xterm`, `xterm-16color`, `xterm-88color`, and `xterm-256color` profiles;
+- built-in `xterm-direct`, `xterm-direct16`, and `xterm-direct256` true-color profiles;
+- semantic monochrome, indexed-color, and direct-RGB inspection;
+- safe indexed and direct-RGB foreground/background expansion helpers;
+- full-screen/cursor-addressing and cursor-visibility primitives where a profile advertises them;
+- descriptive xterm mouse, focus, bracketed-paste, modified-key, cursor-style, reporting, and clipboard metadata;
+- live terminal-size queries on Windows, Linux, and macOS, kept distinct from environment/profile defaults;
 - explicit and reversible Windows virtual-terminal output enablement.
+
+The 0.6.0 behavior of `dumb`, `ansi`, and `vt100` remains intentionally conservative: `dumb` is minimal, `ansi` is the traditional eight-color profile, and `vt100` remains monochrome.
 
 ## Getting started
 
-Terminal resolution is intentionally conservative. An unknown `TERM` value never silently becomes ANSI or VT100, so applications should choose their fallback explicitly:
+Terminal resolution is intentionally conservative. Unknown `TERM` values do not silently become ANSI, VT100, or xterm:
 
 ```csharp
 using Icod.TermInfo;
@@ -50,18 +56,24 @@ TerminalDescription terminal =
 Console.WriteLine($"Terminal profile: {terminal.Name}");
 ```
 
-To require a specific built-in profile instead:
+To select a known modern profile explicitly:
 
 ```csharp
-TerminalDescription ansi = TerminalDatabase.BuiltIn.Load("ansi");
-TerminalDescription vt100 = TerminalDatabase.BuiltIn.Load("vt100");
+TerminalDescription xterm =
+    TerminalDatabase.BuiltIn.Load("xterm");
+
+TerminalDescription xterm256 =
+    TerminalDatabase.BuiltIn.Load("xterm-256color");
+
+TerminalDescription xtermDirect =
+    TerminalDatabase.BuiltIn.Load("xterm-direct256");
 ```
 
-The historical `vt100-am` alias resolves to the same immutable VT100 description.
+Aliases remain exact and intentional. For example, `vt100-am` resolves to `vt100`, and `vt200` resolves to `vt220`.
 
-## Capabilities
+## Standard and extended capabilities
 
-Typed lookup is the normal managed API:
+Typed lookup is the preferred API for standard capabilities:
 
 ```csharp
 bool automaticMargins =
@@ -74,60 +86,121 @@ string? clear =
     terminal.GetString(StringCapability.ClearScreen);
 ```
 
-Traditional short-name lookup is also available:
+Traditional short-name lookup remains available:
 
 ```csharp
 bool hasColors = terminal.TryGetNumber("colors", out int colors);
 bool hasClear = terminal.TryGetString("clear", out string? clear);
 ```
 
-A recognized but absent capability returns the managed absent result appropriate to its type. An unknown capability short name is rejected rather than silently treated as absent.
-
-## Cursor positioning and clearing
-
-Parameterized capabilities use the shared terminfo expansion engine:
+Modern capabilities which are not part of the fixed standard terminfo vocabulary are carried through the extended-capability store:
 
 ```csharp
-TerminalDescription ansi = TerminalProfiles.Ansi;
+if (xterm.TryGetExtendedString("BE", out string? enablePaste))
+{
+    Console.WriteLine("Bracketed-paste enable metadata is present.");
+}
 
-string clear =
-    ansi.GetRequiredString(StringCapability.ClearScreen);
+if (xterm.TryGetExtendedString("XM", out string? mouseMode))
+{
+    string enableMouse =
+        TermInfoParameterExpander.Expand(mouseMode, 1);
+}
+```
 
+Extended names are case-sensitive. Standard capability names cannot be silently shadowed by extended capabilities.
+
+## Color inspection
+
+Color semantics are derived from raw terminfo data rather than from terminal-name checks:
+
+```csharp
+TerminalColorSupport support =
+    TerminalColors.GetColorSupport(xterm256);
+
+Console.WriteLine(support.Model);             // Indexed
+Console.WriteLine(support.Tier);              // Color256
+Console.WriteLine(support.IndexedColorCount); // 256
+```
+
+Raw `colors`, `pairs`, `ncv`, selectors, `bce`, `ccc`, `hls`, `initc`, `op`, `oc`, and extended `RGB`/`CO` metadata remain authoritative. `pairs` is never synthesized from `colors`.
+
+### Indexed color
+
+Use the semantic helper rather than embedding ANSI escape strings:
+
+```csharp
+string foreground =
+    TerminalColors.ExpandForeground(
+        TerminalProfiles.Xterm256Color,
+        196);
+
+TermInfoOutput.PutP(foreground, Console.Out);
+```
+
+The helper validates the terminal's advertised indexed range and expands the terminal's own `setaf` capability through the shared parameter engine.
+
+### Direct RGB color
+
+Direct profiles expose an RGB layout and any retained indexed prefix:
+
+```csharp
+TerminalDescription direct =
+    TerminalProfiles.XtermDirect256;
+
+TerminalColorSupport support =
+    TerminalColors.GetColorSupport(direct);
+
+TerminalRgbColor purple =
+    new(0x80, 0x40, 0xC0);
+
+string foreground =
+    TerminalColors.ExpandForeground(
+        direct,
+        purple);
+```
+
+The selected xterm direct profiles use packed 8/8/8 RGB semantics and retain 8, 16, or 256 indexed entries according to their `CO` metadata. The library validates collisions between packed RGB values and that retained indexed prefix instead of guessing.
+
+## Cursor positioning and full-screen primitives
+
+Parameterized standard capabilities use the same terminfo expansion engine:
+
+```csharp
 string move =
-    ansi.Expand(
+    xterm.Expand(
         StringCapability.CursorAddress,
         10,
         20);
-
-TermInfoOutput.PutP(clear, Console.Out);
-TermInfoOutput.PutP(move, Console.Out);
 ```
 
-The cursor coordinates passed to `Expand` are zero-based terminfo parameters. The ANSI/VT100 `cup` capability performs the required `%i` adjustment itself.
-
-## ANSI attributes and color
-
-The built-in ANSI profile deliberately stops at the traditional eight colors:
+Profiles can also advertise cursor-addressing lifecycle and cursor-visibility primitives:
 
 ```csharp
-TerminalDescription ansi = TerminalProfiles.Ansi;
-
-string red =
-    ansi.Expand(StringCapability.SetForegroundColor, 1);
-
-string bold =
-    ansi.GetRequiredString(StringCapability.EnterBoldMode);
-
-string normal =
-    ansi.GetRequiredString(StringCapability.ExitAttributeMode);
-
-TermInfoOutput.PutP(red, Console.Out);
-TermInfoOutput.PutP(bold, Console.Out);
-Console.Write("important");
-TermInfoOutput.PutP(normal, Console.Out);
+string? enter =
+    xterm.GetString(StringCapability.EnterCursorAddressingMode);
+string? leave =
+    xterm.GetString(StringCapability.ExitCursorAddressingMode);
+string? hideCursor =
+    xterm.GetString(StringCapability.CursorInvisible);
+string? normalCursor =
+    xterm.GetString(StringCapability.CursorNormal);
 ```
 
-The 0.6.0 contract does not advertise 16-color, 256-color, or true-color extensions.
+These are capability strings, not a session manager. `Icod.TermInfo` does not decide when to enter full-screen mode, hide the cursor, recover from exceptions, or restore terminal state. A caller or future higher-level terminal library owns that lifecycle.
+
+## Mouse, focus, paste, and clipboard metadata
+
+The modern xterm profiles carry descriptive protocol metadata such as:
+
+- standard `kmous` plus extended `XM`/`xm` mouse strings;
+- focus enable/disable and focus-in/focus-out strings;
+- bracketed-paste enable/disable and begin/end strings;
+- modified-key strings;
+- cursor-style and terminal-reporting strings;
+- OSC 52 clipboard/selection metadata where present in the selected profile.
+
+This package does **not** decode mouse events, focus events, keys, or paste payloads. It also does not perform clipboard operations or terminal probing. The metadata is intentionally available so a future `Icod.Terminal`-style layer can consume it without teaching `Icod.TermInfo` about live input state.
 
 ## VT100 and padding
 
@@ -164,7 +237,7 @@ TermInfoOutput.TPuts(
     PaddingMode.Delay);
 ```
 
-The output API also supports asynchronous `TextWriter` output, byte streams with a caller-selected encoding, character callbacks, and an injectable `ITermInfoDelayProvider` for deterministic applications and tests.
+The output API also supports asynchronous `TextWriter` output, byte streams with a caller-selected encoding, character callbacks, and an injectable `ITermInfoDelayProvider`.
 
 ## Compatibility-shaped API
 
@@ -172,22 +245,16 @@ The output API also supports asynchronous `TextWriter` output, byte streams with
 
 ```csharp
 bool am =
-    TermInfoCompatibility.TiGetFlag(ansi, "am");
+    TermInfoCompatibility.TiGetFlag(xterm, "am");
 
 int? colorCount =
-    TermInfoCompatibility.TiGetNum(ansi, "colors");
+    TermInfoCompatibility.TiGetNum(xterm, "colors");
 
 string? cup =
-    TermInfoCompatibility.TiGetStr(ansi, "cup");
-
-string expanded =
-    TermInfoCompatibility.TParm(
-        "\x1b[%i%p1%d;%p2%dH",
-        4,
-        12);
+    TermInfoCompatibility.TiGetStr(xterm, "cup");
 ```
 
-There is no process-global `cur_term`, no sentinel pointer result, and no hidden persistent expansion state. Persistent uppercase `%P/%g` variables require an explicit caller-owned `TermInfoExpansionContext`.
+There is no process-global `cur_term`, no sentinel-pointer result, and no hidden persistent expansion state. Persistent uppercase `%P/%g` variables require an explicit caller-owned `TermInfoExpansionContext`.
 
 ## Terminal size
 
@@ -210,30 +277,24 @@ else if (TerminalEnvironment.TryGetProfileSize(terminal, out size))
 }
 ```
 
-A failed live query never substitutes `COLUMNS`/`LINES` or a profile's default dimensions. The fallback order belongs to the caller.
+A failed live query never substitutes `COLUMNS`/`LINES` or a profile default. Fallback order belongs to the caller.
 
 ## Windows virtual-terminal output
 
-Windows VT mode is always opt-in:
+Windows VT output mode is always opt-in:
 
 ```csharp
 using IDisposable? mode =
     WindowsVirtualTerminal.TryEnableOutput();
-
-if (mode is not null)
-{
-    TermInfoOutput.PutP(
-        TerminalProfiles.Ansi.GetRequiredString(
-            StringCapability.ClearScreen),
-        Console.Out);
-}
 ```
 
-The helper returns `null` on non-Windows systems, redirected output, non-console handles, or when Windows refuses the mode change. When it changes console mode, disposing the returned lease restores the exact previous mode. Merely loading a terminal profile never changes console state.
+The helper returns `null` on non-Windows systems, redirected output, non-console handles, or when Windows refuses the mode change. When it changes console mode, disposing the returned lease restores the exact previous mode. Loading a terminal profile never changes console state.
+
+This helper is not a Windows Console terminal profile. Explicit Windows Console and Windows Terminal profile work is reserved for 0.8.0.
 
 ## Custom terminal providers
 
-Applications can add terminal descriptions without changing the built-in database or generic engines:
+Applications can add descriptions without changing the built-in database or generic engines:
 
 ```csharp
 TerminalDescription example =
@@ -241,9 +302,8 @@ TerminalDescription example =
         .SetBoolean(BooleanCapability.AutoRightMargin)
         .SetNumber(NumericCapability.Columns, 80)
         .SetNumber(NumericCapability.Lines, 24)
-        .SetString(
-            StringCapability.CursorAddress,
-            "\x1b[%i%p1%d;%p2%dH")
+        .SetExtendedBoolean("exampleFlag")
+        .SetExtendedString("exampleString", "value")
         .Build();
 
 ITerminalDescriptionProvider provider =
@@ -254,24 +314,49 @@ TerminalDatabase database =
     new(new[] { provider });
 ```
 
-For larger integrations, implement `ITerminalDescriptionProvider` directly. Provider ordering is explicit and deterministic; the first provider that resolves a name wins.
+Provider ordering is explicit and deterministic; the first provider that resolves a name wins.
 
 ## Sample application
 
 `samples/Icod.TermInfo.Sample` demonstrates:
 
 - conservative environment resolution with an explicit `dumb` fallback;
+- semantic indexed/direct color inspection and expansion;
+- extended-capability discovery;
+- full-screen/cursor-visibility capability discovery without taking ownership of a full-screen session;
 - live/configured/profile size selection;
-- redirection handling;
-- explicit Windows VT enablement;
-- clearing, cursor movement, attributes, and ANSI color when the selected profile supports them;
+- redirection handling and explicit Windows VT enablement;
 - a custom provider implementation.
 
-Run it from the repository with:
+Run the ordinary demonstration with:
 
 ```text
 dotnet run --project samples/Icod.TermInfo.Sample/Icod.TermInfo.Sample.csproj
 ```
+
+For CI, documentation checks, or any environment where terminal-control output is inappropriate, use the non-interactive descriptive mode:
+
+```text
+dotnet run --project samples/Icod.TermInfo.Sample/Icod.TermInfo.Sample.csproj -- --describe-only --profile xterm-direct256
+```
+
+`--profile <name>` selects an exact built-in profile instead of consulting `TERM`. `--describe-only` exercises profile/color/extended-capability APIs but emits no terminal-control strings.
+
+## Project-family boundary
+
+`Icod.TermInfo` owns terminal-description data and pure transformations of that data. It does not own a live terminal session.
+
+A future `Icod.Terminal`-style layer may own raw/cooked mode changes, input decoding, keyboard/mouse/paste/focus events, probing, full-screen lifecycle, cursor lifecycle, clipboard operations, and progress helpers. A future curses-style library may own virtual-screen state, windows, pads, panels, menus, forms, and refresh optimization. PTY creation/process plumbing belongs elsewhere as well.
+
+## 0.8.0 reservation
+
+Version 0.8.0 is reserved for three major additions:
+
+1. classic Windows Console support modeled honestly rather than aliased to ANSI/xterm;
+2. explicit Windows Terminal profiles/support;
+3. arbitrary/system compiled terminfo database loading, including discovery/provider-precedence rules.
+
+Version 0.7.0 deliberately contains no `/usr/share/terminfo` loader, `TERMINFO`/`TERMINFO_DIRS` discovery, or host-database-dependent profile selection.
 
 ## Build, test, and pack
 
@@ -285,24 +370,20 @@ dotnet build Icod.TermInfo.sln -c Release
 dotnet test Icod.TermInfo.sln -c Release
 
 dotnet pack Icod.TermInfo.csproj -c Release --output artifacts
+bash .github/scripts/verify-release-package.sh artifacts
 ```
 
-Release packages produce both `.nupkg` and `.snupkg` artifacts. The .NET SDK supplies Source Link support, and GitHub Actions builds set `ContinuousIntegrationBuild` so repository/commit information and deterministic source mapping are emitted for package debugging. The T10 package job also inspects the packed artifacts and installs the package into a fresh `net10.0` application using only the local artifact directory as a NuGet source.
+The package verifier checks the `.nupkg`/`.snupkg` structure, dependency closure, Source Link metadata, and a fresh `net10.0` consumer restored from only the local package directory. T19 also runs the sample's `--describe-only` mode as a non-interactive consumer check.
 
-## Publishing
+GitHub pull requests and pushes to `main` validate both Debug and Release on Windows, Linux, and macOS. The `main` workflow additionally packs and verifies the package and uploads the package artifacts; it does not publish them automatically.
 
-The repository has two publication paths:
-
-- `publish-github-packages.yml` is a manually invoked GitHub Packages workflow;
-- `release.yml` is tag-driven and validates on Windows, Linux, and macOS, packs once, publishes the same `.nupkg` to GitHub Packages and NuGet.org, and creates a GitHub Release containing the package and symbol package.
-
-See `docs/RELEASING.md` for the one-time NuGet trusted-publishing setup and release procedure, and `docs/0.6.0-CONTRACT-AUDIT.md` for the final T10 contract evidence.
+See `docs/RELEASING.md` for the current release procedure and `docs/0.7.0-CONTRACT-AUDIT.md` for the T19 pre-completion audit. T20 remains the final 0.7.0 release gate.
 
 ## Scope
 
-`Icod.TermInfo` is not curses, a terminal emulator, a PTY implementation, a termios wrapper, a keyboard event parser, or a general terminal UI toolkit. Version 0.6.0 also deliberately excludes loading the host operating system's compiled terminfo database and modern terminal-family aliases such as `xterm-256color`, `screen`, `tmux`, or `linux`.
+`Icod.TermInfo` is not curses, a terminal emulator, a PTY implementation, a termios session manager, an input-event parser, or a general terminal UI toolkit. It intentionally carries low-level descriptive data which those higher-level systems may consume.
 
-See `Icod.TermInfo-Development-Roadmap.md` for the complete 0.6.0 contract.
+See `Icod.TermInfo-Development-Roadmap-0.7.0.md` for the complete 0.7.0 contract.
 
 ## License
 

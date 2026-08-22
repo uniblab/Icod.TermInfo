@@ -1,10 +1,10 @@
 using Icod.TermInfo;
 using Icod.TermInfo.Sample;
 
-TerminalDescription terminal =
-    TerminalEnvironment.Resolve(
-        TerminalDatabase.BuiltIn,
-        TerminalProfiles.Dumb);
+bool describeOnly =
+    args.Contains("--describe-only", StringComparer.Ordinal);
+
+TerminalDescription terminal = ResolveTerminal(args);
 
 Console.WriteLine($"Profile: {terminal.Name}");
 
@@ -17,6 +17,8 @@ else
     Console.WriteLine("Size: unknown");
 }
 
+DescribeProfile(terminal);
+
 TerminalDatabase customDatabase =
     new(
         new ITerminalDescriptionProvider[]
@@ -26,6 +28,12 @@ TerminalDatabase customDatabase =
 
 Console.WriteLine(
     $"Custom provider example available: {customDatabase.TryLoad("example-terminal", out _)}");
+
+if (describeOnly)
+{
+    Console.WriteLine("Describe-only mode: no terminal-control strings were emitted.");
+    return;
+}
 
 if (TerminalEnvironment.IsOutputRedirected)
 {
@@ -45,6 +53,35 @@ if (OperatingSystem.IsWindows() && (windowsVt is null))
 }
 
 EmitDemonstration(terminal);
+
+static TerminalDescription ResolveTerminal(string[] arguments)
+{
+    ArgumentNullException.ThrowIfNull(arguments);
+
+    for (int i = 0; i < arguments.Length; i++)
+    {
+        if (!string.Equals(
+                arguments[i],
+                "--profile",
+                StringComparison.Ordinal))
+        {
+            continue;
+        }
+
+        if (i + 1 >= arguments.Length)
+        {
+            throw new ArgumentException(
+                "--profile requires a built-in terminal name.",
+                nameof(arguments));
+        }
+
+        return TerminalDatabase.BuiltIn.Load(arguments[i + 1]);
+    }
+
+    return TerminalEnvironment.Resolve(
+        TerminalDatabase.BuiltIn,
+        TerminalProfiles.Dumb);
+}
 
 static bool TryResolveSize(
     TerminalDescription terminal,
@@ -75,6 +112,65 @@ static bool TryResolveSize(
     return false;
 }
 
+static void DescribeProfile(TerminalDescription terminal)
+{
+    ArgumentNullException.ThrowIfNull(terminal);
+
+    TerminalColorSupport color =
+        TerminalColors.GetColorSupport(terminal);
+
+    Console.WriteLine(
+        $"Color: {color.Model} / {color.Tier}; raw colors={FormatNullable(color.ColorCount)}; indexed={color.IndexedColorCount}; pairs={FormatNullable(color.ColorPairCount)}");
+
+    if (color.Model == TerminalColorModel.Indexed
+        && color.IndexedColorCount > 0
+        && color.HasForegroundSelector)
+    {
+        int index = Math.Min(1, color.IndexedColorCount - 1);
+        string expansion = TerminalColors.ExpandForeground(terminal, index);
+        Console.WriteLine(
+            $"Indexed foreground sample: {EscapeForDisplay(expansion)}");
+    }
+    else if (color.Model == TerminalColorModel.DirectRgb
+        && color.HasForegroundSelector)
+    {
+        string expansion =
+            TerminalColors.ExpandForeground(
+                terminal,
+                new TerminalRgbColor(0x12, 0x34, 0x56));
+        Console.WriteLine(
+            $"Direct RGB foreground sample: {EscapeForDisplay(expansion)}");
+    }
+
+    bool hasFullScreenPrimitives =
+        terminal.GetString(StringCapability.EnterCursorAddressingMode) is not null
+        && terminal.GetString(StringCapability.ExitCursorAddressingMode) is not null;
+    bool hasCursorVisibility =
+        terminal.GetString(StringCapability.CursorInvisible) is not null
+        && terminal.GetString(StringCapability.CursorNormal) is not null;
+
+    Console.WriteLine(
+        $"Cursor-addressing lifecycle primitives: {hasFullScreenPrimitives}");
+    Console.WriteLine(
+        $"Cursor-visibility primitives: {hasCursorVisibility}");
+
+    bool hasBracketedPaste =
+        terminal.TryGetExtendedString("BE", out _)
+        && terminal.TryGetExtendedString("BD", out _)
+        && terminal.TryGetExtendedString("PS", out _)
+        && terminal.TryGetExtendedString("PE", out _);
+    bool hasFocus =
+        terminal.TryGetExtendedString("fe", out _)
+        && terminal.TryGetExtendedString("fd", out _);
+    bool hasMouse =
+        terminal.GetString(StringCapability.KeyMouse) is not null
+        && terminal.TryGetExtendedString("XM", out _)
+        && terminal.TryGetExtendedString("xm", out _);
+
+    Console.WriteLine(
+        $"Descriptive metadata: mouse={hasMouse}, focus={hasFocus}, bracketed-paste={hasBracketedPaste}");
+}
+
 static void EmitDemonstration(TerminalDescription terminal)
 {
     ArgumentNullException.ThrowIfNull(terminal);
@@ -85,9 +181,7 @@ static void EmitDemonstration(TerminalDescription terminal)
         TermInfoOutput.PutP(clear, Console.Out);
     }
 
-    string? cursorAddress =
-        terminal.GetString(StringCapability.CursorAddress);
-    if (cursorAddress is not null)
+    if (terminal.GetString(StringCapability.CursorAddress) is not null)
     {
         string move =
             terminal.Expand(
@@ -106,20 +200,24 @@ static void EmitDemonstration(TerminalDescription terminal)
         TermInfoOutput.PutP(bold, Console.Out);
     }
 
-    int? colors = terminal.GetNumber(NumericCapability.Colors);
-    string? setForeground =
-        terminal.GetString(StringCapability.SetForegroundColor);
+    TerminalColorSupport color =
+        TerminalColors.GetColorSupport(terminal);
 
-    if ((colors is not null)
-        && (colors.Value >= 8)
-        && (setForeground is not null))
+    if (color.Model == TerminalColorModel.DirectRgb
+        && color.HasForegroundSelector)
     {
-        string red =
-            terminal.Expand(
-                StringCapability.SetForegroundColor,
-                1);
-
-        TermInfoOutput.PutP(red, Console.Out);
+        TermInfoOutput.PutP(
+            TerminalColors.ExpandForeground(
+                terminal,
+                new TerminalRgbColor(0x80, 0x40, 0xC0)),
+            Console.Out);
+    }
+    else if (color.IndexedColorCount >= 8
+        && color.HasForegroundSelector)
+    {
+        TermInfoOutput.PutP(
+            TerminalColors.ExpandForeground(terminal, 1),
+            Console.Out);
     }
 
     Console.Write("Icod.TermInfo terminal-control demonstration");
@@ -130,4 +228,20 @@ static void EmitDemonstration(TerminalDescription terminal)
     }
 
     Console.WriteLine();
+}
+
+static string FormatNullable(int? value)
+{
+    return value?.ToString() ?? "absent";
+}
+
+static string EscapeForDisplay(string value)
+{
+    ArgumentNullException.ThrowIfNull(value);
+
+    return value
+        .Replace("\u001b", "\\E", StringComparison.Ordinal)
+        .Replace("\r", "\\r", StringComparison.Ordinal)
+        .Replace("\n", "\\n", StringComparison.Ordinal)
+        .Replace("\t", "\\t", StringComparison.Ordinal);
 }
