@@ -6,22 +6,28 @@ namespace Icod.TermInfo;
 public sealed class TermInfoParameterProgram
 {
     private readonly IReadOnlyList<TermInfoInstruction> _instructions;
+    private readonly TermInfoParameterProgramAnalysis _analysis;
 
     private TermInfoParameterProgram(
         string source,
-        IReadOnlyList<TermInfoInstruction> instructions)
+        IReadOnlyList<TermInfoInstruction> instructions,
+        TermInfoParameterProgramAnalysis analysis)
     {
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(instructions);
+        ArgumentNullException.ThrowIfNull(analysis);
 
         Source = source;
         _instructions = instructions;
+        _analysis = analysis;
     }
 
     /// <summary>
     /// Gets the original terminfo parameter string.
     /// </summary>
     public string Source { get; }
+
+    internal TermInfoParameterProgramAnalysis Analysis => _analysis;
 
     /// <summary>
     /// Parses a terminfo parameter string into a reusable program.
@@ -31,7 +37,15 @@ public sealed class TermInfoParameterProgram
         ArgumentNullException.ThrowIfNull(source);
 
         TermInfoParameterParser parser = new(source);
-        return new TermInfoParameterProgram(source, parser.Parse());
+        IReadOnlyList<TermInfoInstruction> instructions =
+            parser.Parse();
+        TermInfoParameterProgramAnalysis analysis =
+            TermInfoParameterProgramAnalyzer.Analyze(instructions);
+
+        return new TermInfoParameterProgram(
+            source,
+            instructions,
+            analysis);
     }
 
     /// <summary>
@@ -56,6 +70,7 @@ public sealed class TermInfoParameterProgram
 
         return TermInfoParameterEvaluator.Evaluate(
             _instructions,
+            _analysis,
             parameters,
             context);
     }
