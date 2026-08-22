@@ -4,7 +4,7 @@
 **Package:** `Icod.TermInfo`  
 **Target framework:** `net10.0`  
 **Language:** C# 13  
-**Status:** Implementation in progress — T17<br>
+**Status:** Implementation in progress — T18<br>
 **Previous contract:** `0.6.0` — complete and frozen  
 **Contract target:** `0.7.0`  
 **Initial development version:** `0.7.0-alpha.1`
@@ -1416,6 +1416,21 @@ Complete the descriptive metadata required by the selected modern xterm baseline
 - bracketed-paste enable/disable and begin/end metadata;
 - extended modified key strings;
 - authoritative clipboard/selection extension metadata already present in the selected profile, where appropriate.
+
+Final T18 review confirms that T15 seeded the selected metadata early so later
+xterm profiles could compose correctly, and T18 now freezes that data against
+ncurses `terminfo.src` revision 1.1267 (2026-08-14). The contract retains
+standard `kmous`; the SGR-1006 `XM`/`xm` programs; `XF`, `fe`, `fd`, `kxIN`,
+and `kxOUT` focus metadata; `BE`, `BD`, `PS`, and `PE` bracketed-paste
+metadata; the selected PC-style modified-key and X11 three-key extensions; and
+the `xterm+tmux2` cursor/clipboard strings `Cr`, `Cs`, `Ms`, `Se`, and `Ss`,
+together with `RV`/`rv` and `XR`/`xr` reporting metadata. Every built-in xterm
+color variant inherits the same descriptive metadata, and parameterized values
+continue to expand through the shared T2 engine.
+
+These capabilities remain descriptive data only. T18 introduces no mouse,
+focus, or paste event decoder; no clipboard execution; no probing; no event
+loop; and no live terminal-session state.
 
 Document but DO NOT implement:
 

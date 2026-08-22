@@ -143,7 +143,6 @@ internal static class XtermCoreCapabilityFragments
                 StringCapability.InitString2,
                 "\u001b[!p\u001b[?3;4l\u001b[4l\u001b>")
             .SetString(StringCapability.ResetString1, "\u001bc")
-            .SetString(StringCapability.KeyMouse, "\u001b[<")
             .SetString(StringCapability.MemoryLock, "\u001bl")
             .SetString(StringCapability.MemoryUnlock, "\u001bm")
             .SetString(
