@@ -38,6 +38,10 @@ public sealed class TerminalEnvironmentTests
     [InlineData("ansi")]
     [InlineData("vt100")]
     [InlineData("vt100-am")]
+    [InlineData("vt102")]
+    [InlineData("vt220")]
+    [InlineData("vt200")]
+    [InlineData("xterm")]
     [InlineData("dumb")]
     public void CurrentTermResolvesOnlyConfiguredBuiltInNames(string value)
     {
@@ -54,7 +58,6 @@ public sealed class TerminalEnvironmentTests
     [Theory]
     [InlineData(null)]
     [InlineData("")]
-    [InlineData("xterm")]
     [InlineData("xterm-256color")]
     [InlineData("screen")]
     [InlineData("tmux")]

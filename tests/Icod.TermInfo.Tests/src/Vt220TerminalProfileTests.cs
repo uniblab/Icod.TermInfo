@@ -222,6 +222,8 @@ public sealed class Vt220TerminalProfileTests
             [StringCapability.InsertLine] = "\u001b[L",
             [StringCapability.ScrollForward] = "\u001bD",
             [StringCapability.RestoreCursor] = "\u001b8",
+            [StringCapability.EnterBlinkMode] = "\u001b[5m",
+            [StringCapability.EnterBoldMode] = "\u001b[1m",
             [StringCapability.EnterReverseMode] = "\u001b[7m",
             [StringCapability.ScrollReverse] = "\u001bM",
             [StringCapability.ExitAlternateCharacterSetMode] = "\u001b(B$<4>",

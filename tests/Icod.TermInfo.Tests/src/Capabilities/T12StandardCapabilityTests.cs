@@ -174,13 +174,16 @@ public sealed class T12StandardCapabilityTests
     }
 
     [Fact]
-    public void T12DoesNotIntroduceXtermProfileResolutionYet()
+    public void LaterXtermProfileResolutionDoesNotAliasEarlierBuiltIns()
     {
-        Assert.False(
+        Assert.True(
             TerminalDatabase.BuiltIn.TryLoad(
                 "xterm",
                 out TerminalDescription? terminal));
-        Assert.Null(terminal);
+        Assert.Same(TerminalProfiles.Xterm, terminal);
+        Assert.NotSame(TerminalProfiles.Ansi, terminal);
+        Assert.NotSame(TerminalProfiles.Vt100, terminal);
+        Assert.NotSame(TerminalProfiles.Dumb, terminal);
     }
 
     [Fact]
