@@ -4,7 +4,7 @@
 **Package:** `Icod.TermInfo`  
 **Target framework:** `net10.0`  
 **Language:** C# 13  
-**Status:** Implementation in progress — T19<br>
+**Status:** Implementation complete — T20 release candidate<br>
 **Previous contract:** `0.6.0` — complete and frozen  
 **Contract target:** `0.7.0`  
 **Initial development version:** `0.7.0-alpha.1`
@@ -1500,6 +1500,19 @@ T19 is complete when:
 
 Before tagging `0.7.0`, perform a final audit.
 
+Final T20 implementation review closes the repository-side 0.7.0 contract. The
+release candidate carries the final `0.7.0` package/assembly version, adds
+explicit final-version and reserved-0.8 profile gates, and verifies that all
+selected xterm variants retain their cursor-addressing and cursor-visibility
+primitives. The existing validation workflow now also runs on pushes to the
+`0.7.0` release branch and through `workflow_dispatch`, so the exact candidate
+can produce the six cross-platform Debug/Release results and validated package
+artifacts required before tagging.
+
+Tagging and registry publication remain deliberately separate release actions.
+They must use the exact commit/artifacts which pass the T20 workflow; no source
+change may occur between successful final validation and the `v0.7.0` tag.
+
 ### Required checks
 
 - all Windows/Linux/macOS CI jobs pass;
@@ -1539,12 +1552,19 @@ Before tagging `0.7.0`, perform a final audit.
 
 ### Completion
 
-When every T20 item passes:
+The repository-side 0.7.0 implementation contract is complete in this T20
+release candidate. Final release sign-off is intentionally evidence-driven:
 
-- set/confirm both version elements as `0.7.0`;
-- tag `v0.7.0`;
-- publish the same package to NuGet and GitHub Packages;
-- mark this roadmap's 0.7.0 contract complete.
+- confirm both version elements are exactly `0.7.0`;
+- require all six Windows/Linux/macOS Debug/Release jobs and package validation
+  to pass for the exact release commit;
+- tag that exact commit `v0.7.0`;
+- publish the same validated package to NuGet and GitHub Packages, together
+  with its matching symbol package;
+- confirm the published package restores in a fresh consumer.
+
+Any source/package change after validation reopens the gate and requires a new
+T20 validation run before tagging.
 
 ---
 

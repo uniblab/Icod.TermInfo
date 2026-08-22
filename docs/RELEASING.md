@@ -24,9 +24,9 @@ This document describes the current validation and publication procedure for `Ic
 
 Each matrix job cleans, restores, builds, and tests the whole solution, including the sample project.
 
-### Pushes to main
+### Pushes to main and the 0.7.0 release branch
 
-`.github/workflows/push-main.yaml` repeats the Debug/Release three-OS build/test matrix. After that matrix succeeds, an Ubuntu package-validation job:
+`.github/workflows/push-main.yaml` runs for pushes to `main` and `0.7.0`, and may also be started with `workflow_dispatch`. It repeats the Debug/Release three-OS build/test matrix. After that matrix succeeds, an Ubuntu package-validation job:
 
 1. restores and builds Release with `ContinuousIntegrationBuild=true`;
 2. runs the Release test suite;
@@ -57,9 +57,9 @@ On Windows, run the PowerShell/cmd equivalents for the build/test/pack commands.
 
 ## 0.7.0 completion gate
 
-T19 leaves the repository at a prerelease version. T20 is responsible for the final release transition.
+T20 sets both version fields to the final `0.7.0` value and freezes the repository-side release candidate. `T20CompletionGateTests` supplements the existing API/profile/color/metadata tests with final-version, reserved-0.8-name, and xterm screen-primitive assertions.
 
-Before changing the version to `0.7.0`, require all T20 checks in `Icod.TermInfo-Development-Roadmap-0.7.0.md` to pass, including:
+The final candidate must still pass the exact release workflow before it is tagged. Push the candidate to `0.7.0` (or run the validation workflow manually) and require:
 
 - three-OS Debug/Release CI;
 - package validation;
@@ -67,21 +67,21 @@ Before changing the version to `0.7.0`, require all T20 checks in `Icod.TermInfo
 - fresh-package consumer smoke tests;
 - compatibility checks for the retained 0.6.0 profiles;
 - xterm indexed/direct-color and metadata checks;
-- scope checks proving that no system terminfo loader, live session manager, or input decoder slipped into the package.
+- scope checks proving that no system terminfo loader, live session manager, input decoder, Windows Console profile, or Windows Terminal profile slipped into 0.7.0.
 
-The evolving evidence map is in `docs/0.7.0-CONTRACT-AUDIT.md`.
+The final evidence map is in `docs/0.7.0-CONTRACT-AUDIT.md`. Do not create `v0.7.0` until the workflow for the exact release commit is green.
 
 ## Publishing
 
 The current repository intentionally separates validation from publication. The committed workflows validate and upload package artifacts but do not push them to package registries automatically.
 
-When T20 is complete:
+For the T20 release candidate:
 
-1. set both `<Version />` and `<PackageVersion />` to `0.7.0`;
-2. merge the release-ready commit through the normal CI path;
-3. require the `main` workflow to finish successfully;
-4. download or reproduce the exact validated `.nupkg` and `.snupkg` artifacts;
-5. create and push tag `v0.7.0` at the release-ready commit;
+1. confirm both `<Version />` and `<PackageVersion />` are exactly `0.7.0`;
+2. push the release-ready commit to `0.7.0` (and merge it through the normal repository process when appropriate);
+3. require the six Windows/Linux/macOS Debug/Release jobs and the package-validation job for the exact release commit to finish successfully;
+4. download the `.nupkg` and `.snupkg` artifacts produced by that validated commit, or reproduce them from that same commit with the documented deterministic build;
+5. create and push tag `v0.7.0` at that exact release-ready commit;
 6. publish the same `.nupkg` to NuGet.org and GitHub Packages using the repository owner's normal authenticated package-publishing procedure;
 7. publish the `.snupkg` to the NuGet.org symbol server when pushing the NuGet package;
 8. optionally attach both artifacts to a GitHub Release for the tag.

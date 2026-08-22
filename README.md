@@ -8,19 +8,13 @@ The package targets `net10.0`, uses C# 13, contains no native ncurses/terminfo p
 
 ## Install
 
-During 0.7 development, use the prerelease version that matches the branch/package you are testing:
-
-```text
-dotnet add package Icod.TermInfo --version 0.7.0-alpha.11
-```
-
-After the final `v0.7.0` release is published:
+For the 0.7.0 release:
 
 ```text
 dotnet add package Icod.TermInfo --version 0.7.0
 ```
 
-For repository development, reference `Icod.TermInfo.csproj` directly as the sample project does.
+The same package contents are intended for NuGet.org and GitHub Packages. Repository development can reference `Icod.TermInfo.csproj` directly, as the sample project does.
 
 ## What 0.7.0 provides
 
@@ -373,11 +367,11 @@ dotnet pack Icod.TermInfo.csproj -c Release --output artifacts
 bash .github/scripts/verify-release-package.sh artifacts
 ```
 
-The package verifier checks the `.nupkg`/`.snupkg` structure, dependency closure, Source Link metadata, and a fresh `net10.0` consumer restored from only the local package directory. T19 also runs the sample's `--describe-only` mode as a non-interactive consumer check.
+The package verifier checks the `.nupkg`/`.snupkg` structure, dependency closure, Source Link metadata, and a fresh `net10.0` consumer restored from only the local package directory. It also runs the sample's `--describe-only` mode as a non-interactive consumer check.
 
-GitHub pull requests and pushes to `main` validate both Debug and Release on Windows, Linux, and macOS. The `main` workflow additionally packs and verifies the package and uploads the package artifacts; it does not publish them automatically.
+GitHub pull requests validate both Debug and Release on Windows, Linux, and macOS. Pushes to `main` and the `0.7.0` release branch run the same matrix, then pack and verify the package and upload the exact package artifacts; validation may also be started manually. These workflows do not publish packages automatically.
 
-See `docs/RELEASING.md` for the current release procedure and `docs/0.7.0-CONTRACT-AUDIT.md` for the T19 pre-completion audit. T20 remains the final 0.7.0 release gate.
+See `docs/RELEASING.md` for the release procedure and `docs/0.7.0-CONTRACT-AUDIT.md` for the final T20 release-candidate audit. Tag `v0.7.0` and publish only after the exact final candidate passes the full workflow.
 
 ## Scope
 
