@@ -180,6 +180,8 @@ public sealed class PublicApiSurfaceTests
     {
         string[] expectedDescription =
         [
+            "ExpandExtendedString/2",
+            "ExpandExtendedString/3",
             "get_ExtendedCapabilities/0",
             "TryGetExtendedBoolean/2",
             "TryGetExtendedCapability/2",

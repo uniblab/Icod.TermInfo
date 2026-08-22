@@ -1,5 +1,7 @@
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 
 namespace Icod.TermInfo;
 
@@ -15,6 +17,13 @@ public sealed class TerminalDescription
     private readonly IReadOnlyList<BooleanCapability> _booleanCapabilityList;
     private readonly IReadOnlyList<KeyValuePair<NumericCapability, int>> _numericCapabilityList;
     private readonly IReadOnlyList<KeyValuePair<StringCapability, string>> _stringCapabilityList;
+    private readonly ConcurrentDictionary<
+        StringCapability,
+        Lazy<TermInfoParameterProgram>> _standardParameterPrograms = new();
+    private readonly ConcurrentDictionary<
+        string,
+        Lazy<TermInfoParameterProgram>> _extendedParameterPrograms =
+            new(StringComparer.Ordinal);
 
     internal TerminalDescription(
         string name,
@@ -214,9 +223,7 @@ public sealed class TerminalDescription
         Validate(capability);
         ArgumentNullException.ThrowIfNull(parameters);
 
-        return TermInfoParameterExpander.Expand(
-            GetRequiredString(capability),
-            parameters);
+        return GetParameterProgram(capability).Expand(parameters);
     }
 
     /// <summary>
@@ -232,8 +239,45 @@ public sealed class TerminalDescription
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(parameters);
 
-        return TermInfoParameterExpander.Expand(
-            GetRequiredString(capability),
+        return GetParameterProgram(capability).Expand(
+            context,
+            parameters);
+    }
+
+    /// <summary>
+    /// Expands a parameterized extended string capability using isolated
+    /// variable storage.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// The named extended capability is missing or is not a string.
+    /// </exception>
+    public string ExpandExtendedString(
+        string name,
+        params TermInfoParameter[] parameters)
+    {
+        ValidateCapabilityName(name);
+        ArgumentNullException.ThrowIfNull(parameters);
+
+        return GetExtendedParameterProgram(name).Expand(parameters);
+    }
+
+    /// <summary>
+    /// Expands a parameterized extended string capability using the supplied
+    /// context for persistent uppercase variables.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// The named extended capability is missing or is not a string.
+    /// </exception>
+    public string ExpandExtendedString(
+        string name,
+        TermInfoExpansionContext context,
+        params TermInfoParameter[] parameters)
+    {
+        ValidateCapabilityName(name);
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(parameters);
+
+        return GetExtendedParameterProgram(name).Expand(
             context,
             parameters);
     }
@@ -388,6 +432,65 @@ public sealed class TerminalDescription
 
         value = capability.StringValue;
         return true;
+    }
+
+    internal int CachedStandardParameterProgramCount =>
+        _standardParameterPrograms.Count;
+
+    internal int CachedExtendedParameterProgramCount =>
+        _extendedParameterPrograms.Count;
+
+    internal TermInfoParameterProgram GetParameterProgram(
+        StringCapability capability)
+    {
+        Validate(capability);
+
+        string source = GetRequiredString(capability);
+        Lazy<TermInfoParameterProgram> program =
+            _standardParameterPrograms.GetOrAdd(
+                capability,
+                _ => CreateLazyParameterProgram(source));
+
+        return program.Value;
+    }
+
+    internal TermInfoParameterProgram GetExtendedParameterProgram(
+        string name)
+    {
+        ValidateCapabilityName(name);
+
+        if (!_extendedCapabilities.TryGetValue(
+                name,
+                out TermInfoCapabilityValue capability))
+        {
+            throw new InvalidOperationException(
+                $"Terminal '{Name}' does not provide extended capability '{name}'.");
+        }
+
+        if (!capability.IsString)
+        {
+            throw new InvalidOperationException(
+                $"Extended capability '{name}' on terminal '{Name}' has kind "
+                + $"'{capability.Kind}', not '{TermInfoCapabilityValueKind.String}'.");
+        }
+
+        string source = capability.StringValue;
+        Lazy<TermInfoParameterProgram> program =
+            _extendedParameterPrograms.GetOrAdd(
+                name,
+                _ => CreateLazyParameterProgram(source));
+
+        return program.Value;
+    }
+
+    private static Lazy<TermInfoParameterProgram> CreateLazyParameterProgram(
+        string source)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+
+        return new Lazy<TermInfoParameterProgram>(
+            () => TermInfoParameterProgram.Parse(source),
+            LazyThreadSafetyMode.ExecutionAndPublication);
     }
 
     private static ArgumentException CreateUnknownCapabilityException(
