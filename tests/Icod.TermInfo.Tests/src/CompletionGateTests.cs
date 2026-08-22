@@ -74,6 +74,9 @@ public sealed class CompletionGateTests
             TerminalProfiles.Vt100.GetNumber(NumericCapability.ColorPairs));
         Assert.Equal("dumb", TerminalProfiles.Dumb.Name);
         Assert.Equal("xterm", TerminalProfiles.Xterm.Name);
+        Assert.Equal("xterm-16color", TerminalProfiles.Xterm16Color.Name);
+        Assert.Equal("xterm-88color", TerminalProfiles.Xterm88Color.Name);
+        Assert.Equal("xterm-256color", TerminalProfiles.Xterm256Color.Name);
         Assert.Equal("vt102", TerminalProfiles.Vt102.Name);
         Assert.Equal("vt220", TerminalProfiles.Vt220.Name);
 
@@ -92,6 +95,15 @@ public sealed class CompletionGateTests
         Assert.Same(
             TerminalProfiles.Xterm,
             TerminalDatabase.BuiltIn.Load("xterm"));
+        Assert.Same(
+            TerminalProfiles.Xterm16Color,
+            TerminalDatabase.BuiltIn.Load("xterm-16color"));
+        Assert.Same(
+            TerminalProfiles.Xterm88Color,
+            TerminalDatabase.BuiltIn.Load("xterm-88color"));
+        Assert.Same(
+            TerminalProfiles.Xterm256Color,
+            TerminalDatabase.BuiltIn.Load("xterm-256color"));
 
         string[] unsupportedNames =
         [
@@ -100,9 +112,10 @@ public sealed class CompletionGateTests
             "vt220-8",
             "vt220d",
             "vt320",
-            "xterm-16color",
-            "xterm-88color",
-            "xterm-256color",
+            "xterm-mono",
+            "xterm-direct",
+            "xterm-direct16",
+            "xterm-direct256",
             "screen",
             "tmux",
             "linux",
@@ -125,6 +138,9 @@ public sealed class CompletionGateTests
     {
         TerminalDescription[] terminals =
         [
+            TerminalProfiles.Xterm256Color,
+            TerminalProfiles.Xterm88Color,
+            TerminalProfiles.Xterm16Color,
             TerminalProfiles.Xterm,
             TerminalProfiles.Vt220,
             TerminalProfiles.Vt102,

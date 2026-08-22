@@ -42,6 +42,9 @@ public sealed class TerminalEnvironmentTests
     [InlineData("vt220")]
     [InlineData("vt200")]
     [InlineData("xterm")]
+    [InlineData("xterm-16color")]
+    [InlineData("xterm-88color")]
+    [InlineData("xterm-256color")]
     [InlineData("dumb")]
     public void CurrentTermResolvesOnlyConfiguredBuiltInNames(string value)
     {
@@ -58,7 +61,7 @@ public sealed class TerminalEnvironmentTests
     [Theory]
     [InlineData(null)]
     [InlineData("")]
-    [InlineData("xterm-256color")]
+    [InlineData("xterm-mono")]
     [InlineData("screen")]
     [InlineData("tmux")]
     public void MissingOrUnsupportedCurrentTermDoesNotResolve(string? value)
@@ -75,7 +78,7 @@ public sealed class TerminalEnvironmentTests
 
     [Theory]
     [InlineData(null)]
-    [InlineData("xterm-256color")]
+    [InlineData("xterm-mono")]
     public void CurrentTermFallbackIsAlwaysExplicit(string? value)
     {
         using EnvironmentVariableScope scope =

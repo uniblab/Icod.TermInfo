@@ -176,15 +176,26 @@ static void Require(bool condition, string message)
 TerminalDescription ansi = TerminalDatabase.BuiltIn.Load("ansi");
 TerminalDescription vt100 = TerminalDatabase.BuiltIn.Load("vt100");
 TerminalDescription vt100Alias = TerminalDatabase.BuiltIn.Load("vt100-am");
+TerminalDescription xterm16 = TerminalDatabase.BuiltIn.Load("xterm-16color");
+TerminalDescription xterm88 = TerminalDatabase.BuiltIn.Load("xterm-88color");
+TerminalDescription xterm256 = TerminalDatabase.BuiltIn.Load("xterm-256color");
 TerminalDescription dumb = TerminalDatabase.BuiltIn.Load("dumb");
 
 Require(ReferenceEquals(vt100, vt100Alias), "vt100-am must resolve to vt100.");
 Require(ansi.GetNumber(NumericCapability.Colors) == 8, "ANSI must advertise eight colors.");
 Require(vt100.GetNumber(NumericCapability.Colors) is null, "VT100 must remain monochrome.");
+Require(xterm16.GetNumber(NumericCapability.Colors) == 16, "xterm-16color must advertise 16 colors.");
+Require(xterm88.GetNumber(NumericCapability.Colors) == 88, "xterm-88color must advertise 88 colors.");
+Require(xterm88.GetNumber(NumericCapability.ColorPairs) == 7744, "xterm-88color must advertise 7744 pairs.");
+Require(xterm256.GetNumber(NumericCapability.Colors) == 256, "xterm-256color must advertise 256 colors.");
+Require(xterm256.GetNumber(NumericCapability.ColorPairs) == 65536, "xterm-256color must advertise 65536 pairs.");
+Require(
+    TerminalColors.ExpandForeground(xterm256, 255) == "\x1b[38;5;255m",
+    "xterm-256color foreground expansion changed.");
 Require(dumb.Name == "dumb", "The dumb fallback profile must be available.");
 Require(
-    !TerminalDatabase.BuiltIn.TryLoad("xterm-256color", out _),
-    "Unsupported terminal names must not silently resolve.");
+    !TerminalDatabase.BuiltIn.TryLoad("xterm-mono", out _),
+    "Unselected terminal names must not silently resolve.");
 
 string cup = ansi.Expand(StringCapability.CursorAddress, 0, 0);
 Require(cup == "\x1b[1;1H", "ANSI cursor addressing expansion changed.");

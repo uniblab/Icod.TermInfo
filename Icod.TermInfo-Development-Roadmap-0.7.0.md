@@ -4,7 +4,7 @@
 **Package:** `Icod.TermInfo`  
 **Target framework:** `net10.0`  
 **Language:** C# 13  
-**Status:** Implementation in progress — T15¾<br>
+**Status:** Implementation in progress — T16<br>
 **Previous contract:** `0.6.0` — complete and frozen  
 **Contract target:** `0.7.0`  
 **Initial development version:** `0.7.0-alpha.1`
@@ -1346,6 +1346,13 @@ Build on the T15¾ common/color split and implement and golden-test:
 - `xterm-16color`;
 - `xterm-88color`;
 - `xterm-256color`.
+
+Final T16 review does **not** retain `xterm-mono`. The authoritative ncurses
+entry intentionally derives from the historical `xterm-r6` family, whose
+function-key, mouse, and control behavior differs from the modern `xterm-new`
+family used by T15/T15¾. Modeling it as merely "modern xterm without color"
+would therefore be inaccurate. It remains unsupported unless a later contract
+deliberately adds that historical family.
 
 Reuse the T15¾ xterm common fragment and compose each selected indexed-color layer explicitly.
 

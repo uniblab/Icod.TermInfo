@@ -216,11 +216,18 @@ public sealed class XtermTerminalProfileTests
     [InlineData("xterm-direct256")]
     public void LaterXtermVariantsDoNotResolvePrematurely(string name)
     {
-        Assert.False(
+        bool expectedSupported =
+            name is "xterm-16color"
+            or "xterm-88color"
+            or "xterm-256color";
+
+        bool resolved =
             TerminalDatabase.BuiltIn.TryLoad(
                 name,
-                out TerminalDescription? terminal));
-        Assert.Null(terminal);
+                out TerminalDescription? terminal);
+
+        Assert.Equal(expectedSupported, resolved);
+        Assert.Equal(expectedSupported, terminal is not null);
     }
 
     private static Dictionary<StringCapability, string> CreateExpectedStrings()

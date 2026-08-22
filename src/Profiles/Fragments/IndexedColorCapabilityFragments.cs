@@ -22,6 +22,8 @@ internal static class IndexedColorCapabilityFragments
         + "%p3%{255}%*%{1000}%/%2.2X/"
         + "%p4%{255}%*%{1000}%/%2.2X\x1b\\";
     private const string XtermOriginalColors = "\x1b]104\x1b\\";
+    private const string XtermResetWithOriginalColors =
+        "\u001bc\u001b]104\u001b\\";
 
     internal static TerminalDescriptionBuilder ApplyAnsiIndexed(
         this TerminalDescriptionBuilder builder,
@@ -95,7 +97,10 @@ internal static class IndexedColorCapabilityFragments
         return builder
             .SetBoolean(BooleanCapability.CanChangeColor)
             .SetString(StringCapability.InitializeColor, XtermInitializeColor)
-            .SetString(StringCapability.OriginalColors, XtermOriginalColors);
+            .SetString(StringCapability.OriginalColors, XtermOriginalColors)
+            .SetString(
+                StringCapability.ResetString1,
+                XtermResetWithOriginalColors);
     }
 
     private static void ValidateColorPairCount(int colorPairCount)

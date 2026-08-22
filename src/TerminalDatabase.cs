@@ -41,6 +41,9 @@ public sealed class TerminalDatabase
                 new InMemoryTerminalDescriptionProvider(
                     new[]
                     {
+                        TerminalProfiles.Xterm256Color,
+                        TerminalProfiles.Xterm88Color,
+                        TerminalProfiles.Xterm16Color,
                         TerminalProfiles.Xterm,
                         TerminalProfiles.Vt220,
                         TerminalProfiles.Vt102,

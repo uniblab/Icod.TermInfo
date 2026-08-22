@@ -12,6 +12,24 @@ public static class TerminalProfiles
         XtermTerminalProfile.Create();
 
     /// <summary>
+    /// Gets the modern <c>xterm-16color</c> indexed-color profile.
+    /// </summary>
+    public static TerminalDescription Xterm16Color { get; } =
+        XtermIndexedTerminalProfile.Create16Color();
+
+    /// <summary>
+    /// Gets the modern <c>xterm-88color</c> indexed-color profile.
+    /// </summary>
+    public static TerminalDescription Xterm88Color { get; } =
+        XtermIndexedTerminalProfile.Create88Color();
+
+    /// <summary>
+    /// Gets the modern <c>xterm-256color</c> indexed-color profile.
+    /// </summary>
+    public static TerminalDescription Xterm256Color { get; } =
+        XtermIndexedTerminalProfile.Create256Color();
+
+    /// <summary>
     /// Gets the color-capable ANSI/PC-terminal profile.
     /// </summary>
     public static TerminalDescription Ansi { get; } =
