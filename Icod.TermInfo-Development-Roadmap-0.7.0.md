@@ -4,7 +4,7 @@
 **Package:** `Icod.TermInfo`  
 **Target framework:** `net10.0`  
 **Language:** C# 13  
-**Status:** Implementation in progress — T15½<br>
+**Status:** Implementation in progress — T15¾<br>
 **Previous contract:** `0.6.0` — complete and frozen  
 **Contract target:** `0.7.0`  
 **Initial development version:** `0.7.0-alpha.1`
@@ -1311,18 +1311,43 @@ T15½ is complete when:
 
 ---
 
+## T15¾ — xterm Composition Refactor Before Indexed Family
+
+### Work
+
+- separate the modern xterm common control/attribute/screen capability layer from the ordinary eight-color palette and selector layer;
+- move `colors#8`, `pairs#64`, `setaf`, `setab`, and the legacy `setf`/`setb` mappings out of the common xterm fragment;
+- keep common capabilities such as `bce` and `op` where the authoritative indexed xterm variants inherit them unchanged;
+- compose the built-in `xterm` profile from the common layer plus an explicit ordinary eight-color fragment;
+- preserve every T15/T15½ advertised `xterm` capability and golden value exactly;
+- add internal composition tests proving the common layer does not itself choose an indexed palette or selectors;
+- do not add any new `$TERM` identity in this tranche;
+- defer the final `xterm-mono` decision to T16 because the authoritative ncurses `xterm-mono` entry derives from the historical `xterm-r6` family rather than from modern `xterm-new` with color merely removed.
+
+### Acceptance gate
+
+T15¾ is complete when:
+
+- `TERM=xterm` remains behaviorally identical to T15½ and all existing xterm golden tests still pass;
+- the reusable xterm common fragment does not set `colors`, `pairs`, `setaf`, `setab`, `setf`, or `setb`;
+- the explicit xterm ordinary-eight-color fragment reconstructs the current `xterm` color behavior exactly;
+- the refactor changes no public API and introduces no new resolvable terminal name;
+- T16 can select 16/88/256-color data without first installing and then overriding the eight-color selector layer.
+
+---
+
 ## T16 — xterm Indexed-Color Family
 
 ### Work
 
-Implement and golden-test:
+Build on the T15¾ common/color split and implement and golden-test:
 
 - `xterm-mono` if retained by final review;
 - `xterm-16color`;
 - `xterm-88color`;
 - `xterm-256color`.
 
-Reuse the xterm core and color fragments.
+Reuse the T15¾ xterm common fragment and compose each selected indexed-color layer explicitly.
 
 ### Acceptance gate
 

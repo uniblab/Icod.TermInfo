@@ -5,7 +5,7 @@ internal static class XtermCoreCapabilityFragments
     private const string AlternateCharacterSet =
         "``aaffggiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz{{||}}~~";
 
-    internal static TerminalDescriptionBuilder ApplyXtermCore(
+    internal static TerminalDescriptionBuilder ApplyXtermCommon(
         this TerminalDescriptionBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
@@ -21,7 +21,6 @@ internal static class XtermCoreCapabilityFragments
             .SetNumber(NumericCapability.Columns, 80)
             .SetNumber(NumericCapability.Lines, 24)
             .SetNumber(NumericCapability.InitialTabWidth, 8)
-            .ApplyAnsiIndexed(8, 64)
             .SetString(StringCapability.Bell, "\a")
             .SetString(StringCapability.BackTab, "\u001b[Z")
             .SetString(StringCapability.EnterBlinkMode, "\u001b[5m")
@@ -140,14 +139,6 @@ internal static class XtermCoreCapabilityFragments
             .SetString(StringCapability.ExitMetaMode, "\u001b[?1034l")
             .SetString(StringCapability.EnterItalicMode, "\u001b[3m")
             .SetString(StringCapability.ExitItalicMode, "\u001b[23m")
-            .SetString(
-                StringCapability.SetLegacyForegroundColor,
-                "\u001b[3%?%p1%{1}%=%t4%e%p1%{3}%=%t6%e"
-                + "%p1%{4}%=%t1%e%p1%{6}%=%t3%e%p1%d%;m")
-            .SetString(
-                StringCapability.SetLegacyBackgroundColor,
-                "\u001b[4%?%p1%{1}%=%t4%e%p1%{3}%=%t6%e"
-                + "%p1%{4}%=%t1%e%p1%{6}%=%t3%e%p1%d%;m")
             .SetString(
                 StringCapability.InitString2,
                 "\u001b[!p\u001b[?3;4l\u001b[4l\u001b>")

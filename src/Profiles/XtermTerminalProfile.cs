@@ -7,7 +7,8 @@ internal static class XtermTerminalProfile
     internal static TerminalDescription Create()
     {
         return new TerminalDescriptionBuilder("xterm")
-            .ApplyXtermCore()
+            .ApplyXtermCommon()
+            .ApplyXtermBasicEightColor()
             .ApplyXtermKeys()
             .ApplyXtermModernMetadata()
             .Build();
