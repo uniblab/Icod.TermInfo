@@ -24,7 +24,8 @@ The current prerelease foundation provides:
 - injectable delay handling for physical or serial terminals;
 - conservative `TERM` resolution and standard-stream redirection inspection;
 - live terminal-size queries on Windows, Linux, and macOS;
-- explicit `COLUMNS`/`LINES` and profile-dimension fallback APIs.
+- explicit `COLUMNS`/`LINES` and profile-dimension fallback APIs;
+- explicit, reversible Windows virtual-terminal output enablement.
 
 ## Requirements
 
@@ -166,6 +167,36 @@ else if (TerminalEnvironment.TryGetProfileSize(vt100, out TerminalSize profile))
 
 A failed live query never substitutes `COLUMNS`/`LINES` or profile dimensions.
 That fallback order remains an explicit caller decision.
+
+## Windows virtual-terminal output
+
+On Windows, applications can explicitly enable console virtual-terminal output
+processing without changing unrelated console-mode flags:
+
+```csharp
+using IDisposable? mode =
+    WindowsVirtualTerminal.TryEnableOutput();
+
+if (mode is not null)
+{
+    // ANSI/VT control sequences written to stdout are processed by the console.
+}
+```
+
+Disposing the returned lease restores the mode that was present before the
+library changed it. If virtual-terminal processing was already enabled, disposing
+the lease leaves the existing mode untouched.
+
+The helper never enables VT mode merely because a terminal profile is loaded.
+It returns `null` on non-Windows systems, redirected streams, non-console handles,
+or when Windows refuses the mode change. Standard error can be selected
+explicitly:
+
+```csharp
+using IDisposable? errorMode =
+    WindowsVirtualTerminal.TryEnableOutput(
+        TerminalStandardStream.Error);
+```
 
 Unsupported terminal names do not silently become ANSI, VT100, or `dumb`. A fallback is always an explicit caller decision.
 
