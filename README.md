@@ -16,10 +16,12 @@ The current prerelease foundation provides:
 - classic eight-color ANSI foreground/background capabilities;
 - ANSI cursor movement, screen editing, tabs, rendition controls, and cursor-key strings;
 - DEC VT100 advanced-video, scroll-region, alternate-character-set, keypad, cursor-key, and PF-key capabilities;
-- historical VT100 terminfo padding annotations preserved for the output layer;
-- a reusable terminfo parameter-expansion engine, including stack operations, formatting, variables, `%i`, and conditionals.
-
-The next milestone is the padding-aware output layer. Until then, VT100 strings retain their `$<...>` annotations so no timing information is lost.
+- a reusable terminfo parameter-expansion engine, including stack operations, formatting, variables, `%i`, and conditionals;
+- padding-aware `tputs`/`putp`-style output with ignore and delay modes;
+- synchronous and asynchronous `TextWriter` output;
+- byte-stream output with caller-selected encoding;
+- character-callback output;
+- injectable delay handling for physical or serial terminals.
 
 ## Requirements
 
@@ -75,8 +77,46 @@ string move =
 // ESC[11;21H$<5>
 ```
 
-The `$<5>` suffix is a terminfo padding annotation. T4 deliberately preserves
-it; the T5 output layer is responsible for removing or honoring padding.
+The `$<5>` suffix is a terminfo padding annotation. Parameter expansion preserves
+it so the output layer can remove or honor the delay.
+
+## Padding-aware output
+
+Modern terminal emulators normally do not need historical hardware delays.
+`PaddingMode.Ignore` is therefore the default and removes padding annotations
+without writing them:
+
+```csharp
+using StringWriter writer = new();
+
+string move =
+    vt100.Expand(StringCapability.CursorAddress, 10, 20);
+
+TermInfoOutput.TPuts(
+    move,
+    affectedLines: 1,
+    writer);
+
+// writer contains ESC[11;21H
+```
+
+A physical or serial terminal can opt into real delays:
+
+```csharp
+TermInfoOutput.TPuts(
+    move,
+    affectedLines: 1,
+    writer,
+    PaddingMode.Delay);
+```
+
+Padding directives with `*` are multiplied by the supplied affected-line count.
+The `/` suffix is retained as `TermInfoDelay.IsMandatory` when an
+`ITermInfoDelayProvider` is used. The library also provides asynchronous,
+byte-stream, and character-callback output overloads.
+
+`TermInfoOutput.PutP` is a convenience form equivalent to `TPuts` with one
+affected line.
 
 Unsupported terminal names do not silently become ANSI, VT100, or `dumb`. A fallback is always an explicit caller decision.
 
