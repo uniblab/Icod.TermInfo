@@ -21,7 +21,10 @@ The current prerelease foundation provides:
 - synchronous and asynchronous `TextWriter` output;
 - byte-stream output with caller-selected encoding;
 - character-callback output;
-- injectable delay handling for physical or serial terminals.
+- injectable delay handling for physical or serial terminals;
+- conservative `TERM` resolution and standard-stream redirection inspection;
+- live terminal-size queries on Windows, Linux, and macOS;
+- explicit `COLUMNS`/`LINES` and profile-dimension fallback APIs.
 
 ## Requirements
 
@@ -117,6 +120,52 @@ byte-stream, and character-callback output overloads.
 
 `TermInfoOutput.PutP` is a convenience form equivalent to `TPuts` with one
 affected line.
+
+## Terminal environment and size
+
+`TerminalEnvironment` reads `TERM` conservatively. Only names actually present in
+the configured `TerminalDatabase` resolve; an unknown name is never silently
+treated as ANSI or VT100:
+
+```csharp
+if (TerminalEnvironment.TryResolve(
+        TerminalDatabase.BuiltIn,
+        out TerminalDescription? current))
+{
+    // current is ansi, vt100/vt100-am, or dumb in the built-in database.
+}
+
+TerminalDescription withFallback =
+    TerminalEnvironment.Resolve(
+        TerminalDatabase.BuiltIn,
+        TerminalProfiles.Dumb);
+```
+
+Standard-stream redirection is exposed explicitly:
+
+```csharp
+bool redirected = TerminalEnvironment.IsOutputRedirected;
+```
+
+Live dimensions are separate from configured and profile defaults:
+
+```csharp
+if (TerminalEnvironment.TryGetLiveSize(out TerminalSize live))
+{
+    // live came from the operating system.
+}
+else if (TerminalEnvironment.TryGetEnvironmentSize(out TerminalSize configured))
+{
+    // configured came from positive COLUMNS and LINES values.
+}
+else if (TerminalEnvironment.TryGetProfileSize(vt100, out TerminalSize profile))
+{
+    // profile is the terminfo definition default, such as 80x24.
+}
+```
+
+A failed live query never substitutes `COLUMNS`/`LINES` or profile dimensions.
+That fallback order remains an explicit caller decision.
 
 Unsupported terminal names do not silently become ANSI, VT100, or `dumb`. A fallback is always an explicit caller decision.
 
