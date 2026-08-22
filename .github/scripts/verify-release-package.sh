@@ -179,6 +179,9 @@ TerminalDescription vt100Alias = TerminalDatabase.BuiltIn.Load("vt100-am");
 TerminalDescription xterm16 = TerminalDatabase.BuiltIn.Load("xterm-16color");
 TerminalDescription xterm88 = TerminalDatabase.BuiltIn.Load("xterm-88color");
 TerminalDescription xterm256 = TerminalDatabase.BuiltIn.Load("xterm-256color");
+TerminalDescription xtermDirect = TerminalDatabase.BuiltIn.Load("xterm-direct");
+TerminalDescription xtermDirect16 = TerminalDatabase.BuiltIn.Load("xterm-direct16");
+TerminalDescription xtermDirect256 = TerminalDatabase.BuiltIn.Load("xterm-direct256");
 TerminalDescription dumb = TerminalDatabase.BuiltIn.Load("dumb");
 
 Require(ReferenceEquals(vt100, vt100Alias), "vt100-am must resolve to vt100.");
@@ -192,6 +195,24 @@ Require(xterm256.GetNumber(NumericCapability.ColorPairs) == 65536, "xterm-256col
 Require(
     TerminalColors.ExpandForeground(xterm256, 255) == "\x1b[38;5;255m",
     "xterm-256color foreground expansion changed.");
+Require(
+    xtermDirect.GetNumber(NumericCapability.Colors) == (1 << 24),
+    "xterm-direct must advertise the direct RGB color space.");
+Require(
+    TerminalColors.GetColorSupport(xtermDirect256).Model == TerminalColorModel.DirectRgb,
+    "xterm-direct256 must classify as direct RGB.");
+Require(
+    TerminalColors.GetColorSupport(xtermDirect256).IndexedColorCount == 256,
+    "xterm-direct256 must retain 256 indexed colors.");
+Require(
+    TerminalColors.ExpandForeground(xtermDirect16, 15) == "\x1b[97m",
+    "xterm-direct16 indexed foreground expansion changed.");
+Require(
+    TerminalColors.ExpandForeground(
+        xtermDirect256,
+        new TerminalRgbColor(0x12, 0x34, 0x56))
+        == "\x1b[38:2::18:52:86m",
+    "xterm-direct256 RGB foreground expansion changed.");
 Require(dumb.Name == "dumb", "The dumb fallback profile must be available.");
 Require(
     !TerminalDatabase.BuiltIn.TryLoad("xterm-mono", out _),

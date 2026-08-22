@@ -45,6 +45,9 @@ public sealed class TerminalEnvironmentTests
     [InlineData("xterm-16color")]
     [InlineData("xterm-88color")]
     [InlineData("xterm-256color")]
+    [InlineData("xterm-direct")]
+    [InlineData("xterm-direct16")]
+    [InlineData("xterm-direct256")]
     [InlineData("dumb")]
     public void CurrentTermResolvesOnlyConfiguredBuiltInNames(string value)
     {

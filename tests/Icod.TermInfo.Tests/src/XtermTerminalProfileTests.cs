@@ -214,12 +214,15 @@ public sealed class XtermTerminalProfileTests
     [InlineData("xterm-direct")]
     [InlineData("xterm-direct16")]
     [InlineData("xterm-direct256")]
-    public void LaterXtermVariantsDoNotResolvePrematurely(string name)
+    public void SelectedXtermVariantsResolveOnlyWhenImplemented(string name)
     {
         bool expectedSupported =
             name is "xterm-16color"
             or "xterm-88color"
-            or "xterm-256color";
+            or "xterm-256color"
+            or "xterm-direct"
+            or "xterm-direct16"
+            or "xterm-direct256";
 
         bool resolved =
             TerminalDatabase.BuiltIn.TryLoad(

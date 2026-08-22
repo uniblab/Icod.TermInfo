@@ -12,7 +12,7 @@
     <AssemblyName>Icod.TermInfo</AssemblyName>
     <RootNamespace>Icod.TermInfo</RootNamespace>
     <Configurations>Debug;Release;Staging</Configurations>
-    <Version>0.7.0-alpha.8</Version>
+    <Version>0.7.0-alpha.9</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(PlatformTarget)' == '' ">
@@ -52,12 +52,12 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageVersion>0.7.0-alpha.8</PackageVersion>
+    <PackageVersion>0.7.0-alpha.9</PackageVersion>
     <PackageId>Icod.TermInfo</PackageId>
     <Title>Icod.TermInfo</Title>
     <Authors>Timothy J. Bruce</Authors>
     <Description>Managed .NET terminal capability information with an extensible terminfo-style model for ANSI, DEC VT, and xterm-family applications.</Description>
-    <PackageReleaseNotes>T16: add authoritative xterm 16-, 88-, and 256-color built-in profiles with exact indexed selectors, palette reset behavior, and TERM resolution.</PackageReleaseNotes>
+    <PackageReleaseNotes>T17: add authoritative xterm direct-, direct16-, and direct256-color built-in profiles with RGB/CO semantics and colon-form true-color selectors.</PackageReleaseNotes>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>

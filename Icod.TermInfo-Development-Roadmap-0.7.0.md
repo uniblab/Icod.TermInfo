@@ -4,7 +4,7 @@
 **Package:** `Icod.TermInfo`  
 **Target framework:** `net10.0`  
 **Language:** C# 13  
-**Status:** Implementation in progress — T16<br>
+**Status:** Implementation in progress — T17<br>
 **Previous contract:** `0.6.0` — complete and frozen  
 **Contract target:** `0.7.0`  
 **Initial development version:** `0.7.0-alpha.1`
@@ -1379,6 +1379,15 @@ Implement direct-color xterm fragments and profiles selected for the contract, e
 - `xterm-direct256`.
 
 Implement current `RGB`/`CO` semantics required by those profiles.
+
+Final T17 review retains all three direct-color identities. Against ncurses
+`terminfo.src` revision 1.1267 (2026-08-14), each advertises
+`colors#0x1000000`, `pairs#0x10000`, and Boolean `RGB`; their numeric `CO`
+values are respectively 8, 16, and 256. `CO` is the retained indexed-color
+prefix before the packed 8/8/8 RGB parameter space. The selected direct
+selectors use the current colon-separated `38:2::R:G:B` / `48:2::R:G:B`
+form. These profiles do not synthesize palette-changing `ccc`/`initc`/`oc`
+capabilities which the authoritative direct-color entries do not advertise.
 
 Golden-test direct-color selector programs.
 
