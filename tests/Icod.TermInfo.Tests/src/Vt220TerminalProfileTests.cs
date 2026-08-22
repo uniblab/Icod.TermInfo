@@ -24,6 +24,7 @@ public sealed class Vt220TerminalProfileTests
         HashSet<BooleanCapability> expectedBooleans =
         [
             BooleanCapability.AutoRightMargin,
+            BooleanCapability.BackspacesWithBs,
             BooleanCapability.MoveInsertMode,
             BooleanCapability.MoveStandoutMode,
             BooleanCapability.EatNewlineGlitch,
@@ -58,12 +59,7 @@ public sealed class Vt220TerminalProfileTests
             }
         }
 
-        Assert.True(
-            TerminalProfiles.Vt220.TryGetExtendedBoolean(
-                "OTbs",
-                out bool backspace));
-        Assert.True(backspace);
-        Assert.Single(TerminalProfiles.Vt220.ExtendedCapabilities);
+        Assert.Empty(TerminalProfiles.Vt220.ExtendedCapabilities);
     }
 
     [Fact]

@@ -159,7 +159,7 @@ public sealed class XtermModernMetadataTests
         ];
         string[] names =
         [
-            "OTbs", "AX", "XF", "XT", "E3",
+            "AX", "XF", "XT", "E3",
             "BD", "BE", "PE", "PS",
             "Cr", "Cs", "Ms", "Se", "Ss",
             "XM", "xm", "fd", "fe", "kxIN", "kxOUT",
@@ -169,6 +169,10 @@ public sealed class XtermModernMetadataTests
 
         foreach (TerminalDescription variant in variants)
         {
+            Assert.True(baseline.GetBoolean(BooleanCapability.BackspacesWithBs));
+            Assert.Equal(
+                baseline.GetBoolean(BooleanCapability.BackspacesWithBs),
+                variant.GetBoolean(BooleanCapability.BackspacesWithBs));
             Assert.Equal(
                 baseline.GetString(StringCapability.KeyMouse),
                 variant.GetString(StringCapability.KeyMouse));
