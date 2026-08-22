@@ -12,6 +12,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{8B94
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Icod.TermInfo.Sample", "samples\Icod.TermInfo.Sample\Icod.TermInfo.Sample.csproj", "{D649A84B-41DC-47B2-96BC-985EB3C96F9F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{C78B23CF-38CD-4C34-8C20-4BC8DFF8A2D1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Icod.TermInfo.MetadataGenerator", "tools\terminfo-metadata\Icod.TermInfo.MetadataGenerator.csproj", "{D71A2831-89B3-4D86-9AF9-4F6234F5AC51}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
