@@ -3,7 +3,8 @@
 This directory contains the deterministic compiled-entry corpus frozen by the
 0.8 T29 readiness gate and intended to seed 0.9 parser work.
 
-No production compiled terminfo parser belongs in 0.8.
+No production compiled terminfo parser belonged in 0.8. The checked-in corpus is
+now the normative fixture baseline for 0.9 parser work.
 
 The fixture roles are:
 
@@ -23,20 +24,26 @@ The valid binaries were generated with:
 ncurses 6.5.20250216
 ```
 
-using `tic -x`. `generate-fixtures.py` is a maintainer-only regeneration tool.
-It refuses to run with a different `tic -V` string so provenance changes remain
-explicit. The script also performs the documented Boolean-cancellation sentinel
-edit and derives the malformed/adversarial seeds.
-
-Run it from this directory only when intentionally refreshing the corpus:
+using `tic -x`. Fixture regeneration is a maintainer operation implemented by:
 
 ```text
-python3 generate-fixtures.py
+tools/compiled-terminfo-fixtures/Icod.TermInfo.FixtureGenerator.csproj
 ```
 
-After regeneration, compare the printed SHA-256 values with
-`manifests/manifest.json` and update the manifest only when the fixture change is
-intentional and reviewed.
+Run it from anywhere inside the repository only when intentionally refreshing
+the corpus:
+
+```text
+dotnet run --project tools/compiled-terminfo-fixtures/Icod.TermInfo.FixtureGenerator.csproj
+```
+
+The generator refuses to run with a different `tic -V` string so provenance
+changes remain explicit. It also performs the documented Boolean-cancellation
+sentinel edit, derives the malformed/adversarial seeds, and prints SHA-256 values
+for the regenerated corpus.
+
+After regeneration, compare those values with `manifests/manifest.json` and
+update the manifest only when the fixture change is intentional and reviewed.
 
 See `docs/0.8.0-T29-0.9-READINESS.md` for the frozen binary/vendor/provider
 contract and detailed fixture rationale.
