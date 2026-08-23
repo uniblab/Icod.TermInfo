@@ -492,12 +492,25 @@ dotnet build Icod.TermInfo.sln -c Release
 dotnet test Icod.TermInfo.sln -c Release
 
 dotnet pack Icod.TermInfo.csproj -c Release --output artifacts
+```
+
+Then run the release verifier appropriate to the host.
+
+On Windows Command Prompt:
+
+```text
+.github\scripts\verify-release-package.cmd artifacts
+```
+
+On a Bash-capable host:
+
+```text
 bash .github/scripts/verify-release-package.sh artifacts
 ```
 
-The package verifier checks the `.nupkg`/`.snupkg` structure, dependency closure, Source Link metadata, exclusion of test-only compiled fixtures, and a fresh `net10.0` consumer restored from only the local package directory. The fresh consumer exercises the intended new 0.8 metadata/enumeration, expansion, exact-byte, terminal-aware padding, and Windows-profile APIs. It also runs the sample's `--describe-only` mode as a non-interactive consumer check.
+Both wrappers run the same C# metadata/package validation, an isolated package-reference-only smoke consumer, and the sample's non-interactive `--describe-only` path. Windows package validation does not require Bash or Python.
 
-Pushes to `main` and the active `0.8.0` release branch run the Release build/test matrix on Windows, Linux, and macOS. After that matrix succeeds, the package-validation job packs and verifies the exact artifacts, and the downstream `Release` deployment job publishes the validated package to NuGet.org and GitHub Packages. Pull-request validation remains a separate repository workflow.
+Pushes to `main` run the Release build/test matrix on Windows, Linux, and macOS. After that matrix succeeds, the package-validation job packs and verifies the exact artifacts, and the downstream `Release` deployment job publishes the validated package to NuGet.org and GitHub Packages. Pull-request validation remains a separate repository workflow.
 
 See `docs/RELEASING.md` for the release procedure and `docs/0.8.0-CONTRACT-AUDIT.md` for the final T31 evidence map. Tag `v0.8.0` only after the exact final candidate passes the complete workflow described there; no source/package content should change between that successful validation and tagging.
 
