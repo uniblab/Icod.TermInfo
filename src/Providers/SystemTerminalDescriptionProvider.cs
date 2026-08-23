@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Icod.TermInfo;
@@ -24,6 +25,8 @@ public sealed class SystemTerminalDescriptionProvider
 		"/usr/share/terminfo",
 	];
 
+	private readonly ConcurrentDictionary<string, Lazy<TerminalDescription?>> _cache =
+		new(StringComparer.Ordinal);
 	private readonly SystemTerminalDescriptionProviderOptions _options;
 	private readonly SystemTerminalDiscoverySnapshot _snapshot;
 	private readonly DirectorySource[] _directorySources;
@@ -80,6 +83,49 @@ public sealed class SystemTerminalDescriptionProvider
 		DirectoryTerminalDescriptionProvider.ValidateTerminalName(
 			name);
 
+		Lazy<TerminalDescription?> load =
+			_cache.GetOrAdd(
+				name,
+				CreateLoad);
+
+		try
+		{
+			terminal =
+				load.Value;
+		}
+		catch
+		{
+			_cache.TryRemove(
+				new KeyValuePair<string, Lazy<TerminalDescription?>>(
+					name,
+					load));
+			throw;
+		}
+
+		if (terminal is null)
+		{
+			_cache.TryRemove(
+				new KeyValuePair<string, Lazy<TerminalDescription?>>(
+					name,
+					load));
+			return false;
+		}
+
+		return true;
+	}
+
+	private Lazy<TerminalDescription?> CreateLoad(
+		string name)
+	{
+		return new Lazy<TerminalDescription?>(
+			() => LoadUncached(
+				name),
+			LazyThreadSafetyMode.ExecutionAndPublication);
+	}
+
+	private TerminalDescription? LoadUncached(
+		string name)
+	{
 		if (_options.UseEnvironment
 			&& IsEncodedTermInfo(
 				_snapshot.TermInfo))
@@ -88,9 +134,9 @@ public sealed class SystemTerminalDescriptionProvider
 					_snapshot.TermInfo,
 					name,
 					_options.ParserOptions,
-					out terminal))
+					out TerminalDescription? encodedTerminal))
 			{
-				return true;
+				return encodedTerminal;
 			}
 		}
 
@@ -101,14 +147,13 @@ public sealed class SystemTerminalDescriptionProvider
 
 			if (source.Provider.TryLoad(
 					name,
-					out terminal))
+					out TerminalDescription? terminal))
 			{
-				return true;
+				return terminal;
 			}
 		}
 
-		terminal = null;
-		return false;
+		return null;
 	}
 
 	internal static IReadOnlyList<string> GetDefaultRoots(

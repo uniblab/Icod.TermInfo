@@ -6,6 +6,7 @@ namespace Icod.TermInfo;
 /// Resolves terminal descriptions from an ordered set of providers.
 /// </summary>
 public sealed class TerminalDatabase
+    : ITerminalDescriptionProvider
 {
     private readonly IReadOnlyList<ITerminalDescriptionProvider> _providers;
 

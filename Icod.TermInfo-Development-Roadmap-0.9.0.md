@@ -4,7 +4,7 @@
 **Package:** `Icod.TermInfo`
 **Target framework:** `net10.0`
 **Language:** C# 13
-**Status:** Active — T38 system discovery and precedence complete; T39 provider cache/refresh/composition next
+**Status:** Active — T39 provider cache, refresh, and composition complete; T40 API/documentation/package freeze next
 **Previous contract:** `0.8.0` — semantic completion and binary/provider readiness
 **Contract target:** `0.9.0`
 **Initial development version:** `0.9.0-alpha.1`
@@ -1131,6 +1131,8 @@ precedence.
 ## T39 — Provider Cache, Refresh, and Composition
 
 **Development version:** `0.9.0-beta.3`
+**Status:** Complete
+**Implementation record:** `docs/0.9.0-T39-CACHE-REFRESH-COMPOSITION.md`
 
 ### Work
 
