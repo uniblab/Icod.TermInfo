@@ -434,6 +434,12 @@ Provider ordering is explicit and deterministic; the first provider that resolve
 
 ## Compiled terminfo acquisition
 
+For a task-oriented explanation of parser formats, directory layout, discovery
+precedence, option boundaries, errors, caching, and refresh, see
+`docs/0.9.0-ACQUISITION-GUIDE.md`. The focused
+`samples/Icod.TermInfo.Acquisition.Sample` executable demonstrates the same
+public acquisition paths without emitting terminal-control strings.
+
 ### Parse caller-supplied bytes
 
 The parser is independently usable and has no filesystem or environment
@@ -518,19 +524,25 @@ TerminalDatabase database =
 The first provider which resolves the requested name wins.
 `TerminalDatabase.BuiltIn` is never mutated by system discovery.
 
-## Sample application
+## Sample applications
+
+The repository contains two executable samples with deliberately different
+purposes.
+
+### General terminal API sample
 
 `samples/Icod.TermInfo.Sample` demonstrates:
 
-- pure compiled-byte parsing, explicit-root loading, restricted/normal system provider construction, and system-to-built-in composition;
 - conservative environment resolution with an explicit `dumb` fallback;
+- system-to-built-in provider composition for ordinary resolution;
 - verbose description plus standard catalog/per-description enumeration;
 - reusable standard and extended parameterized-string expansion;
 - exact Latin-1 capability-byte output;
 - terminal-aware padding with explicit terminal facts;
 - semantic indexed/direct color inspection and expansion;
 - Windows Console and Windows Terminal profile selection without side effects;
-- full-screen/cursor-visibility capability discovery without taking ownership of a full-screen session;
+- full-screen/cursor-visibility capability discovery without taking ownership of
+  a full-screen session;
 - live/configured/profile size selection;
 - redirection handling and explicit Windows VT enablement;
 - a custom provider implementation.
@@ -541,13 +553,50 @@ Run the ordinary demonstration with:
 dotnet run --project samples/Icod.TermInfo.Sample/Icod.TermInfo.Sample.csproj
 ```
 
-For CI, documentation checks, or any environment where terminal-control output is inappropriate, use the non-interactive descriptive mode:
+For CI, documentation checks, or any environment where terminal-control output
+is inappropriate, use the non-interactive descriptive mode:
 
 ```text
 dotnet run --project samples/Icod.TermInfo.Sample/Icod.TermInfo.Sample.csproj -- --describe-only --profile xterm-direct256
 ```
 
-`--profile <name>` selects an exact built-in profile instead of consulting `TERM`. `--describe-only` exercises metadata/enumeration, expansion, byte-output, padding, profile, color, and extended-capability APIs but emits no terminal-control strings to the active terminal.
+`--profile <name>` selects an exact built-in profile instead of consulting
+`TERM`. `--describe-only` exercises metadata/enumeration, expansion, byte-output,
+padding, profile, color, and extended-capability APIs but emits no
+terminal-control strings to the active terminal.
+
+### Compiled terminfo acquisition sample
+
+`samples/Icod.TermInfo.Acquisition.Sample` is a focused, non-interactive sample
+for the new 0.9 acquisition layer. It demonstrates:
+
+```text
+parse <compiled-file>
+directory <root> <terminal-name>
+system <terminal-name>
+restricted <terminal-name>
+fallback <terminal-name>
+```
+
+For example:
+
+```text
+dotnet run --project samples/Icod.TermInfo.Acquisition.Sample/Icod.TermInfo.Acquisition.Sample.csproj -- system xterm-256color
+```
+
+and:
+
+```text
+dotnet run --project samples/Icod.TermInfo.Acquisition.Sample/Icod.TermInfo.Acquisition.Sample.csproj -- directory /usr/share/terminfo xterm
+```
+
+The sample prints the resolved terminal identity, aliases, selected numeric
+facts, and standard/extended capability counts. It does not write any capability
+string to the terminal.
+
+See `samples/README.md`,
+`samples/Icod.TermInfo.Acquisition.Sample/README.md`, and
+`docs/0.9.0-ACQUISITION-GUIDE.md` for the complete examples.
 
 ## Project-family boundary
 
@@ -589,10 +638,12 @@ termcap, Berkeley-DB hashed terminfo stores, divergent historical vendor binary
 formats, live input/session management, active probing, PTYs, curses, terminal
 emulation, or graphics protocols.
 
-See `Icod.TermInfo-Development-Roadmap-0.9.0.md` for the detailed frozen tranche
-contract, `docs/0.9.0-CONTRACT-AUDIT.md` for the final completion evidence,
-`docs/0.9.0-T40-API-PACKAGE-FREEZE.md` for the release-candidate API/package
-freeze, and `docs/FUTURE-WORK-INVENTORY.md` for the post-0.9 dependency map.
+See `docs/0.9.0-ACQUISITION-GUIDE.md` for the consumer-facing acquisition
+guide, `Icod.TermInfo-Development-Roadmap-0.9.0.md` for the detailed frozen
+tranche contract, `docs/0.9.0-CONTRACT-AUDIT.md` for the final completion
+evidence, `docs/0.9.0-T40-API-PACKAGE-FREEZE.md` for the release-candidate
+API/package freeze, and `docs/FUTURE-WORK-INVENTORY.md` for the post-0.9
+dependency map.
 
 ## Build, test, and pack
 
