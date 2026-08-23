@@ -1,6 +1,5 @@
 using System.Buffers.Binary;
 using System.Globalization;
-using System.Reflection;
 using System.Text;
 using Icod.TermInfo;
 using Xunit;
@@ -11,35 +10,6 @@ public sealed class T43RobustnessCompatibilityTests
 {
 	private const ushort LegacyMagic = 0x011A;
 	private const ushort ExtendedNumberMagic = 0x021E;
-
-	[Fact]
-	public void AssemblyIdentifiesT43DevelopmentVersion()
-	{
-		Assembly assembly =
-			typeof(TerminalDescription).Assembly;
-		AssemblyName assemblyName =
-			assembly.GetName();
-		string? informationalVersion =
-			assembly
-				.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-				?.InformationalVersion;
-
-		Assert.Equal(
-			new Version(1, 0, 0, 0),
-			assemblyName.Version);
-		Assert.NotNull(
-			informationalVersion);
-
-		string semanticVersion =
-			informationalVersion!
-				.Split(
-					'+',
-					2)[0];
-
-		Assert.Equal(
-			"1.0.0-beta.1",
-			semanticVersion);
-	}
 
 	[Fact]
 	public void GeneratedCompiledCorpusIsCultureIndependent()

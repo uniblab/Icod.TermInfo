@@ -4,7 +4,7 @@
 **Package:** `Icod.TermInfo`
 **Supported target frameworks:** `net8.0`, `net10.0`
 **Language:** C# 13
-**Status:** Active — T43 robustness and compatibility gate; T42 baseline review pending
+**Status:** Active — T44 documentation/package freeze; T42/T43 acceptance evidence pending
 **Previous contract:** `0.9.0` — arbitrary compiled terminfo acquisition
 **Contract target:** `1.0.0`
 **Initial development version:** `1.0.0-alpha.1`
@@ -167,7 +167,7 @@ human API-regret review is performed.
 ## T43 — 1.0 Robustness and Compatibility Gate
 
 **Development version:** `1.0.0-beta.1`
-**Status:** Implementation in progress
+**Status:** Implementation complete — acceptance evidence pending
 **Implementation record:** `docs/1.0.0-T43-ROBUSTNESS-COMPATIBILITY.md`
 
 T43 SHALL concentrate on confidence rather than feature expansion:
@@ -202,23 +202,48 @@ Before T43 is marked complete:
 8. package metadata audit passes.
 9. no production runtime API or behavior was expanded.
 
+The implementation is merged. Items which depend on the reviewed T42 baseline,
+the pinned ncurses maintainer run, and complete package validation remain
+acceptance evidence rather than being inferred from source presence.
+
 ---
 
 ## T44 — 1.0 Documentation and Package Freeze
 
 **Development version:** `1.0.0-rc.1`
+**Status:** Implementation in progress
+**Implementation record:** `docs/1.0.0-T44-DOCUMENTATION-PACKAGE-FREEZE.md`
 
 T44 SHALL:
 
-- complete XML documentation for every public member;
-- remove the Release `CS1591` exemption;
-- add stable versioning/compatibility policy documentation;
-- document the 1.x assembly-version and unsigned policy;
-- document the support lifecycle and target framework contract;
+- make missing public XML documentation a Release error by removing the CS1591
+  exemption while retaining warnings-as-errors;
+- add stable `docs/VERSIONING.md` and `docs/COMPATIBILITY.md` policy documents;
+- document the 1.x assembly-version, unsigned, target-framework, host-family,
+  deprecation, and compatibility rules;
 - modernize `CONTRIBUTING.md`;
-- modernize `docs/FUTURE-WORK-INVENTORY.md`;
-- audit the root README and sample documentation;
-- freeze final 1.0 package contents.
+- modernize `docs/FUTURE-WORK-INVENTORY.md` from the stable 1.0 boundary;
+- audit the root README and all sample run commands for the dual-target project
+  shape;
+- update `docs/RELEASING.md` to the actual API/package verifier order;
+- make the package verifier inspect both generated XML documentation files;
+- freeze the intended final 1.0 package shape;
+- add no production runtime feature or public signature.
+
+### T44 acceptance
+
+Before T44 is marked complete:
+
+1. Release build succeeds with CS1591 fatal.
+2. Tests pass on both supported TFMs.
+3. Versioning and compatibility policy documents are reviewed.
+4. README and sample examples execute with explicit target frameworks.
+5. T42 baseline is reviewed, committed, and passes `--check`.
+6. net8/net10 API equivalence passes.
+7. T43 pinned ncurses differential evidence is recorded.
+8. package verification passes with both XML documentation assets.
+9. fresh-package smoke passes on both targets.
+10. the package shape is accepted as the final 1.0 shape.
 
 ---
 

@@ -2,21 +2,27 @@
 
 `Icod.TermInfo` is a managed, dependency-free .NET implementation of the low-level terminal-capability model traditionally supplied by `libtinfo`.
 
-Version 0.9.0 is the arbitrary-terminal acquisition release. It retains the complete 0.8 in-memory semantic model and adds a pure compiled-terminfo byte parser, explicit conventional-directory loading, deterministic `TERMINFO`/`TERMINFO_DIRS`/user/system discovery, and provider-local cache/refresh semantics without introducing a native ncurses dependency or process-global current terminal.
+Version 1.0 is the stability release for the semantic and acquisition work completed through 0.9. `1.0.0-rc.1` freezes the documentation, package shape, target-framework contract, and compatibility policy before the final completion gate.
 
-The package targets `net10.0`, uses C# 13, contains no native ncurses/terminfo payload, and is intended to run on Windows, Linux, and macOS.
+The package targets `net8.0` and `net10.0`, uses C# 13, contains no native ncurses/terminfo payload, and is intended to run on Windows, Linux, and macOS.
 
 ## Install
 
-For the 0.9.0 release:
+For the current 1.0 release candidate:
 
 ```text
-dotnet add package Icod.TermInfo --version 0.9.0
+dotnet add package Icod.TermInfo --version 1.0.0-rc.1
 ```
 
 The same package contents are intended for NuGet.org and GitHub Packages. Repository development can reference `Icod.TermInfo.csproj` directly, as the sample project does.
 
-## What 0.9.0 provides
+## 1.0 stability contract
+
+The 1.x line keeps assembly identity `Icod.TermInfo, Version=1.0.0.0`, remains unsigned, and treats `net8.0` plus `net10.0` as supported consumer targets. Public API, binary/package compatibility, deprecation, and target-framework policy are documented in `docs/VERSIONING.md` and `docs/COMPATIBILITY.md`.
+
+Version 1.0 does not add another terminal family or acquisition format merely to enlarge the release. It stabilizes the existing low-level terminfo responsibility and leaves live terminal sessions, PTYs, curses/UI, terminal emulation, source tooling, and active protocol negotiation to later or sibling work.
+
+## What 1.0 provides
 
 - immutable terminal descriptions with canonical name, aliases, and a separate verbose `Description`;
 - a complete ncurses/System V-compatible standard capability catalog: 44 Boolean, 39 numeric, and 414 string table positions;
@@ -547,18 +553,21 @@ purposes.
 - redirection handling and explicit Windows VT enablement;
 - a custom provider implementation.
 
-Run the ordinary demonstration with:
+Both sample projects target `net8.0` and `net10.0`; `dotnet run` therefore
+needs an explicit framework. Run the ordinary demonstration with:
 
 ```text
-dotnet run --project samples/Icod.TermInfo.Sample/Icod.TermInfo.Sample.csproj
+dotnet run --project samples/Icod.TermInfo.Sample/Icod.TermInfo.Sample.csproj -f net10.0
 ```
 
 For CI, documentation checks, or any environment where terminal-control output
 is inappropriate, use the non-interactive descriptive mode:
 
 ```text
-dotnet run --project samples/Icod.TermInfo.Sample/Icod.TermInfo.Sample.csproj -- --describe-only --profile xterm-direct256
+dotnet run --project samples/Icod.TermInfo.Sample/Icod.TermInfo.Sample.csproj -f net10.0 -- --describe-only --profile xterm-direct256
 ```
+
+Use `-f net8.0` instead when validating the .NET 8 consumer target.
 
 `--profile <name>` selects an exact built-in profile instead of consulting
 `TERM`. `--describe-only` exercises metadata/enumeration, expansion, byte-output,
@@ -567,8 +576,9 @@ terminal-control strings to the active terminal.
 
 ### Compiled terminfo acquisition sample
 
-`samples/Icod.TermInfo.Acquisition.Sample` is a focused, non-interactive sample
-for the new 0.9 acquisition layer. It demonstrates:
+`samples/Icod.TermInfo.Acquisition.Sample` is the focused, non-interactive
+compiled-database acquisition sample introduced in 0.9 and retained for 1.0. It
+demonstrates:
 
 ```text
 parse <compiled-file>
@@ -581,13 +591,13 @@ fallback <terminal-name>
 For example:
 
 ```text
-dotnet run --project samples/Icod.TermInfo.Acquisition.Sample/Icod.TermInfo.Acquisition.Sample.csproj -- system xterm-256color
+dotnet run --project samples/Icod.TermInfo.Acquisition.Sample/Icod.TermInfo.Acquisition.Sample.csproj -f net10.0 -- system xterm-256color
 ```
 
 and:
 
 ```text
-dotnet run --project samples/Icod.TermInfo.Acquisition.Sample/Icod.TermInfo.Acquisition.Sample.csproj -- directory /usr/share/terminfo xterm
+dotnet run --project samples/Icod.TermInfo.Acquisition.Sample/Icod.TermInfo.Acquisition.Sample.csproj -f net10.0 -- directory /usr/share/terminfo xterm
 ```
 
 The sample prints the resolved terminal identity, aliases, selected numeric
@@ -612,12 +622,13 @@ The intended family boundary is now explicit:
 
 The broader dependency inventory is recorded in `docs/FUTURE-WORK-INVENTORY.md`.
 
-## 0.9.0 arbitrary-terminal acquisition
+## Acquisition foundation inherited from 0.9.0
 
-Version 0.8 completed **terminfo semantics in memory**. Version 0.9 adds the
-acquisition layer without redesigning that semantic model.
+Version 0.8 completed **terminfo semantics in memory**. Version 0.9 added the
+acquisition layer without redesigning that semantic model. Version 1.0 freezes
+that combined low-level contract rather than replacing it.
 
-The implemented 0.9 dependency chain is:
+The implemented acquisition dependency chain is:
 
 ```text
 pure compiled-byte parser
@@ -673,17 +684,30 @@ On a Bash-capable host:
 bash .github/scripts/verify-release-package.sh artifacts
 ```
 
-Both wrappers run the same C# metadata/package validation, an isolated package-reference-only smoke consumer, and the sample's non-interactive `--describe-only` path. Windows package validation does not require Bash or Python.
+Both wrappers run the same capability-metadata check, approved API-baseline
+check, net8/net10 API-equivalence check, package/XML/symbol validation, isolated
+package-reference-only smoke consumer on both target frameworks, and the
+sample's non-interactive `--describe-only` path. Windows package validation does
+not require Bash or Python.
 
 Only pushes to `main` run the Release build/test, package-validation, and publication workflow. Pull requests run the separate `pr-build-and-test.yaml` validation workflow and never publish packages. After the `main` Release matrix succeeds, package validation verifies the exact artifacts and the downstream `Release` deployment job publishes them to NuGet.org and GitHub Packages.
 
-See `docs/RELEASING.md` for the release procedure and `docs/0.9.0-CONTRACT-AUDIT.md` for the final completion evidence. Tag `v0.9.0` only after the exact final `main` candidate passes the complete workflow; no source/package content should change between that successful validation and tagging.
+See `docs/RELEASING.md` for the release procedure,
+`Icod.TermInfo-Development-Roadmap-1.0.0.md` for the active 1.0 contract, and
+`docs/1.0.0-T44-DOCUMENTATION-PACKAGE-FREEZE.md` for the RC freeze. The final
+`v1.0.0` tag belongs only to the exact T45 commit which passes the complete
+workflow; no source or package content should change between final validation
+and tagging.
 
 ## Scope
 
 `Icod.TermInfo` is not curses, a terminal emulator, a PTY implementation, a termios session manager, an input-event parser, or a general terminal UI toolkit. It intentionally carries low-level descriptive data which those higher-level systems may consume.
 
-See `Icod.TermInfo-Development-Roadmap-0.8.0.md` for the frozen 0.8.0 contract, `Icod.TermInfo-Development-Roadmap-0.9.0.md` for the 0.9.0 acquisition-release contract, and `docs/FUTURE-WORK-INVENTORY.md` for the broader terminal-system dependency map. The 0.6.0 and 0.7.0 roadmaps remain historical frozen contracts.
+See `Icod.TermInfo-Development-Roadmap-0.9.0.md` for the frozen acquisition
+contract, `Icod.TermInfo-Development-Roadmap-1.0.0.md` for the 1.0 stability
+contract, `docs/VERSIONING.md` and `docs/COMPATIBILITY.md` for the 1.x promises,
+and `docs/FUTURE-WORK-INVENTORY.md` for the broader terminal-system dependency
+map. The 0.6.0 through 0.8.0 roadmaps remain historical frozen contracts.
 
 ## License
 

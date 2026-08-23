@@ -259,6 +259,9 @@ internal static class Program
             VerifyAssemblyIdentity(
                 package,
                 targetFramework);
+            VerifyDocumentation(
+                package,
+                targetFramework);
         }
 
         Require(
@@ -298,6 +301,9 @@ internal static class Program
         Require(
             GetMetadataText(metadata!, "version") == expectedVersion,
             "Unexpected package version.");
+        Require(
+            GetMetadataText(metadata!, "title") == PackageId,
+            "Unexpected package title.");
         Require(
             GetMetadataText(metadata!, "authors") == "Timothy J. Bruce",
             "Unexpected package authors.");
@@ -379,6 +385,61 @@ internal static class Program
             $"Repository metadata has an invalid commit id: '{commit}'.");
 
         return commit;
+    }
+
+    private static void VerifyDocumentation(
+        ZipArchive package,
+        string targetFramework)
+    {
+        ArgumentNullException.ThrowIfNull(package);
+        ArgumentException.ThrowIfNullOrWhiteSpace(targetFramework);
+
+        string documentationPath =
+            $"lib/{targetFramework}/Icod.TermInfo.xml";
+        ZipArchiveEntry? entry =
+            package.GetEntry(
+                documentationPath);
+        Require(
+            entry is not null,
+            $"Primary package is missing {documentationPath}.");
+        Require(
+            entry!.Length > 0,
+            $"{documentationPath} is empty.");
+
+        using Stream stream =
+            entry.Open();
+        XDocument documentation =
+            XDocument.Load(
+                stream,
+                LoadOptions.None);
+
+        string? assemblyName =
+            documentation
+                .Descendants()
+                .FirstOrDefault(
+                    element =>
+                        element.Name.LocalName == "assembly")
+                ?.Elements()
+                .FirstOrDefault(
+                    element =>
+                        element.Name.LocalName == "name")
+                ?.Value;
+
+        Require(
+            assemblyName == PackageId,
+            $"{documentationPath} identifies unexpected assembly "
+                + $"'{assemblyName}'.");
+
+        int memberCount =
+            documentation
+                .Descendants()
+                .Count(
+                    element =>
+                        element.Name.LocalName == "member");
+
+        Require(
+            memberCount > 0,
+            $"{documentationPath} contains no documented members.");
     }
 
     private static void VerifyAssemblyIdentity(

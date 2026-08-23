@@ -1,7 +1,10 @@
 # Icod.TermInfo Acquisition Sample
 
-This executable is the focused 0.9 sample for compiled terminfo acquisition. It
-is intentionally non-interactive and never emits terminal-control strings.
+This executable is the focused compiled terminfo acquisition sample introduced
+in 0.9 and retained for 1.0. It is intentionally non-interactive and never
+emits terminal-control strings.
+
+The project targets `net8.0` and `net10.0`; the commands below use `net10.0`. Substitute `-f net8.0` to exercise the .NET 8 target.
 
 It demonstrates the public API at five ownership levels:
 
@@ -16,7 +19,7 @@ system discovery with immutable built-in fallback
 ## Parse a compiled file directly
 
 ```text
-dotnet run --project samples/Icod.TermInfo.Acquisition.Sample/Icod.TermInfo.Acquisition.Sample.csproj -- parse ./xterm.compiled
+dotnet run --project samples/Icod.TermInfo.Acquisition.Sample/Icod.TermInfo.Acquisition.Sample.csproj -f net10.0 -- parse ./xterm.compiled
 ```
 
 This path calls `CompiledTermInfoParser.Parse` directly. No filesystem search or
@@ -26,7 +29,7 @@ itself.
 ## Load one explicit conventional root
 
 ```text
-dotnet run --project samples/Icod.TermInfo.Acquisition.Sample/Icod.TermInfo.Acquisition.Sample.csproj -- directory /usr/share/terminfo xterm
+dotnet run --project samples/Icod.TermInfo.Acquisition.Sample/Icod.TermInfo.Acquisition.Sample.csproj -f net10.0 -- directory /usr/share/terminfo xterm
 ```
 
 This uses `DirectoryTerminalDescriptionProvider`. The root is caller-owned and
@@ -35,7 +38,7 @@ the provider performs conventional exact-name lookup beneath that root only.
 ## Use normal system discovery
 
 ```text
-dotnet run --project samples/Icod.TermInfo.Acquisition.Sample/Icod.TermInfo.Acquisition.Sample.csproj -- system xterm-256color
+dotnet run --project samples/Icod.TermInfo.Acquisition.Sample/Icod.TermInfo.Acquisition.Sample.csproj -f net10.0 -- system xterm-256color
 ```
 
 This constructs `SystemTerminalDescriptionProvider` with default options. Its
@@ -44,7 +47,7 @@ permitted environment/home/platform inputs are snapshotted at construction.
 ## Demonstrate a fully restricted provider
 
 ```text
-dotnet run --project samples/Icod.TermInfo.Acquisition.Sample/Icod.TermInfo.Acquisition.Sample.csproj -- restricted xterm
+dotnet run --project samples/Icod.TermInfo.Acquisition.Sample/Icod.TermInfo.Acquisition.Sample.csproj -f net10.0 -- restricted xterm
 ```
 
 The sample disables environment, user, and platform-system sources. A clean miss
@@ -53,7 +56,7 @@ is therefore the expected result for a valid terminal name.
 ## Compose system lookup with built-in fallback
 
 ```text
-dotnet run --project samples/Icod.TermInfo.Acquisition.Sample/Icod.TermInfo.Acquisition.Sample.csproj -- fallback xterm
+dotnet run --project samples/Icod.TermInfo.Acquisition.Sample/Icod.TermInfo.Acquisition.Sample.csproj -f net10.0 -- fallback xterm
 ```
 
 This constructs:

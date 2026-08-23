@@ -9,8 +9,10 @@ It verifies:
 - required `net8.0` and `net10.0` package payloads are present;
 - both packaged assemblies retain assembly version `1.0.0.0` and remain
   unsigned;
+- both framework XML documentation files are non-empty, parseable, identify
+  `Icod.TermInfo`, and contain documented members;
 - `README.md` and `icon.png` are present and identified by NuGet metadata;
-- authors, project URL, license expression, license-acceptance flag,
+- title, authors, project URL, license expression, license-acceptance flag,
   description, tags, repository URL, and repository commit remain valid;
 - no runtime/native dependency payload was introduced;
 - repository-only tests, tools, fixtures, `.ti`, and `.bin` assets are absent;

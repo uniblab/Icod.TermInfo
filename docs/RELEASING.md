@@ -7,14 +7,21 @@ This document describes the current validation and publication procedure for
 
 - `<Version />` and `<PackageVersion />` in `Icod.TermInfo.csproj` must always be
   present and identical.
+- The 1.x assembly identity remains `Icod.TermInfo, Version=1.0.0.0` and remains
+  unsigned.
+- Supported consumer targets are `net8.0` and `net10.0`.
 - A final release tag must be exactly `v<PackageVersion>`.
 - Release validation must pass on Windows, Linux, and macOS before a final tag is
   created.
+- Release validation must pass the approved public API baseline and net8/net10
+  API-equivalence gates.
+- Release builds treat missing public XML documentation as an error.
 - The package must pass the release verifier before publication. Use
   `.github/scripts/verify-release-package.sh` on a Bash-capable host or
   `.github/scripts/verify-release-package.cmd` from Windows Command Prompt.
 - Release packages must retain deterministic build metadata, repository commit
-  metadata, portable symbols, and Source Link information.
+  metadata, portable symbols, Source Link, README, icon metadata, and both
+  framework XML-documentation assets.
 - The `.nupkg` and `.snupkg` produced for a version are immutable release
   artifacts. If package contents change, increment the version rather than
   replacing a published package.
@@ -66,14 +73,17 @@ The Bash and CMD entry points perform equivalent validation. They:
 
 1. run the deterministic standard-capability metadata generator in `--check`
    mode;
-2. run the C# package verifier for package structure, dependency closure, package
-   metadata, Source Link, portable symbols, and the generic-parameterization
-   architecture guard;
-3. copy the package-reference-only smoke consumer to a temporary directory;
-4. restore that consumer from the local artifact directory with an isolated
+2. require the approved 1.0 public API baseline to match;
+3. require exact public API equivalence between the built `net8.0` and
+   `net10.0` assemblies;
+4. run the C# package verifier for package structure, dependency closure,
+   README/icon/license metadata, XML documentation, Source Link, portable
+   symbols, and the generic-parameterization architecture guard;
+5. copy the package-reference-only smoke consumer to a temporary directory;
+6. restore that consumer from the local artifact directory with an isolated
    NuGet package cache;
-5. execute the smoke consumer against the packed `Icod.TermInfo` package;
-6. run the general repository sample through its non-interactive
+7. execute the smoke consumer separately against `net8.0` and `net10.0`;
+8. run the general repository sample through its non-interactive
    `--describe-only` path.
 
 Both repository sample executables are solution projects and therefore compile
@@ -85,8 +95,8 @@ deterministic acquisition acceptance test instead.
 The checked-in package smoke project is intentionally not part of the solution
 and contains no project reference to `Icod.TermInfo`.
 
-For the 0.9 release line, the smoke consumer also creates a conventional
-compiled entry at runtime and proves the packed package can:
+The smoke consumer creates a conventional compiled entry at runtime and proves
+the packed package can:
 
 - parse caller-supplied compiled bytes;
 - load an explicit conventional directory tree;
@@ -172,9 +182,16 @@ After a final version is published:
 - treat subsequent public API or package-content changes as changes for the next
   version.
 
-Historical completion evidence for 0.6.0, 0.7.0, and 0.8.0 remains under
-`docs/*-CONTRACT-AUDIT.md`. The 0.9 release-candidate API/package freeze is
-recorded in `docs/0.9.0-T40-API-PACKAGE-FREEZE.md`; final 0.9.0 completion
-evidence is recorded in `docs/0.9.0-CONTRACT-AUDIT.md`. Consumer-facing
-compiled-database usage is consolidated in
-`docs/0.9.0-ACQUISITION-GUIDE.md`.
+Historical completion evidence for 0.6.0 through 0.9.0 remains under the
+versioned roadmap and contract-audit documents. Consumer-facing compiled-database
+usage remains consolidated in `docs/0.9.0-ACQUISITION-GUIDE.md`.
+
+For 1.0, use:
+
+- `Icod.TermInfo-Development-Roadmap-1.0.0.md` for the active gate contract;
+- `docs/1.0.0-T42-CONTRACT-API-AUDIT.md` for assembly/support/API-baseline policy;
+- `docs/1.0.0-T43-ROBUSTNESS-COMPATIBILITY.md` for robustness/package metadata;
+- `docs/1.0.0-T44-DOCUMENTATION-PACKAGE-FREEZE.md` for the RC freeze;
+- `docs/VERSIONING.md` and `docs/COMPATIBILITY.md` for the stable 1.x promises.
+
+The final T45 contract audit owns the exact `v1.0.0` completion evidence.
