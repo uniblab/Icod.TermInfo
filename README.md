@@ -2,21 +2,21 @@
 
 `Icod.TermInfo` is a managed, dependency-free .NET implementation of the low-level terminal-capability model traditionally supplied by `libtinfo`.
 
-Version 0.8.0 is the semantic-completion release: it finishes the in-memory capability model, parameter/runtime safety, exact capability-byte behavior, terminal-aware padding, profile composition/cancellation fidelity, and authoritative Windows Console/Windows Terminal built-ins while preserving conservative resolution and no process-global current terminal.
+Version 0.9.0 is the arbitrary-terminal acquisition release. It retains the complete 0.8 in-memory semantic model and adds a pure compiled-terminfo byte parser, explicit conventional-directory loading, deterministic `TERMINFO`/`TERMINFO_DIRS`/user/system discovery, and provider-local cache/refresh semantics without introducing a native ncurses dependency or process-global current terminal.
 
-The package targets `net10.0`, uses C# 13, contains no native ncurses/terminfo payload, and is intended to run on Windows, Linux, and macOS.
+The current release candidate is `0.9.0-rc.1`. The package targets `net10.0`, uses C# 13, contains no native ncurses/terminfo payload, and is intended to run on Windows, Linux, and macOS.
 
 ## Install
 
-For the 0.8.0 release:
+For the current 0.9.0 release candidate:
 
 ```text
-dotnet add package Icod.TermInfo --version 0.8.0
+dotnet add package Icod.TermInfo --version 0.9.0-rc.1
 ```
 
 The same package contents are intended for NuGet.org and GitHub Packages. Repository development can reference `Icod.TermInfo.csproj` directly, as the sample project does.
 
-## What 0.8.0 provides
+## What 0.9.0 provides
 
 - immutable terminal descriptions with canonical name, aliases, and a separate verbose `Description`;
 - a complete ncurses/System V-compatible standard capability catalog: 44 Boolean, 39 numeric, and 414 string table positions;
@@ -33,24 +33,40 @@ The same package contents are intended for NuGet.org and GitHub Packages. Reposi
 - descriptive mouse, focus, bracketed-paste, modified-key, cursor-style, reporting, and clipboard metadata where the selected profile advertises it;
 - live terminal-size queries kept distinct from environment/profile defaults;
 - explicit and reversible Windows virtual-terminal output enablement, separate from profile selection;
-- a frozen, deterministic 0.9 compiled-terminfo binary/provider target and checked-in parser-readiness fixture corpus, without a production external database loader in 0.8.
+- pure parsing of supported conventional compiled terminfo entries from caller-supplied bytes;
+- caller-owned explicit conventional-directory providers with literal/hex first-character lookup and identity verification;
+- deterministic system discovery through encoded or directory `TERMINFO`, user `.terminfo`, ordered `TERMINFO_DIRS`, and frozen platform defaults;
+- provider-local successful-entry caching with retryable clean misses/failures and new-provider refresh semantics;
+- explicit provider composition, including system lookup followed by immutable built-in fallback.
 
 The 0.6.0 behavior of `dumb`, `ansi`, and `vt100` remains intentionally conservative: `dumb` is minimal, `ansi` is the traditional eight-color profile, and `vt100` remains monochrome.
 
 ## Getting started
 
-Terminal resolution is intentionally conservative. Unknown `TERM` values do not silently become ANSI, VT100, or xterm:
+Terminal resolution remains explicit and conservative. A normal application can
+search the host database first and then fall back to the immutable built-ins:
 
 ```csharp
 using Icod.TermInfo;
 
+TerminalDatabase database =
+    new(
+        new ITerminalDescriptionProvider[]
+        {
+            new SystemTerminalDescriptionProvider(),
+            TerminalDatabase.BuiltIn,
+        });
+
 TerminalDescription terminal =
     TerminalEnvironment.Resolve(
-        TerminalDatabase.BuiltIn,
+        database,
         TerminalProfiles.Dumb);
 
 Console.WriteLine($"Terminal profile: {terminal.Name}");
 ```
+
+`TerminalDatabase.BuiltIn` remains environment-independent and I/O-free.
+Unknown names are not silently coerced to ANSI, VT100, or xterm.
 
 To select a known modern profile explicitly:
 
@@ -416,10 +432,97 @@ TerminalDatabase database =
 
 Provider ordering is explicit and deterministic; the first provider that resolves a name wins.
 
+## Compiled terminfo acquisition
+
+### Parse caller-supplied bytes
+
+The parser is independently usable and has no filesystem or environment
+dependency:
+
+```csharp
+byte[] entry = File.ReadAllBytes("xterm.compiled");
+
+TerminalDescription parsed =
+    CompiledTermInfoParser.Parse(entry);
+```
+
+`CompiledTermInfoParserOptions` bounds accepted entry size. Malformed or
+unsupported compiled data throws `CompiledTermInfoFormatException`; it is not
+reported as a clean provider miss.
+
+### Load an explicit directory
+
+When an application owns a conventional terminfo directory tree, use
+`DirectoryTerminalDescriptionProvider`:
+
+```csharp
+ITerminalDescriptionProvider applicationTermInfo =
+    new DirectoryTerminalDescriptionProvider(
+        "/opt/myapp/share/terminfo");
+
+TerminalDescription terminal =
+    new TerminalDatabase(
+        new[] { applicationTermInfo })
+        .Load("my-terminal");
+```
+
+The provider performs exact-name lookup only and propagates malformed-entry,
+permission, and I/O failures.
+
+### Construct a restricted system provider
+
+Each system discovery category can be disabled independently:
+
+```csharp
+SystemTerminalDescriptionProvider restricted =
+    new(
+        new SystemTerminalDescriptionProviderOptions(
+            useEnvironment: false,
+            useUserDatabase: false,
+            useSystemDatabases: false));
+```
+
+That provider has no enabled acquisition source and therefore returns a clean
+miss for valid terminal names.
+
+### Use normal system discovery
+
+The default system provider snapshots its permitted discovery inputs at
+construction:
+
+```csharp
+SystemTerminalDescriptionProvider system =
+    new();
+```
+
+On non-Windows systems this can search encoded/directory `TERMINFO`, the
+user-local `.terminfo` database, `TERMINFO_DIRS`, and frozen platform defaults.
+Windows does not invent Unix-style implicit roots; explicit `TERMINFO`,
+`TERMINFO_DIRS`, and `DirectoryTerminalDescriptionProvider` remain available.
+
+### Compose system and built-in fallback
+
+`TerminalDatabase` is itself an `ITerminalDescriptionProvider`, so built-in
+fallback remains explicit:
+
+```csharp
+TerminalDatabase database =
+    new(
+        new ITerminalDescriptionProvider[]
+        {
+            new SystemTerminalDescriptionProvider(),
+            TerminalDatabase.BuiltIn,
+        });
+```
+
+The first provider which resolves the requested name wins.
+`TerminalDatabase.BuiltIn` is never mutated by system discovery.
+
 ## Sample application
 
 `samples/Icod.TermInfo.Sample` demonstrates:
 
+- pure compiled-byte parsing, explicit-root loading, restricted/normal system provider construction, and system-to-built-in composition;
 - conservative environment resolution with an explicit `dumb` fallback;
 - verbose description plus standard catalog/per-description enumeration;
 - reusable standard and extended parameterized-string expansion;
@@ -460,25 +563,36 @@ The intended family boundary is now explicit:
 
 The broader dependency inventory is recorded in `docs/FUTURE-WORK-INVENTORY.md`.
 
-## 0.9.0 arbitrary-terminal roadmap
+## 0.9.0 arbitrary-terminal acquisition
 
-Version 0.8 completed **terminfo semantics in memory**. Version 0.9 is planned to add the acquisition layer without redesigning that semantic model.
+Version 0.8 completed **terminfo semantics in memory**. Version 0.9 adds the
+acquisition layer without redesigning that semantic model.
 
-The 0.9 dependency chain is:
+The implemented 0.9 dependency chain is:
 
 ```text
 pure compiled-byte parser
     -> explicit directory provider
     -> TERMINFO / TERMINFO_DIRS / user / platform discovery
     -> provider-local cache and refresh semantics
-    -> final API/package completion gate
+    -> frozen API/package contract
 ```
 
-The parser will be independently usable from caller-supplied bytes and will support the frozen conventional `0432`, ncurses extended-section, and `01036` / signed-32-bit formats. Directory and system providers will reuse that parser rather than embedding their own binary logic. Encoded `TERMINFO=hex:...` and `TERMINFO=b64:...` entries will use the same path.
+The parser independently accepts caller-supplied bytes and supports the frozen
+conventional `0432`, ncurses extended-section, and `01036` / signed-32-bit
+formats. Directory and system providers reuse that parser rather than embedding
+their own binary logic. Encoded `TERMINFO=hex:...` and
+`TERMINFO=b64:...` entries use the same parser path.
 
-0.9 deliberately does **not** include `.ti` source parsing, `tic`/`infocmp`, termcap, Berkeley-DB hashed terminfo stores, divergent historical vendor binary formats, live input/session management, active probing, PTYs, curses, terminal emulation, or graphics protocols.
+0.9 deliberately does **not** include `.ti` source parsing, `tic`/`infocmp`,
+termcap, Berkeley-DB hashed terminfo stores, divergent historical vendor binary
+formats, live input/session management, active probing, PTYs, curses, terminal
+emulation, or graphics protocols.
 
-See `Icod.TermInfo-Development-Roadmap-0.9.0.md` for the detailed tranche contract and `docs/FUTURE-WORK-INVENTORY.md` for the post-0.9 dependency map.
+See `Icod.TermInfo-Development-Roadmap-0.9.0.md` for the detailed frozen tranche
+contract, `docs/0.9.0-T40-API-PACKAGE-FREEZE.md` for the release-candidate API
+and package freeze, and `docs/FUTURE-WORK-INVENTORY.md` for the post-0.9
+dependency map.
 
 ## Build, test, and pack
 
@@ -510,15 +624,15 @@ bash .github/scripts/verify-release-package.sh artifacts
 
 Both wrappers run the same C# metadata/package validation, an isolated package-reference-only smoke consumer, and the sample's non-interactive `--describe-only` path. Windows package validation does not require Bash or Python.
 
-Pushes to `main` run the Release build/test matrix on Windows, Linux, and macOS. After that matrix succeeds, the package-validation job packs and verifies the exact artifacts, and the downstream `Release` deployment job publishes the validated package to NuGet.org and GitHub Packages. Pull-request validation remains a separate repository workflow.
+Pushes to `main` and the active `0.9.0` release branch run the Release build/test matrix on Windows, Linux, and macOS. After that matrix succeeds, the package-validation job packs and verifies the exact artifacts, and the downstream `Release` deployment job publishes the validated package to NuGet.org and GitHub Packages. Pull-request validation remains a separate repository workflow.
 
-See `docs/RELEASING.md` for the release procedure and `docs/0.8.0-CONTRACT-AUDIT.md` for the final T31 evidence map. Tag `v0.8.0` only after the exact final candidate passes the complete workflow described there; no source/package content should change between that successful validation and tagging.
+See `docs/RELEASING.md` for the release procedure and `docs/0.9.0-T40-API-PACKAGE-FREEZE.md` for the release-candidate freeze. Tag `v0.9.0` only after T41 confirms the exact final candidate passes the complete workflow; no source/package content should change between that successful validation and tagging.
 
 ## Scope
 
 `Icod.TermInfo` is not curses, a terminal emulator, a PTY implementation, a termios session manager, an input-event parser, or a general terminal UI toolkit. It intentionally carries low-level descriptive data which those higher-level systems may consume.
 
-See `Icod.TermInfo-Development-Roadmap-0.8.0.md` for the frozen 0.8.0 contract, `Icod.TermInfo-Development-Roadmap-0.9.0.md` for the planned acquisition release, and `docs/FUTURE-WORK-INVENTORY.md` for the broader terminal-system dependency map. The 0.6.0 and 0.7.0 roadmaps remain historical frozen contracts.
+See `Icod.TermInfo-Development-Roadmap-0.8.0.md` for the frozen 0.8.0 contract, `Icod.TermInfo-Development-Roadmap-0.9.0.md` for the 0.9.0 acquisition-release contract, and `docs/FUTURE-WORK-INVENTORY.md` for the broader terminal-system dependency map. The 0.6.0 and 0.7.0 roadmaps remain historical frozen contracts.
 
 ## License
 

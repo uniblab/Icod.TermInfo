@@ -4,7 +4,7 @@
 **Package:** `Icod.TermInfo`
 **Target framework:** `net10.0`
 **Language:** C# 13
-**Status:** Active — T39 provider cache, refresh, and composition complete; T40 API/documentation/package freeze next
+**Status:** Active — T40 API, documentation, samples, and package freeze complete; T41 0.9.0 completion gate next
 **Previous contract:** `0.8.0` — semantic completion and binary/provider readiness
 **Contract target:** `0.9.0`
 **Initial development version:** `0.9.0-alpha.1`
@@ -1155,6 +1155,8 @@ isolated to caller-owned provider instances.
 ## T40 — API, Documentation, Samples, and Package Freeze
 
 **Development version:** `0.9.0-rc.1`
+**Status:** Complete
+**Implementation record:** `docs/0.9.0-T40-API-PACKAGE-FREEZE.md`
 
 ### Work
 

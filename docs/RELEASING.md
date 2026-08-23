@@ -35,9 +35,10 @@ repository `Staging` configuration on:
 Each matrix job cleans, restores, builds, and tests the whole solution, including
 the sample and solution-contained maintenance tools.
 
-### Pushes to main
+### Pushes to main and the active 0.9.0 release branch
 
-`.github/workflows/push-main.yaml` runs the Release build/test matrix on:
+`.github/workflows/push-main.yaml` runs for pushes to `main` and the active
+`0.9.0` release branch. It executes the Release build/test matrix on:
 
 - `windows-latest`;
 - `ubuntu-latest`;
@@ -74,6 +75,18 @@ The Bash and CMD entry points perform equivalent validation. They:
 The checked-in package smoke project is intentionally not part of the solution
 and contains no project reference to `Icod.TermInfo`.
 
+For the 0.9 release line, the smoke consumer also creates a conventional
+compiled entry at runtime and proves the packed package can:
+
+- parse caller-supplied compiled bytes;
+- load an explicit conventional directory tree;
+- construct a fully restricted system provider;
+- load through the public system provider from a snapshotted `TERMINFO` root;
+- compose system lookup with `TerminalDatabase.BuiltIn` fallback.
+
+No checked-in fixture is copied into the smoke project, so those checks prove the
+public package surface rather than repository-only test assets.
+
 ## Local release validation
 
 Build, test, and pack Release first:
@@ -104,10 +117,11 @@ Both wrappers are intended to provide the same validation contract.
 ## Automated publication
 
 The current `push-main.yaml` workflow publishes only after the Release matrix and
-package-validation job succeed. The deploy job consumes the package artifact
-uploaded by package validation rather than repacking the repository.
+package-validation job succeed. It watches both `main` and the active `0.9.0`
+release branch. The deploy job consumes the package artifact uploaded by package
+validation rather than repacking the repository.
 
-Before pushing a release-ready commit to `main`:
+Before pushing a release-ready commit to `main` or `0.9.0`:
 
 1. confirm `<Version />` and `<PackageVersion />` are the intended version;
 2. ensure the NuGet.org trusted-publishing policy authorizes this repository,
@@ -148,4 +162,6 @@ After a final version is published:
   version.
 
 Historical completion evidence for 0.6.0, 0.7.0, and 0.8.0 remains under
-`docs/*-CONTRACT-AUDIT.md`.
+`docs/*-CONTRACT-AUDIT.md`. The 0.9 release-candidate API/package freeze is
+recorded in `docs/0.9.0-T40-API-PACKAGE-FREEZE.md`; T41 owns the final 0.9.0
+completion evidence.

@@ -3,12 +3,7 @@ namespace Icod.TermInfo.Sample;
 internal static class SampleTerminalResolver
 {
     private static readonly TerminalDatabase DefaultDatabase =
-        new(
-            new ITerminalDescriptionProvider[]
-            {
-                new SystemTerminalDescriptionProvider(),
-                TerminalDatabase.BuiltIn,
-            });
+        SampleAcquisition.CreateSystemWithBuiltInFallback();
 
     internal static TerminalDescription Resolve(string[] arguments)
     {
