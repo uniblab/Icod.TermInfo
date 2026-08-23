@@ -217,28 +217,6 @@ public sealed class T21FoundationTests
         "KeySelect",
     ];
     [Fact]
-    public void AssemblyIdentifiesT21DevelopmentVersion()
-    {
-        Assembly assembly = typeof(TerminalDescription).Assembly;
-        Version? assemblyVersion = assembly.GetName().Version;
-        string? informationalVersion =
-            assembly
-                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                ?.InformationalVersion;
-
-        Assert.NotNull(assemblyVersion);
-        Assert.Equal(0, assemblyVersion!.Major);
-        Assert.Equal(8, assemblyVersion.Minor);
-        Assert.Equal(0, assemblyVersion.Build);
-        Assert.NotNull(informationalVersion);
-        Assert.True(
-            informationalVersion!.StartsWith(
-                "0.8.0",
-                StringComparison.Ordinal),
-            $"Unexpected informational version '{informationalVersion}'.");
-    }
-
-    [Fact]
     public void Release07ExportedTypesRemainAvailable()
     {
         HashSet<string> actual =
@@ -271,33 +249,6 @@ public sealed class T21FoundationTests
     {
         AssertRelease07EnumBaseline<StringCapability>(
             Release07StringCapabilityNames);
-    }
-
-    [Fact]
-    public void T21ContainsNoProductionDatabaseAcquisitionTypes()
-    {
-        string[] forbiddenTypeNames =
-        [
-            "CompiledTermInfoParser",
-            "CompiledTermInfoReader",
-            "DirectoryTermInfoProvider",
-            "DirectoryTerminalDescriptionProvider",
-            "SystemTermInfoProvider",
-            "SystemTerminalDescriptionProvider",
-        ];
-
-        Type[] actualTypes =
-            typeof(TerminalDescription).Assembly.GetTypes();
-
-        foreach (string forbiddenTypeName in forbiddenTypeNames)
-        {
-            Assert.DoesNotContain(
-                actualTypes,
-                type => string.Equals(
-                    type.Name,
-                    forbiddenTypeName,
-                    StringComparison.Ordinal));
-        }
     }
 
     private static void AssertRelease07EnumBaseline<TEnum>(

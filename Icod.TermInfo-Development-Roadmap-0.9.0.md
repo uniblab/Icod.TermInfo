@@ -4,7 +4,7 @@
 **Package:** `Icod.TermInfo`
 **Target framework:** `net10.0`
 **Language:** C# 13
-**Status:** Planned — arbitrary compiled-terminfo acquisition
+**Status:** Active — T34 extended/32-bit parser complete; T35 hardening/fuzz gate next
 **Previous contract:** `0.8.0` — semantic completion and binary/provider readiness
 **Contract target:** `0.9.0`
 **Initial development version:** `0.9.0-alpha.1`
@@ -950,6 +950,8 @@ every tranche.
 ## T32 — 0.9 Foundation and Acquisition API Freeze
 
 **Development version:** `0.9.0-alpha.1`
+**Status:** Complete
+**Foundation record:** `docs/0.9.0-T32-FOUNDATION.md`
 
 ### Work
 
@@ -975,6 +977,8 @@ without another architectural/public ownership redesign.
 ## T33 — Legacy `0432` Compiled Parser
 
 **Development version:** `0.9.0-alpha.2`
+**Status:** Complete
+**Implementation record:** `docs/0.9.0-T33-LEGACY-PARSER.md`
 
 ### Work
 
@@ -1000,6 +1004,8 @@ semantic model without filesystem involvement.
 ## T34 — ncurses Extended Sections and `01036`
 
 **Development version:** `0.9.0-alpha.3`
+**Status:** Complete
+**Implementation record:** `docs/0.9.0-T34-EXTENDED-PARSER.md`
 
 ### Work
 

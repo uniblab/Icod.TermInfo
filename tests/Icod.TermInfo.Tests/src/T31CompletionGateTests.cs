@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Text;
 using Icod.TermInfo;
 using Xunit;
@@ -7,30 +6,6 @@ namespace Icod.TermInfo.Tests;
 
 public sealed class T31CompletionGateTests
 {
-    [Fact]
-    public void AssemblyIdentifiesFinal08Release()
-    {
-        Assembly assembly = typeof(TerminalDescription).Assembly;
-        Version? assemblyVersion = assembly.GetName().Version;
-        string? informationalVersion =
-            assembly
-                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                ?.InformationalVersion;
-
-        Assert.NotNull(assemblyVersion);
-        Assert.Equal(new Version(0, 8, 0, 0), assemblyVersion);
-        Assert.NotNull(informationalVersion);
-        Assert.True(
-            string.Equals(
-                informationalVersion,
-                "0.8.0",
-                StringComparison.Ordinal)
-            || informationalVersion!.StartsWith(
-                "0.8.0+",
-                StringComparison.Ordinal),
-            $"Unexpected informational version '{informationalVersion}'.");
-    }
-
     [Fact]
     public void EveryFrozenBuiltInResolvesToItsExactDescription()
     {

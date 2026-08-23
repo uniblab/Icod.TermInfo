@@ -304,29 +304,25 @@ public sealed class T29BinaryReadinessTests
     }
 
     [Fact]
-    public void ProductionAssemblyContainsNoReservedCompiledDatabaseImplementation()
+    public void ProductionAssemblyContainsNoPrematureDatabaseProviderImplementation()
     {
         Assembly assembly = typeof(TerminalDatabase).Assembly;
-        string[] forbiddenFragments =
+        string[] reservedTypeNames =
         [
-            "CompiledTermInfo",
-            "DirectoryTermInfo",
-            "TermInfoDirectory",
-            "SystemTermInfoProvider",
+            "DirectoryTerminalDescriptionProvider",
+            "SystemTerminalDescriptionProviderOptions",
+            "SystemTerminalDescriptionProvider",
         ];
-
-        string[] forbiddenTypes =
+        HashSet<string> actualTypeNames =
             assembly.GetTypes()
-                .Select(type => type.FullName ?? type.Name)
-                .Where(
-                    name => forbiddenFragments.Any(
-                        fragment => name.Contains(
-                            fragment,
-                            StringComparison.OrdinalIgnoreCase)))
-                .OrderBy(name => name, StringComparer.Ordinal)
-                .ToArray();
+                .Select(type => type.Name)
+                .ToHashSet(StringComparer.Ordinal);
 
-        Assert.Empty(forbiddenTypes);
+        Assert.All(
+            reservedTypeNames,
+            reserved => Assert.DoesNotContain(
+                reserved,
+                actualTypeNames));
         Assert.DoesNotContain(
             assembly.GetManifestResourceNames(),
             name => name.Contains(

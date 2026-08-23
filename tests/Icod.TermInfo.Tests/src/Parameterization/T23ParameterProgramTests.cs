@@ -1,4 +1,3 @@
-using System.Reflection;
 using Icod.TermInfo;
 using Xunit;
 
@@ -6,23 +5,6 @@ namespace Icod.TermInfo.Tests;
 
 public sealed class T23ParameterProgramTests
 {
-    [Fact]
-    public void AssemblyIdentifies08DevelopmentVersion()
-    {
-        Assembly assembly = typeof(TermInfoParameterProgram).Assembly;
-        string? informationalVersion =
-            assembly
-                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                ?.InformationalVersion;
-
-        Assert.NotNull(informationalVersion);
-        Assert.True(
-            informationalVersion!.StartsWith(
-                "0.8.0",
-                StringComparison.Ordinal),
-            $"Unexpected informational version '{informationalVersion}'.");
-    }
-
     [Fact]
     public void AnalysisClassifiesParameterAndVariableUse()
     {
