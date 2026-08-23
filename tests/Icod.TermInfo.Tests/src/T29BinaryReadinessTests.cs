@@ -304,12 +304,11 @@ public sealed class T29BinaryReadinessTests
     }
 
     [Fact]
-    public void ProductionAssemblyContainsNoPrematureDatabaseProviderImplementation()
+    public void ProductionAssemblyContainsNoPrematureSystemProviderImplementation()
     {
         Assembly assembly = typeof(TerminalDatabase).Assembly;
         string[] reservedTypeNames =
         [
-            "DirectoryTerminalDescriptionProvider",
             "SystemTerminalDescriptionProviderOptions",
             "SystemTerminalDescriptionProvider",
         ];

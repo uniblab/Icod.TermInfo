@@ -60,13 +60,14 @@ public static partial class CompiledTermInfoParser
                 "header");
         }
 
+        ValidateStandardTableCounts(header);
+
         int numericWidth = GetNumericWidth(header.Magic);
         CompiledLayout layout =
             ReadLayout(
                 entry,
                 header,
                 numericWidth);
-        ValidateStandardTableCounts(header);
 
         TerminalDescriptionBuilder builder =
             CreateBuilder(

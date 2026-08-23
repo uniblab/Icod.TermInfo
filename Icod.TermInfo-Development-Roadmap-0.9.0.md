@@ -4,7 +4,7 @@
 **Package:** `Icod.TermInfo`
 **Target framework:** `net10.0`
 **Language:** C# 13
-**Status:** Active — T34 extended/32-bit parser complete; T35 hardening/fuzz gate next
+**Status:** Active — T36 explicit directory provider complete; T37 encoded `TERMINFO` and discovery inputs next
 **Previous contract:** `0.8.0` — semantic completion and binary/provider readiness
 **Contract target:** `0.9.0`
 **Initial development version:** `0.9.0-alpha.1`
@@ -1030,6 +1030,8 @@ semantic manifest.
 ## T35 — Parser Hardening, Diagnostics, and Fuzz Gate
 
 **Development version:** `0.9.0-alpha.4`
+**Status:** Complete
+**Implementation record:** `docs/0.9.0-T35-PARSER-HARDENING.md`
 
 ### Work
 
@@ -1053,6 +1055,8 @@ integer overflow, partial results, or native dependencies.
 ## T36 — Explicit Directory Provider
 
 **Development version:** `0.9.0-alpha.5`
+**Status:** Complete
+**Implementation record:** `docs/0.9.0-T36-DIRECTORY-PROVIDER.md`
 
 ### Work
 

@@ -1,4 +1,3 @@
-using System.Reflection;
 using Icod.TermInfo;
 using Xunit;
 
@@ -6,26 +5,6 @@ namespace Icod.TermInfo.Tests;
 
 public sealed class T34ExtendedParserTests
 {
-    [Fact]
-    public void AssemblyIdentifiesT34DevelopmentVersion()
-    {
-        Assembly assembly = typeof(CompiledTermInfoParser).Assembly;
-        Version? assemblyVersion = assembly.GetName().Version;
-        string? informationalVersion =
-            assembly
-                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                ?.InformationalVersion;
-
-        Assert.NotNull(assemblyVersion);
-        Assert.Equal(new Version(0, 9, 0, 0), assemblyVersion);
-        Assert.NotNull(informationalVersion);
-        Assert.True(
-            informationalVersion!.StartsWith(
-                "0.9.0-alpha.3",
-                StringComparison.Ordinal),
-            $"Unexpected informational version '{informationalVersion}'.");
-    }
-
     [Fact]
     public void NcursesExtendedFixtureParsesAllValueKindsAndExactNames()
     {

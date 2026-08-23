@@ -1,5 +1,4 @@
 using System.Buffers.Binary;
-using System.Text;
 
 namespace Icod.TermInfo;
 
@@ -93,11 +92,24 @@ public static partial class CompiledTermInfoParser
                 extendedHeader,
                 numericWidth);
 
+        ReadOnlySpan<byte> extendedStringTable =
+            entry.Slice(
+                extendedLayout.StringTableOffset,
+                extendedHeader.StringTableSize);
+        int[] stringTerminatorIndex =
+            BuildStringTerminatorIndex(
+                extendedStringTable);
+        ExtendedStringTableReader stringTable =
+            new(
+                extendedStringTable,
+                stringTerminatorIndex);
+
         int nameTableStart =
             FindExtendedNameTableStart(
                 entry,
                 extendedHeader,
-                extendedLayout);
+                extendedLayout,
+                stringTable);
 
         HashSet<string> names =
             new(StringComparer.Ordinal);
@@ -106,6 +118,7 @@ public static partial class CompiledTermInfoParser
             entry,
             extendedHeader,
             extendedLayout,
+            stringTable,
             nameTableStart,
             names,
             builder);
@@ -113,6 +126,7 @@ public static partial class CompiledTermInfoParser
             entry,
             extendedHeader,
             extendedLayout,
+            stringTable,
             nameTableStart,
             numericWidth,
             names,
@@ -121,6 +135,7 @@ public static partial class CompiledTermInfoParser
             entry,
             extendedHeader,
             extendedLayout,
+            stringTable,
             nameTableStart,
             names,
             builder);
@@ -168,34 +183,25 @@ public static partial class CompiledTermInfoParser
     private static void ValidateExtendedHeader(
         ExtendedHeader header)
     {
-        int nameCount;
-        int expectedItemCount;
-
-        try
-        {
-            nameCount =
-                checked(
-                    header.BooleanCount
-                    + header.NumericCount
-                    + header.StringCount);
-            expectedItemCount =
-                checked(
-                    nameCount
-                    + header.StringCount);
-        }
-        catch (OverflowException exception)
-        {
-            throw CreateFormatException(
-                "Extended capability counts overflowed.",
-                -1,
-                "extended-header",
-                exception);
-        }
+        int nameCount =
+            GetExtendedNameCount(header);
+        int expectedItemCount =
+            GetExtendedStringTableItemCount(
+                header,
+                nameCount);
 
         if (header.StringTableItemCount != expectedItemCount)
         {
             throw CreateFormatException(
                 "The extended string-table item count is inconsistent with the extended capability counts.",
+                -1,
+                "extended-header");
+        }
+
+        if (nameCount > header.StringTableSize)
+        {
+            throw CreateFormatException(
+                "The extended string table is too small to contain every required non-empty capability name.",
                 -1,
                 "extended-header");
         }
@@ -273,10 +279,7 @@ public static partial class CompiledTermInfoParser
             "extended-string-offsets");
 
         int nameCount =
-            checked(
-                header.BooleanCount
-                + header.NumericCount
-                + header.StringCount);
+            GetExtendedNameCount(header);
         int nameOffsetTableOffset = stringOffsetTableEnd;
         int nameOffsetTableEnd =
             CheckedEnd(
@@ -320,12 +323,9 @@ public static partial class CompiledTermInfoParser
     private static int FindExtendedNameTableStart(
         ReadOnlySpan<byte> entry,
         ExtendedHeader header,
-        ExtendedLayout layout)
+        ExtendedLayout layout,
+        ExtendedStringTableReader stringTable)
     {
-        ReadOnlySpan<byte> stringTable =
-            entry.Slice(
-                layout.StringTableOffset,
-                header.StringTableSize);
         int valueRegionEnd = 0;
 
         for (int index = 0;
@@ -356,10 +356,10 @@ public static partial class CompiledTermInfoParser
             }
 
             int stringEnd =
-                GetTerminatedStringEnd(
-                    stringTable,
+                stringTable.GetTerminatedStringEnd(
                     relativeOffset,
                     offsetEntry,
+                    "extended-string-offsets",
                     "extended-string-table");
             valueRegionEnd =
                 Math.Max(
@@ -374,15 +374,11 @@ public static partial class CompiledTermInfoParser
         ReadOnlySpan<byte> entry,
         ExtendedHeader header,
         ExtendedLayout layout,
+        ExtendedStringTableReader stringTable,
         int nameTableStart,
         HashSet<string> names,
         TerminalDescriptionBuilder builder)
     {
-        ReadOnlySpan<byte> stringTable =
-            entry.Slice(
-                layout.StringTableOffset,
-                header.StringTableSize);
-
         for (int index = 0;
             index < header.BooleanCount;
             index++)
@@ -425,16 +421,12 @@ public static partial class CompiledTermInfoParser
         ReadOnlySpan<byte> entry,
         ExtendedHeader header,
         ExtendedLayout layout,
+        ExtendedStringTableReader stringTable,
         int nameTableStart,
         int numericWidth,
         HashSet<string> names,
         TerminalDescriptionBuilder builder)
     {
-        ReadOnlySpan<byte> stringTable =
-            entry.Slice(
-                layout.StringTableOffset,
-                header.StringTableSize);
-
         for (int index = 0;
             index < header.NumericCount;
             index++)
@@ -488,15 +480,11 @@ public static partial class CompiledTermInfoParser
         ReadOnlySpan<byte> entry,
         ExtendedHeader header,
         ExtendedLayout layout,
+        ExtendedStringTableReader stringTable,
         int nameTableStart,
         HashSet<string> names,
         TerminalDescriptionBuilder builder)
     {
-        ReadOnlySpan<byte> stringTable =
-            entry.Slice(
-                layout.StringTableOffset,
-                header.StringTableSize);
-
         for (int index = 0;
             index < header.StringCount;
             index++)
@@ -542,10 +530,10 @@ public static partial class CompiledTermInfoParser
             }
 
             string value =
-                ReadLatin1String(
-                    stringTable,
+                stringTable.ReadLatin1String(
                     relativeOffset,
                     offsetEntry,
+                    "extended-string-offsets",
                     "extended-string-table");
             builder.SetExtendedString(
                 name,
@@ -555,7 +543,7 @@ public static partial class CompiledTermInfoParser
 
     private static string ReadExtendedName(
         ReadOnlySpan<byte> entry,
-        ReadOnlySpan<byte> stringTable,
+        ExtendedStringTableReader stringTable,
         ExtendedLayout layout,
         int nameTableStart,
         int nameIndex,
@@ -596,10 +584,10 @@ public static partial class CompiledTermInfoParser
         }
 
         string name =
-            ReadLatin1String(
-                stringTable,
+            stringTable.ReadLatin1String(
                 tableRelativeOffset,
                 offsetEntry,
+                "extended-name-offsets",
                 "extended-names");
 
         if (string.IsNullOrWhiteSpace(name))
@@ -627,62 +615,6 @@ public static partial class CompiledTermInfoParser
         }
 
         return name;
-    }
-
-    private static string ReadLatin1String(
-        ReadOnlySpan<byte> stringTable,
-        int relativeOffset,
-        int sourceOffset,
-        string section)
-    {
-        int stringEnd =
-            GetTerminatedStringEnd(
-                stringTable,
-                relativeOffset,
-                sourceOffset,
-                section);
-        int length =
-            stringEnd
-            - relativeOffset
-            - 1;
-
-        return Encoding.Latin1.GetString(
-            stringTable.Slice(
-                relativeOffset,
-                length));
-    }
-
-    private static int GetTerminatedStringEnd(
-        ReadOnlySpan<byte> stringTable,
-        int relativeOffset,
-        int sourceOffset,
-        string section)
-    {
-        if (relativeOffset < 0
-            || relativeOffset >= stringTable.Length)
-        {
-            throw CreateFormatException(
-                $"String offset {relativeOffset} lies outside the declared extended string table.",
-                sourceOffset,
-                section);
-        }
-
-        ReadOnlySpan<byte> value =
-            stringTable[relativeOffset..];
-        int terminator =
-            value.IndexOf((byte)0);
-
-        if (terminator < 0)
-        {
-            throw CreateFormatException(
-                "An extended string is not NUL-terminated inside the declared extended string table.",
-                sourceOffset,
-                section);
-        }
-
-        return relativeOffset
-            + terminator
-            + 1;
     }
 
     private readonly struct ExtendedHeader
