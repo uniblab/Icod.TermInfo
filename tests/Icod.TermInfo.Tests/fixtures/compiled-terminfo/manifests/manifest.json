@@ -1,0 +1,231 @@
+{
+  "schemaVersion": 1,
+  "binaryContract": {
+    "byteOrder": "little-endian",
+    "legacyMagicOctal": "0432",
+    "legacyMagicValue": 282,
+    "extendedNumberMagicOctal": "01036",
+    "extendedNumberMagicValue": 542,
+    "absentBooleanByte": 0,
+    "canceledBooleanByte": 254,
+    "absentNumericOrString": -1,
+    "canceledNumericOrString": -2
+  },
+  "generator": {
+    "tool": "tic",
+    "version": "ncurses 6.5.20250216",
+    "arguments": "-x -o <temporary-output> <source-file>",
+    "normalTestsRequireGenerator": false
+  },
+  "fixtures": [
+    {
+      "id": "legacy-minimal",
+      "source": "source/t29-legacy-minimal.ti",
+      "sourceSha256": "ac3becbc3f7654801db3fdabb865f6e86a35e81be7421f4f7f8895bdd937ff37",
+      "binary": "compiled/t29-legacy-minimal.bin",
+      "sha256": "29d54efbb8c4c3a6e38889c2266da57c9925a2c07724cd6c709bac54c752ef62",
+      "magicOctal": "0432",
+      "header": {
+        "namesSize": 52,
+        "booleanCount": 2,
+        "numericCount": 3,
+        "stringCount": 11,
+        "stringTableSize": 25,
+        "numericAlignmentByte": false
+      },
+      "expected": {
+        "name": "t29-legacy-minimal",
+        "aliases": ["t29lm"],
+        "description": "T29 minimal legacy fixture",
+        "booleans": { "am": true },
+        "numbers": { "cols": 80, "lines": 24 },
+        "strings": {
+          "clear": "\u001b[H\u001b[2J",
+          "cup": "\u001b[%i%p1%d;%p2%dH"
+        },
+        "absentBooleans": ["bw"],
+        "absentNumbers": ["it"],
+        "absentStrings": ["bel"]
+      }
+    },
+    {
+      "id": "legacy-alignment",
+      "source": "source/t29-legacy-alignment.ti",
+      "sourceSha256": "357d760c0d6bd13477d15eafca471289ae00566eb7da6e59375dd2518e78e6e2",
+      "binary": "compiled/t29-legacy-alignment.bin",
+      "sha256": "493bfeab84c97b20552c21250780d226fd4a5c3d0fa385338996e5fa285a31d9",
+      "magicOctal": "0432",
+      "header": {
+        "namesSize": 57,
+        "booleanCount": 2,
+        "numericCount": 1,
+        "stringCount": 2,
+        "stringTableSize": 2,
+        "numericAlignmentByte": true
+      },
+      "expected": {
+        "name": "t29-legacy-alignment",
+        "aliases": ["t29la"],
+        "description": "T29 alignment padding fixture",
+        "booleans": { "am": true },
+        "numbers": { "cols": 81 },
+        "strings": { "bel": "\u0007" }
+      }
+    },
+    {
+      "id": "legacy-edge",
+      "source": "source/t29-legacy-edge.ti",
+      "sourceSha256": "f4b2643af7800586b4a8585fc3e75e3827233297ef4fb8398990ae331defc7d6",
+      "binary": "compiled/t29-legacy-edge.bin",
+      "sha256": "fe2ee8f202481c811112150d03ac5ad43be3891c3e958fbe68726cf7c9a06c91",
+      "magicOctal": "0432",
+      "header": {
+        "namesSize": 69,
+        "booleanCount": 5,
+        "numericCount": 14,
+        "stringCount": 56,
+        "stringTableSize": 36,
+        "numericAlignmentByte": false
+      },
+      "expected": {
+        "name": "t29-legacy-edge",
+        "aliases": ["t29le"],
+        "description": "T29 cancellation padding and high-byte fixture",
+        "booleans": { "xenl": true },
+        "numbers": { "cols": 82, "colors": 8 },
+        "strings": {
+          "clear": "\u001b[H\u001b[2J$<5>",
+          "cup": "\u001b[%i%p1%d;%p2%dH$<2*>",
+          "kbs": "\u0080"
+        },
+        "canceledBooleans": ["bw"],
+        "canceledNumbers": ["lines"],
+        "canceledStrings": ["bel"]
+      }
+    },
+    {
+      "id": "extended",
+      "source": "source/t29-extended.ti",
+      "sourceSha256": "402fa17c19c23a3b9bd3775bc7f51c51c67c4de380e2b0eff2750fecaa69993b",
+      "binary": "compiled/t29-extended.bin",
+      "sha256": "bfd758b37a09d571c09c9858c85305823d908e4fa62011cbf510b35123f4dd09",
+      "magicOctal": "0432",
+      "header": {
+        "namesSize": 47,
+        "booleanCount": 2,
+        "numericCount": 1,
+        "stringCount": 6,
+        "stringTableSize": 8,
+        "numericAlignmentByte": true
+      },
+      "extendedHeader": {
+        "booleanCount": 2,
+        "numericCount": 1,
+        "stringCount": 1,
+        "stringTableItemCount": 5,
+        "stringTableSize": 31
+      },
+      "expected": {
+        "name": "t29-extended",
+        "aliases": ["t29x"],
+        "description": "T29 ncurses extended fixture",
+        "booleans": { "am": true },
+        "numbers": { "cols": 90 },
+        "strings": { "clear": "\u001b[H\u001b[2J" },
+        "extendedBooleans": { "XBool": true, "xyz": true },
+        "extendedNumbers": { "XNum": 12345 },
+        "extendedStrings": { "XStr": "alpha\u001bbeta" }
+      }
+    },
+    {
+      "id": "extended32",
+      "source": "source/t29-extended32.ti",
+      "sourceSha256": "57b3e489c61911adf2072a694af7e6ad63b47f723c86f01211b3d41dd13ea188",
+      "binary": "compiled/t29-extended32.bin",
+      "sha256": "181a6ed7176f2a0a2ecc38ddfc3e020c75c64f40b5eee58e77281e2a41018f41",
+      "magicOctal": "01036",
+      "header": {
+        "namesSize": 50,
+        "booleanCount": 2,
+        "numericCount": 15,
+        "stringCount": 6,
+        "stringTableSize": 8,
+        "numericAlignmentByte": false
+      },
+      "extendedHeader": {
+        "booleanCount": 1,
+        "numericCount": 1,
+        "stringCount": 1,
+        "stringTableItemCount": 4,
+        "stringTableSize": 22
+      },
+      "expected": {
+        "name": "t29-extended32",
+        "aliases": ["t29x32"],
+        "description": "T29 extended-number fixture",
+        "booleans": { "am": true },
+        "numbers": { "colors": 16777216, "pairs": 65536 },
+        "strings": { "clear": "\u001b[H\u001b[2J" },
+        "extendedBooleans": { "XBool": true },
+        "extendedNumbers": { "XNum": 2147483640 },
+        "extendedStrings": { "XStr": "omega" }
+      }
+    }
+  ],
+  "adversarialSeeds": [
+    {
+      "id": "truncated-header",
+      "binary": "malformed/truncated-header.bin",
+      "sha256": "0cd7754cf0c10eae04979b8074958c5a0362524cf24004e2b148c311b3392e44",
+      "futureExpectation": "reject truncated six-short header"
+    },
+    {
+      "id": "impossible-count",
+      "binary": "malformed/impossible-count.bin",
+      "sha256": "3b0409a80111d6e3e76fa968c11f7de6a27ebed6d3614d7bfb7c73d37fd14d48",
+      "futureExpectation": "reject counts inconsistent with available bytes"
+    },
+    {
+      "id": "bad-names-terminator",
+      "binary": "malformed/bad-names-terminator.bin",
+      "sha256": "8f477ea170331238f6fe37756a184b7ee68833eda71ec2148081003abbc46467",
+      "futureExpectation": "reject names section without terminating NUL"
+    },
+    {
+      "id": "illegal-string-offset",
+      "binary": "malformed/illegal-string-offset.bin",
+      "sha256": "58c43dbe806eb82e773db88db5209da888b9d8b84974f311d380e40b06806029",
+      "futureExpectation": "reject string offset outside the declared string table"
+    },
+    {
+      "id": "unsupported-magic",
+      "binary": "malformed/unsupported-magic.bin",
+      "sha256": "e14a1af04e12ebd0e088fb5a2071435a8fb49a4116f71b06fab6b85d54fa8517",
+      "futureExpectation": "reject unsupported compiled-entry magic"
+    },
+    {
+      "id": "malformed-extended-header",
+      "binary": "malformed/malformed-extended-header.bin",
+      "sha256": "df3bab519e8c6a2e7bec77bcd5a8ef4ecf7a09acdaeb107f08e8b68ec1bd9139",
+      "futureExpectation": "reject truncated ncurses extended header"
+    },
+    {
+      "id": "impossible-extended-count",
+      "binary": "malformed/impossible-extended-count.bin",
+      "sha256": "c3aa334be830b07a2b4b95172558e21a4d9cb620d6505fbe53214c8257c28878",
+      "futureExpectation": "reject extended counts inconsistent with available bytes"
+    },
+    {
+      "id": "illegal-extended-string-offset",
+      "binary": "malformed/illegal-extended-string-offset.bin",
+      "sha256": "572376dd89ddec0c4bd3d6b9d01a670f0183f8cc71fd29f95bfc9146caef99af",
+      "futureExpectation": "reject extended string offset outside the declared extended string table"
+    },
+    {
+      "id": "extended-standard-name-collision",
+      "binary": "malformed/extended-standard-name-collision.bin",
+      "sha256": "5fbed81c28f2cefd692dffdd6a95038b45187f9220869c21203da3df9135e778",
+      "futureExpectation": "reject or explicitly handle an extended capability named like standard cup"
+    }
+  ]
+}
