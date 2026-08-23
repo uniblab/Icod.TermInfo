@@ -791,3 +791,4 @@ public sealed class T35ParserHardeningTests
             stringOffsetTable,
             nameOffsetTable);
     }
+}
