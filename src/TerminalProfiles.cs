@@ -56,6 +56,13 @@ public static class TerminalProfiles
         AnsiTerminalProfile.Create();
 
     /// <summary>
+    /// Gets the authoritative ncurses <c>winconsole</c> profile for the
+    /// Windows 10-and-later virtual-terminal console.
+    /// </summary>
+    public static TerminalDescription WinConsole { get; } =
+        WindowsConsoleTerminalProfile.Create();
+
+    /// <summary>
     /// Gets the DEC VT100 profile with the advanced-video option.
     /// </summary>
     public static TerminalDescription Vt100 { get; } =

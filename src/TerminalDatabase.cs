@@ -50,6 +50,7 @@ public sealed class TerminalDatabase
                         TerminalProfiles.Xterm,
                         TerminalProfiles.Vt220,
                         TerminalProfiles.Vt102,
+                        TerminalProfiles.WinConsole,
                         TerminalProfiles.Ansi,
                         TerminalProfiles.Vt100,
                         TerminalProfiles.Dumb,

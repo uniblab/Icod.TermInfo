@@ -84,6 +84,7 @@ public sealed class PublicApiSurfaceTests
             "Vt100",
             "Vt102",
             "Vt220",
+            "WinConsole",
             "Xterm",
             "Xterm16Color",
             "Xterm88Color",
