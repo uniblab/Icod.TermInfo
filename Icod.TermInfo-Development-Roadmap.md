@@ -13,9 +13,10 @@ version contracts live in version-specific roadmap files.
 - `Icod.TermInfo-Development-Roadmap-0.8.0.md` — semantic completion, Windows
   profiles, binary/provider readiness, and final 0.8 contract; complete and
   frozen.
-- `Icod.TermInfo-Development-Roadmap-0.9.0.md` — active arbitrary compiled
-  terminfo acquisition: pure binary parser, explicit directory provider,
-  environment/system discovery, and provider-local cache/refresh semantics.
+- `Icod.TermInfo-Development-Roadmap-0.9.0.md` — arbitrary compiled terminfo
+  acquisition: pure binary parser, explicit directory provider,
+  environment/system discovery, and provider-local cache/refresh semantics;
+  complete and frozen.
 
 ## Roadmap sequence
 

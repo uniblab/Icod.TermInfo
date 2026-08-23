@@ -4,6 +4,13 @@ namespace Icod.TermInfo;
 /// Configures which system terminfo discovery sources a system provider is
 /// permitted to consult.
 /// </summary>
+/// <remarks>
+/// <see cref="UseEnvironment"/> controls <c>TERMINFO</c> and
+/// <c>TERMINFO_DIRS</c>. <see cref="UseUserDatabase"/> controls the non-Windows
+/// user <c>.terminfo</c> source. <see cref="UseSystemDatabases"/> controls
+/// implicit platform roots and expansion of empty <c>TERMINFO_DIRS</c>
+/// components to those roots. The three controls are independent.
+/// </remarks>
 public sealed class SystemTerminalDescriptionProviderOptions
 {
     /// <summary>

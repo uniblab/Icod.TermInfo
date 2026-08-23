@@ -5,9 +5,18 @@ using System.Globalization;
 namespace Icod.TermInfo;
 
 /// <summary>
-/// Loads compiled terminal descriptions from one caller-supplied directory
-/// tree.
+/// Loads compiled terminal descriptions from one caller-supplied conventional
+/// terminfo directory tree.
 /// </summary>
+/// <remarks>
+/// Exact-name lookup checks the literal first-character directory before the
+/// lowercase two-digit hexadecimal first-byte directory. Parsed canonical names
+/// and aliases must match the requested name exactly. Successful descriptions
+/// are cached for this provider instance; clean misses and failures remain
+/// retryable. Construct a new provider to observe a changed successful entry.
+/// This provider never consults environment variables, user-home locations, or
+/// platform default databases.
+/// </remarks>
 public sealed class DirectoryTerminalDescriptionProvider
     : ITerminalDescriptionProvider
 {
@@ -21,13 +30,19 @@ public sealed class DirectoryTerminalDescriptionProvider
     /// Initializes a provider rooted at the specified terminfo directory.
     /// </summary>
     /// <param name="root">
-    /// The directory containing conventional first-character terminfo
-    /// subdirectories.
+    /// The conventional terminfo tree root. It is canonicalized to an absolute
+    /// path and does not need to exist at construction time.
     /// </param>
     /// <param name="parserOptions">
     /// Optional parser resource limits. The values are snapshotted when the
     /// provider is constructed.
     /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="root"/> is <see langword="null"/>.
+    /// </exception>
+    /// <exception cref="ArgumentException">
+    /// <paramref name="root"/> is empty or whitespace.
+    /// </exception>
     public DirectoryTerminalDescriptionProvider(
         string root,
         CompiledTermInfoParserOptions? parserOptions = null)
@@ -56,6 +71,12 @@ public sealed class DirectoryTerminalDescriptionProvider
     public string Root { get; }
 
     /// <inheritdoc/>
+    /// <remarks>
+    /// A missing candidate is a clean miss. Malformed compiled data, identity
+    /// mismatches, permission failures, and other I/O failures propagate.
+    /// Successful results are cached by exact requested name for this provider
+    /// instance.
+    /// </remarks>
     public bool TryLoad(
         string name,
         [NotNullWhen(true)] out TerminalDescription? terminal)

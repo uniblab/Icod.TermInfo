@@ -6,6 +6,13 @@ namespace Icod.TermInfo;
 /// <summary>
 /// Parses conventional compiled terminfo entries from caller-supplied bytes.
 /// </summary>
+/// <remarks>
+/// Parsing is pure with respect to filesystem and environment state. Supported
+/// entries include legacy <c>0432</c>, the ncurses extended section, and
+/// <c>01036</c> entries with signed 32-bit numerics. Capability-string bytes are
+/// represented through the library's reversible Latin-1 bridge. The parser
+/// does not retain caller-owned byte storage.
+/// </remarks>
 public static partial class CompiledTermInfoParser
 {
     private const ushort LegacyMagic = 0x011A;
@@ -25,14 +32,19 @@ public static partial class CompiledTermInfoParser
     /// Parses one supported conventional compiled terminfo entry into an
     /// immutable terminal description.
     /// </summary>
-    /// <param name="entry">The complete compiled entry.</param>
+    /// <param name="entry">
+    /// The complete compiled entry. The parser does not retain this storage.
+    /// </param>
     /// <param name="options">
     /// Optional parser resource limits. Default limits are used when omitted.
     /// </param>
-    /// <returns>The parsed immutable terminal description.</returns>
+    /// <returns>
+    /// A new immutable terminal description containing the standard and
+    /// extended capabilities represented by the entry.
+    /// </returns>
     /// <exception cref="CompiledTermInfoFormatException">
-    /// The entry is malformed, exceeds the configured size limit, or uses a
-    /// compiled layout not implemented by this tranche.
+    /// The entry is malformed, exceeds the configured size limit, or uses an
+    /// unsupported compiled layout.
     /// </exception>
     public static TerminalDescription Parse(
         ReadOnlySpan<byte> entry,

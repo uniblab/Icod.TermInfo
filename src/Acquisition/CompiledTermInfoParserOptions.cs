@@ -1,8 +1,14 @@
 namespace Icod.TermInfo;
 
 /// <summary>
-/// Configures resource limits for compiled terminfo parsing.
+/// Configures immutable resource limits for compiled terminfo parsing.
 /// </summary>
+/// <remarks>
+/// The maximum applies to a complete compiled entry whether the bytes are
+/// supplied directly to <see cref="CompiledTermInfoParser"/> or read through a
+/// filesystem-backed provider. Provider constructors snapshot this value.
+/// Increasing the limit does not enable additional compiled formats.
+/// </remarks>
 public sealed class CompiledTermInfoParserOptions
 {
     /// <summary>
@@ -19,8 +25,12 @@ public sealed class CompiledTermInfoParserOptions
     /// Initializes immutable parser options.
     /// </summary>
     /// <param name="maximumEntrySize">
-    /// The largest compiled entry the parser will accept.
+    /// The largest complete compiled entry, in bytes, the parser will accept.
     /// </param>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// <paramref name="maximumEntrySize"/> is less than one byte or greater
+    /// than <see cref="MaximumSupportedEntrySize"/>.
+    /// </exception>
     public CompiledTermInfoParserOptions(
         int maximumEntrySize = DefaultMaximumEntrySize)
     {

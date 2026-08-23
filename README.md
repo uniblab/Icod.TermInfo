@@ -4,14 +4,14 @@
 
 Version 0.9.0 is the arbitrary-terminal acquisition release. It retains the complete 0.8 in-memory semantic model and adds a pure compiled-terminfo byte parser, explicit conventional-directory loading, deterministic `TERMINFO`/`TERMINFO_DIRS`/user/system discovery, and provider-local cache/refresh semantics without introducing a native ncurses dependency or process-global current terminal.
 
-The current release candidate is `0.9.0-rc.1`. The package targets `net10.0`, uses C# 13, contains no native ncurses/terminfo payload, and is intended to run on Windows, Linux, and macOS.
+The package targets `net10.0`, uses C# 13, contains no native ncurses/terminfo payload, and is intended to run on Windows, Linux, and macOS.
 
 ## Install
 
-For the current 0.9.0 release candidate:
+For the 0.9.0 release:
 
 ```text
-dotnet add package Icod.TermInfo --version 0.9.0-rc.1
+dotnet add package Icod.TermInfo --version 0.9.0
 ```
 
 The same package contents are intended for NuGet.org and GitHub Packages. Repository development can reference `Icod.TermInfo.csproj` directly, as the sample project does.
@@ -434,6 +434,12 @@ Provider ordering is explicit and deterministic; the first provider that resolve
 
 ## Compiled terminfo acquisition
 
+For a task-oriented explanation of parser formats, directory layout, discovery
+precedence, option boundaries, errors, caching, and refresh, see
+`docs/0.9.0-ACQUISITION-GUIDE.md`. The focused
+`samples/Icod.TermInfo.Acquisition.Sample` executable demonstrates the same
+public acquisition paths without emitting terminal-control strings.
+
 ### Parse caller-supplied bytes
 
 The parser is independently usable and has no filesystem or environment
@@ -518,19 +524,25 @@ TerminalDatabase database =
 The first provider which resolves the requested name wins.
 `TerminalDatabase.BuiltIn` is never mutated by system discovery.
 
-## Sample application
+## Sample applications
+
+The repository contains two executable samples with deliberately different
+purposes.
+
+### General terminal API sample
 
 `samples/Icod.TermInfo.Sample` demonstrates:
 
-- pure compiled-byte parsing, explicit-root loading, restricted/normal system provider construction, and system-to-built-in composition;
 - conservative environment resolution with an explicit `dumb` fallback;
+- system-to-built-in provider composition for ordinary resolution;
 - verbose description plus standard catalog/per-description enumeration;
 - reusable standard and extended parameterized-string expansion;
 - exact Latin-1 capability-byte output;
 - terminal-aware padding with explicit terminal facts;
 - semantic indexed/direct color inspection and expansion;
 - Windows Console and Windows Terminal profile selection without side effects;
-- full-screen/cursor-visibility capability discovery without taking ownership of a full-screen session;
+- full-screen/cursor-visibility capability discovery without taking ownership of
+  a full-screen session;
 - live/configured/profile size selection;
 - redirection handling and explicit Windows VT enablement;
 - a custom provider implementation.
@@ -541,13 +553,50 @@ Run the ordinary demonstration with:
 dotnet run --project samples/Icod.TermInfo.Sample/Icod.TermInfo.Sample.csproj
 ```
 
-For CI, documentation checks, or any environment where terminal-control output is inappropriate, use the non-interactive descriptive mode:
+For CI, documentation checks, or any environment where terminal-control output
+is inappropriate, use the non-interactive descriptive mode:
 
 ```text
 dotnet run --project samples/Icod.TermInfo.Sample/Icod.TermInfo.Sample.csproj -- --describe-only --profile xterm-direct256
 ```
 
-`--profile <name>` selects an exact built-in profile instead of consulting `TERM`. `--describe-only` exercises metadata/enumeration, expansion, byte-output, padding, profile, color, and extended-capability APIs but emits no terminal-control strings to the active terminal.
+`--profile <name>` selects an exact built-in profile instead of consulting
+`TERM`. `--describe-only` exercises metadata/enumeration, expansion, byte-output,
+padding, profile, color, and extended-capability APIs but emits no
+terminal-control strings to the active terminal.
+
+### Compiled terminfo acquisition sample
+
+`samples/Icod.TermInfo.Acquisition.Sample` is a focused, non-interactive sample
+for the new 0.9 acquisition layer. It demonstrates:
+
+```text
+parse <compiled-file>
+directory <root> <terminal-name>
+system <terminal-name>
+restricted <terminal-name>
+fallback <terminal-name>
+```
+
+For example:
+
+```text
+dotnet run --project samples/Icod.TermInfo.Acquisition.Sample/Icod.TermInfo.Acquisition.Sample.csproj -- system xterm-256color
+```
+
+and:
+
+```text
+dotnet run --project samples/Icod.TermInfo.Acquisition.Sample/Icod.TermInfo.Acquisition.Sample.csproj -- directory /usr/share/terminfo xterm
+```
+
+The sample prints the resolved terminal identity, aliases, selected numeric
+facts, and standard/extended capability counts. It does not write any capability
+string to the terminal.
+
+See `samples/README.md`,
+`samples/Icod.TermInfo.Acquisition.Sample/README.md`, and
+`docs/0.9.0-ACQUISITION-GUIDE.md` for the complete examples.
 
 ## Project-family boundary
 
@@ -589,9 +638,11 @@ termcap, Berkeley-DB hashed terminfo stores, divergent historical vendor binary
 formats, live input/session management, active probing, PTYs, curses, terminal
 emulation, or graphics protocols.
 
-See `Icod.TermInfo-Development-Roadmap-0.9.0.md` for the detailed frozen tranche
-contract, `docs/0.9.0-T40-API-PACKAGE-FREEZE.md` for the release-candidate API
-and package freeze, and `docs/FUTURE-WORK-INVENTORY.md` for the post-0.9
+See `docs/0.9.0-ACQUISITION-GUIDE.md` for the consumer-facing acquisition
+guide, `Icod.TermInfo-Development-Roadmap-0.9.0.md` for the detailed frozen
+tranche contract, `docs/0.9.0-CONTRACT-AUDIT.md` for the final completion
+evidence, `docs/0.9.0-T40-API-PACKAGE-FREEZE.md` for the release-candidate
+API/package freeze, and `docs/FUTURE-WORK-INVENTORY.md` for the post-0.9
 dependency map.
 
 ## Build, test, and pack
@@ -624,9 +675,9 @@ bash .github/scripts/verify-release-package.sh artifacts
 
 Both wrappers run the same C# metadata/package validation, an isolated package-reference-only smoke consumer, and the sample's non-interactive `--describe-only` path. Windows package validation does not require Bash or Python.
 
-Pushes to `main` and the active `0.9.0` release branch run the Release build/test matrix on Windows, Linux, and macOS. After that matrix succeeds, the package-validation job packs and verifies the exact artifacts, and the downstream `Release` deployment job publishes the validated package to NuGet.org and GitHub Packages. Pull-request validation remains a separate repository workflow.
+Only pushes to `main` run the Release build/test, package-validation, and publication workflow. Pull requests run the separate `pr-build-and-test.yaml` validation workflow and never publish packages. After the `main` Release matrix succeeds, package validation verifies the exact artifacts and the downstream `Release` deployment job publishes them to NuGet.org and GitHub Packages.
 
-See `docs/RELEASING.md` for the release procedure and `docs/0.9.0-T40-API-PACKAGE-FREEZE.md` for the release-candidate freeze. Tag `v0.9.0` only after T41 confirms the exact final candidate passes the complete workflow; no source/package content should change between that successful validation and tagging.
+See `docs/RELEASING.md` for the release procedure and `docs/0.9.0-CONTRACT-AUDIT.md` for the final completion evidence. Tag `v0.9.0` only after the exact final `main` candidate passes the complete workflow; no source/package content should change between that successful validation and tagging.
 
 ## Scope
 

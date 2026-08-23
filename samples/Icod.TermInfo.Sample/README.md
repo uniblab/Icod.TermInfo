@@ -1,12 +1,13 @@
 # Icod.TermInfo Sample
 
-This is the repository's single executable sample for the low-level
-`Icod.TermInfo` API. It is intentionally descriptive rather than a live terminal
-session manager.
+This is the repository's general executable sample for the low-level
+`Icod.TermInfo` semantic, profile, output, and environment APIs. It is
+intentionally descriptive rather than a live terminal session manager.
 
 The sample demonstrates:
 
 - exact built-in profile selection and conservative environment resolution;
+- ordinary system-to-built-in provider composition;
 - standard catalog and per-description capability enumeration;
 - reusable standard and extended parameter expansion;
 - exact Latin-1 capability-byte output;
@@ -37,7 +38,10 @@ any environment where terminal-control strings should not be emitted:
 dotnet run --project samples/Icod.TermInfo.Sample/Icod.TermInfo.Sample.csproj -- --describe-only --profile ms-terminal-direct
 ```
 
-The 0.9 acquisition work will extend this same executable with examples for
-caller-supplied compiled bytes, explicit directory providers, restricted system
-discovery, normal system discovery, and explicit built-in fallback composition.
-Those switches will be documented only when the corresponding APIs exist.
+For caller-supplied compiled bytes, explicit database roots, restricted system
+discovery, normal host discovery, and explicit built-in fallback composition,
+use the focused `Icod.TermInfo.Acquisition.Sample` executable next to this
+project.
+
+See `../README.md` for the sample index and
+`../../docs/0.9.0-ACQUISITION-GUIDE.md` for the complete acquisition contract.
