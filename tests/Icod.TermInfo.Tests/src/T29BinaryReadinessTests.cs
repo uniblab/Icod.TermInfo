@@ -1,4 +1,5 @@
 using System.Buffers.Binary;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
@@ -28,7 +29,11 @@ public sealed class T29BinaryReadinessTests
         Assert.False(generator.GetProperty("normalTestsRequireGenerator").GetBoolean());
 
         VerifyHashes(root.GetProperty("fixtures"), "binary", "sha256");
-        VerifyHashes(root.GetProperty("fixtures"), "source", "sourceSha256");
+        VerifyHashes(
+            root.GetProperty("fixtures"),
+            "source",
+            "sourceSha256",
+            normalizeTextLineEndings: true);
         VerifyHashes(
             root.GetProperty("adversarialSeeds"),
             "binary",
@@ -322,12 +327,11 @@ public sealed class T29BinaryReadinessTests
                 .ToArray();
 
         Assert.Empty(forbiddenTypes);
-        Assert.Empty(
-            assembly.GetManifestResourceNames()
-                .Where(
-                    name => name.Contains(
-                        "fixture",
-                        StringComparison.OrdinalIgnoreCase)));
+        Assert.DoesNotContain(
+            assembly.GetManifestResourceNames(),
+            name => name.Contains(
+                "fixture",
+                StringComparison.OrdinalIgnoreCase));
 
         byte[] assemblyImage = File.ReadAllBytes(assembly.Location);
         foreach (string forbiddenLiteral in new[]
@@ -390,13 +394,23 @@ public sealed class T29BinaryReadinessTests
     private static void VerifyHashes(
         JsonElement entries,
         string pathProperty,
-        string hashProperty)
+        string hashProperty,
+        bool normalizeTextLineEndings = false)
     {
         foreach (JsonElement entry in entries.EnumerateArray())
         {
             string relativePath = entry.GetProperty(pathProperty).GetString()!;
             string expected = entry.GetProperty(hashProperty).GetString()!;
             byte[] bytes = File.ReadAllBytes(FixturePath(relativePath));
+            if (normalizeTextLineEndings)
+            {
+                string text =
+                    Encoding.UTF8.GetString(bytes)
+                        .Replace("\r\n", "\n", StringComparison.Ordinal)
+                        .Replace('\r', '\n');
+                bytes = Encoding.UTF8.GetBytes(text);
+            }
+
             string actual =
                 Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant();
 
@@ -846,7 +860,9 @@ public sealed class T29BinaryReadinessTests
     {
         public int CallCount { get; private set; }
 
-        public bool TryLoad(string name, out TerminalDescription? terminal)
+        public bool TryLoad(
+            string name,
+            [NotNullWhen(true)] out TerminalDescription? terminal)
         {
             ArgumentNullException.ThrowIfNull(name);
 
@@ -868,7 +884,9 @@ public sealed class T29BinaryReadinessTests
 
         public int CallCount { get; private set; }
 
-        public bool TryLoad(string name, out TerminalDescription? terminal)
+        public bool TryLoad(
+            string name,
+            [NotNullWhen(true)] out TerminalDescription? terminal)
         {
             ArgumentNullException.ThrowIfNull(name);
 
@@ -886,7 +904,9 @@ public sealed class T29BinaryReadinessTests
 
     private sealed class ThrowingProvider : ITerminalDescriptionProvider
     {
-        public bool TryLoad(string name, out TerminalDescription? terminal)
+        public bool TryLoad(
+            string name,
+            [NotNullWhen(true)] out TerminalDescription? terminal)
         {
             ArgumentNullException.ThrowIfNull(name);
 
