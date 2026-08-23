@@ -8,26 +8,33 @@ internal sealed class TermInfoParameterEvaluator
     private readonly TermInfoParameter[] _dynamicVariables =
         new TermInfoParameter[26];
     private readonly TermInfoExpansionContext _context;
+    private readonly TermInfoParameterProgramAnalysis _analysis;
     private readonly List<TermInfoParameter> _stack = [];
     private readonly StringBuilder _output = new();
+    private int _implicitParameterIndex;
 
     private TermInfoParameterEvaluator(
         TermInfoParameter[] parameters,
-        TermInfoExpansionContext context)
+        TermInfoExpansionContext context,
+        TermInfoParameterProgramAnalysis analysis)
     {
         ArgumentNullException.ThrowIfNull(parameters);
         ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(analysis);
 
         _parameters = parameters;
         _context = context;
+        _analysis = analysis;
     }
 
     internal static string Evaluate(
         IReadOnlyList<TermInfoInstruction> instructions,
+        TermInfoParameterProgramAnalysis analysis,
         TermInfoParameter[] parameters,
         TermInfoExpansionContext context)
     {
         ArgumentNullException.ThrowIfNull(instructions);
+        ArgumentNullException.ThrowIfNull(analysis);
         ArgumentNullException.ThrowIfNull(parameters);
         ArgumentNullException.ThrowIfNull(context);
 
@@ -39,7 +46,10 @@ internal sealed class TermInfoParameterEvaluator
         }
 
         TermInfoParameterEvaluator evaluator =
-            new(parameters.ToArray(), context);
+            new(
+                parameters.ToArray(),
+                context,
+                analysis);
 
         lock (context.SyncRoot)
         {
@@ -66,7 +76,9 @@ internal sealed class TermInfoParameterEvaluator
         switch (instruction)
         {
             case TermInfoLiteralInstruction literal:
-                _output.Append(literal.Text);
+                AppendOutput(
+                    literal.Text,
+                    literal.Position);
                 break;
             case TermInfoPushParameterInstruction pushParameter:
                 PushParameter(pushParameter);
@@ -78,10 +90,14 @@ internal sealed class TermInfoParameterEvaluator
                 GetVariable(getVariable);
                 break;
             case TermInfoPushIntegerInstruction pushInteger:
-                _stack.Add(new TermInfoParameter(pushInteger.Value));
+                Push(
+                    new TermInfoParameter(pushInteger.Value),
+                    pushInteger.Position);
                 break;
             case TermInfoPushCharacterInstruction pushCharacter:
-                _stack.Add(new TermInfoParameter((long)pushCharacter.Value));
+                Push(
+                    new TermInfoParameter((long)pushCharacter.Value),
+                    pushCharacter.Position);
                 break;
             case TermInfoStringLengthInstruction length:
                 PushStringLength(length);
@@ -125,7 +141,9 @@ internal sealed class TermInfoParameterEvaluator
                 instruction.Position);
         }
 
-        _stack.Add(_parameters[index]);
+        Push(
+            _parameters[index],
+            instruction.Position);
     }
 
     private void SetVariable(TermInfoSetVariableInstruction instruction)
@@ -153,11 +171,15 @@ internal sealed class TermInfoParameterEvaluator
 
         if (name is >= 'a' and <= 'z')
         {
-            _stack.Add(_dynamicVariables[name - 'a']);
+            Push(
+                _dynamicVariables[name - 'a'],
+                instruction.Position);
         }
         else if (name is >= 'A' and <= 'Z')
         {
-            _stack.Add(_context.GetStaticVariable(name));
+            Push(
+                _context.GetStaticVariable(name),
+                instruction.Position);
         }
         else
         {
@@ -175,7 +197,9 @@ internal sealed class TermInfoParameterEvaluator
                 instruction.Position);
         }
 
-        _stack.Add(new TermInfoParameter((long)value.StringValue.Length));
+        Push(
+            new TermInfoParameter((long)value.StringValue.Length),
+            instruction.Position);
     }
 
     private void EvaluateBinary(TermInfoBinaryInstruction instruction)
@@ -185,11 +209,31 @@ internal sealed class TermInfoParameterEvaluator
 
         long result = instruction.Operator switch
         {
-            TermInfoBinaryOperator.Add => unchecked(left + right),
-            TermInfoBinaryOperator.Subtract => unchecked(left - right),
-            TermInfoBinaryOperator.Multiply => unchecked(left * right),
-            TermInfoBinaryOperator.Divide => Divide(left, right, instruction.Position),
-            TermInfoBinaryOperator.Modulo => Modulo(left, right, instruction.Position),
+            TermInfoBinaryOperator.Add =>
+                Add(
+                    left,
+                    right,
+                    instruction.Position),
+            TermInfoBinaryOperator.Subtract =>
+                Subtract(
+                    left,
+                    right,
+                    instruction.Position),
+            TermInfoBinaryOperator.Multiply =>
+                Multiply(
+                    left,
+                    right,
+                    instruction.Position),
+            TermInfoBinaryOperator.Divide =>
+                Divide(
+                    left,
+                    right,
+                    instruction.Position),
+            TermInfoBinaryOperator.Modulo =>
+                Modulo(
+                    left,
+                    right,
+                    instruction.Position),
             TermInfoBinaryOperator.BitwiseAnd => left & right,
             TermInfoBinaryOperator.BitwiseOr => left | right,
             TermInfoBinaryOperator.BitwiseXor => left ^ right,
@@ -201,7 +245,9 @@ internal sealed class TermInfoParameterEvaluator
             _ => throw new ArgumentOutOfRangeException(nameof(instruction)),
         };
 
-        _stack.Add(new TermInfoParameter(result));
+        Push(
+            new TermInfoParameter(result),
+            instruction.Position);
     }
 
     private void EvaluateUnary(TermInfoUnaryInstruction instruction)
@@ -214,7 +260,9 @@ internal sealed class TermInfoParameterEvaluator
             _ => throw new ArgumentOutOfRangeException(nameof(instruction)),
         };
 
-        _stack.Add(new TermInfoParameter(result));
+        Push(
+            new TermInfoParameter(result),
+            instruction.Position);
     }
 
     private void IncrementParameters(TermInfoIncrementParametersInstruction instruction)
@@ -230,13 +278,25 @@ internal sealed class TermInfoParameterEvaluator
             }
 
             _parameters[i] =
-                new TermInfoParameter(unchecked(parameter.IntegerValue + 1));
+                new TermInfoParameter(
+                    Increment(
+                        parameter.IntegerValue,
+                        instruction.Position));
         }
     }
 
     private void OutputCharacter(TermInfoCharacterOutputInstruction instruction)
     {
-        long value = PopInteger(instruction.Position);
+        TermInfoParameter parameter =
+            PopOutputValue(instruction.Position);
+        if (!parameter.IsInteger)
+        {
+            throw new TermInfoEvaluationException(
+                "The %c conversion requires an integer value",
+                instruction.Position);
+        }
+
+        long value = parameter.IntegerValue;
         if (value is < byte.MinValue or > byte.MaxValue)
         {
             throw new TermInfoEvaluationException(
@@ -244,17 +304,24 @@ internal sealed class TermInfoParameterEvaluator
                 instruction.Position);
         }
 
-        _output.Append((char)value);
+        AppendOutput(
+            (char)value,
+            instruction.Position);
     }
 
     private void OutputFormatted(TermInfoFormatInstruction instruction)
     {
-        TermInfoParameter value = Pop(instruction.Position);
-        _output.Append(
+        TermInfoParameter value =
+            PopOutputValue(instruction.Position);
+        string formatted =
             TermInfoFormatter.Format(
                 instruction.Specification,
                 value,
-                instruction.Position));
+                instruction.Position);
+
+        AppendOutput(
+            formatted,
+            instruction.Position);
     }
 
     private void EvaluateConditional(TermInfoConditionalInstruction instruction)
@@ -271,6 +338,27 @@ internal sealed class TermInfoParameterEvaluator
         }
 
         Execute(instruction.ElseInstructions);
+    }
+
+    private void Push(
+        TermInfoParameter value,
+        int position)
+    {
+        if (position < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(position));
+        }
+
+        if (_stack.Count
+            >= TermInfoParameterLimits.MaximumStackDepth)
+        {
+            throw new TermInfoEvaluationException(
+                $"The terminfo parameter stack cannot exceed "
+                + $"{TermInfoParameterLimits.MaximumStackDepth} values",
+                position);
+        }
+
+        _stack.Add(value);
     }
 
     private TermInfoParameter Pop(int position)
@@ -293,6 +381,43 @@ internal sealed class TermInfoParameterEvaluator
         return value;
     }
 
+    private TermInfoParameter PopOutputValue(int position)
+    {
+        if (position < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(position));
+        }
+
+        if (_stack.Count > 0)
+        {
+            return Pop(position);
+        }
+
+        if (!_analysis.UsesImplicitFormatParameters)
+        {
+            return Pop(position);
+        }
+
+        if (_implicitParameterIndex >= 9)
+        {
+            throw new TermInfoEvaluationException(
+                "The terminfo parameter program requires more than nine parameters",
+                position);
+        }
+
+        int index = _implicitParameterIndex;
+        _implicitParameterIndex++;
+
+        if (index >= _parameters.Length)
+        {
+            throw new TermInfoEvaluationException(
+                $"Parameter p{index + 1} was not supplied",
+                position);
+        }
+
+        return _parameters[index];
+    }
+
     private long PopInteger(int position)
     {
         if (position < 0)
@@ -309,6 +434,90 @@ internal sealed class TermInfoParameterEvaluator
         }
 
         return value.IntegerValue;
+    }
+
+    private void AppendOutput(
+        string value,
+        int position)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+
+        if (position < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(position));
+        }
+
+        if (value.Length
+            > TermInfoParameterLimits.MaximumOutputLength
+                - _output.Length)
+        {
+            throw new TermInfoEvaluationException(
+                $"Expanded terminfo output cannot exceed "
+                + $"{TermInfoParameterLimits.MaximumOutputLength} characters",
+                position);
+        }
+
+        _output.Append(value);
+    }
+
+    private void AppendOutput(
+        char value,
+        int position)
+    {
+        if (position < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(position));
+        }
+
+        if (_output.Length
+            >= TermInfoParameterLimits.MaximumOutputLength)
+        {
+            throw new TermInfoEvaluationException(
+                $"Expanded terminfo output cannot exceed "
+                + $"{TermInfoParameterLimits.MaximumOutputLength} characters",
+                position);
+        }
+
+        _output.Append(value);
+    }
+
+    private static long Add(
+        long left,
+        long right,
+        int position)
+    {
+        return EvaluateChecked(
+            () => checked(left + right),
+            position);
+    }
+
+    private static long Subtract(
+        long left,
+        long right,
+        int position)
+    {
+        return EvaluateChecked(
+            () => checked(left - right),
+            position);
+    }
+
+    private static long Multiply(
+        long left,
+        long right,
+        int position)
+    {
+        return EvaluateChecked(
+            () => checked(left * right),
+            position);
+    }
+
+    private static long Increment(
+        long value,
+        int position)
+    {
+        return EvaluateChecked(
+            () => checked(value + 1),
+            position);
     }
 
     private static long Divide(
@@ -330,7 +539,9 @@ internal sealed class TermInfoParameterEvaluator
 
         if (left == long.MinValue && right == -1)
         {
-            return long.MinValue;
+            throw new TermInfoEvaluationException(
+                "Terminfo arithmetic overflow",
+                position);
         }
 
         return left / right;
@@ -359,5 +570,28 @@ internal sealed class TermInfoParameterEvaluator
         }
 
         return left % right;
+    }
+
+    private static long EvaluateChecked(
+        Func<long> operation,
+        int position)
+    {
+        ArgumentNullException.ThrowIfNull(operation);
+
+        if (position < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(position));
+        }
+
+        try
+        {
+            return operation();
+        }
+        catch (OverflowException)
+        {
+            throw new TermInfoEvaluationException(
+                "Terminfo arithmetic overflow",
+                position);
+        }
     }
 }

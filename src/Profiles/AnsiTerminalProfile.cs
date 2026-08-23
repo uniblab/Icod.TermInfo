@@ -5,6 +5,7 @@ internal static class AnsiTerminalProfile
     internal static TerminalDescription Create()
     {
         return new TerminalDescriptionBuilder("ansi")
+            .SetDescription("ansi/pc-term compatible with color")
             .SetBoolean(BooleanCapability.AutoRightMargin)
             .SetBoolean(BooleanCapability.MoveStandoutMode)
             .SetBoolean(BooleanCapability.MoveInsertMode)

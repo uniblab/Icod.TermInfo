@@ -82,6 +82,9 @@ public sealed class CompletionGateTests
         Assert.Equal("xterm-direct256", TerminalProfiles.XtermDirect256.Name);
         Assert.Equal("vt102", TerminalProfiles.Vt102.Name);
         Assert.Equal("vt220", TerminalProfiles.Vt220.Name);
+        Assert.Equal("winconsole", TerminalProfiles.WinConsole.Name);
+        Assert.Equal("ms-terminal", TerminalProfiles.MsTerminal.Name);
+        Assert.Equal("ms-terminal-direct", TerminalProfiles.MsTerminalDirect.Name);
 
         Assert.Same(
             TerminalProfiles.Vt100,
@@ -116,6 +119,15 @@ public sealed class CompletionGateTests
         Assert.Same(
             TerminalProfiles.XtermDirect256,
             TerminalDatabase.BuiltIn.Load("xterm-direct256"));
+        Assert.Same(
+            TerminalProfiles.WinConsole,
+            TerminalDatabase.BuiltIn.Load("winconsole"));
+        Assert.Same(
+            TerminalProfiles.MsTerminal,
+            TerminalDatabase.BuiltIn.Load("ms-terminal"));
+        Assert.Same(
+            TerminalProfiles.MsTerminalDirect,
+            TerminalDatabase.BuiltIn.Load("ms-terminal-direct"));
 
         string[] unsupportedNames =
         [
@@ -147,6 +159,9 @@ public sealed class CompletionGateTests
     {
         TerminalDescription[] terminals =
         [
+            TerminalProfiles.MsTerminalDirect,
+            TerminalProfiles.MsTerminal,
+            TerminalProfiles.WinConsole,
             TerminalProfiles.XtermDirect256,
             TerminalProfiles.XtermDirect16,
             TerminalProfiles.XtermDirect,

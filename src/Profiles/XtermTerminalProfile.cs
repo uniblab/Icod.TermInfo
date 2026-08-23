@@ -7,6 +7,7 @@ internal static class XtermTerminalProfile
     internal static TerminalDescription Create()
     {
         return new TerminalDescriptionBuilder("xterm")
+            .SetDescription("xterm terminal emulator (X Window System)")
             .ApplyXtermCommon()
             .ApplyXtermBasicEightColor()
             .ApplyXtermKeys()

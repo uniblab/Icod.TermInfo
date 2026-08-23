@@ -7,10 +7,20 @@ internal sealed class TermInfoParameterParser
 {
     private readonly string _source;
     private int _position;
+    private int _conditionalDepth;
 
     internal TermInfoParameterParser(string source)
     {
         ArgumentNullException.ThrowIfNull(source);
+
+        if (source.Length > TermInfoParameterLimits.MaximumSourceLength)
+        {
+            throw new TermInfoFormatException(
+                $"Parameter program source cannot exceed "
+                + $"{TermInfoParameterLimits.MaximumSourceLength} characters",
+                TermInfoParameterLimits.MaximumSourceLength);
+        }
+
         _source = source;
     }
 
@@ -108,81 +118,102 @@ internal sealed class TermInfoParameterParser
 
     private TermInfoInstruction ParseConditional(int percentPosition)
     {
-        _position += 2;
-
-        ParseSequenceResult condition = ParseSequence(TermInfoDelimiter.Then);
-        if (condition.Delimiter != TermInfoDelimiter.Then)
+        if (_conditionalDepth
+            >= TermInfoParameterLimits.MaximumConditionalNesting)
         {
             throw CreateFormatException(
-                "Conditional expression is missing '%t'",
+                $"Conditional nesting cannot exceed "
+                + $"{TermInfoParameterLimits.MaximumConditionalNesting}",
                 percentPosition);
         }
 
-        ParseSequenceResult body = ParseSequence(
-            TermInfoDelimiter.Else | TermInfoDelimiter.End);
-        if (body.Delimiter == TermInfoDelimiter.EndOfInput)
+        _conditionalDepth++;
+
+        try
         {
-            throw CreateFormatException(
-                "Conditional expression is missing '%;'",
-                percentPosition);
-        }
+            _position += 2;
 
-        List<TermInfoConditionalBranch> branches =
-        [
-            new TermInfoConditionalBranch(
-                condition.Instructions,
-                body.Instructions),
-        ];
-
-        if (body.Delimiter == TermInfoDelimiter.End)
-        {
-            return new TermInfoConditionalInstruction(
-                percentPosition,
-                branches,
-                Array.Empty<TermInfoInstruction>());
-        }
-
-        while (true)
-        {
-            ParseSequenceResult elseCandidate = ParseSequence(
-                TermInfoDelimiter.Then | TermInfoDelimiter.End);
-
-            if (elseCandidate.Delimiter == TermInfoDelimiter.EndOfInput)
+            ParseSequenceResult condition =
+                ParseSequence(TermInfoDelimiter.Then);
+            if (condition.Delimiter != TermInfoDelimiter.Then)
             {
                 throw CreateFormatException(
-                    "Conditional expression is missing '%;'",
+                    "Conditional expression is missing '%t'",
                     percentPosition);
             }
 
-            if (elseCandidate.Delimiter == TermInfoDelimiter.End)
-            {
-                return new TermInfoConditionalInstruction(
-                    percentPosition,
-                    branches,
-                    elseCandidate.Instructions);
-            }
-
-            ParseSequenceResult elseIfBody = ParseSequence(
+            ParseSequenceResult body = ParseSequence(
                 TermInfoDelimiter.Else | TermInfoDelimiter.End);
-            if (elseIfBody.Delimiter == TermInfoDelimiter.EndOfInput)
+            if (body.Delimiter == TermInfoDelimiter.EndOfInput)
             {
                 throw CreateFormatException(
                     "Conditional expression is missing '%;'",
                     percentPosition);
             }
 
-            branches.Add(
+            List<TermInfoConditionalBranch> branches =
+            [
                 new TermInfoConditionalBranch(
-                    elseCandidate.Instructions,
-                    elseIfBody.Instructions));
+                    condition.Instructions,
+                    body.Instructions),
+            ];
 
-            if (elseIfBody.Delimiter == TermInfoDelimiter.End)
+            if (body.Delimiter == TermInfoDelimiter.End)
             {
                 return new TermInfoConditionalInstruction(
                     percentPosition,
                     branches,
                     Array.Empty<TermInfoInstruction>());
             }
+
+            while (true)
+            {
+                ParseSequenceResult elseCandidate = ParseSequence(
+                    TermInfoDelimiter.Then | TermInfoDelimiter.End);
+
+                if (elseCandidate.Delimiter
+                    == TermInfoDelimiter.EndOfInput)
+                {
+                    throw CreateFormatException(
+                        "Conditional expression is missing '%;'",
+                        percentPosition);
+                }
+
+                if (elseCandidate.Delimiter == TermInfoDelimiter.End)
+                {
+                    return new TermInfoConditionalInstruction(
+                        percentPosition,
+                        branches,
+                        elseCandidate.Instructions);
+                }
+
+                ParseSequenceResult elseIfBody = ParseSequence(
+                    TermInfoDelimiter.Else | TermInfoDelimiter.End);
+                if (elseIfBody.Delimiter
+                    == TermInfoDelimiter.EndOfInput)
+                {
+                    throw CreateFormatException(
+                        "Conditional expression is missing '%;'",
+                        percentPosition);
+                }
+
+                branches.Add(
+                    new TermInfoConditionalBranch(
+                        elseCandidate.Instructions,
+                        elseIfBody.Instructions));
+
+                if (elseIfBody.Delimiter == TermInfoDelimiter.End)
+                {
+                    return new TermInfoConditionalInstruction(
+                        percentPosition,
+                        branches,
+                        Array.Empty<TermInfoInstruction>());
+                }
+            }
+        }
+        finally
+        {
+            _conditionalDepth--;
         }
     }
 
@@ -486,10 +517,12 @@ internal sealed class TermInfoParameterParser
                     percentPosition);
             }
 
-            if (parsedWidth > 10_000)
+            if (parsedWidth
+                > TermInfoParameterLimits.MaximumFormatWidth)
             {
                 throw CreateFormatException(
-                    "Format width cannot exceed 10000",
+                    $"Format width cannot exceed "
+                    + $"{TermInfoParameterLimits.MaximumFormatWidth}",
                     percentPosition);
             }
 
@@ -525,10 +558,12 @@ internal sealed class TermInfoParameterParser
                     percentPosition);
             }
 
-            if (parsedPrecision > 10_000)
+            if (parsedPrecision
+                > TermInfoParameterLimits.MaximumFormatPrecision)
             {
                 throw CreateFormatException(
-                    "Format precision cannot exceed 10000",
+                    $"Format precision cannot exceed "
+                    + $"{TermInfoParameterLimits.MaximumFormatPrecision}",
                     percentPosition);
             }
 

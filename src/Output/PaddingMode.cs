@@ -14,4 +14,11 @@ public enum PaddingMode
     /// Honor padding directives using the configured delay provider.
     /// </summary>
     Delay,
+
+    /// <summary>
+    /// Honor padding directives by emitting terminal pad characters when
+    /// transport facts permit it. This mode requires the terminal-aware
+    /// <see cref="TermInfoOutputOptions"/> overloads.
+    /// </summary>
+    PadCharacters,
 }

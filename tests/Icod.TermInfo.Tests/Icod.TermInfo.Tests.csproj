@@ -28,6 +28,13 @@
     <ProjectReference Include="..\..\Icod.TermInfo.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="fixtures/**/*" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../tools/terminfo-metadata/standard-capabilities.tsv"
+          Link="metadata/standard-capabilities.tsv"
+          CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>2</WarningLevel>

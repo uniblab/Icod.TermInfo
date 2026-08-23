@@ -7,6 +7,7 @@ internal static class Vt220TerminalProfile
     internal static TerminalDescription Create()
     {
         return new TerminalDescriptionBuilder("vt220")
+            .SetDescription("DEC VT220")
             .AddAlias("vt200")
             .ApplyVt220Core()
             .ApplyVt220CursorVisibility()

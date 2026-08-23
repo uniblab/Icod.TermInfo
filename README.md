@@ -2,36 +2,38 @@
 
 `Icod.TermInfo` is a managed, dependency-free .NET implementation of the low-level terminal-capability model traditionally supplied by `libtinfo`.
 
-Version 0.7.0 expands the deliberately small 0.6.0 ANSI/VT100 contract into a modern terminal-description library while preserving the same capability-driven architecture: immutable descriptions, generic parameter expansion, padding-aware output, conservative terminal resolution, and no process-global current terminal.
+Version 0.8.0 is the semantic-completion release: it finishes the in-memory capability model, parameter/runtime safety, exact capability-byte behavior, terminal-aware padding, profile composition/cancellation fidelity, and authoritative Windows Console/Windows Terminal built-ins while preserving conservative resolution and no process-global current terminal.
 
 The package targets `net10.0`, uses C# 13, contains no native ncurses/terminfo payload, and is intended to run on Windows, Linux, and macOS.
 
 ## Install
 
-For the 0.7.0 release:
+For the 0.8.0 release:
 
 ```text
-dotnet add package Icod.TermInfo --version 0.7.0
+dotnet add package Icod.TermInfo --version 0.8.0
 ```
 
 The same package contents are intended for NuGet.org and GitHub Packages. Repository development can reference `Icod.TermInfo.csproj` directly, as the sample project does.
 
-## What 0.7.0 provides
+## What 0.8.0 provides
 
-- immutable terminal descriptions and deterministic provider composition;
-- typed standard capability lookup plus generic extended Boolean, numeric, and string capabilities;
-- a stack-oriented terminfo parameter-expansion engine shared by every built-in profile;
-- padding-aware `tputs`/`putp`-style output;
-- conservative `TERM` resolution with explicit caller-selected fallback behavior;
-- built-in `dumb`, `ansi`, `vt100`/`vt100-am`, `vt102`, and `vt220`/`vt200` profiles;
-- built-in modern `xterm`, `xterm-16color`, `xterm-88color`, and `xterm-256color` profiles;
-- built-in `xterm-direct`, `xterm-direct16`, and `xterm-direct256` true-color profiles;
-- semantic monochrome, indexed-color, and direct-RGB inspection;
-- safe indexed and direct-RGB foreground/background expansion helpers;
-- full-screen/cursor-addressing and cursor-visibility primitives where a profile advertises them;
-- descriptive xterm mouse, focus, bracketed-paste, modified-key, cursor-style, reporting, and clipboard metadata;
-- live terminal-size queries on Windows, Linux, and macOS, kept distinct from environment/profile defaults;
-- explicit and reversible Windows virtual-terminal output enablement.
+- immutable terminal descriptions with canonical name, aliases, and a separate verbose `Description`;
+- a complete ncurses/System V-compatible standard capability catalog: 44 Boolean, 39 numeric, and 414 string table positions;
+- canonical standard-capability metadata including fixed future binary index, short name, long/variable name, termcap code, and managed enum identity;
+- deterministic read-only enumeration of the standard catalog and of effectively present standard capabilities on each description;
+- signed 32-bit standard and extended numeric semantics;
+- generic extended Boolean, numeric, and string capabilities with exact case-sensitive names;
+- reusable parsed terminfo parameter programs, hardened parsing/evaluation, and per-description bounded lazy expansion caches;
+- explicit `ExpandExtendedString` symmetry for parameterized extended strings;
+- reversible 8-bit capability-string semantics: bytes `0x01`-`0xFF` map one-to-one through .NET strings and round-trip with `Encoding.Latin1`;
+- simple and terminal-aware `tputs`/`putp`-style output, including `xon`, `pb`, `npc`, `pad`, affected-line multiplication, and caller-supplied baud-rate semantics;
+- semantic monochrome, indexed-color, and direct-RGB inspection and selector expansion;
+- built-in `dumb`, ANSI, DEC VT100/VT102/VT220, xterm indexed/direct-color, `winconsole`, `ms-terminal`, and `ms-terminal-direct` profiles;
+- descriptive mouse, focus, bracketed-paste, modified-key, cursor-style, reporting, and clipboard metadata where the selected profile advertises it;
+- live terminal-size queries kept distinct from environment/profile defaults;
+- explicit and reversible Windows virtual-terminal output enablement, separate from profile selection;
+- a frozen, deterministic 0.9 compiled-terminfo binary/provider target and checked-in parser-readiness fixture corpus, without a production external database loader in 0.8.
 
 The 0.6.0 behavior of `dumb`, `ansi`, and `vt100` remains intentionally conservative: `dumb` is minimal, `ansi` is the traditional eight-color profile, and `vt100` remains monochrome.
 
@@ -61,9 +63,18 @@ TerminalDescription xterm256 =
 
 TerminalDescription xtermDirect =
     TerminalDatabase.BuiltIn.Load("xterm-direct256");
+
+TerminalDescription winConsole =
+    TerminalDatabase.BuiltIn.Load("winconsole");
+
+TerminalDescription windowsTerminal =
+    TerminalDatabase.BuiltIn.Load("ms-terminal");
+
+TerminalDescription windowsTerminalDirect =
+    TerminalDatabase.BuiltIn.Load("ms-terminal-direct");
 ```
 
-Aliases remain exact and intentional. For example, `vt100-am` resolves to `vt100`, and `vt200` resolves to `vt220`.
+Aliases remain exact and intentional. For example, `vt100-am` resolves to `vt100`, and `vt200` resolves to `vt220`. Windows identities are not aliases for ANSI or xterm.
 
 ## Standard and extended capabilities
 
@@ -87,6 +98,38 @@ bool hasColors = terminal.TryGetNumber("colors", out int colors);
 bool hasClear = terminal.TryGetString("clear", out string? clear);
 ```
 
+The complete standard catalog is inspectable in compiled-table order. Managed enum values are deliberately independent from those binary indices:
+
+```csharp
+StandardCapabilityMetadata<StringCapability> cupMetadata =
+    StandardCapabilityCatalog.GetMetadata(
+        StringCapability.CursorAddress);
+
+Console.WriteLine(
+    $"{cupMetadata.ShortName}: binary index {cupMetadata.BinaryIndex}");
+
+foreach (StandardCapabilityMetadata<NumericCapability> metadata
+    in StandardCapabilityCatalog.NumericCapabilities)
+{
+    Console.WriteLine(
+        $"{metadata.ShortName} / {metadata.LongName}");
+}
+```
+
+A terminal description also exposes its effective standard capabilities in the same deterministic order:
+
+```csharp
+Console.WriteLine(terminal.Description ?? "(no verbose description)");
+
+foreach (KeyValuePair<NumericCapability, int> capability
+    in terminal.NumericCapabilities)
+{
+    Console.WriteLine($"{capability.Key} = {capability.Value}");
+}
+```
+
+Absent and internally canceled capabilities do not appear as effective present values. Extended capabilities remain separately enumerable through `ExtendedCapabilities`.
+
 Modern capabilities which are not part of the fixed standard terminfo vocabulary are carried through the extended-capability store:
 
 ```csharp
@@ -95,14 +138,26 @@ if (xterm.TryGetExtendedString("BE", out string? enablePaste))
     Console.WriteLine("Bracketed-paste enable metadata is present.");
 }
 
-if (xterm.TryGetExtendedString("XM", out string? mouseMode))
+if (xterm.TryGetExtendedString("XM", out _))
 {
     string enableMouse =
-        TermInfoParameterExpander.Expand(mouseMode, 1);
+        xterm.ExpandExtendedString("XM", 1);
 }
 ```
 
 Extended names are case-sensitive. Standard capability names cannot be silently shadowed by extended capabilities.
+
+Reusable arbitrary-source parameter programs can be parsed once and expanded repeatedly. Structural/type analysis remains internal safety machinery rather than a second public model:
+
+```csharp
+TermInfoParameterProgram program =
+    TermInfoParameterProgram.Parse("%p1%{1}%+%d");
+
+Console.WriteLine(program.Source);     // %p1%{1}%+%d
+Console.WriteLine(program.Expand(41)); // 42
+```
+
+Per-description standard and extended expansion use bounded lazy caches owned by the immutable description. There is no process-global arbitrary-string cache.
 
 ## Color inspection
 
@@ -233,6 +288,44 @@ TermInfoOutput.TPuts(
 
 The output API also supports asynchronous `TextWriter` output, byte streams with a caller-selected encoding, character callbacks, and an injectable `ITermInfoDelayProvider`.
 
+### Exact capability bytes
+
+Capability strings are protocol byte data, not application text. For data originating in conventional compiled terminfo, `Icod.TermInfo` uses a one-to-one Latin-1 bridge: byte `0x80` is represented by `\u0080`, byte `0xFF` by `\u00FF`, and so on. Use `Encoding.Latin1` when exact capability bytes must be emitted:
+
+```csharp
+using MemoryStream stream = new();
+
+TermInfoOutput.TPuts(
+    "\u0080",
+    affectedLines: 1,
+    stream,
+    Encoding.Latin1);
+
+byte[] bytes = stream.ToArray(); // { 0x80 }
+```
+
+This does **not** prescribe the encoding of application text. Text encoding remains caller-owned.
+
+### Terminal-aware padding
+
+When padding policy needs terminal facts, pass immutable `TermInfoOutputOptions` explicitly:
+
+```csharp
+TermInfoOutputOptions options =
+    new(
+        vt100,
+        baudRate: 9600,
+        paddingMode: PaddingMode.Delay);
+
+TermInfoOutput.TPuts(
+    move,
+    affectedLines: 1,
+    Console.Out,
+    options);
+```
+
+The library never discovers baud rate and never owns a tty/file descriptor. Advisory padding is suppressed according to the terminal's `xon` and `pb` capabilities; mandatory padding remains mandatory unless the caller explicitly chooses `PaddingMode.Ignore`. `PaddingMode.PadCharacters` also honors `npc` and `pad`.
+
 ## Compatibility-shaped API
 
 `TermInfoCompatibility` provides familiar terminfo operation names while retaining managed semantics and explicit terminal ownership:
@@ -284,7 +377,20 @@ using IDisposable? mode =
 
 The helper returns `null` on non-Windows systems, redirected output, non-console handles, or when Windows refuses the mode change. When it changes console mode, disposing the returned lease restores the exact previous mode. Loading a terminal profile never changes console state.
 
-This helper is not a Windows Console terminal profile. Explicit Windows Console and Windows Terminal profile work is reserved for 0.8.0.
+Windows profile selection is separate and side-effect free:
+
+```csharp
+TerminalDescription console =
+    TerminalProfiles.WinConsole;
+
+TerminalDescription wt =
+    TerminalProfiles.MsTerminal;
+
+TerminalDescription wtDirect =
+    TerminalProfiles.MsTerminalDirect;
+```
+
+`winconsole` describes the authoritative modern Windows Console terminfo identity. `ms-terminal` is the indexed-color Windows Terminal identity, while `ms-terminal-direct` advertises direct RGB through the same generic color engine used by other profiles. `WT_SESSION`, `WT_PROFILE_ID`, and `COLORTERM` do not silently select or mutate any profile.
 
 ## Custom terminal providers
 
@@ -315,8 +421,12 @@ Provider ordering is explicit and deterministic; the first provider that resolve
 `samples/Icod.TermInfo.Sample` demonstrates:
 
 - conservative environment resolution with an explicit `dumb` fallback;
+- verbose description plus standard catalog/per-description enumeration;
+- reusable standard and extended parameterized-string expansion;
+- exact Latin-1 capability-byte output;
+- terminal-aware padding with explicit terminal facts;
 - semantic indexed/direct color inspection and expansion;
-- extended-capability discovery;
+- Windows Console and Windows Terminal profile selection without side effects;
 - full-screen/cursor-visibility capability discovery without taking ownership of a full-screen session;
 - live/configured/profile size selection;
 - redirection handling and explicit Windows VT enablement;
@@ -334,23 +444,41 @@ For CI, documentation checks, or any environment where terminal-control output i
 dotnet run --project samples/Icod.TermInfo.Sample/Icod.TermInfo.Sample.csproj -- --describe-only --profile xterm-direct256
 ```
 
-`--profile <name>` selects an exact built-in profile instead of consulting `TERM`. `--describe-only` exercises profile/color/extended-capability APIs but emits no terminal-control strings.
+`--profile <name>` selects an exact built-in profile instead of consulting `TERM`. `--describe-only` exercises metadata/enumeration, expansion, byte-output, padding, profile, color, and extended-capability APIs but emits no terminal-control strings to the active terminal.
 
 ## Project-family boundary
 
-`Icod.TermInfo` owns terminal-description data and pure transformations of that data. It does not own a live terminal session.
+`Icod.TermInfo` owns immutable terminal-description data, acquisition of that data, and pure transformations required to interpret, expand, and output terminal capabilities. It does not own a live terminal session, a child pseudo-terminal, or a virtual screen.
 
-A future `Icod.Terminal`-style layer may own raw/cooked mode changes, input decoding, keyboard/mouse/paste/focus events, probing, full-screen lifecycle, cursor lifecycle, clipboard operations, and progress helpers. A future curses-style library may own virtual-screen state, windows, pads, panels, menus, forms, and refresh optimization. PTY creation/process plumbing belongs elsewhere as well.
+The intended family boundary is now explicit:
 
-## 0.8.0 reservation
+- **`Icod.TermInfo`** — descriptions, compiled-database acquisition, capability semantics, parameter expansion, and output transformation;
+- **future `Icod.Terminal`** — raw/cooked session ownership, input decoding, keyboard/mouse/paste/focus events, active probing/negotiation, full-screen/cursor lifecycle, clipboard/hyperlink operations, and progress helpers;
+- **future `Icod.Pty`** — Unix PTY and Windows ConPTY creation, resize propagation, and child-process plumbing;
+- **future `Icod.Curses`** — Unicode cell/grid state, damage/refresh optimization, windows, pads, panels, menus, forms, and widgets;
+- **future source/tooling work** — `.ti` parsing, `use=` inheritance, `tic`/`infocmp`-class tools, termcap conversion, and optional database-maintenance functionality.
 
-Version 0.8.0 is reserved for three major additions:
+The broader dependency inventory is recorded in `docs/FUTURE-WORK-INVENTORY.md`.
 
-1. classic Windows Console support modeled honestly rather than aliased to ANSI/xterm;
-2. explicit Windows Terminal profiles/support;
-3. arbitrary/system compiled terminfo database loading, including discovery/provider-precedence rules.
+## 0.9.0 arbitrary-terminal roadmap
 
-Version 0.7.0 deliberately contains no `/usr/share/terminfo` loader, `TERMINFO`/`TERMINFO_DIRS` discovery, or host-database-dependent profile selection.
+Version 0.8 completed **terminfo semantics in memory**. Version 0.9 is planned to add the acquisition layer without redesigning that semantic model.
+
+The 0.9 dependency chain is:
+
+```text
+pure compiled-byte parser
+    -> explicit directory provider
+    -> TERMINFO / TERMINFO_DIRS / user / platform discovery
+    -> provider-local cache and refresh semantics
+    -> final API/package completion gate
+```
+
+The parser will be independently usable from caller-supplied bytes and will support the frozen conventional `0432`, ncurses extended-section, and `01036` / signed-32-bit formats. Directory and system providers will reuse that parser rather than embedding their own binary logic. Encoded `TERMINFO=hex:...` and `TERMINFO=b64:...` entries will use the same path.
+
+0.9 deliberately does **not** include `.ti` source parsing, `tic`/`infocmp`, termcap, Berkeley-DB hashed terminfo stores, divergent historical vendor binary formats, live input/session management, active probing, PTYs, curses, terminal emulation, or graphics protocols.
+
+See `Icod.TermInfo-Development-Roadmap-0.9.0.md` for the detailed tranche contract and `docs/FUTURE-WORK-INVENTORY.md` for the post-0.9 dependency map.
 
 ## Build, test, and pack
 
@@ -367,17 +495,17 @@ dotnet pack Icod.TermInfo.csproj -c Release --output artifacts
 bash .github/scripts/verify-release-package.sh artifacts
 ```
 
-The package verifier checks the `.nupkg`/`.snupkg` structure, dependency closure, Source Link metadata, and a fresh `net10.0` consumer restored from only the local package directory. It also runs the sample's `--describe-only` mode as a non-interactive consumer check.
+The package verifier checks the `.nupkg`/`.snupkg` structure, dependency closure, Source Link metadata, exclusion of test-only compiled fixtures, and a fresh `net10.0` consumer restored from only the local package directory. The fresh consumer exercises the intended new 0.8 metadata/enumeration, expansion, exact-byte, terminal-aware padding, and Windows-profile APIs. It also runs the sample's `--describe-only` mode as a non-interactive consumer check.
 
-GitHub pull requests validate both Debug and Release on Windows, Linux, and macOS. Pushes to `main` and the `0.7.0` release branch run the same matrix, then pack and verify the package and upload the exact package artifacts; validation may also be started manually. These workflows do not publish packages automatically.
+Pushes to `main` and the active `0.8.0` release branch run the Release build/test matrix on Windows, Linux, and macOS. After that matrix succeeds, the package-validation job packs and verifies the exact artifacts, and the downstream `Release` deployment job publishes the validated package to NuGet.org and GitHub Packages. Pull-request validation remains a separate repository workflow.
 
-See `docs/RELEASING.md` for the release procedure and `docs/0.7.0-CONTRACT-AUDIT.md` for the final T20 release-candidate audit. Tag `v0.7.0` and publish only after the exact final candidate passes the full workflow.
+See `docs/RELEASING.md` for the release procedure and `docs/0.8.0-CONTRACT-AUDIT.md` for the final T31 evidence map. Tag `v0.8.0` only after the exact final candidate passes the complete workflow described there; no source/package content should change between that successful validation and tagging.
 
 ## Scope
 
 `Icod.TermInfo` is not curses, a terminal emulator, a PTY implementation, a termios session manager, an input-event parser, or a general terminal UI toolkit. It intentionally carries low-level descriptive data which those higher-level systems may consume.
 
-See `Icod.TermInfo-Development-Roadmap-0.7.0.md` for the complete 0.7.0 contract.
+See `Icod.TermInfo-Development-Roadmap-0.8.0.md` for the frozen 0.8.0 contract, `Icod.TermInfo-Development-Roadmap-0.9.0.md` for the planned acquisition release, and `docs/FUTURE-WORK-INVENTORY.md` for the broader terminal-system dependency map. The 0.6.0 and 0.7.0 roadmaps remain historical frozen contracts.
 
 ## License
 

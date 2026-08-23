@@ -1,0 +1,6 @@
+t29-legacy-minimal|t29lm|T29 minimal legacy fixture,
+    am,
+    cols#80,
+    lines#24,
+    clear=\E[H\E[2J,
+    cup=\E[%i%p1%d;%p2%dH,

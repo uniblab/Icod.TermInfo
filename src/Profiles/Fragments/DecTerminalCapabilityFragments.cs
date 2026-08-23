@@ -146,7 +146,7 @@ internal static class DecTerminalCapabilityFragments
         ArgumentNullException.ThrowIfNull(builder);
 
         return builder
-            .SetExtendedBoolean("OTbs")
+            .SetBoolean(BooleanCapability.BackspacesWithBs)
             .SetBoolean(BooleanCapability.AutoRightMargin)
             .SetBoolean(BooleanCapability.MoveInsertMode)
             .SetBoolean(BooleanCapability.MoveStandoutMode)

@@ -5,7 +5,7 @@ namespace Icod.TermInfo;
 /// <summary>
 /// Emits terminfo strings while removing or honoring padding directives.
 /// </summary>
-public static class TermInfoOutput
+public static partial class TermInfoOutput
 {
     /// <summary>
     /// Writes a string using <c>putp</c>-style affected-line semantics.
@@ -297,21 +297,40 @@ public static class TermInfoOutput
         TermInfoOutputSegment segment,
         int affectedLines)
     {
-        decimal milliseconds = segment.Milliseconds;
-
-        if (segment.MultiplyByAffectedLines)
-        {
-            milliseconds *= affectedLines;
-        }
-
-        if (milliseconds > TermInfoPaddingParser.MaximumDelayMilliseconds)
-        {
-            milliseconds = TermInfoPaddingParser.MaximumDelayMilliseconds;
-        }
+        decimal milliseconds =
+            ResolveDelayMilliseconds(
+                segment,
+                affectedLines);
 
         return new TermInfoDelay(
             TimeSpan.FromMilliseconds((double)milliseconds),
             segment.IsMandatory);
+    }
+
+    private static decimal ResolveDelayMilliseconds(
+        TermInfoOutputSegment segment,
+        int affectedLines)
+    {
+        decimal milliseconds = segment.Milliseconds;
+        decimal maximum =
+            TermInfoPaddingParser.MaximumDelayMilliseconds;
+
+        if (segment.MultiplyByAffectedLines)
+        {
+            if (affectedLines == 0)
+            {
+                return 0m;
+            }
+
+            if (milliseconds >= (maximum / affectedLines))
+            {
+                return maximum;
+            }
+
+            milliseconds *= affectedLines;
+        }
+
+        return Math.Min(milliseconds, maximum);
     }
 
     private static ITermInfoDelayProvider ResolveDelayProvider(
@@ -339,6 +358,13 @@ public static class TermInfoOutput
         if (!Enum.IsDefined(typeof(PaddingMode), paddingMode))
         {
             throw new ArgumentOutOfRangeException(nameof(paddingMode));
+        }
+
+        if (paddingMode == PaddingMode.PadCharacters)
+        {
+            throw new ArgumentException(
+                "Pad-character output requires a terminal-aware TermInfoOutputOptions overload.",
+                nameof(paddingMode));
         }
     }
 

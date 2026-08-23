@@ -23,6 +23,7 @@ public sealed class XtermTerminalProfileTests
         [
             BooleanCapability.AutoRightMargin,
             BooleanCapability.BackColorErase,
+            BooleanCapability.BackspacesWithBs,
             BooleanCapability.EatNewlineGlitch,
             BooleanCapability.HasMetaKey,
             BooleanCapability.MoveInsertMode,
@@ -392,7 +393,6 @@ public sealed class XtermTerminalProfileTests
         Dictionary<string, TermInfoCapabilityValue> expected =
             new(StringComparer.Ordinal)
             {
-                ["OTbs"] = new TermInfoCapabilityValue(true),
                 ["AX"] = new TermInfoCapabilityValue(true),
                 ["XF"] = new TermInfoCapabilityValue(true),
                 ["XT"] = new TermInfoCapabilityValue(true),

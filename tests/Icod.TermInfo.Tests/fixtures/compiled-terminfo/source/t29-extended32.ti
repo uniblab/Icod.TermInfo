@@ -1,0 +1,8 @@
+t29-extended32|t29x32|T29 extended-number fixture,
+    am,
+    colors#16777216,
+    pairs#65536,
+    clear=\E[H\E[2J,
+    XBool,
+    XNum#2147483640,
+    XStr=omega,

@@ -1,0 +1,8 @@
+t29-extended|t29x|T29 ncurses extended fixture,
+    am,
+    cols#90,
+    clear=\E[H\E[2J,
+    XBool,
+    xyz,
+    XNum#12345,
+    XStr=alpha\Ebeta,

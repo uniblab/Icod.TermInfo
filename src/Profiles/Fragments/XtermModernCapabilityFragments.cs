@@ -10,7 +10,7 @@ internal static class XtermModernCapabilityFragments
         ArgumentNullException.ThrowIfNull(builder);
 
         return builder
-            .SetExtendedBoolean("OTbs")
+            .SetBoolean(BooleanCapability.BackspacesWithBs)
             .SetExtendedBoolean("AX")
             .SetExtendedBoolean("XT")
             .SetExtendedString("E3", "\u001b[3J")
