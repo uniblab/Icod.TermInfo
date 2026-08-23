@@ -8,16 +8,18 @@ artifact_dir="${1:-artifacts}"
 mkdir -p "${artifact_dir}"
 artifact_dir="$(cd "${artifact_dir}" && pwd)"
 
-# The checked-in generated capability table must exactly match its canonical TSV.
+# Repository-only maintenance tools are executed on one explicit framework.
 dotnet run \
   --project tools/terminfo-metadata/Icod.TermInfo.MetadataGenerator.csproj \
   -c Release \
+  -f net10.0 \
   -- --check
 
 # Structural package, Source Link, dependency, and architecture verification.
 dotnet run \
   --project tools/package-verifier/Icod.TermInfo.PackageVerifier.csproj \
   -c Release \
+  -f net10.0 \
   -- "${artifact_dir}"
 
 package_version="$(
@@ -50,9 +52,18 @@ dotnet restore \
   --source "${artifact_dir}" \
   -p:IcodTermInfoPackageVersion="${package_version}"
 
+# The isolated consumer must execute against every supported target framework.
 dotnet run \
   --project "${smoke_root}/Icod.TermInfo.PackageSmoke.csproj" \
   -c Release \
+  -f net8.0 \
+  --no-restore \
+  -p:IcodTermInfoPackageVersion="${package_version}"
+
+dotnet run \
+  --project "${smoke_root}/Icod.TermInfo.PackageSmoke.csproj" \
+  -c Release \
+  -f net10.0 \
   --no-restore \
   -p:IcodTermInfoPackageVersion="${package_version}"
 
@@ -60,4 +71,5 @@ dotnet run \
 dotnet run \
   --project samples/Icod.TermInfo.Sample/Icod.TermInfo.Sample.csproj \
   -c Release \
+  -f net10.0 \
   -- --describe-only --profile ms-terminal-direct

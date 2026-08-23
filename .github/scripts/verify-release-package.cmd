@@ -11,12 +11,12 @@ for %%I in ("%ARTIFACT_DIR%") do set "ARTIFACT_DIR=%%~fI"
 
 echo.
 echo === Verify generated capability metadata ===
-dotnet run --project tools\terminfo-metadata\Icod.TermInfo.MetadataGenerator.csproj -c Release -- --check
+dotnet run --project tools\terminfo-metadata\Icod.TermInfo.MetadataGenerator.csproj -c Release -f net10.0 -- --check
 if errorlevel 1 goto fail
 
 echo.
 echo === Verify package structure and symbols ===
-dotnet run --project tools\package-verifier\Icod.TermInfo.PackageVerifier.csproj -c Release -- "%ARTIFACT_DIR%"
+dotnet run --project tools\package-verifier\Icod.TermInfo.PackageVerifier.csproj -c Release -f net10.0 -- "%ARTIFACT_DIR%"
 if errorlevel 1 goto fail
 
 set "PACKAGE_VERSION="
@@ -37,16 +37,21 @@ set "OLD_NUGET_PACKAGES=%NUGET_PACKAGES%"
 set "NUGET_PACKAGES=%SMOKE_ROOT%\packages"
 
 echo.
-echo === Fresh package consumer ===
+echo === Fresh package consumer: net8.0 ===
 dotnet restore "%SMOKE_ROOT%\Icod.TermInfo.PackageSmoke.csproj" --source "%ARTIFACT_DIR%" -p:IcodTermInfoPackageVersion=%PACKAGE_VERSION%
 if errorlevel 1 goto fail
 
-dotnet run --project "%SMOKE_ROOT%\Icod.TermInfo.PackageSmoke.csproj" -c Release --no-restore -p:IcodTermInfoPackageVersion=%PACKAGE_VERSION%
+dotnet run --project "%SMOKE_ROOT%\Icod.TermInfo.PackageSmoke.csproj" -c Release -f net8.0 --no-restore -p:IcodTermInfoPackageVersion=%PACKAGE_VERSION%
+if errorlevel 1 goto fail
+
+echo.
+echo === Fresh package consumer: net10.0 ===
+dotnet run --project "%SMOKE_ROOT%\Icod.TermInfo.PackageSmoke.csproj" -c Release -f net10.0 --no-restore -p:IcodTermInfoPackageVersion=%PACKAGE_VERSION%
 if errorlevel 1 goto fail
 
 echo.
 echo === Non-interactive repository sample ===
-dotnet run --project samples\Icod.TermInfo.Sample\Icod.TermInfo.Sample.csproj -c Release -- --describe-only --profile ms-terminal-direct
+dotnet run --project samples\Icod.TermInfo.Sample\Icod.TermInfo.Sample.csproj -c Release -f net10.0 -- --describe-only --profile ms-terminal-direct
 if errorlevel 1 goto fail
 
 goto cleanup
