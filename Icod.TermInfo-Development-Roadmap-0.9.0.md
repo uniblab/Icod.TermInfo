@@ -1185,6 +1185,10 @@ the frozen public API.
 **Status:** Complete
 **Implementation record:** `docs/0.9.0-CONTRACT-AUDIT.md`
 
+**Release-polish follow-up:** consumer documentation and samples were expanded
+after the completion gate without changing the frozen public API or runtime
+behavior. See `docs/0.9.0-ACQUISITION-GUIDE.md` and `samples/README.md`.
+
 Before tagging `v0.9.0`, perform the full completion audit.
 
 Required evidence includes:

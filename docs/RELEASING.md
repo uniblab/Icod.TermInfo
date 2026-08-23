@@ -33,7 +33,7 @@ repository `Staging` configuration on:
 - `macos-latest`.
 
 Each matrix job cleans, restores, builds, and tests the whole solution, including
-the sample and solution-contained maintenance tools.
+both repository sample executables and solution-contained maintenance tools.
 
 The pull-request workflow is validation-only. It must not pack or publish
 packages, request publication credentials, or contain a deployment job.
@@ -73,7 +73,14 @@ The Bash and CMD entry points perform equivalent validation. They:
 4. restore that consumer from the local artifact directory with an isolated
    NuGet package cache;
 5. execute the smoke consumer against the packed `Icod.TermInfo` package;
-6. run the repository sample through its non-interactive `--describe-only` path.
+6. run the general repository sample through its non-interactive
+   `--describe-only` path.
+
+Both repository sample executables are solution projects and therefore compile
+in every CI matrix. The focused acquisition sample is not automatically run
+against the host database because its `system` command intentionally inspects
+host-specific terminfo state; the isolated package-smoke consumer supplies the
+deterministic acquisition acceptance test instead.
 
 The checked-in package smoke project is intentionally not part of the solution
 and contains no project reference to `Icod.TermInfo`.
@@ -168,4 +175,6 @@ After a final version is published:
 Historical completion evidence for 0.6.0, 0.7.0, and 0.8.0 remains under
 `docs/*-CONTRACT-AUDIT.md`. The 0.9 release-candidate API/package freeze is
 recorded in `docs/0.9.0-T40-API-PACKAGE-FREEZE.md`; final 0.9.0 completion
-evidence is recorded in `docs/0.9.0-CONTRACT-AUDIT.md`.
+evidence is recorded in `docs/0.9.0-CONTRACT-AUDIT.md`. Consumer-facing
+compiled-database usage is consolidated in
+`docs/0.9.0-ACQUISITION-GUIDE.md`.

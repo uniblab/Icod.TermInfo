@@ -3,8 +3,15 @@ using System.Diagnostics.CodeAnalysis;
 namespace Icod.TermInfo;
 
 /// <summary>
-/// Resolves terminal descriptions from an ordered set of providers.
+/// Resolves terminal descriptions from an ordered, immutable provider list.
 /// </summary>
+/// <remarks>
+/// Providers are consulted in constructor order and the first successful
+/// provider wins. A <see cref="TerminalDatabase"/> is itself an
+/// <see cref="ITerminalDescriptionProvider"/>, so databases may participate in
+/// explicit composition such as system discovery followed by
+/// <see cref="BuiltIn"/> fallback. Provider failures are propagated.
+/// </remarks>
 public sealed class TerminalDatabase
     : ITerminalDescriptionProvider
 {
@@ -35,6 +42,10 @@ public sealed class TerminalDatabase
     /// <summary>
     /// Gets the immutable database of profiles supplied with the package.
     /// </summary>
+    /// <remarks>
+    /// This database is environment-independent and I/O-free. External
+    /// directory or system acquisition never mutates it.
+    /// </remarks>
     public static TerminalDatabase BuiltIn { get; } =
         new(
             new ITerminalDescriptionProvider[]
@@ -84,7 +95,8 @@ public sealed class TerminalDatabase
     /// </summary>
     /// <remarks>
     /// Providers are consulted in constructor order. The first provider which
-    /// resolves the requested name wins.
+    /// resolves the requested name wins. A clean miss continues to the next
+    /// provider; exceptions from a provider are not hidden as misses.
     /// </remarks>
     public bool TryLoad(
         string name,

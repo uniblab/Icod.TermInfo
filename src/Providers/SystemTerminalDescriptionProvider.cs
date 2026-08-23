@@ -7,6 +7,16 @@ namespace Icod.TermInfo;
 /// Loads compiled terminal descriptions through a deterministic snapshot of
 /// host environment, user, and platform database locations.
 /// </summary>
+/// <remarks>
+/// Discovery precedence is encoded <c>TERMINFO</c>, directory
+/// <c>TERMINFO</c>, non-Windows user <c>.terminfo</c>,
+/// <c>TERMINFO_DIRS</c>, then enabled platform defaults. The environment, home,
+/// current directory, and host platform are snapshotted at construction.
+/// Successful results are cached for this provider instance; clean misses and
+/// failures remain retryable. Construct a new provider to refresh successful
+/// entries or recapture discovery inputs. This provider never mutates
+/// <see cref="TerminalDatabase.BuiltIn"/>.
+/// </remarks>
 public sealed class SystemTerminalDescriptionProvider
 	: ITerminalDescriptionProvider
 {
@@ -36,8 +46,13 @@ public sealed class SystemTerminalDescriptionProvider
 	/// host discovery inputs.
 	/// </summary>
 	/// <param name="options">
-	/// Optional trust/search policy and parser limits.
+	/// Optional trust/search policy and parser limits. Default options permit
+	/// environment, user, and platform-system discovery.
 	/// </param>
+	/// <remarks>
+	/// Construction captures discovery inputs but does not create process-global
+	/// terminal state. The provider owns its snapshot and successful-entry cache.
+	/// </remarks>
 	public SystemTerminalDescriptionProvider(
 		SystemTerminalDescriptionProviderOptions? options = null)
 	{
@@ -76,6 +91,11 @@ public sealed class SystemTerminalDescriptionProvider
 	}
 
 	/// <inheritdoc/>
+	/// <remarks>
+	/// Exhausting enabled sources produces a clean miss. Malformed encoded
+	/// transport, malformed compiled data, permission/I/O failures, unsafe names,
+	/// and reached unsupported file/hashed database sources propagate as errors.
+	/// </remarks>
 	public bool TryLoad(
 		string name,
 		[NotNullWhen(true)] out TerminalDescription? terminal)

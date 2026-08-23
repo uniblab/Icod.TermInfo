@@ -1,9 +1,16 @@
 namespace Icod.TermInfo;
 
 /// <summary>
-/// A compiled terminfo entry is malformed or uses an unsupported compiled
-/// layout.
+/// The compiled terminfo bytes are malformed, exceed a configured parser
+/// bound, or use an unsupported compiled layout.
 /// </summary>
+/// <remarks>
+/// This exception describes failures in the compiled entry itself. Acquisition
+/// transport errors, such as malformed <c>TERMINFO=hex:</c> or
+/// <c>TERMINFO=b64:</c> text, are ordinary <see cref="FormatException"/>
+/// failures. Providers propagate compiled-format failures instead of converting
+/// them to clean misses.
+/// </remarks>
 public sealed class CompiledTermInfoFormatException : FormatException
 {
     /// <summary>
