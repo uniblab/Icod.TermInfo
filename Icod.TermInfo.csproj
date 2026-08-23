@@ -12,7 +12,7 @@
     <AssemblyName>Icod.TermInfo</AssemblyName>
     <RootNamespace>Icod.TermInfo</RootNamespace>
     <Configurations>Debug;Release;Staging</Configurations>
-    <Version>0.9.0-alpha.5</Version>
+    <Version>0.9.0-beta.1</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(PlatformTarget)' == '' ">
@@ -52,12 +52,12 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageVersion>0.9.0-alpha.5</PackageVersion>
+    <PackageVersion>0.9.0-beta.1</PackageVersion>
     <PackageId>Icod.TermInfo</PackageId>
     <Title>Icod.TermInfo</Title>
     <Authors>Timothy J. Bruce</Authors>
     <Description>Managed .NET terminfo capability information with complete standard metadata, ANSI/DEC/xterm and Windows profiles, parameter expansion, and padding-aware output.</Description>
-    <PackageReleaseNotes>0.9.0-alpha.5: add the explicit one-root compiled-terminfo directory provider with safe exact-name lookup, literal/lowercase-hex directory layouts, identity verification, bounded file reads, and provider-local successful-entry caching.</PackageReleaseNotes>
+    <PackageReleaseNotes>0.9.0-beta.1: add bounded ncurses-style TERMINFO hex/base64 decoding, immutable system-discovery options, injected environment snapshots, platform-safe TERMINFO_DIRS splitting, empty-component expansion, and deterministic root deduplication.</PackageReleaseNotes>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>

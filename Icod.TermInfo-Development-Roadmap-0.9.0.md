@@ -4,7 +4,7 @@
 **Package:** `Icod.TermInfo`
 **Target framework:** `net10.0`
 **Language:** C# 13
-**Status:** Active — T36 explicit directory provider complete; T37 encoded `TERMINFO` and discovery inputs next
+**Status:** Active — T37 encoded `TERMINFO` and discovery inputs complete; T38 system discovery/precedence next
 **Previous contract:** `0.8.0` — semantic completion and binary/provider readiness
 **Contract target:** `0.9.0`
 **Initial development version:** `0.9.0-alpha.1`
@@ -1080,6 +1080,8 @@ conventional terminfo directory tree and load exact terminal names safely.
 ## T37 — Encoded `TERMINFO` and Discovery Inputs
 
 **Development version:** `0.9.0-beta.1`
+**Status:** Complete
+**Implementation record:** `docs/0.9.0-T37-DISCOVERY-INPUTS.md`
 
 ### Work
 

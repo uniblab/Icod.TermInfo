@@ -20,6 +20,7 @@ public sealed class PublicApiSurfaceTests
         "Icod.TermInfo.NumericCapability",
         "Icod.TermInfo.PaddingMode",
         "Icod.TermInfo.StandardCapabilityCatalog",
+        "Icod.TermInfo.SystemTerminalDescriptionProviderOptions",
         "Icod.TermInfo.StandardCapabilityMetadata`1",
         "Icod.TermInfo.StringCapability",
         "Icod.TermInfo.TerminalColorModel",

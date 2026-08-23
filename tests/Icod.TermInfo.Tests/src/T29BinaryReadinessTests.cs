@@ -304,12 +304,11 @@ public sealed class T29BinaryReadinessTests
     }
 
     [Fact]
-    public void ProductionAssemblyContainsNoPrematureSystemProviderImplementation()
+    public void ProductionAssemblyContainsNoPrematureSystemProviderOrDefaults()
     {
         Assembly assembly = typeof(TerminalDatabase).Assembly;
         string[] reservedTypeNames =
         [
-            "SystemTerminalDescriptionProviderOptions",
             "SystemTerminalDescriptionProvider",
         ];
         HashSet<string> actualTypeNames =
@@ -331,8 +330,6 @@ public sealed class T29BinaryReadinessTests
         byte[] assemblyImage = File.ReadAllBytes(assembly.Location);
         foreach (string forbiddenLiteral in new[]
         {
-            "TERMINFO",
-            "TERMINFO_DIRS",
             "/usr/share/terminfo",
         })
         {

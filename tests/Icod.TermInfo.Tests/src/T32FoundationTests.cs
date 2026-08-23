@@ -36,11 +36,10 @@ public sealed class T32FoundationTests
     }
 
     [Fact]
-    public void SystemProviderImplementationRemainsReservedForLaterTranches()
+    public void SystemProviderImplementationRemainsReservedForT38()
     {
         string[] reservedTypeNames =
         [
-            "SystemTerminalDescriptionProviderOptions",
             "SystemTerminalDescriptionProvider",
         ];
 
