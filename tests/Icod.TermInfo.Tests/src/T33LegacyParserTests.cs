@@ -7,26 +7,6 @@ namespace Icod.TermInfo.Tests;
 public sealed class T33LegacyParserTests
 {
     [Fact]
-    public void AssemblyIdentifiesT33DevelopmentVersion()
-    {
-        Assembly assembly = typeof(CompiledTermInfoParser).Assembly;
-        Version? assemblyVersion = assembly.GetName().Version;
-        string? informationalVersion =
-            assembly
-                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                ?.InformationalVersion;
-
-        Assert.NotNull(assemblyVersion);
-        Assert.Equal(new Version(0, 9, 0, 0), assemblyVersion);
-        Assert.NotNull(informationalVersion);
-        Assert.True(
-            informationalVersion!.StartsWith(
-                "0.9.0-alpha.2",
-                StringComparison.Ordinal),
-            $"Unexpected informational version '{informationalVersion}'.");
-    }
-
-    [Fact]
     public void ParserPublicSurfaceMatchesT32Freeze()
     {
         Assert.Equal(
@@ -302,22 +282,6 @@ public sealed class T33LegacyParserTests
 
         Assert.NotNull(exception.Section);
         Assert.True(exception.Offset >= 0);
-    }
-
-    [Fact]
-    public void ExtendedFormatsRemainReservedForT34()
-    {
-        CompiledTermInfoFormatException extension =
-            Assert.Throws<CompiledTermInfoFormatException>(
-                () => ParseFixture(
-                    "compiled/t29-extended.bin"));
-        Assert.Equal("extended", extension.Section);
-
-        CompiledTermInfoFormatException extendedNumbers =
-            Assert.Throws<CompiledTermInfoFormatException>(
-                () => ParseFixture(
-                    "compiled/t29-extended32.bin"));
-        Assert.Equal("header", extendedNumbers.Section);
     }
 
     private static TerminalDescription ParseFixture(

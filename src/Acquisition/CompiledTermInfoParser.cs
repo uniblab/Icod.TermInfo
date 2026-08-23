@@ -6,7 +6,7 @@ namespace Icod.TermInfo;
 /// <summary>
 /// Parses conventional compiled terminfo entries from caller-supplied bytes.
 /// </summary>
-public static class CompiledTermInfoParser
+public static partial class CompiledTermInfoParser
 {
     private const ushort LegacyMagic = 0x011A;
     private const int HeaderSize = 12;
@@ -22,8 +22,8 @@ public static class CompiledTermInfoParser
         new();
 
     /// <summary>
-    /// Parses one legacy <c>0432</c> compiled terminfo entry into an immutable
-    /// terminal description.
+    /// Parses one supported conventional compiled terminfo entry into an
+    /// immutable terminal description.
     /// </summary>
     /// <param name="entry">The complete compiled entry.</param>
     /// <param name="options">
@@ -51,24 +51,22 @@ public static class CompiledTermInfoParser
 
         CompiledHeader header = ReadHeader(entry);
 
-        if (header.Magic != LegacyMagic)
+        if (header.Magic != LegacyMagic
+            && header.Magic != ExtendedNumberMagic)
         {
             throw CreateFormatException(
-                $"Unsupported compiled terminfo magic 0x{header.Magic:X4}. T33 accepts only legacy 0432 entries.",
+                $"Unsupported compiled terminfo magic 0x{header.Magic:X4}. Supported magic values are 0432 and 01036.",
                 0,
                 "header");
         }
 
-        CompiledLayout layout = ReadLayout(entry, header);
+        int numericWidth = GetNumericWidth(header.Magic);
+        CompiledLayout layout =
+            ReadLayout(
+                entry,
+                header,
+                numericWidth);
         ValidateStandardTableCounts(header);
-
-        if (layout.EndOffset != entry.Length)
-        {
-            throw CreateFormatException(
-                "Trailing compiled data is not part of the T33 legacy format. Ncurses extended sections are implemented by T34.",
-                layout.EndOffset,
-                "extended");
-        }
 
         TerminalDescriptionBuilder builder =
             CreateBuilder(
@@ -86,12 +84,22 @@ public static class CompiledTermInfoParser
             entry,
             header,
             layout,
+            numericWidth,
             builder);
         ReadStrings(
             entry,
             header,
             layout,
             builder);
+
+        if (layout.EndOffset < entry.Length)
+        {
+            ReadExtendedSection(
+                entry,
+                layout,
+                numericWidth,
+                builder);
+        }
 
         return builder.Build();
     }
@@ -117,7 +125,8 @@ public static class CompiledTermInfoParser
 
     private static CompiledLayout ReadLayout(
         ReadOnlySpan<byte> entry,
-        CompiledHeader header)
+        CompiledHeader header,
+        int numericWidth)
     {
         int namesOffset = HeaderSize;
         int namesEnd =
@@ -172,7 +181,7 @@ public static class CompiledTermInfoParser
             CheckedEnd(
                 numericOffset,
                 header.NumericCount,
-                sizeof(short),
+                numericWidth,
                 "numerics");
         EnsureAvailable(
             entry,
@@ -389,6 +398,7 @@ public static class CompiledTermInfoParser
         ReadOnlySpan<byte> entry,
         CompiledHeader header,
         CompiledLayout layout,
+        int numericWidth,
         TerminalDescriptionBuilder builder)
     {
         for (int index = 0;
@@ -397,12 +407,12 @@ public static class CompiledTermInfoParser
         {
             int offset =
                 layout.NumericOffset
-                + (index * sizeof(short));
-            short value =
-                BinaryPrimitives.ReadInt16LittleEndian(
-                    entry.Slice(
-                        offset,
-                        sizeof(short)));
+                + (index * numericWidth);
+            int value =
+                ReadNumericValue(
+                    entry,
+                    offset,
+                    numericWidth);
             NumericCapability capability =
                 GetCapabilityAtBinaryIndex(
                     StandardCapabilityCatalog.NumericCapabilities,
