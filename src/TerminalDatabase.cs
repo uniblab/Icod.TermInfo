@@ -41,6 +41,8 @@ public sealed class TerminalDatabase
                 new InMemoryTerminalDescriptionProvider(
                     new[]
                     {
+                        TerminalProfiles.MsTerminalDirect,
+                        TerminalProfiles.MsTerminal,
                         TerminalProfiles.XtermDirect256,
                         TerminalProfiles.XtermDirect16,
                         TerminalProfiles.XtermDirect,

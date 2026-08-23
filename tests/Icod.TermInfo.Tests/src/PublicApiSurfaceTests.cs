@@ -81,6 +81,8 @@ public sealed class PublicApiSurfaceTests
         [
             "Ansi",
             "Dumb",
+            "MsTerminal",
+            "MsTerminalDirect",
             "Vt100",
             "Vt102",
             "Vt220",

@@ -56,6 +56,20 @@ public static class TerminalProfiles
         AnsiTerminalProfile.Create();
 
     /// <summary>
+    /// Gets the authoritative ncurses <c>ms-terminal</c> Windows Terminal
+    /// profile with 256 indexed colors.
+    /// </summary>
+    public static TerminalDescription MsTerminal { get; } =
+        WindowsTerminalProfile.Create();
+
+    /// <summary>
+    /// Gets the authoritative ncurses <c>ms-terminal-direct</c> Windows
+    /// Terminal profile with direct RGB color.
+    /// </summary>
+    public static TerminalDescription MsTerminalDirect { get; } =
+        WindowsTerminalProfile.CreateDirect();
+
+    /// <summary>
     /// Gets the authoritative ncurses <c>winconsole</c> profile for the
     /// Windows 10-and-later virtual-terminal console.
     /// </summary>
