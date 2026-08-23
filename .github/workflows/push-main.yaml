@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - 0.7.0
+      - 0.8.0
   workflow_dispatch:
 
 permissions:
@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        configuration: [Release]
+        configuration: [Debug, Release]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4

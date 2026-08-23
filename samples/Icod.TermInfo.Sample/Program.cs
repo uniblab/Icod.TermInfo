@@ -1,3 +1,4 @@
+using System.Text;
 using Icod.TermInfo;
 using Icod.TermInfo.Sample;
 
@@ -7,6 +8,9 @@ bool describeOnly =
 TerminalDescription terminal = ResolveTerminal(args);
 
 Console.WriteLine($"Profile: {terminal.Name}");
+Console.WriteLine($"Description: {terminal.Description ?? "(none)"}");
+
+DescribeSemanticCompletionApis(terminal);
 
 if (TryResolveSize(terminal, out TerminalSize size, out string source))
 {
@@ -110,6 +114,67 @@ static bool TryResolveSize(
 
     source = string.Empty;
     return false;
+}
+
+static void DescribeSemanticCompletionApis(TerminalDescription terminal)
+{
+    ArgumentNullException.ThrowIfNull(terminal);
+
+    Console.WriteLine(
+        $"Standard catalog: booleans={StandardCapabilityCatalog.BooleanCapabilities.Count}, numerics={StandardCapabilityCatalog.NumericCapabilities.Count}, strings={StandardCapabilityCatalog.StringCapabilities.Count}");
+    Console.WriteLine(
+        $"Present standard capabilities: booleans={terminal.BooleanCapabilities.Count}, numerics={terminal.NumericCapabilities.Count}, strings={terminal.StringCapabilities.Count}; extended={terminal.ExtendedCapabilities.Count}");
+
+    StandardCapabilityMetadata<StringCapability> cupMetadata =
+        StandardCapabilityCatalog.GetMetadata(
+            StringCapability.CursorAddress);
+    Console.WriteLine(
+        $"Catalog sample: {cupMetadata.ShortName}/{cupMetadata.LongName}, binary-index={cupMetadata.BinaryIndex}");
+
+    TermInfoParameterProgram reusableProgram =
+        TermInfoParameterProgram.Parse("%p1%{1}%+%d");
+    Console.WriteLine(
+        $"Reusable parameter program sample: 41 -> {reusableProgram.Expand(41)}");
+
+    if (terminal.TryGetExtendedString("XM", out _))
+    {
+        string mouseEnable =
+            terminal.ExpandExtendedString("XM", 1);
+        Console.WriteLine(
+            $"Extended expansion sample XM(1): {EscapeForDisplay(mouseEnable)}");
+    }
+
+    using MemoryStream byteStream = new();
+    TermInfoOutput.TPuts(
+        "\u0080",
+        affectedLines: 1,
+        byteStream,
+        Encoding.Latin1);
+    Console.WriteLine(
+        $"Latin-1 capability byte sample: 0x{byteStream.ToArray()[0]:X2}");
+
+    TerminalDescription xonExample =
+        new TerminalDescriptionBuilder("sample-xon")
+            .SetBoolean(BooleanCapability.XonXoff)
+            .Build();
+    using StringWriter paddingWriter = new();
+    TermInfoOutput.TPuts(
+        "before$<1>after",
+        affectedLines: 1,
+        paddingWriter,
+        new TermInfoOutputOptions(xonExample));
+    Console.WriteLine(
+        $"Terminal-aware padding sample: {paddingWriter}");
+
+    TerminalDescription winConsole =
+        TerminalDatabase.BuiltIn.Load("winconsole");
+    TerminalDescription windowsTerminal =
+        TerminalDatabase.BuiltIn.Load("ms-terminal");
+    TerminalDescription windowsTerminalDirect =
+        TerminalDatabase.BuiltIn.Load("ms-terminal-direct");
+
+    Console.WriteLine(
+        $"Windows profiles: {winConsole.Name}, {windowsTerminal.Name}, {windowsTerminalDirect.Name} ({TerminalColors.GetColorSupport(windowsTerminalDirect).Model})");
 }
 
 static void DescribeProfile(TerminalDescription terminal)

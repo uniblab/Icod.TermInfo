@@ -1,6 +1,6 @@
 # Releasing Icod.TermInfo
 
-This document describes the current validation and publication procedure for `Icod.TermInfo` 0.7.0 and later releases built from the same repository structure.
+This document describes the current validation and publication procedure for the `Icod.TermInfo` 0.8.0 release candidate and later releases built from the same repository structure.
 
 ## Release principles
 
@@ -24,9 +24,9 @@ This document describes the current validation and publication procedure for `Ic
 
 Each matrix job cleans, restores, builds, and tests the whole solution, including the sample project.
 
-### Pushes to main and the 0.7.0 release branch
+### Pushes to main and the 0.8.0 release branch
 
-`.github/workflows/push-main.yaml` runs for pushes to `main` and `0.7.0`, and may also be started with `workflow_dispatch`. It repeats the Debug/Release three-OS build/test matrix. After that matrix succeeds, an Ubuntu package-validation job:
+`.github/workflows/push-main.yaml` runs for pushes to `main` and `0.8.0`, and may also be started with `workflow_dispatch`. It repeats the Debug/Release three-OS build/test matrix. After that matrix succeeds, an Ubuntu package-validation job:
 
 1. restores and builds Release with `ContinuousIntegrationBuild=true`;
 2. runs the Release test suite;
@@ -55,38 +55,40 @@ bash .github/scripts/verify-release-package.sh artifacts
 
 On Windows, run the PowerShell/cmd equivalents for the build/test/pack commands. The package verifier itself is a Bash script and is also exercised by the Ubuntu GitHub Actions package job.
 
-## 0.7.0 completion gate
+## 0.8.0 completion gate
 
-T20 sets both version fields to the final `0.7.0` value and freezes the repository-side release candidate. `T20CompletionGateTests` supplements the existing API/profile/color/metadata tests with final-version, reserved-0.8-name, and xterm screen-primitive assertions.
+T30 sets the release-candidate version to `0.8.0-rc.1`, freezes the intended 0.8 public API, updates documentation/samples, and expands fresh-package validation. T31 is the final completion gate and sets both version fields to `0.8.0` only after the contract audit is satisfied.
 
-The final candidate must still pass the exact release workflow before it is tagged. Push the candidate to `0.7.0` (or run the validation workflow manually) and require:
+The final candidate must pass the exact release workflow before it is tagged. Push the candidate to `0.8.0` (or run the validation workflow manually) and require:
 
 - three-OS Debug/Release CI;
-- package validation;
-- public API baseline validation;
-- fresh-package consumer smoke tests;
-- compatibility checks for the retained 0.6.0 profiles;
-- xterm indexed/direct-color and metadata checks;
-- scope checks proving that no system terminfo loader, live session manager, input decoder, Windows Console profile, or Windows Terminal profile slipped into 0.7.0.
+- package validation and portable-symbol/Source Link checks;
+- the frozen public API baseline;
+- fresh-package consumer smoke tests covering the new 0.8 metadata, enumeration, expansion, byte-output, terminal-aware padding, and Windows profile APIs;
+- compatibility checks for all retained 0.7 built-ins and enum values;
+- golden `winconsole`, `ms-terminal`, and `ms-terminal-direct` tests;
+- parameter/padding hardening and concurrency tests;
+- T29 fixture/provenance and provider clean-miss tests;
+- architecture guards proving that no production compiled terminfo parser, directory/system provider, `TERMINFO`, or `TERMINFO_DIRS` discovery entered 0.8.
 
-The final evidence map is in `docs/0.7.0-CONTRACT-AUDIT.md`. Do not create `v0.7.0` until the workflow for the exact release commit is green.
+T31 should add the final 0.8 contract-audit evidence map. Do not create `v0.8.0` until the workflow for the exact final release commit is green. No source or package content may change between that successful validation and tagging; any change requires rerunning the gate.
 
 ## Publishing
 
 The current repository intentionally separates validation from publication. The committed workflows validate and upload package artifacts but do not push them to package registries automatically.
 
-For the T20 release candidate:
+For the T31 release candidate:
 
-1. confirm both `<Version />` and `<PackageVersion />` are exactly `0.7.0`;
-2. push the release-ready commit to `0.7.0` (and merge it through the normal repository process when appropriate);
+1. confirm both `<Version />` and `<PackageVersion />` are exactly `0.8.0`;
+2. push the release-ready commit to `0.8.0` (and merge it through the normal repository process when appropriate);
 3. require the six Windows/Linux/macOS Debug/Release jobs and the package-validation job for the exact release commit to finish successfully;
 4. download the `.nupkg` and `.snupkg` artifacts produced by that validated commit, or reproduce them from that same commit with the documented deterministic build;
-5. create and push tag `v0.7.0` at that exact release-ready commit;
+5. create and push tag `v0.8.0` at that exact release-ready commit;
 6. publish the same `.nupkg` to NuGet.org and GitHub Packages using the repository owner's normal authenticated package-publishing procedure;
 7. publish the `.snupkg` to the NuGet.org symbol server when pushing the NuGet package;
 8. optionally attach both artifacts to a GitHub Release for the tag.
 
-Do not publish a package built from a different commit than the one that passed the final T20 validation.
+Do not publish a package built from a different commit than the one that passed the final T31 validation.
 
 ## NuGet.org authentication
 
@@ -100,10 +102,10 @@ For GitHub Actions publication, prefer the repository `GITHUB_TOKEN` with the mi
 
 ## After publication
 
-After `v0.7.0` is published:
+After `v0.8.0` is published:
 
 - confirm the package and symbols are visible on NuGet.org;
 - confirm the same package version is visible in GitHub Packages;
 - confirm a fresh consumer can restore the public package;
-- mark the 0.7.0 roadmap complete;
+- mark the 0.8.0 roadmap complete;
 - treat subsequent public API changes as deliberate contract changes for the next version.

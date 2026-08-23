@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Icod.TermInfo;
 using Xunit;
@@ -47,7 +48,7 @@ public sealed class PublicApiSurfaceTests
     ];
 
     [Fact]
-    public void ExportedTypeSetMatchesT25Baseline()
+    public void ExportedTypeSetMatchesT30Baseline()
     {
         string[] actual =
             typeof(TerminalDescription).Assembly
@@ -238,6 +239,300 @@ public sealed class PublicApiSurfaceTests
                 .OrderBy(value => value, StringComparer.Ordinal)
                 .ToArray(),
             actualBuilder);
+    }
+
+    [Fact]
+    public void StandardCapabilityMetadataAndEnumerationSurfaceIsFrozen()
+    {
+        string[] expectedCatalogProperties =
+        [
+            "BooleanCapabilities",
+            "NumericCapabilities",
+            "StringCapabilities",
+        ];
+        string[] actualCatalogProperties =
+            typeof(StandardCapabilityCatalog)
+                .GetProperties(
+                    BindingFlags.Public
+                    | BindingFlags.Static
+                    | BindingFlags.DeclaredOnly)
+                .Select(property => property.Name)
+                .OrderBy(name => name, StringComparer.Ordinal)
+                .ToArray();
+
+        Assert.Equal(
+            expectedCatalogProperties
+                .OrderBy(name => name, StringComparer.Ordinal)
+                .ToArray(),
+            actualCatalogProperties);
+
+        string[] expectedCatalogMethods =
+        [
+            "GetMetadata(BooleanCapability)",
+            "GetMetadata(NumericCapability)",
+            "GetMetadata(StringCapability)",
+            "TryGetBoolean(String,StandardCapabilityMetadata`1&)",
+            "TryGetNumeric(String,StandardCapabilityMetadata`1&)",
+            "TryGetString(String,StandardCapabilityMetadata`1&)",
+        ];
+        string[] actualCatalogMethods =
+            typeof(StandardCapabilityCatalog)
+                .GetMethods(
+                    BindingFlags.Public
+                    | BindingFlags.Static
+                    | BindingFlags.DeclaredOnly)
+                .Where(method => !method.IsSpecialName)
+                .Select(FormatMethod)
+                .OrderBy(value => value, StringComparer.Ordinal)
+                .ToArray();
+
+        Assert.Equal(
+            expectedCatalogMethods
+                .OrderBy(value => value, StringComparer.Ordinal)
+                .ToArray(),
+            actualCatalogMethods);
+
+        Type metadataType = typeof(StandardCapabilityMetadata<>);
+        Assert.DoesNotContain(
+            metadataType.GetConstructors(
+                BindingFlags.Public
+                | BindingFlags.NonPublic
+                | BindingFlags.Instance),
+            constructor => constructor.IsPublic);
+
+        string[] expectedMetadataProperties =
+        [
+            "BinaryIndex",
+            "Capability",
+            "Kind",
+            "LongName",
+            "ShortName",
+            "TermcapCode",
+        ];
+        PropertyInfo[] metadataProperties =
+            metadataType.GetProperties(
+                BindingFlags.Public
+                | BindingFlags.Instance
+                | BindingFlags.DeclaredOnly);
+
+        Assert.All(
+            metadataProperties,
+            property =>
+            {
+                Assert.True(property.CanRead);
+                Assert.False(property.CanWrite);
+            });
+        Assert.Equal(
+            expectedMetadataProperties
+                .OrderBy(name => name, StringComparer.Ordinal)
+                .ToArray(),
+            metadataProperties
+                .Select(property => property.Name)
+                .OrderBy(name => name, StringComparer.Ordinal)
+                .ToArray());
+    }
+
+    [Fact]
+    public void SemanticCompletionDescriptionAndProgramSurfaceIsFrozen()
+    {
+        PropertyInfo description =
+            typeof(TerminalDescription).GetProperty(
+                nameof(TerminalDescription.Description))!;
+        Assert.Equal(typeof(string), description.PropertyType);
+        Assert.True(description.CanRead);
+        Assert.False(description.CanWrite);
+
+        string[] expectedEnumerationProperties =
+        [
+            "BooleanCapabilities",
+            "ExtendedCapabilities",
+            "NumericCapabilities",
+            "StringCapabilities",
+        ];
+        string[] actualEnumerationProperties =
+            typeof(TerminalDescription)
+                .GetProperties(
+                    BindingFlags.Public
+                    | BindingFlags.Instance
+                    | BindingFlags.DeclaredOnly)
+                .Where(property =>
+                    property.Name.EndsWith(
+                        "Capabilities",
+                        StringComparison.Ordinal))
+                .Select(property => property.Name)
+                .OrderBy(name => name, StringComparer.Ordinal)
+                .ToArray();
+
+        Assert.Equal(
+            expectedEnumerationProperties
+                .OrderBy(name => name, StringComparer.Ordinal)
+                .ToArray(),
+            actualEnumerationProperties);
+
+        string[] expectedProgramMembers =
+        [
+            "Expand/1",
+            "Expand/2",
+            "Parse/1",
+            "get_Source/0",
+        ];
+        string[] actualProgramMembers =
+            typeof(TermInfoParameterProgram)
+                .GetMethods(
+                    BindingFlags.Public
+                    | BindingFlags.Instance
+                    | BindingFlags.Static
+                    | BindingFlags.DeclaredOnly)
+                .Select(method =>
+                    $"{method.Name}/{method.GetParameters().Length}")
+                .OrderBy(value => value, StringComparer.Ordinal)
+                .ToArray();
+
+        Assert.Equal(
+            expectedProgramMembers
+                .OrderBy(value => value, StringComparer.Ordinal)
+                .ToArray(),
+            actualProgramMembers);
+
+        Assert.DoesNotContain(
+            typeof(TerminalDescription).Assembly.GetExportedTypes(),
+            type =>
+                type.Name.Contains("Analysis", StringComparison.Ordinal)
+                || type.Name.Contains("Instruction", StringComparison.Ordinal)
+                || type.Name.Contains("Parser", StringComparison.Ordinal)
+                || type.Name.Contains("Cache", StringComparison.Ordinal));
+
+        Assert.DoesNotContain(
+            typeof(TerminalDescription).GetMembers(
+                BindingFlags.Public
+                | BindingFlags.Instance
+                | BindingFlags.DeclaredOnly),
+            member =>
+                member.Name.Contains("Cache", StringComparison.Ordinal)
+                || member.Name.Contains(
+                    "ParameterProgram",
+                    StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void NullabilityContractsAreFrozen()
+    {
+        NullabilityInfoContext nullability = new();
+
+        PropertyInfo description =
+            typeof(TerminalDescription).GetProperty(
+                nameof(TerminalDescription.Description))!;
+        Assert.Equal(
+            NullabilityState.Nullable,
+            nullability.Create(description).ReadState);
+
+        PropertyInfo terminal =
+            typeof(TermInfoOutputOptions).GetProperty(
+                nameof(TermInfoOutputOptions.Terminal))!;
+        Assert.Equal(
+            NullabilityState.NotNull,
+            nullability.Create(terminal).ReadState);
+
+        PropertyInfo delayProvider =
+            typeof(TermInfoOutputOptions).GetProperty(
+                nameof(TermInfoOutputOptions.DelayProvider))!;
+        Assert.Equal(
+            NullabilityState.Nullable,
+            nullability.Create(delayProvider).ReadState);
+
+        MethodInfo tryLoad =
+            typeof(ITerminalDescriptionProvider).GetMethod(
+                nameof(ITerminalDescriptionProvider.TryLoad))!;
+        ParameterInfo result = tryLoad.GetParameters()[1];
+        NotNullWhenAttribute? notNullWhen =
+            result.GetCustomAttribute<NotNullWhenAttribute>();
+
+        Assert.NotNull(notNullWhen);
+        Assert.True(notNullWhen.ReturnValue);
+    }
+
+    [Fact]
+    public void TerminalAwareOutputSurfaceIsFrozen()
+    {
+        ConstructorInfo[] constructors =
+            typeof(TermInfoOutputOptions).GetConstructors(
+                BindingFlags.Public
+                | BindingFlags.Instance);
+
+        Assert.Single(constructors);
+        Assert.Equal(
+            new[]
+            {
+                "TerminalDescription",
+                "Nullable`1",
+                "PaddingMode",
+                "ITermInfoDelayProvider",
+            },
+            constructors[0]
+                .GetParameters()
+                .Select(parameter => parameter.ParameterType.Name)
+                .ToArray());
+
+        string[] expectedOptionProperties =
+        [
+            "BaudRate",
+            "DelayProvider",
+            "PaddingMode",
+            "Terminal",
+        ];
+        PropertyInfo[] optionProperties =
+            typeof(TermInfoOutputOptions)
+                .GetProperties(
+                    BindingFlags.Public
+                    | BindingFlags.Instance
+                    | BindingFlags.DeclaredOnly);
+
+        Assert.All(
+            optionProperties,
+            property =>
+            {
+                Assert.True(property.CanRead);
+                Assert.False(property.CanWrite);
+            });
+        Assert.Equal(
+            expectedOptionProperties
+                .OrderBy(name => name, StringComparer.Ordinal)
+                .ToArray(),
+            optionProperties
+                .Select(property => property.Name)
+                .OrderBy(name => name, StringComparer.Ordinal)
+                .ToArray());
+
+        string[] expectedOutputMethods =
+        [
+            "PutP(String,TextWriter,TermInfoOutputOptions)",
+            "PutPAsync(String,TextWriter,TermInfoOutputOptions,CancellationToken)",
+            "TPuts(String,Int32,Action`1,TermInfoOutputOptions)",
+            "TPuts(String,Int32,Stream,Encoding,TermInfoOutputOptions)",
+            "TPuts(String,Int32,TextWriter,TermInfoOutputOptions)",
+            "TPutsAsync(String,Int32,Stream,Encoding,TermInfoOutputOptions,CancellationToken)",
+            "TPutsAsync(String,Int32,TextWriter,TermInfoOutputOptions,CancellationToken)",
+        ];
+        string[] actualOutputMethods =
+            typeof(TermInfoOutput)
+                .GetMethods(
+                    BindingFlags.Public
+                    | BindingFlags.Static
+                    | BindingFlags.DeclaredOnly)
+                .Where(method =>
+                    method.GetParameters().Any(
+                        parameter =>
+                            parameter.ParameterType
+                            == typeof(TermInfoOutputOptions)))
+                .Select(FormatMethod)
+                .OrderBy(value => value, StringComparer.Ordinal)
+                .ToArray();
+
+        Assert.Equal(
+            expectedOutputMethods
+                .OrderBy(value => value, StringComparer.Ordinal)
+                .ToArray(),
+            actualOutputMethods);
     }
 
     private static string FormatMethod(MethodInfo method)
