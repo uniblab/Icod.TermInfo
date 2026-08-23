@@ -8,10 +8,10 @@ The package targets `net10.0`, uses C# 13, contains no native ncurses/terminfo p
 
 ## Install
 
-For the T30 release candidate:
+For the 0.8.0 release:
 
 ```text
-dotnet add package Icod.TermInfo --version 0.8.0-rc.1
+dotnet add package Icod.TermInfo --version 0.8.0
 ```
 
 The same package contents are intended for NuGet.org and GitHub Packages. Repository development can reference `Icod.TermInfo.csproj` directly, as the sample project does.
@@ -488,7 +488,7 @@ The package verifier checks the `.nupkg`/`.snupkg` structure, dependency closure
 
 GitHub pull requests validate both Debug and Release on Windows, Linux, and macOS. Pushes to `main` and the `0.8.0` release branch run the same matrix, then pack and verify the package and upload the exact package artifacts; validation may also be started manually. These workflows do not publish packages automatically.
 
-See `docs/RELEASING.md` for the release procedure and `docs/0.8.0-T30-API-PACKAGE-FREEZE.md` for the T30 API/package freeze decisions. T31 performs the final 0.8.0 contract audit; tag `v0.8.0` only after the exact final candidate passes that complete workflow.
+See `docs/RELEASING.md` for the release procedure and `docs/0.8.0-CONTRACT-AUDIT.md` for the final T31 evidence map. Tag `v0.8.0` only after the exact final candidate passes the complete workflow described there; no source/package content should change between that successful validation and tagging.
 
 ## Scope
 

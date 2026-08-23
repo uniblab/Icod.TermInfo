@@ -4,7 +4,7 @@
 **Package:** `Icod.TermInfo`  
 **Target framework:** `net10.0`  
 **Language:** C# 13  
-**Status:** Implementation in progress — T30 API Hardening, Documentation, Samples, and Package Freeze<br>
+**Status:** Final release candidate — T31 0.8.0 Completion Gate<br>
 **Previous contract:** `0.7.0` — complete and frozen  
 **Contract target:** `0.8.0`  
 **Initial development version:** `0.8.0-alpha.1`

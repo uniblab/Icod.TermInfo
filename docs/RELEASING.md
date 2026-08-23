@@ -57,7 +57,7 @@ On Windows, run the PowerShell/cmd equivalents for the build/test/pack commands.
 
 ## 0.8.0 completion gate
 
-T30 sets the release-candidate version to `0.8.0-rc.1`, freezes the intended 0.8 public API, updates documentation/samples, and expands fresh-package validation. T31 is the final completion gate and sets both version fields to `0.8.0` only after the contract audit is satisfied.
+T30 set the release-candidate version to `0.8.0-rc.1`, froze the intended 0.8 public API, updated documentation/samples, and expanded fresh-package validation. T31 sets both version fields to the final `0.8.0` value, adds the semantic-completion release assertions, and records the final repository-side evidence map in `docs/0.8.0-CONTRACT-AUDIT.md`.
 
 The final candidate must pass the exact release workflow before it is tagged. Push the candidate to `0.8.0` (or run the validation workflow manually) and require:
 
@@ -71,7 +71,7 @@ The final candidate must pass the exact release workflow before it is tagged. Pu
 - T29 fixture/provenance and provider clean-miss tests;
 - architecture guards proving that no production compiled terminfo parser, directory/system provider, `TERMINFO`, or `TERMINFO_DIRS` discovery entered 0.8.
 
-T31 should add the final 0.8 contract-audit evidence map. Do not create `v0.8.0` until the workflow for the exact final release commit is green. No source or package content may change between that successful validation and tagging; any change requires rerunning the gate.
+The final repository-side evidence map is `docs/0.8.0-CONTRACT-AUDIT.md`. Do not create `v0.8.0` until the workflow for the exact final release commit is green. No source or package content may change between that successful validation and tagging; any change requires rerunning the gate.
 
 ## Publishing
 
