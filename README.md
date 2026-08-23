@@ -448,26 +448,37 @@ dotnet run --project samples/Icod.TermInfo.Sample/Icod.TermInfo.Sample.csproj --
 
 ## Project-family boundary
 
-`Icod.TermInfo` owns terminal-description data and pure transformations of that data. It does not own a live terminal session.
+`Icod.TermInfo` owns immutable terminal-description data, acquisition of that data, and pure transformations required to interpret, expand, and output terminal capabilities. It does not own a live terminal session, a child pseudo-terminal, or a virtual screen.
 
-A future `Icod.Terminal`-style layer may own raw/cooked mode changes, input decoding, keyboard/mouse/paste/focus events, probing, full-screen lifecycle, cursor lifecycle, clipboard operations, and progress helpers. A future curses-style library may own virtual-screen state, windows, pads, panels, menus, forms, and refresh optimization. PTY creation/process plumbing belongs elsewhere as well.
+The intended family boundary is now explicit:
 
-## 0.9.0 arbitrary-terminal boundary
+- **`Icod.TermInfo`** — descriptions, compiled-database acquisition, capability semantics, parameter expansion, and output transformation;
+- **future `Icod.Terminal`** — raw/cooked session ownership, input decoding, keyboard/mouse/paste/focus events, active probing/negotiation, full-screen/cursor lifecycle, clipboard/hyperlink operations, and progress helpers;
+- **future `Icod.Pty`** — Unix PTY and Windows ConPTY creation, resize propagation, and child-process plumbing;
+- **future `Icod.Curses`** — Unicode cell/grid state, damage/refresh optimization, windows, pads, panels, menus, forms, and widgets;
+- **future source/tooling work** — `.ti` parsing, `use=` inheritance, `tic`/`infocmp`-class tools, termcap conversion, and optional database-maintenance functionality.
 
-Version 0.8 deliberately completes **terminfo semantics in memory** but does not acquire arbitrary terminal descriptions from the host.
+The broader dependency inventory is recorded in `docs/FUTURE-WORK-INVENTORY.md`.
 
-The required 0.9 work is already frozen and fixture-backed. It includes:
+## 0.9.0 arbitrary-terminal roadmap
 
-- conventional `0432` compiled entries;
-- ncurses extended sections;
-- `01036` / signed 32-bit numeric entries;
-- absent/canceled binary handling;
-- explicit directory-tree providers;
-- `TERMINFO`, `TERMINFO_DIRS`, `$HOME/.terminfo`, and platform default roots;
-- encoded `TERMINFO=hex:...` / `TERMINFO=b64:...`;
-- safe malformed-entry diagnostics and provider-instance caching.
+Version 0.8 completed **terminfo semantics in memory**. Version 0.9 is planned to add the acquisition layer without redesigning that semantic model.
 
-Version 0.8 therefore contains **no production compiled terminfo parser**, no `/usr/share/terminfo` loader, no `TERMINFO`/`TERMINFO_DIRS` discovery, and no host-database-dependent automatic profile selection. The checked-in T29 compiled fixtures are test/provenance assets for 0.9 and are not runtime package data.
+The 0.9 dependency chain is:
+
+```text
+pure compiled-byte parser
+    -> explicit directory provider
+    -> TERMINFO / TERMINFO_DIRS / user / platform discovery
+    -> provider-local cache and refresh semantics
+    -> final API/package completion gate
+```
+
+The parser will be independently usable from caller-supplied bytes and will support the frozen conventional `0432`, ncurses extended-section, and `01036` / signed-32-bit formats. Directory and system providers will reuse that parser rather than embedding their own binary logic. Encoded `TERMINFO=hex:...` and `TERMINFO=b64:...` entries will use the same path.
+
+0.9 deliberately does **not** include `.ti` source parsing, `tic`/`infocmp`, termcap, Berkeley-DB hashed terminfo stores, divergent historical vendor binary formats, live input/session management, active probing, PTYs, curses, terminal emulation, or graphics protocols.
+
+See `Icod.TermInfo-Development-Roadmap-0.9.0.md` for the detailed tranche contract and `docs/FUTURE-WORK-INVENTORY.md` for the post-0.9 dependency map.
 
 ## Build, test, and pack
 
@@ -486,7 +497,7 @@ bash .github/scripts/verify-release-package.sh artifacts
 
 The package verifier checks the `.nupkg`/`.snupkg` structure, dependency closure, Source Link metadata, exclusion of test-only compiled fixtures, and a fresh `net10.0` consumer restored from only the local package directory. The fresh consumer exercises the intended new 0.8 metadata/enumeration, expansion, exact-byte, terminal-aware padding, and Windows-profile APIs. It also runs the sample's `--describe-only` mode as a non-interactive consumer check.
 
-GitHub pull requests validate both Debug and Release on Windows, Linux, and macOS. Pushes to `main` and the `0.8.0` release branch run the same matrix, then pack and verify the package and upload the exact package artifacts; validation may also be started manually. These workflows do not publish packages automatically.
+Pushes to `main` and the active `0.8.0` release branch run the Release build/test matrix on Windows, Linux, and macOS. After that matrix succeeds, the package-validation job packs and verifies the exact artifacts, and the downstream `Release` deployment job publishes the validated package to NuGet.org and GitHub Packages. Pull-request validation remains a separate repository workflow.
 
 See `docs/RELEASING.md` for the release procedure and `docs/0.8.0-CONTRACT-AUDIT.md` for the final T31 evidence map. Tag `v0.8.0` only after the exact final candidate passes the complete workflow described there; no source/package content should change between that successful validation and tagging.
 
@@ -494,7 +505,7 @@ See `docs/RELEASING.md` for the release procedure and `docs/0.8.0-CONTRACT-AUDIT
 
 `Icod.TermInfo` is not curses, a terminal emulator, a PTY implementation, a termios session manager, an input-event parser, or a general terminal UI toolkit. It intentionally carries low-level descriptive data which those higher-level systems may consume.
 
-See `Icod.TermInfo-Development-Roadmap-0.8.0.md` for the complete 0.8.0 contract. The 0.6.0 and 0.7.0 roadmaps remain historical frozen contracts.
+See `Icod.TermInfo-Development-Roadmap-0.8.0.md` for the frozen 0.8.0 contract, `Icod.TermInfo-Development-Roadmap-0.9.0.md` for the planned acquisition release, and `docs/FUTURE-WORK-INVENTORY.md` for the broader terminal-system dependency map. The 0.6.0 and 0.7.0 roadmaps remain historical frozen contracts.
 
 ## License
 

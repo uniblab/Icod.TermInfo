@@ -1,5 +1,43 @@
 # Icod.TermInfo Development Roadmap
 
+This unversioned document is the **master roadmap index**. The original 0.6.0
+planning body is preserved below for historical context, while active and later
+version contracts live in version-specific roadmap files.
+
+## Version contracts
+
+- `Icod.TermInfo Development Roadmap — Version 0.6.0 Contract.md` — foundational
+  managed terminfo contract; complete and frozen.
+- `Icod.TermInfo-Development-Roadmap-0.7.0.md` — modern xterm, extended
+  capabilities, color, and descriptive protocol expansion; complete and frozen.
+- `Icod.TermInfo-Development-Roadmap-0.8.0.md` — semantic completion, Windows
+  profiles, binary/provider readiness, and final 0.8 contract; complete and
+  frozen.
+- `Icod.TermInfo-Development-Roadmap-0.9.0.md` — planned arbitrary compiled
+  terminfo acquisition: pure binary parser, explicit directory provider,
+  environment/system discovery, and provider-local cache/refresh semantics.
+
+## Roadmap sequence
+
+```text
+0.6.0  foundation
+  -> 0.7.0  modern descriptive capability model
+  -> 0.8.0  semantic completion
+  -> 0.9.0  arbitrary compiled acquisition
+  -> 1.0 readiness review
+```
+
+The 0.9 contract deliberately does **not** absorb every remaining terminal
+feature. Terminfo source-language tooling, termcap compatibility, hashed
+Berkeley-DB stores, live terminal sessions/input/probing, PTYs, curses/virtual
+screens, graphics protocols, and terminal emulation are separate future-work
+families. Their dependencies and likely package homes are recorded in
+`docs/FUTURE-WORK-INVENTORY.md`.
+
+The remainder of this file preserves the original 0.6.0 planning document.
+
+---
+
 ## Version 0.6.0 Contract
 
 **Project:** `Icod.TermInfo`  

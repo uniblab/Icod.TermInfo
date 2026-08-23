@@ -75,6 +75,12 @@
 
   <ItemGroup>
     <Compile Include="src\**\*.cs" />
+    <EmbeddedResource Remove="samples\**" />
+    <None Remove="samples\**" />
+    <EmbeddedResource Remove="tests\**" />
+    <None Remove="tests\**" />
+    <EmbeddedResource Remove="tools\**" />
+    <None Remove="tools\**" />
   </ItemGroup>
 
   <ItemGroup>
