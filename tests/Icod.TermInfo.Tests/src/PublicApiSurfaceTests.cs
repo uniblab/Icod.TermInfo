@@ -13,6 +13,7 @@ public sealed class PublicApiSurfaceTests
         "Icod.TermInfo.CompiledTermInfoFormatException",
         "Icod.TermInfo.CompiledTermInfoParser",
         "Icod.TermInfo.CompiledTermInfoParserOptions",
+        "Icod.TermInfo.DirectoryTerminalDescriptionProvider",
         "Icod.TermInfo.ITerminalDescriptionProvider",
         "Icod.TermInfo.ITermInfoDelayProvider",
         "Icod.TermInfo.InMemoryTerminalDescriptionProvider",

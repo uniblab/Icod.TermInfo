@@ -12,25 +12,6 @@ public sealed class T35ParserHardeningTests {
 	private const int HeaderSize = 12;
 	private const int ExtendedHeaderSize = 10;
 
-	[Fact]
-	public void AssemblyIdentifiesT35DevelopmentVersion() {
-		Assembly assembly = typeof( CompiledTermInfoParser ).Assembly;
-		Version? assemblyVersion = assembly.GetName().Version;
-		string? informationalVersion =
-			assembly
-				.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-				?.InformationalVersion;
-
-		Assert.NotNull( assemblyVersion );
-		Assert.Equal( new Version( 0, 9, 0, 0 ), assemblyVersion );
-		Assert.NotNull( informationalVersion );
-		Assert.True(
-			informationalVersion!.StartsWith(
-				"0.9.0-alpha.4",
-				StringComparison.Ordinal ),
-			$"Unexpected informational version '{informationalVersion}'." );
-	}
-
 	[Theory]
 	[InlineData( "compiled/t29-legacy-minimal.bin" )]
 	[InlineData( "compiled/t29-legacy-alignment.bin" )]

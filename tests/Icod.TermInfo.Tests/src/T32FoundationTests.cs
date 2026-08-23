@@ -36,11 +36,10 @@ public sealed class T32FoundationTests
     }
 
     [Fact]
-    public void IoBackedProviderImplementationRemainsReservedForLaterTranches()
+    public void SystemProviderImplementationRemainsReservedForLaterTranches()
     {
         string[] reservedTypeNames =
         [
-            "DirectoryTerminalDescriptionProvider",
             "SystemTerminalDescriptionProviderOptions",
             "SystemTerminalDescriptionProvider",
         ];

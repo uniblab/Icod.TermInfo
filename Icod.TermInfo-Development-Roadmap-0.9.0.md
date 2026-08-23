@@ -4,7 +4,7 @@
 **Package:** `Icod.TermInfo`
 **Target framework:** `net10.0`
 **Language:** C# 13
-**Status:** Active — T35 parser hardening complete; T36 explicit directory provider next
+**Status:** Active — T36 explicit directory provider complete; T37 encoded `TERMINFO` and discovery inputs next
 **Previous contract:** `0.8.0` — semantic completion and binary/provider readiness
 **Contract target:** `0.9.0`
 **Initial development version:** `0.9.0-alpha.1`
@@ -1055,6 +1055,8 @@ integer overflow, partial results, or native dependencies.
 ## T36 — Explicit Directory Provider
 
 **Development version:** `0.9.0-alpha.5`
+**Status:** Complete
+**Implementation record:** `docs/0.9.0-T36-DIRECTORY-PROVIDER.md`
 
 ### Work
 
