@@ -22,6 +22,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Icod.TermInfo.FixtureGenera
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Icod.TermInfo.PackageVerifier", "tools\package-verifier\Icod.TermInfo.PackageVerifier.csproj", "{9C3F8D6B-0CA9-4C37-9EE1-E2D8CCEA097A}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Icod.TermInfo.PublicApiSnapshot", "tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj", "{6D3A260F-13BD-46C4-A4E4-A7F99A9AB1C0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,12 @@ Global
 		{9C3F8D6B-0CA9-4C37-9EE1-E2D8CCEA097A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9C3F8D6B-0CA9-4C37-9EE1-E2D8CCEA097A}.Staging|Any CPU.ActiveCfg = Staging|Any CPU
 		{9C3F8D6B-0CA9-4C37-9EE1-E2D8CCEA097A}.Staging|Any CPU.Build.0 = Staging|Any CPU
+		{6D3A260F-13BD-46C4-A4E4-A7F99A9AB1C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D3A260F-13BD-46C4-A4E4-A7F99A9AB1C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D3A260F-13BD-46C4-A4E4-A7F99A9AB1C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D3A260F-13BD-46C4-A4E4-A7F99A9AB1C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D3A260F-13BD-46C4-A4E4-A7F99A9AB1C0}.Staging|Any CPU.ActiveCfg = Staging|Any CPU
+		{6D3A260F-13BD-46C4-A4E4-A7F99A9AB1C0}.Staging|Any CPU.Build.0 = Staging|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -82,5 +90,6 @@ Global
 		{D71A2831-89B3-4D86-9AF9-4F6234F5AC51} = {C78B23CF-38CD-4C34-8C20-4BC8DFF8A2D1}
 		{A4B4A956-415D-4F7C-9FB8-7BB541027B12} = {C78B23CF-38CD-4C34-8C20-4BC8DFF8A2D1}
 		{9C3F8D6B-0CA9-4C37-9EE1-E2D8CCEA097A} = {C78B23CF-38CD-4C34-8C20-4BC8DFF8A2D1}
+		{6D3A260F-13BD-46C4-A4E4-A7F99A9AB1C0} = {C78B23CF-38CD-4C34-8C20-4BC8DFF8A2D1}
 	EndGlobalSection
 EndGlobal

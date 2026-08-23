@@ -1,4 +1,5 @@
 using System.IO.Compression;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -11,6 +12,8 @@ internal static class Program
     private const string PackageId = "Icod.TermInfo";
     private const string RepositoryUrl =
         "https://github.com/uniblab/Icod.TermInfo";
+    private const string ExpectedAssemblyVersion = "1.0.0.0";
+
     private static readonly string[] TargetFrameworks =
     [
         "net8.0",
@@ -57,8 +60,9 @@ internal static class Program
             VerifySymbolPackage(snupkg, commit);
 
             Console.WriteLine(
-                "Verified package structure, dependency closure, symbols, "
-                + $"and Source Link for {packageVersion}.");
+                "Verified dual-target package structure, assembly identity, "
+                + "dependency closure, symbols, and Source Link for "
+                + $"{packageVersion}.");
             return 0;
         }
         catch (Exception exception) when (
@@ -249,6 +253,13 @@ internal static class Program
             "Primary package contains unexpected DLL payloads: "
                 + string.Join(", ", dlls));
 
+        foreach (string targetFramework in TargetFrameworks)
+        {
+            VerifyAssemblyIdentity(
+                package,
+                targetFramework);
+        }
+
         Require(
             !names.Any(HasNativeLibraryExtension),
             "Primary package unexpectedly contains a native library payload.");
@@ -318,6 +329,66 @@ internal static class Program
             $"Repository metadata has an invalid commit id: '{commit}'.");
 
         return commit;
+    }
+
+    private static void VerifyAssemblyIdentity(
+        ZipArchive package,
+        string targetFramework)
+    {
+        ArgumentNullException.ThrowIfNull(package);
+        ArgumentException.ThrowIfNullOrWhiteSpace(targetFramework);
+
+        string assemblyPath =
+            $"lib/{targetFramework}/Icod.TermInfo.dll";
+        ZipArchiveEntry? entry =
+            package.GetEntry(assemblyPath);
+        Require(
+            entry is not null,
+            $"Primary package is missing {assemblyPath}.");
+
+        string temporaryPath =
+            Path.Combine(
+                Path.GetTempPath(),
+                "Icod.TermInfo-package-verifier-"
+                + Guid.NewGuid().ToString("N")
+                + ".dll");
+
+        try
+        {
+            using (Stream source = entry!.Open())
+            using (FileStream destination = File.Create(temporaryPath))
+            {
+                source.CopyTo(destination);
+            }
+
+            AssemblyName assemblyName =
+                AssemblyName.GetAssemblyName(
+                    temporaryPath);
+
+            Require(
+                assemblyName.Name == PackageId,
+                $"{assemblyPath} has unexpected assembly name "
+                    + $"'{assemblyName.Name}'.");
+            Require(
+                assemblyName.Version?.ToString() == ExpectedAssemblyVersion,
+                $"{assemblyPath} has assembly version "
+                    + $"'{assemblyName.Version}', expected "
+                    + $"{ExpectedAssemblyVersion}.");
+
+            byte[]? publicKeyToken =
+                assemblyName.GetPublicKeyToken();
+            Require(
+                publicKeyToken is null
+                    || publicKeyToken.Length == 0,
+                $"{assemblyPath} is unexpectedly strong-name signed.");
+        }
+        finally
+        {
+            if (File.Exists(temporaryPath))
+            {
+                File.Delete(temporaryPath);
+            }
+        }
     }
 
     private static void VerifySymbolPackage(
