@@ -11,12 +11,11 @@ internal static class Program
     private const string PackageId = "Icod.TermInfo";
     private const string RepositoryUrl =
         "https://github.com/uniblab/Icod.TermInfo";
-    private const string AssemblyPath =
-        "lib/net10.0/Icod.TermInfo.dll";
-    private const string DocumentationPath =
-        "lib/net10.0/Icod.TermInfo.xml";
-    private const string PdbPath =
-        "lib/net10.0/Icod.TermInfo.pdb";
+    private static readonly string[] TargetFrameworks =
+    [
+        "net8.0",
+        "net10.0",
+    ];
 
     public static int Main(string[] args)
     {
@@ -188,12 +187,18 @@ internal static class Program
                 .Select(entry => entry.FullName)
                 .ToHashSet(StringComparer.Ordinal);
 
-        string[] required =
+        List<string> required =
         [
             "README.md",
-            AssemblyPath,
-            DocumentationPath,
         ];
+
+        foreach (string targetFramework in TargetFrameworks)
+        {
+            required.Add(
+                $"lib/{targetFramework}/Icod.TermInfo.dll");
+            required.Add(
+                $"lib/{targetFramework}/Icod.TermInfo.xml");
+        }
 
         string[] missing =
             required
@@ -228,9 +233,18 @@ internal static class Program
                             StringComparison.OrdinalIgnoreCase))
                 .OrderBy(name => name, StringComparer.Ordinal)
                 .ToArray();
+        string[] expectedDlls =
+            TargetFrameworks
+                .Select(
+                    targetFramework =>
+                        $"lib/{targetFramework}/Icod.TermInfo.dll")
+                .OrderBy(
+                    name => name,
+                    StringComparer.Ordinal)
+                .ToArray();
         Require(
             dlls.SequenceEqual(
-                new[] { AssemblyPath },
+                expectedDlls,
                 StringComparer.Ordinal),
             "Primary package contains unexpected DLL payloads: "
                 + string.Join(", ", dlls));
@@ -315,29 +329,36 @@ internal static class Program
 
         using ZipArchive symbols =
             ZipFile.OpenRead(packagePath);
-        ZipArchiveEntry? pdbEntry =
-            symbols.GetEntry(PdbPath);
-        Require(
-            pdbEntry is not null,
-            "Symbol package is missing the portable PDB.");
 
-        using Stream stream = pdbEntry!.Open();
-        using MemoryStream buffer = new();
-        stream.CopyTo(buffer);
-        byte[] pdb = buffer.ToArray();
+        foreach (string targetFramework in TargetFrameworks)
+        {
+            string pdbPath =
+                $"lib/{targetFramework}/Icod.TermInfo.pdb";
+            ZipArchiveEntry? pdbEntry =
+                symbols.GetEntry(pdbPath);
+            Require(
+                pdbEntry is not null,
+                $"Symbol package is missing {pdbPath}.");
 
-        Require(
-            pdb.AsSpan().StartsWith("BSJB"u8),
-            "Icod.TermInfo.pdb is not a portable PDB.");
-        Require(
-            ContainsAscii(
-                pdb,
-                "raw.githubusercontent.com/uniblab/Icod.TermInfo/"),
-            "Portable PDB does not contain the expected GitHub Source Link mapping.");
-        Require(
-            ContainsAscii(pdb, commit),
-            "Portable PDB Source Link data does not contain the package "
-                + "repository commit.");
+            using Stream stream = pdbEntry!.Open();
+            using MemoryStream buffer = new();
+            stream.CopyTo(buffer);
+            byte[] pdb = buffer.ToArray();
+
+            Require(
+                pdb.AsSpan().StartsWith("BSJB"u8),
+                $"{pdbPath} is not a portable PDB.");
+            Require(
+                ContainsAscii(
+                    pdb,
+                    "raw.githubusercontent.com/uniblab/Icod.TermInfo/"),
+                $"{pdbPath} does not contain the expected GitHub "
+                    + "Source Link mapping.");
+            Require(
+                ContainsAscii(pdb, commit),
+                $"{pdbPath} Source Link data does not contain the package "
+                    + "repository commit.");
+        }
     }
 
     private static string? GetMetadataText(
