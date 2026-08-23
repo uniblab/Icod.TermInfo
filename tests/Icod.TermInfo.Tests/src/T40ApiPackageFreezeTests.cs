@@ -8,30 +8,6 @@ namespace Icod.TermInfo.Tests;
 public sealed class T40ApiPackageFreezeTests
 {
 	[Fact]
-	public void AssemblyIdentifiesT40DevelopmentVersion()
-	{
-		Assembly assembly =
-			typeof(SystemTerminalDescriptionProvider).Assembly;
-		Version? assemblyVersion =
-			assembly.GetName().Version;
-		string? informationalVersion =
-			assembly
-				.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-				?.InformationalVersion;
-
-		Assert.NotNull(assemblyVersion);
-		Assert.Equal(
-			new Version(0, 9, 0, 0),
-			assemblyVersion);
-		Assert.NotNull(informationalVersion);
-		Assert.True(
-			informationalVersion!.StartsWith(
-				"0.9.0-rc.1",
-				StringComparison.Ordinal),
-			$"Unexpected informational version '{informationalVersion}'.");
-	}
-
-	[Fact]
 	public void CompiledParserSurfaceIsFrozen()
 	{
 		Assert.Equal(

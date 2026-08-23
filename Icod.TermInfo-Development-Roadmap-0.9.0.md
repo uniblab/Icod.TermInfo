@@ -4,7 +4,7 @@
 **Package:** `Icod.TermInfo`
 **Target framework:** `net10.0`
 **Language:** C# 13
-**Status:** Active — T40 API, documentation, samples, and package freeze complete; T41 0.9.0 completion gate next
+**Status:** Complete and frozen — T41 0.9.0 completion gate
 **Previous contract:** `0.8.0` — semantic completion and binary/provider readiness
 **Contract target:** `0.9.0`
 **Initial development version:** `0.9.0-alpha.1`
@@ -1182,6 +1182,8 @@ the frozen public API.
 ## T41 — 0.9.0 Completion Gate
 
 **Final version:** `0.9.0`
+**Status:** Complete
+**Implementation record:** `docs/0.9.0-CONTRACT-AUDIT.md`
 
 Before tagging `v0.9.0`, perform the full completion audit.
 

@@ -12,7 +12,7 @@
 		<AssemblyName>Icod.TermInfo</AssemblyName>
 		<RootNamespace>Icod.TermInfo</RootNamespace>
 		<Configurations>Debug;Release;Staging</Configurations>
-		<Version>0.9.0-rc.1</Version>
+		<Version>0.9.0</Version>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(PlatformTarget)' == '' ">
@@ -52,12 +52,12 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<PackageVersion>0.9.0-rc.1</PackageVersion>
+		<PackageVersion>0.9.0</PackageVersion>
 		<PackageId>Icod.TermInfo</PackageId>
 		<Title>Icod.TermInfo</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed .NET terminfo capability information with complete standard metadata, compiled-database acquisition, ANSI/DEC/xterm and Windows profiles, parameter expansion, and padding-aware output.</Description>
-		<PackageReleaseNotes>0.9.0-rc.1: freeze the 0.9 public acquisition API, release-facing documentation and samples, package-reference-only acquisition smoke coverage, package-content/dependency gates, and the active 0.9.0 release workflow.</PackageReleaseNotes>
+		<PackageReleaseNotes>0.9.0: add pure conventional compiled-terminfo parsing, explicit directory acquisition, deterministic TERMINFO/TERMINFO_DIRS/user/system discovery, bounded encoded TERMINFO decoding, provider-local cache and refresh semantics, and explicit built-in fallback without a native ncurses dependency or process-global terminal state.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>
 		<PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
