@@ -5,15 +5,13 @@ using Xunit;
 
 namespace Icod.TermInfo.Tests;
 
-public sealed class T39ProviderCacheCompositionTests
-{
+public sealed class T39ProviderCacheCompositionTests {
 	private const int CompiledHeaderSize = 12;
 
 	[Fact]
-	public void AssemblyIdentifiesT39DevelopmentVersion()
-	{
+	public void AssemblyIdentifiesT39DevelopmentVersion() {
 		Assembly assembly =
-			typeof(SystemTerminalDescriptionProvider).Assembly;
+			typeof( SystemTerminalDescriptionProvider ).Assembly;
 		Version? assemblyVersion =
 			assembly.GetName().Version;
 		string? informationalVersion =
@@ -21,24 +19,23 @@ public sealed class T39ProviderCacheCompositionTests
 				.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
 				?.InformationalVersion;
 
-		Assert.NotNull(assemblyVersion);
+		Assert.NotNull( assemblyVersion );
 		Assert.Equal(
-			new Version(0, 9, 0, 0),
-			assemblyVersion);
-		Assert.NotNull(informationalVersion);
+			new Version( 0, 9, 0, 0 ),
+			assemblyVersion );
+		Assert.NotNull( informationalVersion );
 		Assert.True(
 			informationalVersion!.StartsWith(
 				"0.9.0-beta.3",
-				StringComparison.Ordinal),
-			$"Unexpected informational version '{informationalVersion}'.");
+				StringComparison.Ordinal ),
+			$"Unexpected informational version '{informationalVersion}'." );
 	}
 
 	[Fact]
-	public void TerminalDatabaseCanParticipateAsAProvider()
-	{
+	public void TerminalDatabaseCanParticipateAsAProvider() {
 		Assert.True(
-			typeof(ITerminalDescriptionProvider).IsAssignableFrom(
-				typeof(TerminalDatabase)));
+			typeof( ITerminalDescriptionProvider ).IsAssignableFrom(
+				typeof( TerminalDatabase ) ) );
 
 		ITerminalDescriptionProvider provider =
 			TerminalDatabase.BuiltIn;
@@ -46,15 +43,14 @@ public sealed class T39ProviderCacheCompositionTests
 		Assert.True(
 			provider.TryLoad(
 				"xterm",
-				out TerminalDescription? terminal));
+				out TerminalDescription? terminal ) );
 		Assert.Same(
 			TerminalProfiles.Xterm,
-			terminal);
+			terminal );
 	}
 
 	[Fact]
-	public void DirectorySuccessfulEntryRemainsStableForProviderLifetime()
-	{
+	public void DirectorySuccessfulEntryRemainsStableForProviderLifetime() {
 		using TemporaryDirectory temporary = new();
 		string name =
 			"t29-legacy-minimal";
@@ -62,36 +58,35 @@ public sealed class T39ProviderCacheCompositionTests
 			WriteLiteralCandidate(
 				temporary.Root,
 				name,
-				CreateEntryWithColumns(80));
+				CreateEntryWithColumns( 80 ) );
 		DirectoryTerminalDescriptionProvider provider =
 			new(
-				temporary.Root);
+				temporary.Root );
 
 		TerminalDescription first =
 			Load(
 				provider,
-				name);
+				name );
 
 		File.WriteAllBytes(
 			path,
-			CreateEntryWithColumns(99));
+			CreateEntryWithColumns( 99 ) );
 
 		TerminalDescription second =
 			Load(
 				provider,
-				name);
+				name );
 
 		Assert.Same(
 			first,
-			second);
+			second );
 		AssertColumns(
 			80,
-			second);
+			second );
 	}
 
 	[Fact]
-	public async Task DirectoryConcurrentFirstLoadPublishesOneDescription()
-	{
+	public async Task DirectoryConcurrentFirstLoadPublishesOneDescription() {
 		using TemporaryDirectory temporary = new();
 		string name =
 			"t29-legacy-minimal";
@@ -99,68 +94,66 @@ public sealed class T39ProviderCacheCompositionTests
 		WriteLiteralCandidate(
 			temporary.Root,
 			name,
-			CreateEntryWithColumns(80));
+			CreateEntryWithColumns( 80 ) );
 
 		DirectoryTerminalDescriptionProvider provider =
 			new(
-				temporary.Root);
+				temporary.Root );
 		Task<TerminalDescription>[] tasks =
 			Enumerable
 				.Range(
 					0,
-					32)
+					32 )
 				.Select(
 					_ => Task.Run(
 						() => Load(
 							provider,
-							name)))
+							name ) ) )
 				.ToArray();
 
 		TerminalDescription[] terminals =
 			await Task.WhenAll(
-				tasks);
+				tasks );
 
 		TerminalDescription first =
-			terminals[0];
+			terminals[ 0 ];
 		Assert.All(
 			terminals,
 			terminal => Assert.Same(
 				first,
-				terminal));
+				terminal ) );
 	}
 
 	[Fact]
-	public void DirectoryCleanMissIsNotNegativeCached()
-	{
+	public void DirectoryCleanMissIsNotNegativeCached() {
 		using TemporaryDirectory temporary = new();
 		string name =
 			"t29-legacy-minimal";
 		DirectoryTerminalDescriptionProvider provider =
 			new(
-				temporary.Root);
+				temporary.Root );
 
 		Assert.False(
 			provider.TryLoad(
 				name,
-				out TerminalDescription? missing));
+				out TerminalDescription? missing ) );
 		Assert.Null(
-			missing);
+			missing );
 
 		WriteLiteralCandidate(
 			temporary.Root,
 			name,
-			CreateEntryWithColumns(80));
+			CreateEntryWithColumns( 80 ) );
 
 		AssertColumns(
 			80,
 			Load(
 				provider,
-				name));
+				name ) );
 	}
 
 	[Fact]
-	public void DirectoryFailureIsRetryableAfterEntryIsCorrected()
-	{
+	public void DirectoryFailureIsRetryableAfterEntryIsCorrected() {
 		using TemporaryDirectory temporary = new();
 		string name =
 			"t29-legacy-minimal";
@@ -169,30 +162,29 @@ public sealed class T39ProviderCacheCompositionTests
 				temporary.Root,
 				name,
 				ReadFixture(
-					"malformed/unsupported-magic.bin"));
+					"malformed/unsupported-magic.bin" ) );
 		DirectoryTerminalDescriptionProvider provider =
 			new(
-				temporary.Root);
+				temporary.Root );
 
 		Assert.Throws<CompiledTermInfoFormatException>(
 			() => provider.TryLoad(
 				name,
-				out _));
+				out _ ) );
 
 		File.WriteAllBytes(
 			path,
-			CreateEntryWithColumns(80));
+			CreateEntryWithColumns( 80 ) );
 
 		AssertColumns(
 			80,
 			Load(
 				provider,
-				name));
+				name ) );
 	}
 
 	[Fact]
-	public void SystemSuccessfulEntryRemainsStableForProviderLifetime()
-	{
+	public void SystemSuccessfulEntryRemainsStableForProviderLifetime() {
 		using TemporaryDirectory temporary = new();
 		string name =
 			"t29-legacy-minimal";
@@ -200,36 +192,35 @@ public sealed class T39ProviderCacheCompositionTests
 			WriteLiteralCandidate(
 				temporary.Root,
 				name,
-				CreateEntryWithColumns(80));
+				CreateEntryWithColumns( 80 ) );
 		SystemTerminalDescriptionProvider provider =
 			CreateSystemProvider(
-				temporary.Root);
+				temporary.Root );
 
 		TerminalDescription first =
 			Load(
 				provider,
-				name);
+				name );
 
 		File.WriteAllBytes(
 			path,
-			CreateEntryWithColumns(99));
+			CreateEntryWithColumns( 99 ) );
 
 		TerminalDescription second =
 			Load(
 				provider,
-				name);
+				name );
 
 		Assert.Same(
 			first,
-			second);
+			second );
 		AssertColumns(
 			80,
-			second);
+			second );
 	}
 
 	[Fact]
-	public async Task SystemConcurrentFirstLoadPublishesOneDescription()
-	{
+	public async Task SystemConcurrentFirstLoadPublishesOneDescription() {
 		using TemporaryDirectory temporary = new();
 		string name =
 			"t29-legacy-minimal";
@@ -237,68 +228,66 @@ public sealed class T39ProviderCacheCompositionTests
 		WriteLiteralCandidate(
 			temporary.Root,
 			name,
-			CreateEntryWithColumns(80));
+			CreateEntryWithColumns( 80 ) );
 
 		SystemTerminalDescriptionProvider provider =
 			CreateSystemProvider(
-				temporary.Root);
+				temporary.Root );
 		Task<TerminalDescription>[] tasks =
 			Enumerable
 				.Range(
 					0,
-					32)
+					32 )
 				.Select(
 					_ => Task.Run(
 						() => Load(
 							provider,
-							name)))
+							name ) ) )
 				.ToArray();
 
 		TerminalDescription[] terminals =
 			await Task.WhenAll(
-				tasks);
+				tasks );
 
 		TerminalDescription first =
-			terminals[0];
+			terminals[ 0 ];
 		Assert.All(
 			terminals,
 			terminal => Assert.Same(
 				first,
-				terminal));
+				terminal ) );
 	}
 
 	[Fact]
-	public void SystemCleanMissIsNotNegativeCached()
-	{
+	public void SystemCleanMissIsNotNegativeCached() {
 		using TemporaryDirectory temporary = new();
 		string name =
 			"t29-legacy-minimal";
 		SystemTerminalDescriptionProvider provider =
 			CreateSystemProvider(
-				temporary.Root);
+				temporary.Root );
 
 		Assert.False(
 			provider.TryLoad(
 				name,
-				out TerminalDescription? missing));
+				out TerminalDescription? missing ) );
 		Assert.Null(
-			missing);
+			missing );
 
 		WriteLiteralCandidate(
 			temporary.Root,
 			name,
-			CreateEntryWithColumns(80));
+			CreateEntryWithColumns( 80 ) );
 
 		AssertColumns(
 			80,
 			Load(
 				provider,
-				name));
+				name ) );
 	}
 
 	[Fact]
-	public void SystemFailureIsRetryableAfterEntryIsCorrected()
-	{
+	public void SystemFailureIsRetryableAfterEntryIsCorrected() {
 		using TemporaryDirectory temporary = new();
 		string name =
 			"t29-legacy-minimal";
@@ -307,73 +296,71 @@ public sealed class T39ProviderCacheCompositionTests
 				temporary.Root,
 				name,
 				ReadFixture(
-					"malformed/unsupported-magic.bin"));
+					"malformed/unsupported-magic.bin" ) );
 		SystemTerminalDescriptionProvider provider =
 			CreateSystemProvider(
-				temporary.Root);
+				temporary.Root );
 
 		Assert.Throws<CompiledTermInfoFormatException>(
 			() => provider.TryLoad(
 				name,
-				out _));
+				out _ ) );
 
 		File.WriteAllBytes(
 			path,
-			CreateEntryWithColumns(80));
+			CreateEntryWithColumns( 80 ) );
 
 		AssertColumns(
 			80,
 			Load(
 				provider,
-				name));
+				name ) );
 	}
 
 	[Fact]
-	public void EncodedSystemEntryIsCachedPerProvider()
-	{
+	public void EncodedSystemEntryIsCachedPerProvider() {
 		using TemporaryDirectory temporary = new();
 		string name =
 			"t29-legacy-minimal";
 		byte[] encoded =
-			CreateEntryWithColumns(80);
+			CreateEntryWithColumns( 80 );
 		SystemTerminalDiscoverySnapshot snapshot =
 			new(
 				termInfo:
 					"hex:"
 					+ Convert.ToHexString(
-						encoded),
+						encoded ),
 				termInfoDirs: null,
 				homeDirectory: null,
 				currentDirectory: temporary.Root,
-				platform: TerminalHostPlatform.Linux);
+				platform: TerminalHostPlatform.Linux );
 		SystemTerminalDescriptionProviderOptions options =
 			new(
 				useEnvironment: true,
 				useUserDatabase: false,
-				useSystemDatabases: false);
+				useSystemDatabases: false );
 		SystemTerminalDescriptionProvider provider =
 			new(
 				options,
 				snapshot,
-				Array.Empty<string>());
+				Array.Empty<string>() );
 
 		TerminalDescription first =
 			Load(
 				provider,
-				name);
+				name );
 		TerminalDescription second =
 			Load(
 				provider,
-				name);
+				name );
 
 		Assert.Same(
 			first,
-			second);
+			second );
 	}
 
 	[Fact]
-	public void NewSystemProviderObservesChangedEntry()
-	{
+	public void NewSystemProviderObservesChangedEntry() {
 		using TemporaryDirectory temporary = new();
 		string name =
 			"t29-legacy-minimal";
@@ -381,46 +368,45 @@ public sealed class T39ProviderCacheCompositionTests
 			WriteLiteralCandidate(
 				temporary.Root,
 				name,
-				CreateEntryWithColumns(80));
+				CreateEntryWithColumns( 80 ) );
 		SystemTerminalDescriptionProvider firstProvider =
 			CreateSystemProvider(
-				temporary.Root);
+				temporary.Root );
 		TerminalDescription first =
 			Load(
 				firstProvider,
-				name);
+				name );
 
 		File.WriteAllBytes(
 			path,
-			CreateEntryWithColumns(99));
+			CreateEntryWithColumns( 99 ) );
 
 		SystemTerminalDescriptionProvider secondProvider =
 			CreateSystemProvider(
-				temporary.Root);
+				temporary.Root );
 		TerminalDescription second =
 			Load(
 				secondProvider,
-				name);
+				name );
 
 		AssertColumns(
 			80,
-			first);
+			first );
 		AssertColumns(
 			99,
-			second);
+			second );
 		Assert.Same(
 			first,
 			Load(
 				firstProvider,
-				name));
+				name ) );
 		Assert.NotSame(
 			first,
-			second);
+			second );
 	}
 
 	[Fact]
-	public void SeparateSystemProvidersDoNotShareCacheAcrossRoots()
-	{
+	public void SeparateSystemProvidersDoNotShareCacheAcrossRoots() {
 		using TemporaryDirectory firstRoot = new();
 		using TemporaryDirectory secondRoot = new();
 		string name =
@@ -429,62 +415,61 @@ public sealed class T39ProviderCacheCompositionTests
 		WriteLiteralCandidate(
 			firstRoot.Root,
 			name,
-			CreateEntryWithColumns(80));
+			CreateEntryWithColumns( 80 ) );
 		WriteLiteralCandidate(
 			secondRoot.Root,
 			name,
-			CreateEntryWithColumns(99));
+			CreateEntryWithColumns( 99 ) );
 
 		SystemTerminalDescriptionProvider firstProvider =
 			CreateSystemProvider(
-				firstRoot.Root);
+				firstRoot.Root );
 		SystemTerminalDescriptionProvider secondProvider =
 			CreateSystemProvider(
-				secondRoot.Root);
+				secondRoot.Root );
 
 		TerminalDescription first =
 			Load(
 				firstProvider,
-				name);
+				name );
 		TerminalDescription second =
 			Load(
 				secondProvider,
-				name);
+				name );
 
 		AssertColumns(
 			80,
-			first);
+			first );
 		AssertColumns(
 			99,
-			second);
+			second );
 		Assert.NotSame(
 			first,
-			second);
+			second );
 	}
 
 	[Fact]
-	public void SeparateSystemProvidersRespectIndependentOptions()
-	{
+	public void SeparateSystemProvidersRespectIndependentOptions() {
 		using TemporaryDirectory temporary = new();
 		string name =
 			"t29-legacy-minimal";
 		string environmentRoot =
 			temporary.CreateSubdirectory(
-				"environment");
+				"environment" );
 		string home =
 			temporary.CreateSubdirectory(
-				"home");
+				"home" );
 
 		WriteLiteralCandidate(
 			environmentRoot,
 			name,
-			CreateEntryWithColumns(80));
+			CreateEntryWithColumns( 80 ) );
 		WriteLiteralCandidate(
 			Path.Combine(
 				home,
-				".terminfo"),
+				".terminfo" ),
 			name,
-			CreateEntryWithColumns(99));
+			CreateEntryWithColumns( 99 ) );
 
 		SystemTerminalDiscoverySnapshot snapshot =
 			new(
@@ -492,244 +477,233 @@ public sealed class T39ProviderCacheCompositionTests
 				termInfoDirs: null,
 				homeDirectory: home,
 				currentDirectory: temporary.Root,
-				platform: TerminalHostPlatform.Linux);
+				platform: TerminalHostPlatform.Linux );
 		SystemTerminalDescriptionProvider environmentProvider =
 			new(
 				new SystemTerminalDescriptionProviderOptions(
 					useEnvironment: true,
 					useUserDatabase: false,
-					useSystemDatabases: false),
+					useSystemDatabases: false ),
 				snapshot,
-				Array.Empty<string>());
+				Array.Empty<string>() );
 		SystemTerminalDescriptionProvider userProvider =
 			new(
 				new SystemTerminalDescriptionProviderOptions(
 					useEnvironment: false,
 					useUserDatabase: true,
-					useSystemDatabases: false),
+					useSystemDatabases: false ),
 				snapshot,
-				Array.Empty<string>());
+				Array.Empty<string>() );
 
 		AssertColumns(
 			80,
 			Load(
 				environmentProvider,
-				name));
+				name ) );
 		AssertColumns(
 			99,
 			Load(
 				userProvider,
-				name));
+				name ) );
 	}
 
 	[Fact]
-	public void SystemWithBuiltInFallbackUsesBuiltInOnSystemMiss()
-	{
+	public void SystemWithBuiltInFallbackUsesBuiltInOnSystemMiss() {
 		using TemporaryDirectory temporary = new();
 		SystemTerminalDescriptionProvider systemProvider =
 			CreateSystemProvider(
-				temporary.Root);
+				temporary.Root );
 		TerminalDatabase database =
 			new(
 				new ITerminalDescriptionProvider[]
 				{
 					systemProvider,
 					TerminalDatabase.BuiltIn,
-				});
+				} );
 
 		TerminalDescription terminal =
 			database.Load(
-				"xterm");
+				"xterm" );
 
 		Assert.Same(
 			TerminalProfiles.Xterm,
-			terminal);
+			terminal );
 	}
 
 	[Fact]
-	public void SystemLookupDoesNotMutateBuiltInDatabase()
-	{
+	public void SystemLookupDoesNotMutateBuiltInDatabase() {
 		using TemporaryDirectory temporary = new();
 		string name =
 			"t29-legacy-minimal";
 		TerminalDescription builtInBefore =
 			TerminalDatabase.BuiltIn.Load(
-				"xterm");
+				"xterm" );
 
 		WriteLiteralCandidate(
 			temporary.Root,
 			name,
-			CreateEntryWithColumns(80));
+			CreateEntryWithColumns( 80 ) );
 		SystemTerminalDescriptionProvider systemProvider =
 			CreateSystemProvider(
-				temporary.Root);
+				temporary.Root );
 
 		AssertColumns(
 			80,
 			Load(
 				systemProvider,
-				name));
+				name ) );
 
 		TerminalDescription builtInAfter =
 			TerminalDatabase.BuiltIn.Load(
-				"xterm");
+				"xterm" );
 
 		Assert.Same(
 			builtInBefore,
-			builtInAfter);
+			builtInAfter );
 		Assert.Same(
 			TerminalProfiles.Xterm,
-			builtInAfter);
+			builtInAfter );
 		Assert.False(
 			TerminalDatabase.BuiltIn.TryLoad(
 				name,
-				out TerminalDescription? leaked));
+				out TerminalDescription? leaked ) );
 		Assert.Null(
-			leaked);
+			leaked );
 	}
 
 	[Fact]
-	public void SystemCacheIsInstanceOwnedRatherThanStatic()
-	{
+	public void SystemCacheIsInstanceOwnedRatherThanStatic() {
 		FieldInfo cache =
-			typeof(SystemTerminalDescriptionProvider)
+			typeof( SystemTerminalDescriptionProvider )
 				.GetField(
 					"_cache",
 					BindingFlags.NonPublic
-					| BindingFlags.Instance)!;
+					| BindingFlags.Instance )!;
 
 		Assert.NotNull(
-			cache);
+			cache );
 		Assert.False(
-			cache.IsStatic);
+			cache.IsStatic );
 	}
 
 	private static SystemTerminalDescriptionProvider CreateSystemProvider(
-		string root)
-	{
-		ArgumentNullException.ThrowIfNull(root);
+		string root ) {
+		ArgumentNullException.ThrowIfNull( root );
 
 		SystemTerminalDescriptionProviderOptions options =
 			new(
 				useEnvironment: true,
 				useUserDatabase: false,
-				useSystemDatabases: false);
+				useSystemDatabases: false );
 		SystemTerminalDiscoverySnapshot snapshot =
 			new(
 				termInfo: root,
 				termInfoDirs: null,
 				homeDirectory: null,
-				currentDirectory: Path.GetFullPath(root),
-				platform: TerminalHostPlatform.Linux);
+				currentDirectory: Path.GetFullPath( root ),
+				platform: TerminalHostPlatform.Linux );
 
 		return new SystemTerminalDescriptionProvider(
 			options,
 			snapshot,
-			Array.Empty<string>());
+			Array.Empty<string>() );
 	}
 
 	private static TerminalDescription Load(
 		ITerminalDescriptionProvider provider,
-		string name)
-	{
-		ArgumentNullException.ThrowIfNull(provider);
-		ArgumentNullException.ThrowIfNull(name);
+		string name ) {
+		ArgumentNullException.ThrowIfNull( provider );
+		ArgumentNullException.ThrowIfNull( name );
 
 		Assert.True(
 			provider.TryLoad(
 				name,
-				out TerminalDescription? terminal));
+				out TerminalDescription? terminal ) );
 		return Assert.IsType<TerminalDescription>(
-			terminal);
+			terminal );
 	}
 
 	private static void AssertColumns(
 		int expected,
-		TerminalDescription terminal)
-	{
-		ArgumentNullException.ThrowIfNull(terminal);
+		TerminalDescription terminal ) {
+		ArgumentNullException.ThrowIfNull( terminal );
 
 		Assert.Equal<int?>(
 			expected,
 			terminal.GetNumber(
-				NumericCapability.Columns));
+				NumericCapability.Columns ) );
 	}
 
 	private static byte[] CreateEntryWithColumns(
-		int columns)
-	{
+		int columns ) {
 		byte[] entry =
 			ReadFixture(
-				"compiled/t29-legacy-minimal.bin");
+				"compiled/t29-legacy-minimal.bin" );
 		SetLegacyColumns(
 			entry,
-			columns);
+			columns );
 		return entry;
 	}
 
 	private static void SetLegacyColumns(
 		byte[] entry,
-		int columns)
-	{
-		ArgumentNullException.ThrowIfNull(entry);
+		int columns ) {
+		ArgumentNullException.ThrowIfNull( entry );
 
 		int names =
 			BinaryPrimitives.ReadUInt16LittleEndian(
 				entry.AsSpan(
 					2,
-					sizeof(ushort)));
+					sizeof( ushort ) ) );
 		int booleans =
 			BinaryPrimitives.ReadUInt16LittleEndian(
 				entry.AsSpan(
 					4,
-					sizeof(ushort)));
+					sizeof( ushort ) ) );
 		int numericOffset =
 			CompiledHeaderSize
 			+ names
 			+ booleans;
 
-		if ((numericOffset & 1) != 0)
-		{
+		if ( ( numericOffset & 1 ) != 0 ) {
 			numericOffset++;
 		}
 
 		BinaryPrimitives.WriteInt16LittleEndian(
 			entry.AsSpan(
 				numericOffset,
-				sizeof(short)),
-			checked((short)columns));
+				sizeof( short ) ),
+			checked((short)columns) );
 	}
 
 	private static string WriteLiteralCandidate(
 		string root,
 		string name,
-		byte[] entry)
-	{
-		ArgumentNullException.ThrowIfNull(root);
-		ArgumentNullException.ThrowIfNull(name);
-		ArgumentNullException.ThrowIfNull(entry);
+		byte[] entry ) {
+		ArgumentNullException.ThrowIfNull( root );
+		ArgumentNullException.ThrowIfNull( name );
+		ArgumentNullException.ThrowIfNull( entry );
 
 		string directory =
 			Path.Combine(
 				root,
-				name[0].ToString());
+				name[ 0 ].ToString() );
 		Directory.CreateDirectory(
-			directory);
+			directory );
 
 		string path =
 			Path.Combine(
 				directory,
-				name);
+				name );
 		File.WriteAllBytes(
 			path,
-			entry);
+			entry );
 		return path;
 	}
 
 	private static byte[] ReadFixture(
-		string relativePath)
-	{
-		ArgumentNullException.ThrowIfNull(relativePath);
+		string relativePath ) {
+		ArgumentNullException.ThrowIfNull( relativePath );
 
 		return File.ReadAllBytes(
 			Path.Combine(
@@ -738,49 +712,43 @@ public sealed class T39ProviderCacheCompositionTests
 				"compiled-terminfo",
 				relativePath.Replace(
 					'/',
-					Path.DirectorySeparatorChar)));
+					Path.DirectorySeparatorChar ) ) );
 	}
 
-	private sealed class TemporaryDirectory : IDisposable
-	{
-		internal TemporaryDirectory()
-		{
+	private sealed class TemporaryDirectory : IDisposable {
+		internal TemporaryDirectory() {
 			Root =
 				Path.Combine(
 					Path.GetTempPath(),
 					"icod-terminfo-t39-"
-					+ Guid.NewGuid().ToString("N"));
+					+ Guid.NewGuid().ToString( "N" ) );
 			Directory.CreateDirectory(
-				Root);
+				Root );
 		}
 
-		internal string Root
-		{
+		internal string Root {
 			get;
 		}
 
 		internal string CreateSubdirectory(
-			string name)
-		{
-			ArgumentNullException.ThrowIfNull(name);
+			string name ) {
+			ArgumentNullException.ThrowIfNull( name );
 
 			string path =
 				Path.Combine(
 					Root,
-					name);
+					name );
 			Directory.CreateDirectory(
-				path);
+				path );
 			return path;
 		}
 
-		public void Dispose()
-		{
-			if (Directory.Exists(
-					Root))
-			{
+		public void Dispose() {
+			if ( Directory.Exists(
+					Root ) ) {
 				Directory.Delete(
 					Root,
-					recursive: true);
+					recursive: true );
 			}
 		}
 	}
