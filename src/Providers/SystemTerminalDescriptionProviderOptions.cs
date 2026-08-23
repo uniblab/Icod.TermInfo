@@ -1,8 +1,8 @@
 namespace Icod.TermInfo;
 
 /// <summary>
-/// Configures which system terminfo discovery sources a future system provider
-/// is permitted to consult.
+/// Configures which system terminfo discovery sources a system provider is
+/// permitted to consult.
 /// </summary>
 public sealed class SystemTerminalDescriptionProviderOptions
 {

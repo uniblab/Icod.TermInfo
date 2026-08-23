@@ -4,7 +4,7 @@
 **Package:** `Icod.TermInfo`
 **Target framework:** `net10.0`
 **Language:** C# 13
-**Status:** Active — T37 encoded `TERMINFO` and discovery inputs complete; T38 system discovery/precedence next
+**Status:** Active — T38 system discovery and precedence complete; T39 provider cache/refresh/composition next
 **Previous contract:** `0.8.0` — semantic completion and binary/provider readiness
 **Contract target:** `0.9.0`
 **Initial development version:** `0.9.0-alpha.1`
@@ -1105,6 +1105,8 @@ without duplicating parser logic or corrupting Windows paths.
 ## T38 — System Discovery and Precedence
 
 **Development version:** `0.9.0-beta.2`
+**Status:** Complete
+**Implementation record:** `docs/0.9.0-T38-SYSTEM-DISCOVERY.md`
 
 ### Work
 

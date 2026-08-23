@@ -8,30 +8,6 @@ namespace Icod.TermInfo.Tests;
 public sealed class T37DiscoveryInputTests
 {
     [Fact]
-    public void AssemblyIdentifiesT37DevelopmentVersion()
-    {
-        Assembly assembly =
-            typeof(SystemTerminalDescriptionProviderOptions).Assembly;
-        Version? assemblyVersion =
-            assembly.GetName().Version;
-        string? informationalVersion =
-            assembly
-                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                ?.InformationalVersion;
-
-        Assert.NotNull(assemblyVersion);
-        Assert.Equal(
-            new Version(0, 9, 0, 0),
-            assemblyVersion);
-        Assert.NotNull(informationalVersion);
-        Assert.True(
-            informationalVersion!.StartsWith(
-                "0.9.0-beta.1",
-                StringComparison.Ordinal),
-            $"Unexpected informational version '{informationalVersion}'.");
-    }
-
-    [Fact]
     public void OptionsSurfaceMatchesT32Freeze()
     {
         ConstructorInfo constructor =
@@ -549,17 +525,6 @@ public sealed class T37DiscoveryInputTests
                 });
 
         Assert.Empty(roots);
-    }
-
-    [Fact]
-    public void SystemProviderRemainsReservedForT38()
-    {
-        Assert.DoesNotContain(
-            typeof(TerminalDescription).Assembly.GetExportedTypes(),
-            type => string.Equals(
-                type.Name,
-                "SystemTerminalDescriptionProvider",
-                StringComparison.Ordinal));
     }
 
     private static byte[] ReadFixture(

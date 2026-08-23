@@ -34,25 +34,4 @@ public sealed class T32FoundationTests
                 out TerminalDescription? terminal));
         Assert.Null(terminal);
     }
-
-    [Fact]
-    public void SystemProviderImplementationRemainsReservedForT38()
-    {
-        string[] reservedTypeNames =
-        [
-            "SystemTerminalDescriptionProvider",
-        ];
-
-        HashSet<string> actualTypeNames =
-            typeof(TerminalDescription).Assembly
-                .GetTypes()
-                .Select(type => type.Name)
-                .ToHashSet(StringComparer.Ordinal);
-
-        Assert.All(
-            reservedTypeNames,
-            reserved => Assert.DoesNotContain(
-                reserved,
-                actualTypeNames));
-    }
 }

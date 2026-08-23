@@ -237,7 +237,7 @@ public sealed class DirectoryTerminalDescriptionProvider
         return true;
     }
 
-    private static void ValidateTerminalName(string name)
+    internal static void ValidateTerminalName(string name)
     {
         ArgumentNullException.ThrowIfNull(name);
 
