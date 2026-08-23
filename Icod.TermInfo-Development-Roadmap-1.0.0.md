@@ -4,7 +4,7 @@
 **Package:** `Icod.TermInfo`
 **Supported target frameworks:** `net8.0`, `net10.0`
 **Language:** C# 13
-**Status:** Active — T42 contract and API-regret audit
+**Status:** Active — T43 robustness and compatibility gate; T42 baseline review pending
 **Previous contract:** `0.9.0` — arbitrary compiled terminfo acquisition
 **Contract target:** `1.0.0`
 **Initial development version:** `1.0.0-alpha.1`
@@ -116,7 +116,7 @@ After approval, later tranches use `--check` rather than rewriting the baseline.
 ## T42 — 1.0 Contract and API Regret Audit
 
 **Development version:** `1.0.0-alpha.1`
-**Status:** Implementation in progress
+**Status:** Implementation complete — API baseline review/commit remains the acceptance item
 **Implementation record:** `docs/1.0.0-T42-CONTRACT-API-AUDIT.md`
 
 T42 SHALL:
@@ -158,26 +158,49 @@ Before T42 is marked complete:
 8. Any approved corrections are applied and the baseline is regenerated.
 9. The final T42 baseline is committed and `--check` passes.
 
+The implementation portion has been exercised successfully on both supported
+frameworks. The baseline file remains intentionally absent until the explicit
+human API-regret review is performed.
+
 ---
 
 ## T43 — 1.0 Robustness and Compatibility Gate
 
 **Development version:** `1.0.0-beta.1`
+**Status:** Implementation in progress
+**Implementation record:** `docs/1.0.0-T43-ROBUSTNESS-COMPATIBILITY.md`
 
 T43 SHALL concentrate on confidence rather than feature expansion:
 
-- expanded compiled-entry corpus;
-- larger deterministic mutation/fuzz campaign;
-- pinned ncurses differential campaign;
-- culture-independence audit;
-- concurrency/cache stress audit;
-- resource/bounds audit;
-- package compatibility baseline against published `0.9.0`;
-- net8/net10 API-equivalence gate;
-- package icon metadata correction;
-- final package metadata audit.
+- expand valid parser coverage with a deterministic generated conventional-entry
+  corpus spanning both supported numeric-width magics;
+- expand deterministic random-byte and valid-seed mutation campaigns;
+- add a non-destructive pinned ncurses `tic` corpus differential check;
+- audit parser behavior under invariant, Turkish, and Arabic cultures;
+- stress provider single-flight caching under concurrent first load;
+- audit exact parser entry-size boundaries;
+- treat the reviewed T42 public API manifest as the 0.9-compatible 1.0 baseline,
+  because T42 introduced no production public API change;
+- require exact net8/net10 public API equivalence in release validation;
+- register `icon.png` as actual NuGet package icon metadata;
+- tighten package metadata validation for readme, icon, authors, project URL,
+  license, license acceptance, description, tags, repository, and dependencies.
 
 T43 must not weaken or casually rewrite the approved T42 API baseline.
+
+### T43 acceptance
+
+Before T43 is marked complete:
+
+1. T42 API baseline is generated, manually reviewed, and committed.
+2. `public-api-snapshot --check` passes.
+3. net8/net10 `public-api-snapshot --compare` passes.
+4. expanded T43 parser/culture/concurrency/resource tests pass on both TFMs.
+5. pinned `ncurses 6.5.20250216` fixture differential passes on a maintainer host.
+6. Release package validation passes.
+7. NuGet package contains and identifies `icon.png`.
+8. package metadata audit passes.
+9. no production runtime API or behavior was expanded.
 
 ---
 

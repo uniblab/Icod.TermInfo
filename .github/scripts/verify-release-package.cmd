@@ -15,6 +15,16 @@ dotnet run --project tools\terminfo-metadata\Icod.TermInfo.MetadataGenerator.csp
 if errorlevel 1 goto fail
 
 echo.
+echo === Verify approved public API baseline ===
+dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c Release --no-build -- --check
+if errorlevel 1 goto fail
+
+echo.
+echo === Verify net8.0/net10.0 API equivalence ===
+dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c Release --no-build -- --compare bin\Release\net8.0\Icod.TermInfo.dll bin\Release\net10.0\Icod.TermInfo.dll
+if errorlevel 1 goto fail
+
+echo.
 echo === Verify package structure and symbols ===
 dotnet run --project tools\package-verifier\Icod.TermInfo.PackageVerifier.csproj -c Release -f net10.0 -- "%ARTIFACT_DIR%"
 if errorlevel 1 goto fail

@@ -7,11 +7,16 @@ It verifies:
 
 - `<Version>` and `<PackageVersion>` remain present and identical;
 - required `net8.0` and `net10.0` package payloads are present;
+- both packaged assemblies retain assembly version `1.0.0.0` and remain
+  unsigned;
+- `README.md` and `icon.png` are present and identified by NuGet metadata;
+- authors, project URL, license expression, license-acceptance flag,
+  description, tags, repository URL, and repository commit remain valid;
 - no runtime/native dependency payload was introduced;
 - repository-only tests, tools, fixtures, `.ti`, and `.bin` assets are absent;
-- NuGet metadata identifies the expected package and repository commit;
 - the package has no runtime NuGet dependencies;
-- the symbol package contains portable PDBs for both supported frameworks with the expected Source Link data;
+- the symbol package contains portable PDBs for both supported frameworks with
+  the expected Source Link data;
 - the generic parameterization source layer contains no terminal-profile-specific
   reference.
 

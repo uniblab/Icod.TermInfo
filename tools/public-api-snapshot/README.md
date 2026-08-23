@@ -47,3 +47,16 @@ After the baseline is approved and committed, verify it with:
 ```text
 dotnet run --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj -c Release -- --check
 ```
+
+Compare the public contract of two built assemblies:
+
+```text
+dotnet run --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj -c Release -- --compare bin/Release/net8.0/Icod.TermInfo.dll bin/Release/net10.0/Icod.TermInfo.dll
+```
+
+T43 release validation uses this mode to require exact public API equivalence
+between the `net8.0` and `net10.0` package targets.
+
+Once the T42 baseline is reviewed and committed, release validation also runs
+`--check`. The release/package gate therefore fails rather than silently
+blessing an unexplained public API change.

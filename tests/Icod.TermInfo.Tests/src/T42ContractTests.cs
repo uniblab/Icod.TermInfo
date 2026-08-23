@@ -8,31 +8,16 @@ namespace Icod.TermInfo.Tests;
 public sealed class T42ContractTests
 {
 	[Fact]
-	public void AssemblyIdentifiesT42AndStableOneXIdentity()
+	public void StableOneXAssemblyIdentityAndUnsignedPolicyAreFrozen()
 	{
-		Assembly assembly =
-			typeof(TerminalDescription).Assembly;
 		AssemblyName assemblyName =
-			assembly.GetName();
-		string? informationalVersion =
-			assembly
-				.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-				?.InformationalVersion;
+			typeof(TerminalDescription)
+				.Assembly
+				.GetName();
 
 		Assert.Equal(
 			new Version(1, 0, 0, 0),
 			assemblyName.Version);
-		Assert.NotNull(informationalVersion);
-
-		string semanticVersion =
-			informationalVersion!
-				.Split(
-					'+',
-					2)[0];
-
-		Assert.Equal(
-			"1.0.0-alpha.1",
-			semanticVersion);
 
 		byte[]? publicKeyToken =
 			assemblyName.GetPublicKeyToken();

@@ -61,8 +61,8 @@ internal static class Program
 
             Console.WriteLine(
                 "Verified dual-target package structure, assembly identity, "
-                + "dependency closure, symbols, and Source Link for "
-                + $"{packageVersion}.");
+                + "package metadata, dependency closure, symbols, and "
+                + $"Source Link for {packageVersion}.");
             return 0;
         }
         catch (Exception exception) when (
@@ -194,6 +194,7 @@ internal static class Program
         List<string> required =
         [
             "README.md",
+            "icon.png",
         ];
 
         foreach (string targetFramework in TargetFrameworks)
@@ -297,6 +298,55 @@ internal static class Program
         Require(
             GetMetadataText(metadata!, "version") == expectedVersion,
             "Unexpected package version.");
+        Require(
+            GetMetadataText(metadata!, "authors") == "Timothy J. Bruce",
+            "Unexpected package authors.");
+        Require(
+            GetMetadataText(metadata!, "projectUrl") == RepositoryUrl,
+            "Unexpected package project URL.");
+        Require(
+            GetMetadataText(metadata!, "readme") == "README.md",
+            "Package metadata does not identify README.md.");
+        Require(
+            GetMetadataText(metadata!, "icon") == "icon.png",
+            "Package metadata does not identify icon.png.");
+        Require(
+            string.Equals(
+                GetMetadataText(
+                    metadata!,
+                    "requireLicenseAcceptance"),
+                "true",
+                StringComparison.OrdinalIgnoreCase),
+            "Package must require license acceptance.");
+        Require(
+            !string.IsNullOrWhiteSpace(
+                GetMetadataText(
+                    metadata!,
+                    "description")),
+            "Package description is missing.");
+        Require(
+            !string.IsNullOrWhiteSpace(
+                GetMetadataText(
+                    metadata!,
+                    "tags")),
+            "Package tags are missing.");
+
+        XElement? license =
+            metadata!
+                .Elements()
+                .FirstOrDefault(
+                    element =>
+                        element.Name.LocalName == "license");
+        Require(
+            license is not null,
+            "Package metadata has no license element.");
+        Require(
+            license!.Attribute("type")?.Value == "expression",
+            "Package license is not an expression.");
+        Require(
+            license.Value == "LGPL-3.0-or-later",
+            "Unexpected package license expression.");
+
         Require(
             !metadata!
                 .Descendants()

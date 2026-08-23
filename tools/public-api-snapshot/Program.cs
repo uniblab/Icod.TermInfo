@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Reflection;
 using System.Security.Cryptography;
+using System.Runtime.Loader;
 using System.Text;
 using Icod.TermInfo;
 
@@ -17,6 +18,16 @@ internal static class Program
     public static int Main(string[] args)
     {
         ArgumentNullException.ThrowIfNull(args);
+
+        if (args.Length >= 1
+            && string.Equals(
+                args[0],
+                "--compare",
+                StringComparison.Ordinal))
+        {
+            return CompareAssemblies(
+                args);
+        }
 
         if (args.Length > 2)
         {
@@ -114,6 +125,88 @@ internal static class Program
         Console.WriteLine(
             $"SHA-256 {ComputeSha256(manifest)}");
         return 0;
+    }
+
+    private static int CompareAssemblies(
+        string[] args)
+    {
+        ArgumentNullException.ThrowIfNull(args);
+
+        if (args.Length != 3)
+        {
+            PrintUsage();
+            return 2;
+        }
+
+        string firstPath =
+            Path.GetFullPath(
+                args[1]);
+        string secondPath =
+            Path.GetFullPath(
+                args[2]);
+
+        if (!File.Exists(firstPath)
+            || !File.Exists(secondPath))
+        {
+            Console.Error.WriteLine(
+                "Both assembly paths supplied to --compare must exist.");
+            return 1;
+        }
+
+        string first =
+            CreateManifestFromAssemblyPath(
+                firstPath);
+        string second =
+            CreateManifestFromAssemblyPath(
+                secondPath);
+
+        if (!string.Equals(
+                first,
+                second,
+                StringComparison.Ordinal))
+        {
+            Console.Error.WriteLine(
+                "Public API differs between target-framework assemblies.");
+            Console.Error.WriteLine(
+                $"{firstPath}: {ComputeSha256(first)}");
+            Console.Error.WriteLine(
+                $"{secondPath}: {ComputeSha256(second)}");
+            return 1;
+        }
+
+        Console.WriteLine(
+            "Public API is equivalent between:");
+        Console.WriteLine(
+            $"  {firstPath}");
+        Console.WriteLine(
+            $"  {secondPath}");
+        Console.WriteLine(
+            $"SHA-256 {ComputeSha256(first)}");
+        return 0;
+    }
+
+    private static string CreateManifestFromAssemblyPath(
+        string path)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(
+            path);
+
+        SnapshotAssemblyLoadContext context =
+            new();
+
+        try
+        {
+            Assembly assembly =
+                context.LoadFromAssemblyPath(
+                    Path.GetFullPath(path));
+
+            return CreateManifest(
+                assembly);
+        }
+        finally
+        {
+            context.Unload();
+        }
     }
 
     private static string CreateManifest(
@@ -1162,5 +1255,26 @@ internal static class Program
             "  public-api-snapshot --write [baseline-path]");
         Console.Error.WriteLine(
             "  public-api-snapshot --check [baseline-path]");
+        Console.Error.WriteLine(
+            "  public-api-snapshot --compare <assembly-a> <assembly-b>");
+    }
+
+    private sealed class SnapshotAssemblyLoadContext
+        : AssemblyLoadContext
+    {
+        internal SnapshotAssemblyLoadContext()
+            : base(
+                isCollectible: true)
+        {
+        }
+
+        protected override Assembly? Load(
+            AssemblyName assemblyName)
+        {
+            ArgumentNullException.ThrowIfNull(
+                assemblyName);
+
+            return null;
+        }
     }
 }

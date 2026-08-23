@@ -15,24 +15,42 @@ internal static class Program
     {
         ArgumentNullException.ThrowIfNull(args);
 
-        if (args.Length != 0)
+        bool checkOnly =
+            args.Length == 1
+            && string.Equals(
+                args[0],
+                "--check",
+                StringComparison.Ordinal);
+
+        if (args.Length != 0
+            && !checkOnly)
         {
             Console.Error.WriteLine(
                 "Usage: dotnet run --project tools/compiled-terminfo-fixtures/"
-                + "Icod.TermInfo.FixtureGenerator.csproj");
+                + "Icod.TermInfo.FixtureGenerator.csproj [--check]");
             return 2;
         }
+
+        Dictionary<string, byte[]>? snapshot = null;
+        string? fixtureRoot = null;
 
         try
         {
             string root = FindRepositoryRoot();
-            string fixtureRoot =
+            fixtureRoot =
                 Path.Combine(
                     root,
                     "tests",
                     "Icod.TermInfo.Tests",
                     "fixtures",
                     "compiled-terminfo");
+
+            if (checkOnly)
+            {
+                snapshot =
+                    CaptureCorpus(
+                        fixtureRoot);
+            }
 
             string version =
                 RunProcess("tic", ["-V"]).PreferredOutput.Trim();
@@ -48,6 +66,17 @@ internal static class Program
 
             CompileSources(fixtureRoot);
             CreateAdversarialSeeds(fixtureRoot);
+
+            if (checkOnly)
+            {
+                VerifyCorpusMatches(
+                    fixtureRoot,
+                    snapshot!);
+
+                Console.WriteLine(
+                    "Compiled fixture corpus matches pinned ncurses provenance.");
+            }
+
             PrintHashes(fixtureRoot);
             return 0;
         }
@@ -60,6 +89,17 @@ internal static class Program
         {
             Console.Error.WriteLine(exception.Message);
             return 1;
+        }
+        finally
+        {
+            if (checkOnly
+                && fixtureRoot is not null
+                && snapshot is not null)
+            {
+                RestoreCorpus(
+                    fixtureRoot,
+                    snapshot);
+            }
         }
     }
 
@@ -350,6 +390,153 @@ internal static class Program
             + (numbers * numericWidth)
             + (strings * 2)
             + table;
+    }
+
+    private static Dictionary<string, byte[]> CaptureCorpus(
+        string root)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(root);
+
+        Dictionary<string, byte[]> files =
+            new(
+                StringComparer.Ordinal);
+
+        foreach (string folder in new[] { "compiled", "malformed" })
+        {
+            string directory =
+                Path.Combine(
+                    root,
+                    folder);
+
+            if (!Directory.Exists(directory))
+            {
+                continue;
+            }
+
+            foreach (
+                string path
+                in Directory
+                    .EnumerateFiles(
+                        directory,
+                        "*.bin")
+                    .OrderBy(
+                        path => path,
+                        StringComparer.Ordinal))
+            {
+                string relative =
+                    Path.GetRelativePath(
+                            root,
+                            path)
+                        .Replace(
+                            Path.DirectorySeparatorChar,
+                            '/');
+
+                files.Add(
+                    relative,
+                    File.ReadAllBytes(path));
+            }
+        }
+
+        return files;
+    }
+
+    private static void VerifyCorpusMatches(
+        string root,
+        IReadOnlyDictionary<string, byte[]> expected)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(root);
+        ArgumentNullException.ThrowIfNull(expected);
+
+        Dictionary<string, byte[]> actual =
+            CaptureCorpus(
+                root);
+
+        string[] expectedNames =
+            expected.Keys
+                .OrderBy(
+                    name => name,
+                    StringComparer.Ordinal)
+                .ToArray();
+        string[] actualNames =
+            actual.Keys
+                .OrderBy(
+                    name => name,
+                    StringComparer.Ordinal)
+                .ToArray();
+
+        if (!expectedNames.SequenceEqual(
+                actualNames,
+                StringComparer.Ordinal))
+        {
+            throw new InvalidDataException(
+                "Pinned fixture corpus file set changed.");
+        }
+
+        foreach (string name in expectedNames)
+        {
+            if (!expected[name].AsSpan().SequenceEqual(
+                    actual[name]))
+            {
+                throw new InvalidDataException(
+                    $"Pinned fixture differs after regeneration: {name}");
+            }
+        }
+    }
+
+    private static void RestoreCorpus(
+        string root,
+        IReadOnlyDictionary<string, byte[]> snapshot)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(root);
+        ArgumentNullException.ThrowIfNull(snapshot);
+
+        foreach (string folder in new[] { "compiled", "malformed" })
+        {
+            string directory =
+                Path.Combine(
+                    root,
+                    folder);
+
+            if (Directory.Exists(directory))
+            {
+                foreach (
+                    string path
+                    in Directory.EnumerateFiles(
+                        directory,
+                        "*.bin"))
+                {
+                    File.Delete(
+                        path);
+                }
+            }
+        }
+
+        foreach (
+            KeyValuePair<string, byte[]> file
+            in snapshot.OrderBy(
+                pair => pair.Key,
+                StringComparer.Ordinal))
+        {
+            string path =
+                Path.Combine(
+                    root,
+                    file.Key.Replace(
+                        '/',
+                        Path.DirectorySeparatorChar));
+            string? directory =
+                Path.GetDirectoryName(
+                    path);
+
+            if (!string.IsNullOrEmpty(directory))
+            {
+                Directory.CreateDirectory(
+                    directory);
+            }
+
+            File.WriteAllBytes(
+                path,
+                file.Value);
+        }
     }
 
     private static void PrintHashes(string root)
