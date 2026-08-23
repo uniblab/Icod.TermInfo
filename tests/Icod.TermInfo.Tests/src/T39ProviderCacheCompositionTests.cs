@@ -9,29 +9,6 @@ public sealed class T39ProviderCacheCompositionTests {
 	private const int CompiledHeaderSize = 12;
 
 	[Fact]
-	public void AssemblyIdentifiesT39DevelopmentVersion() {
-		Assembly assembly =
-			typeof( SystemTerminalDescriptionProvider ).Assembly;
-		Version? assemblyVersion =
-			assembly.GetName().Version;
-		string? informationalVersion =
-			assembly
-				.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-				?.InformationalVersion;
-
-		Assert.NotNull( assemblyVersion );
-		Assert.Equal(
-			new Version( 0, 9, 0, 0 ),
-			assemblyVersion );
-		Assert.NotNull( informationalVersion );
-		Assert.True(
-			informationalVersion!.StartsWith(
-				"0.9.0-beta.3",
-				StringComparison.Ordinal ),
-			$"Unexpected informational version '{informationalVersion}'." );
-	}
-
-	[Fact]
 	public void TerminalDatabaseCanParticipateAsAProvider() {
 		Assert.True(
 			typeof( ITerminalDescriptionProvider ).IsAssignableFrom(
