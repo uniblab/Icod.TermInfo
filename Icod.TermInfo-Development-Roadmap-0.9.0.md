@@ -4,7 +4,7 @@
 **Package:** `Icod.TermInfo`
 **Target framework:** `net10.0`
 **Language:** C# 13
-**Status:** Active — T32 foundation/API freeze complete; T33 parser next
+**Status:** Active — T33 legacy `0432` parser complete; T34 extended/32-bit parser next
 **Previous contract:** `0.8.0` — semantic completion and binary/provider readiness
 **Contract target:** `0.9.0`
 **Initial development version:** `0.9.0-alpha.1`
@@ -977,6 +977,8 @@ without another architectural/public ownership redesign.
 ## T33 — Legacy `0432` Compiled Parser
 
 **Development version:** `0.9.0-alpha.2`
+**Status:** Complete
+**Implementation record:** `docs/0.9.0-T33-LEGACY-PARSER.md`
 
 ### Work
 

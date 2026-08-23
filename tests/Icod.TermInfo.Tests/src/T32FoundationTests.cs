@@ -7,26 +7,6 @@ namespace Icod.TermInfo.Tests;
 public sealed class T32FoundationTests
 {
     [Fact]
-    public void AssemblyIdentifiesT32DevelopmentVersion()
-    {
-        Assembly assembly = typeof(TerminalDescription).Assembly;
-        Version? assemblyVersion = assembly.GetName().Version;
-        string? informationalVersion =
-            assembly
-                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                ?.InformationalVersion;
-
-        Assert.NotNull(assemblyVersion);
-        Assert.Equal(new Version(0, 9, 0, 0), assemblyVersion);
-        Assert.NotNull(informationalVersion);
-        Assert.True(
-            informationalVersion!.StartsWith(
-                "0.9.0-alpha.1",
-                StringComparison.Ordinal),
-            $"Unexpected informational version '{informationalVersion}'.");
-    }
-
-    [Fact]
     public void BuiltInDatabaseRemainsInMemoryOnly()
     {
         FieldInfo? providersField =
@@ -56,13 +36,10 @@ public sealed class T32FoundationTests
     }
 
     [Fact]
-    public void AcquisitionImplementationRemainsReservedForLaterTranches()
+    public void IoBackedProviderImplementationRemainsReservedForLaterTranches()
     {
         string[] reservedTypeNames =
         [
-            "CompiledTermInfoParserOptions",
-            "CompiledTermInfoParser",
-            "CompiledTermInfoFormatException",
             "DirectoryTerminalDescriptionProvider",
             "SystemTerminalDescriptionProviderOptions",
             "SystemTerminalDescriptionProvider",

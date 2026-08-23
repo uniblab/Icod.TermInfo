@@ -10,6 +10,9 @@ public sealed class PublicApiSurfaceTests
     private static readonly string[] ExpectedExportedTypes =
     [
         "Icod.TermInfo.BooleanCapability",
+        "Icod.TermInfo.CompiledTermInfoFormatException",
+        "Icod.TermInfo.CompiledTermInfoParser",
+        "Icod.TermInfo.CompiledTermInfoParserOptions",
         "Icod.TermInfo.ITerminalDescriptionProvider",
         "Icod.TermInfo.ITermInfoDelayProvider",
         "Icod.TermInfo.InMemoryTerminalDescriptionProvider",
@@ -48,7 +51,7 @@ public sealed class PublicApiSurfaceTests
     ];
 
     [Fact]
-    public void ExportedTypeSetMatchesT30Baseline()
+    public void ExportedTypeSetMatchesCurrentContract()
     {
         string[] actual =
             typeof(TerminalDescription).Assembly
@@ -399,7 +402,9 @@ public sealed class PublicApiSurfaceTests
             type =>
                 type.Name.Contains("Analysis", StringComparison.Ordinal)
                 || type.Name.Contains("Instruction", StringComparison.Ordinal)
-                || type.Name.Contains("Parser", StringComparison.Ordinal)
+                || (type.Name.Contains("Parser", StringComparison.Ordinal)
+                    && type != typeof(CompiledTermInfoParser)
+                    && type != typeof(CompiledTermInfoParserOptions))
                 || type.Name.Contains("Cache", StringComparison.Ordinal));
 
         Assert.DoesNotContain(

@@ -251,33 +251,6 @@ public sealed class T21FoundationTests
             Release07StringCapabilityNames);
     }
 
-    [Fact]
-    public void T21ContainsNoProductionDatabaseAcquisitionTypes()
-    {
-        string[] forbiddenTypeNames =
-        [
-            "CompiledTermInfoParser",
-            "CompiledTermInfoReader",
-            "DirectoryTermInfoProvider",
-            "DirectoryTerminalDescriptionProvider",
-            "SystemTermInfoProvider",
-            "SystemTerminalDescriptionProvider",
-        ];
-
-        Type[] actualTypes =
-            typeof(TerminalDescription).Assembly.GetTypes();
-
-        foreach (string forbiddenTypeName in forbiddenTypeNames)
-        {
-            Assert.DoesNotContain(
-                actualTypes,
-                type => string.Equals(
-                    type.Name,
-                    forbiddenTypeName,
-                    StringComparison.Ordinal));
-        }
-    }
-
     private static void AssertRelease07EnumBaseline<TEnum>(
         IReadOnlyList<string> release07Names)
         where TEnum : struct, Enum
