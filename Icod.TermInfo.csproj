@@ -75,6 +75,7 @@
 
 	<ItemGroup>
 		<Compile Include="src\**\*.cs" />
+		<None Include="icon.png" Pack="true" PackagePath="" />
 		<EmbeddedResource Remove="samples\**" />
 		<None Remove="samples\**" />
 		<EmbeddedResource Remove="tests\**" />
