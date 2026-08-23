@@ -304,47 +304,15 @@ public sealed class T29BinaryReadinessTests
     }
 
     [Fact]
-    public void ProductionAssemblyContainsNoPrematureSystemProviderImplementation()
+    public void ProductionAssemblyContainsNoFixtureResources()
     {
         Assembly assembly = typeof(TerminalDatabase).Assembly;
-        string[] reservedTypeNames =
-        [
-            "SystemTerminalDescriptionProviderOptions",
-            "SystemTerminalDescriptionProvider",
-        ];
-        HashSet<string> actualTypeNames =
-            assembly.GetTypes()
-                .Select(type => type.Name)
-                .ToHashSet(StringComparer.Ordinal);
 
-        Assert.All(
-            reservedTypeNames,
-            reserved => Assert.DoesNotContain(
-                reserved,
-                actualTypeNames));
         Assert.DoesNotContain(
             assembly.GetManifestResourceNames(),
             name => name.Contains(
                 "fixture",
                 StringComparison.OrdinalIgnoreCase));
-
-        byte[] assemblyImage = File.ReadAllBytes(assembly.Location);
-        foreach (string forbiddenLiteral in new[]
-        {
-            "TERMINFO",
-            "TERMINFO_DIRS",
-            "/usr/share/terminfo",
-        })
-        {
-            Assert.True(
-                assemblyImage.AsSpan().IndexOf(
-                    Encoding.UTF8.GetBytes(forbiddenLiteral)) < 0,
-                $"Production assembly contains reserved 0.9 literal '{forbiddenLiteral}'.");
-            Assert.True(
-                assemblyImage.AsSpan().IndexOf(
-                    Encoding.Unicode.GetBytes(forbiddenLiteral)) < 0,
-                $"Production assembly contains reserved 0.9 literal '{forbiddenLiteral}'.");
-        }
     }
 
     private static JsonDocument LoadManifest()

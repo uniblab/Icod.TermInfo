@@ -2,6 +2,9 @@ namespace Icod.TermInfo.Sample;
 
 internal static class SampleTerminalResolver
 {
+    private static readonly TerminalDatabase DefaultDatabase =
+        SampleAcquisition.CreateSystemWithBuiltInFallback();
+
     internal static TerminalDescription Resolve(string[] arguments)
     {
         ArgumentNullException.ThrowIfNull(arguments);
@@ -27,7 +30,7 @@ internal static class SampleTerminalResolver
         }
 
         return TerminalEnvironment.Resolve(
-            TerminalDatabase.BuiltIn,
+            DefaultDatabase,
             TerminalProfiles.Dumb);
     }
 

@@ -1,3 +1,4 @@
+using System.Buffers.Binary;
 using System.Text;
 using Icod.TermInfo;
 
@@ -7,6 +8,84 @@ static void Require(bool condition, string message)
     {
         throw new InvalidOperationException(message);
     }
+}
+
+static byte[] CreateLegacyCompiledEntry(
+    string name,
+    string alias,
+    short columns)
+{
+    ArgumentException.ThrowIfNullOrWhiteSpace(name);
+    ArgumentException.ThrowIfNullOrWhiteSpace(alias);
+
+    Require(
+        StandardCapabilityCatalog
+            .GetMetadata(NumericCapability.Columns)
+            .BinaryIndex == 0,
+        "The package smoke fixture assumes cols is compiled numeric index zero.");
+
+    byte[] names =
+        Encoding.ASCII.GetBytes(
+            $"{name}|{alias}|Package smoke external entry\0");
+    int numericOffset =
+        12
+        + names.Length;
+
+    if ((numericOffset & 1) != 0)
+    {
+        numericOffset++;
+    }
+
+    byte[] entry =
+        new byte[
+            numericOffset
+            + sizeof(short)];
+
+    BinaryPrimitives.WriteUInt16LittleEndian(
+        entry.AsSpan(0, sizeof(ushort)),
+        0x011A);
+    BinaryPrimitives.WriteUInt16LittleEndian(
+        entry.AsSpan(2, sizeof(ushort)),
+        checked((ushort)names.Length));
+    BinaryPrimitives.WriteUInt16LittleEndian(
+        entry.AsSpan(6, sizeof(ushort)),
+        1);
+
+    names.CopyTo(
+        entry.AsSpan(12));
+    BinaryPrimitives.WriteInt16LittleEndian(
+        entry.AsSpan(
+            numericOffset,
+            sizeof(short)),
+        columns);
+
+    return entry;
+}
+
+static string WriteCompiledEntry(
+    string root,
+    string name,
+    byte[] entry)
+{
+    ArgumentException.ThrowIfNullOrWhiteSpace(root);
+    ArgumentException.ThrowIfNullOrWhiteSpace(name);
+    ArgumentNullException.ThrowIfNull(entry);
+
+    string directory =
+        Path.Combine(
+            root,
+            name[0].ToString());
+    Directory.CreateDirectory(
+        directory);
+
+    string path =
+        Path.Combine(
+            directory,
+            name);
+    File.WriteAllBytes(
+        path,
+        entry);
+    return path;
 }
 
 TerminalDescription ansi = TerminalDatabase.BuiltIn.Load("ansi");
@@ -171,5 +250,125 @@ Require(
 Require(
     TermInfoCompatibility.TiGetNum(ansi, "cols") == 80,
     "Compatibility capability lookup changed.");
+
+string externalName =
+    "package-smoke-external";
+string externalAlias =
+    "package-smoke-external-alias";
+byte[] compiledEntry =
+    CreateLegacyCompiledEntry(
+        externalName,
+        externalAlias,
+        123);
+
+TerminalDescription parsed =
+    CompiledTermInfoParser.Parse(
+        compiledEntry);
+Require(
+    parsed.Name == externalName
+        && parsed.Aliases.Contains(
+            externalAlias,
+            StringComparer.Ordinal)
+        && parsed.GetNumber(NumericCapability.Columns) == 123,
+    "Fresh package consumer could not parse caller-supplied compiled bytes.");
+
+string acquisitionRoot =
+    Path.Combine(
+        Path.GetTempPath(),
+        "Icod.TermInfo-package-smoke-"
+        + Guid.NewGuid().ToString("N"));
+Directory.CreateDirectory(
+    acquisitionRoot);
+
+string? originalTermInfo =
+    Environment.GetEnvironmentVariable(
+        "TERMINFO");
+string? originalTermInfoDirs =
+    Environment.GetEnvironmentVariable(
+        "TERMINFO_DIRS");
+
+try
+{
+    WriteCompiledEntry(
+        acquisitionRoot,
+        externalName,
+        compiledEntry);
+
+    DirectoryTerminalDescriptionProvider explicitProvider =
+        new(
+            acquisitionRoot);
+    Require(
+        explicitProvider.TryLoad(
+            externalName,
+            out TerminalDescription? explicitTerminal)
+            && explicitTerminal.GetNumber(NumericCapability.Columns) == 123,
+        "Fresh package consumer could not load an explicit terminfo root.");
+
+    SystemTerminalDescriptionProvider restrictedSystem =
+        new(
+            new SystemTerminalDescriptionProviderOptions(
+                useEnvironment: false,
+                useUserDatabase: false,
+                useSystemDatabases: false));
+    Require(
+        !restrictedSystem.TryLoad(
+            externalName,
+            out _),
+        "A fully restricted system provider unexpectedly found an entry.");
+
+    Environment.SetEnvironmentVariable(
+        "TERMINFO",
+        acquisitionRoot);
+    Environment.SetEnvironmentVariable(
+        "TERMINFO_DIRS",
+        null);
+
+    SystemTerminalDescriptionProvider system =
+        new(
+            new SystemTerminalDescriptionProviderOptions(
+                useEnvironment: true,
+                useUserDatabase: false,
+                useSystemDatabases: false));
+    Require(
+        system.TryLoad(
+            externalName,
+            out TerminalDescription? systemTerminal)
+            && systemTerminal.GetNumber(NumericCapability.Columns) == 123,
+        "Fresh package consumer could not load through system TERMINFO discovery.");
+
+    TerminalDatabase composed =
+        new(
+            new ITerminalDescriptionProvider[]
+            {
+                system,
+                TerminalDatabase.BuiltIn,
+            });
+    Require(
+        ReferenceEquals(
+            composed.Load("xterm"),
+            TerminalProfiles.Xterm),
+        "System-to-built-in fallback composition failed.");
+    Require(
+        ReferenceEquals(
+            composed.Load(externalName),
+            systemTerminal),
+        "Composed database did not preserve system-provider precedence.");
+}
+finally
+{
+    Environment.SetEnvironmentVariable(
+        "TERMINFO",
+        originalTermInfo);
+    Environment.SetEnvironmentVariable(
+        "TERMINFO_DIRS",
+        originalTermInfoDirs);
+
+    if (Directory.Exists(acquisitionRoot))
+    {
+        Directory.Delete(
+            acquisitionRoot,
+            recursive: true);
+    }
+}
 
 Console.WriteLine("Icod.TermInfo package smoke test passed.");

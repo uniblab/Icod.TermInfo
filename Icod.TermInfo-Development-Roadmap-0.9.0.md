@@ -4,7 +4,7 @@
 **Package:** `Icod.TermInfo`
 **Target framework:** `net10.0`
 **Language:** C# 13
-**Status:** Active — T36 explicit directory provider complete; T37 encoded `TERMINFO` and discovery inputs next
+**Status:** Active — T40 API, documentation, samples, and package freeze complete; T41 0.9.0 completion gate next
 **Previous contract:** `0.8.0` — semantic completion and binary/provider readiness
 **Contract target:** `0.9.0`
 **Initial development version:** `0.9.0-alpha.1`
@@ -1080,6 +1080,8 @@ conventional terminfo directory tree and load exact terminal names safely.
 ## T37 — Encoded `TERMINFO` and Discovery Inputs
 
 **Development version:** `0.9.0-beta.1`
+**Status:** Complete
+**Implementation record:** `docs/0.9.0-T37-DISCOVERY-INPUTS.md`
 
 ### Work
 
@@ -1103,6 +1105,8 @@ without duplicating parser logic or corrupting Windows paths.
 ## T38 — System Discovery and Precedence
 
 **Development version:** `0.9.0-beta.2`
+**Status:** Complete
+**Implementation record:** `docs/0.9.0-T38-SYSTEM-DISCOVERY.md`
 
 ### Work
 
@@ -1127,6 +1131,8 @@ precedence.
 ## T39 — Provider Cache, Refresh, and Composition
 
 **Development version:** `0.9.0-beta.3`
+**Status:** Complete
+**Implementation record:** `docs/0.9.0-T39-CACHE-REFRESH-COMPOSITION.md`
 
 ### Work
 
@@ -1149,6 +1155,8 @@ isolated to caller-owned provider instances.
 ## T40 — API, Documentation, Samples, and Package Freeze
 
 **Development version:** `0.9.0-rc.1`
+**Status:** Complete
+**Implementation record:** `docs/0.9.0-T40-API-PACKAGE-FREEZE.md`
 
 ### Work
 

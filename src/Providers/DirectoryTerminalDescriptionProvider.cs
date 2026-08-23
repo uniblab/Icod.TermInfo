@@ -13,7 +13,7 @@ public sealed class DirectoryTerminalDescriptionProvider
 {
     private const int FileBufferSize = 4096;
 
-    private readonly ConcurrentDictionary<string, TerminalDescription> _cache =
+    private readonly ConcurrentDictionary<string, Lazy<TerminalDescription?>> _cache =
         new(StringComparer.Ordinal);
     private readonly CompiledTermInfoParserOptions _parserOptions;
 
@@ -62,27 +62,57 @@ public sealed class DirectoryTerminalDescriptionProvider
     {
         ValidateTerminalName(name);
 
-        if (_cache.TryGetValue(
+        Lazy<TerminalDescription?> load =
+            _cache.GetOrAdd(
                 name,
-                out TerminalDescription? cached))
+                CreateLoad);
+
+        try
         {
-            terminal = cached;
-            return true;
+            terminal =
+                load.Value;
+        }
+        catch
+        {
+            _cache.TryRemove(
+                new KeyValuePair<string, Lazy<TerminalDescription?>>(
+                    name,
+                    load));
+            throw;
         }
 
-        if (!TryLoadUncached(
-                name,
-                out TerminalDescription? loaded))
+        if (terminal is null)
         {
-            terminal = null;
+            _cache.TryRemove(
+                new KeyValuePair<string, Lazy<TerminalDescription?>>(
+                    name,
+                    load));
             return false;
         }
 
-        terminal =
-            _cache.GetOrAdd(
-                name,
-                loaded);
         return true;
+    }
+
+    private Lazy<TerminalDescription?> CreateLoad(
+        string name)
+    {
+        return new Lazy<TerminalDescription?>(
+            () => LoadUncached(
+                name),
+            LazyThreadSafetyMode.ExecutionAndPublication);
+    }
+
+    private TerminalDescription? LoadUncached(
+        string name)
+    {
+        if (TryLoadUncached(
+                name,
+                out TerminalDescription? terminal))
+        {
+            return terminal;
+        }
+
+        return null;
     }
 
     private bool TryLoadUncached(
@@ -237,7 +267,7 @@ public sealed class DirectoryTerminalDescriptionProvider
         return true;
     }
 
-    private static void ValidateTerminalName(string name)
+    internal static void ValidateTerminalName(string name)
     {
         ArgumentNullException.ThrowIfNull(name);
 
