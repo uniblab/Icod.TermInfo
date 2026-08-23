@@ -1,95 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <Copyright>2026</Copyright>
-    <LangVersion>13.0</LangVersion>
-    <OutputType>Library</OutputType>
-    <TargetFramework>net10.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
-    <AssemblyName>Icod.TermInfo</AssemblyName>
-    <RootNamespace>Icod.TermInfo</RootNamespace>
-    <Configurations>Debug;Release;Staging</Configurations>
-    <Version>0.9.0-beta.3</Version>
-  </PropertyGroup>
+	<PropertyGroup>
+		<Copyright>2026</Copyright>
+		<LangVersion>13.0</LangVersion>
+		<OutputType>Library</OutputType>
+		<TargetFramework>net10.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+		<AssemblyName>Icod.TermInfo</AssemblyName>
+		<RootNamespace>Icod.TermInfo</RootNamespace>
+		<Configurations>Debug;Release;Staging</Configurations>
+		<Version>0.9.0-beta.3</Version>
+	</PropertyGroup>
 
-  <PropertyGroup Condition=" '$(PlatformTarget)' == '' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-  </PropertyGroup>
+	<PropertyGroup Condition=" '$(PlatformTarget)' == '' ">
+		<PlatformTarget>AnyCPU</PlatformTarget>
+	</PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>2</WarningLevel>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <SignAssembly>false</SignAssembly>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-  </PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+		<ErrorReport>prompt</ErrorReport>
+		<WarningLevel>2</WarningLevel>
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>full</DebugType>
+		<Optimize>false</Optimize>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+		<SignAssembly>false</SignAssembly>
+		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+	</PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Staging' ">
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>3</WarningLevel>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <DefineConstants>TRACE</DefineConstants>
-    <SignAssembly>false</SignAssembly>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-  </PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)' == 'Staging' ">
+		<ErrorReport>prompt</ErrorReport>
+		<WarningLevel>3</WarningLevel>
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>full</DebugType>
+		<Optimize>false</Optimize>
+		<DefineConstants>TRACE</DefineConstants>
+		<SignAssembly>false</SignAssembly>
+		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+	</PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DebugType>portable</DebugType>
-    <Optimize>true</Optimize>
-    <SignAssembly>false</SignAssembly>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <WarningsNotAsErrors>CS1591</WarningsNotAsErrors>
-  </PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+		<ErrorReport>prompt</ErrorReport>
+		<WarningLevel>4</WarningLevel>
+		<DebugType>portable</DebugType>
+		<Optimize>true</Optimize>
+		<SignAssembly>false</SignAssembly>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<WarningsNotAsErrors>CS1591</WarningsNotAsErrors>
+	</PropertyGroup>
 
-  <PropertyGroup>
-    <PackageVersion>0.9.0-beta.3</PackageVersion>
-    <PackageId>Icod.TermInfo</PackageId>
-    <Title>Icod.TermInfo</Title>
-    <Authors>Timothy J. Bruce</Authors>
-    <Description>Managed .NET terminfo capability information with complete standard metadata, ANSI/DEC/xterm and Windows profiles, parameter expansion, and padding-aware output.</Description>
-    <PackageReleaseNotes>0.9.0-beta.3: harden directory/system providers with single-flight successful-entry caching, retryable misses and failures, fresh-provider refresh semantics, isolated provider caches, and explicit system-to-built-in TerminalDatabase composition.</PackageReleaseNotes>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>
-    <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <Deterministic>true</Deterministic>
-    <PackageTags>terminfo;libtinfo;terminal;ansi;vt100;vt102;vt220;xterm;windows-terminal;truecolor;terminal-capabilities;console;cross-platform;dotnet;csharp</PackageTags>
-    <RepositoryUrl>https://github.com/uniblab/Icod.TermInfo</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <GenerateAppxPackageOnBuild>false</GenerateAppxPackageOnBuild>
-    <EnablePackageValidation>true</EnablePackageValidation>
-  </PropertyGroup>
+	<PropertyGroup>
+		<PackageVersion>0.9.0-beta.3</PackageVersion>
+		<PackageId>Icod.TermInfo</PackageId>
+		<Title>Icod.TermInfo</Title>
+		<Authors>Timothy J. Bruce</Authors>
+		<Description>Managed .NET terminfo capability information with complete standard metadata, ANSI/DEC/xterm and Windows profiles, parameter expansion, and padding-aware output.</Description>
+		<PackageReleaseNotes>0.9.0-beta.3: harden directory/system providers with single-flight successful-entry caching, retryable misses and failures, fresh-provider refresh semantics, isolated provider caches, and explicit system-to-built-in TerminalDatabase composition.</PackageReleaseNotes>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>
+		<PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<Deterministic>true</Deterministic>
+		<PackageTags>terminfo;libtinfo;terminal;ansi;vt100;vt102;vt220;xterm;windows-terminal;truecolor;terminal-capabilities;console;cross-platform;dotnet;csharp</PackageTags>
+		<RepositoryUrl>https://github.com/uniblab/Icod.TermInfo</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<GenerateAppxPackageOnBuild>false</GenerateAppxPackageOnBuild>
+		<EnablePackageValidation>true</EnablePackageValidation>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Compile Include="src\**\*.cs" />
-    <EmbeddedResource Remove="samples\**" />
-    <None Remove="samples\**" />
-    <EmbeddedResource Remove="tests\**" />
-    <None Remove="tests\**" />
-    <EmbeddedResource Remove="tools\**" />
-    <None Remove="tools\**" />
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Include="src\**\*.cs" />
+		<None Include="icon.png" Pack="true" PackagePath="" />
+		<EmbeddedResource Remove="samples\**" />
+		<None Remove="samples\**" />
+		<EmbeddedResource Remove="tests\**" />
+		<None Remove="tests\**" />
+		<EmbeddedResource Remove="tools\**" />
+		<None Remove="tools\**" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Update="README.md" Pack="true" PackagePath="\" />
-    <Content Include="LICENSE">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <TargetPath>$(AssemblyName).LICENSE.txt</TargetPath>
-      <Pack>true</Pack>
-      <PackagePath>\</PackagePath>
-    </Content>
-  </ItemGroup>
+	<ItemGroup>
+		<None Update="README.md" Pack="true" PackagePath="\" />
+		<Content Include="LICENSE">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<TargetPath>$(AssemblyName).LICENSE.txt</TargetPath>
+			<Pack>true</Pack>
+			<PackagePath>\</PackagePath>
+		</Content>
+	</ItemGroup>
 </Project>
