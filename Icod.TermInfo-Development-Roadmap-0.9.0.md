@@ -4,7 +4,7 @@
 **Package:** `Icod.TermInfo`
 **Target framework:** `net10.0`
 **Language:** C# 13
-**Status:** Planned — arbitrary compiled-terminfo acquisition
+**Status:** Active — T32 foundation/API freeze complete; T33 parser next
 **Previous contract:** `0.8.0` — semantic completion and binary/provider readiness
 **Contract target:** `0.9.0`
 **Initial development version:** `0.9.0-alpha.1`
@@ -950,6 +950,8 @@ every tranche.
 ## T32 — 0.9 Foundation and Acquisition API Freeze
 
 **Development version:** `0.9.0-alpha.1`
+**Status:** Complete
+**Foundation record:** `docs/0.9.0-T32-FOUNDATION.md`
 
 ### Work
 

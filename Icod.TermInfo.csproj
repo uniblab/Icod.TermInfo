@@ -12,7 +12,7 @@
     <AssemblyName>Icod.TermInfo</AssemblyName>
     <RootNamespace>Icod.TermInfo</RootNamespace>
     <Configurations>Debug;Release;Staging</Configurations>
-    <Version>0.8.0</Version>
+    <Version>0.9.0-alpha.1</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(PlatformTarget)' == '' ">
@@ -52,12 +52,12 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageVersion>0.8.0</PackageVersion>
+    <PackageVersion>0.9.0-alpha.1</PackageVersion>
     <PackageId>Icod.TermInfo</PackageId>
     <Title>Icod.TermInfo</Title>
     <Authors>Timothy J. Bruce</Authors>
     <Description>Managed .NET terminfo capability information with complete standard metadata, ANSI/DEC/xterm and Windows profiles, parameter expansion, and padding-aware output.</Description>
-    <PackageReleaseNotes>0.8.0: complete the in-memory terminfo semantic model, hardened parameter/output runtime, and authoritative Windows Console/Terminal profiles; arbitrary compiled/system terminfo loading remains required for 0.9.</PackageReleaseNotes>
+    <PackageReleaseNotes>0.9.0-alpha.1: freeze the arbitrary compiled-terminfo acquisition contract, resource bounds, provider ownership, environment snapshot policy, and cache/refresh semantics before parser implementation begins.</PackageReleaseNotes>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
