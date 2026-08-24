@@ -179,6 +179,12 @@ public sealed class T42ContractTests
 		Assert.Contains(
 			"verify-release-package.sh artifacts",
 			pullRequest);
+		Assert.Contains(
+			"actions/upload-artifact@v4",
+			pullRequest);
+		Assert.Contains(
+			"name: icod-terminfo-pr-packages",
+			pullRequest);
 		Assert.DoesNotContain(
 			"dotnet nuget push",
 			pullRequest);

@@ -154,6 +154,18 @@ public sealed class T41CompletionGateTests
 		Assert.Contains(
 			"verify-release-package.sh artifacts",
 			pullRequest);
+		Assert.Contains(
+			"actions/upload-artifact@v4",
+			pullRequest);
+		Assert.Contains(
+			"name: icod-terminfo-pr-packages",
+			pullRequest);
+		Assert.Contains(
+			"artifacts/*.nupkg",
+			pullRequest);
+		Assert.Contains(
+			"artifacts/*.snupkg",
+			pullRequest);
 
 		string[] forbiddenPublicationFragments =
 		[

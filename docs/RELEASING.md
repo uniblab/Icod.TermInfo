@@ -47,16 +47,21 @@ After the Staging matrix succeeds, a separate Ubuntu package-validation job:
 1. restores and builds Release with `ContinuousIntegrationBuild=true`;
 2. runs the Release test suite;
 3. packs `Icod.TermInfo.csproj` into a runner-local `artifacts` directory;
-4. runs `.github/scripts/verify-release-package.sh artifacts`.
+4. runs `.github/scripts/verify-release-package.sh artifacts`;
+5. uploads the validated `.nupkg` and `.snupkg` as the
+   `icod-terminfo-pr-packages` Actions artifact for seven days.
 
 That verifier covers generated capability metadata, the approved public API
 baseline, net8/net10 API equivalence, package structure/metadata/XML/symbols,
 both fresh-package consumers, and the non-interactive repository sample.
 
-Packing on a pull request is validation, not publication. The pull-request
-workflow has only `contents: read` permission and must not request OIDC or
-package-write permission, authenticate to a package registry, push a package, or
-contain a deployment job.
+The PR artifact is uploaded only after verification succeeds. It is intended for
+inspection, installation, and testing and is not a registry publication.
+
+Packing and uploading a GitHub Actions artifact on a pull request is validation,
+not publication. The pull-request workflow has only `contents: read` permission
+and must not request OIDC or package-write permission, authenticate to a package
+registry, push a package, or contain a deployment job.
 
 ### Pushes to main
 

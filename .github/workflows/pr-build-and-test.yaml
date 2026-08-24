@@ -41,3 +41,12 @@ jobs:
       - run: dotnet test Icod.TermInfo.sln -c Release --no-build --logger trx
       - run: dotnet pack Icod.TermInfo.csproj -c Release --no-build --output artifacts
       - run: bash .github/scripts/verify-release-package.sh artifacts
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: icod-terminfo-pr-packages
+          path: |
+            artifacts/*.nupkg
+            artifacts/*.snupkg
+          if-no-files-found: error
+          retention-days: 7
