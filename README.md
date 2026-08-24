@@ -717,6 +717,16 @@ contract, `docs/VERSIONING.md` and `docs/COMPATIBILITY.md` for the 1.x promises,
 and `docs/FUTURE-WORK-INVENTORY.md` for the broader terminal-system dependency
 map. The 0.6.0 through 0.8.0 roadmaps remain historical frozen contracts.
 
+## Authors
+
+Inspired by original work from Bill Joy, author of the original `termcap`; Mary Ann (born Mark) Horton, author of `terminfo`; Pavel Curtis, author of `pcurses`; and Zeyd Ben-Halim, Eric S. Raymond, and Thomas Dickey, whose work developed and maintained `libtinfo` and ncurses.
+
+Managed .NET implementation by Timothy J. Bruce <uniblab@hotmail.com>.
+
+## Copyright
+
+Copyright (c) 2026 Timothy J. Bruce
+
 ## License
 
 Licensed under the GNU Lesser General Public License v3.0 or later. See `LICENSE`.
