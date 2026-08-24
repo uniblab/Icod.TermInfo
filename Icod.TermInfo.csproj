@@ -35,7 +35,7 @@
 		<ErrorReport>prompt</ErrorReport>
 		<WarningLevel>3</WarningLevel>
 		<DebugSymbols>true</DebugSymbols>
-		<DebugType>full</DebugType>
+		<DebugType>portable</DebugType>
 		<Optimize>false</Optimize>
 		<DefineConstants>TRACE</DefineConstants>
 		<SignAssembly>false</SignAssembly>

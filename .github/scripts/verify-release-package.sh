@@ -1,30 +1,50 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+usage() {
+  echo "Usage: verify-release-package.sh <artifact-directory> <Staging|Release>" >&2
+}
+
+if (( $# != 2 )); then
+  usage
+  exit 2
+fi
+
+artifact_dir="$1"
+configuration="$2"
+
+case "${configuration}" in
+  Staging|Release)
+    ;;
+  *)
+    usage
+    exit 2
+    ;;
+esac
+
 repository_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "${repository_root}"
 
-artifact_dir="${1:-artifacts}"
 mkdir -p "${artifact_dir}"
 artifact_dir="$(cd "${artifact_dir}" && pwd)"
 
 # Repository-only maintenance tools are executed on one explicit framework.
 dotnet run \
   --project tools/terminfo-metadata/Icod.TermInfo.MetadataGenerator.csproj \
-  -c Release \
+  -c "${configuration}" \
   -f net10.0 \
   -- --check
 
 # The reviewed 1.0 API baseline must remain exact.
-dotnet run   --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj   -c Release   --no-build   -- --check
+dotnet run   --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj   -c "${configuration}"   --no-build   -- --check
 
 # The two shipped target frameworks must expose the exact same API.
-dotnet run   --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj   -c Release   --no-build   -- --compare   bin/Release/net8.0/Icod.TermInfo.dll   bin/Release/net10.0/Icod.TermInfo.dll
+dotnet run   --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj   -c "${configuration}"   --no-build   -- --compare   bin/${configuration}/net8.0/Icod.TermInfo.dll   bin/${configuration}/net10.0/Icod.TermInfo.dll
 
 # Structural package, Source Link, dependency, and architecture verification.
 dotnet run \
   --project tools/package-verifier/Icod.TermInfo.PackageVerifier.csproj \
-  -c Release \
+  -c "${configuration}" \
   -f net10.0 \
   -- "${artifact_dir}"
 
@@ -61,14 +81,14 @@ dotnet restore \
 # The isolated consumer must execute against every supported target framework.
 dotnet run \
   --project "${smoke_root}/Icod.TermInfo.PackageSmoke.csproj" \
-  -c Release \
+  -c "${configuration}" \
   -f net8.0 \
   --no-restore \
   -p:IcodTermInfoPackageVersion="${package_version}"
 
 dotnet run \
   --project "${smoke_root}/Icod.TermInfo.PackageSmoke.csproj" \
-  -c Release \
+  -c "${configuration}" \
   -f net10.0 \
   --no-restore \
   -p:IcodTermInfoPackageVersion="${package_version}"
@@ -76,6 +96,6 @@ dotnet run \
 # The repository sample must retain a non-interactive path suitable for CI.
 dotnet run \
   --project samples/Icod.TermInfo.Sample/Icod.TermInfo.Sample.csproj \
-  -c Release \
+  -c "${configuration}" \
   -f net10.0 \
   -- --describe-only --profile ms-terminal-direct

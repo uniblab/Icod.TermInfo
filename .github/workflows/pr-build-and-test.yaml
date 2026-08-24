@@ -37,10 +37,10 @@ jobs:
             10.0.x
 
       - run: dotnet restore Icod.TermInfo.sln
-      - run: dotnet build Icod.TermInfo.sln -c Release --no-restore -p:ContinuousIntegrationBuild=true
-      - run: dotnet test Icod.TermInfo.sln -c Release --no-build --logger trx
-      - run: dotnet pack Icod.TermInfo.csproj -c Release --no-build --output artifacts
-      - run: bash .github/scripts/verify-release-package.sh artifacts
+      - run: dotnet build Icod.TermInfo.sln -c Staging --no-restore -p:ContinuousIntegrationBuild=true
+      - run: dotnet test Icod.TermInfo.sln -c Staging --no-build --logger trx
+      - run: dotnet pack Icod.TermInfo.csproj -c Staging --no-build --output artifacts
+      - run: bash .github/scripts/verify-release-package.sh artifacts Staging
 
       - uses: actions/upload-artifact@v4
         with:

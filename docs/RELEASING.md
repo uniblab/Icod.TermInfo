@@ -44,10 +44,11 @@ both repository sample executables and solution-contained maintenance tools.
 
 After the Staging matrix succeeds, a separate Ubuntu package-validation job:
 
-1. restores and builds Release with `ContinuousIntegrationBuild=true`;
-2. runs the Release test suite;
-3. packs `Icod.TermInfo.csproj` into a runner-local `artifacts` directory;
-4. runs `.github/scripts/verify-release-package.sh artifacts`;
+1. restores and builds Staging with `ContinuousIntegrationBuild=true`;
+2. runs the Staging test suite;
+3. packs `Icod.TermInfo.csproj` in Staging into a runner-local `artifacts`
+   directory;
+4. runs `.github/scripts/verify-release-package.sh artifacts Staging`;
 5. uploads the validated `.nupkg` and `.snupkg` as the
    `icod-terminfo-pr-packages` Actions artifact for seven days.
 
@@ -77,7 +78,7 @@ After that matrix succeeds, the Ubuntu package-validation job:
 1. restores and builds Release with `ContinuousIntegrationBuild=true`;
 2. runs the Release test suite;
 3. packs `Icod.TermInfo.csproj` into `artifacts`;
-4. runs `.github/scripts/verify-release-package.sh artifacts`;
+4. runs `.github/scripts/verify-release-package.sh artifacts Release`;
 5. uploads the exact `.nupkg` and `.snupkg` as workflow artifacts.
 
 After package validation succeeds, the `Release` deployment job downloads those
@@ -136,21 +137,24 @@ dotnet test Icod.TermInfo.sln -c Release
 dotnet pack Icod.TermInfo.csproj -c Release --output artifacts
 ```
 
-Then run the package verifier appropriate to the host.
+Then run the package verifier with the same configuration used to build and pack.
 
-On Windows Command Prompt:
-
-```text
-.github\scripts\verify-release-package.cmd artifacts
-```
-
-On a Bash-capable host:
+For Staging:
 
 ```text
-bash .github/scripts/verify-release-package.sh artifacts
+.github\scripts\verify-release-package.cmd artifacts Staging
+bash .github/scripts/verify-release-package.sh artifacts Staging
 ```
 
-Both wrappers are intended to provide the same validation contract.
+For final Release validation:
+
+```text
+.github\scripts\verify-release-package.cmd artifacts Release
+bash .github/scripts/verify-release-package.sh artifacts Release
+```
+
+Both wrappers reject configurations other than `Staging` and `Release` and
+otherwise provide the same validation contract.
 
 ## Automated publication
 

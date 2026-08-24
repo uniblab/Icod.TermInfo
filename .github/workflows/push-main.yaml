@@ -46,7 +46,7 @@ jobs:
       - run: dotnet build Icod.TermInfo.sln -c Release --no-restore -p:ContinuousIntegrationBuild=true
       - run: dotnet test Icod.TermInfo.sln -c Release --no-build --logger trx
       - run: dotnet pack Icod.TermInfo.csproj -c Release --no-build --output artifacts
-      - run: bash .github/scripts/verify-release-package.sh artifacts
+      - run: bash .github/scripts/verify-release-package.sh artifacts Release
 
       - uses: actions/upload-artifact@v4
         with:

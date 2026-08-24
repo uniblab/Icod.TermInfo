@@ -174,11 +174,33 @@ public sealed class T42ContractTests
 			"pull_request:",
 			pushMain);
 		Assert.Contains(
-			"dotnet pack Icod.TermInfo.csproj",
+			"dotnet build Icod.TermInfo.sln -c Staging",
 			pullRequest);
 		Assert.Contains(
-			"verify-release-package.sh artifacts",
+			"dotnet test Icod.TermInfo.sln -c Staging",
 			pullRequest);
+		Assert.Contains(
+			"dotnet pack Icod.TermInfo.csproj -c Staging",
+			pullRequest);
+		Assert.Contains(
+			"verify-release-package.sh artifacts Staging",
+			pullRequest);
+		Assert.DoesNotContain(
+			"-c Release",
+			pullRequest);
+
+		Assert.Contains(
+			"dotnet build Icod.TermInfo.sln -c Release",
+			pushMain);
+		Assert.Contains(
+			"dotnet test Icod.TermInfo.sln -c Release",
+			pushMain);
+		Assert.Contains(
+			"dotnet pack Icod.TermInfo.csproj -c Release",
+			pushMain);
+		Assert.Contains(
+			"verify-release-package.sh artifacts Release",
+			pushMain);
 		Assert.Contains(
 			"actions/upload-artifact@v4",
 			pullRequest);
