@@ -93,11 +93,5 @@
 			<Pack>true</Pack>
 			<PackagePath>\</PackagePath>
 		</Content>
-		<Content Include="LICENSE">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-			<TargetPath>$(AssemblyName).LICENSE.txt</TargetPath>
-			<Pack>true</Pack>
-			<PackagePath>\</PackagePath>
-		</Content>
 	</ItemGroup>
 </Project>
