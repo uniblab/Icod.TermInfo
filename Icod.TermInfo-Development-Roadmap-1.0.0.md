@@ -4,7 +4,7 @@
 **Package:** `Icod.TermInfo`
 **Supported target frameworks:** `net8.0`, `net10.0`
 **Language:** C# 13
-**Status:** Active — T44 documentation/package freeze; T42/T43 acceptance evidence pending
+**Status:** T45 final candidate — release validation and human-owned acceptance evidence pending
 **Previous contract:** `0.9.0` — arbitrary compiled terminfo acquisition
 **Contract target:** `1.0.0`
 **Initial development version:** `1.0.0-alpha.1`
@@ -211,7 +211,7 @@ acceptance evidence rather than being inferred from source presence.
 ## T44 — 1.0 Documentation and Package Freeze
 
 **Development version:** `1.0.0-rc.1`
-**Status:** Implementation in progress
+**Status:** Implementation complete — acceptance evidence pending
 **Implementation record:** `docs/1.0.0-T44-DOCUMENTATION-PACKAGE-FREEZE.md`
 
 T44 SHALL:
@@ -250,6 +250,11 @@ Before T44 is marked complete:
 ## T45 — 1.0.0 Completion Gate
 
 **Final version:** `1.0.0`
+**Status:** Implementation complete — final release sign-off pending
+**Implementation record:** `docs/1.0.0-CONTRACT-AUDIT.md`
+
+T45 makes only the final package/documentation/test-gate transition. It adds no
+production runtime feature or public signature.
 
 Before tagging `v1.0.0`, require:
 
@@ -268,6 +273,11 @@ Before tagging `v1.0.0`, require:
 
 No source or package-content change is permitted between the successful final
 validation and the `v1.0.0` tag without rerunning the completion gate.
+
+The T45 implementation does not manufacture the human-reviewed T42 API baseline
+or infer the pinned ncurses differential result. Those remain mandatory
+acceptance evidence and are enforced/documented by the release-verification
+path and final contract audit.
 
 ---
 

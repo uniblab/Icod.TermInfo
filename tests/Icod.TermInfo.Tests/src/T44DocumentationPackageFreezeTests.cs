@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Xml.Linq;
 using Icod.TermInfo;
 using Xunit;
@@ -7,35 +6,6 @@ namespace Icod.TermInfo.Tests;
 
 public sealed class T44DocumentationPackageFreezeTests
 {
-	[Fact]
-	public void AssemblyIdentifiesT44ReleaseCandidate()
-	{
-		Assembly assembly =
-			typeof(TerminalDescription).Assembly;
-		AssemblyName assemblyName =
-			assembly.GetName();
-		string? informationalVersion =
-			assembly
-				.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-				?.InformationalVersion;
-
-		Assert.Equal(
-			new Version(1, 0, 0, 0),
-			assemblyName.Version);
-		Assert.NotNull(
-			informationalVersion);
-
-		string semanticVersion =
-			informationalVersion!
-				.Split(
-					'+',
-					2)[0];
-
-		Assert.Equal(
-			"1.0.0-rc.1",
-			semanticVersion);
-	}
-
 	[Fact]
 	public void ReleaseBuildMakesMissingPublicXmlDocumentationFatal()
 	{
@@ -137,34 +107,6 @@ public sealed class T44DocumentationPackageFreezeTests
 		Assert.Contains(
 			"macOS",
 			compatibility);
-	}
-
-	[Fact]
-	public void ReadmeIdentifiesReleaseCandidateAndSupportedTargets()
-	{
-		string root =
-			FindRepositoryRoot();
-		string readme =
-			File.ReadAllText(
-				Path.Combine(
-					root,
-					"README.md"));
-
-		Assert.Contains(
-			"1.0.0-rc.1",
-			readme);
-		Assert.Contains(
-			"net8.0",
-			readme);
-		Assert.Contains(
-			"net10.0",
-			readme);
-		Assert.Contains(
-			"docs/VERSIONING.md",
-			readme);
-		Assert.Contains(
-			"docs/COMPATIBILITY.md",
-			readme);
 	}
 
 	[Fact]

@@ -188,10 +188,13 @@ usage remains consolidated in `docs/0.9.0-ACQUISITION-GUIDE.md`.
 
 For 1.0, use:
 
-- `Icod.TermInfo-Development-Roadmap-1.0.0.md` for the active gate contract;
+- `Icod.TermInfo-Development-Roadmap-1.0.0.md` for the final gate contract;
 - `docs/1.0.0-T42-CONTRACT-API-AUDIT.md` for assembly/support/API-baseline policy;
 - `docs/1.0.0-T43-ROBUSTNESS-COMPATIBILITY.md` for robustness/package metadata;
 - `docs/1.0.0-T44-DOCUMENTATION-PACKAGE-FREEZE.md` for the RC freeze;
+- `docs/1.0.0-CONTRACT-AUDIT.md` for final T45 release sign-off requirements;
 - `docs/VERSIONING.md` and `docs/COMPATIBILITY.md` for the stable 1.x promises.
 
-The final T45 contract audit owns the exact `v1.0.0` completion evidence.
+The final `v1.0.0` tag must identify the exact validated and published `main`
+commit; do not edit the audit or any other source/package content after that
+validation without rerunning the completion gate.

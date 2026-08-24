@@ -2,16 +2,16 @@
 
 `Icod.TermInfo` is a managed, dependency-free .NET implementation of the low-level terminal-capability model traditionally supplied by `libtinfo`.
 
-Version 1.0 is the stability release for the semantic and acquisition work completed through 0.9. `1.0.0-rc.1` freezes the documentation, package shape, target-framework contract, and compatibility policy before the final completion gate.
+Version 1.0.0 is the stable public-contract release for the semantic and acquisition work completed through 0.9 and hardened through the 1.0 readiness gates.
 
 The package targets `net8.0` and `net10.0`, uses C# 13, contains no native ncurses/terminfo payload, and is intended to run on Windows, Linux, and macOS.
 
 ## Install
 
-For the current 1.0 release candidate:
+For the 1.0.0 release:
 
 ```text
-dotnet add package Icod.TermInfo --version 1.0.0-rc.1
+dotnet add package Icod.TermInfo --version 1.0.0
 ```
 
 The same package contents are intended for NuGet.org and GitHub Packages. Repository development can reference `Icod.TermInfo.csproj` directly, as the sample project does.
@@ -693,11 +693,11 @@ not require Bash or Python.
 Only pushes to `main` run the Release build/test, package-validation, and publication workflow. Pull requests run the separate `pr-build-and-test.yaml` validation workflow and never publish packages. After the `main` Release matrix succeeds, package validation verifies the exact artifacts and the downstream `Release` deployment job publishes them to NuGet.org and GitHub Packages.
 
 See `docs/RELEASING.md` for the release procedure,
-`Icod.TermInfo-Development-Roadmap-1.0.0.md` for the active 1.0 contract, and
-`docs/1.0.0-T44-DOCUMENTATION-PACKAGE-FREEZE.md` for the RC freeze. The final
-`v1.0.0` tag belongs only to the exact T45 commit which passes the complete
-workflow; no source or package content should change between final validation
-and tagging.
+`Icod.TermInfo-Development-Roadmap-1.0.0.md` for the 1.0 contract, and
+`docs/1.0.0-CONTRACT-AUDIT.md` for the final T45 sign-off requirements. Tag
+`v1.0.0` only on the exact `main` commit whose complete Release validation and
+publication succeeded; no source or package content may change between that
+validation and tagging.
 
 ## Scope
 
