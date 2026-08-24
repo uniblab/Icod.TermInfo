@@ -143,20 +143,20 @@ public sealed class T42ContractTests
 						"workflows",
 						"push-main.yaml")));
 
-		Assert.Contains(
-			"dotnet-version: |\n"
-			+ "            8.0.x\n"
-			+ "            10.0.x\n",
-			pullRequest);
-		Assert.True(
+		Assert.Equal(
+			1,
+			CountOccurrences(
+				pullRequest,
+				"dotnet-version: |\n"
+				+ "            8.0.x\n"
+				+ "            10.0.x\n"));
+		Assert.Equal(
+			1,
 			CountOccurrences(
 				pushMain,
 				"dotnet-version: |\n"
 				+ "            8.0.x\n"
-				+ "            10.0.x\n")
-				>= 2,
-			"The main build/test and package-validation jobs must install "
-				+ "both supported SDK/runtime lines.");
+				+ "            10.0.x\n"));
 
 		Assert.StartsWith(
 			"name: build and publish\n"
@@ -169,8 +169,51 @@ public sealed class T42ContractTests
 		Assert.DoesNotContain(
 			"pull_request:",
 			pushMain);
+		Assert.Contains(
+			"dotnet build Icod.TermInfo.sln -c Staging",
+			pullRequest);
+		Assert.Contains(
+			"dotnet test Icod.TermInfo.sln -c Staging",
+			pullRequest);
+		Assert.Contains(
+			"dotnet pack Icod.TermInfo.csproj -c Staging",
+			pullRequest);
+		Assert.Contains(
+			"verify-release-package.sh artifacts Staging",
+			pullRequest);
+		Assert.Contains(
+			"if: matrix.os == 'ubuntu-latest'",
+			pullRequest);
 		Assert.DoesNotContain(
-			"dotnet pack",
+			"\n  package-validation:\n",
+			pullRequest);
+		Assert.DoesNotContain(
+			"-c Release",
+			pullRequest);
+
+		Assert.Contains(
+			"dotnet build Icod.TermInfo.sln -c Release",
+			pushMain);
+		Assert.Contains(
+			"dotnet test Icod.TermInfo.sln -c Release",
+			pushMain);
+		Assert.Contains(
+			"dotnet pack Icod.TermInfo.csproj -c Release",
+			pushMain);
+		Assert.Contains(
+			"verify-release-package.sh artifacts Release",
+			pushMain);
+		Assert.Contains(
+			"if: matrix.os == 'ubuntu-latest'",
+			pushMain);
+		Assert.DoesNotContain(
+			"\n  package-validation:\n",
+			pushMain);
+		Assert.Contains(
+			"actions/upload-artifact@v4",
+			pullRequest);
+		Assert.Contains(
+			"name: icod-terminfo-pr-packages",
 			pullRequest);
 		Assert.DoesNotContain(
 			"dotnet nuget push",

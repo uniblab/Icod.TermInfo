@@ -32,8 +32,8 @@ This document describes the current validation and publication procedure for
 
 ### Pull requests
 
-`.github/workflows/pr-build-and-test.yaml` currently runs the solution in the
-repository `Staging` configuration on:
+`.github/workflows/pr-build-and-test.yaml` runs the solution in the repository
+`Staging` configuration on:
 
 - `windows-latest`;
 - `ubuntu-latest`;
@@ -42,8 +42,28 @@ repository `Staging` configuration on:
 Each matrix job cleans, restores, builds, and tests the whole solution, including
 both repository sample executables and solution-contained maintenance tools.
 
-The pull-request workflow is validation-only. It must not pack or publish
-packages, request publication credentials, or contain a deployment job.
+The Ubuntu matrix leg continues after the shared Staging build/test steps and:
+
+1. packs `Icod.TermInfo.csproj` into a runner-local `artifacts` directory;
+2. runs `.github/scripts/verify-release-package.sh artifacts Staging`;
+3. uploads the validated `.nupkg` and `.snupkg` as the
+   `icod-terminfo-pr-packages` Actions artifact for seven days.
+
+There is no second checkout/restore/build/test package-validation job; the
+package is produced from the same Staging outputs which just passed the Ubuntu
+matrix tests.
+
+That verifier covers generated capability metadata, the approved public API
+baseline, net8/net10 API equivalence, package structure/metadata/XML/symbols,
+both fresh-package consumers, and the non-interactive repository sample.
+
+The PR artifact is uploaded only after verification succeeds. It is intended for
+inspection, installation, and testing and is not a registry publication.
+
+Packing and uploading a GitHub Actions artifact on a pull request is validation,
+not publication. The pull-request workflow has only `contents: read` permission
+and must not request OIDC or package-write permission, authenticate to a package
+registry, push a package, or contain a deployment job.
 
 ### Pushes to main
 
@@ -54,13 +74,15 @@ the Release build/test matrix on:
 - `ubuntu-latest`;
 - `macos-latest`.
 
-After that matrix succeeds, the Ubuntu package-validation job:
+The Ubuntu matrix leg continues after the shared Release build/test steps and:
 
-1. restores and builds Release with `ContinuousIntegrationBuild=true`;
-2. runs the Release test suite;
-3. packs `Icod.TermInfo.csproj` into `artifacts`;
-4. runs `.github/scripts/verify-release-package.sh artifacts`;
-5. uploads the exact `.nupkg` and `.snupkg` as workflow artifacts.
+1. packs `Icod.TermInfo.csproj` into `artifacts`;
+2. runs `.github/scripts/verify-release-package.sh artifacts Release`;
+3. uploads the exact `.nupkg` and `.snupkg` as workflow artifacts.
+
+There is no second checkout/restore/build/test package-validation job. The
+deployment job waits for the complete three-OS matrix and then downloads the
+artifact produced and verified by the Ubuntu leg.
 
 After package validation succeeds, the `Release` deployment job downloads those
 exact artifacts and publishes the `.nupkg` to NuGet.org and GitHub Packages. The
@@ -118,29 +140,32 @@ dotnet test Icod.TermInfo.sln -c Release
 dotnet pack Icod.TermInfo.csproj -c Release --output artifacts
 ```
 
-Then run the package verifier appropriate to the host.
+Then run the package verifier with the same configuration used to build and pack.
 
-On Windows Command Prompt:
-
-```text
-.github\scripts\verify-release-package.cmd artifacts
-```
-
-On a Bash-capable host:
+For Staging:
 
 ```text
-bash .github/scripts/verify-release-package.sh artifacts
+.github\scripts\verify-release-package.cmd artifacts Staging
+bash .github/scripts/verify-release-package.sh artifacts Staging
 ```
 
-Both wrappers are intended to provide the same validation contract.
+For final Release validation:
+
+```text
+.github\scripts\verify-release-package.cmd artifacts Release
+bash .github/scripts/verify-release-package.sh artifacts Release
+```
+
+Both wrappers reject configurations other than `Staging` and `Release` and
+otherwise provide the same validation contract.
 
 ## Automated publication
 
 The current `push-main.yaml` workflow watches only `main` and publishes only
-after the Release matrix and package-validation job succeed. Pull-request and
-development-branch pushes do not publish packages. The deploy job consumes the
-package artifact uploaded by package validation rather than repacking the
-repository.
+after the complete Release matrix succeeds, including the Ubuntu-only
+pack/verify/upload steps. Pull-request and development-branch pushes do not
+publish packages. The deploy job consumes that validated matrix artifact rather
+than repacking the repository.
 
 Before merging or pushing a release-ready commit to `main`:
 

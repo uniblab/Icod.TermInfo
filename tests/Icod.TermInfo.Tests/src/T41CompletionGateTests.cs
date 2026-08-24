@@ -128,7 +128,10 @@ public sealed class T41CompletionGateTests
 			"pull_request:",
 			pushMain);
 		Assert.Contains(
-			"dotnet pack Icod.TermInfo.csproj",
+			"dotnet pack Icod.TermInfo.csproj -c Release",
+			pushMain);
+		Assert.Contains(
+			"verify-release-package.sh artifacts Release",
 			pushMain);
 		Assert.Contains(
 			"NuGet/login@v1",
@@ -143,12 +146,35 @@ public sealed class T41CompletionGateTests
 			+ "on:\n"
 			+ "  pull_request:\n"
 			+ "\n"
+			+ "permissions:\n"
+			+ "  contents: read\n"
+			+ "\n"
 			+ "jobs:\n",
+			pullRequest);
+		Assert.Contains(
+			"dotnet pack Icod.TermInfo.csproj -c Staging",
+			pullRequest);
+		Assert.Contains(
+			"verify-release-package.sh artifacts Staging",
+			pullRequest);
+		Assert.DoesNotContain(
+			"-c Release",
+			pullRequest);
+		Assert.Contains(
+			"actions/upload-artifact@v4",
+			pullRequest);
+		Assert.Contains(
+			"name: icod-terminfo-pr-packages",
+			pullRequest);
+		Assert.Contains(
+			"artifacts/*.nupkg",
+			pullRequest);
+		Assert.Contains(
+			"artifacts/*.snupkg",
 			pullRequest);
 
 		string[] forbiddenPublicationFragments =
 		[
-			"dotnet pack",
 			"NuGet/login",
 			"dotnet nuget push",
 			"packages: write",

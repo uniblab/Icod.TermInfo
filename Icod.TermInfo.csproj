@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<Copyright>2026</Copyright>
+		<Copyright>Copyright (c) 2026 Timothy J. Bruce</Copyright>
 		<LangVersion>13.0</LangVersion>
 		<OutputType>Library</OutputType>
 		<TargetFrameworks>net8.0;net10.0</TargetFrameworks>
@@ -35,7 +35,7 @@
 		<ErrorReport>prompt</ErrorReport>
 		<WarningLevel>3</WarningLevel>
 		<DebugSymbols>true</DebugSymbols>
-		<DebugType>full</DebugType>
+		<DebugType>portable</DebugType>
 		<Optimize>false</Optimize>
 		<DefineConstants>TRACE</DefineConstants>
 		<SignAssembly>false</SignAssembly>
@@ -56,8 +56,8 @@
 		<PackageId>Icod.TermInfo</PackageId>
 		<Title>Icod.TermInfo</Title>
 		<Authors>Timothy J. Bruce</Authors>
-		<Description>Managed .NET terminfo capability information with complete standard metadata, compiled-database acquisition, ANSI/DEC/xterm and Windows profiles, parameter expansion, and padding-aware output.</Description>
-		<PackageReleaseNotes>1.0.0: stable dual-target managed terminfo contract for net8.0 and net10.0, including complete standard and extended capability semantics, conventional compiled-database acquisition, deterministic discovery and provider composition, parameter expansion, padding-aware output, built-in ANSI/DEC/xterm/Windows profiles, frozen 1.x assembly identity, XML documentation, symbols, Source Link, and compatibility/package gates.</PackageReleaseNotes>
+		<Description>Managed, dependency-free .NET terminfo library for terminal capability metadata, compiled terminfo parsing and database discovery, ANSI/DEC/xterm and Windows profiles, parameter expansion, color semantics, and padding-aware output.</Description>
+		<PackageReleaseNotes>1.0.0 is the first production-ready release of Icod.TermInfo: a stable, dependency-free managed terminfo library for net8.0 and net10.0. It provides complete standard and extended capability semantics; conventional compiled terminfo parsing and deterministic environment/user/system discovery; explicit provider composition and caching; parameter expansion; padding-aware output; indexed/direct-RGB color helpers; built-in ANSI/DEC/xterm/Windows profiles; frozen 1.x assembly identity; XML documentation; portable symbols and Source Link; and public-API/package/fresh-consumer compatibility gates.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>

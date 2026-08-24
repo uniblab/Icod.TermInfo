@@ -664,24 +664,29 @@ dotnet restore Icod.TermInfo.sln
 dotnet build Icod.TermInfo.sln -c Debug
 dotnet test Icod.TermInfo.sln -c Debug
 
+dotnet build Icod.TermInfo.sln -c Staging
+dotnet test Icod.TermInfo.sln -c Staging
+dotnet pack Icod.TermInfo.csproj -c Staging --output artifacts
+
 dotnet build Icod.TermInfo.sln -c Release
 dotnet test Icod.TermInfo.sln -c Release
-
 dotnet pack Icod.TermInfo.csproj -c Release --output artifacts
 ```
 
-Then run the release verifier appropriate to the host.
+Use the verifier with the same configuration used to build and pack.
 
-On Windows Command Prompt:
+For Staging validation:
 
 ```text
-.github\scripts\verify-release-package.cmd artifacts
+.github\scripts\verify-release-package.cmd artifacts Staging
+bash .github/scripts/verify-release-package.sh artifacts Staging
 ```
 
-On a Bash-capable host:
+For final Release validation:
 
 ```text
-bash .github/scripts/verify-release-package.sh artifacts
+.github\scripts\verify-release-package.cmd artifacts Release
+bash .github/scripts/verify-release-package.sh artifacts Release
 ```
 
 Both wrappers run the same capability-metadata check, approved API-baseline
@@ -690,7 +695,10 @@ package-reference-only smoke consumer on both target frameworks, and the
 sample's non-interactive `--describe-only` path. Windows package validation does
 not require Bash or Python.
 
-Only pushes to `main` run the Release build/test, package-validation, and publication workflow. Pull requests run the separate `pr-build-and-test.yaml` validation workflow and never publish packages. After the `main` Release matrix succeeds, package validation verifies the exact artifacts and the downstream `Release` deployment job publishes them to NuGet.org and GitHub Packages.
+Pull requests use Staging throughout, may upload the verified `.nupkg` and
+`.snupkg` as short-lived GitHub Actions artifacts, and never publish packages.
+Only pushes to `main` run the Release build/test/package-validation/publication
+workflow.
 
 See `docs/RELEASING.md` for the release procedure,
 `Icod.TermInfo-Development-Roadmap-1.0.0.md` for the 1.0 contract, and
@@ -708,6 +716,16 @@ contract, `Icod.TermInfo-Development-Roadmap-1.0.0.md` for the 1.0 stability
 contract, `docs/VERSIONING.md` and `docs/COMPATIBILITY.md` for the 1.x promises,
 and `docs/FUTURE-WORK-INVENTORY.md` for the broader terminal-system dependency
 map. The 0.6.0 through 0.8.0 roadmaps remain historical frozen contracts.
+
+## Authors
+
+Inspired by original work from Bill Joy, author of the original `termcap`; Mary Ann (born Mark) Horton, author of `terminfo`; Pavel Curtis, author of `pcurses`; and Zeyd Ben-Halim, Eric S. Raymond, and Thomas Dickey, whose work developed and maintained `libtinfo` and ncurses.
+
+Managed .NET implementation by Timothy J. Bruce <uniblab@hotmail.com>.
+
+## Copyright
+
+Copyright (c) 2026 Timothy J. Bruce
 
 ## License
 

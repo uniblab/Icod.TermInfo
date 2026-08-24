@@ -1,0 +1,941 @@
+# Icod.TermInfo public API baseline
+# Format: Icod.TermInfo.PublicApiSnapshot/v1
+# AssemblyVersion: 1.0.0.0
+
+TYPE enum Icod.TermInfo.BooleanCapability [sealed]
+  INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  UNDERLYING System.Int32
+  ENUM AutoLeftMargin = 11
+  ENUM AutoRightMargin = 0
+  ENUM BackColorErase = 6
+  ENUM BackspacesWithBs = 37
+  ENUM CanChangeColor = 7
+  ENUM CeolStandoutGlitch = 13
+  ENUM ColAddrGlitch = 30
+  ENUM CpiChangesRes = 35
+  ENUM CrCancelsMicroMode = 31
+  ENUM CrtNoScrolling = 38
+  ENUM DestTabsMagicSmso = 22
+  ENUM EatNewlineGlitch = 3
+  ENUM EraseOverstrike = 14
+  ENUM GenericType = 1
+  ENUM GnuHasMetaKey = 40
+  ENUM HardCopy = 15
+  ENUM HardCursor = 27
+  ENUM HasHardwareTabs = 42
+  ENUM HasMetaKey = 9
+  ENUM HasPrintWheel = 32
+  ENUM HasStatusLine = 16
+  ENUM HueLightnessSaturation = 8
+  ENUM InsertNullGlitch = 17
+  ENUM LinefeedIsNewline = 41
+  ENUM LpiChangesRes = 36
+  ENUM MemoryAbove = 18
+  ENUM MemoryBelow = 19
+  ENUM MoveInsertMode = 5
+  ENUM MoveStandoutMode = 2
+  ENUM NeedsXonXoff = 25
+  ENUM NoCorrectlyWorkingCr = 39
+  ENUM NoEscCtlc = 12
+  ENUM NoPadCharacter = 10
+  ENUM NonDestScrollRegion = 29
+  ENUM NonRevRmcup = 28
+  ENUM OverStrike = 20
+  ENUM PrtrSilent = 26
+  ENUM ReturnDoesClrEol = 43
+  ENUM RowAddrGlitch = 33
+  ENUM SemiAutoRightMargin = 34
+  ENUM StatusLineEscOk = 21
+  ENUM TildeGlitch = 23
+  ENUM TransparentUnderline = 24
+  ENUM XonXoff = 4
+END
+
+TYPE class Icod.TermInfo.CompiledTermInfoFormatException [sealed]
+  BASE System.FormatException
+  INTERFACES System.Runtime.Serialization.ISerializable
+  CTOR public CompiledTermInfoFormatException()
+  CTOR public CompiledTermInfoFormatException(System.String message null=nullable/nullable)
+  CTOR public CompiledTermInfoFormatException(System.String message null=nullable/nullable, System.Exception innerException null=nullable/nullable)
+  PROPERTY System.Int32 Offset { public get; } null=not-null/unknown
+  PROPERTY System.String Section { public get; } null=nullable/unknown
+END
+
+TYPE class Icod.TermInfo.CompiledTermInfoParser [static]
+  METHOD public static Icod.TermInfo.TerminalDescription Parse(System.ReadOnlySpan<System.Byte> entry null=not-null/not-null<not-null/not-null>, Icod.TermInfo.CompiledTermInfoParserOptions options null=nullable/nullable default=null) return-null=not-null/not-null
+END
+
+TYPE class Icod.TermInfo.CompiledTermInfoParserOptions [sealed]
+  FIELD public static const System.Int32 DefaultMaximumEntrySize null=not-null/not-null value=1048576
+  FIELD public static const System.Int32 MaximumSupportedEntrySize null=not-null/not-null value=16777216
+  CTOR public CompiledTermInfoParserOptions(System.Int32 maximumEntrySize null=not-null/not-null default=1048576)
+  PROPERTY System.Int32 MaximumEntrySize { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.DirectoryTerminalDescriptionProvider [sealed]
+  INTERFACES Icod.TermInfo.ITerminalDescriptionProvider
+  CTOR public DirectoryTerminalDescriptionProvider(System.String root null=not-null/not-null, Icod.TermInfo.CompiledTermInfoParserOptions parserOptions null=nullable/nullable default=null)
+  PROPERTY System.String Root { public get; } null=not-null/unknown
+  METHOD public System.Boolean TryLoad(System.String name null=not-null/not-null, out Icod.TermInfo.TerminalDescription terminal null=nullable/nullable attrs=NotNullWhenAttribute(true)) return-null=not-null/not-null
+END
+
+TYPE interface Icod.TermInfo.ITermInfoDelayProvider [abstract]
+  METHOD public abstract System.Threading.Tasks.ValueTask DelayAsync(Icod.TermInfo.TermInfoDelay delay null=not-null/not-null, System.Threading.CancellationToken cancellationToken null=not-null/not-null default=null) return-null=not-null/not-null
+  METHOD public abstract System.Void Delay(Icod.TermInfo.TermInfoDelay delay null=not-null/not-null) return-null=not-null/not-null
+END
+
+TYPE interface Icod.TermInfo.ITerminalDescriptionProvider [abstract]
+  METHOD public abstract System.Boolean TryLoad(System.String name null=not-null/not-null, out Icod.TermInfo.TerminalDescription terminal null=nullable/nullable attrs=NotNullWhenAttribute(true)) return-null=not-null/not-null
+END
+
+TYPE class Icod.TermInfo.InMemoryTerminalDescriptionProvider [sealed]
+  INTERFACES Icod.TermInfo.ITerminalDescriptionProvider
+  CTOR public InMemoryTerminalDescriptionProvider(System.Collections.Generic.IEnumerable<Icod.TermInfo.TerminalDescription> terminals null=not-null/not-null<not-null/not-null>)
+  METHOD public System.Boolean TryLoad(System.String name null=not-null/not-null, out Icod.TermInfo.TerminalDescription terminal null=nullable/nullable attrs=NotNullWhenAttribute(true)) return-null=not-null/not-null
+END
+
+TYPE enum Icod.TermInfo.NumericCapability [sealed]
+  INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  UNDERLYING System.Int32
+  ENUM BackspaceDelay = 36
+  ENUM BitImageEntwining = 31
+  ENUM BitImageType = 32
+  ENUM BufferCapacity = 16
+  ENUM Buttons = 30
+  ENUM CarriageReturnDelay = 34
+  ENUM ColorPairs = 3
+  ENUM Colors = 2
+  ENUM Columns = 0
+  ENUM DotHorzSpacing = 18
+  ENUM DotVertSpacing = 17
+  ENUM HorizontalTabDelay = 37
+  ENUM InitialTabWidth = 4
+  ENUM LabelHeight = 12
+  ENUM LabelWidth = 13
+  ENUM Lines = 1
+  ENUM LinesOfMemory = 7
+  ENUM MagicCookieGlitch = 8
+  ENUM MagicCookieGlitchUl = 33
+  ENUM MaxAttributes = 14
+  ENUM MaxMicroAddress = 19
+  ENUM MaxMicroJump = 20
+  ENUM MaximumWindows = 15
+  ENUM MicroColSize = 21
+  ENUM MicroLineSize = 22
+  ENUM NewLineDelay = 35
+  ENUM NoColorVideo = 6
+  ENUM NumLabels = 11
+  ENUM NumberOfFunctionKeys = 38
+  ENUM NumberOfPins = 23
+  ENUM OutputResChar = 24
+  ENUM OutputResHorzInch = 26
+  ENUM OutputResLine = 25
+  ENUM OutputResVertInch = 27
+  ENUM PaddingBaudRate = 9
+  ENUM PrintRate = 28
+  ENUM VirtualTerminal = 5
+  ENUM WideCharSize = 29
+  ENUM WidthStatusLine = 10
+END
+
+TYPE enum Icod.TermInfo.PaddingMode [sealed]
+  INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  UNDERLYING System.Int32
+  ENUM Delay = 1
+  ENUM Ignore = 0
+  ENUM PadCharacters = 2
+END
+
+TYPE class Icod.TermInfo.StandardCapabilityCatalog [static]
+  PROPERTY static System.Collections.Generic.IReadOnlyList<Icod.TermInfo.StandardCapabilityMetadata<Icod.TermInfo.BooleanCapability>> BooleanCapabilities { public get; } null=not-null/unknown<not-null/not-null<not-null/not-null>>
+  PROPERTY static System.Collections.Generic.IReadOnlyList<Icod.TermInfo.StandardCapabilityMetadata<Icod.TermInfo.NumericCapability>> NumericCapabilities { public get; } null=not-null/unknown<not-null/not-null<not-null/not-null>>
+  PROPERTY static System.Collections.Generic.IReadOnlyList<Icod.TermInfo.StandardCapabilityMetadata<Icod.TermInfo.StringCapability>> StringCapabilities { public get; } null=not-null/unknown<not-null/not-null<not-null/not-null>>
+  METHOD public static Icod.TermInfo.StandardCapabilityMetadata<Icod.TermInfo.BooleanCapability> GetMetadata(Icod.TermInfo.BooleanCapability capability null=not-null/not-null) return-null=not-null/not-null<not-null/not-null>
+  METHOD public static Icod.TermInfo.StandardCapabilityMetadata<Icod.TermInfo.NumericCapability> GetMetadata(Icod.TermInfo.NumericCapability capability null=not-null/not-null) return-null=not-null/not-null<not-null/not-null>
+  METHOD public static Icod.TermInfo.StandardCapabilityMetadata<Icod.TermInfo.StringCapability> GetMetadata(Icod.TermInfo.StringCapability capability null=not-null/not-null) return-null=not-null/not-null<not-null/not-null>
+  METHOD public static System.Boolean TryGetBoolean(System.String shortName null=not-null/not-null, out Icod.TermInfo.StandardCapabilityMetadata<Icod.TermInfo.BooleanCapability> metadata null=nullable/nullable<not-null/not-null> attrs=NotNullWhenAttribute(true)) return-null=not-null/not-null
+  METHOD public static System.Boolean TryGetNumeric(System.String shortName null=not-null/not-null, out Icod.TermInfo.StandardCapabilityMetadata<Icod.TermInfo.NumericCapability> metadata null=nullable/nullable<not-null/not-null> attrs=NotNullWhenAttribute(true)) return-null=not-null/not-null
+  METHOD public static System.Boolean TryGetString(System.String shortName null=not-null/not-null, out Icod.TermInfo.StandardCapabilityMetadata<Icod.TermInfo.StringCapability> metadata null=nullable/nullable<not-null/not-null> attrs=NotNullWhenAttribute(true)) return-null=not-null/not-null
+END
+
+TYPE class Icod.TermInfo.StandardCapabilityMetadata<TCapability> [sealed]
+  GENERIC TCapability : struct, System.Enum, new()
+  PROPERTY Icod.TermInfo.TermInfoCapabilityValueKind Kind { public get; } null=not-null/unknown
+  PROPERTY System.Int32 BinaryIndex { public get; } null=not-null/unknown
+  PROPERTY System.String LongName { public get; } null=not-null/unknown
+  PROPERTY System.String ShortName { public get; } null=not-null/unknown
+  PROPERTY System.String TermcapCode { public get; } null=not-null/unknown
+  PROPERTY TCapability Capability { public get; } null=not-null/unknown
+END
+
+TYPE enum Icod.TermInfo.StringCapability [sealed]
+  INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  UNDERLYING System.Int32
+  ENUM AcsBtee = 408
+  ENUM AcsHline = 410
+  ENUM AcsLlcorner = 403
+  ENUM AcsLrcorner = 405
+  ENUM AcsLtee = 406
+  ENUM AcsPlus = 412
+  ENUM AcsRtee = 407
+  ENUM AcsTtee = 409
+  ENUM AcsUlcorner = 402
+  ENUM AcsUrcorner = 404
+  ENUM AcsVline = 411
+  ENUM AltScancodeEsc = 387
+  ENUM AlternateCharacterSet = 54
+  ENUM ArrowKeyMap = 401
+  ENUM BackTab = 10
+  ENUM BackspaceIfNotBs = 399
+  ENUM Bell = 0
+  ENUM BitImageCarriageReturn = 374
+  ENUM BitImageNewline = 373
+  ENUM BitImageRepeat = 372
+  ENUM BoxChars1 = 413
+  ENUM CarriageReturn = 1
+  ENUM ChangeCharPitch = 311
+  ENUM ChangeLinePitch = 312
+  ENUM ChangeResHorz = 313
+  ENUM ChangeResVert = 314
+  ENUM ChangeScrollRegion = 13
+  ENUM CharPadding = 192
+  ENUM CharSetNames = 359
+  ENUM ClearAllTabs = 68
+  ENUM ClearMargins = 282
+  ENUM ClearScreen = 4
+  ENUM ClearToBeginningOfLine = 27
+  ENUM ClearToEndOfLine = 26
+  ENUM ClearToEndOfScreen = 25
+  ENUM CodeSetInit = 365
+  ENUM ColorNames = 375
+  ENUM ColumnAddress = 29
+  ENUM CommandCharacter = 147
+  ENUM CreateWindow = 289
+  ENUM CursorAddress = 5
+  ENUM CursorDown = 16
+  ENUM CursorDownOne = 2
+  ENUM CursorHome = 28
+  ENUM CursorInvisible = 71
+  ENUM CursorLeft = 14
+  ENUM CursorLeftOne = 15
+  ENUM CursorMemAddress = 148
+  ENUM CursorNormal = 72
+  ENUM CursorRight = 17
+  ENUM CursorRightOne = 18
+  ENUM CursorToLl = 149
+  ENUM CursorUp = 19
+  ENUM CursorUpOne = 20
+  ENUM CursorVeryVisible = 73
+  ENUM DefineBitImageRegion = 376
+  ENUM DefineChar = 315
+  ENUM DeleteCharacter = 22
+  ENUM DeleteCharacters = 21
+  ENUM DeleteLine = 24
+  ENUM DeleteLines = 23
+  ENUM DeviceType = 364
+  ENUM DialPhone = 292
+  ENUM DisStatusLine = 150
+  ENUM DisplayClock = 287
+  ENUM DisplayPcChar = 380
+  ENUM DownHalfLine = 151
+  ENUM EnableAlternateCharacterSet = 55
+  ENUM EndBitImageRegion = 377
+  ENUM EnterAlternateCharacterSetMode = 48
+  ENUM EnterAutomaticMargins = 49
+  ENUM EnterBlinkMode = 11
+  ENUM EnterBoldMode = 6
+  ENUM EnterCursorAddressingMode = 69
+  ENUM EnterDeleteMode = 152
+  ENUM EnterDimMode = 12
+  ENUM EnterDoublewideMode = 316
+  ENUM EnterDraftQuality = 317
+  ENUM EnterHorizontalHlMode = 388
+  ENUM EnterInsertMode = 78
+  ENUM EnterInvisibleMode = 36
+  ENUM EnterItalicMode = 82
+  ENUM EnterKeypadMode = 50
+  ENUM EnterLeftHlMode = 389
+  ENUM EnterLeftwardMode = 318
+  ENUM EnterLowHlMode = 390
+  ENUM EnterMetaMode = 80
+  ENUM EnterMicroMode = 319
+  ENUM EnterNearLetterQuality = 320
+  ENUM EnterNormalQuality = 321
+  ENUM EnterPcCharsetMode = 381
+  ENUM EnterProtectedMode = 153
+  ENUM EnterReverseMode = 39
+  ENUM EnterRightHlMode = 391
+  ENUM EnterScancodeMode = 383
+  ENUM EnterShadowMode = 322
+  ENUM EnterStandoutMode = 51
+  ENUM EnterSubscriptMode = 323
+  ENUM EnterSuperscriptMode = 324
+  ENUM EnterTopHlMode = 392
+  ENUM EnterUnderlineMode = 52
+  ENUM EnterUpwardMode = 325
+  ENUM EnterVerticalHlMode = 393
+  ENUM EnterXonMode = 194
+  ENUM EraseCharacters = 67
+  ENUM ExitAlternateCharacterSetMode = 41
+  ENUM ExitAttributeMode = 7
+  ENUM ExitAutomaticMargins = 42
+  ENUM ExitCursorAddressingMode = 70
+  ENUM ExitDeleteMode = 154
+  ENUM ExitDoublewideMode = 326
+  ENUM ExitInsertMode = 79
+  ENUM ExitItalicMode = 83
+  ENUM ExitKeypadMode = 43
+  ENUM ExitLeftwardMode = 327
+  ENUM ExitMetaMode = 81
+  ENUM ExitMicroMode = 328
+  ENUM ExitPcCharsetMode = 382
+  ENUM ExitScancodeMode = 384
+  ENUM ExitShadowMode = 329
+  ENUM ExitStandoutMode = 44
+  ENUM ExitSubscriptMode = 330
+  ENUM ExitSuperscriptMode = 331
+  ENUM ExitUnderlineMode = 45
+  ENUM ExitUpwardMode = 332
+  ENUM ExitXonMode = 195
+  ENUM FixedPause = 297
+  ENUM FlashHook = 296
+  ENUM FlashScreen = 74
+  ENUM FormFeed = 155
+  ENUM FromStatusLine = 156
+  ENUM GetMouse = 362
+  ENUM GotoWindow = 290
+  ENUM Hangup = 291
+  ENUM InitFile = 157
+  ENUM InitProg = 190
+  ENUM InitString1 = 88
+  ENUM InitString2 = 89
+  ENUM InitString3 = 90
+  ENUM InitializeColor = 84
+  ENUM InitializePair = 309
+  ENUM InsertCharacter = 33
+  ENUM InsertCharacters = 32
+  ENUM InsertLine = 35
+  ENUM InsertLines = 34
+  ENUM InsertPadding = 158
+  ENUM KeyA1 = 128
+  ENUM KeyA3 = 129
+  ENUM KeyB2 = 130
+  ENUM KeyBackTab = 100
+  ENUM KeyBackspace = 56
+  ENUM KeyBegin = 101
+  ENUM KeyC1 = 131
+  ENUM KeyC3 = 132
+  ENUM KeyCancel = 200
+  ENUM KeyCatab = 159
+  ENUM KeyClear = 160
+  ENUM KeyClose = 201
+  ENUM KeyCommand = 202
+  ENUM KeyCopy = 203
+  ENUM KeyCreate = 204
+  ENUM KeyCtab = 161
+  ENUM KeyCursorDown = 57
+  ENUM KeyCursorLeft = 58
+  ENUM KeyCursorRight = 59
+  ENUM KeyCursorUp = 60
+  ENUM KeyDeleteCharacter = 102
+  ENUM KeyDl = 162
+  ENUM KeyEic = 163
+  ENUM KeyEnd = 103
+  ENUM KeyEnter = 104
+  ENUM KeyEol = 164
+  ENUM KeyEos = 165
+  ENUM KeyExit = 205
+  ENUM KeyF0 = 166
+  ENUM KeyF1 = 62
+  ENUM KeyF10 = 113
+  ENUM KeyF11 = 114
+  ENUM KeyF12 = 115
+  ENUM KeyF13 = 116
+  ENUM KeyF14 = 117
+  ENUM KeyF15 = 118
+  ENUM KeyF16 = 119
+  ENUM KeyF17 = 120
+  ENUM KeyF18 = 121
+  ENUM KeyF19 = 122
+  ENUM KeyF2 = 63
+  ENUM KeyF20 = 123
+  ENUM KeyF21 = 124
+  ENUM KeyF22 = 125
+  ENUM KeyF23 = 126
+  ENUM KeyF24 = 127
+  ENUM KeyF25 = 243
+  ENUM KeyF26 = 244
+  ENUM KeyF27 = 245
+  ENUM KeyF28 = 246
+  ENUM KeyF29 = 247
+  ENUM KeyF3 = 64
+  ENUM KeyF30 = 248
+  ENUM KeyF31 = 249
+  ENUM KeyF32 = 250
+  ENUM KeyF33 = 251
+  ENUM KeyF34 = 252
+  ENUM KeyF35 = 253
+  ENUM KeyF36 = 254
+  ENUM KeyF37 = 255
+  ENUM KeyF38 = 256
+  ENUM KeyF39 = 257
+  ENUM KeyF4 = 65
+  ENUM KeyF40 = 258
+  ENUM KeyF41 = 259
+  ENUM KeyF42 = 260
+  ENUM KeyF43 = 261
+  ENUM KeyF44 = 262
+  ENUM KeyF45 = 263
+  ENUM KeyF46 = 264
+  ENUM KeyF47 = 265
+  ENUM KeyF48 = 266
+  ENUM KeyF49 = 267
+  ENUM KeyF5 = 108
+  ENUM KeyF50 = 268
+  ENUM KeyF51 = 269
+  ENUM KeyF52 = 270
+  ENUM KeyF53 = 271
+  ENUM KeyF54 = 272
+  ENUM KeyF55 = 273
+  ENUM KeyF56 = 274
+  ENUM KeyF57 = 275
+  ENUM KeyF58 = 276
+  ENUM KeyF59 = 277
+  ENUM KeyF6 = 109
+  ENUM KeyF60 = 278
+  ENUM KeyF61 = 279
+  ENUM KeyF62 = 280
+  ENUM KeyF63 = 281
+  ENUM KeyF7 = 110
+  ENUM KeyF8 = 111
+  ENUM KeyF9 = 112
+  ENUM KeyFind = 143
+  ENUM KeyHelp = 144
+  ENUM KeyHome = 61
+  ENUM KeyIl = 167
+  ENUM KeyInsertCharacter = 105
+  ENUM KeyLl = 168
+  ENUM KeyMark = 206
+  ENUM KeyMessage = 207
+  ENUM KeyMouse = 93
+  ENUM KeyMove = 208
+  ENUM KeyNext = 209
+  ENUM KeyNextPage = 106
+  ENUM KeyOpen = 210
+  ENUM KeyOptions = 211
+  ENUM KeyPrevious = 212
+  ENUM KeyPreviousPage = 107
+  ENUM KeyPrint = 213
+  ENUM KeyRedo = 145
+  ENUM KeyReference = 214
+  ENUM KeyRefresh = 215
+  ENUM KeyReplace = 216
+  ENUM KeyRestart = 217
+  ENUM KeyResume = 218
+  ENUM KeySave = 219
+  ENUM KeySbeg = 222
+  ENUM KeyScancel = 223
+  ENUM KeyScommand = 224
+  ENUM KeyScopy = 225
+  ENUM KeyScreate = 226
+  ENUM KeyScrollForward = 133
+  ENUM KeyScrollReverse = 134
+  ENUM KeySdl = 227
+  ENUM KeySelect = 146
+  ENUM KeySeol = 228
+  ENUM KeySexit = 229
+  ENUM KeySfind = 230
+  ENUM KeyShelp = 231
+  ENUM KeyShiftDeleteCharacter = 135
+  ENUM KeyShiftEnd = 136
+  ENUM KeyShiftHome = 137
+  ENUM KeyShiftInsertCharacter = 138
+  ENUM KeyShiftLeft = 139
+  ENUM KeyShiftNextPage = 140
+  ENUM KeyShiftPreviousPage = 141
+  ENUM KeyShiftRight = 142
+  ENUM KeySmessage = 232
+  ENUM KeySmove = 233
+  ENUM KeySoptions = 234
+  ENUM KeySprint = 235
+  ENUM KeySredo = 236
+  ENUM KeySreplace = 237
+  ENUM KeySrsume = 238
+  ENUM KeySsave = 239
+  ENUM KeySsuspend = 240
+  ENUM KeyStab = 169
+  ENUM KeySundo = 241
+  ENUM KeySuspend = 220
+  ENUM KeyUndo = 221
+  ENUM LabF0 = 170
+  ENUM LabF1 = 171
+  ENUM LabF10 = 172
+  ENUM LabF2 = 173
+  ENUM LabF3 = 174
+  ENUM LabF4 = 175
+  ENUM LabF5 = 176
+  ENUM LabF6 = 177
+  ENUM LabF7 = 178
+  ENUM LabF8 = 179
+  ENUM LabF9 = 180
+  ENUM LabelFormat = 285
+  ENUM LabelOff = 199
+  ENUM LabelOn = 198
+  ENUM LinefeedIfNotLf = 398
+  ENUM MemoryLock = 94
+  ENUM MemoryUnlock = 95
+  ENUM MicroColumnAddress = 333
+  ENUM MicroDown = 334
+  ENUM MicroLeft = 335
+  ENUM MicroRight = 336
+  ENUM MicroRowAddress = 337
+  ENUM MicroUp = 338
+  ENUM MouseInfo = 360
+  ENUM NewLine = 75
+  ENUM OrderOfPins = 339
+  ENUM OriginalColorPair = 37
+  ENUM OriginalColors = 85
+  ENUM OtherNonFunctionKeys = 400
+  ENUM PadChar = 181
+  ENUM ParmDownMicro = 340
+  ENUM ParmLeftMicro = 341
+  ENUM ParmRightMicro = 342
+  ENUM ParmUpMicro = 343
+  ENUM PcTermOptions = 385
+  ENUM PkeyKey = 182
+  ENUM PkeyLocal = 183
+  ENUM PkeyPlab = 363
+  ENUM PkeyXmit = 184
+  ENUM PlabNorm = 193
+  ENUM PrintScreen = 97
+  ENUM PrinterOff = 98
+  ENUM PrinterOn = 99
+  ENUM PrtrNon = 191
+  ENUM Pulse = 295
+  ENUM QuickDial = 293
+  ENUM RemoveClock = 288
+  ENUM RepeatCharacter = 96
+  ENUM ReqForInput = 242
+  ENUM ReqMousePos = 361
+  ENUM ResetFile = 185
+  ENUM ResetString1 = 91
+  ENUM ResetString2 = 66
+  ENUM ResetString3 = 92
+  ENUM RestoreCursor = 38
+  ENUM RowAddress = 53
+  ENUM SaveCursor = 46
+  ENUM ScancodeEscape = 386
+  ENUM ScrollForward = 3
+  ENUM ScrollForwardLines = 76
+  ENUM ScrollReverse = 40
+  ENUM ScrollReverseLines = 77
+  ENUM SelectCharSet = 344
+  ENUM Set0DesSeq = 366
+  ENUM Set1DesSeq = 367
+  ENUM Set2DesSeq = 368
+  ENUM Set3DesSeq = 369
+  ENUM SetAAttributes = 394
+  ENUM SetAttributes = 47
+  ENUM SetBackgroundColor = 9
+  ENUM SetBottomMargin = 345
+  ENUM SetBottomMarginParm = 346
+  ENUM SetClock = 286
+  ENUM SetColorBand = 378
+  ENUM SetColorPair = 310
+  ENUM SetForegroundColor = 8
+  ENUM SetLeftMargin = 283
+  ENUM SetLeftMarginParm = 347
+  ENUM SetLegacyBackgroundColor = 87
+  ENUM SetLegacyForegroundColor = 86
+  ENUM SetLrMargin = 370
+  ENUM SetPageLength = 379
+  ENUM SetPglenInch = 395
+  ENUM SetRightMargin = 284
+  ENUM SetRightMarginParm = 348
+  ENUM SetTab = 31
+  ENUM SetTbMargin = 371
+  ENUM SetTopMargin = 349
+  ENUM SetTopMarginParm = 350
+  ENUM SetWindow = 186
+  ENUM StartBitImage = 351
+  ENUM StartCharSetDef = 352
+  ENUM StopBitImage = 353
+  ENUM StopCharSetDef = 354
+  ENUM SubscriptCharacters = 355
+  ENUM SuperscriptCharacters = 356
+  ENUM Tab = 30
+  ENUM TermcapInit2 = 396
+  ENUM TermcapReset = 397
+  ENUM TheseCauseCr = 357
+  ENUM ToStatusLine = 187
+  ENUM Tone = 294
+  ENUM UnderlineChar = 188
+  ENUM UpHalfLine = 189
+  ENUM User0 = 299
+  ENUM User1 = 300
+  ENUM User2 = 301
+  ENUM User3 = 302
+  ENUM User4 = 303
+  ENUM User5 = 304
+  ENUM User6 = 305
+  ENUM User7 = 306
+  ENUM User8 = 307
+  ENUM User9 = 308
+  ENUM WaitTone = 298
+  ENUM XoffCharacter = 197
+  ENUM XonCharacter = 196
+  ENUM ZeroMotion = 358
+END
+
+TYPE class Icod.TermInfo.SystemTerminalDescriptionProvider [sealed]
+  INTERFACES Icod.TermInfo.ITerminalDescriptionProvider
+  CTOR public SystemTerminalDescriptionProvider(Icod.TermInfo.SystemTerminalDescriptionProviderOptions options null=nullable/nullable default=null)
+  METHOD public System.Boolean TryLoad(System.String name null=not-null/not-null, out Icod.TermInfo.TerminalDescription terminal null=nullable/nullable attrs=NotNullWhenAttribute(true)) return-null=not-null/not-null
+END
+
+TYPE class Icod.TermInfo.SystemTerminalDescriptionProviderOptions [sealed]
+  CTOR public SystemTerminalDescriptionProviderOptions(System.Boolean useEnvironment null=not-null/not-null default=true, System.Boolean useUserDatabase null=not-null/not-null default=true, System.Boolean useSystemDatabases null=not-null/not-null default=true, Icod.TermInfo.CompiledTermInfoParserOptions parserOptions null=nullable/nullable default=null)
+  PROPERTY Icod.TermInfo.CompiledTermInfoParserOptions ParserOptions { public get; } null=not-null/unknown
+  PROPERTY System.Boolean UseEnvironment { public get; } null=not-null/unknown
+  PROPERTY System.Boolean UseSystemDatabases { public get; } null=not-null/unknown
+  PROPERTY System.Boolean UseUserDatabase { public get; } null=not-null/unknown
+END
+
+TYPE struct Icod.TermInfo.TermInfoCapabilityValue [sealed,readonly]
+  BASE System.ValueType
+  INTERFACES System.IEquatable<Icod.TermInfo.TermInfoCapabilityValue>
+  CTOR public TermInfoCapabilityValue(System.Boolean value null=not-null/not-null)
+  CTOR public TermInfoCapabilityValue(System.Int32 value null=not-null/not-null)
+  CTOR public TermInfoCapabilityValue(System.String value null=not-null/not-null)
+  PROPERTY Icod.TermInfo.TermInfoCapabilityValueKind Kind { public get; } null=not-null/unknown
+  PROPERTY System.Boolean BooleanValue { public get; } null=not-null/unknown
+  PROPERTY System.Boolean IsBoolean { public get; } null=not-null/unknown
+  PROPERTY System.Boolean IsNumber { public get; } null=not-null/unknown
+  PROPERTY System.Boolean IsString { public get; } null=not-null/unknown
+  PROPERTY System.Int32 NumberValue { public get; } null=not-null/unknown
+  PROPERTY System.String StringValue { public get; } null=not-null/unknown
+  METHOD public System.Boolean Equals(Icod.TermInfo.TermInfoCapabilityValue other null=not-null/not-null) return-null=not-null/not-null
+  METHOD public virtual System.Boolean Equals(System.Object obj null=nullable/nullable) return-null=not-null/not-null
+  METHOD public virtual System.Int32 GetHashCode() return-null=not-null/not-null
+  METHOD public virtual System.String ToString() return-null=not-null/not-null
+END
+
+TYPE enum Icod.TermInfo.TermInfoCapabilityValueKind [sealed]
+  INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  UNDERLYING System.Int32
+  ENUM Boolean = 0
+  ENUM Number = 1
+  ENUM String = 2
+END
+
+TYPE class Icod.TermInfo.TermInfoCompatibility [static]
+  METHOD public static System.Boolean TiGetFlag(Icod.TermInfo.TerminalDescription terminal null=not-null/not-null, System.String name null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.Nullable<System.Int32> TiGetNum(Icod.TermInfo.TerminalDescription terminal null=not-null/not-null, System.String name null=not-null/not-null) return-null=nullable/nullable
+  METHOD public static System.String TParm(System.String source null=not-null/not-null, Icod.TermInfo.TermInfoExpansionContext context null=not-null/not-null, params Icod.TermInfo.TermInfoParameter[] parameters null=not-null/not-null<not-null/not-null>) return-null=not-null/not-null
+  METHOD public static System.String TParm(System.String source null=not-null/not-null, params Icod.TermInfo.TermInfoParameter[] parameters null=not-null/not-null<not-null/not-null>) return-null=not-null/not-null
+  METHOD public static System.String TiGetStr(Icod.TermInfo.TerminalDescription terminal null=not-null/not-null, System.String name null=not-null/not-null) return-null=nullable/nullable
+  METHOD public static System.String TiParm(System.String source null=not-null/not-null, Icod.TermInfo.TermInfoExpansionContext context null=not-null/not-null, params Icod.TermInfo.TermInfoParameter[] parameters null=not-null/not-null<not-null/not-null>) return-null=not-null/not-null
+  METHOD public static System.String TiParm(System.String source null=not-null/not-null, params Icod.TermInfo.TermInfoParameter[] parameters null=not-null/not-null<not-null/not-null>) return-null=not-null/not-null
+  METHOD public static System.Void PutP(System.String value null=not-null/not-null, System.Action<System.Char> output null=not-null/not-null<not-null/not-null>, Icod.TermInfo.PaddingMode paddingMode null=not-null/not-null default=Ignore, Icod.TermInfo.ITermInfoDelayProvider delayProvider null=nullable/nullable default=null) return-null=not-null/not-null
+  METHOD public static System.Void TPuts(System.String value null=not-null/not-null, System.Int32 affectedLines null=not-null/not-null, System.Action<System.Char> output null=not-null/not-null<not-null/not-null>, Icod.TermInfo.PaddingMode paddingMode null=not-null/not-null default=Ignore, Icod.TermInfo.ITermInfoDelayProvider delayProvider null=nullable/nullable default=null) return-null=not-null/not-null
+END
+
+TYPE struct Icod.TermInfo.TermInfoDelay [sealed,readonly]
+  BASE System.ValueType
+  INTERFACES System.IEquatable<Icod.TermInfo.TermInfoDelay>
+  CTOR public TermInfoDelay(System.TimeSpan duration null=not-null/not-null, System.Boolean isMandatory null=not-null/not-null)
+  PROPERTY System.Boolean IsMandatory { public get; } null=not-null/unknown
+  PROPERTY System.TimeSpan Duration { public get; } null=not-null/unknown
+  METHOD public System.Boolean Equals(Icod.TermInfo.TermInfoDelay other null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.Boolean op_Equality(Icod.TermInfo.TermInfoDelay left null=not-null/not-null, Icod.TermInfo.TermInfoDelay right null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.Boolean op_Inequality(Icod.TermInfo.TermInfoDelay left null=not-null/not-null, Icod.TermInfo.TermInfoDelay right null=not-null/not-null) return-null=not-null/not-null
+  METHOD public virtual System.Boolean Equals(System.Object obj null=unknown/unknown) return-null=not-null/not-null
+  METHOD public virtual System.Int32 GetHashCode() return-null=not-null/not-null
+  METHOD public virtual System.String ToString() return-null=unknown/unknown
+END
+
+TYPE class Icod.TermInfo.TermInfoEvaluationException [sealed]
+  BASE System.InvalidOperationException
+  INTERFACES System.Runtime.Serialization.ISerializable
+  CTOR public TermInfoEvaluationException()
+  CTOR public TermInfoEvaluationException(System.String message null=nullable/nullable)
+  CTOR public TermInfoEvaluationException(System.String message null=nullable/nullable, System.Exception innerException null=nullable/nullable)
+  PROPERTY System.Int32 Position { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.TermInfoExpansionContext [sealed]
+  CTOR public TermInfoExpansionContext()
+  METHOD public System.Void Reset() return-null=not-null/not-null
+END
+
+TYPE class Icod.TermInfo.TermInfoFormatException [sealed]
+  BASE System.FormatException
+  INTERFACES System.Runtime.Serialization.ISerializable
+  CTOR public TermInfoFormatException()
+  CTOR public TermInfoFormatException(System.String message null=nullable/nullable)
+  CTOR public TermInfoFormatException(System.String message null=nullable/nullable, System.Exception innerException null=nullable/nullable)
+  PROPERTY System.Int32 Position { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.TermInfoOutput [static]
+  METHOD public static System.Threading.Tasks.ValueTask PutPAsync(System.String value null=not-null/not-null, System.IO.TextWriter writer null=not-null/not-null, Icod.TermInfo.PaddingMode paddingMode null=not-null/not-null default=Ignore, Icod.TermInfo.ITermInfoDelayProvider delayProvider null=nullable/nullable default=null, System.Threading.CancellationToken cancellationToken null=not-null/not-null default=null) return-null=not-null/not-null
+  METHOD public static System.Threading.Tasks.ValueTask PutPAsync(System.String value null=not-null/not-null, System.IO.TextWriter writer null=not-null/not-null, Icod.TermInfo.TermInfoOutputOptions options null=not-null/not-null, System.Threading.CancellationToken cancellationToken null=not-null/not-null default=null) return-null=not-null/not-null
+  METHOD public static System.Threading.Tasks.ValueTask TPutsAsync(System.String value null=not-null/not-null, System.Int32 affectedLines null=not-null/not-null, System.IO.Stream stream null=not-null/not-null, System.Text.Encoding encoding null=not-null/not-null, Icod.TermInfo.PaddingMode paddingMode null=not-null/not-null default=Ignore, Icod.TermInfo.ITermInfoDelayProvider delayProvider null=nullable/nullable default=null, System.Threading.CancellationToken cancellationToken null=not-null/not-null default=null) return-null=not-null/not-null
+  METHOD public static System.Threading.Tasks.ValueTask TPutsAsync(System.String value null=not-null/not-null, System.Int32 affectedLines null=not-null/not-null, System.IO.Stream stream null=not-null/not-null, System.Text.Encoding encoding null=not-null/not-null, Icod.TermInfo.TermInfoOutputOptions options null=not-null/not-null, System.Threading.CancellationToken cancellationToken null=not-null/not-null default=null) return-null=not-null/not-null
+  METHOD public static System.Threading.Tasks.ValueTask TPutsAsync(System.String value null=not-null/not-null, System.Int32 affectedLines null=not-null/not-null, System.IO.TextWriter writer null=not-null/not-null, Icod.TermInfo.PaddingMode paddingMode null=not-null/not-null default=Ignore, Icod.TermInfo.ITermInfoDelayProvider delayProvider null=nullable/nullable default=null, System.Threading.CancellationToken cancellationToken null=not-null/not-null default=null) return-null=not-null/not-null
+  METHOD public static System.Threading.Tasks.ValueTask TPutsAsync(System.String value null=not-null/not-null, System.Int32 affectedLines null=not-null/not-null, System.IO.TextWriter writer null=not-null/not-null, Icod.TermInfo.TermInfoOutputOptions options null=not-null/not-null, System.Threading.CancellationToken cancellationToken null=not-null/not-null default=null) return-null=not-null/not-null
+  METHOD public static System.Void PutP(System.String value null=not-null/not-null, System.IO.TextWriter writer null=not-null/not-null, Icod.TermInfo.PaddingMode paddingMode null=not-null/not-null default=Ignore, Icod.TermInfo.ITermInfoDelayProvider delayProvider null=nullable/nullable default=null) return-null=not-null/not-null
+  METHOD public static System.Void PutP(System.String value null=not-null/not-null, System.IO.TextWriter writer null=not-null/not-null, Icod.TermInfo.TermInfoOutputOptions options null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.Void TPuts(System.String value null=not-null/not-null, System.Int32 affectedLines null=not-null/not-null, System.Action<System.Char> output null=not-null/not-null<not-null/not-null>, Icod.TermInfo.PaddingMode paddingMode null=not-null/not-null default=Ignore, Icod.TermInfo.ITermInfoDelayProvider delayProvider null=nullable/nullable default=null) return-null=not-null/not-null
+  METHOD public static System.Void TPuts(System.String value null=not-null/not-null, System.Int32 affectedLines null=not-null/not-null, System.Action<System.Char> output null=not-null/not-null<not-null/not-null>, Icod.TermInfo.TermInfoOutputOptions options null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.Void TPuts(System.String value null=not-null/not-null, System.Int32 affectedLines null=not-null/not-null, System.IO.Stream stream null=not-null/not-null, System.Text.Encoding encoding null=not-null/not-null, Icod.TermInfo.PaddingMode paddingMode null=not-null/not-null default=Ignore, Icod.TermInfo.ITermInfoDelayProvider delayProvider null=nullable/nullable default=null) return-null=not-null/not-null
+  METHOD public static System.Void TPuts(System.String value null=not-null/not-null, System.Int32 affectedLines null=not-null/not-null, System.IO.Stream stream null=not-null/not-null, System.Text.Encoding encoding null=not-null/not-null, Icod.TermInfo.TermInfoOutputOptions options null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.Void TPuts(System.String value null=not-null/not-null, System.Int32 affectedLines null=not-null/not-null, System.IO.TextWriter writer null=not-null/not-null, Icod.TermInfo.PaddingMode paddingMode null=not-null/not-null default=Ignore, Icod.TermInfo.ITermInfoDelayProvider delayProvider null=nullable/nullable default=null) return-null=not-null/not-null
+  METHOD public static System.Void TPuts(System.String value null=not-null/not-null, System.Int32 affectedLines null=not-null/not-null, System.IO.TextWriter writer null=not-null/not-null, Icod.TermInfo.TermInfoOutputOptions options null=not-null/not-null) return-null=not-null/not-null
+END
+
+TYPE class Icod.TermInfo.TermInfoOutputOptions [sealed]
+  CTOR public TermInfoOutputOptions(Icod.TermInfo.TerminalDescription terminal null=not-null/not-null, System.Nullable<System.Int32> baudRate null=nullable/nullable default=null, Icod.TermInfo.PaddingMode paddingMode null=not-null/not-null default=Delay, Icod.TermInfo.ITermInfoDelayProvider delayProvider null=nullable/nullable default=null)
+  PROPERTY Icod.TermInfo.ITermInfoDelayProvider DelayProvider { public get; } null=nullable/unknown
+  PROPERTY Icod.TermInfo.PaddingMode PaddingMode { public get; } null=not-null/unknown
+  PROPERTY Icod.TermInfo.TerminalDescription Terminal { public get; } null=not-null/unknown
+  PROPERTY System.Nullable<System.Int32> BaudRate { public get; } null=nullable/unknown
+END
+
+TYPE class Icod.TermInfo.TermInfoPaddingFormatException [sealed]
+  BASE System.FormatException
+  INTERFACES System.Runtime.Serialization.ISerializable
+  CTOR public TermInfoPaddingFormatException()
+  CTOR public TermInfoPaddingFormatException(System.String message null=nullable/nullable)
+  CTOR public TermInfoPaddingFormatException(System.String message null=nullable/nullable, System.Exception innerException null=nullable/nullable)
+  PROPERTY System.Int32 Position { public get; } null=not-null/unknown
+END
+
+TYPE struct Icod.TermInfo.TermInfoParameter [sealed,readonly]
+  BASE System.ValueType
+  INTERFACES System.IEquatable<Icod.TermInfo.TermInfoParameter>
+  CTOR public TermInfoParameter(System.Int64 value null=not-null/not-null)
+  CTOR public TermInfoParameter(System.String value null=not-null/not-null)
+  PROPERTY System.Boolean IsInteger { public get; } null=not-null/unknown
+  PROPERTY System.Boolean IsString { public get; } null=not-null/unknown
+  PROPERTY System.Int64 IntegerValue { public get; } null=not-null/unknown
+  PROPERTY System.String StringValue { public get; } null=not-null/unknown
+  METHOD public System.Boolean Equals(Icod.TermInfo.TermInfoParameter other null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static Icod.TermInfo.TermInfoParameter op_Implicit(System.Int32 value null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static Icod.TermInfo.TermInfoParameter op_Implicit(System.Int64 value null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static Icod.TermInfo.TermInfoParameter op_Implicit(System.String value null=not-null/not-null) return-null=not-null/not-null
+  METHOD public virtual System.Boolean Equals(System.Object obj null=nullable/nullable) return-null=not-null/not-null
+  METHOD public virtual System.Int32 GetHashCode() return-null=not-null/not-null
+  METHOD public virtual System.String ToString() return-null=not-null/not-null
+END
+
+TYPE class Icod.TermInfo.TermInfoParameterExpander [static]
+  METHOD public static System.String Expand(System.String source null=not-null/not-null, Icod.TermInfo.TermInfoExpansionContext context null=not-null/not-null, params Icod.TermInfo.TermInfoParameter[] parameters null=not-null/not-null<not-null/not-null>) return-null=not-null/not-null
+  METHOD public static System.String Expand(System.String source null=not-null/not-null, params Icod.TermInfo.TermInfoParameter[] parameters null=not-null/not-null<not-null/not-null>) return-null=not-null/not-null
+END
+
+TYPE class Icod.TermInfo.TermInfoParameterProgram [sealed]
+  PROPERTY System.String Source { public get; } null=not-null/unknown
+  METHOD public System.String Expand(Icod.TermInfo.TermInfoExpansionContext context null=not-null/not-null, params Icod.TermInfo.TermInfoParameter[] parameters null=not-null/not-null<not-null/not-null>) return-null=not-null/not-null
+  METHOD public System.String Expand(params Icod.TermInfo.TermInfoParameter[] parameters null=not-null/not-null<not-null/not-null>) return-null=not-null/not-null
+  METHOD public static Icod.TermInfo.TermInfoParameterProgram Parse(System.String source null=not-null/not-null) return-null=not-null/not-null
+END
+
+TYPE enum Icod.TermInfo.TerminalColorModel [sealed]
+  INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  UNDERLYING System.Int32
+  ENUM DirectRgb = 2
+  ENUM Indexed = 1
+  ENUM None = 0
+END
+
+TYPE struct Icod.TermInfo.TerminalColorSupport [sealed,readonly]
+  BASE System.ValueType
+  INTERFACES System.IEquatable<Icod.TermInfo.TerminalColorSupport>
+  PROPERTY Icod.TermInfo.TerminalColorModel Model { public get; } null=not-null/unknown
+  PROPERTY Icod.TermInfo.TerminalColorTier Tier { public get; } null=not-null/unknown
+  PROPERTY System.Boolean BackColorErase { public get; } null=not-null/unknown
+  PROPERTY System.Boolean CanChangeColor { public get; } null=not-null/unknown
+  PROPERTY System.Boolean HasBackgroundSelector { public get; } null=not-null/unknown
+  PROPERTY System.Boolean HasForegroundSelector { public get; } null=not-null/unknown
+  PROPERTY System.Boolean HasInitializeColor { public get; } null=not-null/unknown
+  PROPERTY System.Boolean HasOriginalColorPair { public get; } null=not-null/unknown
+  PROPERTY System.Boolean HasOriginalColors { public get; } null=not-null/unknown
+  PROPERTY System.Boolean UsesHlsColorInitialization { public get; } null=not-null/unknown
+  PROPERTY System.Int32 IndexedColorCount { public get; } null=not-null/unknown
+  PROPERTY System.Nullable<Icod.TermInfo.TerminalRgbLayout> RgbLayout { public get; } null=nullable/unknown
+  PROPERTY System.Nullable<System.Int32> ColorCount { public get; } null=nullable/unknown
+  PROPERTY System.Nullable<System.Int32> ColorPairCount { public get; } null=nullable/unknown
+  PROPERTY System.Nullable<System.Int32> NoColorVideoMask { public get; } null=nullable/unknown
+  METHOD public System.Boolean Equals(Icod.TermInfo.TerminalColorSupport other null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.Boolean op_Equality(Icod.TermInfo.TerminalColorSupport left null=not-null/not-null, Icod.TermInfo.TerminalColorSupport right null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.Boolean op_Inequality(Icod.TermInfo.TerminalColorSupport left null=not-null/not-null, Icod.TermInfo.TerminalColorSupport right null=not-null/not-null) return-null=not-null/not-null
+  METHOD public virtual System.Boolean Equals(System.Object obj null=unknown/unknown) return-null=not-null/not-null
+  METHOD public virtual System.Int32 GetHashCode() return-null=not-null/not-null
+  METHOD public virtual System.String ToString() return-null=unknown/unknown
+END
+
+TYPE enum Icod.TermInfo.TerminalColorTier [sealed]
+  INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  UNDERLYING System.Int32
+  ENUM Color16 = 3
+  ENUM Color256 = 4
+  ENUM Color4 = 1
+  ENUM Color8 = 2
+  ENUM Monochrome = 0
+  ENUM OtherDirectRgb = 7
+  ENUM OtherIndexed = 6
+  ENUM TrueColor = 5
+END
+
+TYPE class Icod.TermInfo.TerminalColors [static]
+  METHOD public static Icod.TermInfo.TerminalColorSupport GetColorSupport(Icod.TermInfo.TerminalDescription terminal null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.String ExpandBackground(Icod.TermInfo.TerminalDescription terminal null=not-null/not-null, Icod.TermInfo.TerminalRgbColor color null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.String ExpandBackground(Icod.TermInfo.TerminalDescription terminal null=not-null/not-null, System.Int32 colorIndex null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.String ExpandForeground(Icod.TermInfo.TerminalDescription terminal null=not-null/not-null, Icod.TermInfo.TerminalRgbColor color null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.String ExpandForeground(Icod.TermInfo.TerminalDescription terminal null=not-null/not-null, System.Int32 colorIndex null=not-null/not-null) return-null=not-null/not-null
+END
+
+TYPE class Icod.TermInfo.TerminalDatabase [sealed]
+  INTERFACES Icod.TermInfo.ITerminalDescriptionProvider
+  CTOR public TerminalDatabase(System.Collections.Generic.IEnumerable<Icod.TermInfo.ITerminalDescriptionProvider> providers null=not-null/not-null<not-null/not-null>)
+  PROPERTY static Icod.TermInfo.TerminalDatabase BuiltIn { public get; } null=not-null/unknown
+  METHOD public Icod.TermInfo.TerminalDescription Load(System.String name null=not-null/not-null) return-null=not-null/not-null
+  METHOD public Icod.TermInfo.TerminalDescription Resolve(System.String requestedName null=nullable/nullable, Icod.TermInfo.TerminalDescription fallback null=not-null/not-null) return-null=not-null/not-null
+  METHOD public System.Boolean TryLoad(System.String name null=not-null/not-null, out Icod.TermInfo.TerminalDescription terminal null=nullable/nullable attrs=NotNullWhenAttribute(true)) return-null=not-null/not-null
+END
+
+TYPE class Icod.TermInfo.TerminalDescription [sealed]
+  PROPERTY System.Collections.Generic.IReadOnlyDictionary<System.String,Icod.TermInfo.TermInfoCapabilityValue> ExtendedCapabilities { public get; } null=not-null/unknown<not-null/not-null,not-null/not-null>
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.BooleanCapability> BooleanCapabilities { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.Collections.Generic.IReadOnlyList<System.Collections.Generic.KeyValuePair<Icod.TermInfo.NumericCapability,System.Int32>> NumericCapabilities { public get; } null=not-null/unknown<not-null/not-null<not-null/not-null,not-null/not-null>>
+  PROPERTY System.Collections.Generic.IReadOnlyList<System.Collections.Generic.KeyValuePair<Icod.TermInfo.StringCapability,System.String>> StringCapabilities { public get; } null=not-null/unknown<not-null/not-null<not-null/not-null,not-null/not-null>>
+  PROPERTY System.Collections.Generic.IReadOnlyList<System.String> Aliases { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.String Description { public get; } null=nullable/unknown
+  PROPERTY System.String Name { public get; } null=not-null/unknown
+  METHOD public System.Boolean GetBoolean(Icod.TermInfo.BooleanCapability capability null=not-null/not-null) return-null=not-null/not-null
+  METHOD public System.Boolean TryGetBoolean(System.String name null=not-null/not-null, out System.Boolean value null=not-null/not-null) return-null=not-null/not-null
+  METHOD public System.Boolean TryGetExtendedBoolean(System.String name null=not-null/not-null, out System.Boolean value null=not-null/not-null) return-null=not-null/not-null
+  METHOD public System.Boolean TryGetExtendedCapability(System.String name null=not-null/not-null, out Icod.TermInfo.TermInfoCapabilityValue value null=not-null/not-null) return-null=not-null/not-null
+  METHOD public System.Boolean TryGetExtendedNumber(System.String name null=not-null/not-null, out System.Int32 value null=not-null/not-null) return-null=not-null/not-null
+  METHOD public System.Boolean TryGetExtendedString(System.String name null=not-null/not-null, out System.String value null=nullable/nullable attrs=NotNullWhenAttribute(true)) return-null=not-null/not-null
+  METHOD public System.Boolean TryGetNumber(System.String name null=not-null/not-null, out System.Int32 value null=not-null/not-null) return-null=not-null/not-null
+  METHOD public System.Boolean TryGetString(System.String name null=not-null/not-null, out System.String value null=nullable/nullable attrs=NotNullWhenAttribute(true)) return-null=not-null/not-null
+  METHOD public System.Nullable<System.Int32> GetNumber(Icod.TermInfo.NumericCapability capability null=not-null/not-null) return-null=nullable/nullable
+  METHOD public System.String Expand(Icod.TermInfo.StringCapability capability null=not-null/not-null, Icod.TermInfo.TermInfoExpansionContext context null=not-null/not-null, params Icod.TermInfo.TermInfoParameter[] parameters null=not-null/not-null<not-null/not-null>) return-null=not-null/not-null
+  METHOD public System.String Expand(Icod.TermInfo.StringCapability capability null=not-null/not-null, params Icod.TermInfo.TermInfoParameter[] parameters null=not-null/not-null<not-null/not-null>) return-null=not-null/not-null
+  METHOD public System.String ExpandExtendedString(System.String name null=not-null/not-null, Icod.TermInfo.TermInfoExpansionContext context null=not-null/not-null, params Icod.TermInfo.TermInfoParameter[] parameters null=not-null/not-null<not-null/not-null>) return-null=not-null/not-null
+  METHOD public System.String ExpandExtendedString(System.String name null=not-null/not-null, params Icod.TermInfo.TermInfoParameter[] parameters null=not-null/not-null<not-null/not-null>) return-null=not-null/not-null
+  METHOD public System.String GetRequiredString(Icod.TermInfo.StringCapability capability null=not-null/not-null) return-null=not-null/not-null
+  METHOD public System.String GetString(Icod.TermInfo.StringCapability capability null=not-null/not-null) return-null=nullable/nullable
+END
+
+TYPE class Icod.TermInfo.TerminalDescriptionBuilder [sealed]
+  CTOR public TerminalDescriptionBuilder(System.String name null=not-null/not-null)
+  PROPERTY System.String Name { public get; } null=not-null/unknown
+  METHOD public Icod.TermInfo.TerminalDescription Build() return-null=not-null/not-null
+  METHOD public Icod.TermInfo.TerminalDescriptionBuilder AddAlias(System.String alias null=not-null/not-null) return-null=not-null/not-null
+  METHOD public Icod.TermInfo.TerminalDescriptionBuilder RemoveExtended(System.String name null=not-null/not-null) return-null=not-null/not-null
+  METHOD public Icod.TermInfo.TerminalDescriptionBuilder RemoveNumber(Icod.TermInfo.NumericCapability capability null=not-null/not-null) return-null=not-null/not-null
+  METHOD public Icod.TermInfo.TerminalDescriptionBuilder RemoveString(Icod.TermInfo.StringCapability capability null=not-null/not-null) return-null=not-null/not-null
+  METHOD public Icod.TermInfo.TerminalDescriptionBuilder SetBoolean(Icod.TermInfo.BooleanCapability capability null=not-null/not-null, System.Boolean value null=not-null/not-null default=true) return-null=not-null/not-null
+  METHOD public Icod.TermInfo.TerminalDescriptionBuilder SetDescription(System.String description null=nullable/nullable) return-null=not-null/not-null
+  METHOD public Icod.TermInfo.TerminalDescriptionBuilder SetExtended(System.String name null=not-null/not-null, Icod.TermInfo.TermInfoCapabilityValue value null=not-null/not-null) return-null=not-null/not-null
+  METHOD public Icod.TermInfo.TerminalDescriptionBuilder SetExtendedBoolean(System.String name null=not-null/not-null, System.Boolean value null=not-null/not-null default=true) return-null=not-null/not-null
+  METHOD public Icod.TermInfo.TerminalDescriptionBuilder SetExtendedNumber(System.String name null=not-null/not-null, System.Int32 value null=not-null/not-null) return-null=not-null/not-null
+  METHOD public Icod.TermInfo.TerminalDescriptionBuilder SetExtendedString(System.String name null=not-null/not-null, System.String value null=not-null/not-null) return-null=not-null/not-null
+  METHOD public Icod.TermInfo.TerminalDescriptionBuilder SetNumber(Icod.TermInfo.NumericCapability capability null=not-null/not-null, System.Int32 value null=not-null/not-null) return-null=not-null/not-null
+  METHOD public Icod.TermInfo.TerminalDescriptionBuilder SetString(Icod.TermInfo.StringCapability capability null=not-null/not-null, System.String value null=not-null/not-null) return-null=not-null/not-null
+END
+
+TYPE class Icod.TermInfo.TerminalEnvironment [static]
+  PROPERTY static System.Boolean IsErrorRedirected { public get; } null=not-null/unknown
+  PROPERTY static System.Boolean IsInputRedirected { public get; } null=not-null/unknown
+  PROPERTY static System.Boolean IsOutputRedirected { public get; } null=not-null/unknown
+  PROPERTY static System.String TerminalName { public get; } null=nullable/unknown
+  METHOD public static Icod.TermInfo.TerminalDescription Resolve(Icod.TermInfo.TerminalDatabase database null=not-null/not-null, Icod.TermInfo.TerminalDescription fallback null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.Boolean IsRedirected(Icod.TermInfo.TerminalStandardStream stream null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.Boolean TryGetEnvironmentSize(out Icod.TermInfo.TerminalSize size null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.Boolean TryGetLiveSize(Icod.TermInfo.TerminalStandardStream stream null=not-null/not-null, out Icod.TermInfo.TerminalSize size null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.Boolean TryGetLiveSize(out Icod.TermInfo.TerminalSize size null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.Boolean TryGetProfileSize(Icod.TermInfo.TerminalDescription terminal null=not-null/not-null, out Icod.TermInfo.TerminalSize size null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.Boolean TryResolve(Icod.TermInfo.TerminalDatabase database null=not-null/not-null, out Icod.TermInfo.TerminalDescription terminal null=nullable/nullable attrs=NotNullWhenAttribute(true)) return-null=not-null/not-null
+END
+
+TYPE class Icod.TermInfo.TerminalProfiles [static]
+  PROPERTY static Icod.TermInfo.TerminalDescription Ansi { public get; } null=not-null/unknown
+  PROPERTY static Icod.TermInfo.TerminalDescription Dumb { public get; } null=not-null/unknown
+  PROPERTY static Icod.TermInfo.TerminalDescription MsTerminal { public get; } null=not-null/unknown
+  PROPERTY static Icod.TermInfo.TerminalDescription MsTerminalDirect { public get; } null=not-null/unknown
+  PROPERTY static Icod.TermInfo.TerminalDescription Vt100 { public get; } null=not-null/unknown
+  PROPERTY static Icod.TermInfo.TerminalDescription Vt102 { public get; } null=not-null/unknown
+  PROPERTY static Icod.TermInfo.TerminalDescription Vt220 { public get; } null=not-null/unknown
+  PROPERTY static Icod.TermInfo.TerminalDescription WinConsole { public get; } null=not-null/unknown
+  PROPERTY static Icod.TermInfo.TerminalDescription Xterm { public get; } null=not-null/unknown
+  PROPERTY static Icod.TermInfo.TerminalDescription Xterm16Color { public get; } null=not-null/unknown
+  PROPERTY static Icod.TermInfo.TerminalDescription Xterm256Color { public get; } null=not-null/unknown
+  PROPERTY static Icod.TermInfo.TerminalDescription Xterm88Color { public get; } null=not-null/unknown
+  PROPERTY static Icod.TermInfo.TerminalDescription XtermDirect { public get; } null=not-null/unknown
+  PROPERTY static Icod.TermInfo.TerminalDescription XtermDirect16 { public get; } null=not-null/unknown
+  PROPERTY static Icod.TermInfo.TerminalDescription XtermDirect256 { public get; } null=not-null/unknown
+END
+
+TYPE struct Icod.TermInfo.TerminalRgbColor [sealed,readonly]
+  BASE System.ValueType
+  INTERFACES System.IEquatable<Icod.TermInfo.TerminalRgbColor>
+  CTOR public TerminalRgbColor(System.Byte red null=not-null/not-null, System.Byte green null=not-null/not-null, System.Byte blue null=not-null/not-null)
+  PROPERTY System.Byte Blue { public get; } null=not-null/unknown
+  PROPERTY System.Byte Green { public get; } null=not-null/unknown
+  PROPERTY System.Byte Red { public get; } null=not-null/unknown
+  METHOD public System.Boolean Equals(Icod.TermInfo.TerminalRgbColor other null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.Boolean op_Equality(Icod.TermInfo.TerminalRgbColor left null=not-null/not-null, Icod.TermInfo.TerminalRgbColor right null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.Boolean op_Inequality(Icod.TermInfo.TerminalRgbColor left null=not-null/not-null, Icod.TermInfo.TerminalRgbColor right null=not-null/not-null) return-null=not-null/not-null
+  METHOD public virtual System.Boolean Equals(System.Object obj null=unknown/unknown) return-null=not-null/not-null
+  METHOD public virtual System.Int32 GetHashCode() return-null=not-null/not-null
+  METHOD public virtual System.String ToString() return-null=unknown/unknown
+END
+
+TYPE struct Icod.TermInfo.TerminalRgbLayout [sealed,readonly]
+  BASE System.ValueType
+  INTERFACES System.IEquatable<Icod.TermInfo.TerminalRgbLayout>
+  CTOR public TerminalRgbLayout(System.Int32 redBits null=not-null/not-null, System.Int32 greenBits null=not-null/not-null, System.Int32 blueBits null=not-null/not-null)
+  PROPERTY System.Int32 BlueBits { public get; } null=not-null/unknown
+  PROPERTY System.Int32 GreenBits { public get; } null=not-null/unknown
+  PROPERTY System.Int32 RedBits { public get; } null=not-null/unknown
+  PROPERTY System.Int32 TotalBits { public get; } null=not-null/unknown
+  METHOD public System.Boolean Equals(Icod.TermInfo.TerminalRgbLayout other null=not-null/not-null) return-null=not-null/not-null
+  METHOD public System.Int32 Pack(Icod.TermInfo.TerminalRgbColor color null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.Boolean op_Equality(Icod.TermInfo.TerminalRgbLayout left null=not-null/not-null, Icod.TermInfo.TerminalRgbLayout right null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.Boolean op_Inequality(Icod.TermInfo.TerminalRgbLayout left null=not-null/not-null, Icod.TermInfo.TerminalRgbLayout right null=not-null/not-null) return-null=not-null/not-null
+  METHOD public virtual System.Boolean Equals(System.Object obj null=unknown/unknown) return-null=not-null/not-null
+  METHOD public virtual System.Int32 GetHashCode() return-null=not-null/not-null
+  METHOD public virtual System.String ToString() return-null=unknown/unknown
+END
+
+TYPE struct Icod.TermInfo.TerminalSize [sealed,readonly]
+  BASE System.ValueType
+  INTERFACES System.IEquatable<Icod.TermInfo.TerminalSize>
+  CTOR public TerminalSize(System.Int32 columns null=not-null/not-null, System.Int32 rows null=not-null/not-null)
+  PROPERTY System.Int32 Columns { public get; } null=not-null/unknown
+  PROPERTY System.Int32 Rows { public get; } null=not-null/unknown
+  METHOD public System.Boolean Equals(Icod.TermInfo.TerminalSize other null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.Boolean op_Equality(Icod.TermInfo.TerminalSize left null=not-null/not-null, Icod.TermInfo.TerminalSize right null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.Boolean op_Inequality(Icod.TermInfo.TerminalSize left null=not-null/not-null, Icod.TermInfo.TerminalSize right null=not-null/not-null) return-null=not-null/not-null
+  METHOD public virtual System.Boolean Equals(System.Object obj null=unknown/unknown) return-null=not-null/not-null
+  METHOD public virtual System.Int32 GetHashCode() return-null=not-null/not-null
+  METHOD public virtual System.String ToString() return-null=unknown/unknown
+END
+
+TYPE enum Icod.TermInfo.TerminalStandardStream [sealed]
+  INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  UNDERLYING System.Int32
+  ENUM Error = 2
+  ENUM Input = 0
+  ENUM Output = 1
+END
+
+TYPE class Icod.TermInfo.WindowsVirtualTerminal [static]
+  METHOD public static System.IDisposable TryEnableOutput() return-null=nullable/nullable
+  METHOD public static System.IDisposable TryEnableOutput(Icod.TermInfo.TerminalStandardStream stream null=not-null/not-null) return-null=nullable/nullable
+END
+
