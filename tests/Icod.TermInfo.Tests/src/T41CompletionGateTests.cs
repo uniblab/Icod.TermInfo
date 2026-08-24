@@ -143,12 +143,20 @@ public sealed class T41CompletionGateTests
 			+ "on:\n"
 			+ "  pull_request:\n"
 			+ "\n"
+			+ "permissions:\n"
+			+ "  contents: read\n"
+			+ "\n"
 			+ "jobs:\n",
+			pullRequest);
+		Assert.Contains(
+			"dotnet pack Icod.TermInfo.csproj",
+			pullRequest);
+		Assert.Contains(
+			"verify-release-package.sh artifacts",
 			pullRequest);
 
 		string[] forbiddenPublicationFragments =
 		[
-			"dotnet pack",
 			"NuGet/login",
 			"dotnet nuget push",
 			"packages: write",

@@ -32,8 +32,8 @@ This document describes the current validation and publication procedure for
 
 ### Pull requests
 
-`.github/workflows/pr-build-and-test.yaml` currently runs the solution in the
-repository `Staging` configuration on:
+`.github/workflows/pr-build-and-test.yaml` runs the solution in the repository
+`Staging` configuration on:
 
 - `windows-latest`;
 - `ubuntu-latest`;
@@ -42,8 +42,21 @@ repository `Staging` configuration on:
 Each matrix job cleans, restores, builds, and tests the whole solution, including
 both repository sample executables and solution-contained maintenance tools.
 
-The pull-request workflow is validation-only. It must not pack or publish
-packages, request publication credentials, or contain a deployment job.
+After the Staging matrix succeeds, a separate Ubuntu package-validation job:
+
+1. restores and builds Release with `ContinuousIntegrationBuild=true`;
+2. runs the Release test suite;
+3. packs `Icod.TermInfo.csproj` into a runner-local `artifacts` directory;
+4. runs `.github/scripts/verify-release-package.sh artifacts`.
+
+That verifier covers generated capability metadata, the approved public API
+baseline, net8/net10 API equivalence, package structure/metadata/XML/symbols,
+both fresh-package consumers, and the non-interactive repository sample.
+
+Packing on a pull request is validation, not publication. The pull-request
+workflow has only `contents: read` permission and must not request OIDC or
+package-write permission, authenticate to a package registry, push a package, or
+contain a deployment job.
 
 ### Pushes to main
 

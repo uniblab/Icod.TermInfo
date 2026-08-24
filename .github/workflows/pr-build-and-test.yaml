@@ -3,6 +3,9 @@ name: pr-build-and-test
 on:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   build-and-test:
     strategy:
@@ -20,3 +23,21 @@ jobs:
       - run: dotnet restore Icod.TermInfo.sln
       - run: dotnet build Icod.TermInfo.sln -c Staging --no-restore
       - run: dotnet test Icod.TermInfo.sln -c Staging --no-build --logger trx
+
+  package-validation:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - run: dotnet restore Icod.TermInfo.sln
+      - run: dotnet build Icod.TermInfo.sln -c Release --no-restore -p:ContinuousIntegrationBuild=true
+      - run: dotnet test Icod.TermInfo.sln -c Release --no-build --logger trx
+      - run: dotnet pack Icod.TermInfo.csproj -c Release --no-build --output artifacts
+      - run: bash .github/scripts/verify-release-package.sh artifacts

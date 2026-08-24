@@ -143,11 +143,15 @@ public sealed class T42ContractTests
 						"workflows",
 						"push-main.yaml")));
 
-		Assert.Contains(
-			"dotnet-version: |\n"
-			+ "            8.0.x\n"
-			+ "            10.0.x\n",
-			pullRequest);
+		Assert.True(
+			CountOccurrences(
+				pullRequest,
+				"dotnet-version: |\n"
+				+ "            8.0.x\n"
+				+ "            10.0.x\n")
+				>= 2,
+			"The pull-request build/test and package-validation jobs must "
+				+ "install both supported SDK/runtime lines.");
 		Assert.True(
 			CountOccurrences(
 				pushMain,
@@ -169,8 +173,11 @@ public sealed class T42ContractTests
 		Assert.DoesNotContain(
 			"pull_request:",
 			pushMain);
-		Assert.DoesNotContain(
-			"dotnet pack",
+		Assert.Contains(
+			"dotnet pack Icod.TermInfo.csproj",
+			pullRequest);
+		Assert.Contains(
+			"verify-release-package.sh artifacts",
 			pullRequest);
 		Assert.DoesNotContain(
 			"dotnet nuget push",
