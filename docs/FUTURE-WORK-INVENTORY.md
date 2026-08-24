@@ -1,12 +1,11 @@
 # Icod.TermInfo and Terminal-System Future Work Inventory
 
-This document records the broader terminal-related work that remains after the
-0.6.0, 0.7.0, and 0.8.0 `Icod.TermInfo` contracts, and identifies which work
-belongs in 0.9 versus sibling or later layers.
+This document records terminal-related work which remains outside the stable
+`Icod.TermInfo` 1.0 boundary and identifies its natural package/layer.
 
 Its purpose is to prevent the existence of a missing terminal feature from
-being mistaken for evidence that the feature belongs in the `Icod.TermInfo`
-runtime package.
+being mistaken for evidence that the feature belongs in the low-level
+`Icod.TermInfo` runtime package.
 
 The governing distinction is:
 
@@ -19,7 +18,7 @@ The governing distinction is:
 
 ## 1. Current foundation
 
-By the end of 0.8.0, `Icod.TermInfo` already provides:
+The 1.0 line freezes the combined 0.8 semantic and 0.9 acquisition foundation:
 
 - immutable terminal descriptions;
 - complete standard capability metadata;
@@ -32,21 +31,26 @@ By the end of 0.8.0, `Icod.TermInfo` already provides:
 - ANSI, DEC, xterm, Windows Console, and Windows Terminal built-ins;
 - semantic indexed/direct color support;
 - descriptive modern protocol/key metadata;
+- pure conventional compiled-entry parsing;
+- explicit directory acquisition;
+- deterministic `TERMINFO`/`TERMINFO_DIRS`/user/system discovery;
+- provider-local successful-entry caching and new-provider refresh;
 - deterministic provider composition;
 - no process-global current terminal;
-- a frozen compiled-format target and parser fixture corpus.
+- dual-target `net8.0`/`net10.0` package and compatibility gates.
 
-0.9 is therefore an acquisition release rather than a semantic rewrite.
+Version 1.0 is a stability/package-contract release, not another semantic or
+acquisition expansion.
 
 ---
 
 ## 2. Inventory by architectural family
 
-| Family | Missing work | Natural home | Common dependency |
+| Family | Status / future work | Natural home | Common dependency |
 | --- | --- | --- | --- |
-| Compiled acquisition | `0432`, extended sections, `01036`, diagnostics | `Icod.TermInfo` 0.9 | 0.8 semantic model |
-| Filesystem/system discovery | directory provider, `TERMINFO`, `TERMINFO_DIRS`, user/default roots | `Icod.TermInfo` 0.9 | compiled parser |
-| External-data lifecycle | cache, refresh, concurrency, hostile-file bounds | `Icod.TermInfo` 0.9 | parser + providers |
+| Compiled acquisition | completed for frozen conventional `0432`, ncurses extended sections, and `01036` | `Icod.TermInfo` 0.9/1.0 | semantic model |
+| Filesystem/system discovery | completed for directory, `TERMINFO`, `TERMINFO_DIRS`, user/default roots | `Icod.TermInfo` 0.9/1.0 | compiled parser |
+| External-data lifecycle | completed provider-local cache/refresh/concurrency/bounds contract | `Icod.TermInfo` 0.9/1.0 | parser + providers |
 | Hashed databases | Berkeley DB/ncurses hashed stores | optional later provider/package | compiled parser |
 | Historical vendor formats | HP-UX/AIX/OSF/1 divergent binary layouts | optional later | parser abstraction + fixtures |
 | Terminfo source language | `.ti`, escapes, cancellation, `use=` inheritance | later core/source package | 0.8 semantic model + source AST |
@@ -66,12 +70,12 @@ By the end of 0.8.0, `Icod.TermInfo` already provides:
 
 ---
 
-## 3. Core `Icod.TermInfo` work after 0.9
+## 3. Core `Icod.TermInfo` work after 1.0
 
 ### 3.1 Terminfo source syntax
 
-The largest coherent terminfo feature not included in 0.9 is source-language
-support.
+The largest coherent terminfo feature outside the 1.0 runtime contract is
+source-language support.
 
 A future design would need:
 
@@ -390,14 +394,14 @@ The recommended near-term sequence is:
         v
 0.9 compiled acquisition
         |
+        v
+1.0 stable contract
+        |
         +----------------------------+
         |                            |
         v                            v
-Icod.TermInfo 1.0 review       source/tooling family
+Icod.Terminal                 source/tooling family
                                      (optional/later)
-        |
-        v
-Icod.Terminal
         |
    +----+----------------+
    |                     |
@@ -415,19 +419,16 @@ plumbing is largely orthogonal to terminfo database acquisition.
 
 ---
 
-## 10. 1.0 interpretation
+## 10. 1.0 boundary
 
-After 0.9, `Icod.TermInfo` should be evaluated for 1.0 based on whether its core
-job is complete and stable, not on whether every terminal-related project has
-been implemented.
-
-A strong 1.0 definition would be:
+The 1.0 definition is now explicit:
 
 > `Icod.TermInfo` can deterministically identify/load supported conventional
 > terminal descriptions, represent their standard and extended terminfo
 > semantics completely, and query/expand/output them correctly without native
 > ncurses or hidden process-global terminal state.
 
-Under that definition, source tooling, termcap, live input, probing, graphics,
-PTYs, curses, and terminal emulation are valuable future systems but are not
-prerequisites for a stable `Icod.TermInfo` 1.0.
+Source tooling, termcap, live input, probing, graphics, PTYs, curses, and
+terminal emulation remain valuable future systems, but they are not omissions
+from the stable `Icod.TermInfo` 1.0 contract. New work should preserve that
+boundary unless a future major-version design deliberately revisits it.

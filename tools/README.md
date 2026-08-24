@@ -9,11 +9,18 @@ the NuGet package.
 - `compiled-terminfo-fixtures` — maintainer-only regeneration of the checked-in
   compiled/malformed T29 fixture corpus; requires the documented `tic` version
   only when deliberately regenerating fixtures.
-- `package-verifier` — `.nupkg`/`.snupkg`, Source Link, dependency, and
-  architecture validation used by release scripts.
+- `package-verifier` — `.nupkg`/`.snupkg`, dual-target payload, assembly
+  identity, Source Link, dependency, and architecture validation used by
+  release scripts.
+- `public-api-snapshot` — deterministic exhaustive reflection manifest for the
+  1.0 API-regret audit and later compatibility checks.
 - `package-smoke` — package-reference-only fresh consumer source. It is
   deliberately excluded from the solution so normal solution restore cannot
   accidentally turn the package smoke test into a project-reference test.
 
-Repository maintenance utilities are implemented in C#/.NET. Normal build,
-test, package validation, and fixture consumption do not require Python.
+Repository maintenance utilities target `net10.0` unless their purpose is to
+exercise a shipped consumer target. The package-smoke consumer deliberately
+targets both `net8.0` and `net10.0`.
+
+Normal build, test, package validation, and fixture consumption do not require
+Python.

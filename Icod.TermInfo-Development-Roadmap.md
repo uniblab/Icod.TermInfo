@@ -17,6 +17,9 @@ version contracts live in version-specific roadmap files.
   acquisition: pure binary parser, explicit directory provider,
   environment/system discovery, and provider-local cache/refresh semantics;
   complete and frozen.
+- `Icod.TermInfo-Development-Roadmap-1.0.0.md` — active 1.0 readiness contract:
+  API-regret audit, dual-target robustness/compatibility, documentation/package
+  freeze, and final completion gate.
 
 ## Roadmap sequence
 
@@ -25,13 +28,13 @@ version contracts live in version-specific roadmap files.
   -> 0.7.0  modern descriptive capability model
   -> 0.8.0  semantic completion
   -> 0.9.0  arbitrary compiled acquisition
-  -> 1.0 readiness review
+  -> 1.0.0  stable public contract
 ```
 
-The 0.9 contract deliberately does **not** absorb every remaining terminal
+The 1.0 readiness work deliberately does **not** absorb every remaining terminal
 feature. Terminfo source-language tooling, termcap compatibility, hashed
 Berkeley-DB stores, live terminal sessions/input/probing, PTYs, curses/virtual
-screens, graphics protocols, and terminal emulation are separate future-work
+screens, graphics protocols, and terminal emulation remain separate future-work
 families. Their dependencies and likely package homes are recorded in
 `docs/FUTURE-WORK-INVENTORY.md`.
 

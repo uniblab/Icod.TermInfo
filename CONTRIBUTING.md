@@ -1,10 +1,15 @@
 # Contributing to Icod.TermInfo
 
-Contributions are welcome when they preserve the capability-driven design and versioned contracts documented by the current roadmap and the frozen historical release roadmaps.
+Contributions are welcome when they preserve the capability-driven design, the active 1.0 contract, and the frozen historical release contracts.
 
 ## Development requirements
 
-Use the .NET 10 SDK and C# 13. Before submitting a change, run Debug and Release builds and tests for `Icod.TermInfo.sln`:
+Install the .NET 8 and .NET 10 SDK/runtime lines and use C# 13. The shipped
+library, tests, and samples target both `net8.0` and `net10.0`; repository-only
+maintenance tools normally target `net10.0`.
+
+Before submitting a change, run Debug and Release builds and tests for
+`Icod.TermInfo.sln`:
 
 ```text
 dotnet restore Icod.TermInfo.sln
@@ -16,13 +21,21 @@ dotnet test Icod.TermInfo.sln -c Release
 
 Repository text files use UTF-8 and LF line endings. Use braces for all control-flow bodies. Public, protected, and internal API entry points should validate their parameters before performing work.
 
-Release builds treat warnings as errors except for the repository's deliberate XML-documentation exception. New public API must therefore be intentional, documented, nullable-correct, and covered by the current public API baseline tests. For 0.8, T30 freezes that surface before the final completion gate.
+Release builds treat warnings as errors, including CS1591. Every public member
+must carry XML documentation. Public API changes must also be nullable-correct,
+covered by semantic surface tests, and reconciled deliberately with the checked
+1.0 API baseline; do not regenerate the baseline merely to silence a mismatch.
 
 ## Version metadata
 
-`Icod.TermInfo.csproj` contains both `<Version />` and `<PackageVersion />`. Keep them identical in every development and release change.
+`Icod.TermInfo.csproj` contains `<Version />`, `<PackageVersion />`, and the
+stable 1.x `<AssemblyVersion />`. Keep `Version` and `PackageVersion` identical.
+The 1.x assembly version remains `1.0.0.0`, and the assembly remains unsigned.
 
-Prerelease development should use the active version roadmap's alpha/beta/RC sequence. A release tag must be exactly `v<PackageVersion>`; the release workflow rejects a tag/version mismatch.
+Prerelease development should use the active version roadmap's alpha/beta/RC sequence. A final release tag must be exactly `v<PackageVersion>`.
+
+See `docs/VERSIONING.md` and `docs/COMPATIBILITY.md` before changing public API,
+assembly identity, target frameworks, or compatibility behavior.
 
 ## Adding or changing a terminal profile
 
@@ -73,21 +86,36 @@ Terminal profile loading must remain side-effect free. In particular, Windows vi
 
 Public behavior changes should update README examples when relevant. Samples must remain safe on redirected output and should not assume the CI runner has a usable `TERM` or interactive TTY.
 
-If a public type or compatibility operation is added, update the public API baseline tests deliberately rather than weakening them.
+Both sample projects are multi-targeted. Documentation which invokes them with
+`dotnet run` must specify `-f net8.0` or `-f net10.0`.
+
+If a public type or compatibility operation changes, update the semantic public
+API tests deliberately. Once `docs/1.0.0-PUBLIC-API-BASELINE.txt` is approved,
+`public-api-snapshot --check` is the compatibility gate; rewriting the baseline
+requires an explicit compatibility decision.
 
 ## Packaging and release changes
 
 Package changes should preserve:
 
 - deterministic/continuous-integration builds;
+- first-class `net8.0` and `net10.0` managed/XML assets;
+- stable assembly version `1.0.0.0` throughout 1.x;
+- unsigned assembly identity throughout 1.x;
 - Source Link information supplied by the .NET SDK;
-- portable PDBs and `.snupkg` generation;
-- package validation;
-- the package README and LGPL license;
+- portable PDBs and `.snupkg` generation for both targets;
+- package validation and the fresh-package smoke consumer on both targets;
+- the package README, icon metadata, and LGPL license expression;
 - identical release artifacts for NuGet.org and GitHub Packages.
 
 See `docs/RELEASING.md` before modifying publication workflows.
 
 ## Scope discipline
 
-The 0.8 contract deliberately stops at immutable terminfo semantics, pure transformation/output helpers, built-in profiles, and explicit narrow platform helpers. Arbitrary compiled/system terminfo acquisition (`TERMINFO`, `TERMINFO_DIRS`, filesystem providers, and the production compiled parser) is required for 0.9, not 0.8. Live session ownership, input-event decoding, curses/UI behavior, PTY/ConPTY lifecycle, and terminal probing remain outside `Icod.TermInfo` 0.8.
+The 1.0 contract combines the immutable terminfo semantics completed in 0.8 with
+the compiled/system acquisition layer completed in 0.9 and then freezes their
+public/package contract. Live session ownership, input-event decoding,
+curses/UI behavior, PTY/ConPTY lifecycle, terminal probing, source-language
+tooling, and terminal emulation remain outside `Icod.TermInfo` 1.0.
+
+See `docs/FUTURE-WORK-INVENTORY.md` for the maintained project-family boundary.

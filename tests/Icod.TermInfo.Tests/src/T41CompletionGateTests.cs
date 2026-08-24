@@ -1,4 +1,3 @@
-using System.Reflection;
 using Icod.TermInfo;
 using Xunit;
 
@@ -6,35 +5,6 @@ namespace Icod.TermInfo.Tests;
 
 public sealed class T41CompletionGateTests
 {
-	[Fact]
-	public void AssemblyIdentifiesFinal09Release()
-	{
-		Assembly assembly =
-			typeof(SystemTerminalDescriptionProvider).Assembly;
-		Version? assemblyVersion =
-			assembly.GetName().Version;
-		string? informationalVersion =
-			assembly
-				.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-				?.InformationalVersion;
-
-		Assert.NotNull(assemblyVersion);
-		Assert.Equal(
-			new Version(0, 9, 0, 0),
-			assemblyVersion);
-		Assert.NotNull(informationalVersion);
-
-		string semanticVersion =
-			informationalVersion!
-				.Split(
-					'+',
-					2)[0];
-
-		Assert.Equal(
-			"0.9.0",
-			semanticVersion);
-	}
-
 	[Fact]
 	public void SupportedCompiledEntryFlowsThroughParserProvidersAndBuiltInFallback()
 	{

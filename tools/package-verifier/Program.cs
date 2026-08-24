@@ -1,4 +1,5 @@
 using System.IO.Compression;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -11,6 +12,8 @@ internal static class Program
     private const string PackageId = "Icod.TermInfo";
     private const string RepositoryUrl =
         "https://github.com/uniblab/Icod.TermInfo";
+    private const string ExpectedAssemblyVersion = "1.0.0.0";
+
     private static readonly string[] TargetFrameworks =
     [
         "net8.0",
@@ -57,8 +60,9 @@ internal static class Program
             VerifySymbolPackage(snupkg, commit);
 
             Console.WriteLine(
-                "Verified package structure, dependency closure, symbols, "
-                + $"and Source Link for {packageVersion}.");
+                "Verified dual-target package structure, assembly identity, "
+                + "package metadata, dependency closure, symbols, and "
+                + $"Source Link for {packageVersion}.");
             return 0;
         }
         catch (Exception exception) when (
@@ -190,6 +194,7 @@ internal static class Program
         List<string> required =
         [
             "README.md",
+            "icon.png",
         ];
 
         foreach (string targetFramework in TargetFrameworks)
@@ -249,6 +254,16 @@ internal static class Program
             "Primary package contains unexpected DLL payloads: "
                 + string.Join(", ", dlls));
 
+        foreach (string targetFramework in TargetFrameworks)
+        {
+            VerifyAssemblyIdentity(
+                package,
+                targetFramework);
+            VerifyDocumentation(
+                package,
+                targetFramework);
+        }
+
         Require(
             !names.Any(HasNativeLibraryExtension),
             "Primary package unexpectedly contains a native library payload.");
@@ -287,6 +302,58 @@ internal static class Program
             GetMetadataText(metadata!, "version") == expectedVersion,
             "Unexpected package version.");
         Require(
+            GetMetadataText(metadata!, "title") == PackageId,
+            "Unexpected package title.");
+        Require(
+            GetMetadataText(metadata!, "authors") == "Timothy J. Bruce",
+            "Unexpected package authors.");
+        Require(
+            GetMetadataText(metadata!, "projectUrl") == RepositoryUrl,
+            "Unexpected package project URL.");
+        Require(
+            GetMetadataText(metadata!, "readme") == "README.md",
+            "Package metadata does not identify README.md.");
+        Require(
+            GetMetadataText(metadata!, "icon") == "icon.png",
+            "Package metadata does not identify icon.png.");
+        Require(
+            string.Equals(
+                GetMetadataText(
+                    metadata!,
+                    "requireLicenseAcceptance"),
+                "true",
+                StringComparison.OrdinalIgnoreCase),
+            "Package must require license acceptance.");
+        Require(
+            !string.IsNullOrWhiteSpace(
+                GetMetadataText(
+                    metadata!,
+                    "description")),
+            "Package description is missing.");
+        Require(
+            !string.IsNullOrWhiteSpace(
+                GetMetadataText(
+                    metadata!,
+                    "tags")),
+            "Package tags are missing.");
+
+        XElement? license =
+            metadata!
+                .Elements()
+                .FirstOrDefault(
+                    element =>
+                        element.Name.LocalName == "license");
+        Require(
+            license is not null,
+            "Package metadata has no license element.");
+        Require(
+            license!.Attribute("type")?.Value == "expression",
+            "Package license is not an expression.");
+        Require(
+            license.Value == "LGPL-3.0-or-later",
+            "Unexpected package license expression.");
+
+        Require(
             !metadata!
                 .Descendants()
                 .Any(
@@ -318,6 +385,121 @@ internal static class Program
             $"Repository metadata has an invalid commit id: '{commit}'.");
 
         return commit;
+    }
+
+    private static void VerifyDocumentation(
+        ZipArchive package,
+        string targetFramework)
+    {
+        ArgumentNullException.ThrowIfNull(package);
+        ArgumentException.ThrowIfNullOrWhiteSpace(targetFramework);
+
+        string documentationPath =
+            $"lib/{targetFramework}/Icod.TermInfo.xml";
+        ZipArchiveEntry? entry =
+            package.GetEntry(
+                documentationPath);
+        Require(
+            entry is not null,
+            $"Primary package is missing {documentationPath}.");
+        Require(
+            entry!.Length > 0,
+            $"{documentationPath} is empty.");
+
+        using Stream stream =
+            entry.Open();
+        XDocument documentation =
+            XDocument.Load(
+                stream,
+                LoadOptions.None);
+
+        string? assemblyName =
+            documentation
+                .Descendants()
+                .FirstOrDefault(
+                    element =>
+                        element.Name.LocalName == "assembly")
+                ?.Elements()
+                .FirstOrDefault(
+                    element =>
+                        element.Name.LocalName == "name")
+                ?.Value;
+
+        Require(
+            assemblyName == PackageId,
+            $"{documentationPath} identifies unexpected assembly "
+                + $"'{assemblyName}'.");
+
+        int memberCount =
+            documentation
+                .Descendants()
+                .Count(
+                    element =>
+                        element.Name.LocalName == "member");
+
+        Require(
+            memberCount > 0,
+            $"{documentationPath} contains no documented members.");
+    }
+
+    private static void VerifyAssemblyIdentity(
+        ZipArchive package,
+        string targetFramework)
+    {
+        ArgumentNullException.ThrowIfNull(package);
+        ArgumentException.ThrowIfNullOrWhiteSpace(targetFramework);
+
+        string assemblyPath =
+            $"lib/{targetFramework}/Icod.TermInfo.dll";
+        ZipArchiveEntry? entry =
+            package.GetEntry(assemblyPath);
+        Require(
+            entry is not null,
+            $"Primary package is missing {assemblyPath}.");
+
+        string temporaryPath =
+            Path.Combine(
+                Path.GetTempPath(),
+                "Icod.TermInfo-package-verifier-"
+                + Guid.NewGuid().ToString("N")
+                + ".dll");
+
+        try
+        {
+            using (Stream source = entry!.Open())
+            using (FileStream destination = File.Create(temporaryPath))
+            {
+                source.CopyTo(destination);
+            }
+
+            AssemblyName assemblyName =
+                AssemblyName.GetAssemblyName(
+                    temporaryPath);
+
+            Require(
+                assemblyName.Name == PackageId,
+                $"{assemblyPath} has unexpected assembly name "
+                    + $"'{assemblyName.Name}'.");
+            Require(
+                assemblyName.Version?.ToString() == ExpectedAssemblyVersion,
+                $"{assemblyPath} has assembly version "
+                    + $"'{assemblyName.Version}', expected "
+                    + $"{ExpectedAssemblyVersion}.");
+
+            byte[]? publicKeyToken =
+                assemblyName.GetPublicKeyToken();
+            Require(
+                publicKeyToken is null
+                    || publicKeyToken.Length == 0,
+                $"{assemblyPath} is unexpectedly strong-name signed.");
+        }
+        finally
+        {
+            if (File.Exists(temporaryPath))
+            {
+                File.Delete(temporaryPath);
+            }
+        }
     }
 
     private static void VerifySymbolPackage(

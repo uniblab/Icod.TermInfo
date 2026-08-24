@@ -15,6 +15,12 @@ dotnet run \
   -f net10.0 \
   -- --check
 
+# The reviewed 1.0 API baseline must remain exact.
+dotnet run   --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj   -c Release   --no-build   -- --check
+
+# The two shipped target frameworks must expose the exact same API.
+dotnet run   --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj   -c Release   --no-build   -- --compare   bin/Release/net8.0/Icod.TermInfo.dll   bin/Release/net10.0/Icod.TermInfo.dll
+
 # Structural package, Source Link, dependency, and architecture verification.
 dotnet run \
   --project tools/package-verifier/Icod.TermInfo.PackageVerifier.csproj \

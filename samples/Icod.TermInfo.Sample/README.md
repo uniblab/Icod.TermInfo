@@ -4,6 +4,8 @@ This is the repository's general executable sample for the low-level
 `Icod.TermInfo` semantic, profile, output, and environment APIs. It is
 intentionally descriptive rather than a live terminal session manager.
 
+The project targets `net8.0` and `net10.0`; the commands below use `net10.0` explicitly. Substitute `-f net8.0` to exercise the .NET 8 target.
+
 The sample demonstrates:
 
 - exact built-in profile selection and conservative environment resolution;
@@ -22,20 +24,20 @@ The sample demonstrates:
 Run the ordinary demonstration with:
 
 ```text
-dotnet run --project samples/Icod.TermInfo.Sample/Icod.TermInfo.Sample.csproj
+dotnet run --project samples/Icod.TermInfo.Sample/Icod.TermInfo.Sample.csproj -f net10.0
 ```
 
 Select an exact built-in profile with:
 
 ```text
-dotnet run --project samples/Icod.TermInfo.Sample/Icod.TermInfo.Sample.csproj -- --profile xterm-256color
+dotnet run --project samples/Icod.TermInfo.Sample/Icod.TermInfo.Sample.csproj -f net10.0 -- --profile xterm-256color
 ```
 
 Use the non-interactive mode in CI, documentation checks, redirected output, or
 any environment where terminal-control strings should not be emitted:
 
 ```text
-dotnet run --project samples/Icod.TermInfo.Sample/Icod.TermInfo.Sample.csproj -- --describe-only --profile ms-terminal-direct
+dotnet run --project samples/Icod.TermInfo.Sample/Icod.TermInfo.Sample.csproj -f net10.0 -- --describe-only --profile ms-terminal-direct
 ```
 
 For caller-supplied compiled bytes, explicit database roots, restricted system

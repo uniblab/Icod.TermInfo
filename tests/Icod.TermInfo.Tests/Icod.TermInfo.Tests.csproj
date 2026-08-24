@@ -64,6 +64,5 @@
     <Optimize>true</Optimize>
     <SignAssembly>false</SignAssembly>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <WarningsNotAsErrors>CS1591</WarningsNotAsErrors>
   </PropertyGroup>
 </Project>
