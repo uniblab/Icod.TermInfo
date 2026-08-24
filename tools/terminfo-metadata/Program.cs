@@ -325,7 +325,9 @@ internal static class Program
             "src",
             "Capabilities",
             EnumFiles[kind]);
-        string source = File.ReadAllText(enumPath);
+        string source =
+            NormalizeLineEndings(
+                File.ReadAllText(enumPath));
 
         HashSet<string> actualNames =
             EnumMemberPattern
