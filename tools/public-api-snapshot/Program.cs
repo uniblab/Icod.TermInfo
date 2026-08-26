@@ -29,19 +29,18 @@ internal static class Program
                 args);
         }
 
-        if (args.Length > 2)
+        if (args.Length > 3)
         {
             PrintUsage();
             return 2;
         }
 
-        string manifest =
-            CreateManifest(
-                typeof(TerminalDescription).Assembly);
-
         if (args.Length == 0)
         {
-            Console.Write(manifest);
+            string currentManifest =
+                CreateManifest(
+                    typeof(TerminalDescription).Assembly);
+            Console.Write(currentManifest);
             return 0;
         }
 
@@ -58,8 +57,32 @@ internal static class Program
             return 2;
         }
 
+        string manifest;
+        if (args.Length == 3)
+        {
+            string assemblyPath =
+                Path.GetFullPath(
+                    args[2]);
+            if (!File.Exists(assemblyPath))
+            {
+                Console.Error.WriteLine(
+                    $"Assembly not found: {assemblyPath}");
+                return 1;
+            }
+
+            manifest =
+                CreateManifestFromAssemblyPath(
+                    assemblyPath);
+        }
+        else
+        {
+            manifest =
+                CreateManifest(
+                    typeof(TerminalDescription).Assembly);
+        }
+
         string path =
-            args.Length == 2
+            args.Length >= 2
                 ? Path.GetFullPath(args[1])
                 : Path.Combine(
                     FindRepositoryRoot(),
@@ -214,13 +237,24 @@ internal static class Program
     {
         ArgumentNullException.ThrowIfNull(assembly);
 
+        AssemblyName assemblyName =
+            assembly.GetName();
+        string simpleName =
+            assemblyName.Name
+            ?? throw new InvalidOperationException(
+                "The assembly does not have a simple name.");
+        Version assemblyVersion =
+            assemblyName.Version
+            ?? throw new InvalidOperationException(
+                "The assembly does not have an assembly version.");
+
         StringBuilder builder = new();
         builder.AppendLine(
-            "# Icod.TermInfo public API baseline");
+            $"# {simpleName} public API baseline");
         builder.AppendLine(
             "# Format: Icod.TermInfo.PublicApiSnapshot/v1");
         builder.AppendLine(
-            "# AssemblyVersion: 1.0.0.0");
+            $"# AssemblyVersion: {assemblyVersion}");
         builder.AppendLine();
 
         foreach (
@@ -1201,10 +1235,9 @@ internal static class Program
                     '\r',
                     '\n');
 
-        return normalized.EndsWith(
+        return normalized.TrimEnd(
                 '\n')
-            ? normalized
-            : normalized + "\n";
+            + "\n";
     }
 
     private static string ComputeSha256(
@@ -1255,6 +1288,10 @@ internal static class Program
             "  public-api-snapshot --write [baseline-path]");
         Console.Error.WriteLine(
             "  public-api-snapshot --check [baseline-path]");
+        Console.Error.WriteLine(
+            "  public-api-snapshot --write <baseline-path> <assembly-path>");
+        Console.Error.WriteLine(
+            "  public-api-snapshot --check <baseline-path> <assembly-path>");
         Console.Error.WriteLine(
             "  public-api-snapshot --compare <assembly-a> <assembly-b>");
     }

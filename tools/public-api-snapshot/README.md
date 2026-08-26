@@ -1,7 +1,8 @@
 # Public API Snapshot
 
 `Icod.TermInfo.PublicApiSnapshot` emits a deterministic reflection manifest of
-the complete exported `Icod.TermInfo` API.
+the complete exported `Icod.TermInfo` API or of an explicitly supplied built
+assembly.
 
 The manifest records:
 
@@ -18,35 +19,45 @@ The manifest records:
 - relevant `System.Diagnostics.CodeAnalysis`, `Flags`, and `Obsolete`
   attributes.
 
-The tool intentionally targets `net10.0`; it describes the public contract of
-the project reference rather than becoming a shipped runtime asset.
+The tool intentionally targets `net10.0`; it is repository maintenance tooling
+rather than a shipped runtime asset.
 
-Print the current manifest:
+Print the current runtime manifest:
 
 ```text
 dotnet run --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj -c Release
 ```
 
-Write the candidate 1.0 baseline:
+Write the candidate 1.0 runtime baseline:
 
 ```text
 dotnet run --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj -c Release -- --write
 ```
 
-The default path is:
+The default runtime path is:
 
 ```text
 docs/1.0.0-PUBLIC-API-BASELINE.txt
 ```
 
-The first baseline must be reviewed by a human during T42 before it is accepted.
-Do not use `--write` as a way to silence an unexplained API change.
+The first runtime baseline was reviewed during T42. Do not use `--write` as a
+way to silence an unexplained API change.
 
-After the baseline is approved and committed, verify it with:
+Verify the approved runtime baseline with:
 
 ```text
 dotnet run --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj -c Release -- --check
 ```
+
+S02 adds explicit-assembly baseline support. The reviewed Source baseline can be
+checked with:
+
+```text
+dotnet run --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj -c Release --no-build -- --check docs/1.1.0-SOURCE-PUBLIC-API-BASELINE.txt Icod.TermInfo.Source/bin/Release/net10.0/Icod.TermInfo.Source.dll
+```
+
+Use the same three-argument form with `--write` only when deliberately creating
+or reviewing a new baseline.
 
 Compare the public contract of two built assemblies:
 
@@ -54,9 +65,7 @@ Compare the public contract of two built assemblies:
 dotnet run --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj -c Release -- --compare bin/Release/net8.0/Icod.TermInfo.dll bin/Release/net10.0/Icod.TermInfo.dll
 ```
 
-T43 release validation uses this mode to require exact public API equivalence
-between the `net8.0` and `net10.0` package targets.
-
-Once the T42 baseline is reviewed and committed, release validation also runs
-`--check`. The release/package gate therefore fails rather than silently
-blessing an unexplained public API change.
+Release validation requires exact public API equivalence between the `net8.0`
+and `net10.0` package targets. It also checks the frozen runtime baseline and,
+from S02 onward, the reviewed Source baseline. The release/package gate fails
+rather than silently blessing an unexplained public API change.

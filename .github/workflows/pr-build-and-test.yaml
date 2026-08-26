@@ -28,7 +28,9 @@ jobs:
 
       - name: Pack Staging packages
         if: matrix.os == 'ubuntu-latest'
-        run: dotnet pack Icod.TermInfo.csproj -c Staging --no-build --output artifacts
+        run: |
+          dotnet pack Icod.TermInfo.csproj -c Staging --no-build --output artifacts
+          dotnet pack Icod.TermInfo.Source/Icod.TermInfo.Source.csproj -c Staging --no-build --output artifacts
 
       - name: Verify Staging packages
         if: matrix.os == 'ubuntu-latest'

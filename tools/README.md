@@ -13,14 +13,19 @@ the NuGet package.
   identity, Source Link, dependency, and architecture validation used by
   release scripts.
 - `public-api-snapshot` — deterministic exhaustive reflection manifest for the
-  1.0 API-regret audit and later compatibility checks.
+  frozen runtime API and, from S02 onward, explicitly supplied assemblies such
+  as `Icod.TermInfo.Source`.
 - `package-smoke` — package-reference-only fresh consumer source. It is
   deliberately excluded from the solution so normal solution restore cannot
   accidentally turn the package smoke test into a project-reference test.
+- `source-package-smoke` — package-reference-only consumer for
+  `Icod.TermInfo.Source`; it also uses `Icod.TermInfo` through the package
+  dependency to prove the source package does not rely on a repository-local
+  project reference.
 
 Repository maintenance utilities target `net10.0` unless their purpose is to
-exercise a shipped consumer target. The package-smoke consumer deliberately
-targets both `net8.0` and `net10.0`.
+exercise a shipped consumer target. Both package-smoke consumers deliberately
+target `net8.0` and `net10.0`.
 
 Normal build, test, package validation, and fixture consumption do not require
 Python.
