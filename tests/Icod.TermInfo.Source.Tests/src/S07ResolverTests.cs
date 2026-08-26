@@ -584,11 +584,12 @@ public sealed class S07ResolverTests {
 			[NotNullWhen( true )] out TermInfoSourceEntry? entry
 		) {
 			ArgumentException.ThrowIfNullOrWhiteSpace( name );
-			entry = null;
+
+			// Deliberately violate the provider contract to test resolver validation.
+			entry = null!;
 			return true;
 		}
 	}
-
 	private sealed class MissWithEntryProvider : ITermInfoSourceEntryProvider {
 		private readonly TermInfoSourceEntry _entry;
 
