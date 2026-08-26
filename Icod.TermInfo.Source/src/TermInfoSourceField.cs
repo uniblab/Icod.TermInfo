@@ -9,7 +9,8 @@ namespace Icod.TermInfo.Source;
 /// <para>
 /// Fields remain in source order. S06 keeps these declarations intact for
 /// provenance while an internal semantic state applies local values and
-/// cancellation tombstones. <c>use=</c> inheritance remains S07 work.
+/// cancellation tombstones. S07 consumes <c>use=</c> declarations through the
+/// inheritance resolver without mutating this unresolved representation.
 /// </para>
 /// <para>
 /// Invalid numeric or string values retain their raw source text and field

@@ -12,16 +12,16 @@
 		<AssemblyName>Icod.TermInfo</AssemblyName>
 		<RootNamespace>Icod.TermInfo</RootNamespace>
 		<Configurations>Debug;Release;Staging</Configurations>
-		<Version>1.1.0-Alpha-6</Version>
+		<Version>1.1.0-Alpha-7</Version>
 		<AssemblyVersion>1.0.0.0</AssemblyVersion>
 	</PropertyGroup>
 	<PropertyGroup>
-		<PackageVersion>1.1.0-Alpha-6</PackageVersion>
+		<PackageVersion>1.1.0-Alpha-7</PackageVersion>
 		<PackageId>Icod.TermInfo</PackageId>
 		<Title>Icod.TermInfo</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed, dependency-free .NET terminfo library for terminal capability metadata, compiled terminfo parsing and database discovery, ANSI/DEC/xterm and Windows profiles, parameter expansion, color semantics, and padding-aware output.</Description>
-		<PackageReleaseNotes>1.1.0-Alpha-6 adds source cancellation tombstone and priority-merge semantics in the separately packaged Icod.TermInfo.Source layer while preserving the frozen Icod.TermInfo 1.x runtime assembly identity and 1.0 public contract.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.1.0-Alpha-7 adds recursive use= inheritance resolution, source-entry provider composition, cycle and missing-parent diagnostics, and bounded inheritance depth in the separately packaged Icod.TermInfo.Source layer while preserving the frozen Icod.TermInfo 1.x runtime assembly identity and 1.0 public contract.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>

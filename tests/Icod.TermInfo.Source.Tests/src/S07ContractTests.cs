@@ -1,12 +1,11 @@
 using System.Reflection;
 using System.Xml.Linq;
-using Icod.TermInfo;
 using Icod.TermInfo.Source;
 using Xunit;
 
 namespace Icod.TermInfo.Source.Tests;
 
-public sealed class S04ContractTests
+public sealed class S07ContractTests
 {
     private const string DevelopmentVersion = "1.1.0-Alpha-7";
     private const string StableAssemblyVersion = "1.0.0.0";
@@ -52,10 +51,10 @@ public sealed class S04ContractTests
     }
 
     [Fact]
-    public void SourcePublicSurfaceIncludesReviewedUnresolvedModelTypes()
+    public void SourcePublicSurfaceIncludesReviewedResolverContract()
     {
         Assembly assembly =
-            typeof(TermInfoSourceParser).Assembly;
+            typeof(TermInfoSourceResolver).Assembly;
         string[] exportedTypes =
             assembly
                 .GetExportedTypes()
@@ -65,29 +64,20 @@ public sealed class S04ContractTests
                     StringComparer.Ordinal)
                 .ToArray();
 
-        Assert.Equal(
-            new[]
-            {
-                "Icod.TermInfo.Source.TermInfoSourceCapabilityClassification",
-                "Icod.TermInfo.Source.TermInfoSourceDiagnostic",
-                "Icod.TermInfo.Source.TermInfoSourceDiagnosticCodes",
-                "Icod.TermInfo.Source.TermInfoSourceDiagnosticSeverity",
-                "Icod.TermInfo.Source.TermInfoSourceDocument",
-                "Icod.TermInfo.Source.TermInfoSourceEntry",
-                "Icod.TermInfo.Source.TermInfoSourceField",
-                "Icod.TermInfo.Source.TermInfoSourceFieldKind",
-                "Icod.TermInfo.Source.TermInfoSourceLexResult",
-                "Icod.TermInfo.Source.TermInfoSourceLexer",
-                "Icod.TermInfo.Source.TermInfoSourceLexerOptions",
-                "Icod.TermInfo.Source.TermInfoSourceNumericValueResult",
-                "Icod.TermInfo.Source.TermInfoSourceParseResult",
-                "Icod.TermInfo.Source.TermInfoSourceParser",
-                "Icod.TermInfo.Source.TermInfoSourceSpan",
-                "Icod.TermInfo.Source.TermInfoSourceStringValueResult",
-                "Icod.TermInfo.Source.TermInfoSourceToken",
-                "Icod.TermInfo.Source.TermInfoSourceTokenKind",
-                "Icod.TermInfo.Source.TermInfoSourceValueParser",
-            },
+        Assert.Contains(
+            "Icod.TermInfo.Source.ITermInfoSourceEntryProvider",
+            exportedTypes);
+        Assert.Contains(
+            "Icod.TermInfo.Source.TermInfoSourceResolveResult",
+            exportedTypes);
+        Assert.Contains(
+            "Icod.TermInfo.Source.TermInfoSourceResolvedEntry",
+            exportedTypes);
+        Assert.Contains(
+            "Icod.TermInfo.Source.TermInfoSourceResolver",
+            exportedTypes);
+        Assert.Contains(
+            "Icod.TermInfo.Source.TermInfoSourceResolverOptions",
             exportedTypes);
         Assert.Equal(
             new Version(1, 0, 0, 0),
@@ -95,31 +85,7 @@ public sealed class S04ContractTests
     }
 
     [Fact]
-    public void UnresolvedModelDoesNotExposeTerminalDescriptionState()
-    {
-        Type[] modelTypes =
-        [
-            typeof(TermInfoSourceDocument),
-            typeof(TermInfoSourceEntry),
-            typeof(TermInfoSourceField),
-            typeof(TermInfoSourceParseResult),
-        ];
-
-        Assert.DoesNotContain(
-            modelTypes
-                .SelectMany(
-                    type =>
-                        type.GetProperties(
-                            BindingFlags.Public
-                            | BindingFlags.Instance))
-                .SelectMany(
-                    property =>
-                        FlattenType(property.PropertyType)),
-            type => type == typeof(TerminalDescription));
-    }
-
-    [Fact]
-    public void SourcePublicApiBaselineIncludesUnresolvedModelContract()
+    public void SourcePublicApiBaselineIncludesResolverAndDiagnostics()
     {
         string root = FindRepositoryRoot();
         string baseline =
@@ -130,34 +96,28 @@ public sealed class S04ContractTests
                     "1.1.0-SOURCE-PUBLIC-API-BASELINE.txt"));
 
         Assert.Contains(
-            "TYPE class Icod.TermInfo.Source.TermInfoSourceDocument [sealed]",
+            "TYPE interface Icod.TermInfo.Source.ITermInfoSourceEntryProvider [abstract]",
             baseline);
         Assert.Contains(
-            "TYPE class Icod.TermInfo.Source.TermInfoSourceEntry [sealed]",
+            "TYPE class Icod.TermInfo.Source.TermInfoSourceResolver [static]",
             baseline);
         Assert.Contains(
-            "TYPE class Icod.TermInfo.Source.TermInfoSourceField [sealed]",
+            "TYPE class Icod.TermInfo.Source.TermInfoSourceResolvedEntry [sealed]",
             baseline);
-        Assert.Contains(
-            "TYPE enum Icod.TermInfo.Source.TermInfoSourceFieldKind [sealed]",
-            baseline);
-        Assert.Contains(
-            "TYPE class Icod.TermInfo.Source.TermInfoSourceParseResult [sealed]",
-            baseline);
-        Assert.Contains(
-            "TYPE class Icod.TermInfo.Source.TermInfoSourceParser [static]",
-            baseline);
+        Assert.Contains("TIS0022", baseline);
+        Assert.Contains("TIS0023", baseline);
+        Assert.Contains("TIS0024", baseline);
     }
 
     [Fact]
-    public void S04ImplementationRecordAndRoadmapLinkArePresent()
+    public void S07ImplementationRecordAndRoadmapLinkArePresent()
     {
         string root = FindRepositoryRoot();
         string recordPath =
             Path.Combine(
                 root,
                 "docs",
-                "1.1.0-S04-UNRESOLVED-SOURCE-ENTRY-MODEL.md");
+                "1.1.0-S07-USE-INHERITANCE-RESOLVER.md");
         string roadmap =
             File.ReadAllText(
                 Path.Combine(
@@ -167,32 +127,15 @@ public sealed class S04ContractTests
         Assert.True(File.Exists(recordPath));
         string record =
             File.ReadAllText(recordPath);
-        Assert.Contains("1.1.0-Alpha-4", record);
-        Assert.Contains("TermInfoSourceDocument", record);
-        Assert.Contains("TermInfoSourceEntry", record);
-        Assert.Contains("TermInfoSourceField", record);
-        Assert.Contains("S05", record);
+        Assert.Contains("1.1.0-Alpha-7", record);
+        Assert.Contains("ITermInfoSourceEntryProvider", record);
+        Assert.Contains("TIS0022", record);
+        Assert.Contains("TIS0023", record);
+        Assert.Contains("TIS0024", record);
+        Assert.Contains("S08", record);
         Assert.Contains(
-            "1.1.0-S04-UNRESOLVED-SOURCE-ENTRY-MODEL.md",
+            "1.1.0-S07-USE-INHERITANCE-RESOLVER.md",
             roadmap);
-    }
-
-    private static IEnumerable<Type> FlattenType(
-        Type type)
-    {
-        ArgumentNullException.ThrowIfNull(type);
-
-        yield return type;
-        if (type.IsGenericType)
-        {
-            foreach (Type argument in type.GetGenericArguments())
-            {
-                foreach (Type nested in FlattenType(argument))
-                {
-                    yield return nested;
-                }
-            }
-        }
     }
 
     private static string ReadRequiredProperty(

@@ -30,12 +30,14 @@ Require(
     "The source package must retain the stable 1.x assembly identity.");
 
 const string source =
-    "package-smoke|Package smoke source,\n"
+    "source-parent|Source package smoke parent,\n"
+    + "\tlines#24,\n"
+    + "package-smoke|Package smoke source,\n"
     + "\tam,\n"
     + "\tcols#0100,\n"
     + "\tclear=\\E[H,\n"
     + "\tAX,\n"
-    + "\tuse=dumb,\n";
+    + "\tuse=source-parent,\n";
 
 TermInfoSourceLexResult lexed =
     TermInfoSourceLexer.Tokenize(
@@ -61,7 +63,8 @@ TermInfoSourceNumericValueResult numeric =
     TermInfoSourceValueParser.ParseNumeric(
         lexed.Tokens.Single(
             token =>
-                token.Kind == TermInfoSourceTokenKind.NumericCapability));
+                token.Kind == TermInfoSourceTokenKind.NumericCapability
+                && token.Text == "cols#0100"));
 Require(
     !numeric.HasErrors
         && numeric.Value == 64,
@@ -85,7 +88,8 @@ Require(
     !parsed.HasErrors,
     "The source package could not parse representative unresolved source.");
 TermInfoSourceEntry parsedEntry =
-    parsed.Document.Entries.Single();
+    parsed.Document.Entries.Single(
+        entry => entry.CanonicalName == "package-smoke");
 Require(
     parsedEntry.CanonicalName == "package-smoke"
         && parsedEntry.Fields.Count == 5,
@@ -118,8 +122,26 @@ Require(
     parsedEntry.Fields.Single(
             field =>
                 field.Kind == TermInfoSourceFieldKind.UseReference)
-        .ReferenceName == "dumb",
+        .ReferenceName == "source-parent",
     "The S04 model did not retain the use= reference.");
+
+TermInfoSourceResolveResult resolved =
+    TermInfoSourceResolver.Resolve(
+        parsed.Document,
+        "package-smoke");
+Require(
+    !resolved.HasErrors,
+    "The S07 resolver could not resolve representative use= inheritance.");
+TermInfoSourceResolvedEntry resolvedEntry =
+    resolved.Entry
+    ?? throw new InvalidOperationException(
+        "The S07 resolver returned no entry without reporting an error.");
+Require(
+    resolvedEntry.GetNumber(NumericCapability.Columns) == 64
+        && resolvedEntry.GetNumber(NumericCapability.Lines) == 24
+        && resolvedEntry.GetBoolean(BooleanCapability.AutoRightMargin)
+        && resolvedEntry.GetString(StringCapability.ClearScreen) == "\x1b[H",
+    "The S07 resolved source did not preserve local and inherited capabilities.");
 
 Assembly runtimeAssembly =
     typeof(TerminalDescription).Assembly;

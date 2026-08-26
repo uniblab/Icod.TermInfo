@@ -110,4 +110,19 @@ public static class TermInfoSourceDiagnosticCodes
     /// A standard capability is declared using the wrong source value kind.
     /// </summary>
     public const string StandardCapabilityTypeMismatch = "TIS0021";
+
+    /// <summary>
+    /// A requested root or <c>use=</c> parent source entry could not be found.
+    /// </summary>
+    public const string MissingSourceEntry = "TIS0022";
+
+    /// <summary>
+    /// The <c>use=</c> graph contains a direct or indirect inheritance cycle.
+    /// </summary>
+    public const string InheritanceCycle = "TIS0023";
+
+    /// <summary>
+    /// Source inheritance exceeded the configured maximum depth.
+    /// </summary>
+    public const string MaximumInheritanceDepthExceeded = "TIS0024";
 }

@@ -2,6 +2,10 @@
 # Format: Icod.TermInfo.PublicApiSnapshot/v1
 # AssemblyVersion: 1.0.0.0
 
+TYPE interface Icod.TermInfo.Source.ITermInfoSourceEntryProvider [abstract]
+  METHOD public abstract System.Boolean TryLoad(System.String name null=not-null/not-null, out Icod.TermInfo.Source.TermInfoSourceEntry entry null=nullable/nullable attrs=NotNullWhenAttribute(true)) return-null=not-null/not-null
+END
+
 TYPE enum Icod.TermInfo.Source.TermInfoSourceCapabilityClassification [sealed]
   INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
   UNDERLYING System.Int32
@@ -25,13 +29,16 @@ TYPE class Icod.TermInfo.Source.TermInfoSourceDiagnosticCodes [static]
   FIELD public static const System.String EmptyTerminalName null=not-null/not-null value="TIS0005"
   FIELD public static const System.String IncompleteBackslashEscape null=not-null/not-null value="TIS0013"
   FIELD public static const System.String IncompleteControlEscape null=not-null/not-null value="TIS0015"
+  FIELD public static const System.String InheritanceCycle null=not-null/not-null value="TIS0023"
   FIELD public static const System.String InvalidCapabilityName null=not-null/not-null value="TIS0020"
   FIELD public static const System.String InvalidControlEscape null=not-null/not-null value="TIS0016"
   FIELD public static const System.String InvalidNumericValue null=not-null/not-null value="TIS0011"
+  FIELD public static const System.String MaximumInheritanceDepthExceeded null=not-null/not-null value="TIS0024"
   FIELD public static const System.String MaximumSourceLengthExceeded null=not-null/not-null value="TIS0001"
   FIELD public static const System.String MissingCapabilityName null=not-null/not-null value="TIS0004"
   FIELD public static const System.String MissingFieldTerminator null=not-null/not-null value="TIS0003"
   FIELD public static const System.String MissingNumericValue null=not-null/not-null value="TIS0010"
+  FIELD public static const System.String MissingSourceEntry null=not-null/not-null value="TIS0022"
   FIELD public static const System.String MissingUseReference null=not-null/not-null value="TIS0007"
   FIELD public static const System.String NonOctalDigitInStringEscape null=not-null/not-null value="TIS0017"
   FIELD public static const System.String NumericValueOutOfRange null=not-null/not-null value="TIS0012"
@@ -122,6 +129,32 @@ END
 TYPE class Icod.TermInfo.Source.TermInfoSourceParser [static]
   METHOD public static Icod.TermInfo.Source.TermInfoSourceParseResult Parse(System.IO.TextReader reader null=not-null/not-null, System.String sourceName null=nullable/nullable default=null, Icod.TermInfo.Source.TermInfoSourceLexerOptions options null=nullable/nullable default=null) return-null=not-null/not-null
   METHOD public static Icod.TermInfo.Source.TermInfoSourceParseResult Parse(System.String source null=not-null/not-null, System.String sourceName null=nullable/nullable default=null, Icod.TermInfo.Source.TermInfoSourceLexerOptions options null=nullable/nullable default=null) return-null=not-null/not-null
+END
+
+TYPE class Icod.TermInfo.Source.TermInfoSourceResolveResult [sealed]
+  PROPERTY Icod.TermInfo.Source.TermInfoSourceResolvedEntry Entry { public get; } null=nullable/unknown
+  PROPERTY System.Boolean HasErrors { public get; } null=not-null/unknown
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Source.TermInfoSourceDiagnostic> Diagnostics { public get; } null=not-null/unknown<not-null/not-null>
+END
+
+TYPE class Icod.TermInfo.Source.TermInfoSourceResolvedEntry [sealed]
+  PROPERTY Icod.TermInfo.Source.TermInfoSourceEntry SourceEntry { public get; } null=not-null/unknown
+  METHOD public System.Boolean GetBoolean(Icod.TermInfo.BooleanCapability capability null=not-null/not-null) return-null=not-null/not-null
+  METHOD public System.Boolean TryGetExtended(System.String name null=not-null/not-null, out Icod.TermInfo.TermInfoCapabilityValue value null=not-null/not-null) return-null=not-null/not-null
+  METHOD public System.Nullable<System.Int32> GetNumber(Icod.TermInfo.NumericCapability capability null=not-null/not-null) return-null=nullable/nullable
+  METHOD public System.String GetString(Icod.TermInfo.StringCapability capability null=not-null/not-null) return-null=nullable/nullable
+END
+
+TYPE class Icod.TermInfo.Source.TermInfoSourceResolver [static]
+  METHOD public static Icod.TermInfo.Source.TermInfoSourceResolveResult Resolve(Icod.TermInfo.Source.ITermInfoSourceEntryProvider provider null=not-null/not-null, System.String name null=not-null/not-null, Icod.TermInfo.Source.TermInfoSourceResolverOptions options null=nullable/nullable default=null) return-null=not-null/not-null
+  METHOD public static Icod.TermInfo.Source.TermInfoSourceResolveResult Resolve(Icod.TermInfo.Source.TermInfoSourceDocument document null=not-null/not-null, System.String name null=not-null/not-null, Icod.TermInfo.Source.TermInfoSourceResolverOptions options null=nullable/nullable default=null) return-null=not-null/not-null
+END
+
+TYPE class Icod.TermInfo.Source.TermInfoSourceResolverOptions [sealed]
+  FIELD public static const System.Int32 DefaultMaximumInheritanceDepth null=not-null/not-null value=64
+  FIELD public static const System.Int32 MaximumSupportedInheritanceDepth null=not-null/not-null value=256
+  CTOR public TermInfoSourceResolverOptions(System.Int32 maximumInheritanceDepth null=not-null/not-null default=64)
+  PROPERTY System.Int32 MaximumInheritanceDepth { public get; } null=not-null/unknown
 END
 
 TYPE class Icod.TermInfo.Source.TermInfoSourceSpan [sealed]

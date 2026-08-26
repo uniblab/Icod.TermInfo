@@ -6,9 +6,9 @@
 **Target frameworks:** `net8.0`; `net10.0`  
 **Current stable contract:** `1.0.0`  
 **Next development line:** `1.1.0`  
-**Development version:** `1.1.0-Alpha-6`
-**Status:** S06 implementation complete — validation pending
-**Current tranche:** S06 — Cancellation semantics
+**Development version:** `1.1.0-Alpha-7`
+**Status:** S07 implementation complete — validation pending
+**Current tranche:** S07 — `use=` inheritance resolver
 **Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
 
 ---
@@ -336,6 +336,8 @@ Resolver APIs SHOULD permit both:
 This allows inheritance to refer eventually to source entries obtained from multiple files or providers.
 
 **Gate S07:** complicated multi-level inheritance graphs resolve reproducibly and cyclic graphs fail cleanly.
+
+**S07 implementation record:** [`docs/1.1.0-S07-USE-INHERITANCE-RESOLVER.md`](docs/1.1.0-S07-USE-INHERITANCE-RESOLVER.md).
 
 ---
 
