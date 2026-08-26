@@ -38,6 +38,40 @@ TYPE enum Icod.TermInfo.Source.TermInfoSourceDiagnosticSeverity [sealed]
   ENUM Warning = 0
 END
 
+TYPE class Icod.TermInfo.Source.TermInfoSourceDocument [sealed]
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Source.TermInfoSourceEntry> Entries { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Source.TermInfoSourceToken> Tokens { public get; } null=not-null/unknown<not-null/not-null>
+END
+
+TYPE class Icod.TermInfo.Source.TermInfoSourceEntry [sealed]
+  PROPERTY Icod.TermInfo.Source.TermInfoSourceSpan Span { public get; } null=not-null/unknown
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Source.TermInfoSourceField> Fields { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.Collections.Generic.IReadOnlyList<System.String> Aliases { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.String CanonicalName { public get; } null=not-null/unknown
+  PROPERTY System.String Description { public get; } null=nullable/unknown
+END
+
+TYPE class Icod.TermInfo.Source.TermInfoSourceField [sealed]
+  PROPERTY Icod.TermInfo.Source.TermInfoSourceFieldKind Kind { public get; } null=not-null/unknown
+  PROPERTY Icod.TermInfo.Source.TermInfoSourceSpan Span { public get; } null=not-null/unknown
+  PROPERTY System.Nullable<System.Int32> NumericValue { public get; } null=nullable/unknown
+  PROPERTY System.String CapabilityName { public get; } null=nullable/unknown
+  PROPERTY System.String ReferenceName { public get; } null=nullable/unknown
+  PROPERTY System.String StringValue { public get; } null=nullable/unknown
+  PROPERTY System.String Text { public get; } null=not-null/unknown
+END
+
+TYPE enum Icod.TermInfo.Source.TermInfoSourceFieldKind [sealed]
+  INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  UNDERLYING System.Int32
+  ENUM BooleanCapability = 0
+  ENUM CancelledCapability = 3
+  ENUM DisabledCapability = 5
+  ENUM NumericCapability = 1
+  ENUM StringCapability = 2
+  ENUM UseReference = 4
+END
+
 TYPE class Icod.TermInfo.Source.TermInfoSourceLexResult [sealed]
   PROPERTY System.Boolean HasErrors { public get; } null=not-null/unknown
   PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Source.TermInfoSourceDiagnostic> Diagnostics { public get; } null=not-null/unknown<not-null/not-null>
@@ -60,6 +94,17 @@ TYPE class Icod.TermInfo.Source.TermInfoSourceNumericValueResult [sealed]
   PROPERTY System.Boolean HasErrors { public get; } null=not-null/unknown
   PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Source.TermInfoSourceDiagnostic> Diagnostics { public get; } null=not-null/unknown<not-null/not-null>
   PROPERTY System.Nullable<System.Int32> Value { public get; } null=nullable/unknown
+END
+
+TYPE class Icod.TermInfo.Source.TermInfoSourceParseResult [sealed]
+  PROPERTY Icod.TermInfo.Source.TermInfoSourceDocument Document { public get; } null=not-null/unknown
+  PROPERTY System.Boolean HasErrors { public get; } null=not-null/unknown
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Source.TermInfoSourceDiagnostic> Diagnostics { public get; } null=not-null/unknown<not-null/not-null>
+END
+
+TYPE class Icod.TermInfo.Source.TermInfoSourceParser [static]
+  METHOD public static Icod.TermInfo.Source.TermInfoSourceParseResult Parse(System.IO.TextReader reader null=not-null/not-null, System.String sourceName null=nullable/nullable default=null, Icod.TermInfo.Source.TermInfoSourceLexerOptions options null=nullable/nullable default=null) return-null=not-null/not-null
+  METHOD public static Icod.TermInfo.Source.TermInfoSourceParseResult Parse(System.String source null=not-null/not-null, System.String sourceName null=nullable/nullable default=null, Icod.TermInfo.Source.TermInfoSourceLexerOptions options null=nullable/nullable default=null) return-null=not-null/not-null
 END
 
 TYPE class Icod.TermInfo.Source.TermInfoSourceSpan [sealed]

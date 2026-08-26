@@ -7,7 +7,7 @@ namespace Icod.TermInfo.Source.Tests;
 
 public sealed class S02ContractTests
 {
-    private const string DevelopmentVersion = "1.1.0-Alpha-3";
+    private const string DevelopmentVersion = "1.1.0-Alpha-4";
     private const string StableAssemblyVersion = "1.0.0.0";
 
     [Fact]
@@ -70,10 +70,16 @@ public sealed class S02ContractTests
                 "Icod.TermInfo.Source.TermInfoSourceDiagnostic",
                 "Icod.TermInfo.Source.TermInfoSourceDiagnosticCodes",
                 "Icod.TermInfo.Source.TermInfoSourceDiagnosticSeverity",
+                "Icod.TermInfo.Source.TermInfoSourceDocument",
+                "Icod.TermInfo.Source.TermInfoSourceEntry",
+                "Icod.TermInfo.Source.TermInfoSourceField",
+                "Icod.TermInfo.Source.TermInfoSourceFieldKind",
                 "Icod.TermInfo.Source.TermInfoSourceLexResult",
                 "Icod.TermInfo.Source.TermInfoSourceLexer",
                 "Icod.TermInfo.Source.TermInfoSourceLexerOptions",
                 "Icod.TermInfo.Source.TermInfoSourceNumericValueResult",
+                "Icod.TermInfo.Source.TermInfoSourceParseResult",
+                "Icod.TermInfo.Source.TermInfoSourceParser",
                 "Icod.TermInfo.Source.TermInfoSourceSpan",
                 "Icod.TermInfo.Source.TermInfoSourceStringValueResult",
                 "Icod.TermInfo.Source.TermInfoSourceToken",

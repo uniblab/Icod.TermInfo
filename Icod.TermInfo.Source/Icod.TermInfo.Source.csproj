@@ -12,17 +12,17 @@
 		<AssemblyName>Icod.TermInfo.Source</AssemblyName>
 		<RootNamespace>Icod.TermInfo.Source</RootNamespace>
 		<Configurations>Debug;Release;Staging</Configurations>
-		<Version>1.1.0-Alpha-3</Version>
+		<Version>1.1.0-Alpha-4</Version>
 		<AssemblyVersion>1.0.0.0</AssemblyVersion>
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<PackageVersion>1.1.0-Alpha-3</PackageVersion>
+		<PackageVersion>1.1.0-Alpha-4</PackageVersion>
 		<PackageId>Icod.TermInfo.Source</PackageId>
 		<Title>Icod.TermInfo.Source</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed terminfo source-language support for Icod.TermInfo. The 1.1 line parses and resolves .ti source into the stable TerminalDescription model without enlarging the runtime Icod.TermInfo package.</Description>
-		<PackageReleaseNotes>1.1.0-Alpha-3 implements S03: decimal/octal/hex numeric values, terminfo control/backslash/octal string escapes, multiline continuation semantics, byte-preserving high values, deterministic value diagnostics, and T29 source-corpus validation.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.1.0-Alpha-4 implements S04: unresolved source documents and entries, ordered fields, decoded numeric/string values, cancellation and use= declarations, disabled-field preservation, source provenance, and deterministic composition of lexical and value diagnostics.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>

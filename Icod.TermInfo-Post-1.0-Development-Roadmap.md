@@ -6,9 +6,9 @@
 **Target frameworks:** `net8.0`; `net10.0`  
 **Current stable contract:** `1.0.0`  
 **Next development line:** `1.1.0`  
-**Development version:** `1.1.0-Alpha-1`
-**Status:** S01 implementation in progress
-**Current tranche:** S01 — Source package foundation
+**Development version:** `1.1.0-Alpha-4`
+**Status:** S04 implementation complete — validation pending
+**Current tranche:** S04 — Unresolved source-entry model
 **Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
 
 ---
@@ -254,6 +254,8 @@ The model SHALL preserve:
 The unresolved source model SHALL NOT pretend that inheritance has already occurred.
 
 **Gate S04:** parsing a source entry requires no `TerminalDescription` construction and loses no information required for later resolution or diagnostics.
+
+**S04 implementation record:** [`docs/1.1.0-S04-UNRESOLVED-SOURCE-ENTRY-MODEL.md`](docs/1.1.0-S04-UNRESOLVED-SOURCE-ENTRY-MODEL.md).
 
 ---
 

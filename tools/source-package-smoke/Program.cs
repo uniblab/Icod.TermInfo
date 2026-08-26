@@ -29,13 +29,16 @@ Require(
         == new Version(1, 0, 0, 0),
     "The source package must retain the stable 1.x assembly identity.");
 
+const string source =
+    "package-smoke|Package smoke source,\n"
+    + "\tam,\n"
+    + "\tcols#0100,\n"
+    + "\tclear=\\E[H,\n"
+    + "\tuse=dumb,\n";
+
 TermInfoSourceLexResult lexed =
     TermInfoSourceLexer.Tokenize(
-        "package-smoke|Package smoke source,\n"
-        + "\tam,\n"
-        + "\tcols#0100,\n"
-        + "\tclear=\\E[H,\n"
-        + "\tuse=dumb,\n",
+        source,
         "package-smoke.ti");
 Require(
     !lexed.HasErrors,
@@ -72,6 +75,32 @@ Require(
     !text.HasErrors
         && text.Value == "\x1b[H",
     "The source package did not decode string source escapes.");
+
+TermInfoSourceParseResult parsed =
+    TermInfoSourceParser.Parse(
+        source,
+        "package-smoke.ti");
+Require(
+    !parsed.HasErrors,
+    "The source package could not parse representative unresolved source.");
+TermInfoSourceEntry parsedEntry =
+    parsed.Document.Entries.Single();
+Require(
+    parsedEntry.CanonicalName == "package-smoke"
+        && parsedEntry.Fields.Count == 4,
+    "The source package did not expose the S04 unresolved entry model.");
+Require(
+    parsedEntry.Fields.Single(
+            field =>
+                field.Kind == TermInfoSourceFieldKind.NumericCapability)
+        .NumericValue == 64,
+    "The S04 model did not retain decoded numeric source semantics.");
+Require(
+    parsedEntry.Fields.Single(
+            field =>
+                field.Kind == TermInfoSourceFieldKind.UseReference)
+        .ReferenceName == "dumb",
+    "The S04 model did not retain the use= reference.");
 
 Assembly runtimeAssembly =
     typeof(TerminalDescription).Assembly;
