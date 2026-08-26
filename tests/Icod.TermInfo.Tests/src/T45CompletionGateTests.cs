@@ -30,7 +30,7 @@ public sealed class T45CompletionGateTests {
 					2 )[ 0 ];
 
 		Assert.Equal(
-			"1.1.0",
+			"1.1.1",
 			semanticVersion );
 	}
 
@@ -46,12 +46,12 @@ public sealed class T45CompletionGateTests {
 				LoadOptions.None );
 
 		Assert.Equal(
-			"1.1.0",
+			"1.1.1",
 			ReadRequiredProperty(
 				project,
 				"Version" ) );
 		Assert.Equal(
-			"1.1.0",
+			"1.1.1",
 			ReadRequiredProperty(
 				project,
 				"PackageVersion" ) );
@@ -78,10 +78,10 @@ public sealed class T45CompletionGateTests {
 					"README.md" ) );
 
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo --version 1.1.0",
+			"dotnet add package Icod.TermInfo --version 1.1.1",
 			readme );
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo.Source --version 1.1.0",
+			"dotnet add package Icod.TermInfo.Source --version 1.1.1",
 			readme );
 		Assert.DoesNotContain(
 			"1.1.0-Alpha-9",

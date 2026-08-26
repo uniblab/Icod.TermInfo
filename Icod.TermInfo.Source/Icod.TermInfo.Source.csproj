@@ -22,7 +22,7 @@
 		<Title>Icod.TermInfo.Source</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed terminfo source-language support for Icod.TermInfo. The 1.1 line parses and resolves .ti source into the stable TerminalDescription model without enlarging the runtime Icod.TermInfo package.</Description>
-		<PackageReleaseNotes>1.1.1 completes managed .ti source parsing and resolution: diagnostics and source spans, string and numeric semantics, unresolved entries, standard and extended capability classification, cancellation, use= inheritance, TerminalDescription materialization, duplicate source-identity warnings, deterministic mutation fuzzing, hostile-input bounds, and offline tic-generated compatibility fixtures.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.1.1 is a coordinated maintenance release of Icod.TermInfo.Source for Icod.TermInfo 1.1.1. It preserves the 1.1.0 source-language public API and semantics while retaining assembly version 1.0.0.0.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>
