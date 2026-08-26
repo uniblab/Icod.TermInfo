@@ -122,7 +122,7 @@ public sealed class S08ContractTests {
 		Assert.True( File.Exists( recordPath ) );
 		string record =
 			File.ReadAllText( recordPath );
-		Assert.Contains( "1.1.0-Alpha-9", record );
+		Assert.Contains( "1.1.0-Alpha-8", record );
 		Assert.Contains( "ToTerminalDescription", record );
 		Assert.Contains( "t29-legacy-edge", record );
 		Assert.Contains( "t29-extended32", record );
