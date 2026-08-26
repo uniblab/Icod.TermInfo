@@ -1,3 +1,5 @@
+using Icod.TermInfo;
+
 namespace Icod.TermInfo.Source;
 
 /// <summary>
@@ -5,10 +7,10 @@ namespace Icod.TermInfo.Source;
 /// </summary>
 /// <remarks>
 /// <para>
-/// S04 composes the S02 lexer with the S03 value parser. It preserves source
-/// order and provenance but does not classify capability names, apply
-/// cancellation, resolve <c>use=</c> inheritance, or construct
-/// <c>TerminalDescription</c> values.
+/// S05 composes the S02 lexer and S03 value parser with capability-name
+/// classification against the authoritative runtime catalog. It preserves
+/// source order and provenance but does not apply cancellation, resolve
+/// <c>use=</c> inheritance, or construct <c>TerminalDescription</c> values.
 /// </para>
 /// </remarks>
 public static class TermInfoSourceParser
@@ -182,7 +184,8 @@ public static class TermInfoSourceParser
                     token,
                     token.Text.Trim(),
                     null,
-                    null);
+                    null,
+                    diagnostics);
 
             case TermInfoSourceTokenKind.NumericCapability:
             {
@@ -199,7 +202,8 @@ public static class TermInfoSourceParser
                             token.Text,
                             '#')),
                     numeric.Value,
-                    null);
+                    null,
+                    diagnostics);
             }
 
             case TermInfoSourceTokenKind.StringCapability:
@@ -217,7 +221,8 @@ public static class TermInfoSourceParser
                             token.Text,
                             '=')),
                     null,
-                    text.Value);
+                    text.Value,
+                    diagnostics);
             }
 
             case TermInfoSourceTokenKind.CancelledCapability:
@@ -229,7 +234,8 @@ public static class TermInfoSourceParser
                             token.Text,
                             '@')),
                     null,
-                    null);
+                    null,
+                    diagnostics);
 
             case TermInfoSourceTokenKind.UseReference:
                 return new TermInfoSourceField(
@@ -259,7 +265,8 @@ public static class TermInfoSourceParser
                     NormalizeCapabilityName(
                         TextBeforeAnyCapabilityOperator(disabled)),
                     null,
-                    null);
+                    null,
+                    diagnostics);
             }
 
             default:
@@ -272,10 +279,43 @@ public static class TermInfoSourceParser
         TermInfoSourceToken token,
         string capabilityName,
         int? numericValue,
-        string? stringValue)
+        string? stringValue,
+        ICollection<TermInfoSourceDiagnostic> diagnostics)
     {
         ArgumentNullException.ThrowIfNull(token);
-        ArgumentNullException.ThrowIfNull(capabilityName);
+        ArgumentException.ThrowIfNullOrWhiteSpace(capabilityName);
+        ArgumentNullException.ThrowIfNull(diagnostics);
+
+        TermInfoSourceCapabilityIdentity identity =
+            TermInfoSourceCapabilityClassifier.Classify(
+                capabilityName);
+
+        if (identity.Classification
+            == TermInfoSourceCapabilityClassification.Invalid)
+        {
+            diagnostics.Add(
+                new TermInfoSourceDiagnostic(
+                    TermInfoSourceDiagnosticCodes.InvalidCapabilityName,
+                    TermInfoSourceDiagnosticSeverity.Error,
+                    $"'{capabilityName}' is not a valid terminfo capability name.",
+                    token.Span));
+        }
+        else
+        {
+            TermInfoCapabilityValueKind? declaredKind =
+                GetDeclaredValueKind(kind);
+            if (declaredKind is not null
+                && identity.StandardValueKind is not null
+                && declaredKind != identity.StandardValueKind)
+            {
+                diagnostics.Add(
+                    new TermInfoSourceDiagnostic(
+                        TermInfoSourceDiagnosticCodes.StandardCapabilityTypeMismatch,
+                        TermInfoSourceDiagnosticSeverity.Error,
+                        $"Standard capability '{identity.CanonicalName}' is {identity.StandardValueKind} but the source field declares it as {declaredKind}.",
+                        token.Span));
+            }
+        }
 
         return new TermInfoSourceField(
             kind,
@@ -284,7 +324,28 @@ public static class TermInfoSourceParser
             numericValue,
             stringValue,
             token.Text,
-            token.Span);
+            token.Span,
+            identity.Classification,
+            identity.CanonicalName,
+            identity.StandardValueKind,
+            identity.StandardBooleanCapability,
+            identity.StandardNumericCapability,
+            identity.StandardStringCapability);
+    }
+
+    private static TermInfoCapabilityValueKind? GetDeclaredValueKind(
+        TermInfoSourceFieldKind kind)
+    {
+        return kind switch
+        {
+            TermInfoSourceFieldKind.BooleanCapability =>
+                TermInfoCapabilityValueKind.Boolean,
+            TermInfoSourceFieldKind.NumericCapability =>
+                TermInfoCapabilityValueKind.Number,
+            TermInfoSourceFieldKind.StringCapability =>
+                TermInfoCapabilityValueKind.String,
+            _ => null,
+        };
     }
 
     private static string NormalizeCapabilityName(

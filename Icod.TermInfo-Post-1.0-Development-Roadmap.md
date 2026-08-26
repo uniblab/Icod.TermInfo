@@ -6,9 +6,9 @@
 **Target frameworks:** `net8.0`; `net10.0`  
 **Current stable contract:** `1.0.0`  
 **Next development line:** `1.1.0`  
-**Development version:** `1.1.0-Alpha-4`
-**Status:** S04 implementation complete — validation pending
-**Current tranche:** S04 — Unresolved source-entry model
+**Development version:** `1.1.0-Alpha-5`
+**Status:** S05 implementation complete — validation pending
+**Current tranche:** S05 — Capability classification
 **Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
 
 ---
@@ -277,6 +277,8 @@ No duplicate standard capability table SHALL be introduced in `Icod.TermInfo.Sou
 Capability aliases and historical names SHALL follow an explicitly documented compatibility policy.
 
 **Gate S05:** every standard capability accepted from source maps to the same semantic identifier used by compiled parsing and built-in profiles.
+
+**S05 implementation record:** [`docs/1.1.0-S05-CAPABILITY-CLASSIFICATION.md`](docs/1.1.0-S05-CAPABILITY-CLASSIFICATION.md).
 
 ---
 

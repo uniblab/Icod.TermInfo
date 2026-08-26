@@ -8,7 +8,7 @@ namespace Icod.TermInfo.Source.Tests;
 
 public sealed class S04ContractTests
 {
-    private const string DevelopmentVersion = "1.1.0-Alpha-4";
+    private const string DevelopmentVersion = "1.1.0-Alpha-5";
     private const string StableAssemblyVersion = "1.0.0.0";
 
     [Fact]
@@ -68,6 +68,7 @@ public sealed class S04ContractTests
         Assert.Equal(
             new[]
             {
+                "Icod.TermInfo.Source.TermInfoSourceCapabilityClassification",
                 "Icod.TermInfo.Source.TermInfoSourceDiagnostic",
                 "Icod.TermInfo.Source.TermInfoSourceDiagnosticCodes",
                 "Icod.TermInfo.Source.TermInfoSourceDiagnosticSeverity",

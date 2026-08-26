@@ -2,6 +2,15 @@
 # Format: Icod.TermInfo.PublicApiSnapshot/v1
 # AssemblyVersion: 1.0.0.0
 
+TYPE enum Icod.TermInfo.Source.TermInfoSourceCapabilityClassification [sealed]
+  INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  UNDERLYING System.Int32
+  ENUM Invalid = 3
+  ENUM KnownExtended = 1
+  ENUM Standard = 0
+  ENUM UnknownExtended = 2
+END
+
 TYPE class Icod.TermInfo.Source.TermInfoSourceDiagnostic [sealed]
   PROPERTY Icod.TermInfo.Source.TermInfoSourceDiagnosticSeverity Severity { public get; } null=not-null/unknown
   PROPERTY Icod.TermInfo.Source.TermInfoSourceSpan Span { public get; } null=nullable/unknown
@@ -16,6 +25,7 @@ TYPE class Icod.TermInfo.Source.TermInfoSourceDiagnosticCodes [static]
   FIELD public static const System.String EmptyTerminalName null=not-null/not-null value="TIS0005"
   FIELD public static const System.String IncompleteBackslashEscape null=not-null/not-null value="TIS0013"
   FIELD public static const System.String IncompleteControlEscape null=not-null/not-null value="TIS0015"
+  FIELD public static const System.String InvalidCapabilityName null=not-null/not-null value="TIS0020"
   FIELD public static const System.String InvalidControlEscape null=not-null/not-null value="TIS0016"
   FIELD public static const System.String InvalidNumericValue null=not-null/not-null value="TIS0011"
   FIELD public static const System.String MaximumSourceLengthExceeded null=not-null/not-null value="TIS0001"
@@ -26,6 +36,7 @@ TYPE class Icod.TermInfo.Source.TermInfoSourceDiagnosticCodes [static]
   FIELD public static const System.String NonOctalDigitInStringEscape null=not-null/not-null value="TIS0017"
   FIELD public static const System.String NumericValueOutOfRange null=not-null/not-null value="TIS0012"
   FIELD public static const System.String OrphanedCapabilityField null=not-null/not-null value="TIS0002"
+  FIELD public static const System.String StandardCapabilityTypeMismatch null=not-null/not-null value="TIS0021"
   FIELD public static const System.String UnexpectedTextAfterCancellation null=not-null/not-null value="TIS0009"
   FIELD public static const System.String UnindentedStringContinuation null=not-null/not-null value="TIS0018"
   FIELD public static const System.String UnknownStringEscape null=not-null/not-null value="TIS0014"
@@ -54,7 +65,13 @@ END
 TYPE class Icod.TermInfo.Source.TermInfoSourceField [sealed]
   PROPERTY Icod.TermInfo.Source.TermInfoSourceFieldKind Kind { public get; } null=not-null/unknown
   PROPERTY Icod.TermInfo.Source.TermInfoSourceSpan Span { public get; } null=not-null/unknown
+  PROPERTY System.Nullable<Icod.TermInfo.BooleanCapability> StandardBooleanCapability { public get; } null=nullable/unknown
+  PROPERTY System.Nullable<Icod.TermInfo.NumericCapability> StandardNumericCapability { public get; } null=nullable/unknown
+  PROPERTY System.Nullable<Icod.TermInfo.Source.TermInfoSourceCapabilityClassification> CapabilityClassification { public get; } null=nullable/unknown
+  PROPERTY System.Nullable<Icod.TermInfo.StringCapability> StandardStringCapability { public get; } null=nullable/unknown
+  PROPERTY System.Nullable<Icod.TermInfo.TermInfoCapabilityValueKind> StandardValueKind { public get; } null=nullable/unknown
   PROPERTY System.Nullable<System.Int32> NumericValue { public get; } null=nullable/unknown
+  PROPERTY System.String CanonicalCapabilityName { public get; } null=nullable/unknown
   PROPERTY System.String CapabilityName { public get; } null=nullable/unknown
   PROPERTY System.String ReferenceName { public get; } null=nullable/unknown
   PROPERTY System.String StringValue { public get; } null=nullable/unknown

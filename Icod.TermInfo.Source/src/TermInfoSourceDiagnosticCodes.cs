@@ -100,4 +100,14 @@ public static class TermInfoSourceDiagnosticCodes
     /// A source string contains a literal NUL character.
     /// </summary>
     public const string EmbeddedNullCharacter = "TIS0019";
+
+    /// <summary>
+    /// A capability name is invalid or reserved in terminfo source.
+    /// </summary>
+    public const string InvalidCapabilityName = "TIS0020";
+
+    /// <summary>
+    /// A standard capability is declared using the wrong source value kind.
+    /// </summary>
+    public const string StandardCapabilityTypeMismatch = "TIS0021";
 }

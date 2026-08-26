@@ -34,6 +34,7 @@ const string source =
     + "\tam,\n"
     + "\tcols#0100,\n"
     + "\tclear=\\E[H,\n"
+    + "\tAX,\n"
     + "\tuse=dumb,\n";
 
 TermInfoSourceLexResult lexed =
@@ -87,8 +88,26 @@ TermInfoSourceEntry parsedEntry =
     parsed.Document.Entries.Single();
 Require(
     parsedEntry.CanonicalName == "package-smoke"
-        && parsedEntry.Fields.Count == 4,
+        && parsedEntry.Fields.Count == 5,
     "The source package did not expose the S04 unresolved entry model.");
+TermInfoSourceField standardBoolean =
+    parsedEntry.Fields.Single(
+        field => field.CapabilityName == "am");
+Require(
+    standardBoolean.CapabilityClassification
+            == TermInfoSourceCapabilityClassification.Standard
+        && standardBoolean.StandardBooleanCapability
+            == BooleanCapability.AutoRightMargin
+        && standardBoolean.CanonicalCapabilityName == "am",
+    "The S05 model did not map a standard capability to its runtime identity.");
+TermInfoSourceField knownExtended =
+    parsedEntry.Fields.Single(
+        field => field.CapabilityName == "AX");
+Require(
+    knownExtended.CapabilityClassification
+            == TermInfoSourceCapabilityClassification.KnownExtended
+        && knownExtended.CanonicalCapabilityName == "AX",
+    "The S05 model did not classify a known extended capability.");
 Require(
     parsedEntry.Fields.Single(
             field =>

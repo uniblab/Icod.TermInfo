@@ -14,13 +14,14 @@ source diagnostics, cancellation, extended capabilities, and `use=`
 inheritance. Resolved source entries materialize into the same immutable
 `TerminalDescription` model used by compiled terminfo acquisition.
 
-`1.1.0-Alpha-4` implements S04 unresolved source parsing on top of the S02
-lexer and S03 value semantics. `TermInfoSourceParser` produces immutable
-`TermInfoSourceDocument` and `TermInfoSourceEntry` values whose ordered fields
-retain capability names, decoded numeric/string values, cancellations, `use=`
-references, disabled fields, exact lexical text, and source spans. Capability
-names intentionally remain unclassified until S05, and no inheritance or
-`TerminalDescription` materialization occurs in S04.
+`1.1.0-Alpha-5` implements S05 capability classification on top of the S04
+unresolved model. Standard short names and long variable names are mapped
+through `StandardCapabilityCatalog` to the exact runtime capability enum
+identities. Recognized extended names remain distinct from unknown-but-valid
+extended names, while invalid/reserved names and standard value-kind mismatches
+produce deterministic diagnostics. Termcap codes are not treated as terminfo
+aliases; termcap interoperability remains 1.5 work. Cancellation and `use=`
+resolution remain S06 and S07 work.
 
 The runtime dependency direction is one-way:
 

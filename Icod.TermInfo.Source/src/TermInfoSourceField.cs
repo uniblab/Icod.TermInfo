@@ -1,3 +1,5 @@
+using Icod.TermInfo;
+
 namespace Icod.TermInfo.Source;
 
 /// <summary>
@@ -5,8 +7,9 @@ namespace Icod.TermInfo.Source;
 /// </summary>
 /// <remarks>
 /// <para>
-/// Fields remain in source order. S04 does not classify capability names as
-/// standard or extended and does not apply cancellation or inheritance.
+/// Fields remain in source order. S05 classifies capability names against the
+/// runtime standard-capability catalog while leaving cancellation and
+/// inheritance unresolved.
 /// </para>
 /// <para>
 /// Invalid numeric or string values retain their raw source text and field
@@ -23,7 +26,13 @@ public sealed class TermInfoSourceField
         int? numericValue,
         string? stringValue,
         string text,
-        TermInfoSourceSpan span)
+        TermInfoSourceSpan span,
+        TermInfoSourceCapabilityClassification? capabilityClassification = null,
+        string? canonicalCapabilityName = null,
+        TermInfoCapabilityValueKind? standardValueKind = null,
+        BooleanCapability? standardBooleanCapability = null,
+        NumericCapability? standardNumericCapability = null,
+        StringCapability? standardStringCapability = null)
     {
         ArgumentNullException.ThrowIfNull(text);
         ArgumentNullException.ThrowIfNull(span);
@@ -35,6 +44,12 @@ public sealed class TermInfoSourceField
         StringValue = stringValue;
         Text = text;
         Span = span;
+        CapabilityClassification = capabilityClassification;
+        CanonicalCapabilityName = canonicalCapabilityName;
+        StandardValueKind = standardValueKind;
+        StandardBooleanCapability = standardBooleanCapability;
+        StandardNumericCapability = standardNumericCapability;
+        StandardStringCapability = standardStringCapability;
     }
 
     /// <summary>
@@ -47,10 +62,52 @@ public sealed class TermInfoSourceField
     /// </summary>
     /// <remarks>
     /// This is <see langword="null"/> for <see cref="TermInfoSourceFieldKind.UseReference"/>.
-    /// The name has not yet been classified against the runtime capability
-    /// catalog.
+    /// The spelling is the normalized source spelling and may be a standard
+    /// long name rather than the canonical short name.
     /// </remarks>
     public string? CapabilityName { get; }
+
+    /// <summary>
+    /// Gets the S05 classification for a capability-bearing field.
+    /// </summary>
+    /// <remarks>
+    /// This is <see langword="null"/> for <c>use=</c> references, which are not
+    /// capability declarations.
+    /// </remarks>
+    public TermInfoSourceCapabilityClassification? CapabilityClassification { get; }
+
+    /// <summary>
+    /// Gets the canonical standard short name or the accepted extended name.
+    /// </summary>
+    /// <remarks>
+    /// This is <see langword="null"/> for invalid/reserved names and for
+    /// <c>use=</c> references.
+    /// </remarks>
+    public string? CanonicalCapabilityName { get; }
+
+    /// <summary>
+    /// Gets the standard capability value kind when classification resolved to
+    /// the runtime standard catalog.
+    /// </summary>
+    public TermInfoCapabilityValueKind? StandardValueKind { get; }
+
+    /// <summary>
+    /// Gets the exact runtime Boolean capability identity for a standard
+    /// Boolean source name.
+    /// </summary>
+    public BooleanCapability? StandardBooleanCapability { get; }
+
+    /// <summary>
+    /// Gets the exact runtime numeric capability identity for a standard
+    /// numeric source name.
+    /// </summary>
+    public NumericCapability? StandardNumericCapability { get; }
+
+    /// <summary>
+    /// Gets the exact runtime string capability identity for a standard string
+    /// source name.
+    /// </summary>
+    public StringCapability? StandardStringCapability { get; }
 
     /// <summary>
     /// Gets the referenced parent entry name for a <c>use=</c> field.

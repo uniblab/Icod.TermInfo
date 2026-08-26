@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Icod.TermInfo.Source.Tests;
 
-public sealed class S03ContractTests
+public sealed class S05ContractTests
 {
     private const string DevelopmentVersion = "1.1.0-Alpha-5";
     private const string StableAssemblyVersion = "1.0.0.0";
@@ -51,10 +51,10 @@ public sealed class S03ContractTests
     }
 
     [Fact]
-    public void SourcePublicSurfaceIncludesReviewedValueSemanticsTypes()
+    public void SourcePublicSurfaceIncludesReviewedClassificationContract()
     {
         Assembly assembly =
-            typeof(TermInfoSourceValueParser).Assembly;
+            typeof(TermInfoSourceParser).Assembly;
         string[] exportedTypes =
             assembly
                 .GetExportedTypes()
@@ -64,29 +64,11 @@ public sealed class S03ContractTests
                     StringComparer.Ordinal)
                 .ToArray();
 
-        Assert.Equal(
-            new[]
-            {
-                "Icod.TermInfo.Source.TermInfoSourceCapabilityClassification",
-                "Icod.TermInfo.Source.TermInfoSourceDiagnostic",
-                "Icod.TermInfo.Source.TermInfoSourceDiagnosticCodes",
-                "Icod.TermInfo.Source.TermInfoSourceDiagnosticSeverity",
-                "Icod.TermInfo.Source.TermInfoSourceDocument",
-                "Icod.TermInfo.Source.TermInfoSourceEntry",
-                "Icod.TermInfo.Source.TermInfoSourceField",
-                "Icod.TermInfo.Source.TermInfoSourceFieldKind",
-                "Icod.TermInfo.Source.TermInfoSourceLexResult",
-                "Icod.TermInfo.Source.TermInfoSourceLexer",
-                "Icod.TermInfo.Source.TermInfoSourceLexerOptions",
-                "Icod.TermInfo.Source.TermInfoSourceNumericValueResult",
-                "Icod.TermInfo.Source.TermInfoSourceParseResult",
-                "Icod.TermInfo.Source.TermInfoSourceParser",
-                "Icod.TermInfo.Source.TermInfoSourceSpan",
-                "Icod.TermInfo.Source.TermInfoSourceStringValueResult",
-                "Icod.TermInfo.Source.TermInfoSourceToken",
-                "Icod.TermInfo.Source.TermInfoSourceTokenKind",
-                "Icod.TermInfo.Source.TermInfoSourceValueParser",
-            },
+        Assert.Contains(
+            "Icod.TermInfo.Source.TermInfoSourceCapabilityClassification",
+            exportedTypes);
+        Assert.Contains(
+            "Icod.TermInfo.Source.TermInfoSourceField",
             exportedTypes);
         Assert.Equal(
             new Version(1, 0, 0, 0),
@@ -94,7 +76,7 @@ public sealed class S03ContractTests
     }
 
     [Fact]
-    public void SourcePublicApiBaselineIncludesValueSemanticsContract()
+    public void SourcePublicApiBaselineIncludesClassificationAndDiagnostics()
     {
         string root = FindRepositoryRoot();
         string baseline =
@@ -105,27 +87,33 @@ public sealed class S03ContractTests
                     "1.1.0-SOURCE-PUBLIC-API-BASELINE.txt"));
 
         Assert.Contains(
-            "TYPE class Icod.TermInfo.Source.TermInfoSourceNumericValueResult [sealed]",
+            "TYPE enum Icod.TermInfo.Source.TermInfoSourceCapabilityClassification [sealed]",
             baseline);
         Assert.Contains(
-            "TYPE class Icod.TermInfo.Source.TermInfoSourceStringValueResult [sealed]",
+            "CapabilityClassification",
             baseline);
         Assert.Contains(
-            "TYPE class Icod.TermInfo.Source.TermInfoSourceValueParser [static]",
+            "StandardBooleanCapability",
             baseline);
-        Assert.Contains("TIS0010", baseline);
-        Assert.Contains("TIS0019", baseline);
+        Assert.Contains(
+            "StandardNumericCapability",
+            baseline);
+        Assert.Contains(
+            "StandardStringCapability",
+            baseline);
+        Assert.Contains("TIS0020", baseline);
+        Assert.Contains("TIS0021", baseline);
     }
 
     [Fact]
-    public void S03ImplementationRecordAndRoadmapLinkArePresent()
+    public void S05ImplementationRecordAndRoadmapLinkArePresent()
     {
         string root = FindRepositoryRoot();
         string recordPath =
             Path.Combine(
                 root,
                 "docs",
-                "1.1.0-S03-STRING-NUMERIC-SOURCE-SEMANTICS.md");
+                "1.1.0-S05-CAPABILITY-CLASSIFICATION.md");
         string roadmap =
             File.ReadAllText(
                 Path.Combine(
@@ -135,12 +123,12 @@ public sealed class S03ContractTests
         Assert.True(File.Exists(recordPath));
         string record =
             File.ReadAllText(recordPath);
-        Assert.Contains("1.1.0-Alpha-3", record);
-        Assert.Contains("TIS0010", record);
-        Assert.Contains("TIS0019", record);
-        Assert.Contains("S04", record);
+        Assert.Contains("1.1.0-Alpha-5", record);
+        Assert.Contains("StandardCapabilityCatalog", record);
+        Assert.Contains("termcap", record, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("S06", record);
         Assert.Contains(
-            "1.1.0-S03-STRING-NUMERIC-SOURCE-SEMANTICS.md",
+            "1.1.0-S05-CAPABILITY-CLASSIFICATION.md",
             roadmap);
     }
 
