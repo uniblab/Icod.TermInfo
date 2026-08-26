@@ -1,5 +1,6 @@
 using System.Reflection;
 using Icod.TermInfo;
+using Icod.TermInfo.Source;
 
 static void Require(
     bool condition,
@@ -15,8 +16,7 @@ static void Require(
 }
 
 Assembly sourceAssembly =
-    Assembly.Load(
-        "Icod.TermInfo.Source");
+    typeof(TermInfoSourceLexer).Assembly;
 AssemblyName sourceName =
     sourceAssembly.GetName();
 
@@ -28,6 +28,28 @@ Require(
     sourceName.Version
         == new Version(1, 0, 0, 0),
     "The source package must retain the stable 1.x assembly identity.");
+
+TermInfoSourceLexResult lexed =
+    TermInfoSourceLexer.Tokenize(
+        "package-smoke|Package smoke source,\n"
+        + "\tam,\n"
+        + "\tuse=dumb,\n",
+        "package-smoke.ti");
+Require(
+    !lexed.HasErrors,
+    "The source package could not tokenize representative source.");
+Require(
+    lexed.Tokens.Any(
+        token =>
+            token.Kind == TermInfoSourceTokenKind.BooleanCapability
+            && token.Text == "am"),
+    "The source package did not expose Boolean capability lexing.");
+Require(
+    lexed.Tokens.Any(
+        token =>
+            token.Kind == TermInfoSourceTokenKind.UseReference
+            && token.Span.SourceName == "package-smoke.ti"),
+    "The source package did not expose use= lexing with source locations.");
 
 Assembly runtimeAssembly =
     typeof(TerminalDescription).Assembly;

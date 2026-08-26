@@ -29,8 +29,9 @@ paths, the runtime-package verifier, both runtime and Source package artifacts,
 both fresh-package consumers, and the non-interactive repository sample.
 
 The 1.1 source-language line keeps the frozen `Icod.TermInfo` package checks and
-adds `Icod.TermInfo.Source` net8.0/net10.0 API-equivalence, coordinated-version,
-artifact-presence, and package-reference-only consumer gates.
+adds `Icod.TermInfo.Source` net8.0/net10.0 API-equivalence, reviewed public-API
+baseline, coordinated-version, artifact-presence, and package-reference-only
+consumer gates.
 
 - Use `verify-release-package.sh` on Bash-capable hosts and in Ubuntu GitHub
   Actions package-validation jobs.

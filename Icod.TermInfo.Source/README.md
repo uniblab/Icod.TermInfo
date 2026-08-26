@@ -9,14 +9,17 @@ reference `Icod.TermInfo` alone.
 
 ## 1.1.0 development line
 
-The 1.1 line will add managed parsing and resolution of `.ti` source, including
+The 1.1 line adds managed parsing and resolution of `.ti` source, including
 source diagnostics, cancellation, extended capabilities, and `use=`
 inheritance. Resolved source entries materialize into the same immutable
 `TerminalDescription` model used by compiled terminfo acquisition.
 
-`1.1.0-Alpha-1` is the S01 package foundation. It establishes the package,
-dependency, build, test, packaging, API-equivalence, and fresh-consumer
-contracts. The first source-language API is introduced by S02.
+`1.1.0-Alpha-2` implements the S02 lexical and source-location foundation. It
+can tokenize source from a `string` or `TextReader`, retain exact raw field text,
+identify entry names/aliases/descriptions and capability forms, preserve
+comments, distinguish `use=` and cancellation, and report deterministic
+`TISdddd` diagnostics with source spans. String/numeric value decoding remains
+S03 work.
 
 The runtime dependency direction is one-way:
 

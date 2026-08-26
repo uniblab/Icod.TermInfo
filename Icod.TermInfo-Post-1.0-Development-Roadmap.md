@@ -207,6 +207,8 @@ Diagnostics SHALL be able to identify the relevant source location.
 
 **Gate S02:** representative `.ti` files can be tokenized deterministically with precise diagnostics for malformed lexical input.
 
+**S02 implementation record:** [`docs/1.1.0-S02-LEXICAL-SOURCE-LOCATION.md`](docs/1.1.0-S02-LEXICAL-SOURCE-LOCATION.md).
+
 ---
 
 ## 4.4 S03 — String and numeric source semantics

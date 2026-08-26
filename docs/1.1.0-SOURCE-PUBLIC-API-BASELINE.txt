@@ -1,0 +1,79 @@
+# Icod.TermInfo.Source public API baseline
+# Format: Icod.TermInfo.PublicApiSnapshot/v1
+# AssemblyVersion: 1.0.0.0
+
+TYPE class Icod.TermInfo.Source.TermInfoSourceDiagnostic [sealed]
+  PROPERTY Icod.TermInfo.Source.TermInfoSourceDiagnosticSeverity Severity { public get; } null=not-null/unknown
+  PROPERTY Icod.TermInfo.Source.TermInfoSourceSpan Span { public get; } null=nullable/unknown
+  PROPERTY System.String Code { public get; } null=not-null/unknown
+  PROPERTY System.String Message { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.Source.TermInfoSourceDiagnosticCodes [static]
+  FIELD public static const System.String EmptyField null=not-null/not-null value="TIS0008"
+  FIELD public static const System.String EmptyHeaderComponent null=not-null/not-null value="TIS0006"
+  FIELD public static const System.String EmptyTerminalName null=not-null/not-null value="TIS0005"
+  FIELD public static const System.String MaximumSourceLengthExceeded null=not-null/not-null value="TIS0001"
+  FIELD public static const System.String MissingCapabilityName null=not-null/not-null value="TIS0004"
+  FIELD public static const System.String MissingFieldTerminator null=not-null/not-null value="TIS0003"
+  FIELD public static const System.String MissingUseReference null=not-null/not-null value="TIS0007"
+  FIELD public static const System.String OrphanedCapabilityField null=not-null/not-null value="TIS0002"
+  FIELD public static const System.String UnexpectedTextAfterCancellation null=not-null/not-null value="TIS0009"
+END
+
+TYPE enum Icod.TermInfo.Source.TermInfoSourceDiagnosticSeverity [sealed]
+  INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  UNDERLYING System.Int32
+  ENUM Error = 1
+  ENUM Warning = 0
+END
+
+TYPE class Icod.TermInfo.Source.TermInfoSourceLexResult [sealed]
+  PROPERTY System.Boolean HasErrors { public get; } null=not-null/unknown
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Source.TermInfoSourceDiagnostic> Diagnostics { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Source.TermInfoSourceToken> Tokens { public get; } null=not-null/unknown<not-null/not-null>
+END
+
+TYPE class Icod.TermInfo.Source.TermInfoSourceLexer [static]
+  METHOD public static Icod.TermInfo.Source.TermInfoSourceLexResult Tokenize(System.IO.TextReader reader null=not-null/not-null, System.String sourceName null=nullable/nullable default=null, Icod.TermInfo.Source.TermInfoSourceLexerOptions options null=nullable/nullable default=null) return-null=not-null/not-null
+  METHOD public static Icod.TermInfo.Source.TermInfoSourceLexResult Tokenize(System.String source null=not-null/not-null, System.String sourceName null=nullable/nullable default=null, Icod.TermInfo.Source.TermInfoSourceLexerOptions options null=nullable/nullable default=null) return-null=not-null/not-null
+END
+
+TYPE class Icod.TermInfo.Source.TermInfoSourceLexerOptions [sealed]
+  FIELD public static const System.Int32 DefaultMaximumSourceLength null=not-null/not-null value=4194304
+  FIELD public static const System.Int32 MaximumSupportedSourceLength null=not-null/not-null value=67108864
+  CTOR public TermInfoSourceLexerOptions(System.Int32 maximumSourceLength null=not-null/not-null default=4194304)
+  PROPERTY System.Int32 MaximumSourceLength { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.Source.TermInfoSourceSpan [sealed]
+  CTOR public TermInfoSourceSpan(System.String sourceName null=nullable/nullable, System.Int32 offset null=not-null/not-null, System.Int32 line null=not-null/not-null, System.Int32 column null=not-null/not-null, System.Int32 length null=not-null/not-null)
+  PROPERTY System.Int32 Column { public get; } null=not-null/unknown
+  PROPERTY System.Int32 EndOffset { public get; } null=not-null/unknown
+  PROPERTY System.Int32 Length { public get; } null=not-null/unknown
+  PROPERTY System.Int32 Line { public get; } null=not-null/unknown
+  PROPERTY System.Int32 Offset { public get; } null=not-null/unknown
+  PROPERTY System.String SourceName { public get; } null=nullable/unknown
+END
+
+TYPE class Icod.TermInfo.Source.TermInfoSourceToken [sealed]
+  PROPERTY Icod.TermInfo.Source.TermInfoSourceSpan Span { public get; } null=not-null/unknown
+  PROPERTY Icod.TermInfo.Source.TermInfoSourceTokenKind Kind { public get; } null=not-null/unknown
+  PROPERTY System.String Text { public get; } null=not-null/unknown
+END
+
+TYPE enum Icod.TermInfo.Source.TermInfoSourceTokenKind [sealed]
+  INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  UNDERLYING System.Int32
+  ENUM Alias = 1
+  ENUM BooleanCapability = 3
+  ENUM CancelledCapability = 6
+  ENUM Comment = 9
+  ENUM Description = 2
+  ENUM DisabledCapability = 8
+  ENUM Invalid = 10
+  ENUM NumericCapability = 4
+  ENUM StringCapability = 5
+  ENUM TerminalName = 0
+  ENUM UseReference = 7
+END

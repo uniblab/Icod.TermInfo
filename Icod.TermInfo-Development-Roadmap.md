@@ -17,9 +17,12 @@ version contracts live in version-specific roadmap files.
   acquisition: pure binary parser, explicit directory provider,
   environment/system discovery, and provider-local cache/refresh semantics;
   complete and frozen.
-- `Icod.TermInfo-Development-Roadmap-1.0.0.md` — active 1.0 readiness contract:
+- `Icod.TermInfo-Development-Roadmap-1.0.0.md` — stable 1.0 readiness contract:
   API-regret audit, dual-target robustness/compatibility, documentation/package
-  freeze, and final completion gate.
+  freeze, and final completion gate; complete and frozen.
+- `Icod.TermInfo-Post-1.0-Development-Roadmap.md` — active post-1.0 program;
+  1.1.0 adds the separately packaged terminfo source language, followed by
+  compiler, inspection/tooling, and termcap interoperability releases.
 
 ## Roadmap sequence
 
@@ -29,14 +32,15 @@ version contracts live in version-specific roadmap files.
   -> 0.8.0  semantic completion
   -> 0.9.0  arbitrary compiled acquisition
   -> 1.0.0  stable public contract
+  -> 1.1.0  terminfo source language (active)
 ```
 
-The 1.0 readiness work deliberately does **not** absorb every remaining terminal
-feature. Terminfo source-language tooling, termcap compatibility, hashed
-Berkeley-DB stores, live terminal sessions/input/probing, PTYs, curses/virtual
-screens, graphics protocols, and terminal emulation remain separate future-work
-families. Their dependencies and likely package homes are recorded in
-`docs/FUTURE-WORK-INVENTORY.md`.
+The stable 1.0 runtime package deliberately does **not** absorb every remaining
+terminal feature. Source-language work now proceeds in the separate
+`Icod.TermInfo.Source` package, while termcap compatibility, hashed Berkeley-DB
+stores, live terminal sessions/input/probing, PTYs, curses/virtual screens,
+graphics protocols, and terminal emulation remain separate work families. Their
+dependencies and likely package homes are recorded in `docs/FUTURE-WORK-INVENTORY.md`.
 
 The remainder of this file preserves the original 0.6.0 planning document.
 

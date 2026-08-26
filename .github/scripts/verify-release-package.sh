@@ -44,6 +44,15 @@ dotnet run   --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot
 # The optional Source package must expose the same API on both shipped frameworks.
 dotnet run   --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj   -c "${configuration}"   --no-build   -- --compare   Icod.TermInfo.Source/bin/${configuration}/net8.0/Icod.TermInfo.Source.dll   Icod.TermInfo.Source/bin/${configuration}/net10.0/Icod.TermInfo.Source.dll
 
+# The first Source public surface is reviewed and frozen independently.
+dotnet run \
+  --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj \
+  -c "${configuration}" \
+  --no-build \
+  -- --check \
+  docs/1.1.0-SOURCE-PUBLIC-API-BASELINE.txt \
+  Icod.TermInfo.Source/bin/${configuration}/net10.0/Icod.TermInfo.Source.dll
+
 # Structural package, Source Link, dependency, and architecture verification.
 dotnet run \
   --project tools/package-verifier/Icod.TermInfo.PackageVerifier.csproj \

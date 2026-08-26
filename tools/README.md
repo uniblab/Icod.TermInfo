@@ -13,7 +13,8 @@ the NuGet package.
   identity, Source Link, dependency, and architecture validation used by
   release scripts.
 - `public-api-snapshot` — deterministic exhaustive reflection manifest for the
-  1.0 API-regret audit and later compatibility checks.
+  frozen runtime API and, from S02 onward, explicitly supplied assemblies such
+  as `Icod.TermInfo.Source`.
 - `package-smoke` — package-reference-only fresh consumer source. It is
   deliberately excluded from the solution so normal solution restore cannot
   accidentally turn the package smoke test into a project-reference test.

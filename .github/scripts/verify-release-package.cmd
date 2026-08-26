@@ -43,6 +43,11 @@ dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.c
 if errorlevel 1 goto fail
 
 echo.
+echo === Verify approved Icod.TermInfo.Source public API baseline (%CONFIGURATION%) ===
+dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c %CONFIGURATION% --no-build -- --check docs\1.1.0-SOURCE-PUBLIC-API-BASELINE.txt Icod.TermInfo.Source\bin\%CONFIGURATION%\net10.0\Icod.TermInfo.Source.dll
+if errorlevel 1 goto fail
+
+echo.
 echo === Verify package structure and symbols (%CONFIGURATION%) ===
 dotnet run --project tools\package-verifier\Icod.TermInfo.PackageVerifier.csproj -c %CONFIGURATION% -f net10.0 -- "%ARTIFACT_DIR%"
 if errorlevel 1 goto fail

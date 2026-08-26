@@ -5,7 +5,7 @@ namespace Icod.TermInfo.Source.Tests;
 
 public sealed class S01ContractTests
 {
-    private const string DevelopmentVersion = "1.1.0-Alpha-1";
+    private const string DevelopmentVersion = "1.1.0-Alpha-2";
     private const string StableAssemblyVersion = "1.0.0.0";
 
     [Fact]
