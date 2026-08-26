@@ -17,6 +17,7 @@ internal static class Program
     private static readonly string[] TargetFrameworks =
     [
         "net8.0",
+        "net9.0",
         "net10.0",
     ];
 
@@ -60,7 +61,7 @@ internal static class Program
             VerifySymbolPackage(snupkg, commit);
 
             Console.WriteLine(
-                "Verified dual-target package structure, assembly identity, "
+                "Verified multi-target package structure, assembly identity, "
                 + "package metadata, dependency closure, symbols, and "
                 + $"Source Link for {packageVersion}.");
             return 0;

@@ -4,7 +4,9 @@ This is the repository's general executable sample for the low-level
 `Icod.TermInfo` semantic, profile, output, and environment APIs. It is
 intentionally descriptive rather than a live terminal session manager.
 
-The project targets `net8.0` and `net10.0`; the commands below use `net10.0` explicitly. Substitute `-f net8.0` to exercise the .NET 8 target.
+The project targets `net8.0`, `net9.0`, and `net10.0`; the commands below use
+`net10.0` explicitly. Substitute `-f net8.0` or `-f net9.0` to exercise those
+targets.
 
 The sample demonstrates:
 

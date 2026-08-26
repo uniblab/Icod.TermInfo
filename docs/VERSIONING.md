@@ -56,7 +56,7 @@ Package patch/minor versions do not advance `AssemblyVersion`.
 
 This is deliberate. Advancing `AssemblyVersion` for a compatible package-minor
 release would create a new binary assembly identity and would weaken the 1.x
-binding contract without providing a semantic-versioning benefit. Both
+binding contract without providing a semantic-versioning benefit. All three
 assemblies remain unsigned throughout 1.x. Adding a strong name changes assembly
 identity and is treated as a major-version design decision unless a future
 compatibility review demonstrates a safe migration.
@@ -79,9 +79,9 @@ values, parameter names/order/defaults, ref/out/in/params shape, generic
 constraints, nullability, and relevant attributes.
 
 Routine release validation must check the applicable baseline and require
-`net8.0` / `net10.0` API equivalence. Do not regenerate either baseline merely
-because a check fails. A changed baseline must correspond to an intentional
-compatibility decision.
+`net8.0` / `net9.0` / `net10.0` API equivalence. Do not regenerate either
+baseline merely because a check fails. A changed baseline must correspond to an
+intentional compatibility decision.
 
 ## Deprecation
 
@@ -94,7 +94,7 @@ change must be documented explicitly.
 
 ## Package metadata
 
-README, icon, license expression, repository metadata, dual-target managed/XML
+README, icon, license expression, repository metadata, multi-target managed/XML
 payloads, portable symbols, Source Link, and the intended inter-package
 dependency direction are part of the release-quality contract.
 

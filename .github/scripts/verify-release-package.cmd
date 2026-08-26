@@ -35,12 +35,16 @@ dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.c
 if errorlevel 1 goto fail
 
 echo.
-echo === Verify net8.0/net10.0 API equivalence (%CONFIGURATION%) ===
+echo === Verify net8.0/net9.0/net10.0 API equivalence (%CONFIGURATION%) ===
+dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c %CONFIGURATION% --no-build -- --compare bin\%CONFIGURATION%\net8.0\Icod.TermInfo.dll bin\%CONFIGURATION%\net9.0\Icod.TermInfo.dll
+if errorlevel 1 goto fail
 dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c %CONFIGURATION% --no-build -- --compare bin\%CONFIGURATION%\net8.0\Icod.TermInfo.dll bin\%CONFIGURATION%\net10.0\Icod.TermInfo.dll
 if errorlevel 1 goto fail
 
 echo.
-echo === Verify Icod.TermInfo.Source net8.0/net10.0 API equivalence (%CONFIGURATION%) ===
+echo === Verify Icod.TermInfo.Source net8.0/net9.0/net10.0 API equivalence (%CONFIGURATION%) ===
+dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c %CONFIGURATION% --no-build -- --compare Icod.TermInfo.Source\bin\%CONFIGURATION%\net8.0\Icod.TermInfo.Source.dll Icod.TermInfo.Source\bin\%CONFIGURATION%\net9.0\Icod.TermInfo.Source.dll
+if errorlevel 1 goto fail
 dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c %CONFIGURATION% --no-build -- --compare Icod.TermInfo.Source\bin\%CONFIGURATION%\net8.0\Icod.TermInfo.Source.dll Icod.TermInfo.Source\bin\%CONFIGURATION%\net10.0\Icod.TermInfo.Source.dll
 if errorlevel 1 goto fail
 
@@ -99,6 +103,11 @@ dotnet run --project "%SMOKE_ROOT%\Icod.TermInfo.PackageSmoke.csproj" -c %CONFIG
 if errorlevel 1 goto fail
 
 echo.
+echo === Fresh package consumer: net9.0 ===
+dotnet run --project "%SMOKE_ROOT%\Icod.TermInfo.PackageSmoke.csproj" -c %CONFIGURATION% -f net9.0 --no-restore -p:IcodTermInfoPackageVersion=%PACKAGE_VERSION%
+if errorlevel 1 goto fail
+
+echo.
 echo === Fresh package consumer: net10.0 ===
 dotnet run --project "%SMOKE_ROOT%\Icod.TermInfo.PackageSmoke.csproj" -c %CONFIGURATION% -f net10.0 --no-restore -p:IcodTermInfoPackageVersion=%PACKAGE_VERSION%
 if errorlevel 1 goto fail
@@ -118,6 +127,11 @@ dotnet restore "%SOURCE_SMOKE_ROOT%\Icod.TermInfo.Source.PackageSmoke.csproj" --
 if errorlevel 1 goto fail
 
 dotnet run --project "%SOURCE_SMOKE_ROOT%\Icod.TermInfo.Source.PackageSmoke.csproj" -c %CONFIGURATION% -f net8.0 --no-restore -p:IcodTermInfoSourcePackageVersion=%SOURCE_PACKAGE_VERSION%
+if errorlevel 1 goto fail
+
+echo.
+echo === Fresh Icod.TermInfo.Source package consumer: net9.0 ===
+dotnet run --project "%SOURCE_SMOKE_ROOT%\Icod.TermInfo.Source.PackageSmoke.csproj" -c %CONFIGURATION% -f net9.0 --no-restore -p:IcodTermInfoSourcePackageVersion=%SOURCE_PACKAGE_VERSION%
 if errorlevel 1 goto fail
 
 echo.

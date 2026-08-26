@@ -38,10 +38,12 @@ dotnet run \
 # The reviewed 1.0 API baseline must remain exact.
 dotnet run   --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj   -c "${configuration}"   --no-build   -- --check
 
-# The two shipped target frameworks must expose the exact same API.
+# The three shipped target frameworks must expose the exact same API.
+dotnet run   --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj   -c "${configuration}"   --no-build   -- --compare   bin/${configuration}/net8.0/Icod.TermInfo.dll   bin/${configuration}/net9.0/Icod.TermInfo.dll
 dotnet run   --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj   -c "${configuration}"   --no-build   -- --compare   bin/${configuration}/net8.0/Icod.TermInfo.dll   bin/${configuration}/net10.0/Icod.TermInfo.dll
 
-# The optional Source package must expose the same API on both shipped frameworks.
+# The optional Source package must expose the same API on all shipped frameworks.
+dotnet run   --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj   -c "${configuration}"   --no-build   -- --compare   Icod.TermInfo.Source/bin/${configuration}/net8.0/Icod.TermInfo.Source.dll   Icod.TermInfo.Source/bin/${configuration}/net9.0/Icod.TermInfo.Source.dll
 dotnet run   --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj   -c "${configuration}"   --no-build   -- --compare   Icod.TermInfo.Source/bin/${configuration}/net8.0/Icod.TermInfo.Source.dll   Icod.TermInfo.Source/bin/${configuration}/net10.0/Icod.TermInfo.Source.dll
 
 # The first Source public surface is reviewed and frozen independently.
@@ -128,6 +130,12 @@ dotnet run \
 dotnet run \
   --project "${smoke_root}/Icod.TermInfo.PackageSmoke.csproj" \
   -c "${configuration}" \
+  -f net9.0 \
+  --no-restore \
+  -p:IcodTermInfoPackageVersion="${package_version}"
+dotnet run \
+  --project "${smoke_root}/Icod.TermInfo.PackageSmoke.csproj" \
+  -c "${configuration}" \
   -f net10.0 \
   --no-restore \
   -p:IcodTermInfoPackageVersion="${package_version}"
@@ -155,6 +163,12 @@ dotnet run \
   --no-restore \
   -p:IcodTermInfoSourcePackageVersion="${source_package_version}"
 
+dotnet run \
+  --project "${source_smoke_root}/Icod.TermInfo.Source.PackageSmoke.csproj" \
+  -c "${configuration}" \
+  -f net9.0 \
+  --no-restore \
+  -p:IcodTermInfoSourcePackageVersion="${source_package_version}"
 dotnet run \
   --project "${source_smoke_root}/Icod.TermInfo.Source.PackageSmoke.csproj" \
   -c "${configuration}" \

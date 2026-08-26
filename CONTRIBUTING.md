@@ -5,9 +5,9 @@ active 1.x compatibility contracts, and the frozen historical release contracts.
 
 ## Development requirements
 
-Install the .NET 8 and .NET 10 SDK/runtime lines and use C# 13. The shipped
-libraries, tests, and samples target both `net8.0` and `net10.0`; repository-only
-maintenance tools normally target `net10.0`.
+Install the .NET 8, .NET 9, and .NET 10 SDK/runtime lines and use C# 13. The
+shipped libraries, tests, and samples target `net8.0`, `net9.0`, and `net10.0`;
+repository-only maintenance tools normally target `net10.0`.
 
 Before submitting a change, run Debug and Release builds and tests for
 `Icod.TermInfo.sln`:
@@ -20,9 +20,10 @@ dotnet build Icod.TermInfo.sln -c Release
 dotnet test Icod.TermInfo.sln -c Release
 ```
 
-Repository text files use UTF-8 and LF line endings. Use braces for all
-control-flow bodies. Public, protected, and internal API entry points should
-validate their parameters before performing work.
+Repository text files use UTF-8 and CRLF line endings, as frozen by
+`.editorconfig`. Use braces for all control-flow bodies. Public, protected, and
+internal API entry points should validate their parameters before performing
+work.
 
 For multiline invocations and method declarations, place the closing `)` on its
 own line. Do not attach it to the final argument or parameter. When xUnit
@@ -109,7 +110,7 @@ Terminal profile loading must remain side-effect free. In particular, Windows vi
 Public behavior changes should update README examples when relevant. Samples must remain safe on redirected output and should not assume the CI runner has a usable `TERM` or interactive TTY.
 
 Both runtime sample projects are multi-targeted. Documentation which invokes
-them with `dotnet run` must specify `-f net8.0` or `-f net10.0`.
+them with `dotnet run` must specify `-f net8.0`, `-f net9.0`, or `-f net10.0`.
 
 If a public runtime type or compatibility operation changes, update the semantic
 public API tests deliberately and reconcile the change with
@@ -123,16 +124,16 @@ compatibility decision.
 Package changes should preserve:
 
 - deterministic/continuous-integration builds;
-- first-class `net8.0` and `net10.0` managed/XML assets for every package in the
-  coordinated family;
+- first-class `net8.0`, `net9.0`, and `net10.0` managed/XML assets for every
+  package in the coordinated family;
 - stable assembly version `1.0.0.0` throughout 1.x;
 - unsigned assembly identity throughout 1.x;
 - Source Link information supplied by the .NET SDK;
-- portable PDBs and `.snupkg` generation for both targets;
+- portable PDBs and `.snupkg` generation for all three targets;
 - synchronized `Icod.TermInfo` / `Icod.TermInfo.Source` package versions;
 - synchronized `Icod.TermInfo.Compiler` package versions beginning with C01;
-- runtime and Source fresh-package smoke consumers on both targets;
-- Compiler fresh-package smoke consumers on both targets beginning with C01;
+- runtime and Source fresh-package smoke consumers on all three targets;
+- Compiler fresh-package smoke consumers on all three targets beginning with C01;
 - each package README, icon metadata, and LGPL license expression;
 - a one-way Source -> runtime package dependency;
 - a one-way Compiler -> runtime/Source dependency;

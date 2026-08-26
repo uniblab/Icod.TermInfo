@@ -61,7 +61,7 @@ public sealed class T45CompletionGateTests {
 				project,
 				"AssemblyVersion" ) );
 		Assert.Equal(
-			"net8.0;net10.0",
+			"net8.0;net9.0;net10.0",
 			ReadRequiredProperty(
 				project,
 				"TargetFrameworks" ) );
@@ -129,6 +129,9 @@ public sealed class T45CompletionGateTests {
 				verifier );
 			Assert.Contains(
 				"net8.0",
+				verifier );
+			Assert.Contains(
+				"net9.0",
 				verifier );
 			Assert.Contains(
 				"net10.0",

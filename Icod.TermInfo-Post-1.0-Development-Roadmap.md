@@ -5,7 +5,7 @@
 **Optional source package:** `Icod.TermInfo.Source`
 **Planned compiler package:** `Icod.TermInfo.Compiler`
 **Language:** C# 13  
-**Target frameworks:** `net8.0`; `net10.0`  
+**Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
 **Current release version:** `1.1.1`
 **Next development line:** `1.2.0`
@@ -463,7 +463,7 @@ Required package-foundation work:
 
 - add `Icod.TermInfo.Compiler`;
 - add `tests/Icod.TermInfo.Compiler.Tests`;
-- target `net8.0;net10.0`;
+- target `net8.0;net9.0;net10.0`;
 - use C# 13;
 - reference `Icod.TermInfo`;
 - add the projects to `Icod.TermInfo.sln`;
@@ -533,7 +533,7 @@ No unsupported format SHALL be emitted by guesswork.
 **Gate C01:** a minimal representable `TerminalDescription` can be serialized
 as deterministic legacy `0432` bytes and parsed by the existing
 `CompiledTermInfoParser` into a semantically equivalent description, while the
-new package/API/package-consumer gates pass on both target frameworks.
+new package/API/package-consumer gates pass on all three target frameworks.
 
 ---
 
@@ -765,10 +765,10 @@ Release closure SHALL:
 - preserve the frozen runtime 1.0 public API baseline;
 - preserve the frozen Source 1.1 public API baseline;
 - freeze the reviewed Compiler public API baseline;
-- pass `net8.0` / `net10.0` API-equivalence checks for all three packages;
+- pass `net8.0` / `net9.0` / `net10.0` API-equivalence checks for all three packages;
 - pass the complete Windows/Linux/macOS solution matrix;
 - pack and structurally validate all three NuGet and symbol packages;
-- execute fresh runtime, Source, and Compiler package consumers on both targets;
+- execute fresh runtime, Source, and Compiler package consumers on all three targets;
 - verify the one-way dependency graph;
 - publish the exact validated artifacts to NuGet.org and GitHub Packages;
 - tag the exact validated/published commit as `v1.2.0`.

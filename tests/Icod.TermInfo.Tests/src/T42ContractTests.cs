@@ -33,7 +33,7 @@ public sealed class T42ContractTests
 		string root =
 			FindRepositoryRoot();
 
-		string[] dualTargetProjects =
+		string[] multiTargetProjects =
 		[
 			"Icod.TermInfo.csproj",
 			"tests/Icod.TermInfo.Tests/Icod.TermInfo.Tests.csproj",
@@ -42,10 +42,10 @@ public sealed class T42ContractTests
 			"tools/package-smoke/Icod.TermInfo.PackageSmoke.csproj",
 		];
 
-		foreach (string relativePath in dualTargetProjects)
+		foreach (string relativePath in multiTargetProjects)
 		{
 			Assert.Equal(
-				"net8.0;net10.0",
+				"net8.0;net9.0;net10.0",
 				ReadProjectProperty(
 					root,
 					relativePath,
@@ -122,7 +122,7 @@ public sealed class T42ContractTests
 	}
 
 	[Fact]
-	public void BuildAndPackageValidationInstallBothSupportedSdks()
+	public void BuildAndPackageValidationInstallAllSupportedSdks()
 	{
 		string root =
 			FindRepositoryRoot();
@@ -149,6 +149,7 @@ public sealed class T42ContractTests
 				pullRequest,
 				"dotnet-version: |\n"
 				+ "            8.0.x\n"
+				+ "            9.0.x\n"
 				+ "            10.0.x\n"));
 		Assert.Equal(
 			1,
@@ -156,6 +157,7 @@ public sealed class T42ContractTests
 				pushMain,
 				"dotnet-version: |\n"
 				+ "            8.0.x\n"
+				+ "            9.0.x\n"
 				+ "            10.0.x\n"));
 
 		Assert.StartsWith(

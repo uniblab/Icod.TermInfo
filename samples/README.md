@@ -4,9 +4,9 @@ The repository contains two executable samples. They are intentionally separate
 so acquisition examples stay easy to copy without mixing them with interactive
 terminal-control output.
 
-Both sample projects target `net8.0` and `net10.0`. Every `dotnet run` example
-therefore specifies a framework; substitute `-f net8.0` when exercising the
-.NET 8 consumer target.
+Both sample projects target `net8.0`, `net9.0`, and `net10.0`. Every
+`dotnet run` example therefore specifies a framework; substitute `-f net8.0` or
+`-f net9.0` when exercising those consumer targets.
 
 ## Icod.TermInfo.Sample
 
