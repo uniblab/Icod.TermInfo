@@ -6,6 +6,9 @@
 **Target frameworks:** `net8.0`; `net10.0`  
 **Current stable contract:** `1.0.0`  
 **Next development line:** `1.1.0`  
+**Development version:** `1.1.0-Alpha-1`
+**Status:** S01 implementation in progress
+**Current tranche:** S01 — Source package foundation
 **Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
 
 ---
@@ -165,6 +168,8 @@ Required work:
 - establish source diagnostic conventions.
 
 **Gate S01:** a fresh consumer can reference `Icod.TermInfo.Source` without changing the `Icod.TermInfo` runtime package.
+
+**S01 implementation record:** [`docs/1.1.0-S01-SOURCE-PACKAGE-FOUNDATION.md`](docs/1.1.0-S01-SOURCE-PACKAGE-FOUNDATION.md).
 
 ---
 
