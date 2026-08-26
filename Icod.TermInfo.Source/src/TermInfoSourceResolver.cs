@@ -143,7 +143,7 @@ public static class TermInfoSourceResolver {
 					cacheKey,
 					out ResolvedNode? cached
 			) ) {
-				return cached!.Clone();
+				return cached.Clone();
 			}
 
 			_activeNames.Add( canonicalName );
@@ -169,7 +169,8 @@ public static class TermInfoSourceResolver {
 						AddDiagnostic(
 							TermInfoSourceDiagnosticCodes.MissingUseReference,
 							"A use= field must identify a parent source entry.",
-							field.Span );
+							field.Span
+						);
 						parentFailed = true;
 						continue;
 					}
