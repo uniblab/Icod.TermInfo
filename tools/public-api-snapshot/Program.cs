@@ -1235,10 +1235,9 @@ internal static class Program
                     '\r',
                     '\n');
 
-        return normalized.EndsWith(
+        return normalized.TrimEnd(
                 '\n')
-            ? normalized
-            : normalized + "\n";
+            + "\n";
     }
 
     private static string ComputeSha256(
