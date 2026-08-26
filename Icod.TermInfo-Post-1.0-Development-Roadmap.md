@@ -2,13 +2,14 @@
 
 **Project:** `Icod.TermInfo`  
 **Stable runtime package:** `Icod.TermInfo`  
+**Optional source package:** `Icod.TermInfo.Source`
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net10.0`  
-**Current stable contract:** `1.0.0`  
-**Next development line:** `1.1.0`  
-**Development version:** `1.1.0-Alpha-9`
-**Status:** S09 implementation complete — validation pending
-**Current tranche:** S09 — Corpus, fuzzing, and compatibility
+**Frozen runtime contract:** `1.0.0`
+**Current release version:** `1.1.0`
+**Next development line:** `1.2.0`
+**Status:** S01-S09 complete — 1.1.0 release closure
+**Current tranche:** 1.1.0 release closure
 **Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
 
 ---
@@ -392,6 +393,28 @@ Normal CI SHALL remain deterministic and SHALL NOT require host ncurses installa
 **1.1 completion gate:** arbitrary supported `.ti` source can be parsed and resolved into the same semantic runtime model used by the existing 1.0 compiled-term acquisition path.
 
 **S09 implementation record:** [`docs/1.1.0-S09-CORPUS-FUZZING-COMPATIBILITY.md`](docs/1.1.0-S09-CORPUS-FUZZING-COMPATIBILITY.md).
+
+## 4.11 1.1.0 release closure
+
+S01-S09 constitute the complete planned implementation program for 1.1.0. The
+final release step is deliberately a closure gate rather than another feature
+tranche.
+
+Release closure SHALL:
+
+- set both package versions to exactly `1.1.0`;
+- retain assembly version `1.0.0.0` for both assemblies;
+- preserve the frozen runtime 1.0 public API baseline;
+- freeze the reviewed Source public API baseline;
+- pass `net8.0` / `net10.0` API-equivalence checks;
+- pass the complete Windows/Linux/macOS solution matrix;
+- pack and validate both NuGet packages and symbol packages;
+- execute fresh runtime and Source package consumers for both targets;
+- review final package README, license, repository, and dependency metadata;
+- publish the exact validated artifacts to NuGet.org and GitHub Packages;
+- tag the exact validated/published commit as `v1.1.0`.
+
+**Release audit:** [`docs/1.1.0-RELEASE-AUDIT.md`](docs/1.1.0-RELEASE-AUDIT.md).
 
 ---
 

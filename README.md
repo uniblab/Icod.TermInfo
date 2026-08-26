@@ -2,25 +2,33 @@
 
 `Icod.TermInfo` is a managed, dependency-free .NET implementation of the low-level terminal-capability model traditionally supplied by `libtinfo`.
 
-Version 1.0.0 is the stable public-contract release for the semantic and acquisition work completed through 0.9 and hardened through the 1.0 readiness gates.
+Version 1.1.0 is the current stable package release. It preserves the frozen 1.0 runtime contract while adding the optional `Icod.TermInfo.Source` package for managed `.ti` source parsing, cancellation, `use=` inheritance, and materialization into the existing immutable `TerminalDescription` model.
 
-The package targets `net8.0` and `net10.0`, uses C# 13, contains no native ncurses/terminfo payload, and is intended to run on Windows, Linux, and macOS.
+Both packages target `net8.0` and `net10.0`, use C# 13, contain no native ncurses/terminfo payload, and are intended to run on Windows, Linux, and macOS.
 
 ## Install
 
-For the 1.0.0 release:
+For the 1.1.0 release, runtime-only consumers use:
 
 ```text
-dotnet add package Icod.TermInfo --version 1.0.0
+dotnet add package Icod.TermInfo --version 1.1.0
 ```
 
-The same package contents are intended for NuGet.org and GitHub Packages. Repository development can reference `Icod.TermInfo.csproj` directly, as the sample project does.
+Applications which need terminfo source-language support use:
 
-## 1.0 stability contract
+```text
+dotnet add package Icod.TermInfo.Source --version 1.1.0
+```
 
-The 1.x line keeps assembly identity `Icod.TermInfo, Version=1.0.0.0`, remains unsigned, and treats `net8.0` plus `net10.0` as supported consumer targets. Public API, binary/package compatibility, deprecation, and target-framework policy are documented in `docs/VERSIONING.md` and `docs/COMPATIBILITY.md`.
+`Icod.TermInfo.Source` depends on the matching `Icod.TermInfo` package. Applications which only load compiled terminfo or consume `TerminalDescription` values continue to reference `Icod.TermInfo` alone.
 
-Version 1.0 does not add another terminal family or acquisition format merely to enlarge the release. It stabilizes the existing low-level terminfo responsibility and leaves live terminal sessions, PTYs, curses/UI, terminal emulation, source tooling, and active protocol negotiation to later or sibling work.
+The same validated package artifacts are intended for NuGet.org and GitHub Packages. Repository development can reference the corresponding project directly.
+
+## 1.x stability contract
+
+The 1.x line keeps runtime assembly identity `Icod.TermInfo, Version=1.0.0.0`, remains unsigned, and treats `net8.0` plus `net10.0` as supported consumer targets. `Icod.TermInfo.Source` also retains assembly version `1.0.0.0` throughout its 1.x line. Public API, binary/package compatibility, deprecation, and target-framework policy are documented in `docs/VERSIONING.md` and `docs/COMPATIBILITY.md`.
+
+The runtime 1.0 public API remains frozen. Version 1.1 adds source-language functionality in the separate `Icod.TermInfo.Source` package rather than making the runtime package depend on parser/front-end code. Live terminal sessions, PTYs, curses/UI, terminal emulation, compiler/tool commands, termcap conversion, and active protocol negotiation remain later or sibling work.
 
 ## What 1.0 provides
 
@@ -47,6 +55,21 @@ Version 1.0 does not add another terminal family or acquisition format merely to
 
 The 0.6.0 behavior of `dumb`, `ansi`, and `vt100` remains intentionally conservative: `dumb` is minimal, `ansi` is the traditional eight-color profile, and `vt100` remains monochrome.
 
+## What 1.1 adds
+
+The optional `Icod.TermInfo.Source` package adds the source-language path without changing the runtime package contract:
+
+- deterministic `.ti` lexical analysis with source spans and diagnostics;
+- terminfo string and numeric source-value semantics;
+- unresolved documents, entries, fields, aliases, and descriptions;
+- classification of standard and extended capabilities against the runtime catalog;
+- cancellation semantics and `use=` inheritance resolution;
+- materialization of resolved source entries into ordinary immutable `TerminalDescription` values;
+- stable duplicate source-name and alias diagnostics;
+- bounded source and inheritance processing, deterministic mutation fuzzing, and checked-in source/compiled compatibility fixtures.
+
+The source package is optional. Compiled-database users and higher-level terminal consumers do not acquire it transitively through `Icod.TermInfo`.
+
 ## Getting started
 
 Terminal resolution remains explicit and conservative. A normal application can
@@ -61,12 +84,14 @@ TerminalDatabase database =
         {
             new SystemTerminalDescriptionProvider(),
             TerminalDatabase.BuiltIn,
-        });
+        }
+    );
 
 TerminalDescription terminal =
     TerminalEnvironment.Resolve(
         database,
-        TerminalProfiles.Dumb);
+        TerminalProfiles.Dumb
+    );
 
 Console.WriteLine($"Terminal profile: {terminal.Name}");
 ```
@@ -125,16 +150,19 @@ The complete standard catalog is inspectable in compiled-table order. Managed en
 ```csharp
 StandardCapabilityMetadata<StringCapability> cupMetadata =
     StandardCapabilityCatalog.GetMetadata(
-        StringCapability.CursorAddress);
+        StringCapability.CursorAddress
+    );
 
 Console.WriteLine(
-    $"{cupMetadata.ShortName}: binary index {cupMetadata.BinaryIndex}");
+    $"{cupMetadata.ShortName}: binary index {cupMetadata.BinaryIndex}"
+);
 
 foreach (StandardCapabilityMetadata<NumericCapability> metadata
     in StandardCapabilityCatalog.NumericCapabilities)
 {
     Console.WriteLine(
-        $"{metadata.ShortName} / {metadata.LongName}");
+        $"{metadata.ShortName} / {metadata.LongName}"
+    );
 }
 ```
 
@@ -204,7 +232,8 @@ Use the semantic helper rather than embedding ANSI escape strings:
 string foreground =
     TerminalColors.ExpandForeground(
         TerminalProfiles.Xterm256Color,
-        196);
+        196
+    );
 
 TermInfoOutput.PutP(foreground, Console.Out);
 ```
@@ -228,7 +257,8 @@ TerminalRgbColor purple =
 string foreground =
     TerminalColors.ExpandForeground(
         direct,
-        purple);
+        purple
+    );
 ```
 
 The selected xterm direct profiles use packed 8/8/8 RGB semantics and retain 8, 16, or 256 indexed entries according to their `CO` metadata. The library validates collisions between packed RGB values and that retained indexed prefix instead of guessing.
@@ -242,7 +272,8 @@ string move =
     xterm.Expand(
         StringCapability.CursorAddress,
         10,
-        20);
+        20
+    );
 ```
 
 Profiles can also advertise cursor-addressing lifecycle and cursor-visibility primitives:
@@ -284,7 +315,8 @@ string move =
     vt100.Expand(
         StringCapability.CursorAddress,
         10,
-        20);
+        20
+    );
 
 // move contains ESC[11;21H$<5>
 ```
@@ -295,7 +327,8 @@ Applications should emit capability strings through the output layer. Modern ter
 TermInfoOutput.TPuts(
     move,
     affectedLines: 1,
-    Console.Out);
+    Console.Out
+);
 ```
 
 Physical or serial terminals can opt into delays:
@@ -305,7 +338,8 @@ TermInfoOutput.TPuts(
     move,
     affectedLines: 1,
     Console.Out,
-    PaddingMode.Delay);
+    PaddingMode.Delay
+);
 ```
 
 The output API also supports asynchronous `TextWriter` output, byte streams with a caller-selected encoding, character callbacks, and an injectable `ITermInfoDelayProvider`.
@@ -321,7 +355,8 @@ TermInfoOutput.TPuts(
     "\u0080",
     affectedLines: 1,
     stream,
-    Encoding.Latin1);
+    Encoding.Latin1
+);
 
 byte[] bytes = stream.ToArray(); // { 0x80 }
 ```
@@ -337,13 +372,15 @@ TermInfoOutputOptions options =
     new(
         vt100,
         baudRate: 9600,
-        paddingMode: PaddingMode.Delay);
+        paddingMode: PaddingMode.Delay
+    );
 
 TermInfoOutput.TPuts(
     move,
     affectedLines: 1,
     Console.Out,
-    options);
+    options
+);
 ```
 
 The library never discovers baud rate and never owns a tty/file descriptor. Advisory padding is suppressed according to the terminal's `xon` and `pb` capabilities; mandatory padding remains mandatory unless the caller explicitly chooses `PaddingMode.Ignore`. `PaddingMode.PadCharacters` also honors `npc` and `pad`.
@@ -430,7 +467,8 @@ TerminalDescription example =
 
 ITerminalDescriptionProvider provider =
     new InMemoryTerminalDescriptionProvider(
-        new[] { example });
+        new[] { example }
+    );
 
 TerminalDatabase database =
     new(new[] { provider });
@@ -470,11 +508,13 @@ When an application owns a conventional terminfo directory tree, use
 ```csharp
 ITerminalDescriptionProvider applicationTermInfo =
     new DirectoryTerminalDescriptionProvider(
-        "/opt/myapp/share/terminfo");
+        "/opt/myapp/share/terminfo"
+    );
 
 TerminalDescription terminal =
     new TerminalDatabase(
-        new[] { applicationTermInfo })
+        new[] { applicationTermInfo }
+    )
         .Load("my-terminal");
 ```
 
@@ -491,7 +531,9 @@ SystemTerminalDescriptionProvider restricted =
         new SystemTerminalDescriptionProviderOptions(
             useEnvironment: false,
             useUserDatabase: false,
-            useSystemDatabases: false));
+            useSystemDatabases: false
+        )
+    );
 ```
 
 That provider has no enabled acquisition source and therefore returns a clean
@@ -524,7 +566,8 @@ TerminalDatabase database =
         {
             new SystemTerminalDescriptionProvider(),
             TerminalDatabase.BuiltIn,
-        });
+        }
+    );
 ```
 
 The first provider which resolves the requested name wins.
@@ -610,15 +653,16 @@ See `samples/README.md`,
 
 ## Project-family boundary
 
-`Icod.TermInfo` owns immutable terminal-description data, acquisition of that data, and pure transformations required to interpret, expand, and output terminal capabilities. It does not own a live terminal session, a child pseudo-terminal, or a virtual screen.
+`Icod.TermInfo` owns immutable terminal-description data, acquisition of that data, and pure transformations required to interpret, expand, and output terminal capabilities. `Icod.TermInfo.Source` owns optional source-language parsing and inheritance resolution. Neither package owns a live terminal session, a child pseudo-terminal, or a virtual screen.
 
 The intended family boundary is now explicit:
 
 - **`Icod.TermInfo`** — descriptions, compiled-database acquisition, capability semantics, parameter expansion, and output transformation;
+- **`Icod.TermInfo.Source`** — `.ti` lexical analysis, source diagnostics, unresolved entries, cancellation, `use=` inheritance, and materialization into `TerminalDescription`;
+- **future `Icod.TermInfo.Compiler` / tools** — compiled-entry writing, `tic`/`infocmp`/`toe` engines and commands, termcap conversion, and optional database-maintenance functionality;
 - **future `Icod.Terminal`** — raw/cooked session ownership, input decoding, keyboard/mouse/paste/focus events, active probing/negotiation, full-screen/cursor lifecycle, clipboard/hyperlink operations, and progress helpers;
 - **future `Icod.Pty`** — Unix PTY and Windows ConPTY creation, resize propagation, and child-process plumbing;
-- **future `Icod.Curses`** — Unicode cell/grid state, damage/refresh optimization, windows, pads, panels, menus, forms, and widgets;
-- **future source/tooling work** — `.ti` parsing, `use=` inheritance, `tic`/`infocmp`-class tools, termcap conversion, and optional database-maintenance functionality.
+- **future `Icod.Curses`** — Unicode cell/grid state, damage/refresh optimization, windows, pads, panels, menus, forms, and widgets.
 
 The broader dependency inventory is recorded in `docs/FUTURE-WORK-INVENTORY.md`.
 
@@ -667,10 +711,12 @@ dotnet test Icod.TermInfo.sln -c Debug
 dotnet build Icod.TermInfo.sln -c Staging
 dotnet test Icod.TermInfo.sln -c Staging
 dotnet pack Icod.TermInfo.csproj -c Staging --output artifacts
+dotnet pack Icod.TermInfo.Source/Icod.TermInfo.Source.csproj -c Staging --output artifacts
 
 dotnet build Icod.TermInfo.sln -c Release
 dotnet test Icod.TermInfo.sln -c Release
 dotnet pack Icod.TermInfo.csproj -c Release --output artifacts
+dotnet pack Icod.TermInfo.Source/Icod.TermInfo.Source.csproj -c Release --output artifacts
 ```
 
 Use the verifier with the same configuration used to build and pack.
@@ -689,33 +735,36 @@ For final Release validation:
 bash .github/scripts/verify-release-package.sh artifacts Release
 ```
 
-Both wrappers run the same capability-metadata check, approved API-baseline
-check, net8/net10 API-equivalence check, package/XML/symbol validation, isolated
-package-reference-only smoke consumer on both target frameworks, and the
-sample's non-interactive `--describe-only` path. Windows package validation does
-not require Bash or Python.
+Both wrappers run the same capability-metadata check; exact runtime and Source
+public-API baseline checks; net8/net10 API-equivalence checks; runtime
+package/XML/symbol validation; isolated runtime and Source package-reference-only
+smoke consumers on both target frameworks; and the sample's non-interactive
+`--describe-only` path. Windows package validation does not require Bash or
+Python.
 
 Pull requests use Staging throughout, may upload the verified `.nupkg` and
-`.snupkg` as short-lived GitHub Actions artifacts, and never publish packages.
-Only pushes to `main` run the Release build/test/package-validation/publication
-workflow.
+`.snupkg` artifacts for both packages, and never publish packages. Only pushes to
+`main` run the Release build/test/package-validation/publication workflow.
 
 See `docs/RELEASING.md` for the release procedure,
-`Icod.TermInfo-Development-Roadmap-1.0.0.md` for the 1.0 contract, and
-`docs/1.0.0-CONTRACT-AUDIT.md` for the final T45 sign-off requirements. Tag
-`v1.0.0` only on the exact `main` commit whose complete Release validation and
+`Icod.TermInfo-Development-Roadmap-1.0.0.md` for the frozen runtime contract,
+`Icod.TermInfo-Post-1.0-Development-Roadmap.md` for the 1.1 source-language
+program, and `docs/1.1.0-RELEASE-AUDIT.md` for the final release gate. Tag
+`v1.1.0` only on the exact `main` commit whose complete Release validation and
 publication succeeded; no source or package content may change between that
 validation and tagging.
 
 ## Scope
 
-`Icod.TermInfo` is not curses, a terminal emulator, a PTY implementation, a termios session manager, an input-event parser, or a general terminal UI toolkit. It intentionally carries low-level descriptive data which those higher-level systems may consume.
+`Icod.TermInfo` is not curses, a terminal emulator, a PTY implementation, a termios session manager, an input-event parser, or a general terminal UI toolkit. It intentionally carries low-level descriptive data which those higher-level systems may consume. `Icod.TermInfo.Source` is an optional parser/resolver layer and does not change those runtime boundaries.
 
 See `Icod.TermInfo-Development-Roadmap-0.9.0.md` for the frozen acquisition
-contract, `Icod.TermInfo-Development-Roadmap-1.0.0.md` for the 1.0 stability
-contract, `docs/VERSIONING.md` and `docs/COMPATIBILITY.md` for the 1.x promises,
-and `docs/FUTURE-WORK-INVENTORY.md` for the broader terminal-system dependency
-map. The 0.6.0 through 0.8.0 roadmaps remain historical frozen contracts.
+contract, `Icod.TermInfo-Development-Roadmap-1.0.0.md` for the 1.0 runtime
+stability contract, `Icod.TermInfo-Post-1.0-Development-Roadmap.md` for the 1.1
+source-language program, `docs/VERSIONING.md` and `docs/COMPATIBILITY.md` for the
+1.x promises, and `docs/FUTURE-WORK-INVENTORY.md` for the broader terminal-system
+dependency map. The 0.6.0 through 1.0.0 roadmaps remain historical frozen
+contracts.
 
 ## Authors
 
