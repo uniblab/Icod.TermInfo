@@ -32,7 +32,7 @@ public sealed class T45CompletionGateTests
 					2)[0];
 
 		Assert.Equal(
-			"1.1.0",
+			"1.1.1",
 			semanticVersion);
 	}
 
@@ -49,12 +49,12 @@ public sealed class T45CompletionGateTests
 				LoadOptions.None);
 
 		Assert.Equal(
-			"1.1.0",
+			"1.1.1",
 			ReadRequiredProperty(
 				project,
 				"Version"));
 		Assert.Equal(
-			"1.1.0",
+			"1.1.1",
 			ReadRequiredProperty(
 				project,
 				"PackageVersion"));

@@ -12,17 +12,17 @@
 		<AssemblyName>Icod.TermInfo.Source</AssemblyName>
 		<RootNamespace>Icod.TermInfo.Source</RootNamespace>
 		<Configurations>Debug;Release;Staging</Configurations>
-		<Version>1.1.0</Version>
+		<Version>1.1.1</Version>
 		<AssemblyVersion>1.0.0.0</AssemblyVersion>
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<PackageVersion>1.1.0</PackageVersion>
+		<PackageVersion>1.1.1</PackageVersion>
 		<PackageId>Icod.TermInfo.Source</PackageId>
 		<Title>Icod.TermInfo.Source</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed terminfo source-language support for Icod.TermInfo. The 1.1 line parses and resolves .ti source into the stable TerminalDescription model without enlarging the runtime Icod.TermInfo package.</Description>
-		<PackageReleaseNotes>1.1.0 completes managed .ti source parsing and resolution: diagnostics and source spans, string and numeric semantics, unresolved entries, standard and extended capability classification, cancellation, use= inheritance, TerminalDescription materialization, duplicate source-identity warnings, deterministic mutation fuzzing, hostile-input bounds, and offline tic-generated compatibility fixtures.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.1.1 completes managed .ti source parsing and resolution: diagnostics and source spans, string and numeric semantics, unresolved entries, standard and extended capability classification, cancellation, use= inheritance, TerminalDescription materialization, duplicate source-identity warnings, deterministic mutation fuzzing, hostile-input bounds, and offline tic-generated compatibility fixtures.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>
