@@ -53,6 +53,10 @@ foundation and adds the optional source-language layer:
 The runtime public contract remains the frozen 1.0 contract. Source-language
 functionality is isolated in `Icod.TermInfo.Source`.
 
+Beginning with 1.2, active package-family validation expands to the three-target
+`net8.0`/`net9.0`/`net10.0` matrix. This additive support change does not rewrite
+the frozen 1.0/1.1 target-framework contracts.
+
 ---
 
 ## 2. Inventory by architectural family

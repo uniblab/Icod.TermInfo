@@ -6,16 +6,25 @@ with 1.2, the optional `Icod.TermInfo.Compiler` package.
 
 ## Supported target frameworks
 
-Every package in the coordinated 1.x family supports:
+The frozen 1.0 and 1.1 package lines support:
 
 ```text
 net8.0
 net10.0
 ```
 
-They are first-class package targets. Release validation requires equivalent
-public API manifests between target frameworks and fresh-package execution for
-each target for every package present in that release.
+Beginning with 1.2.0, every package in the coordinated family supports:
+
+```text
+net8.0
+net9.0
+net10.0
+```
+
+For 1.2 and later, all three are first-class package targets. Release validation
+requires equivalent public API manifests between target frameworks and
+fresh-package execution for each target for every package present in that
+release.
 
 Dropping a supported target framework is considered a breaking support-contract
 change and normally requires a new major version.
@@ -152,15 +161,15 @@ duplicate-identity lookup remain deterministic and ordinal/case-sensitive.
 
 ## Package compatibility
 
-`Icod.TermInfo` contains managed/XML assets for both supported target frameworks
-and portable symbols for both. It has no runtime NuGet dependency and no native
-ncurses/terminfo payload.
+Beginning with 1.2, `Icod.TermInfo` contains managed/XML assets and portable
+symbols for all three supported target frameworks. It has no runtime NuGet
+dependency and no native ncurses/terminfo payload.
 
-`Icod.TermInfo.Source` contains the corresponding dual-target managed/XML and
-symbol assets and depends on the matching `Icod.TermInfo` package. The dependency
-direction is one-way: `Icod.TermInfo` never depends on Source.
+`Icod.TermInfo.Source` likewise contains corresponding three-target managed/XML
+and symbol assets and depends on the matching `Icod.TermInfo` package. The
+dependency direction is one-way: `Icod.TermInfo` never depends on Source.
 
-Beginning with 1.2, `Icod.TermInfo.Compiler` contains corresponding dual-target
+Beginning with 1.2, `Icod.TermInfo.Compiler` contains corresponding three-target
 managed/XML and symbol assets. It depends directly on the matching runtime
 package and may depend on the matching Source package for source compilation.
 Runtime and Source never depend on Compiler.

@@ -11,18 +11,18 @@ This document describes the current validation and publication procedure for the
 - Beginning with 1.1.0, the runtime and Source package versions must match.
 - The 1.x assembly identities remain `Icod.TermInfo, Version=1.0.0.0` and
   `Icod.TermInfo.Source, Version=1.0.0.0`; both remain unsigned.
-- Supported consumer targets are `net8.0` and `net10.0`.
+- Supported consumer targets for the 1.2 line are `net8.0`, `net9.0`, and `net10.0`.
 - A final release tag must be exactly `v<PackageVersion>`.
 - Release validation must pass on Windows, Linux, and macOS before a final tag is
   created.
 - Release validation must pass the frozen runtime API baseline, the reviewed
-  Source API baseline, and net8/net10 API-equivalence gates.
+  Source API baseline, and net8/net9/net10 API-equivalence gates.
 - Release builds treat missing public XML documentation as an error.
 - Both packages must pass the coordinated release verifier before publication.
   Use `.github/scripts/verify-release-package.sh` on a Bash-capable host or
   `.github/scripts/verify-release-package.cmd` from Windows Command Prompt.
 - Release packages must retain deterministic build metadata, repository commit
-  metadata, portable symbols, Source Link, README, icon metadata, and both
+  metadata, portable symbols, Source Link, README, icon metadata, and all three
   framework XML-documentation assets.
 - The four `.nupkg` / `.snupkg` artifacts produced for a version are immutable
   release artifacts. If package contents change, increment the version rather
@@ -59,8 +59,8 @@ packages are produced from the same Staging outputs which just passed the Ubuntu
 matrix tests.
 
 That verifier covers generated capability metadata, the frozen runtime API
-baseline, the reviewed Source API baseline, net8/net10 API equivalence for both
-assemblies, runtime package structure/metadata/XML/symbols, both fresh-package
+baseline, the reviewed Source API baseline, net8/net9/net10 API equivalence for
+both assemblies, runtime package structure/metadata/XML/symbols, both fresh-package
 consumers, and the non-interactive repository sample.
 
 The PR artifact is uploaded only after verification succeeds. It is intended for
@@ -103,9 +103,10 @@ The Bash and CMD entry points perform equivalent validation. They:
 1. run the deterministic standard-capability metadata generator in `--check`
    mode;
 2. require the frozen runtime 1.0 public API baseline to match;
-3. require exact runtime public API equivalence between the built `net8.0` and
-   `net10.0` assemblies;
-4. require exact Source public API equivalence between `net8.0` and `net10.0`;
+3. require exact runtime public API equivalence across the built `net8.0`,
+   `net9.0`, and `net10.0` assemblies;
+4. require exact Source public API equivalence across `net8.0`, `net9.0`, and
+   `net10.0`;
 5. require the reviewed `docs/1.1.0-SOURCE-PUBLIC-API-BASELINE.txt` to match the
    built Source assembly;
 6. run the C# runtime-package verifier for package structure, dependency closure,
@@ -114,9 +115,9 @@ The Bash and CMD entry points perform equivalent validation. They:
 7. require the Source `.nupkg` and `.snupkg` to exist at the same package version
    as the runtime artifacts;
 8. restore and execute the isolated runtime package consumer separately against
-   `net8.0` and `net10.0`;
+   `net8.0`, `net9.0`, and `net10.0`;
 9. restore and execute the isolated Source package consumer separately against
-   `net8.0` and `net10.0`;
+   `net8.0`, `net9.0`, and `net10.0`;
 10. run the general repository sample through its non-interactive
     `--describe-only` path.
 
@@ -141,7 +142,7 @@ proves the packed package can:
 
 The Source smoke consumer proves the separately packed source-language package
 can restore through its NuGet dependency on the matching runtime package and
-execute on both supported target frameworks.
+execute on all three supported target frameworks.
 
 No checked-in runtime fixture is copied into the smoke project, so those checks
 prove the public package surface rather than repository-only outputs.
