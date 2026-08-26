@@ -2,22 +2,22 @@
 
 `Icod.TermInfo` is a managed, dependency-free .NET implementation of the low-level terminal-capability model traditionally supplied by `libtinfo`.
 
-Version 1.1.0 is the current stable package release. It preserves the frozen 1.0 runtime contract while adding the optional `Icod.TermInfo.Source` package for managed `.ti` source parsing, cancellation, `use=` inheritance, and materialization into the existing immutable `TerminalDescription` model.
+Version 1.1.1 is the current maintenance release of the 1.1 line. It preserves the frozen 1.0 runtime contract and the 1.1 source-language feature set provided by the optional `Icod.TermInfo.Source` package.
 
 Both packages target `net8.0` and `net10.0`, use C# 13, contain no native ncurses/terminfo payload, and are intended to run on Windows, Linux, and macOS.
 
 ## Install
 
-For the 1.1.0 release, runtime-only consumers use:
+For the 1.1.1 release, runtime-only consumers use:
 
 ```text
-dotnet add package Icod.TermInfo --version 1.1.0
+dotnet add package Icod.TermInfo --version 1.1.1
 ```
 
 Applications which need terminfo source-language support use:
 
 ```text
-dotnet add package Icod.TermInfo.Source --version 1.1.0
+dotnet add package Icod.TermInfo.Source --version 1.1.1
 ```
 
 `Icod.TermInfo.Source` depends on the matching `Icod.TermInfo` package. Applications which only load compiled terminfo or consume `TerminalDescription` values continue to reference `Icod.TermInfo` alone.
@@ -750,7 +750,7 @@ See `docs/RELEASING.md` for the release procedure,
 `Icod.TermInfo-Development-Roadmap-1.0.0.md` for the frozen runtime contract,
 `Icod.TermInfo-Post-1.0-Development-Roadmap.md` for the 1.1 source-language
 program, and `docs/1.1.0-RELEASE-AUDIT.md` for the final release gate. Tag
-`v1.1.0` only on the exact `main` commit whose complete Release validation and
+`v1.1.1` only on the exact `main` commit whose complete Release validation and
 publication succeeded; no source or package content may change between that
 validation and tagging.
 

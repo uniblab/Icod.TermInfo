@@ -6,10 +6,10 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net10.0`  
 **Frozen runtime contract:** `1.0.0`
-**Current release version:** `1.1.0`
+**Current release version:** `1.1.1`
 **Next development line:** `1.2.0`
-**Status:** S01-S09 complete — 1.1.0 release closure
-**Current tranche:** 1.1.0 release closure
+**Status:** S01-S09 complete — 1.1.1 maintenance release
+**Current tranche:** 1.1.1 maintenance release
 **Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
 
 ---

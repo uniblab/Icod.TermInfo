@@ -12,16 +12,16 @@
 		<AssemblyName>Icod.TermInfo</AssemblyName>
 		<RootNamespace>Icod.TermInfo</RootNamespace>
 		<Configurations>Debug;Release;Staging</Configurations>
-		<Version>1.1.0</Version>
+		<Version>1.1.1</Version>
 		<AssemblyVersion>1.0.0.0</AssemblyVersion>
 	</PropertyGroup>
 	<PropertyGroup>
-		<PackageVersion>1.1.0</PackageVersion>
+		<PackageVersion>1.1.1</PackageVersion>
 		<PackageId>Icod.TermInfo</PackageId>
 		<Title>Icod.TermInfo</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed, dependency-free .NET terminfo library for terminal capability metadata, compiled terminfo parsing and database discovery, ANSI/DEC/xterm and Windows profiles, parameter expansion, color semantics, and padding-aware output.</Description>
-		<PackageReleaseNotes>1.1.0 publishes the completed terminfo source-language work as the optional Icod.TermInfo.Source package while preserving the frozen Icod.TermInfo runtime public contract, dependency-free runtime package, and 1.0.0.0 assembly identity throughout the 1.x line.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.1.1 is a maintenance release of the 1.1 line. It preserves the frozen Icod.TermInfo runtime public contract, dependency-free runtime package, and 1.0.0.0 assembly identity while coordinating package versioning with Icod.TermInfo.Source.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>

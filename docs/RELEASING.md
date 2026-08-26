@@ -244,6 +244,6 @@ For 1.1, use:
 - `docs/1.0.0-PUBLIC-API-BASELINE.txt` for the unchanged runtime API;
 - `docs/VERSIONING.md` and `docs/COMPATIBILITY.md` for the stable 1.x promises.
 
-The final `v1.1.0` tag must identify the exact validated and published `main`
+The final `v<PackageVersion>` tag must identify the exact validated and published `main`
 commit. Do not edit the audit or any other source/package content after that
 validation without rerunning the release gate.
