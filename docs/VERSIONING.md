@@ -11,7 +11,9 @@ The NuGet packages use:
 MAJOR.MINOR.PATCH
 ```
 
-with ordinary prerelease suffixes such as `-alpha.1`, `-beta.1`, and `-rc.1`.
+Development tranches use the repository's established prerelease form, such as
+`1.2.0-Alpha-1`, `1.2.0-Alpha-2`, and later `-Beta-X` / `-RC-X` forms when
+needed.
 
 For the 1.x line:
 
@@ -26,9 +28,15 @@ Beginning with 1.1.0, `Icod.TermInfo` and `Icod.TermInfo.Source` advance
 together. In each project, `<Version>` and `<PackageVersion>` must be identical,
 and the package versions of the two projects must match.
 
+Beginning with C01 in the 1.2.0 development line,
+`Icod.TermInfo.Compiler` joins the coordinated package family. From that point
+forward, all three package projects SHALL carry the same package version for
+each development tranche and final release. The C01-C07 development sequence is
+`1.2.0-Alpha-1` through `1.2.0-Alpha-7`.
+
 ## Assembly identity
 
-The 1.x line freezes both managed assembly identities:
+The 1.x line freezes the managed assembly identities:
 
 ```text
 AssemblyName       Icod.TermInfo
@@ -36,6 +44,10 @@ AssemblyVersion    1.0.0.0
 Strong-name signed no
 
 AssemblyName       Icod.TermInfo.Source
+AssemblyVersion    1.0.0.0
+Strong-name signed no
+
+AssemblyName       Icod.TermInfo.Compiler
 AssemblyVersion    1.0.0.0
 Strong-name signed no
 ```
@@ -57,6 +69,10 @@ machine-readable runtime contract established by 1.0 and retained throughout
 
 The approved `docs/1.1.0-SOURCE-PUBLIC-API-BASELINE.txt` is the independent
 machine-readable public contract for `Icod.TermInfo.Source`.
+
+Beginning with C01, `docs/1.2.0-COMPILER-PUBLIC-API-BASELINE.txt` records the
+developing public contract for `Icod.TermInfo.Compiler` and becomes the frozen
+Compiler contract at 1.2 release closure.
 
 The baselines record exported types, public/protected members, enum numeric
 values, parameter names/order/defaults, ref/out/in/params shape, generic
@@ -84,6 +100,11 @@ dependency direction are part of the release-quality contract.
 
 `Icod.TermInfo` remains dependency-free. `Icod.TermInfo.Source` depends on the
 matching `Icod.TermInfo` package; the runtime package never depends on Source.
+
+`Icod.TermInfo.Compiler` depends directly on the matching `Icod.TermInfo`
+package. When source compilation enters the Compiler package in C05, Compiler
+may also depend on the matching `Icod.TermInfo.Source` package. Neither Runtime
+nor Source may acquire a dependency on Compiler.
 
 See `COMPATIBILITY.md` for target-framework, platform, behavioral, and feature-
 boundary promises.

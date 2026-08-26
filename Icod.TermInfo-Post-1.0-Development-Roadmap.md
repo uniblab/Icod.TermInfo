@@ -3,13 +3,14 @@
 **Project:** `Icod.TermInfo`  
 **Stable runtime package:** `Icod.TermInfo`  
 **Optional source package:** `Icod.TermInfo.Source`
+**Planned compiler package:** `Icod.TermInfo.Compiler`
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net10.0`  
 **Frozen runtime contract:** `1.0.0`
 **Current release version:** `1.1.1`
 **Next development line:** `1.2.0`
-**Status:** S01-S09 complete — 1.1.1 maintenance release
-**Current tranche:** 1.1.1 maintenance release
+**Status:** 1.2.0 pre-C01 contract tightening complete — C01 ready
+**Current tranche:** 1.2.0 pre-C01 contract freeze
 **Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
 
 ---
@@ -34,19 +35,21 @@ Post-1.0 development SHALL build outward from that foundation rather than repeat
 The principal new family is **terminfo source and tooling**:
 
 ```text
-                     Icod.TermInfo
-                 stable runtime model
-                        /     \
-                       /       \
-                      v         v
-       Icod.TermInfo.Source   compiled-entry acquisition
-                |
-                v
-       Icod.TermInfo.Compiler
-                |
-                v
-         Icod.TermInfo.Tools
+                 Icod.TermInfo.Tools
+                         |
+                         v
+              Icod.TermInfo.Compiler
+                    /           \
+                   v             v
+      Icod.TermInfo.Source ---> Icod.TermInfo
+                               stable runtime
 ```
+
+The arrows are dependency arrows. `Icod.TermInfo` remains dependency-free.
+`Icod.TermInfo.Source` depends on `Icod.TermInfo`. The compiler depends directly
+on `Icod.TermInfo`; its Source dependency is introduced only when source
+compilation enters the compiler in C05. No dependency may point from the runtime
+package back toward Source, Compiler, or Tools.
 
 Live-terminal state, terminal input, probing, PTYs, curses presentation, and terminal emulation remain outside this roadmap and belong to their respective packages.
 
@@ -429,32 +432,114 @@ Introduce:
 ```text
 Icod.TermInfo.Compiler
     -> Icod.TermInfo
-    -> Icod.TermInfo.Source
 ```
 
-where source compilation is required.
+At C01, the Compiler package depends only on `Icod.TermInfo`. C05 MAY add:
+
+```text
+Icod.TermInfo.Compiler
+    -> Icod.TermInfo.Source
+        -> Icod.TermInfo
+```
+
+when source compilation becomes a compiler responsibility. The runtime package
+SHALL remain dependency-free and SHALL NOT acquire a dependency on Source or
+Compiler.
 
 The core writer SHOULD also be capable of compiling an already-resolved `TerminalDescription`.
 
+The pre-C01 architectural and representation contract is frozen by
+[`docs/1.2.0-PRE-C01-CONTRACT-AUDIT.md`](docs/1.2.0-PRE-C01-CONTRACT-AUDIT.md).
+
 ---
 
-## 5.2 C01 — Binary writer contract
+## 5.2 C01 — Compiler package foundation and binary writer contract
+
+**Development version:** `1.2.0-Alpha-1`
+
+Create the compiler package and establish the deterministic low-level writer.
+
+Required package-foundation work:
+
+- add `Icod.TermInfo.Compiler`;
+- add `tests/Icod.TermInfo.Compiler.Tests`;
+- target `net8.0;net10.0`;
+- use C# 13;
+- reference `Icod.TermInfo`;
+- add the projects to `Icod.TermInfo.sln`;
+- establish Compiler package metadata, README, icon, license, and Source Link;
+- establish `docs/1.2.0-COMPILER-PUBLIC-API-BASELINE.txt`;
+- extend public-API snapshotting and cross-target API comparison to Compiler;
+- add a package-reference-only Compiler smoke consumer;
+- extend package verification and both CI workflows to the Compiler package;
+- coordinate all three package versions at `1.2.0-Alpha-1`;
+- retain assembly version `1.0.0.0` for all three assemblies.
+
+Before the first C01 merge to `main`, the NuGet.org trusted-publishing policy
+SHALL authorize the `Icod.TermInfo.Compiler` package ID in addition to the
+existing runtime and Source package IDs.
 
 Define a deterministic compiled-entry writer.
 
-It SHALL support the conventional formats already accepted by the 1.0 parser, including the adopted:
+The preferred low-level ownership is conceptually symmetrical with the reader:
 
-- traditional compiled format;
-- wide numeric format;
+```text
+CompiledTermInfoParser
+    bytes -> TerminalDescription
+
+CompiledTermInfoWriter
+    TerminalDescription -> bytes
+```
+
+Exact public signatures SHALL receive an API-regret review during C01. A broad
+format-policy public surface SHOULD NOT be frozen before C04 requires it.
+
+The C01 writer SHALL be pure:
+
+- no filesystem access;
+- no environment-variable discovery;
+- no process-global state;
+- no native `tic`, `infocmp`, or ncurses dependency;
+- no database-layout policy.
+
+C01 SHALL implement the minimal conventional legacy `0432` representation
+needed to prove the writer contract. The public design SHALL leave room for the
+already-supported reader family:
+
+- legacy `0432`;
+- wide-numeric `01036`;
 - ncurses extended sections.
+
+All compiled integers SHALL be emitted little-endian according to the frozen
+0.9 reader contract.
+
+Identity and capability strings SHALL use a strict reversible Latin-1 mapping.
+The writer SHALL reject managed characters which cannot be represented as one
+byte and SHALL reject embedded NUL where the binary format uses NUL
+termination. It SHALL NOT silently replace characters.
+
+The writer SHALL NOT synthesize identity metadata merely to make a description
+encodable. In particular, the currently supported compiled names contract
+requires a verbose description. A `TerminalDescription` without one is not
+losslessly representable and SHALL fail deterministically unless authoritative
+format evidence later establishes an equivalent representation.
+
+`TerminalDescription` exposes effective values, not source cancellation
+tombstones. The writer SHALL therefore emit absence for absent effective
+capabilities and SHALL NOT invent compiled cancellation sentinels.
 
 No unsupported format SHALL be emitted by guesswork.
 
-**Gate C01:** a minimal `TerminalDescription` can be serialized and parsed back successfully.
+**Gate C01:** a minimal representable `TerminalDescription` can be serialized
+as deterministic legacy `0432` bytes and parsed by the existing
+`CompiledTermInfoParser` into a semantically equivalent description, while the
+new package/API/package-consumer gates pass on both target frameworks.
 
 ---
 
 ## 5.3 C02 — Standard capability emission
+
+**Development version:** `1.2.0-Alpha-2`
 
 Implement:
 
@@ -465,16 +550,28 @@ Implement:
 - string table;
 - required alignment;
 - absent values;
-- cancelled values where representable;
-- correct integer width and endianness.
+- deterministic omission/truncation of trailing absent standard positions;
+- strict representation validation;
+- correct legacy integer width and little-endian encoding.
 
 Capability ordering SHALL derive from the canonical 1.0 metadata.
+
+Standard tables SHALL derive exclusively from
+`StandardCapabilityCatalog.BinaryIndex`; managed enum ordinal values SHALL NOT
+be used as compiled positions.
+
+Present numeric values which collide with compiled sentinel semantics or fall
+outside the selected representation SHALL fail deterministically. String-table
+offsets and section sizes SHALL be checked before narrowing to binary field
+widths. Silent truncation and wraparound are forbidden.
 
 **Gate C02:** standard-only entries round-trip exactly at the semantic level.
 
 ---
 
 ## 5.4 C03 — Extended capability emission
+
+**Development version:** `1.2.0-Alpha-3`
 
 Write the supported ncurses extended-capability representation.
 
@@ -488,11 +585,21 @@ Include:
 - alignment;
 - overflow validation.
 
+Extended capabilities SHALL be emitted deterministically. Within each
+Boolean/numeric/string kind, names SHALL be ordered using ordinal,
+case-sensitive comparison rather than dictionary enumeration order.
+
+Extended capability names and string values SHALL follow the same strict
+Latin-1, NUL-termination, offset-width, and overflow rules as the conventional
+sections.
+
 **Gate C03:** all extended capability kinds survive writer → parser round-trip.
 
 ---
 
 ## 5.5 C04 — Format selection
+
+**Development version:** `1.2.0-Alpha-4`
 
 Introduce explicit writer policy.
 
@@ -505,11 +612,34 @@ The compiler SHALL determine or accept:
 
 Silent truncation SHALL be forbidden.
 
+Automatic selection SHALL prefer the narrow conventional representation when it
+is sufficient and select `01036` only when a representable numeric value
+requires the wide form. Explicit format requests SHALL either produce that
+format exactly or fail; they SHALL NOT silently upgrade or downgrade.
+
+Representation validation SHALL include:
+
+- strict Latin-1 identity, aliases, descriptions, capability names, and strings;
+- NUL-terminated-field constraints;
+- names-section separator constraints;
+- legacy versus wide numeric range;
+- compiled absent/canceled sentinel collisions;
+- signed 16-bit string/name offset limits;
+- extended section count and byte-size limits;
+- checked total-entry-size arithmetic.
+
+The writer SHALL distinguish an invalid `TerminalDescription` argument from a
+valid description which cannot be represented by the requested compiled format.
+The exact public exception/options surface SHALL be frozen here if C01-C03 have
+not already required it.
+
 **Gate C04:** boundary numeric/string/count cases select or reject formats predictably.
 
 ---
 
 ## 5.6 C05 — Source compiler engine
+
+**Development version:** `1.2.0-Alpha-5`
 
 Compose:
 
@@ -529,11 +659,28 @@ The engine SHALL support multiple source entries and dependency ordering.
 
 Compilation diagnostics SHALL preserve source locations from the 1.1 parser.
 
+This is the earliest tranche at which `Icod.TermInfo.Compiler` SHOULD acquire a
+dependency on `Icod.TermInfo.Source`. The dependency SHALL remain one-way:
+
+```text
+Compiler -> Source -> Runtime
+Compiler ------------> Runtime
+```
+
+Source parsing and inheritance SHALL NOT be duplicated in Compiler.
+
+Because `TerminalDescription` contains only effective values, source
+cancellation tombstones SHALL NOT be reconstructed after materialization.
+Compiler output is required to preserve effective terminal semantics, not
+incidental source-only state.
+
 **Gate C05:** a multi-entry source file with `use=` inheritance compiles into independently loadable entries.
 
 ---
 
 ## 5.7 C06 — Database-layout writer
+
+**Development version:** `1.2.0-Alpha-6`
 
 Add controlled output suitable for conventional terminfo directory layouts.
 
@@ -555,6 +702,8 @@ No process-global installation shall occur merely by compiling a description.
 
 ## 5.8 C07 — Round-trip and differential validation
 
+**Development version:** `1.2.0-Alpha-7`
+
 The principal invariant becomes:
 
 ```text
@@ -573,9 +722,56 @@ TerminalDescription B
 A == B semantically
 ```
 
+The writer SHALL additionally be deterministic: the same semantic input and
+writer options SHALL produce byte-for-byte identical output independent of
+dictionary iteration order, process execution, host operating system, or
+culture.
+
+Validation SHALL reuse the checked-in 0.9 binary corpus and its pinned
+ncurses/`tic` provenance. Ordinary CI SHALL remain independent of a host ncurses
+installation.
+
+Tests SHALL include:
+
+- legacy `0432` entries;
+- `01036` wide numerics;
+- ncurses extended sections;
+- alignment boundaries;
+- absent capabilities and sparse standard tables;
+- high Latin-1 bytes;
+- unrepresentable Unicode;
+- embedded NUL rejection;
+- sentinel numeric collisions;
+- string/name offset boundaries;
+- oversized and overflow-producing descriptions;
+- deterministic extended-capability ordering;
+- source → resolve → write → parse semantic equivalence;
+- temporary database output consumed through the existing directory provider.
+
 Optional ncurses comparison MAY additionally verify emitted data against `tic`.
 
 **1.2 completion gate:** Icod can compile supported terminfo source into conventional compiled database entries which its existing 1.0 runtime parser reads without semantic loss.
+
+## 5.9 1.2.0 release closure
+
+C01-C07 constitute the planned 1.2 implementation program. Publication is a
+separate closure gate rather than an additional feature tranche.
+
+Release closure SHALL:
+
+- set `Icod.TermInfo`, `Icod.TermInfo.Source`, and
+  `Icod.TermInfo.Compiler` package versions to exactly `1.2.0`;
+- retain assembly version `1.0.0.0` for all three assemblies;
+- preserve the frozen runtime 1.0 public API baseline;
+- preserve the frozen Source 1.1 public API baseline;
+- freeze the reviewed Compiler public API baseline;
+- pass `net8.0` / `net10.0` API-equivalence checks for all three packages;
+- pass the complete Windows/Linux/macOS solution matrix;
+- pack and structurally validate all three NuGet and symbol packages;
+- execute fresh runtime, Source, and Compiler package consumers on both targets;
+- verify the one-way dependency graph;
+- publish the exact validated artifacts to NuGet.org and GitHub Packages;
+- tag the exact validated/published commit as `v1.2.0`.
 
 ---
 

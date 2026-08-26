@@ -34,7 +34,9 @@ must carry XML documentation. Public API changes must also be nullable-correct
 and covered by semantic surface tests. Runtime API changes must be reconciled
 deliberately with `docs/1.0.0-PUBLIC-API-BASELINE.txt`; Source API changes must
 be reconciled with `docs/1.1.0-SOURCE-PUBLIC-API-BASELINE.txt`. Do not regenerate
-either baseline merely to silence a mismatch.
+either baseline merely to silence a mismatch. Beginning with C01, Compiler API
+changes must likewise be reconciled with
+`docs/1.2.0-COMPILER-PUBLIC-API-BASELINE.txt`.
 
 ## Version metadata
 
@@ -45,6 +47,11 @@ project, and keep the two package versions synchronized.
 
 The 1.x assembly version remains `1.0.0.0` for both assemblies, and both remain
 unsigned.
+
+Beginning with C01, `Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj` joins
+that coordinated version set. Runtime, Source, and Compiler use the same
+`1.2.0-Alpha-X` package version for each 1.2 development tranche while all three
+retain assembly version `1.0.0.0`.
 
 Prerelease development should use the active version roadmap's alpha/beta/RC
 sequence. A final release tag must be exactly `v<PackageVersion>`.
@@ -116,15 +123,19 @@ compatibility decision.
 Package changes should preserve:
 
 - deterministic/continuous-integration builds;
-- first-class `net8.0` and `net10.0` managed/XML assets for both packages;
+- first-class `net8.0` and `net10.0` managed/XML assets for every package in the
+  coordinated family;
 - stable assembly version `1.0.0.0` throughout 1.x;
 - unsigned assembly identity throughout 1.x;
 - Source Link information supplied by the .NET SDK;
 - portable PDBs and `.snupkg` generation for both targets;
 - synchronized `Icod.TermInfo` / `Icod.TermInfo.Source` package versions;
+- synchronized `Icod.TermInfo.Compiler` package versions beginning with C01;
 - runtime and Source fresh-package smoke consumers on both targets;
+- Compiler fresh-package smoke consumers on both targets beginning with C01;
 - each package README, icon metadata, and LGPL license expression;
 - a one-way Source -> runtime package dependency;
+- a one-way Compiler -> runtime/Source dependency;
 - identical validated release artifacts for NuGet.org and GitHub Packages.
 
 See `docs/RELEASING.md` before modifying publication workflows.
@@ -137,8 +148,14 @@ their public/package contract. Version 1.1 adds `.ti` parsing, cancellation,
 `use=` inheritance, and materialization in the optional `Icod.TermInfo.Source`
 package without changing that runtime boundary.
 
+Version 1.2 adds compiled-entry writing and the reusable source compiler engine
+in the optional `Icod.TermInfo.Compiler` package. The low-level writer remains
+pure; filesystem/database-layout output is layered separately, and no compiler
+dependency enters `Icod.TermInfo` or `Icod.TermInfo.Source`.
+
 Live session ownership, input-event decoding, curses/UI behavior, PTY/ConPTY
-lifecycle, terminal probing, compiler/tool commands, termcap interoperability,
-and terminal emulation remain outside the current package-family scope.
+lifecycle, terminal probing, command-line `tic`/`infocmp`/`toe` applications,
+termcap interoperability, and terminal emulation remain outside the current
+package-family scope.
 
 See `docs/FUTURE-WORK-INVENTORY.md` for the maintained project-family boundary.

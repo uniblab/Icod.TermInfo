@@ -13,6 +13,8 @@ The governing distinction is:
 > **`Icod.TermInfo` owns immutable terminal-description data, acquisition of
 > that data, and pure transformations required to interpret/expand/output it.
 > `Icod.TermInfo.Source` owns `.ti` source parsing and inheritance resolution.
+> `Icod.TermInfo.Compiler` owns deterministic compiled-entry writing and the
+> reusable source-to-compiled engine introduced in the 1.2 line.
 > Live terminal conversations, process plumbing, and virtual-screen/UI policy
 > belong elsewhere.**
 
@@ -63,7 +65,7 @@ functionality is isolated in `Icod.TermInfo.Source`.
 | Hashed databases | Berkeley DB/ncurses hashed stores | optional later provider/package | compiled parser |
 | Historical vendor formats | HP-UX/AIX/OSF/1 divergent binary layouts | optional later | parser abstraction + fixtures |
 | Terminfo source language | completed in 1.1: `.ti`, diagnostics, cancellation, `use=` inheritance, materialization | `Icod.TermInfo.Source` | runtime semantic model |
-| Terminfo compiler | compiled-entry writer and reusable `tic` engine | planned `Icod.TermInfo.Compiler` | Source + runtime model |
+| Terminfo compiler | planned for 1.2: deterministic compiled-entry writer, source compiler engine, and safe database-layout output | `Icod.TermInfo.Compiler` | runtime model; Source from C05 |
 | Terminfo tooling | `tic`, `infocmp`, `toe`, conversion tooling | likely `Icod.TermInfo.Tools` | source parser + binary reader/writer |
 | Termcap interoperability | termcap syntax, `TERMCAP`, `TERMPATH`, conversion | optional compatibility/tooling | source/conversion model |
 | Live session | raw/cooked/cbreak, restore, tty ownership, full-screen/cursor lifecycle | `Icod.Terminal` | `Icod.TermInfo` + OS interop |
@@ -116,11 +118,30 @@ inheritance concerns that runtime-only consumers do not need.
 
 ### 3.2 `tic`-class binary writing
 
-Once a source model exists, binary emission can compile resolved descriptions
-into the supported compiled formats.
+The 1.2 line introduces `Icod.TermInfo.Compiler` as an optional sibling package.
+Its low-level writer accepts an already-resolved `TerminalDescription` and emits
+the conventional compiled formats accepted by the 0.9 runtime parser.
 
-A writer should reuse the same canonical metadata and byte semantics as the
-0.9 reader rather than maintaining a separate capability table.
+The writer reuses the same canonical metadata and byte semantics as the 0.9
+reader rather than maintaining a separate capability table. It is deterministic,
+strictly byte-oriented, and fails rather than silently replacing or truncating
+unrepresentable state.
+
+The 1.2 dependency boundary is:
+
+```text
+Compiler -> Runtime
+Compiler -> Source -> Runtime   (from C05)
+```
+
+The Runtime package remains dependency-free. Source never depends on Compiler.
+
+The source compiler composes the already-shipped parser and resolver rather than
+creating a second terminfo source implementation. Database-layout output is a
+separate later layer so the core binary writer remains pure.
+
+The complete pre-C01 representation and package contract is recorded in
+`docs/1.2.0-PRE-C01-CONTRACT-AUDIT.md`.
 
 ### 3.3 `infocmp`-class inspection
 
