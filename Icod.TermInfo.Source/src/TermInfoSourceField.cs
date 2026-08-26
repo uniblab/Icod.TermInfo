@@ -7,9 +7,9 @@ namespace Icod.TermInfo.Source;
 /// </summary>
 /// <remarks>
 /// <para>
-/// Fields remain in source order. S05 classifies capability names against the
-/// runtime standard-capability catalog while leaving cancellation and
-/// inheritance unresolved.
+/// Fields remain in source order. S06 keeps these declarations intact for
+/// provenance while an internal semantic state applies local values and
+/// cancellation tombstones. <c>use=</c> inheritance remains S07 work.
 /// </para>
 /// <para>
 /// Invalid numeric or string values retain their raw source text and field

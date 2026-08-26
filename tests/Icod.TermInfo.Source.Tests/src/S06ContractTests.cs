@@ -1,11 +1,12 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 using Icod.TermInfo.Source;
 using Xunit;
 
 namespace Icod.TermInfo.Source.Tests;
 
-public sealed class S05ContractTests
+public sealed class S06ContractTests
 {
     private const string DevelopmentVersion = "1.1.0-Alpha-6";
     private const string StableAssemblyVersion = "1.0.0.0";
@@ -51,33 +52,22 @@ public sealed class S05ContractTests
     }
 
     [Fact]
-    public void SourcePublicSurfaceIncludesReviewedClassificationContract()
+    public void CancellationStateRemainsInternalSourceResolutionMachinery()
     {
         Assembly assembly =
             typeof(TermInfoSourceParser).Assembly;
-        string[] exportedTypes =
-            assembly
-                .GetExportedTypes()
-                .Select(type => type.FullName!)
-                .OrderBy(
-                    name => name,
-                    StringComparer.Ordinal)
-                .ToArray();
 
+        Assert.DoesNotContain(
+            assembly.GetExportedTypes(),
+            type =>
+                type.FullName
+                    == "Icod.TermInfo.Source.TermInfoSourceCapabilityState");
         Assert.Contains(
-            "Icod.TermInfo.Source.TermInfoSourceCapabilityClassification",
-            exportedTypes);
-        Assert.Contains(
-            "Icod.TermInfo.Source.TermInfoSourceField",
-            exportedTypes);
-        Assert.Equal(
-            new Version(1, 0, 0, 0),
-            assembly.GetName().Version);
-    }
+            assembly.GetCustomAttributes<InternalsVisibleToAttribute>(),
+            attribute =>
+                attribute.AssemblyName
+                    == "Icod.TermInfo.Source.Tests");
 
-    [Fact]
-    public void SourcePublicApiBaselineIncludesClassificationAndDiagnostics()
-    {
         string root = FindRepositoryRoot();
         string baseline =
             File.ReadAllText(
@@ -85,35 +75,20 @@ public sealed class S05ContractTests
                     root,
                     "docs",
                     "1.1.0-SOURCE-PUBLIC-API-BASELINE.txt"));
-
-        Assert.Contains(
-            "TYPE enum Icod.TermInfo.Source.TermInfoSourceCapabilityClassification [sealed]",
+        Assert.DoesNotContain(
+            "TermInfoSourceCapabilityState",
             baseline);
-        Assert.Contains(
-            "CapabilityClassification",
-            baseline);
-        Assert.Contains(
-            "StandardBooleanCapability",
-            baseline);
-        Assert.Contains(
-            "StandardNumericCapability",
-            baseline);
-        Assert.Contains(
-            "StandardStringCapability",
-            baseline);
-        Assert.Contains("TIS0020", baseline);
-        Assert.Contains("TIS0021", baseline);
     }
 
     [Fact]
-    public void S05ImplementationRecordAndRoadmapLinkArePresent()
+    public void S06ImplementationRecordAndRoadmapLinkArePresent()
     {
         string root = FindRepositoryRoot();
         string recordPath =
             Path.Combine(
                 root,
                 "docs",
-                "1.1.0-S05-CAPABILITY-CLASSIFICATION.md");
+                "1.1.0-S06-CANCELLATION-SEMANTICS.md");
         string roadmap =
             File.ReadAllText(
                 Path.Combine(
@@ -123,12 +98,19 @@ public sealed class S05ContractTests
         Assert.True(File.Exists(recordPath));
         string record =
             File.ReadAllText(recordPath);
-        Assert.Contains("1.1.0-Alpha-5", record);
-        Assert.Contains("StandardCapabilityCatalog", record);
-        Assert.Contains("termcap", record, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains("S06", record);
+        Assert.Contains("1.1.0-Alpha-6", record);
+        Assert.Contains("capability@", record);
+        Assert.True(
+            record.Contains(
+                "tombstone",
+                StringComparison.OrdinalIgnoreCase));
+        Assert.True(
+            record.Contains(
+                "rightmost",
+                StringComparison.OrdinalIgnoreCase));
+        Assert.Contains("S07", record);
         Assert.Contains(
-            "1.1.0-S05-CAPABILITY-CLASSIFICATION.md",
+            "1.1.0-S06-CANCELLATION-SEMANTICS.md",
             roadmap);
     }
 

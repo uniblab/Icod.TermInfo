@@ -14,14 +14,14 @@ source diagnostics, cancellation, extended capabilities, and `use=`
 inheritance. Resolved source entries materialize into the same immutable
 `TerminalDescription` model used by compiled terminfo acquisition.
 
-`1.1.0-Alpha-5` implements S05 capability classification on top of the S04
-unresolved model. Standard short names and long variable names are mapped
-through `StandardCapabilityCatalog` to the exact runtime capability enum
-identities. Recognized extended names remain distinct from unknown-but-valid
-extended names, while invalid/reserved names and standard value-kind mismatches
-produce deterministic diagnostics. Termcap codes are not treated as terminfo
-aliases; termcap interoperability remains 1.5 work. Cancellation and `use=`
-resolution remain S06 and S07 work.
+`1.1.0-Alpha-6` implements S06 cancellation semantics on top of the S05
+classified unresolved model. An internal semantic state records explicit values
+and cancellation tombstones for standard and extended capabilities so a
+higher-priority cancellation cannot be undone by lower-priority inheritance.
+S06 distinguishes right-to-left parent overlays from the final lower-priority
+inheritance beneath local fields, providing the precedence primitives required
+for S07. The `use=` graph itself, including cycle, missing-parent, and depth
+diagnostics, remains S07 work.
 
 The runtime dependency direction is one-way:
 

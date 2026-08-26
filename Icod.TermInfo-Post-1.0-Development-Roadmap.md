@@ -6,9 +6,9 @@
 **Target frameworks:** `net8.0`; `net10.0`  
 **Current stable contract:** `1.0.0`  
 **Next development line:** `1.1.0`  
-**Development version:** `1.1.0-Alpha-5`
-**Status:** S05 implementation complete — validation pending
-**Current tranche:** S05 — Capability classification
+**Development version:** `1.1.0-Alpha-6`
+**Status:** S06 implementation complete — validation pending
+**Current tranche:** S06 — Cancellation semantics
 **Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
 
 ---
@@ -304,6 +304,8 @@ Cancellation SHALL prevent an inherited value from reappearing contrary to the a
 The existing builder's cancellation/inheritance machinery SHOULD be reused or generalized rather than reimplemented independently.
 
 **Gate S06:** cancellation tests cover local values, inherited values, multiple parents, and extended capabilities.
+
+**S06 implementation record:** [`docs/1.1.0-S06-CANCELLATION-SEMANTICS.md`](docs/1.1.0-S06-CANCELLATION-SEMANTICS.md).
 
 ---
 
