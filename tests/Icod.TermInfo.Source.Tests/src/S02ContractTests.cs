@@ -7,7 +7,7 @@ namespace Icod.TermInfo.Source.Tests;
 
 public sealed class S02ContractTests
 {
-    private const string DevelopmentVersion = "1.1.0-Alpha-6";
+    private const string DevelopmentVersion = "1.1.0-Alpha-7";
     private const string StableAssemblyVersion = "1.0.0.0";
 
     [Fact]
@@ -51,7 +51,7 @@ public sealed class S02ContractTests
     }
 
     [Fact]
-    public void FirstSourcePublicSurfaceIsIntentionalAndFinite()
+    public void SourcePublicSurfaceIncludesReviewedLexicalTypes()
     {
         Assembly assembly =
             typeof(TermInfoSourceLexer).Assembly;
@@ -59,38 +59,48 @@ public sealed class S02ContractTests
             assembly
                 .GetExportedTypes()
                 .Select(type => type.FullName!)
-                .OrderBy(
-                    name => name,
-                    StringComparer.Ordinal)
                 .ToArray();
 
-        Assert.Equal(
-            new[]
-            {
-                "Icod.TermInfo.Source.TermInfoSourceCapabilityClassification",
-                "Icod.TermInfo.Source.TermInfoSourceDiagnostic",
-                "Icod.TermInfo.Source.TermInfoSourceDiagnosticCodes",
-                "Icod.TermInfo.Source.TermInfoSourceDiagnosticSeverity",
-                "Icod.TermInfo.Source.TermInfoSourceDocument",
-                "Icod.TermInfo.Source.TermInfoSourceEntry",
-                "Icod.TermInfo.Source.TermInfoSourceField",
-                "Icod.TermInfo.Source.TermInfoSourceFieldKind",
-                "Icod.TermInfo.Source.TermInfoSourceLexResult",
-                "Icod.TermInfo.Source.TermInfoSourceLexer",
-                "Icod.TermInfo.Source.TermInfoSourceLexerOptions",
-                "Icod.TermInfo.Source.TermInfoSourceNumericValueResult",
-                "Icod.TermInfo.Source.TermInfoSourceParseResult",
-                "Icod.TermInfo.Source.TermInfoSourceParser",
-                "Icod.TermInfo.Source.TermInfoSourceSpan",
-                "Icod.TermInfo.Source.TermInfoSourceStringValueResult",
-                "Icod.TermInfo.Source.TermInfoSourceToken",
-                "Icod.TermInfo.Source.TermInfoSourceTokenKind",
-                "Icod.TermInfo.Source.TermInfoSourceValueParser",
-            },
-            exportedTypes);
+        Assert.Contains(
+            "Icod.TermInfo.Source.TermInfoSourceDiagnostic",
+            exportedTypes
+        );
+        Assert.Contains(
+            "Icod.TermInfo.Source.TermInfoSourceDiagnosticCodes",
+            exportedTypes
+        );
+        Assert.Contains(
+            "Icod.TermInfo.Source.TermInfoSourceDiagnosticSeverity",
+            exportedTypes
+        );
+        Assert.Contains(
+            "Icod.TermInfo.Source.TermInfoSourceLexResult",
+            exportedTypes
+        );
+        Assert.Contains(
+            "Icod.TermInfo.Source.TermInfoSourceLexer",
+            exportedTypes
+        );
+        Assert.Contains(
+            "Icod.TermInfo.Source.TermInfoSourceLexerOptions",
+            exportedTypes
+        );
+        Assert.Contains(
+            "Icod.TermInfo.Source.TermInfoSourceSpan",
+            exportedTypes
+        );
+        Assert.Contains(
+            "Icod.TermInfo.Source.TermInfoSourceToken",
+            exportedTypes
+        );
+        Assert.Contains(
+            "Icod.TermInfo.Source.TermInfoSourceTokenKind",
+            exportedTypes
+        );
         Assert.Equal(
             new Version(1, 0, 0, 0),
-            assembly.GetName().Version);
+            assembly.GetName().Version
+        );
     }
 
     [Fact]

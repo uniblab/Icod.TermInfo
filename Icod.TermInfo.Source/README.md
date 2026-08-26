@@ -14,14 +14,14 @@ source diagnostics, cancellation, extended capabilities, and `use=`
 inheritance. Resolved source entries materialize into the same immutable
 `TerminalDescription` model used by compiled terminfo acquisition.
 
-`1.1.0-Alpha-6` implements S06 cancellation semantics on top of the S05
-classified unresolved model. An internal semantic state records explicit values
-and cancellation tombstones for standard and extended capabilities so a
-higher-priority cancellation cannot be undone by lower-priority inheritance.
-S06 distinguishes right-to-left parent overlays from the final lower-priority
-inheritance beneath local fields, providing the precedence primitives required
-for S07. The `use=` graph itself, including cycle, missing-parent, and depth
-diagnostics, remains S07 work.
+`1.1.0-Alpha-7` implements S07 `use=` inheritance resolution on top of the
+S06 cancellation state. The resolver supports canonical and alias lookup,
+recursive and multiple-parent inheritance, caller-supplied source-entry
+providers, deterministic missing-entry and cycle diagnostics, and a bounded
+inheritance depth. Parent composition follows terminfo's right-to-left `use=`
+processing while explicit child fields remain higher priority than all inherited
+state. Resolved source remains separate from `TerminalDescription`; conversion
+to the stable runtime model remains S08 work.
 
 The runtime dependency direction is one-way:
 

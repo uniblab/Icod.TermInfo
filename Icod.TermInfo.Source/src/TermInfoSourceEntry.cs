@@ -4,9 +4,10 @@ namespace Icod.TermInfo.Source;
 /// Represents one parsed but unresolved terminfo source entry.
 /// </summary>
 /// <remarks>
-/// The entry is intentionally pre-resolution state. Capability classification,
-/// cancellation application, <c>use=</c> inheritance, and
-/// <c>TerminalDescription</c> materialization occur in later tranches.
+/// The entry is intentionally pre-resolution state. S05 classification and S06
+/// cancellation semantics annotate or consume its fields without mutating it;
+/// S07 resolves <c>use=</c> inheritance into a separate semantic result.
+/// <c>TerminalDescription</c> materialization remains S08 work.
 /// </remarks>
 public sealed class TermInfoSourceEntry
 {
