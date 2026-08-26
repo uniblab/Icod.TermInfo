@@ -40,21 +40,21 @@ internal static class TermInfoSourceCapabilityClassifier
                 name,
                 out StandardCapabilityMetadata<BooleanCapability>? boolean))
         {
-            return TermInfoSourceCapabilityIdentity.StandardBoolean(boolean);
+            return TermInfoSourceCapabilityIdentity.StandardBoolean(boolean!);
         }
 
         if (TryGetStandardNumeric(
                 name,
                 out StandardCapabilityMetadata<NumericCapability>? numeric))
         {
-            return TermInfoSourceCapabilityIdentity.StandardNumeric(numeric);
+            return TermInfoSourceCapabilityIdentity.StandardNumeric(numeric!);
         }
 
         if (TryGetStandardString(
                 name,
                 out StandardCapabilityMetadata<StringCapability>? text))
         {
-            return TermInfoSourceCapabilityIdentity.StandardString(text);
+            return TermInfoSourceCapabilityIdentity.StandardString(text!);
         }
 
         if (!IsValidExtendedName(name))
