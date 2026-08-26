@@ -14,12 +14,12 @@ source diagnostics, cancellation, extended capabilities, and `use=`
 inheritance. Resolved source entries materialize into the same immutable
 `TerminalDescription` model used by compiled terminfo acquisition.
 
-`1.1.0-Alpha-2` implements the S02 lexical and source-location foundation. It
-can tokenize source from a `string` or `TextReader`, retain exact raw field text,
-identify entry names/aliases/descriptions and capability forms, preserve
-comments, distinguish `use=` and cancellation, and report deterministic
-`TISdddd` diagnostics with source spans. String/numeric value decoding remains
-S03 work.
+`1.1.0-Alpha-3` implements S03 string and numeric source-value semantics on top
+of the S02 lexer. Decimal, octal, and hexadecimal numeric spellings decode to
+the stable signed 32-bit model. String values support terminfo control notation,
+backslash escapes, octal byte escapes, multiline continuations, and historical
+zero/high-byte behavior while retaining deterministic `TISdddd` diagnostics.
+The unresolved source-entry model remains S04 work.
 
 The runtime dependency direction is one-way:
 

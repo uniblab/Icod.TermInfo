@@ -33,6 +33,8 @@ TermInfoSourceLexResult lexed =
     TermInfoSourceLexer.Tokenize(
         "package-smoke|Package smoke source,\n"
         + "\tam,\n"
+        + "\tcols#0100,\n"
+        + "\tclear=\\E[H,\n"
         + "\tuse=dumb,\n",
         "package-smoke.ti");
 Require(
@@ -50,6 +52,26 @@ Require(
             token.Kind == TermInfoSourceTokenKind.UseReference
             && token.Span.SourceName == "package-smoke.ti"),
     "The source package did not expose use= lexing with source locations.");
+
+TermInfoSourceNumericValueResult numeric =
+    TermInfoSourceValueParser.ParseNumeric(
+        lexed.Tokens.Single(
+            token =>
+                token.Kind == TermInfoSourceTokenKind.NumericCapability));
+Require(
+    !numeric.HasErrors
+        && numeric.Value == 64,
+    "The source package did not decode octal numeric source values.");
+
+TermInfoSourceStringValueResult text =
+    TermInfoSourceValueParser.ParseString(
+        lexed.Tokens.Single(
+            token =>
+                token.Kind == TermInfoSourceTokenKind.StringCapability));
+Require(
+    !text.HasErrors
+        && text.Value == "\x1b[H",
+    "The source package did not decode string source escapes.");
 
 Assembly runtimeAssembly =
     typeof(TerminalDescription).Assembly;

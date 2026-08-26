@@ -37,6 +37,12 @@ pack()
         --no-build
 }
 
+validate()
+{
+    printf '\n=== Validate ===\n'
+    ./.github/scripts/verify-release-package.sh artifacts Debug
+}
+
 case "${1-}" in
     "")
         clean
@@ -44,6 +50,7 @@ case "${1-}" in
         build
         test
         pack
+	validate
         ;;
 
     clean)
@@ -66,9 +73,13 @@ case "${1-}" in
         pack
         ;;
 
+    validate)
+        validate
+        ;;
+
     *)
         printf 'Invalid section: %s\n' "$1" >&2
-        printf 'Usage: %s [clean|restore|build|test|pack]\n' "$0" >&2
+        printf 'Usage: %s [clean|restore|build|test|pack|validate]\n' "$0" >&2
         exit 1
         ;;
 esac

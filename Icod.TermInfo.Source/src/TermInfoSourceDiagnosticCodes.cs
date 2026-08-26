@@ -50,4 +50,54 @@ public static class TermInfoSourceDiagnosticCodes
     /// A cancelled capability contains non-whitespace text after <c>@</c>.
     /// </summary>
     public const string UnexpectedTextAfterCancellation = "TIS0009";
+
+    /// <summary>
+    /// A numeric capability contains no value after <c>#</c>.
+    /// </summary>
+    public const string MissingNumericValue = "TIS0010";
+
+    /// <summary>
+    /// A numeric capability contains a malformed value for its selected base.
+    /// </summary>
+    public const string InvalidNumericValue = "TIS0011";
+
+    /// <summary>
+    /// A numeric capability exceeds the supported signed 32-bit range.
+    /// </summary>
+    public const string NumericValueOutOfRange = "TIS0012";
+
+    /// <summary>
+    /// A backslash source escape ends before an escaped character is present.
+    /// </summary>
+    public const string IncompleteBackslashEscape = "TIS0013";
+
+    /// <summary>
+    /// A backslash source escape is not one of the defined terminfo escapes.
+    /// </summary>
+    public const string UnknownStringEscape = "TIS0014";
+
+    /// <summary>
+    /// A caret control-character escape is incomplete.
+    /// </summary>
+    public const string IncompleteControlEscape = "TIS0015";
+
+    /// <summary>
+    /// A caret control-character target lies outside printable ASCII.
+    /// </summary>
+    public const string InvalidControlEscape = "TIS0016";
+
+    /// <summary>
+    /// A digit <c>8</c> or <c>9</c> occurs inside an octal source escape.
+    /// </summary>
+    public const string NonOctalDigitInStringEscape = "TIS0017";
+
+    /// <summary>
+    /// A physical newline continues a string on an unindented source line.
+    /// </summary>
+    public const string UnindentedStringContinuation = "TIS0018";
+
+    /// <summary>
+    /// A source string contains a literal NUL character.
+    /// </summary>
+    public const string EmbeddedNullCharacter = "TIS0019";
 }

@@ -229,6 +229,8 @@ Numeric capabilities SHALL use the same signed 32-bit semantic model frozen in 1
 
 **Gate S03:** source capability values round-trip through known authoritative fixtures without semantic corruption.
 
+**S03 implementation record:** [`docs/1.1.0-S03-STRING-NUMERIC-SOURCE-SEMANTICS.md`](docs/1.1.0-S03-STRING-NUMERIC-SOURCE-SEMANTICS.md).
+
 ---
 
 ## 4.5 S04 — Unresolved source-entry model

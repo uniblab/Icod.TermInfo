@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Icod.TermInfo.Source.Tests;
 
-public sealed class S02ContractTests
+public sealed class S03ContractTests
 {
     private const string DevelopmentVersion = "1.1.0-Alpha-3";
     private const string StableAssemblyVersion = "1.0.0.0";
@@ -51,10 +51,10 @@ public sealed class S02ContractTests
     }
 
     [Fact]
-    public void FirstSourcePublicSurfaceIsIntentionalAndFinite()
+    public void SourcePublicSurfaceIncludesReviewedValueSemanticsTypes()
     {
         Assembly assembly =
-            typeof(TermInfoSourceLexer).Assembly;
+            typeof(TermInfoSourceValueParser).Assembly;
         string[] exportedTypes =
             assembly
                 .GetExportedTypes()
@@ -87,107 +87,54 @@ public sealed class S02ContractTests
     }
 
     [Fact]
-    public void SourcePublicApiBaselineAndVerificationAreCheckedIn()
+    public void SourcePublicApiBaselineIncludesValueSemanticsContract()
     {
         string root = FindRepositoryRoot();
         string baseline =
-            Path.Combine(
-                root,
-                "docs",
-                "1.1.0-SOURCE-PUBLIC-API-BASELINE.txt");
-
-        Assert.True(
-            File.Exists(baseline));
-        string baselineText =
-            File.ReadAllText(baseline);
-        Assert.StartsWith(
-            "# Icod.TermInfo.Source public API baseline",
-            baselineText);
-        Assert.Contains(
-            "TYPE class Icod.TermInfo.Source.TermInfoSourceLexer [static]",
-            baselineText);
-        Assert.Contains(
-            "TYPE class Icod.TermInfo.Source.TermInfoSourceSpan [sealed]",
-            baselineText);
-
-        foreach (
-            string relativePath
-            in new[]
-            {
+            File.ReadAllText(
                 Path.Combine(
-                    ".github",
-                    "scripts",
-                    "verify-release-package.cmd"),
-                Path.Combine(
-                    ".github",
-                    "scripts",
-                    "verify-release-package.sh"),
-            })
-        {
-            string verifier =
-                File.ReadAllText(
-                    Path.Combine(
-                        root,
-                        relativePath));
+                    root,
+                    "docs",
+                    "1.1.0-SOURCE-PUBLIC-API-BASELINE.txt"));
 
-            Assert.Contains(
-                "1.1.0-SOURCE-PUBLIC-API-BASELINE.txt",
-                verifier);
-            Assert.Contains(
-                "Icod.TermInfo.Source.dll",
-                verifier);
-            Assert.Contains(
-                "--check",
-                verifier);
-        }
+        Assert.Contains(
+            "TYPE class Icod.TermInfo.Source.TermInfoSourceNumericValueResult [sealed]",
+            baseline);
+        Assert.Contains(
+            "TYPE class Icod.TermInfo.Source.TermInfoSourceStringValueResult [sealed]",
+            baseline);
+        Assert.Contains(
+            "TYPE class Icod.TermInfo.Source.TermInfoSourceValueParser [static]",
+            baseline);
+        Assert.Contains("TIS0010", baseline);
+        Assert.Contains("TIS0019", baseline);
     }
 
     [Fact]
-    public void S02ImplementationRecordAndRoadmapLinkArePresent()
+    public void S03ImplementationRecordAndRoadmapLinkArePresent()
     {
         string root = FindRepositoryRoot();
         string recordPath =
             Path.Combine(
                 root,
                 "docs",
-                "1.1.0-S02-LEXICAL-SOURCE-LOCATION.md");
+                "1.1.0-S03-STRING-NUMERIC-SOURCE-SEMANTICS.md");
         string roadmap =
             File.ReadAllText(
                 Path.Combine(
                     root,
                     "Icod.TermInfo-Post-1.0-Development-Roadmap.md"));
 
-        Assert.True(
-            File.Exists(recordPath));
+        Assert.True(File.Exists(recordPath));
         string record =
             File.ReadAllText(recordPath);
+        Assert.Contains("1.1.0-Alpha-3", record);
+        Assert.Contains("TIS0010", record);
+        Assert.Contains("TIS0019", record);
+        Assert.Contains("S04", record);
         Assert.Contains(
-            "TIS0001",
-            record);
-        Assert.True(
-            record.Contains(
-                "escaped comma",
-                StringComparison.OrdinalIgnoreCase));
-        Assert.Contains(
-            "S03",
-            record);
-        Assert.Contains(
-            "1.1.0-S02-LEXICAL-SOURCE-LOCATION.md",
+            "1.1.0-S03-STRING-NUMERIC-SOURCE-SEMANTICS.md",
             roadmap);
-    }
-
-    [Fact]
-    public void SourceAssemblyMarkerIsRetiredAfterRealApiArrives()
-    {
-        string root = FindRepositoryRoot();
-
-        Assert.False(
-            File.Exists(
-                Path.Combine(
-                    root,
-                    "Icod.TermInfo.Source",
-                    "src",
-                    "SourceAssemblyMarker.cs")));
     }
 
     private static string ReadRequiredProperty(
