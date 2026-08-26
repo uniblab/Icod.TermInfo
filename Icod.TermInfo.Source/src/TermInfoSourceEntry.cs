@@ -6,8 +6,9 @@ namespace Icod.TermInfo.Source;
 /// <remarks>
 /// The entry is intentionally pre-resolution state. S05 classification and S06
 /// cancellation semantics annotate or consume its fields without mutating it;
-/// S07 resolves <c>use=</c> inheritance into a separate semantic result.
-/// <c>TerminalDescription</c> materialization remains S08 work.
+/// S07 resolves <c>use=</c> inheritance into a separate semantic result. S08
+/// materializes that resolved result into <c>TerminalDescription</c> without
+/// mutating this source representation.
 /// </remarks>
 public sealed class TermInfoSourceEntry
 {

@@ -14,14 +14,15 @@ source diagnostics, cancellation, extended capabilities, and `use=`
 inheritance. Resolved source entries materialize into the same immutable
 `TerminalDescription` model used by compiled terminfo acquisition.
 
-`1.1.0-Alpha-7` implements S07 `use=` inheritance resolution on top of the
-S06 cancellation state. The resolver supports canonical and alias lookup,
-recursive and multiple-parent inheritance, caller-supplied source-entry
-providers, deterministic missing-entry and cycle diagnostics, and a bounded
-inheritance depth. Parent composition follows terminfo's right-to-left `use=`
-processing while explicit child fields remain higher priority than all inherited
-state. Resolved source remains separate from `TerminalDescription`; conversion
-to the stable runtime model remains S08 work.
+`1.1.0-Alpha-8` implements S08 `TerminalDescription` materialization on top of
+the S07 resolved source state. `TermInfoSourceResolvedEntry.ToTerminalDescription`
+projects terminal identity plus all effectively present standard and extended
+capabilities into the stable runtime model. Source-only `use=` declarations,
+source locations, comments, and cancellation tombstones do not leak into the
+runtime description. The authoritative T29 source/compiled fixture pairs verify
+semantic parity across legacy, cancellation, high-byte, extended-capability, and
+wide-numeric cases. S09 remains the final 1.1 corpus, fuzzing, and compatibility
+tranche.
 
 The runtime dependency direction is one-way:
 

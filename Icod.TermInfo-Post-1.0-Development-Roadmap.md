@@ -6,9 +6,9 @@
 **Target frameworks:** `net8.0`; `net10.0`  
 **Current stable contract:** `1.0.0`  
 **Next development line:** `1.1.0`  
-**Development version:** `1.1.0-Alpha-7`
-**Status:** S07 implementation complete — validation pending
-**Current tranche:** S07 — `use=` inheritance resolver
+**Development version:** `1.1.0-Alpha-8`
+**Status:** S08 implementation complete — validation pending
+**Current tranche:** S08 — `TerminalDescription` materialization
 **Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
 
 ---
@@ -362,6 +362,8 @@ TermInfoSourceDiagnostic
 Exact public names SHALL receive an API-regret review before release.
 
 **Gate S08:** source and compiled forms of equivalent fixtures produce semantically equivalent `TerminalDescription` instances.
+
+**S08 implementation record:** [`docs/1.1.0-S08-TERMINAL-DESCRIPTION-MATERIALIZATION.md`](docs/1.1.0-S08-TERMINAL-DESCRIPTION-MATERIALIZATION.md).
 
 ---
 
