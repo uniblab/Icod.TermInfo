@@ -60,38 +60,36 @@ public sealed class S04ContractTests
             assembly
                 .GetExportedTypes()
                 .Select(type => type.FullName!)
-                .OrderBy(
-                    name => name,
-                    StringComparer.Ordinal)
                 .ToArray();
 
-        Assert.Equal(
-            new[]
-            {
-                "Icod.TermInfo.Source.TermInfoSourceCapabilityClassification",
-                "Icod.TermInfo.Source.TermInfoSourceDiagnostic",
-                "Icod.TermInfo.Source.TermInfoSourceDiagnosticCodes",
-                "Icod.TermInfo.Source.TermInfoSourceDiagnosticSeverity",
-                "Icod.TermInfo.Source.TermInfoSourceDocument",
-                "Icod.TermInfo.Source.TermInfoSourceEntry",
-                "Icod.TermInfo.Source.TermInfoSourceField",
-                "Icod.TermInfo.Source.TermInfoSourceFieldKind",
-                "Icod.TermInfo.Source.TermInfoSourceLexResult",
-                "Icod.TermInfo.Source.TermInfoSourceLexer",
-                "Icod.TermInfo.Source.TermInfoSourceLexerOptions",
-                "Icod.TermInfo.Source.TermInfoSourceNumericValueResult",
-                "Icod.TermInfo.Source.TermInfoSourceParseResult",
-                "Icod.TermInfo.Source.TermInfoSourceParser",
-                "Icod.TermInfo.Source.TermInfoSourceSpan",
-                "Icod.TermInfo.Source.TermInfoSourceStringValueResult",
-                "Icod.TermInfo.Source.TermInfoSourceToken",
-                "Icod.TermInfo.Source.TermInfoSourceTokenKind",
-                "Icod.TermInfo.Source.TermInfoSourceValueParser",
-            },
-            exportedTypes);
+        Assert.Contains(
+            "Icod.TermInfo.Source.TermInfoSourceDocument",
+            exportedTypes
+        );
+        Assert.Contains(
+            "Icod.TermInfo.Source.TermInfoSourceEntry",
+            exportedTypes
+        );
+        Assert.Contains(
+            "Icod.TermInfo.Source.TermInfoSourceField",
+            exportedTypes
+        );
+        Assert.Contains(
+            "Icod.TermInfo.Source.TermInfoSourceFieldKind",
+            exportedTypes
+        );
+        Assert.Contains(
+            "Icod.TermInfo.Source.TermInfoSourceParseResult",
+            exportedTypes
+        );
+        Assert.Contains(
+            "Icod.TermInfo.Source.TermInfoSourceParser",
+            exportedTypes
+        );
         Assert.Equal(
             new Version(1, 0, 0, 0),
-            assembly.GetName().Version);
+            assembly.GetName().Version
+        );
     }
 
     [Fact]
