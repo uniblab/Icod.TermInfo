@@ -1,11 +1,12 @@
 # Contributing to Icod.TermInfo
 
-Contributions are welcome when they preserve the capability-driven design, the active 1.0 contract, and the frozen historical release contracts.
+Contributions are welcome when they preserve the capability-driven design, the
+active 1.x compatibility contracts, and the frozen historical release contracts.
 
 ## Development requirements
 
 Install the .NET 8 and .NET 10 SDK/runtime lines and use C# 13. The shipped
-library, tests, and samples target both `net8.0` and `net10.0`; repository-only
+libraries, tests, and samples target both `net8.0` and `net10.0`; repository-only
 maintenance tools normally target `net10.0`.
 
 Before submitting a change, run Debug and Release builds and tests for
@@ -19,20 +20,34 @@ dotnet build Icod.TermInfo.sln -c Release
 dotnet test Icod.TermInfo.sln -c Release
 ```
 
-Repository text files use UTF-8 and LF line endings. Use braces for all control-flow bodies. Public, protected, and internal API entry points should validate their parameters before performing work.
+Repository text files use UTF-8 and LF line endings. Use braces for all
+control-flow bodies. Public, protected, and internal API entry points should
+validate their parameters before performing work.
+
+For multiline invocations and method declarations, place the closing `)` on its
+own line. Do not attach it to the final argument or parameter. When xUnit
+provides a predicate overload for an assertion, prefer that overload instead of
+filtering with `Where(...)` and asserting on the filtered sequence.
 
 Release builds treat warnings as errors, including CS1591. Every public member
-must carry XML documentation. Public API changes must also be nullable-correct,
-covered by semantic surface tests, and reconciled deliberately with the checked
-1.0 API baseline; do not regenerate the baseline merely to silence a mismatch.
+must carry XML documentation. Public API changes must also be nullable-correct
+and covered by semantic surface tests. Runtime API changes must be reconciled
+deliberately with `docs/1.0.0-PUBLIC-API-BASELINE.txt`; Source API changes must
+be reconciled with `docs/1.1.0-SOURCE-PUBLIC-API-BASELINE.txt`. Do not regenerate
+either baseline merely to silence a mismatch.
 
 ## Version metadata
 
-`Icod.TermInfo.csproj` contains `<Version />`, `<PackageVersion />`, and the
-stable 1.x `<AssemblyVersion />`. Keep `Version` and `PackageVersion` identical.
-The 1.x assembly version remains `1.0.0.0`, and the assembly remains unsigned.
+`Icod.TermInfo.csproj` and `Icod.TermInfo.Source/Icod.TermInfo.Source.csproj`
+contain `<Version />`, `<PackageVersion />`, and the stable 1.x
+`<AssemblyVersion />`. Keep `Version` and `PackageVersion` identical within each
+project, and keep the two package versions synchronized.
 
-Prerelease development should use the active version roadmap's alpha/beta/RC sequence. A final release tag must be exactly `v<PackageVersion>`.
+The 1.x assembly version remains `1.0.0.0` for both assemblies, and both remain
+unsigned.
+
+Prerelease development should use the active version roadmap's alpha/beta/RC
+sequence. A final release tag must be exactly `v<PackageVersion>`.
 
 See `docs/VERSIONING.md` and `docs/COMPATIBILITY.md` before changing public API,
 assembly identity, target frameworks, or compatibility behavior.
@@ -86,36 +101,44 @@ Terminal profile loading must remain side-effect free. In particular, Windows vi
 
 Public behavior changes should update README examples when relevant. Samples must remain safe on redirected output and should not assume the CI runner has a usable `TERM` or interactive TTY.
 
-Both sample projects are multi-targeted. Documentation which invokes them with
-`dotnet run` must specify `-f net8.0` or `-f net10.0`.
+Both runtime sample projects are multi-targeted. Documentation which invokes
+them with `dotnet run` must specify `-f net8.0` or `-f net10.0`.
 
-If a public type or compatibility operation changes, update the semantic public
-API tests deliberately. Once `docs/1.0.0-PUBLIC-API-BASELINE.txt` is approved,
-`public-api-snapshot --check` is the compatibility gate; rewriting the baseline
-requires an explicit compatibility decision.
+If a public runtime type or compatibility operation changes, update the semantic
+public API tests deliberately and reconcile the change with
+`docs/1.0.0-PUBLIC-API-BASELINE.txt`. If a Source public API changes, reconcile
+it with `docs/1.1.0-SOURCE-PUBLIC-API-BASELINE.txt`. The release verifier treats
+both baselines as intentional contracts; rewriting either requires an explicit
+compatibility decision.
 
 ## Packaging and release changes
 
 Package changes should preserve:
 
 - deterministic/continuous-integration builds;
-- first-class `net8.0` and `net10.0` managed/XML assets;
+- first-class `net8.0` and `net10.0` managed/XML assets for both packages;
 - stable assembly version `1.0.0.0` throughout 1.x;
 - unsigned assembly identity throughout 1.x;
 - Source Link information supplied by the .NET SDK;
 - portable PDBs and `.snupkg` generation for both targets;
-- package validation and the fresh-package smoke consumer on both targets;
-- the package README, icon metadata, and LGPL license expression;
-- identical release artifacts for NuGet.org and GitHub Packages.
+- synchronized `Icod.TermInfo` / `Icod.TermInfo.Source` package versions;
+- runtime and Source fresh-package smoke consumers on both targets;
+- each package README, icon metadata, and LGPL license expression;
+- a one-way Source -> runtime package dependency;
+- identical validated release artifacts for NuGet.org and GitHub Packages.
 
 See `docs/RELEASING.md` before modifying publication workflows.
 
 ## Scope discipline
 
-The 1.0 contract combines the immutable terminfo semantics completed in 0.8 with
-the compiled/system acquisition layer completed in 0.9 and then freezes their
-public/package contract. Live session ownership, input-event decoding,
-curses/UI behavior, PTY/ConPTY lifecycle, terminal probing, source-language
-tooling, and terminal emulation remain outside `Icod.TermInfo` 1.0.
+The runtime 1.0 contract combines the immutable terminfo semantics completed in
+0.8 with the compiled/system acquisition layer completed in 0.9 and freezes
+their public/package contract. Version 1.1 adds `.ti` parsing, cancellation,
+`use=` inheritance, and materialization in the optional `Icod.TermInfo.Source`
+package without changing that runtime boundary.
+
+Live session ownership, input-event decoding, curses/UI behavior, PTY/ConPTY
+lifecycle, terminal probing, compiler/tool commands, termcap interoperability,
+and terminal emulation remain outside the current package-family scope.
 
 See `docs/FUTURE-WORK-INVENTORY.md` for the maintained project-family boundary.

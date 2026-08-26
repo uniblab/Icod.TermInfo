@@ -1,32 +1,34 @@
 # Releasing Icod.TermInfo
 
-This document describes the current validation and publication procedure for
-`Icod.TermInfo` releases built from this repository.
+This document describes the current validation and publication procedure for the
+`Icod.TermInfo` package family built from this repository.
 
 ## Release principles
 
-- `<Version />` and `<PackageVersion />` in `Icod.TermInfo.csproj` must always be
-  present and identical.
-- The 1.x assembly identity remains `Icod.TermInfo, Version=1.0.0.0` and remains
-  unsigned.
+- `<Version />` and `<PackageVersion />` must be present and identical in both
+  `Icod.TermInfo.csproj` and
+  `Icod.TermInfo.Source/Icod.TermInfo.Source.csproj`.
+- Beginning with 1.1.0, the runtime and Source package versions must match.
+- The 1.x assembly identities remain `Icod.TermInfo, Version=1.0.0.0` and
+  `Icod.TermInfo.Source, Version=1.0.0.0`; both remain unsigned.
 - Supported consumer targets are `net8.0` and `net10.0`.
 - A final release tag must be exactly `v<PackageVersion>`.
 - Release validation must pass on Windows, Linux, and macOS before a final tag is
   created.
-- Release validation must pass the approved public API baseline and net8/net10
-  API-equivalence gates.
+- Release validation must pass the frozen runtime API baseline, the reviewed
+  Source API baseline, and net8/net10 API-equivalence gates.
 - Release builds treat missing public XML documentation as an error.
-- The package must pass the release verifier before publication. Use
-  `.github/scripts/verify-release-package.sh` on a Bash-capable host or
+- Both packages must pass the coordinated release verifier before publication.
+  Use `.github/scripts/verify-release-package.sh` on a Bash-capable host or
   `.github/scripts/verify-release-package.cmd` from Windows Command Prompt.
 - Release packages must retain deterministic build metadata, repository commit
   metadata, portable symbols, Source Link, README, icon metadata, and both
   framework XML-documentation assets.
-- The `.nupkg` and `.snupkg` produced for a version are immutable release
-  artifacts. If package contents change, increment the version rather than
-  replacing a published package.
-- Publication is downstream of build/test/package validation. A package must not
-  be pushed if any validation stage fails.
+- The four `.nupkg` / `.snupkg` artifacts produced for a version are immutable
+  release artifacts. If package contents change, increment the version rather
+  than replacing a published package.
+- Publication is downstream of build/test/package validation. No package may be
+  pushed if any validation stage fails.
 
 ## Repository CI
 
@@ -40,22 +42,26 @@ This document describes the current validation and publication procedure for
 - `macos-latest`.
 
 Each matrix job cleans, restores, builds, and tests the whole solution, including
-both repository sample executables and solution-contained maintenance tools.
+both package projects, Source tests, repository sample executables, and
+solution-contained maintenance tools.
 
 The Ubuntu matrix leg continues after the shared Staging build/test steps and:
 
-1. packs `Icod.TermInfo.csproj` into a runner-local `artifacts` directory;
+1. packs both `Icod.TermInfo.csproj` and
+   `Icod.TermInfo.Source/Icod.TermInfo.Source.csproj` into a runner-local
+   `artifacts` directory;
 2. runs `.github/scripts/verify-release-package.sh artifacts Staging`;
-3. uploads the validated `.nupkg` and `.snupkg` as the
+3. uploads the validated `.nupkg` and `.snupkg` files as the
    `icod-terminfo-pr-packages` Actions artifact for seven days.
 
-There is no second checkout/restore/build/test package-validation job; the
-package is produced from the same Staging outputs which just passed the Ubuntu
+There is no second checkout/restore/build/test package-validation job; both
+packages are produced from the same Staging outputs which just passed the Ubuntu
 matrix tests.
 
-That verifier covers generated capability metadata, the approved public API
-baseline, net8/net10 API equivalence, package structure/metadata/XML/symbols,
-both fresh-package consumers, and the non-interactive repository sample.
+That verifier covers generated capability metadata, the frozen runtime API
+baseline, the reviewed Source API baseline, net8/net10 API equivalence for both
+assemblies, runtime package structure/metadata/XML/symbols, both fresh-package
+consumers, and the non-interactive repository sample.
 
 The PR artifact is uploaded only after verification succeeds. It is intended for
 inspection, installation, and testing and is not a registry publication.
@@ -76,18 +82,19 @@ the Release build/test matrix on:
 
 The Ubuntu matrix leg continues after the shared Release build/test steps and:
 
-1. packs `Icod.TermInfo.csproj` into `artifacts`;
+1. packs both package projects into `artifacts`;
 2. runs `.github/scripts/verify-release-package.sh artifacts Release`;
-3. uploads the exact `.nupkg` and `.snupkg` as workflow artifacts.
+3. uploads the exact `.nupkg` and `.snupkg` files as workflow artifacts.
 
 There is no second checkout/restore/build/test package-validation job. The
 deployment job waits for the complete three-OS matrix and then downloads the
 artifact produced and verified by the Ubuntu leg.
 
 After package validation succeeds, the `Release` deployment job downloads those
-exact artifacts and publishes the `.nupkg` to NuGet.org and GitHub Packages. The
-NuGet.org push uses trusted publishing/OIDC through `NuGet/login`; GitHub Packages
-uses the repository `GITHUB_TOKEN`. Both pushes use `--skip-duplicate`.
+exact artifacts and publishes both `.nupkg` files to NuGet.org and GitHub
+Packages. The NuGet.org push uses trusted publishing/OIDC through `NuGet/login`;
+GitHub Packages uses the repository `GITHUB_TOKEN`. Both pushes use
+`--skip-duplicate`.
 
 ## What the release verifier checks
 
@@ -95,30 +102,36 @@ The Bash and CMD entry points perform equivalent validation. They:
 
 1. run the deterministic standard-capability metadata generator in `--check`
    mode;
-2. require the approved 1.0 public API baseline to match;
-3. require exact public API equivalence between the built `net8.0` and
+2. require the frozen runtime 1.0 public API baseline to match;
+3. require exact runtime public API equivalence between the built `net8.0` and
    `net10.0` assemblies;
-4. run the C# package verifier for package structure, dependency closure,
+4. require exact Source public API equivalence between `net8.0` and `net10.0`;
+5. require the reviewed `docs/1.1.0-SOURCE-PUBLIC-API-BASELINE.txt` to match the
+   built Source assembly;
+6. run the C# runtime-package verifier for package structure, dependency closure,
    README/icon/license metadata, XML documentation, Source Link, portable
    symbols, and the generic-parameterization architecture guard;
-5. copy the package-reference-only smoke consumer to a temporary directory;
-6. restore that consumer from the local artifact directory with an isolated
-   NuGet package cache;
-7. execute the smoke consumer separately against `net8.0` and `net10.0`;
-8. run the general repository sample through its non-interactive
-   `--describe-only` path.
+7. require the Source `.nupkg` and `.snupkg` to exist at the same package version
+   as the runtime artifacts;
+8. restore and execute the isolated runtime package consumer separately against
+   `net8.0` and `net10.0`;
+9. restore and execute the isolated Source package consumer separately against
+   `net8.0` and `net10.0`;
+10. run the general repository sample through its non-interactive
+    `--describe-only` path.
 
 Both repository sample executables are solution projects and therefore compile
 in every CI matrix. The focused acquisition sample is not automatically run
 against the host database because its `system` command intentionally inspects
-host-specific terminfo state; the isolated package-smoke consumer supplies the
-deterministic acquisition acceptance test instead.
+host-specific terminfo state; the isolated runtime package-smoke consumer
+supplies the deterministic acquisition acceptance test instead.
 
-The checked-in package smoke project is intentionally not part of the solution
-and contains no project reference to `Icod.TermInfo`.
+The checked-in runtime and Source package-smoke projects are intentionally not
+part of the solution and contain no project references to the packages they
+consume.
 
-The smoke consumer creates a conventional compiled entry at runtime and proves
-the packed package can:
+The runtime smoke consumer creates a conventional compiled entry at runtime and
+proves the packed package can:
 
 - parse caller-supplied compiled bytes;
 - load an explicit conventional directory tree;
@@ -126,8 +139,12 @@ the packed package can:
 - load through the public system provider from a snapshotted `TERMINFO` root;
 - compose system lookup with `TerminalDatabase.BuiltIn` fallback.
 
-No checked-in fixture is copied into the smoke project, so those checks prove the
-public package surface rather than repository-only test assets.
+The Source smoke consumer proves the separately packed source-language package
+can restore through its NuGet dependency on the matching runtime package and
+execute on both supported target frameworks.
+
+No checked-in runtime fixture is copied into the smoke project, so those checks
+prove the public package surface rather than repository-only outputs.
 
 ## Local release validation
 
@@ -138,9 +155,11 @@ dotnet restore Icod.TermInfo.sln
 dotnet build Icod.TermInfo.sln -c Release
 dotnet test Icod.TermInfo.sln -c Release
 dotnet pack Icod.TermInfo.csproj -c Release --output artifacts
+dotnet pack Icod.TermInfo.Source/Icod.TermInfo.Source.csproj -c Release --output artifacts
 ```
 
-Then run the package verifier with the same configuration used to build and pack.
+Then run the coordinated verifier with the same configuration used to build and
+pack.
 
 For Staging:
 
@@ -169,13 +188,16 @@ than repacking the repository.
 
 Before merging or pushing a release-ready commit to `main`:
 
-1. confirm `<Version />` and `<PackageVersion />` are the intended version;
-2. ensure the NuGet.org trusted-publishing policy authorizes this repository,
-   workflow, and `Release` environment;
-3. ensure the `NUGET_USER` repository secret identifies the intended NuGet.org
+1. confirm `<Version />` and `<PackageVersion />` are the intended version in
+   both package projects and that all four values match;
+2. confirm both assemblies still declare `AssemblyVersion` `1.0.0.0`;
+3. ensure the NuGet.org trusted-publishing policy authorizes this repository,
+   `push-main.yaml`, the `Release` environment, and both package IDs
+   `Icod.TermInfo` and `Icod.TermInfo.Source`;
+4. ensure the `NUGET_USER` repository secret identifies the intended NuGet.org
    account;
-4. preserve `packages: write` permission for GitHub Packages;
-5. remember that a source/package change after validation creates a new release
+5. preserve `packages: write` permission for GitHub Packages;
+6. remember that a source/package change after validation creates a new release
    candidate and requires validation again.
 
 For a final release, create tag `v<PackageVersion>` only for the exact commit
@@ -185,7 +207,8 @@ whose release validation and publication succeeded.
 
 NuGet.org publication uses trusted publishing. The workflow obtains a temporary
 API key through GitHub OIDC and does not require a committed or long-lived NuGet
-API key.
+API key. The trusted-publishing package scope must authorize both package IDs for
+the coordinated 1.1+ release.
 
 Do not commit NuGet credentials to the repository.
 
@@ -200,26 +223,27 @@ control.
 
 After a final version is published:
 
-- confirm the package and symbols are visible on NuGet.org;
-- confirm the same package version is visible in GitHub Packages;
-- confirm a fresh public-package consumer can restore the version;
+- confirm both package IDs and both symbol packages are visible on NuGet.org;
+- confirm the same package version for both IDs is visible in GitHub Packages;
+- confirm fresh runtime-only and Source consumers can restore the final version;
 - create/verify the exact final tag;
 - treat subsequent public API or package-content changes as changes for the next
   version.
 
-Historical completion evidence for 0.6.0 through 0.9.0 remains under the
+Historical completion evidence for 0.6.0 through 1.0.0 remains under the
 versioned roadmap and contract-audit documents. Consumer-facing compiled-database
 usage remains consolidated in `docs/0.9.0-ACQUISITION-GUIDE.md`.
 
-For 1.0, use:
+For 1.1, use:
 
-- `Icod.TermInfo-Development-Roadmap-1.0.0.md` for the final gate contract;
-- `docs/1.0.0-T42-CONTRACT-API-AUDIT.md` for assembly/support/API-baseline policy;
-- `docs/1.0.0-T43-ROBUSTNESS-COMPATIBILITY.md` for robustness/package metadata;
-- `docs/1.0.0-T44-DOCUMENTATION-PACKAGE-FREEZE.md` for the RC freeze;
-- `docs/1.0.0-CONTRACT-AUDIT.md` for final T45 release sign-off requirements;
+- `Icod.TermInfo-Post-1.0-Development-Roadmap.md` for the S01-S09 contract;
+- `docs/1.1.0-S01-SOURCE-PACKAGE-FOUNDATION.md` through
+  `docs/1.1.0-S09-CORPUS-FUZZING-COMPATIBILITY.md` for tranche evidence;
+- `docs/1.1.0-SOURCE-PUBLIC-API-BASELINE.txt` for the frozen Source API;
+- `docs/1.1.0-RELEASE-AUDIT.md` for final release sign-off requirements;
+- `docs/1.0.0-PUBLIC-API-BASELINE.txt` for the unchanged runtime API;
 - `docs/VERSIONING.md` and `docs/COMPATIBILITY.md` for the stable 1.x promises.
 
-The final `v1.0.0` tag must identify the exact validated and published `main`
-commit; do not edit the audit or any other source/package content after that
-validation without rerunning the completion gate.
+The final `v1.1.0` tag must identify the exact validated and published `main`
+commit. Do not edit the audit or any other source/package content after that
+validation without rerunning the release gate.

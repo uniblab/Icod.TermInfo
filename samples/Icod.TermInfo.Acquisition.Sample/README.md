@@ -67,7 +67,8 @@ new TerminalDatabase(
     {
         new SystemTerminalDescriptionProvider(),
         TerminalDatabase.BuiltIn,
-    });
+    }
+);
 ```
 
 The first provider which resolves the name wins. System acquisition never

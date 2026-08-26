@@ -5,7 +5,7 @@ using Xunit;
 namespace Icod.TermInfo.Source.Tests;
 
 public sealed class S09ContractTests {
-	private const string DevelopmentVersion = "1.1.0-Alpha-9";
+	private const string DevelopmentVersion = "1.1.0";
 	private const string StableAssemblyVersion = "1.0.0.0";
 
 	[Fact]
@@ -117,7 +117,7 @@ public sealed class S09ContractTests {
 		Assert.True( File.Exists( recordPath ) );
 		string record =
 			File.ReadAllText( recordPath );
-		Assert.Contains( DevelopmentVersion, record );
+		Assert.Contains( "1.1.0-Alpha-9", record );
 		Assert.Contains( "TIS0025", record );
 		Assert.Contains( "TIS0026", record );
 		Assert.Contains( "deterministic", record );

@@ -1,16 +1,18 @@
 # Icod.TermInfo and Terminal-System Future Work Inventory
 
-This document records terminal-related work which remains outside the stable
-`Icod.TermInfo` 1.0 boundary and identifies its natural package/layer.
+This document records terminal-related work which remains outside the current
+`Icod.TermInfo` 1.x package-family boundary and identifies its natural
+package/layer.
 
 Its purpose is to prevent the existence of a missing terminal feature from
 being mistaken for evidence that the feature belongs in the low-level
-`Icod.TermInfo` runtime package.
+`Icod.TermInfo` runtime package or the optional source-language package.
 
 The governing distinction is:
 
 > **`Icod.TermInfo` owns immutable terminal-description data, acquisition of
 > that data, and pure transformations required to interpret/expand/output it.
+> `Icod.TermInfo.Source` owns `.ti` source parsing and inheritance resolution.
 > Live terminal conversations, process plumbing, and virtual-screen/UI policy
 > belong elsewhere.**
 
@@ -18,7 +20,8 @@ The governing distinction is:
 
 ## 1. Current foundation
 
-The 1.0 line freezes the combined 0.8 semantic and 0.9 acquisition foundation:
+The 1.1 line preserves the combined 0.8 semantic and 0.9 acquisition runtime
+foundation and adds the optional source-language layer:
 
 - immutable terminal descriptions;
 - complete standard capability metadata;
@@ -36,11 +39,17 @@ The 1.0 line freezes the combined 0.8 semantic and 0.9 acquisition foundation:
 - deterministic `TERMINFO`/`TERMINFO_DIRS`/user/system discovery;
 - provider-local successful-entry caching and new-provider refresh;
 - deterministic provider composition;
+- `.ti` lexical analysis and source diagnostics;
+- unresolved source documents and entries;
+- standard/extended capability classification;
+- cancellation and `use=` inheritance resolution;
+- materialization into the existing immutable `TerminalDescription` model;
+- deterministic corpus/fuzz/resource-bound validation;
 - no process-global current terminal;
 - dual-target `net8.0`/`net10.0` package and compatibility gates.
 
-Version 1.0 is a stability/package-contract release, not another semantic or
-acquisition expansion.
+The runtime public contract remains the frozen 1.0 contract. Source-language
+functionality is isolated in `Icod.TermInfo.Source`.
 
 ---
 
@@ -48,12 +57,13 @@ acquisition expansion.
 
 | Family | Status / future work | Natural home | Common dependency |
 | --- | --- | --- | --- |
-| Compiled acquisition | completed for frozen conventional `0432`, ncurses extended sections, and `01036` | `Icod.TermInfo` 0.9/1.0 | semantic model |
-| Filesystem/system discovery | completed for directory, `TERMINFO`, `TERMINFO_DIRS`, user/default roots | `Icod.TermInfo` 0.9/1.0 | compiled parser |
-| External-data lifecycle | completed provider-local cache/refresh/concurrency/bounds contract | `Icod.TermInfo` 0.9/1.0 | parser + providers |
+| Compiled acquisition | completed for frozen conventional `0432`, ncurses extended sections, and `01036` | `Icod.TermInfo` 0.9/1.x | semantic model |
+| Filesystem/system discovery | completed for directory, `TERMINFO`, `TERMINFO_DIRS`, user/default roots | `Icod.TermInfo` 0.9/1.x | compiled parser |
+| External-data lifecycle | completed provider-local cache/refresh/concurrency/bounds contract | `Icod.TermInfo` 0.9/1.x | parser + providers |
 | Hashed databases | Berkeley DB/ncurses hashed stores | optional later provider/package | compiled parser |
 | Historical vendor formats | HP-UX/AIX/OSF/1 divergent binary layouts | optional later | parser abstraction + fixtures |
-| Terminfo source language | `.ti`, escapes, cancellation, `use=` inheritance | later core/source package | 0.8 semantic model + source AST |
+| Terminfo source language | completed in 1.1: `.ti`, diagnostics, cancellation, `use=` inheritance, materialization | `Icod.TermInfo.Source` | runtime semantic model |
+| Terminfo compiler | compiled-entry writer and reusable `tic` engine | planned `Icod.TermInfo.Compiler` | Source + runtime model |
 | Terminfo tooling | `tic`, `infocmp`, `toe`, conversion tooling | likely `Icod.TermInfo.Tools` | source parser + binary reader/writer |
 | Termcap interoperability | termcap syntax, `TERMCAP`, `TERMPATH`, conversion | optional compatibility/tooling | source/conversion model |
 | Live session | raw/cooked/cbreak, restore, tty ownership, full-screen/cursor lifecycle | `Icod.Terminal` | `Icod.TermInfo` + OS interop |
@@ -70,14 +80,11 @@ acquisition expansion.
 
 ---
 
-## 3. Core `Icod.TermInfo` work after 1.0
+## 3. Core package-family work after 1.1
 
-### 3.1 Terminfo source syntax
+### 3.1 Terminfo source syntax — completed in 1.1
 
-The largest coherent terminfo feature outside the 1.0 runtime contract is
-source-language support.
-
-A future design would need:
+`Icod.TermInfo.Source` now implements the source-language path:
 
 ```text
 .ti text
@@ -86,26 +93,26 @@ A future design would need:
 lexer/parser
    |
    v
-source entry / AST
+unresolved source entries
    |
-   +----------------+
-   |                |
-   v                v
-validation       use= inheritance
-                    |
-                    v
-             resolved source entry
-                    |
-                    v
-           TerminalDescription
+   v
+validation + cancellation + use= inheritance
+   |
+   v
+resolved source entry
+   |
+   v
+TerminalDescription
 ```
 
-This includes source escapes, Boolean/numeric/string fields, cancellation,
-extended capabilities, aliases/descriptions, and `use=` inheritance.
+The 1.1 contract includes source escapes, Boolean/numeric/string fields,
+cancellation, extended capabilities, aliases/descriptions, `use=` inheritance,
+source spans and diagnostics, hostile-input bounds, and deterministic duplicate
+source-identity handling.
 
-It is intentionally separate from 0.9 because compiled entries already contain
-the resolved semantic result; a source parser introduces a second language and
-an inheritance/resolution model.
+The package remains separate because compiled entries already contain the
+resolved semantic result while source processing introduces language and
+inheritance concerns that runtime-only consumers do not need.
 
 ### 3.2 `tic`-class binary writing
 
@@ -352,12 +359,17 @@ than describing how an application should produce it.
 
 Highest-value fuzz targets include:
 
-- 0.9 compiled parser;
-- future terminfo source parser;
-- live input escape decoder;
-- active-query response parser;
-- graphics protocol decoders;
-- terminal-emulator control parser.
+- compiled terminfo parsing;
+- the 1.1 terminfo source parser/resolver;
+- future compiled-entry writing;
+- live input escape decoding;
+- active-query response parsing;
+- graphics protocol decoding;
+- terminal-emulator control parsing.
+
+The source parser/resolver already has a deterministic bounded mutation corpus;
+future work should widen coverage deliberately without making ordinary CI depend
+on wall-clock randomness or host databases.
 
 ### 8.2 Differential testing
 
@@ -395,40 +407,45 @@ The recommended near-term sequence is:
 0.9 compiled acquisition
         |
         v
-1.0 stable contract
+1.0 stable runtime contract
         |
-        +----------------------------+
-        |                            |
-        v                            v
-Icod.Terminal                 source/tooling family
-                                     (optional/later)
-        |
-   +----+----------------+
-   |                     |
-   v                     v
-Icod.Pty              input/probing/protocols
-   |                     |
-   +----------+----------+
-              |
-              v
-          Icod.Curses
+        +------------------------------+
+        |                              |
+        v                              v
+1.1 Icod.TermInfo.Source          Icod.Terminal
+        |                              |
+        v                         +----+----------------+
+1.2 compiler/writer              |                     |
+        |                        v                     v
+        v                     Icod.Pty        input/probing/protocols
+1.3 inspection/comparison          |                     |
+        |                           +----------+----------+
+        v                                      |
+1.4 tool commands                             v
+                                         Icod.Curses
 ```
 
 `Icod.Pty` may also proceed independently/parallel because its core OS/process
-plumbing is largely orthogonal to terminfo database acquisition.
+plumbing is largely orthogonal to terminfo source/compiler work.
 
 ---
 
-## 10. 1.0 boundary
+## 10. 1.1 package-family boundary
 
-The 1.0 definition is now explicit:
+The runtime definition remains explicit:
 
 > `Icod.TermInfo` can deterministically identify/load supported conventional
 > terminal descriptions, represent their standard and extended terminfo
 > semantics completely, and query/expand/output them correctly without native
 > ncurses or hidden process-global terminal state.
 
-Source tooling, termcap, live input, probing, graphics, PTYs, curses, and
-terminal emulation remain valuable future systems, but they are not omissions
-from the stable `Icod.TermInfo` 1.0 contract. New work should preserve that
-boundary unless a future major-version design deliberately revisits it.
+The 1.1 addition is equally explicit:
+
+> `Icod.TermInfo.Source` can parse and resolve supported `.ti` source, preserve
+> deterministic source diagnostics and hostile-input bounds, and materialize the
+> resolved result into the same immutable runtime semantic model.
+
+Compiled writing/tool commands, termcap, live input, probing, graphics, PTYs,
+curses, and terminal emulation remain valuable future systems. They are not
+omissions from the 1.1 package family. New work should preserve the runtime /
+Source boundary unless a future major-version design deliberately revisits it.
