@@ -32,8 +32,6 @@ pack()
     printf '\n=== Pack ===\n'
     dotnet pack Icod.TermInfo.sln \
         -c Debug \
-        --include-source \
-        --include-symbols \
         --no-build \
 	--output artifacts 
 }
