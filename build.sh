@@ -34,7 +34,8 @@ pack()
         -c Debug \
         --include-source \
         --include-symbols \
-        --no-build
+        --no-build \
+	--output artifacts 
 }
 
 validate()

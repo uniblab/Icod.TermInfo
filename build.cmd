@@ -84,7 +84,7 @@ exit /b %errorlevel%
 :pack
 echo.
 echo === Pack ===
-dotnet pack Icod.TermInfo.sln -c Debug --include-source --include-symbols --no-build
+dotnet pack Icod.TermInfo.sln -c Debug --include-source --include-symbols --no-build --output artifacts
 exit /b %errorlevel%
 
 :validate
