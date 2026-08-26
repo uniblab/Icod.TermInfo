@@ -12,17 +12,17 @@
 		<AssemblyName>Icod.TermInfo.Source</AssemblyName>
 		<RootNamespace>Icod.TermInfo.Source</RootNamespace>
 		<Configurations>Debug;Release;Staging</Configurations>
-		<Version>1.1.0-Alpha-8</Version>
+		<Version>1.1.0-Alpha-9</Version>
 		<AssemblyVersion>1.0.0.0</AssemblyVersion>
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<PackageVersion>1.1.0-Alpha-8</PackageVersion>
+		<PackageVersion>1.1.0-Alpha-9</PackageVersion>
 		<PackageId>Icod.TermInfo.Source</PackageId>
 		<Title>Icod.TermInfo.Source</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed terminfo source-language support for Icod.TermInfo. The 1.1 line parses and resolves .ti source into the stable TerminalDescription model without enlarging the runtime Icod.TermInfo package.</Description>
-		<PackageReleaseNotes>1.1.0-Alpha-8 implements S08: resolved source entries materialize into TerminalDescription while preserving terminal identity and all resolved standard and extended capabilities, dropping source-only inheritance and cancellation provenance, and validating semantic parity against the authoritative T29 compiled fixtures.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.1.0-Alpha-9 implements S09: an authoritative source corpus, duplicate source-entry and alias warnings, deterministic mutation fuzzing, deep-inheritance and source-size adversarial coverage, and offline compatibility validation against the checked-in tic-generated T29 fixtures.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>

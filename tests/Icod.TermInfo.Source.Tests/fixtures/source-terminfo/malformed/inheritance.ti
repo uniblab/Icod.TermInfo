@@ -1,0 +1,6 @@
+s09-cycle-a|S09 cycle a,
+	use=s09-cycle-b,
+s09-cycle-b|S09 cycle b,
+	use=s09-cycle-a,
+s09-missing|S09 missing parent,
+	use=s09-does-not-exist,

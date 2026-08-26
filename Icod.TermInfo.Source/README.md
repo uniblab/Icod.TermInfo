@@ -14,15 +14,15 @@ source diagnostics, cancellation, extended capabilities, and `use=`
 inheritance. Resolved source entries materialize into the same immutable
 `TerminalDescription` model used by compiled terminfo acquisition.
 
-`1.1.0-Alpha-8` implements S08 `TerminalDescription` materialization on top of
-the S07 resolved source state. `TermInfoSourceResolvedEntry.ToTerminalDescription`
-projects terminal identity plus all effectively present standard and extended
-capabilities into the stable runtime model. Source-only `use=` declarations,
-source locations, comments, and cancellation tombstones do not leak into the
-runtime description. The authoritative T29 source/compiled fixture pairs verify
-semantic parity across legacy, cancellation, high-byte, extended-capability, and
-wide-numeric cases. S09 remains the final 1.1 corpus, fuzzing, and compatibility
-tranche.
+`1.1.0-Alpha-9` implements S09 and closes the planned 1.1 source-language
+implementation tranches. The checked-in source corpus covers System V-style
+entries, ncurses extended capabilities, unusual escapes, cancellation,
+inheritance, malformed input, duplicate lookup identities, and bounded resource
+attacks. Duplicate canonical names and aliases produce stable warning diagnostics
+while document lookup remains deterministic and source-order based. A fixed,
+deterministic mutation corpus exercises parser and resolver robustness without a
+host `tic` or `infocmp` dependency. The checked-in T29 source/compiled fixture
+pairs continue to provide offline semantic compatibility coverage.
 
 The runtime dependency direction is one-way:
 

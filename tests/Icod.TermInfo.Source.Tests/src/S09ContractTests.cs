@@ -1,13 +1,11 @@
-using System.Reflection;
 using System.Xml.Linq;
-using Icod.TermInfo;
 using Icod.TermInfo.Source;
 using Xunit;
 
 namespace Icod.TermInfo.Source.Tests;
 
-public sealed class S08ContractTests {
-	private const string DevelopmentVersion = "1.1.0-Alpha-8";
+public sealed class S09ContractTests {
+	private const string DevelopmentVersion = "1.1.0-Alpha-9";
 	private const string StableAssemblyVersion = "1.0.0.0";
 
 	[Fact]
@@ -55,29 +53,10 @@ public sealed class S08ContractTests {
 				)
 			);
 		}
-	}
 
-	[Fact]
-	public void SourcePublicSurfaceIncludesReviewedMaterializationContract() {
-		MethodInfo method = Assert.Single(
-			typeof( TermInfoSourceResolvedEntry ).GetMethods(
-				BindingFlags.Public
-				| BindingFlags.Instance
-				| BindingFlags.DeclaredOnly
-			),
-			candidate => candidate.Name == nameof(
-					TermInfoSourceResolvedEntry.ToTerminalDescription
-			)
-		);
-
-		Assert.Empty( method.GetParameters() );
-		Assert.Equal(
-			typeof( TerminalDescription ),
-			method.ReturnType
-		);
 		Assert.Equal(
 			new Version( 1, 0, 0, 0 ),
-			typeof( TermInfoSourceResolvedEntry )
+			typeof( TermInfoSourceParser )
 				.Assembly
 				.GetName()
 				.Version
@@ -85,7 +64,19 @@ public sealed class S08ContractTests {
 	}
 
 	[Fact]
-	public void SourcePublicApiBaselineIncludesMaterializationContract() {
+	public void DuplicateSourceIdentityDiagnosticCodesAreStable() {
+		Assert.Equal(
+			"TIS0025",
+			TermInfoSourceDiagnosticCodes.DuplicateSourceEntryName
+		);
+		Assert.Equal(
+			"TIS0026",
+			TermInfoSourceDiagnosticCodes.DuplicateSourceAlias
+		);
+	}
+
+	[Fact]
+	public void SourcePublicApiBaselineIncludesS09DiagnosticCodes() {
 		string root = FindRepositoryRoot();
 		string baseline =
 			File.ReadAllText(
@@ -97,19 +88,23 @@ public sealed class S08ContractTests {
 			);
 
 		Assert.Contains(
-			"METHOD public Icod.TermInfo.TerminalDescription ToTerminalDescription() return-null=not-null/not-null",
+			"FIELD public static const System.String DuplicateSourceEntryName null=not-null/not-null value=\"TIS0025\"",
+			baseline
+		);
+		Assert.Contains(
+			"FIELD public static const System.String DuplicateSourceAlias null=not-null/not-null value=\"TIS0026\"",
 			baseline
 		);
 	}
 
 	[Fact]
-	public void S08ImplementationRecordAndRoadmapLinkArePresent() {
+	public void S09ImplementationRecordAndRoadmapLinkArePresent() {
 		string root = FindRepositoryRoot();
 		string recordPath =
 			Path.Combine(
 				root,
 				"docs",
-				"1.1.0-S08-TERMINAL-DESCRIPTION-MATERIALIZATION.md"
+				"1.1.0-S09-CORPUS-FUZZING-COMPATIBILITY.md"
 			);
 		string roadmap =
 			File.ReadAllText(
@@ -122,13 +117,13 @@ public sealed class S08ContractTests {
 		Assert.True( File.Exists( recordPath ) );
 		string record =
 			File.ReadAllText( recordPath );
-		Assert.Contains( "1.1.0-Alpha-8", record );
-		Assert.Contains( "ToTerminalDescription", record );
-		Assert.Contains( "t29-legacy-edge", record );
-		Assert.Contains( "t29-extended32", record );
-		Assert.Contains( "S09", record );
+		Assert.Contains( DevelopmentVersion, record );
+		Assert.Contains( "TIS0025", record );
+		Assert.Contains( "TIS0026", record );
+		Assert.Contains( "deterministic", record );
+		Assert.Contains( "`tic`", record );
 		Assert.Contains(
-			"1.1.0-S08-TERMINAL-DESCRIPTION-MATERIALIZATION.md",
+			"1.1.0-S09-CORPUS-FUZZING-COMPATIBILITY.md",
 			roadmap
 		);
 	}

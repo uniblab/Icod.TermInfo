@@ -1,0 +1,6 @@
+s09-sysv|s09sv|S09 System V basic,
+	am,
+	cols#80,
+	lines#24,
+	bel=^G,
+	clear=\E[H\E[2J,
