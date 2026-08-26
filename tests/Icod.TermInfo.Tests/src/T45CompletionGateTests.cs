@@ -5,13 +5,11 @@ using Xunit;
 
 namespace Icod.TermInfo.Tests;
 
-public sealed class T45CompletionGateTests
-{
+public sealed class T45CompletionGateTests {
 	[Fact]
-	public void AssemblyRetainsStableIdentityForOneOneRelease()
-	{
+	public void AssemblyRetainsStableIdentityForOneOneRelease() {
 		Assembly assembly =
-			typeof(TerminalDescription).Assembly;
+			typeof( TerminalDescription ).Assembly;
 		AssemblyName assemblyName =
 			assembly.GetName();
 		string? informationalVersion =
@@ -20,90 +18,87 @@ public sealed class T45CompletionGateTests
 				?.InformationalVersion;
 
 		Assert.Equal(
-			new Version(1, 0, 0, 0),
-			assemblyName.Version);
+			new Version( 1, 0, 0, 0 ),
+			assemblyName.Version );
 		Assert.NotNull(
-			informationalVersion);
+			informationalVersion );
 
 		string semanticVersion =
 			informationalVersion!
 				.Split(
 					'+',
-					2)[0];
+					2 )[ 0 ];
 
 		Assert.Equal(
-			"1.1.1",
-			semanticVersion);
+			"1.1.0",
+			semanticVersion );
 	}
 
 	[Fact]
-	public void ProjectMetadataIdentifiesOneOneReleaseAndStableAssembly()
-	{
+	public void ProjectMetadataIdentifiesOneOneReleaseAndStableAssembly() {
 		string root =
 			FindRepositoryRoot();
 		XDocument project =
 			XDocument.Load(
 				Path.Combine(
 					root,
-					"Icod.TermInfo.csproj"),
-				LoadOptions.None);
+					"Icod.TermInfo.csproj" ),
+				LoadOptions.None );
 
 		Assert.Equal(
-			"1.1.1",
+			"1.1.0",
 			ReadRequiredProperty(
 				project,
-				"Version"));
+				"Version" ) );
 		Assert.Equal(
-			"1.1.1",
+			"1.1.0",
 			ReadRequiredProperty(
 				project,
-				"PackageVersion"));
+				"PackageVersion" ) );
 		Assert.Equal(
 			"1.0.0.0",
 			ReadRequiredProperty(
 				project,
-				"AssemblyVersion"));
+				"AssemblyVersion" ) );
 		Assert.Equal(
 			"net8.0;net10.0",
 			ReadRequiredProperty(
 				project,
-				"TargetFrameworks"));
+				"TargetFrameworks" ) );
 	}
 
 	[Fact]
-	public void FinalReadmeUsesStablePackageVersionAndPolicies()
-	{
+	public void FinalReadmeUsesStablePackageVersionAndPolicies() {
 		string root =
 			FindRepositoryRoot();
 		string readme =
 			File.ReadAllText(
 				Path.Combine(
 					root,
-					"README.md"));
+					"README.md" ) );
 
 		Assert.Contains(
 			"dotnet add package Icod.TermInfo --version 1.1.0",
-			readme);
+			readme );
 		Assert.Contains(
 			"dotnet add package Icod.TermInfo.Source --version 1.1.0",
-			readme);
+			readme );
 		Assert.DoesNotContain(
 			"1.1.0-Alpha-9",
-			readme);
+			readme );
 		Assert.Contains(
 			"docs/VERSIONING.md",
-			readme);
+			readme );
 		Assert.Contains(
 			"docs/COMPATIBILITY.md",
-			readme);
+			readme );
 		Assert.Contains(
 			"docs/1.1.0-RELEASE-AUDIT.md",
-			readme);
+			readme );
 	}
 
 	[Fact]
-	public void ReleaseVerifierRetainsAllFinalCompatibilityGates()
-	{
+	public void ReleaseVerifierRetainsAllFinalCompatibilityGates() {
 		string root =
 			FindRepositoryRoot();
 
@@ -119,43 +114,41 @@ public sealed class T45CompletionGateTests
 					".github",
 					"scripts",
 					"verify-release-package.sh"),
-			})
-		{
+			} ) {
 			string verifier =
 				File.ReadAllText(
 					Path.Combine(
 						root,
-						relativePath));
+						relativePath ) );
 
 			Assert.Contains(
 				"--check",
-				verifier);
+				verifier );
 			Assert.Contains(
 				"--compare",
-				verifier);
+				verifier );
 			Assert.Contains(
 				"net8.0",
-				verifier);
+				verifier );
 			Assert.Contains(
 				"net10.0",
-				verifier);
+				verifier );
 			Assert.Contains(
 				"1.1.0-SOURCE-PUBLIC-API-BASELINE.txt",
-				verifier);
+				verifier );
 			Assert.True(
 				verifier.Contains(
 					"package-smoke",
-					StringComparison.OrdinalIgnoreCase));
+					StringComparison.OrdinalIgnoreCase ) );
 			Assert.True(
 				verifier.Contains(
 					"source-package-smoke",
-					StringComparison.OrdinalIgnoreCase));
+					StringComparison.OrdinalIgnoreCase ) );
 		}
 	}
 
 	[Fact]
-	public void OneOneReleaseAuditDefinesReleaseSignOffWithoutClaimingIt()
-	{
+	public void OneOneReleaseAuditDefinesReleaseSignOffWithoutClaimingIt() {
 		string root =
 			FindRepositoryRoot();
 		string audit =
@@ -163,60 +156,56 @@ public sealed class T45CompletionGateTests
 				Path.Combine(
 					root,
 					"docs",
-					"1.1.0-RELEASE-AUDIT.md"));
+					"1.1.0-RELEASE-AUDIT.md" ) );
 
 		Assert.Contains(
 			"Release sign-off pending",
-			audit);
+			audit );
 		Assert.Contains(
 			"docs/1.0.0-PUBLIC-API-BASELINE.txt",
-			audit);
+			audit );
 		Assert.Contains(
 			"docs/1.1.0-SOURCE-PUBLIC-API-BASELINE.txt",
-			audit);
+			audit );
 		Assert.Contains(
 			"public-api-snapshot --check",
-			audit);
+			audit );
 		Assert.Contains(
 			"verify-release-package",
-			audit);
+			audit );
 		Assert.Contains(
 			"v1.1.0",
-			audit);
+			audit );
 	}
 
 	private static string ReadRequiredProperty(
 		XDocument project,
-		string name)
-	{
+		string name ) {
 		ArgumentNullException.ThrowIfNull(
-			project);
+			project );
 		ArgumentNullException.ThrowIfNull(
-			name);
+			name );
 
 		return project
 			.Descendants()
 			.Single(
 				element =>
 					element.Name.LocalName
-						== name)
+						== name )
 			.Value
 			.Trim();
 	}
 
-	private static string FindRepositoryRoot()
-	{
+	private static string FindRepositoryRoot() {
 		DirectoryInfo? current =
 			new(
-				AppContext.BaseDirectory);
+				AppContext.BaseDirectory );
 
-		while (current is not null)
-		{
-			if (File.Exists(
+		while ( current is not null ) {
+			if ( File.Exists(
 					Path.Combine(
 						current.FullName,
-						"Icod.TermInfo.csproj")))
-			{
+						"Icod.TermInfo.csproj" ) ) ) {
 				return current.FullName;
 			}
 
@@ -225,6 +214,6 @@ public sealed class T45CompletionGateTests
 		}
 
 		throw new InvalidOperationException(
-			"Unable to locate the Icod.TermInfo repository root.");
+			"Unable to locate the Icod.TermInfo repository root." );
 	}
 }
