@@ -143,6 +143,23 @@ Require(
         && resolvedEntry.GetString(StringCapability.ClearScreen) == "\x1b[H",
     "The S07 resolved source did not preserve local and inherited capabilities.");
 
+TerminalDescription materialized =
+    resolvedEntry.ToTerminalDescription();
+Require(
+    materialized.Name == "package-smoke"
+        && materialized.Description == "Package smoke source"
+        && materialized.GetNumber( NumericCapability.Columns ) == 64
+        && materialized.GetNumber( NumericCapability.Lines ) == 24
+        && materialized.GetBoolean( BooleanCapability.AutoRightMargin )
+        && materialized.GetString( StringCapability.ClearScreen ) == "\x1b[H"
+        && materialized.TryGetExtendedBoolean(
+            "AX",
+            out bool ax
+        )
+        && ax,
+    "The S08 materialized description did not preserve resolved source semantics."
+);
+
 Assembly runtimeAssembly =
     typeof(TerminalDescription).Assembly;
 Require(

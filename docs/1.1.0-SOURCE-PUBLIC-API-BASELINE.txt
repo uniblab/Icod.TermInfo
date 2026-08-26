@@ -139,6 +139,7 @@ END
 
 TYPE class Icod.TermInfo.Source.TermInfoSourceResolvedEntry [sealed]
   PROPERTY Icod.TermInfo.Source.TermInfoSourceEntry SourceEntry { public get; } null=not-null/unknown
+  METHOD public Icod.TermInfo.TerminalDescription ToTerminalDescription() return-null=not-null/not-null
   METHOD public System.Boolean GetBoolean(Icod.TermInfo.BooleanCapability capability null=not-null/not-null) return-null=not-null/not-null
   METHOD public System.Boolean TryGetExtended(System.String name null=not-null/not-null, out Icod.TermInfo.TermInfoCapabilityValue value null=not-null/not-null) return-null=not-null/not-null
   METHOD public System.Nullable<System.Int32> GetNumber(Icod.TermInfo.NumericCapability capability null=not-null/not-null) return-null=nullable/nullable

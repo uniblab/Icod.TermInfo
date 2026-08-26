@@ -7,9 +7,9 @@ namespace Icod.TermInfo.Source;
 /// been resolved.
 /// </summary>
 /// <remarks>
-/// S07 intentionally exposes capability queries rather than materializing a
-/// <see cref="TerminalDescription"/>. Conversion to the stable runtime model is
-/// S08 work. Source cancellation tombstones remain internal resolution state.
+/// S08 can project this resolved source state into the stable
+/// <see cref="TerminalDescription"/> runtime model. Source cancellation
+/// tombstones remain internal resolution state and materialize as absence.
 /// </remarks>
 public sealed class TermInfoSourceResolvedEntry
 {
@@ -31,6 +31,64 @@ public sealed class TermInfoSourceResolvedEntry
     /// result.
     /// </summary>
     public TermInfoSourceEntry SourceEntry { get; }
+
+    /// <summary>
+    /// Materializes this resolved source entry into the stable runtime terminal
+    /// description model.
+    /// </summary>
+    /// <remarks>
+    /// Only effective terminal identity and capability values are projected.
+    /// Source-only inheritance declarations, cancellation tombstones, comments,
+    /// tokens, and source locations are not represented by the returned value.
+    /// </remarks>
+    public TerminalDescription ToTerminalDescription() {
+        TerminalDescriptionBuilder builder =
+            new( SourceEntry.CanonicalName );
+
+        if ( SourceEntry.Description is string description ) {
+            builder.SetDescription( description );
+        }
+
+        foreach ( string alias in SourceEntry.Aliases ) {
+            builder.AddAlias( alias );
+        }
+
+        foreach ( BooleanCapability capability in _state.BooleanCapabilities ) {
+            builder.SetBoolean( capability );
+        }
+
+        foreach (
+            KeyValuePair<NumericCapability, int> pair
+            in _state.NumericCapabilities
+        ) {
+            builder.SetNumber(
+                pair.Key,
+                pair.Value
+            );
+        }
+
+        foreach (
+            KeyValuePair<StringCapability, string> pair
+            in _state.StringCapabilities
+        ) {
+            builder.SetString(
+                pair.Key,
+                pair.Value
+            );
+        }
+
+        foreach (
+            KeyValuePair<string, TermInfoCapabilityValue> pair
+            in _state.ExtendedCapabilities
+        ) {
+            builder.SetExtended(
+                pair.Key,
+                pair.Value
+            );
+        }
+
+        return builder.Build();
+    }
 
     /// <summary>
     /// Gets whether the resolved entry advertises a standard Boolean capability.
