@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Icod.TermInfo;
 
@@ -40,21 +41,21 @@ internal static class TermInfoSourceCapabilityClassifier
                 name,
                 out StandardCapabilityMetadata<BooleanCapability>? boolean))
         {
-            return TermInfoSourceCapabilityIdentity.StandardBoolean(boolean!);
+            return TermInfoSourceCapabilityIdentity.StandardBoolean(boolean);
         }
 
         if (TryGetStandardNumeric(
                 name,
                 out StandardCapabilityMetadata<NumericCapability>? numeric))
         {
-            return TermInfoSourceCapabilityIdentity.StandardNumeric(numeric!);
+            return TermInfoSourceCapabilityIdentity.StandardNumeric(numeric);
         }
 
         if (TryGetStandardString(
                 name,
                 out StandardCapabilityMetadata<StringCapability>? text))
         {
-            return TermInfoSourceCapabilityIdentity.StandardString(text!);
+            return TermInfoSourceCapabilityIdentity.StandardString(text);
         }
 
         if (!IsValidExtendedName(name))
@@ -70,6 +71,7 @@ internal static class TermInfoSourceCapabilityClassifier
 
     private static bool TryGetStandardBoolean(
         string name,
+        [NotNullWhen(true)]
         out StandardCapabilityMetadata<BooleanCapability>? metadata)
     {
         ArgumentNullException.ThrowIfNull(name);
@@ -84,6 +86,7 @@ internal static class TermInfoSourceCapabilityClassifier
 
     private static bool TryGetStandardNumeric(
         string name,
+        [NotNullWhen(true)]
         out StandardCapabilityMetadata<NumericCapability>? metadata)
     {
         ArgumentNullException.ThrowIfNull(name);
@@ -98,6 +101,7 @@ internal static class TermInfoSourceCapabilityClassifier
 
     private static bool TryGetStandardString(
         string name,
+        [NotNullWhen(true)]
         out StandardCapabilityMetadata<StringCapability>? metadata)
     {
         ArgumentNullException.ThrowIfNull(name);
