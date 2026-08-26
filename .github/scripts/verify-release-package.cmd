@@ -23,6 +23,8 @@ pushd "%~dp0\..\.." >nul || exit /b 1
 set "RESULT=0"
 if not exist "%ARTIFACT_DIR%" mkdir "%ARTIFACT_DIR%" || goto fail
 for %%I in ("%ARTIFACT_DIR%") do set "ARTIFACT_DIR=%%~fI"
+set "ICOD_TERMINFO_ARTIFACT_DIR=%ARTIFACT_DIR%"
+set "SMOKE_NUGET_CONFIG=%~dp0package-smoke.NuGet.Config"
 
 echo.
 echo === Verify generated capability metadata (%CONFIGURATION%) ===
@@ -96,7 +98,7 @@ set "NUGET_PACKAGES=%SMOKE_ROOT%\packages"
 
 echo.
 echo === Fresh package consumer: net8.0 ===
-dotnet restore "%SMOKE_ROOT%\Icod.TermInfo.PackageSmoke.csproj" --source "%ARTIFACT_DIR%" -p:IcodTermInfoPackageVersion=%PACKAGE_VERSION%
+dotnet restore "%SMOKE_ROOT%\Icod.TermInfo.PackageSmoke.csproj" --configfile "%SMOKE_NUGET_CONFIG%" -p:IcodTermInfoPackageVersion=%PACKAGE_VERSION%
 if errorlevel 1 goto fail
 
 dotnet run --project "%SMOKE_ROOT%\Icod.TermInfo.PackageSmoke.csproj" -c %CONFIGURATION% -f net8.0 --no-restore -p:IcodTermInfoPackageVersion=%PACKAGE_VERSION%
@@ -123,7 +125,7 @@ set "NUGET_PACKAGES=%SOURCE_SMOKE_ROOT%\packages"
 
 echo.
 echo === Fresh Icod.TermInfo.Source package consumer: net8.0 ===
-dotnet restore "%SOURCE_SMOKE_ROOT%\Icod.TermInfo.Source.PackageSmoke.csproj" --source "%ARTIFACT_DIR%" -p:IcodTermInfoSourcePackageVersion=%SOURCE_PACKAGE_VERSION%
+dotnet restore "%SOURCE_SMOKE_ROOT%\Icod.TermInfo.Source.PackageSmoke.csproj" --configfile "%SMOKE_NUGET_CONFIG%" -p:IcodTermInfoSourcePackageVersion=%SOURCE_PACKAGE_VERSION%
 if errorlevel 1 goto fail
 
 dotnet run --project "%SOURCE_SMOKE_ROOT%\Icod.TermInfo.Source.PackageSmoke.csproj" -c %CONFIGURATION% -f net8.0 --no-restore -p:IcodTermInfoSourcePackageVersion=%SOURCE_PACKAGE_VERSION%

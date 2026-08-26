@@ -27,6 +27,8 @@ cd "${repository_root}"
 
 mkdir -p "${artifact_dir}"
 artifact_dir="$(cd "${artifact_dir}" && pwd)"
+export ICOD_TERMINFO_ARTIFACT_DIR="${artifact_dir}"
+smoke_nuget_config="${repository_root}/.github/scripts/package-smoke.NuGet.Config"
 
 # Repository-only maintenance tools are executed on one explicit framework.
 dotnet run \
@@ -116,7 +118,7 @@ export NUGET_PACKAGES="${smoke_root}/packages"
 
 dotnet restore \
   "${smoke_root}/Icod.TermInfo.PackageSmoke.csproj" \
-  --source "${artifact_dir}" \
+  --configfile "${smoke_nuget_config}" \
   -p:IcodTermInfoPackageVersion="${package_version}"
 
 # The isolated consumer must execute against every supported target framework.
@@ -153,7 +155,7 @@ export NUGET_PACKAGES="${source_smoke_root}/packages"
 
 dotnet restore \
   "${source_smoke_root}/Icod.TermInfo.Source.PackageSmoke.csproj" \
-  --source "${artifact_dir}" \
+  --configfile "${smoke_nuget_config}" \
   -p:IcodTermInfoSourcePackageVersion="${source_package_version}"
 
 dotnet run \
