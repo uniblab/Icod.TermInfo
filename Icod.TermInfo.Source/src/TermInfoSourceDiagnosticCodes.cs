@@ -125,4 +125,14 @@ public static class TermInfoSourceDiagnosticCodes
     /// Source inheritance exceeded the configured maximum depth.
     /// </summary>
     public const string MaximumInheritanceDepthExceeded = "TIS0024";
+
+    /// <summary>
+    /// A canonical source entry name duplicates an earlier source identity.
+    /// </summary>
+    public const string DuplicateSourceEntryName = "TIS0025";
+
+    /// <summary>
+    /// A source alias duplicates an earlier source identity.
+    /// </summary>
+    public const string DuplicateSourceAlias = "TIS0026";
 }

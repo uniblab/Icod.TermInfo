@@ -23,6 +23,8 @@ TYPE class Icod.TermInfo.Source.TermInfoSourceDiagnostic [sealed]
 END
 
 TYPE class Icod.TermInfo.Source.TermInfoSourceDiagnosticCodes [static]
+  FIELD public static const System.String DuplicateSourceAlias null=not-null/not-null value="TIS0026"
+  FIELD public static const System.String DuplicateSourceEntryName null=not-null/not-null value="TIS0025"
   FIELD public static const System.String EmbeddedNullCharacter null=not-null/not-null value="TIS0019"
   FIELD public static const System.String EmptyField null=not-null/not-null value="TIS0008"
   FIELD public static const System.String EmptyHeaderComponent null=not-null/not-null value="TIS0006"

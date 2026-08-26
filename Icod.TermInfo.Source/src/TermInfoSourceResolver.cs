@@ -12,8 +12,9 @@ public static class TermInfoSourceResolver {
 	/// </summary>
 	/// <remarks>
 	/// Canonical names and aliases are matched case-sensitively in document
-	/// order. If duplicate names are present, the first matching entry is used;
-	/// duplicate-name diagnostics remain S09 work.
+	/// order. The source parser reports duplicate lookup identities as warnings.
+	/// If a caller resolves such a document, the first matching entry is used
+	/// deterministically.
 	/// </remarks>
 	public static TermInfoSourceResolveResult Resolve(
 		TermInfoSourceDocument document,

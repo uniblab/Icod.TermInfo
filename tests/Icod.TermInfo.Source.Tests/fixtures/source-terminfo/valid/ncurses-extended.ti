@@ -1,0 +1,8 @@
+s09-ncurses|s09x|S09 ncurses extended,
+	am,
+	colors#256,
+	AX,
+	RGB,
+	XBool,
+	XNum#0x1234,
+	XStr=left\,right\s\E\200,

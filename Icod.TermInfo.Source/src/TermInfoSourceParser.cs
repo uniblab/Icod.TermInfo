@@ -65,6 +65,8 @@ public static class TermInfoSourceParser
         List<TermInfoSourceDiagnostic> diagnostics =
             [.. lexResult.Diagnostics];
         List<TermInfoSourceEntry> entries = [];
+        HashSet<string> sourceIdentities =
+            new(StringComparer.Ordinal);
         IReadOnlyList<TermInfoSourceToken> tokens =
             lexResult.Tokens;
 
@@ -82,6 +84,13 @@ public static class TermInfoSourceParser
                 tokens[index];
             string canonicalName =
                 nameToken.Text;
+            RegisterSourceIdentity(
+                sourceIdentities,
+                canonicalName,
+                false,
+                nameToken.Span,
+                diagnostics
+            );
             List<string> aliases = [];
             string? description = null;
             TermInfoSourceToken lastSemanticToken =
@@ -95,6 +104,13 @@ public static class TermInfoSourceParser
                 if (token.Kind == TermInfoSourceTokenKind.Alias)
                 {
                     aliases.Add(token.Text);
+                    RegisterSourceIdentity(
+                        sourceIdentities,
+                        token.Text,
+                        true,
+                        token.Span,
+                        diagnostics
+                    );
                     lastSemanticToken = token;
                     index++;
                     continue;
@@ -167,6 +183,50 @@ public static class TermInfoSourceParser
                 entries,
                 tokens),
             orderedDiagnostics);
+    }
+
+    private static void RegisterSourceIdentity(
+        ISet<string> identities,
+        string name,
+        bool isAlias,
+        TermInfoSourceSpan span,
+        ICollection<TermInfoSourceDiagnostic> diagnostics
+    )
+    {
+        ArgumentNullException.ThrowIfNull(identities);
+        ArgumentNullException.ThrowIfNull(name);
+        ArgumentNullException.ThrowIfNull(span);
+        ArgumentNullException.ThrowIfNull(diagnostics);
+
+        if (string.IsNullOrWhiteSpace(name)
+            || identities.Add(name))
+        {
+            return;
+        }
+
+        string code;
+        string message;
+        if (isAlias)
+        {
+            code = TermInfoSourceDiagnosticCodes.DuplicateSourceAlias;
+            message =
+                $"Source alias '{name}' duplicates an earlier source identity.";
+        }
+        else
+        {
+            code = TermInfoSourceDiagnosticCodes.DuplicateSourceEntryName;
+            message =
+                $"Source entry name '{name}' duplicates an earlier source identity.";
+        }
+
+        diagnostics.Add(
+            new TermInfoSourceDiagnostic(
+                code,
+                TermInfoSourceDiagnosticSeverity.Warning,
+                message,
+                span
+            )
+        );
     }
 
     private static TermInfoSourceField? CreateField(

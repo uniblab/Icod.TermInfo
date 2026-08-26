@@ -6,9 +6,9 @@
 **Target frameworks:** `net8.0`; `net10.0`  
 **Current stable contract:** `1.0.0`  
 **Next development line:** `1.1.0`  
-**Development version:** `1.1.0-Alpha-8`
-**Status:** S08 implementation complete — validation pending
-**Current tranche:** S08 — `TerminalDescription` materialization
+**Development version:** `1.1.0-Alpha-9`
+**Status:** S09 implementation complete — validation pending
+**Current tranche:** S09 — Corpus, fuzzing, and compatibility
 **Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
 
 ---
@@ -390,6 +390,8 @@ Optional differential tests MAY compare resolution with `tic`/`infocmp`.
 Normal CI SHALL remain deterministic and SHALL NOT require host ncurses installation.
 
 **1.1 completion gate:** arbitrary supported `.ti` source can be parsed and resolved into the same semantic runtime model used by the existing 1.0 compiled-term acquisition path.
+
+**S09 implementation record:** [`docs/1.1.0-S09-CORPUS-FUZZING-COMPATIBILITY.md`](docs/1.1.0-S09-CORPUS-FUZZING-COMPATIBILITY.md).
 
 ---
 
