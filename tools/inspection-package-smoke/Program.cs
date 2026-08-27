@@ -31,15 +31,19 @@ Require(
 Type[] exportedTypes =
 	inspectionAssembly.GetExportedTypes();
 Require(
-	exportedTypes.Length == 7
+	exportedTypes.Length == 11
 		&& exportedTypes.Contains( typeof( TermInfoComparisonResult ) )
 		&& exportedTypes.Contains( typeof( TermInfoDifference ) )
 		&& exportedTypes.Contains( typeof( TermInfoDifferenceKind ) )
+		&& exportedTypes.Contains( typeof( TermInfoInspectionComparison ) )
+		&& exportedTypes.Contains( typeof( TermInfoInspectionEngine ) )
+		&& exportedTypes.Contains( typeof( TermInfoInspectionResult ) )
+		&& exportedTypes.Contains( typeof( TermInfoInspectionTarget ) )
 		&& exportedTypes.Contains( typeof( TermInfoSourceComparer ) )
 		&& exportedTypes.Contains( typeof( TermInfoSourceRenderer ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionComparer ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceRenderer ) ),
-	"The Inspection package did not expose exactly the reviewed I02-I05 surface."
+	"The Inspection package did not expose exactly the reviewed I02-I06 surface."
 );
 
 Require(
@@ -167,6 +171,45 @@ Require(
 		&& sourceComparison.Differences[ 0 ].LeftSourceField is not null
 		&& sourceComparison.Differences[ 0 ].RightSourceField is not null,
 	"The I05 source-aware comparer did not report the local numeric difference."
+);
+
+InMemoryTerminalDescriptionProvider provider =
+	new(
+		new[] {
+			terminal,
+		}
+	);
+TermInfoInspectionTarget inspectionTarget =
+	new(
+		provider,
+		"inspection-smoke",
+		"package smoke provider"
+	);
+TermInfoInspectionResult inspected =
+	TermInfoInspectionEngine.Inspect(
+		inspectionTarget
+	);
+Require(
+	ReferenceEquals( inspected.Target, inspectionTarget )
+		&& ReferenceEquals( inspected.Terminal, terminal )
+		&& inspected.Target.DisplayName == "package smoke provider",
+	"The I06 inspection engine did not retain target and terminal identity."
+);
+Require(
+	TermInfoInspectionEngine.Render( inspected ) == rendered,
+	"The I06 inspection engine did not delegate to canonical effective rendering."
+);
+TermInfoInspectionComparison inspectionComparison =
+	TermInfoInspectionEngine.Compare(
+		inspected,
+		inspected
+	);
+Require(
+	inspectionComparison.AreEqual
+		&& inspectionComparison.Comparison.Differences.Count == 0
+		&& ReferenceEquals( inspectionComparison.Left, inspected )
+		&& ReferenceEquals( inspectionComparison.Right, inspected ),
+	"The I06 inspection engine did not preserve acquired results during comparison."
 );
 
 Console.WriteLine(

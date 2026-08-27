@@ -10,10 +10,10 @@
 **Source API contract:** frozen at 1.1  
 **Compiler API contract:** frozen at 1.2  
 **New package:** `Icod.TermInfo.Inspection`
-**Current development version:** `1.3.0-Alpha-5`
+**Current development version:** `1.3.0-Alpha-6`
 **Development sequence:** `1.3.0-Alpha-1` through `1.3.0-Alpha-7`
-**Status:** I05 implementation candidate — build/test/package validation required
-**Current tranche:** I05 — Source-aware comparison
+**Status:** I06 implementation candidate — build/test/package validation required
+**Current tranche:** I06 — Provider-aware inspection and reusable `infocmp` engine
 **Release objective:** reusable managed inspection, canonical rendering, and semantic-comparison APIs underlying future `infocmp`-style tooling without destabilizing the existing Runtime, Source, or Compiler contracts.
 
 ---
@@ -584,6 +584,8 @@ TermInfoDifference
 TermInfoDifferenceKind
 
 TermInfoInspectionTarget
+TermInfoInspectionResult
+TermInfoInspectionComparison
 TermInfoInspectionEngine
 ```
 
@@ -816,6 +818,8 @@ No console parsing/output policy belongs here.
 **Gate I06:** an application can implement the core of common `infocmp`
 inspection/comparison workflows without duplicating acquisition, rendering, or
 comparison logic.
+
+**Implementation record:** [`docs/1.3.0-I06-PROVIDER-AWARE-INSPECTION.md`](docs/1.3.0-I06-PROVIDER-AWARE-INSPECTION.md)
 
 ---
 

@@ -7,6 +7,56 @@ The 1.3 line provides the reusable API engine underneath future
 `infocmp`-style tooling while preserving the already-frozen Runtime 1.0, Source
 1.1, and Compiler 1.2 public contracts.
 
+## I06 provider-aware inspection and reusable `infocmp` engine
+
+`1.3.0-Alpha-6` composes the existing Runtime acquisition contract with the I02
+canonical renderer and I04 effective comparer. An inspection target contains an
+explicit `ITerminalDescriptionProvider`, the exact requested terminal name, and
+an optional caller-owned display label:
+
+```csharp
+TermInfoInspectionTarget target =
+	new(
+		provider,
+		"xterm",
+		"system xterm"
+	);
+
+TermInfoInspectionResult inspected =
+	TermInfoInspectionEngine.Inspect(
+		target
+	);
+```
+
+`TryInspect` preserves the Runtime provider contract's clean-miss semantics;
+provider exceptions continue to propagate. Successful results retain both the
+requested target identity and the provider-returned canonical
+`TerminalDescription`, so aliases do not erase what the caller actually asked
+for.
+
+The engine can render a target or an already acquired result and can compare two
+targets or two acquired results:
+
+```csharp
+TermInfoInspectionComparison comparison =
+	TermInfoInspectionEngine.Compare(
+		leftTarget,
+		rightTarget
+	);
+```
+
+The comparison retains both target/result identities together with the I04
+`TermInfoComparisonResult`. Already acquired results are never reacquired when
+rendered or compared.
+
+The optional display label is caller-owned diagnostic context only. I06 does not
+enumerate providers, expose private system-discovery internals, infer the exact
+compiled database path used by a provider, or add command-line/console-output
+policy. `SystemTerminalDescriptionProvider`, separate
+`DirectoryTerminalDescriptionProvider` roots, `TerminalDatabase.BuiltIn`, and
+caller-defined providers all participate through the same frozen Runtime
+interface.
+
 ## I05 source-aware comparison
 
 `1.3.0-Alpha-5` adds deterministic comparison of unresolved Source 1.1
@@ -146,10 +196,10 @@ There is no production dependency between Inspection and Compiler.
 
 ## Install
 
-During I05 development:
+During I06 development:
 
 ```text
-dotnet add package Icod.TermInfo.Inspection --version 1.3.0-Alpha-5
+dotnet add package Icod.TermInfo.Inspection --version 1.3.0-Alpha-6
 ```
 
 The package targets `net8.0`, `net9.0`, and `net10.0`, uses C# 13, remains
