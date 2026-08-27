@@ -9,15 +9,17 @@ namespace Icod.TermInfo.Compiler;
 /// terminfo entries.
 /// </summary>
 /// <remarks>
-/// C01 implements deterministic minimal legacy <c>0432</c> entries containing
-/// terminal identity metadata only. Standard capability tables, extended
-/// sections, and wide-numeric format policy are added by later 1.2 tranches.
-/// Writing is pure with respect to filesystem, environment, and native ncurses
-/// state.
+/// C02 implements deterministic legacy <c>0432</c> entries containing terminal
+/// identity metadata and complete standard Boolean, numeric, and string
+/// capability tables. Extended sections and wide-numeric format policy are
+/// added by later 1.2 tranches. Writing is pure with respect to filesystem,
+/// environment, and native ncurses state.
 /// </remarks>
 public static class CompiledTermInfoWriter {
 	private const ushort LegacyMagic = 0x011A;
 	private const int HeaderSize = 12;
+	private const byte BooleanPresent = 0x01;
+	private const short ValueAbsent = -1;
 
 	/// <summary>
 	/// Writes one representable terminal description as deterministic legacy
@@ -31,19 +33,19 @@ public static class CompiledTermInfoWriter {
 	/// <paramref name="description"/> is <see langword="null"/>.
 	/// </exception>
 	/// <exception cref="InvalidOperationException">
-	/// The terminal identity cannot be represented exactly by the C01 legacy
-	/// names section.
+	/// The terminal identity or a standard capability cannot be represented
+	/// exactly by the C02 legacy format.
 	/// </exception>
 	/// <exception cref="NotSupportedException">
-	/// The description contains capabilities whose compiled tables are not yet
-	/// implemented by C01.
+	/// The description contains extended capabilities, which are introduced by
+	/// C03.
 	/// </exception>
 	public static byte[] Write(
 		TerminalDescription description
 	) {
 		ArgumentNullException.ThrowIfNull( description );
 
-		EnsureC01CapabilityScope( description );
+		EnsureC02CapabilityScope( description );
 
 		string identity =
 			CreateIdentity( description );
@@ -58,36 +60,55 @@ public static class CompiledTermInfoWriter {
 			);
 		}
 
-		int alignmentSize =
-			( ( HeaderSize + namesSize ) & 1 ) == 0
-				? 0
-				: 1;
-		byte[] entry =
-			new byte[HeaderSize + namesSize + alignmentSize];
+		int booleanCount =
+			GetBooleanCount( description );
+		int numericCount =
+			GetNumericCount( description );
+		int stringCount =
+			GetStringCount( description );
+		(short[] stringOffsets, byte[] stringTable) =
+			CreateStringTable(
+				description,
+				stringCount
+			);
 
-		BinaryPrimitives.WriteUInt16LittleEndian(
-			entry.AsSpan( 0, 2 ),
-			LegacyMagic
-		);
-		BinaryPrimitives.WriteUInt16LittleEndian(
-			entry.AsSpan( 2, 2 ),
-			(ushort)namesSize
-		);
-		BinaryPrimitives.WriteUInt16LittleEndian(
-			entry.AsSpan( 4, 2 ),
-			0
-		);
-		BinaryPrimitives.WriteUInt16LittleEndian(
-			entry.AsSpan( 6, 2 ),
-			0
-		);
-		BinaryPrimitives.WriteUInt16LittleEndian(
-			entry.AsSpan( 8, 2 ),
-			0
-		);
-		BinaryPrimitives.WriteUInt16LittleEndian(
-			entry.AsSpan( 10, 2 ),
-			0
+		int booleanOffset =
+			checked( HeaderSize + namesSize );
+		int unalignedNumericOffset =
+			checked( booleanOffset + booleanCount );
+		int alignmentSize =
+			( ( unalignedNumericOffset & 1 ) == 0 )
+				? 0
+				: 1
+		;
+		int numericOffset =
+			checked( unalignedNumericOffset + alignmentSize );
+		int stringOffsetTableOffset =
+			checked(
+				numericOffset
+				+ checked( numericCount * sizeof( short ) )
+			);
+		int stringTableOffset =
+			checked(
+				stringOffsetTableOffset
+				+ checked( stringCount * sizeof( short ) )
+			);
+		int entrySize =
+			checked(
+				stringTableOffset
+				+ stringTable.Length
+			);
+
+		byte[] entry =
+			new byte[entrySize];
+
+		WriteHeader(
+			entry,
+			namesSize,
+			booleanCount,
+			numericCount,
+			stringCount,
+			stringTable.Length
 		);
 
 		identityBytes.CopyTo(
@@ -95,22 +116,340 @@ public static class CompiledTermInfoWriter {
 		);
 		entry[HeaderSize + identityBytes.Length] = 0;
 
+		WriteBooleans(
+			entry,
+			booleanOffset,
+			description
+		);
+		WriteNumerics(
+			entry,
+			numericOffset,
+			numericCount,
+			description
+		);
+		WriteStringOffsets(
+			entry,
+			stringOffsetTableOffset,
+			stringOffsets
+		);
+		stringTable.CopyTo(
+			entry.AsSpan( stringTableOffset )
+		);
+
 		return entry;
 	}
 
-	private static void EnsureC01CapabilityScope(
+	private static void EnsureC02CapabilityScope(
 		TerminalDescription description
 	) {
 		ArgumentNullException.ThrowIfNull( description );
 
-		if ( description.BooleanCapabilities.Count != 0
-			|| description.NumericCapabilities.Count != 0
-			|| description.StringCapabilities.Count != 0
-			|| description.ExtendedCapabilities.Count != 0 ) {
+		if ( description.ExtendedCapabilities.Count != 0 ) {
 			throw new NotSupportedException(
-				"C01 writes identity-only legacy entries. Standard capability tables are introduced by C02 and extended capability tables by C03."
+				"C02 writes standard capabilities only. Extended capability tables are introduced by C03."
 			);
 		}
+	}
+
+	private static void WriteHeader(
+		Span<byte> entry,
+		int namesSize,
+		int booleanCount,
+		int numericCount,
+		int stringCount,
+		int stringTableSize
+	) {
+		BinaryPrimitives.WriteUInt16LittleEndian(
+			entry[0..2],
+			LegacyMagic
+		);
+		BinaryPrimitives.WriteUInt16LittleEndian(
+			entry[2..4],
+			ToUnsignedShort(
+				namesSize,
+				"names section size"
+			)
+		);
+		BinaryPrimitives.WriteUInt16LittleEndian(
+			entry[4..6],
+			ToUnsignedShort(
+				booleanCount,
+				"Boolean table count"
+			)
+		);
+		BinaryPrimitives.WriteUInt16LittleEndian(
+			entry[6..8],
+			ToUnsignedShort(
+				numericCount,
+				"numeric table count"
+			)
+		);
+		BinaryPrimitives.WriteUInt16LittleEndian(
+			entry[8..10],
+			ToUnsignedShort(
+				stringCount,
+				"string table count"
+			)
+		);
+		BinaryPrimitives.WriteUInt16LittleEndian(
+			entry[10..12],
+			ToUnsignedShort(
+				stringTableSize,
+				"string table size"
+			)
+		);
+	}
+
+	private static void WriteBooleans(
+		Span<byte> entry,
+		int booleanOffset,
+		TerminalDescription description
+	) {
+		ArgumentNullException.ThrowIfNull( description );
+
+		foreach ( BooleanCapability capability in description.BooleanCapabilities ) {
+			int binaryIndex =
+				StandardCapabilityCatalog
+					.GetMetadata( capability )
+					.BinaryIndex;
+			entry[booleanOffset + binaryIndex] = BooleanPresent;
+		}
+	}
+
+	private static void WriteNumerics(
+		Span<byte> entry,
+		int numericOffset,
+		int numericCount,
+		TerminalDescription description
+	) {
+		ArgumentNullException.ThrowIfNull( description );
+
+		for ( int index = 0; index < numericCount; index++ ) {
+			BinaryPrimitives.WriteInt16LittleEndian(
+				entry.Slice(
+					numericOffset + ( index * sizeof( short ) ),
+					sizeof( short )
+				),
+				ValueAbsent
+			);
+		}
+
+		foreach (
+			KeyValuePair<NumericCapability, int> pair
+			in description.NumericCapabilities
+		) {
+			StandardCapabilityMetadata<NumericCapability> metadata =
+				StandardCapabilityCatalog.GetMetadata( pair.Key );
+			ValidateLegacyNumericValue(
+				pair.Value,
+				metadata.ShortName
+			);
+			BinaryPrimitives.WriteInt16LittleEndian(
+				entry.Slice(
+					numericOffset
+						+ ( metadata.BinaryIndex * sizeof( short ) ),
+					sizeof( short )
+				),
+				(short)pair.Value
+			);
+		}
+	}
+
+	private static void WriteStringOffsets(
+		Span<byte> entry,
+		int stringOffsetTableOffset,
+		IReadOnlyList<short> stringOffsets
+	) {
+		ArgumentNullException.ThrowIfNull( stringOffsets );
+
+		for ( int index = 0; index < stringOffsets.Count; index++ ) {
+			BinaryPrimitives.WriteInt16LittleEndian(
+				entry.Slice(
+					stringOffsetTableOffset
+						+ ( index * sizeof( short ) ),
+					sizeof( short )
+				),
+				stringOffsets[index]
+			);
+		}
+	}
+
+	private static int GetBooleanCount(
+		TerminalDescription description
+	) {
+		ArgumentNullException.ThrowIfNull( description );
+
+		int count = 0;
+		foreach ( BooleanCapability capability in description.BooleanCapabilities ) {
+			int binaryIndex =
+				StandardCapabilityCatalog
+					.GetMetadata( capability )
+					.BinaryIndex;
+			count =
+				Math.Max(
+					count,
+					checked( binaryIndex + 1 )
+				);
+		}
+
+		return count;
+	}
+
+	private static int GetNumericCount(
+		TerminalDescription description
+	) {
+		ArgumentNullException.ThrowIfNull( description );
+
+		int count = 0;
+		foreach (
+			KeyValuePair<NumericCapability, int> pair
+			in description.NumericCapabilities
+		) {
+			int binaryIndex =
+				StandardCapabilityCatalog
+					.GetMetadata( pair.Key )
+					.BinaryIndex;
+			count =
+				Math.Max(
+					count,
+					checked( binaryIndex + 1 )
+				);
+		}
+
+		return count;
+	}
+
+	private static int GetStringCount(
+		TerminalDescription description
+	) {
+		ArgumentNullException.ThrowIfNull( description );
+
+		int count = 0;
+		foreach (
+			KeyValuePair<StringCapability, string> pair
+			in description.StringCapabilities
+		) {
+			int binaryIndex =
+				StandardCapabilityCatalog
+					.GetMetadata( pair.Key )
+					.BinaryIndex;
+			count =
+				Math.Max(
+					count,
+					checked( binaryIndex + 1 )
+				);
+		}
+
+		return count;
+	}
+
+	private static (
+		short[] Offsets,
+		byte[] Bytes
+	) CreateStringTable(
+		TerminalDescription description,
+		int stringCount
+	) {
+		ArgumentNullException.ThrowIfNull( description );
+
+		short[] offsets =
+			new short[stringCount];
+		Array.Fill(
+			offsets,
+			ValueAbsent
+		);
+		byte[]?[] encodedStrings =
+			new byte[]?[stringCount];
+		int tableSize = 0;
+
+		foreach (
+			KeyValuePair<StringCapability, string> pair
+			in description.StringCapabilities
+		) {
+			StandardCapabilityMetadata<StringCapability> metadata =
+				StandardCapabilityCatalog.GetMetadata( pair.Key );
+			string role =
+				$"standard string capability '{metadata.ShortName}'";
+			ValidateLatinOneTerminatedValue(
+				pair.Value,
+				role
+			);
+
+			if ( tableSize > short.MaxValue ) {
+				throw new InvalidOperationException(
+					$"The {role} would begin at string-table offset {tableSize}, exceeding the signed 16-bit offset field."
+				);
+			}
+
+			int remaining =
+				ushort.MaxValue - tableSize;
+			if ( pair.Value.Length >= remaining ) {
+				throw new InvalidOperationException(
+					$"The {role} would grow the compiled string table beyond the unsigned 16-bit size field."
+				);
+			}
+
+			byte[] encoded =
+				Encoding.Latin1.GetBytes( pair.Value );
+			offsets[metadata.BinaryIndex] =
+				(short)tableSize;
+			encodedStrings[metadata.BinaryIndex] = encoded;
+			tableSize =
+				checked(
+					tableSize
+					+ encoded.Length
+					+ 1
+				);
+		}
+
+		byte[] table =
+			new byte[tableSize];
+		for ( int index = 0; index < encodedStrings.Length; index++ ) {
+			byte[]? encoded =
+				encodedStrings[index];
+			if ( encoded is null ) {
+				continue;
+			}
+
+			int offset =
+				offsets[index];
+			encoded.CopyTo(
+				table.AsSpan( offset )
+			);
+		}
+
+		return (
+			offsets,
+			table
+		);
+	}
+
+	private static void ValidateLegacyNumericValue(
+		int value,
+		string capabilityName
+	) {
+		ArgumentException.ThrowIfNullOrWhiteSpace( capabilityName );
+
+		if ( value < 0 || value > short.MaxValue ) {
+			throw new InvalidOperationException(
+				$"Standard numeric capability '{capabilityName}' has value {value}, which cannot be represented by legacy 0432 without colliding with sentinels or exceeding the signed 16-bit range."
+			);
+		}
+	}
+
+	private static ushort ToUnsignedShort(
+		int value,
+		string role
+	) {
+		ArgumentException.ThrowIfNullOrWhiteSpace( role );
+
+		if ( value < 0 || value > ushort.MaxValue ) {
+			throw new InvalidOperationException(
+				$"The {role} value {value} cannot be represented by the unsigned 16-bit header field."
+			);
+		}
+
+		return (ushort)value;
 	}
 
 	private static string CreateIdentity(
@@ -160,14 +499,28 @@ public static class CompiledTermInfoWriter {
 		ArgumentNullException.ThrowIfNull( value );
 		ArgumentException.ThrowIfNullOrWhiteSpace( role );
 
-		if ( value.IndexOf( '\0' ) >= 0 ) {
-			throw new InvalidOperationException(
-				$"The {role} contains an embedded NUL and cannot be represented by the compiled names section."
-			);
-		}
+		ValidateLatinOneTerminatedValue(
+			value,
+			role
+		);
+
 		if ( value.IndexOf( '|' ) >= 0 ) {
 			throw new InvalidOperationException(
 				$"The {role} contains the compiled names separator '|'."
+			);
+		}
+	}
+
+	private static void ValidateLatinOneTerminatedValue(
+		string value,
+		string role
+	) {
+		ArgumentNullException.ThrowIfNull( value );
+		ArgumentException.ThrowIfNullOrWhiteSpace( role );
+
+		if ( value.IndexOf( '\0' ) >= 0 ) {
+			throw new InvalidOperationException(
+				$"The {role} contains an embedded NUL and cannot be represented by a NUL-terminated compiled field."
 			);
 		}
 

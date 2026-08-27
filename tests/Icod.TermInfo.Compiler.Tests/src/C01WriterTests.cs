@@ -170,23 +170,15 @@ public sealed class C01WriterTests {
 	}
 
 	[Fact]
-	public void CapabilityBearingDescriptionsWaitForLaterTranches() {
-		TerminalDescription standard =
-			new TerminalDescriptionBuilder( "standard" )
-				.SetDescription( "Standard capability terminal" )
-				.SetBoolean( BooleanCapability.AutoRightMargin )
-				.Build();
-		TerminalDescription extended =
+	public void ExtendedCapabilityBearingDescriptionsWaitForC03() {
+		TerminalDescription description =
 			new TerminalDescriptionBuilder( "extended" )
 				.SetDescription( "Extended capability terminal" )
 				.SetExtendedBoolean( "AX" )
 				.Build();
 
 		Assert.Throws<NotSupportedException>(
-			() => CompiledTermInfoWriter.Write( standard )
-		);
-		Assert.Throws<NotSupportedException>(
-			() => CompiledTermInfoWriter.Write( extended )
+			() => CompiledTermInfoWriter.Write( description )
 		);
 	}
 }

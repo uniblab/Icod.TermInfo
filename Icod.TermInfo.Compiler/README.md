@@ -4,23 +4,22 @@
 for `Icod.TermInfo`.
 
 C01 establishes the package and the pure inverse of the runtime compiled-entry
-parser. The initial writer emits deterministic minimal legacy `0432` entries
-from representable `TerminalDescription` values. Standard capability tables,
-extended sections, and explicit format-selection policy are added by later 1.2
-tranches.
+parser. C02 completes standard Boolean, numeric, and string capability emission
+for deterministic legacy `0432` entries. Extended sections and wide-numeric
+format selection remain later 1.2 tranches.
 
 ## Install
 
-For the C01 development package:
+For the C02 development package:
 
 ```text
-dotnet add package Icod.TermInfo.Compiler --version 1.2.0-Alpha-1
+dotnet add package Icod.TermInfo.Compiler --version 1.2.0-Alpha-2
 ```
 
 The package targets `net8.0`, `net9.0`, and `net10.0` and depends on the matching
-`Icod.TermInfo` package. C01 does not depend on `Icod.TermInfo.Source`.
+`Icod.TermInfo` package. C02 does not depend on `Icod.TermInfo.Source`.
 
-## Minimal writer
+## Standard compiled writer
 
 ```csharp
 using Icod.TermInfo;
@@ -29,6 +28,12 @@ using Icod.TermInfo.Compiler;
 TerminalDescription description =
 	new TerminalDescriptionBuilder( "example" )
 		.SetDescription( "Example terminal" )
+		.SetBoolean( BooleanCapability.AutoRightMargin )
+		.SetNumber( NumericCapability.Columns, 80 )
+		.SetString(
+			StringCapability.ClearScreen,
+			"\u001b[H\u001b[2J"
+		)
 		.Build();
 
 byte[] compiled =
@@ -42,11 +47,14 @@ TerminalDescription parsed =
 	);
 ```
 
-The C01 writer is intentionally narrow. It rejects capability-bearing
-descriptions until C02/C03 implement the corresponding tables. It also rejects
-identity data that cannot be represented exactly by the conventional names
-section, including missing verbose descriptions, embedded NULs, `|` separators,
-and characters outside Latin-1.
+The C02 writer emits standard tables only through
+`StandardCapabilityCatalog.BinaryIndex`. Trailing absent positions are omitted,
+interior absent positions use conventional sentinels, numerics must fit the
+legacy non-negative 16-bit range, and strings use strict reversible Latin-1 with
+checked signed 16-bit offsets and an unsigned 16-bit table-size field.
+
+Extended capabilities are still rejected until C03. Values which require the
+`01036` wide-numeric format are rejected until C04 rather than truncated.
 
 The writer is pure: it does not inspect environment variables, access terminfo
 directories, invoke native `tic`/ncurses, or write database layouts.

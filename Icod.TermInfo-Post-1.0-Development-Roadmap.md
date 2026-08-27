@@ -8,10 +8,10 @@
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
 **Current release version:** `1.1.1`
-**Current development version:** `1.2.0-Alpha-1`
+**Current development version:** `1.2.0-Alpha-2`
 **Next development line:** `1.2.0`
-**Status:** C01 implementation candidate — build/test/package validation required
-**Current tranche:** C01 — Compiler package foundation and binary writer contract
+**Status:** C02 implementation candidate — build/test/package validation required
+**Current tranche:** C02 — Standard capability emission
 **Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
 
 ---
@@ -569,6 +569,8 @@ offsets and section sizes SHALL be checked before narrowing to binary field
 widths. Silent truncation and wraparound are forbidden.
 
 **Gate C02:** standard-only entries round-trip exactly at the semantic level.
+
+**Implementation record:** [`docs/1.2.0-C02-STANDARD-CAPABILITY-EMISSION.md`](docs/1.2.0-C02-STANDARD-CAPABILITY-EMISSION.md)
 
 ---
 

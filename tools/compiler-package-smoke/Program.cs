@@ -30,6 +30,12 @@ TerminalDescription description =
 	new TerminalDescriptionBuilder( "compiler-package-smoke" )
 		.AddAlias( "compiler-smoke" )
 		.SetDescription( "Compiler package smoke terminal" )
+		.SetBoolean( BooleanCapability.AutoRightMargin )
+		.SetNumber( NumericCapability.Columns, 132 )
+		.SetString(
+			StringCapability.ClearScreen,
+			"\u001b[H\u001b[2J"
+		)
 		.Build();
 byte[] compiled =
 	CompiledTermInfoWriter.Write(
@@ -43,8 +49,11 @@ TerminalDescription parsed =
 Require(
 	parsed.Name == description.Name
 		&& parsed.Description == description.Description
-		&& parsed.Aliases.SequenceEqual( description.Aliases ),
-	"The Compiler package did not round-trip the C01 identity-only entry."
+		&& parsed.Aliases.SequenceEqual( description.Aliases )
+		&& parsed.GetBoolean( BooleanCapability.AutoRightMargin )
+		&& parsed.GetNumber( NumericCapability.Columns ) == 132
+		&& parsed.GetString( StringCapability.ClearScreen ) == "\u001b[H\u001b[2J",
+	"The Compiler package did not round-trip the C02 standard-capability entry."
 );
 Require(
 	typeof( TerminalDescription ).Assembly.GetName().Version
