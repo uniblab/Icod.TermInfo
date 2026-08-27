@@ -2,11 +2,45 @@
 # Format: Icod.TermInfo.PublicApiSnapshot/v1
 # AssemblyVersion: 1.0.0.0
 
+TYPE class Icod.TermInfo.Inspection.TermInfoComparisonResult [sealed]
+  PROPERTY System.Boolean AreEqual { public get; } null=not-null/unknown
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Inspection.TermInfoDifference> Differences { public get; } null=not-null/unknown<not-null/not-null>
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoDifference [sealed]
+  PROPERTY Icod.TermInfo.Inspection.TermInfoDifferenceKind Kind { public get; } null=not-null/unknown
+  PROPERTY System.Boolean IsCapabilityDifference { public get; } null=not-null/unknown
+  PROPERTY System.Collections.Generic.IReadOnlyList<System.String> LeftAliases { public get; } null=nullable/unknown<not-null/not-null>
+  PROPERTY System.Collections.Generic.IReadOnlyList<System.String> RightAliases { public get; } null=nullable/unknown<not-null/not-null>
+  PROPERTY System.Nullable<Icod.TermInfo.TermInfoCapabilityValue> LeftCapabilityValue { public get; } null=nullable/unknown
+  PROPERTY System.Nullable<Icod.TermInfo.TermInfoCapabilityValue> RightCapabilityValue { public get; } null=nullable/unknown
+  PROPERTY System.Nullable<System.Boolean> IsExtendedCapability { public get; } null=nullable/unknown
+  PROPERTY System.String CapabilityName { public get; } null=nullable/unknown
+  PROPERTY System.String LeftText { public get; } null=nullable/unknown
+  PROPERTY System.String RightText { public get; } null=nullable/unknown
+END
+
+TYPE enum Icod.TermInfo.Inspection.TermInfoDifferenceKind [sealed]
+  INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  UNDERLYING System.Int32
+  ENUM DifferentValue = 5
+  ENUM DifferentValueKind = 6
+  ENUM IdentityAliases = 1
+  ENUM IdentityDescription = 2
+  ENUM IdentityName = 0
+  ENUM OnlyInLeft = 3
+  ENUM OnlyInRight = 4
+END
+
 TYPE class Icod.TermInfo.Inspection.TermInfoSourceRenderer [static]
   METHOD public static System.String Render(Icod.TermInfo.Source.TermInfoSourceDocument document null=not-null/not-null) return-null=not-null/not-null
   METHOD public static System.String Render(Icod.TermInfo.Source.TermInfoSourceEntry entry null=not-null/not-null) return-null=not-null/not-null
   METHOD public static System.Void Write(System.IO.TextWriter writer null=not-null/not-null, Icod.TermInfo.Source.TermInfoSourceDocument document null=not-null/not-null) return-null=not-null/not-null
   METHOD public static System.Void Write(System.IO.TextWriter writer null=not-null/not-null, Icod.TermInfo.Source.TermInfoSourceEntry entry null=not-null/not-null) return-null=not-null/not-null
+END
+
+TYPE class Icod.TermInfo.Inspection.TerminalDescriptionComparer [static]
+  METHOD public static Icod.TermInfo.Inspection.TermInfoComparisonResult Compare(Icod.TermInfo.TerminalDescription left null=not-null/not-null, Icod.TermInfo.TerminalDescription right null=not-null/not-null) return-null=not-null/not-null
 END
 
 TYPE class Icod.TermInfo.Inspection.TerminalDescriptionSourceRenderer [static]

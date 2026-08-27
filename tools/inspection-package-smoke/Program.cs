@@ -31,10 +31,14 @@ Require(
 Type[] exportedTypes =
 	inspectionAssembly.GetExportedTypes();
 Require(
-	exportedTypes.Length == 2
+	exportedTypes.Length == 6
+		&& exportedTypes.Contains( typeof( TermInfoComparisonResult ) )
+		&& exportedTypes.Contains( typeof( TermInfoDifference ) )
+		&& exportedTypes.Contains( typeof( TermInfoDifferenceKind ) )
 		&& exportedTypes.Contains( typeof( TermInfoSourceRenderer ) )
+		&& exportedTypes.Contains( typeof( TerminalDescriptionComparer ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceRenderer ) ),
-	"The Inspection package did not expose exactly the reviewed I02/I03 renderer surface."
+	"The Inspection package did not expose exactly the reviewed I02-I04 surface."
 );
 
 Require(
@@ -124,6 +128,17 @@ Require(
 		&& normalizedParsed.Document.Entries.Count == 1
 		&& normalizedParsed.Document.Entries[ 0 ].Fields.Count == 2,
 	"The normalized I03 smoke representation did not preserve the unresolved source model."
+);
+
+TermInfoComparisonResult comparison =
+	TerminalDescriptionComparer.Compare(
+		terminal,
+		terminal
+	);
+Require(
+	comparison.AreEqual
+		&& comparison.Differences.Count == 0,
+	"The I04 effective comparer did not report self-comparison as equal."
 );
 
 Console.WriteLine(

@@ -10,10 +10,10 @@
 **Source API contract:** frozen at 1.1  
 **Compiler API contract:** frozen at 1.2  
 **New package:** `Icod.TermInfo.Inspection`
-**Current development version:** `1.3.0-Alpha-2`
+**Current development version:** `1.3.0-Alpha-4`
 **Development sequence:** `1.3.0-Alpha-1` through `1.3.0-Alpha-7`
-**Status:** I02 implementation candidate — build/test/package validation required
-**Current tranche:** I02 — Canonical effective source renderer
+**Status:** I04 implementation candidate — build/test/package validation required
+**Current tranche:** I04 — Effective semantic comparison and structured difference model
 **Release objective:** reusable managed inspection, canonical rendering, and semantic-comparison APIs underlying future `infocmp`-style tooling without destabilizing the existing Runtime, Source, or Compiler contracts.
 
 ---
@@ -706,6 +706,8 @@ Tests SHALL emphasize cases where reordering would be incorrect:
 **Gate I03:** normalized unresolved output reparses into an equivalent ordered
 source model and resolves equivalently against the same provider/document.
 
+**Implementation record:** [`docs/1.3.0-I03-NORMALIZED-UNRESOLVED-SOURCE-RENDERER.md`](docs/1.3.0-I03-NORMALIZED-UNRESOLVED-SOURCE-RENDERER.md)
+
 ---
 
 # I04 — Effective semantic comparison and structured difference model
@@ -738,6 +740,8 @@ with left/right categories appropriately reversed.
 
 **Gate I04:** callers can inspect exact semantic differences without parsing
 human-readable renderer output.
+
+**Implementation record:** [`docs/1.3.0-I04-EFFECTIVE-SEMANTIC-COMPARISON.md`](docs/1.3.0-I04-EFFECTIVE-SEMANTIC-COMPARISON.md)
 
 ---
 

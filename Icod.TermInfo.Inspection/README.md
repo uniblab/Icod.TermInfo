@@ -7,6 +7,32 @@ The 1.3 line provides the reusable API engine underneath future
 `infocmp`-style tooling while preserving the already-frozen Runtime 1.0, Source
 1.1, and Compiler 1.2 public contracts.
 
+## I04 effective semantic comparison
+
+`1.3.0-Alpha-4` adds deterministic, machine-readable comparison of effective
+`TerminalDescription` values:
+
+```csharp
+TermInfoComparisonResult comparison =
+	TerminalDescriptionComparer.Compare(
+		left,
+		right
+	);
+```
+
+`TermInfoComparisonResult.Differences` contains structured
+`TermInfoDifference` values. Identity metadata is reported separately from
+capabilities; standard capabilities are compared in canonical Runtime metadata
+order; and extended capabilities are matched by exact ordinal, case-sensitive
+name. Extended value-kind mismatches remain distinct from ordinary value
+differences.
+
+The effective comparer reports left-only, right-only, value, and value-kind
+differences without rendering either terminal to text. It does not invent source
+cancellation, disabled-field, `use=`, or provenance information because those
+facts are not retained by `TerminalDescription`. Source-aware comparison remains
+I05 work.
+
 ## I03 normalized unresolved-source rendering
 
 `1.3.0-Alpha-3` adds normalized rendering for the unresolved Source 1.1 model:
@@ -89,10 +115,10 @@ There is no production dependency between Inspection and Compiler.
 
 ## Install
 
-During I03 development:
+During I04 development:
 
 ```text
-dotnet add package Icod.TermInfo.Inspection --version 1.3.0-Alpha-3
+dotnet add package Icod.TermInfo.Inspection --version 1.3.0-Alpha-4
 ```
 
 The package targets `net8.0`, `net9.0`, and `net10.0`, uses C# 13, remains
