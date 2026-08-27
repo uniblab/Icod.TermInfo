@@ -142,6 +142,14 @@ public sealed class T42ContractTests
 						".github",
 						"workflows",
 						"push-main.yaml")));
+		string release =
+			NormalizeLineEndings(
+				File.ReadAllText(
+					Path.Combine(
+						root,
+						".github",
+						"workflows",
+						"release.yaml")));
 
 		Assert.Equal(
 			1,
@@ -151,17 +159,20 @@ public sealed class T42ContractTests
 				+ "            8.0.x\n"
 				+ "            9.0.x\n"
 				+ "            10.0.x\n"));
-		Assert.Equal(
-			1,
-			CountOccurrences(
-				pushMain,
-				"dotnet-version: |\n"
-				+ "            8.0.x\n"
-				+ "            9.0.x\n"
-				+ "            10.0.x\n"));
+		foreach (string workflow in new[] { pushMain, release })
+		{
+			Assert.Equal(
+				1,
+				CountOccurrences(
+					workflow,
+					"dotnet-version: |\n"
+					+ "            8.0.x\n"
+					+ "            9.0.x\n"
+					+ "            10.0.x\n"));
+		}
 
 		Assert.StartsWith(
-			"name: build and publish\n"
+			"name: main validation\n"
 			+ "\n"
 			+ "on:\n"
 			+ "  push:\n"
@@ -193,24 +204,27 @@ public sealed class T42ContractTests
 			"-c Release",
 			pullRequest);
 
-		Assert.Contains(
-			"dotnet build Icod.TermInfo.sln -c Release",
-			pushMain);
-		Assert.Contains(
-			"dotnet test Icod.TermInfo.sln -c Release",
-			pushMain);
-		Assert.Contains(
-			"dotnet pack Icod.TermInfo.csproj -c Release",
-			pushMain);
-		Assert.Contains(
-			"verify-release-package.sh artifacts Release",
-			pushMain);
-		Assert.Contains(
-			"if: matrix.os == 'ubuntu-latest'",
-			pushMain);
-		Assert.DoesNotContain(
-			"\n  package-validation:\n",
-			pushMain);
+		foreach (string workflow in new[] { pushMain, release })
+		{
+			Assert.Contains(
+				"dotnet build Icod.TermInfo.sln -c Release",
+				workflow);
+			Assert.Contains(
+				"dotnet test Icod.TermInfo.sln -c Release",
+				workflow);
+			Assert.Contains(
+				"dotnet pack Icod.TermInfo.csproj -c Release",
+				workflow);
+			Assert.Contains(
+				"verify-release-package.sh artifacts Release",
+				workflow);
+			Assert.Contains(
+				"verify-release-package.cmd artifacts Release",
+				workflow);
+			Assert.DoesNotContain(
+				"\n  package-validation:\n",
+				workflow);
+		}
 		Assert.Contains(
 			"actions/upload-artifact@v4",
 			pullRequest);
@@ -220,6 +234,12 @@ public sealed class T42ContractTests
 		Assert.DoesNotContain(
 			"dotnet nuget push",
 			pullRequest);
+		Assert.DoesNotContain(
+			"dotnet nuget push",
+			pushMain);
+		Assert.Contains(
+			"dotnet nuget push",
+			release);
 	}
 
 	private static int CountOccurrences(
