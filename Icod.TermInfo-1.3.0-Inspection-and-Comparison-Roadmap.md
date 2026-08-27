@@ -10,10 +10,10 @@
 **Source API contract:** frozen at 1.1  
 **Compiler API contract:** frozen at 1.2  
 **New package:** `Icod.TermInfo.Inspection`
-**Current development version:** `1.3.0-Alpha-1`
+**Current development version:** `1.3.0-Alpha-2`
 **Development sequence:** `1.3.0-Alpha-1` through `1.3.0-Alpha-7`
-**Status:** active 1.3 development
-**Current tranche:** I01 — Inspection package foundation and contract freeze
+**Status:** I02 implementation candidate — build/test/package validation required
+**Current tranche:** I02 — Canonical effective source renderer
 **Release objective:** reusable managed inspection, canonical rendering, and semantic-comparison APIs underlying future `infocmp`-style tooling without destabilizing the existing Runtime, Source, or Compiler contracts.
 
 ---
@@ -672,6 +672,8 @@ Testing SHALL include:
 
 **Gate I02:** effective parse/resolve/render/parse round trips preserve
 `TerminalDescription` semantics for the supported corpus.
+
+**Implementation record:** [`docs/1.3.0-I02-CANONICAL-EFFECTIVE-SOURCE-RENDERER.md`](docs/1.3.0-I02-CANONICAL-EFFECTIVE-SOURCE-RENDERER.md)
 
 ---
 

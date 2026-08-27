@@ -1,5 +1,6 @@
 using System.Reflection;
 using Icod.TermInfo;
+using Icod.TermInfo.Inspection;
 using Icod.TermInfo.Source;
 
 static void Require(
@@ -27,9 +28,12 @@ Require(
 	inspectionName.Version == new Version( 1, 0, 0, 0 ),
 	"The Inspection package must retain the stable 1.x assembly identity."
 );
+Type[] exportedTypes =
+	inspectionAssembly.GetExportedTypes();
 Require(
-	inspectionAssembly.GetExportedTypes().Length == 0,
-	"I01 must not accidentally expose a public Inspection surface."
+	exportedTypes.Length == 1
+		&& exportedTypes[ 0 ] == typeof( TerminalDescriptionSourceRenderer ),
+	"The Inspection package did not expose exactly the reviewed I02 renderer surface."
 );
 
 Require(
@@ -65,6 +69,40 @@ Require(
 		&& parsed.Document.Entries.Count == 1
 		&& parsed.Document.Entries[ 0 ].CanonicalName == "inspection-smoke",
 	"The Source dependency could not parse a deterministic smoke entry."
+);
+
+TermInfoSourceResolveResult resolved =
+	TermInfoSourceResolver.Resolve(
+		parsed.Document,
+		"inspection-smoke"
+	);
+Require(
+	!resolved.HasErrors
+		&& resolved.Entry is not null,
+	"The Source dependency could not resolve the smoke entry."
+);
+TerminalDescription terminal =
+	resolved.Entry!.ToTerminalDescription();
+string rendered =
+	TerminalDescriptionSourceRenderer.Render(
+		terminal
+	);
+Require(
+	rendered
+		== "inspection-smoke|Inspection package smoke,\n"
+			+ "    am,\n"
+			+ "    cols#80,\n",
+	"The I02 renderer did not produce the canonical smoke representation."
+);
+TermInfoSourceParseResult reparsed =
+	TermInfoSourceParser.Parse(
+		rendered,
+		"inspection-package-smoke-rendered.ti"
+	);
+Require(
+	!reparsed.HasErrors
+		&& reparsed.Document.Entries.Count == 1,
+	"The canonical I02 smoke representation did not reparse."
 );
 
 Console.WriteLine(

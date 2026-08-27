@@ -5,7 +5,7 @@ using Xunit;
 namespace Icod.TermInfo.Inspection.Tests;
 
 public sealed class I01ContractTests {
-	private const string DevelopmentVersion = "1.3.0-Alpha-1";
+	private const string DevelopmentVersion = "1.3.0-Alpha-2";
 	private const string StableAssemblyVersion = "1.0.0.0";
 
 	[Fact]
@@ -59,8 +59,14 @@ public sealed class I01ContractTests {
 			new Version( 1, 0, 0, 0 ),
 			inspection.GetName().Version
 		);
-		Assert.Empty(
-			inspection.GetExportedTypes()
+		Type[] exportedTypes =
+			inspection.GetExportedTypes();
+		Assert.Single(
+			exportedTypes
+		);
+		Assert.Equal(
+			"Icod.TermInfo.Inspection.TerminalDescriptionSourceRenderer",
+			exportedTypes[ 0 ].FullName
 		);
 	}
 
@@ -170,7 +176,7 @@ public sealed class I01ContractTests {
 	}
 
 	[Fact]
-	public void InspectionPublicApiBaselineStartsIntentionallyEmpty() {
+	public void InspectionPublicApiBaselineContainsReviewedI02Renderer() {
 		string root =
 			FindRepositoryRoot();
 		string baseline =
@@ -184,15 +190,16 @@ public sealed class I01ContractTests {
 				)
 			);
 
-		Assert.Equal(
-			"# Icod.TermInfo.Inspection public API baseline\n"
-				+ "# Format: Icod.TermInfo.PublicApiSnapshot/v1\n"
-				+ "# AssemblyVersion: 1.0.0.0\n"
-				+ "\n",
+		Assert.Contains(
+			"TYPE class Icod.TermInfo.Inspection.TerminalDescriptionSourceRenderer [static]",
 			baseline
 		);
-		Assert.DoesNotContain(
-			"TYPE ",
+		Assert.Contains(
+			"METHOD public static System.String Render(Icod.TermInfo.TerminalDescription description",
+			baseline
+		);
+		Assert.Contains(
+			"METHOD public static System.Void Write(System.IO.TextWriter writer",
 			baseline
 		);
 	}

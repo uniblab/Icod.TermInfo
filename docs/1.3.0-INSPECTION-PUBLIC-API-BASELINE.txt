@@ -2,3 +2,8 @@
 # Format: Icod.TermInfo.PublicApiSnapshot/v1
 # AssemblyVersion: 1.0.0.0
 
+TYPE class Icod.TermInfo.Inspection.TerminalDescriptionSourceRenderer [static]
+  METHOD public static System.String Render(Icod.TermInfo.TerminalDescription description null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.Void Write(System.IO.TextWriter writer null=not-null/not-null, Icod.TermInfo.TerminalDescription description null=not-null/not-null) return-null=not-null/not-null
+END
+
