@@ -68,10 +68,25 @@ dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.c
 if errorlevel 1 goto fail
 
 echo.
+echo === Verify Icod.TermInfo.Inspection net8.0/net9.0/net10.0 API equivalence (%CONFIGURATION%) ===
+dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c %CONFIGURATION% --no-build -- --compare Icod.TermInfo.Inspection\bin\%CONFIGURATION%\net8.0\Icod.TermInfo.Inspection.dll Icod.TermInfo.Inspection\bin\%CONFIGURATION%\net9.0\Icod.TermInfo.Inspection.dll
+if errorlevel 1 goto fail
+dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c %CONFIGURATION% --no-build -- --compare Icod.TermInfo.Inspection\bin\%CONFIGURATION%\net8.0\Icod.TermInfo.Inspection.dll Icod.TermInfo.Inspection\bin\%CONFIGURATION%\net10.0\Icod.TermInfo.Inspection.dll
+if errorlevel 1 goto fail
+
+echo.
+echo === Verify approved Icod.TermInfo.Inspection public API baseline (%CONFIGURATION%) ===
+dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c %CONFIGURATION% --no-build -- --check docs\1.3.0-INSPECTION-PUBLIC-API-BASELINE.txt Icod.TermInfo.Inspection\bin\%CONFIGURATION%\net10.0\Icod.TermInfo.Inspection.dll
+if errorlevel 1 goto fail
+
+echo.
 echo === Verify package structure and symbols (%CONFIGURATION%) ===
 dotnet run --project tools\package-verifier\Icod.TermInfo.PackageVerifier.csproj -c %CONFIGURATION% -f net10.0 -- "%ARTIFACT_DIR%"
 if errorlevel 1 goto fail
 dotnet run --project tools\compiler-package-verifier\Icod.TermInfo.Compiler.PackageVerifier.csproj -c %CONFIGURATION% -f net10.0 -- "%ARTIFACT_DIR%"
+if errorlevel 1 goto fail
+
+dotnet run --project tools\inspection-package-verifier\Icod.TermInfo.Inspection.PackageVerifier.csproj -c %CONFIGURATION% -f net10.0 -- "%ARTIFACT_DIR%"
 if errorlevel 1 goto fail
 
 set "PACKAGE_VERSION="
@@ -116,6 +131,25 @@ if not exist "%ARTIFACT_DIR%\Icod.TermInfo.Compiler.%COMPILER_PACKAGE_VERSION%.n
 )
 if not exist "%ARTIFACT_DIR%\Icod.TermInfo.Compiler.%COMPILER_PACKAGE_VERSION%.snupkg" (
     echo Icod.TermInfo.Compiler symbol package not found. 1>&2
+    goto fail
+)
+
+set "INSPECTION_PACKAGE_VERSION="
+for /f "delims=" %%V in ('dotnet msbuild Icod.TermInfo.Inspection\Icod.TermInfo.Inspection.csproj -nologo -getProperty:PackageVersion') do set "INSPECTION_PACKAGE_VERSION=%%V"
+if not defined INSPECTION_PACKAGE_VERSION (
+    echo Unable to determine Icod.TermInfo.Inspection PackageVersion. 1>&2
+    goto fail
+)
+if not "%INSPECTION_PACKAGE_VERSION%"=="%PACKAGE_VERSION%" (
+    echo Icod.TermInfo and Icod.TermInfo.Inspection PackageVersion values must match. 1>&2
+    goto fail
+)
+if not exist "%ARTIFACT_DIR%\Icod.TermInfo.Inspection.%INSPECTION_PACKAGE_VERSION%.nupkg" (
+    echo Icod.TermInfo.Inspection package not found. 1>&2
+    goto fail
+)
+if not exist "%ARTIFACT_DIR%\Icod.TermInfo.Inspection.%INSPECTION_PACKAGE_VERSION%.snupkg" (
+    echo Icod.TermInfo.Inspection symbol package not found. 1>&2
     goto fail
 )
 
@@ -201,6 +235,33 @@ echo === Fresh Icod.TermInfo.Compiler package consumer: net10.0 ===
 dotnet run --project "%COMPILER_SMOKE_ROOT%\Icod.TermInfo.Compiler.PackageSmoke.csproj" -c %CONFIGURATION% -f net10.0 --no-restore -p:IcodTermInfoCompilerPackageVersion=%COMPILER_PACKAGE_VERSION%
 if errorlevel 1 goto fail
 
+set "INSPECTION_SMOKE_ROOT=%TEMP%\Icod.TermInfo.Inspection-package-smoke-%RANDOM%-%RANDOM%"
+if exist "%INSPECTION_SMOKE_ROOT%" rmdir /s /q "%INSPECTION_SMOKE_ROOT%"
+mkdir "%INSPECTION_SMOKE_ROOT%" || goto fail
+
+copy /y tools\inspection-package-smoke\Icod.TermInfo.Inspection.PackageSmoke.csproj "%INSPECTION_SMOKE_ROOT%\Icod.TermInfo.Inspection.PackageSmoke.csproj" >nul || goto fail
+copy /y tools\inspection-package-smoke\Program.cs "%INSPECTION_SMOKE_ROOT%\Program.cs" >nul || goto fail
+
+set "NUGET_PACKAGES=%INSPECTION_SMOKE_ROOT%\packages"
+
+echo.
+echo === Fresh Icod.TermInfo.Inspection package consumer: net8.0 ===
+dotnet restore "%INSPECTION_SMOKE_ROOT%\Icod.TermInfo.Inspection.PackageSmoke.csproj" --configfile "%SMOKE_NUGET_CONFIG%" -p:IcodTermInfoInspectionPackageVersion=%INSPECTION_PACKAGE_VERSION%
+if errorlevel 1 goto fail
+
+dotnet run --project "%INSPECTION_SMOKE_ROOT%\Icod.TermInfo.Inspection.PackageSmoke.csproj" -c %CONFIGURATION% -f net8.0 --no-restore -p:IcodTermInfoInspectionPackageVersion=%INSPECTION_PACKAGE_VERSION%
+if errorlevel 1 goto fail
+
+echo.
+echo === Fresh Icod.TermInfo.Inspection package consumer: net9.0 ===
+dotnet run --project "%INSPECTION_SMOKE_ROOT%\Icod.TermInfo.Inspection.PackageSmoke.csproj" -c %CONFIGURATION% -f net9.0 --no-restore -p:IcodTermInfoInspectionPackageVersion=%INSPECTION_PACKAGE_VERSION%
+if errorlevel 1 goto fail
+
+echo.
+echo === Fresh Icod.TermInfo.Inspection package consumer: net10.0 ===
+dotnet run --project "%INSPECTION_SMOKE_ROOT%\Icod.TermInfo.Inspection.PackageSmoke.csproj" -c %CONFIGURATION% -f net10.0 --no-restore -p:IcodTermInfoInspectionPackageVersion=%INSPECTION_PACKAGE_VERSION%
+if errorlevel 1 goto fail
+
 echo.
 echo === Non-interactive repository sample ===
 dotnet run --project samples\Icod.TermInfo.Sample\Icod.TermInfo.Sample.csproj -c %CONFIGURATION% -f net10.0 -- --describe-only --profile ms-terminal-direct
@@ -220,6 +281,7 @@ if "%RESULT%"=="0" set "RESULT=1"
 if defined SMOKE_ROOT if exist "%SMOKE_ROOT%" rmdir /s /q "%SMOKE_ROOT%"
 if defined SOURCE_SMOKE_ROOT if exist "%SOURCE_SMOKE_ROOT%" rmdir /s /q "%SOURCE_SMOKE_ROOT%"
 if defined COMPILER_SMOKE_ROOT if exist "%COMPILER_SMOKE_ROOT%" rmdir /s /q "%COMPILER_SMOKE_ROOT%"
+if defined INSPECTION_SMOKE_ROOT if exist "%INSPECTION_SMOKE_ROOT%" rmdir /s /q "%INSPECTION_SMOKE_ROOT%"
 if defined OLD_NUGET_PACKAGES (
     set "NUGET_PACKAGES=%OLD_NUGET_PACKAGES%"
 ) else (

@@ -1,8 +1,9 @@
 # Icod.TermInfo Compatibility Policy
 
 This document defines the supported 1.x compatibility boundary for
-`Icod.TermInfo`, the optional `Icod.TermInfo.Source` package, and, beginning
-with 1.2, the optional `Icod.TermInfo.Compiler` package.
+`Icod.TermInfo`, the optional `Icod.TermInfo.Source` and
+`Icod.TermInfo.Compiler` packages, and, beginning with 1.3, the optional
+`Icod.TermInfo.Inspection` package.
 
 ## Supported target frameworks
 
@@ -21,10 +22,10 @@ net9.0
 net10.0
 ```
 
-For 1.2 and later, all three are first-class package targets. Release validation
-requires equivalent public API manifests between target frameworks and
-fresh-package execution for each target for every package present in that
-release.
+For 1.2 and later, all three target frameworks are first-class package targets.
+Release validation requires equivalent public API manifests between target
+frameworks and fresh-package execution for each target for every package present
+in that release.
 
 Dropping a supported target framework is considered a breaking support-contract
 change and normally requires a new major version.
@@ -56,9 +57,13 @@ The runtime 1.0 public API is frozen by
 The Source 1.1 public API is independently frozen by
 `docs/1.1.0-SOURCE-PUBLIC-API-BASELINE.txt` and its source-contract tests.
 
-The Compiler 1.2 public API is developed and frozen through
-`docs/1.2.0-COMPILER-PUBLIC-API-BASELINE.txt` and its compiler-contract tests
-beginning with C01.
+The Compiler 1.2 public API is frozen through
+`docs/1.2.0-COMPILER-PUBLIC-API-BASELINE.txt` and its compiler-contract tests.
+
+Beginning with I01, the Inspection 1.3 public API is developed independently
+through `docs/1.3.0-INSPECTION-PUBLIC-API-BASELINE.txt` and Inspection contract
+tests. I01 deliberately exports no Inspection public types; later I-tranches add
+reviewed API to that independent baseline.
 
 Within 1.x:
 
@@ -70,8 +75,8 @@ Within 1.x:
 - behavior changes must preserve documented semantic contracts unless they
   correct an acknowledged defect.
 
-Runtime, Source, and Compiler assemblies retain version `1.0.0.0` and remain
-unsigned throughout 1.x.
+Runtime, Source, Compiler, and Inspection assemblies retain version `1.0.0.0`
+and remain unsigned throughout 1.x.
 
 ## Runtime terminfo semantic compatibility
 
@@ -147,6 +152,27 @@ truncate numeric values, wrap offsets, or synthesize missing identity metadata.
 For deterministic output, standard capabilities use canonical binary metadata
 and extended capability names are ordered ordinally within their value kinds.
 
+## Inspection compatibility
+
+`Icod.TermInfo.Inspection` 1.3 is the optional human-readable inspection and
+semantic-comparison layer. It is deliberately separate from Runtime, Source, and
+Compiler so those frozen public contracts do not acquire tooling-oriented API.
+
+The 1.3 architectural contract distinguishes two domains:
+
+- effective inspection/comparison over `TerminalDescription`;
+- source-aware inspection/comparison over unresolved Source models.
+
+Effective inspection SHALL NOT invent `use=` relationships, cancellation
+tombstones, duplicate-source history, comments, or provenance that
+`TerminalDescription` does not retain. Source-aware operations SHALL preserve
+field order where order is semantically significant and likewise shall not
+invent source information the parsed model does not retain.
+
+I01 establishes only the package, dependency, baseline, and release-validation
+foundation. Canonical rendering and comparison behavior enter in later 1.3
+tranches and are frozen through the independent Inspection baseline.
+
 ## Discovery and failure compatibility
 
 Runtime discovery precedence, clean-miss behavior, parser failures,
@@ -174,15 +200,19 @@ managed/XML and symbol assets. It depends directly on the matching runtime
 package and may depend on the matching Source package for source compilation.
 Runtime and Source never depend on Compiler.
 
+Beginning with 1.3, `Icod.TermInfo.Inspection` contains corresponding three-target
+managed/XML and symbol assets and depends directly on the matching Runtime and
+Source packages. Inspection does not depend on Compiler. Runtime, Source, and
+Compiler do not depend on Inspection.
+
 The same validated artifacts for a release are used for NuGet.org and GitHub
 Packages.
 
 ## Explicit non-goals
 
-The 1.2 package family does not promise:
+The 1.3 package family does not promise:
 
 - `tic`, `infocmp`, or `toe` command-line applications;
-- `infocmp`-class canonical rendering or semantic-comparison tooling;
 - termcap parsing/conversion;
 - Berkeley DB/hashed terminfo stores;
 - divergent undocumented vendor binary dialects;

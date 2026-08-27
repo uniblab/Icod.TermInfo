@@ -8,6 +8,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Icod.TermInfo.Source", "Ico
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Icod.TermInfo.Compiler", "Icod.TermInfo.Compiler\Icod.TermInfo.Compiler.csproj", "{A1D5D0F1-62A0-4E8A-8FD3-66D858F70912}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Icod.TermInfo.Inspection", "Icod.TermInfo.Inspection\Icod.TermInfo.Inspection.csproj", "{94EBF03F-92EC-46D5-8607-7FB5208EB02D}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{B55F5A14-2D39-4D4C-AEAC-916B6A25F23E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Icod.TermInfo.Tests", "tests\Icod.TermInfo.Tests\Icod.TermInfo.Tests.csproj", "{CA53D988-1A94-46F0-AC80-D66166EEB561}"
@@ -15,6 +17,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Icod.TermInfo.Source.Tests", "tests\Icod.TermInfo.Source.Tests\Icod.TermInfo.Source.Tests.csproj", "{C9110F42-983C-495D-9C47-F93A5B2F731C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Icod.TermInfo.Compiler.Tests", "tests\Icod.TermInfo.Compiler.Tests\Icod.TermInfo.Compiler.Tests.csproj", "{B8AF056A-3D03-4E65-89E0-6DB8D5E7C124}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Icod.TermInfo.Inspection.Tests", "tests\Icod.TermInfo.Inspection.Tests\Icod.TermInfo.Inspection.Tests.csproj", "{6AB4657A-23CE-422A-BFBD-9B5EA429E1ED}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{8B94AE15-A91A-49D7-B324-C395C84E68D7}"
 EndProject
@@ -33,6 +37,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Icod.TermInfo.PublicApiSnapshot", "tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj", "{6D3A260F-13BD-46C4-A4E4-A7F99A9AB1C0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Icod.TermInfo.Compiler.PackageVerifier", "tools\compiler-package-verifier\Icod.TermInfo.Compiler.PackageVerifier.csproj", "{D901FA77-07BF-4C48-859D-7A6B62F4E733}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Icod.TermInfo.Inspection.PackageVerifier", "tools\inspection-package-verifier\Icod.TermInfo.Inspection.PackageVerifier.csproj", "{6652E4DE-40F4-42F5-9C8E-707C49DEA570}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -119,6 +125,24 @@ Global
 		{D901FA77-07BF-4C48-859D-7A6B62F4E733}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D901FA77-07BF-4C48-859D-7A6B62F4E733}.Staging|Any CPU.ActiveCfg = Staging|Any CPU
 		{D901FA77-07BF-4C48-859D-7A6B62F4E733}.Staging|Any CPU.Build.0 = Staging|Any CPU
+		{94EBF03F-92EC-46D5-8607-7FB5208EB02D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94EBF03F-92EC-46D5-8607-7FB5208EB02D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94EBF03F-92EC-46D5-8607-7FB5208EB02D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94EBF03F-92EC-46D5-8607-7FB5208EB02D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94EBF03F-92EC-46D5-8607-7FB5208EB02D}.Staging|Any CPU.ActiveCfg = Staging|Any CPU
+		{94EBF03F-92EC-46D5-8607-7FB5208EB02D}.Staging|Any CPU.Build.0 = Staging|Any CPU
+		{6AB4657A-23CE-422A-BFBD-9B5EA429E1ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AB4657A-23CE-422A-BFBD-9B5EA429E1ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AB4657A-23CE-422A-BFBD-9B5EA429E1ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AB4657A-23CE-422A-BFBD-9B5EA429E1ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AB4657A-23CE-422A-BFBD-9B5EA429E1ED}.Staging|Any CPU.ActiveCfg = Staging|Any CPU
+		{6AB4657A-23CE-422A-BFBD-9B5EA429E1ED}.Staging|Any CPU.Build.0 = Staging|Any CPU
+		{6652E4DE-40F4-42F5-9C8E-707C49DEA570}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6652E4DE-40F4-42F5-9C8E-707C49DEA570}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6652E4DE-40F4-42F5-9C8E-707C49DEA570}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6652E4DE-40F4-42F5-9C8E-707C49DEA570}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6652E4DE-40F4-42F5-9C8E-707C49DEA570}.Staging|Any CPU.ActiveCfg = Staging|Any CPU
+		{6652E4DE-40F4-42F5-9C8E-707C49DEA570}.Staging|Any CPU.Build.0 = Staging|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -127,6 +151,7 @@ Global
 		{CA53D988-1A94-46F0-AC80-D66166EEB561} = {B55F5A14-2D39-4D4C-AEAC-916B6A25F23E}
 		{C9110F42-983C-495D-9C47-F93A5B2F731C} = {B55F5A14-2D39-4D4C-AEAC-916B6A25F23E}
 		{B8AF056A-3D03-4E65-89E0-6DB8D5E7C124} = {B55F5A14-2D39-4D4C-AEAC-916B6A25F23E}
+		{6AB4657A-23CE-422A-BFBD-9B5EA429E1ED} = {B55F5A14-2D39-4D4C-AEAC-916B6A25F23E}
 		{D649A84B-41DC-47B2-96BC-985EB3C96F9F} = {8B94AE15-A91A-49D7-B324-C395C84E68D7}
 		{E3D8F5A1-7C44-4B7B-9D5A-2F6E0C8A9134} = {8B94AE15-A91A-49D7-B324-C395C84E68D7}
 		{D71A2831-89B3-4D86-9AF9-4F6234F5AC51} = {C78B23CF-38CD-4C34-8C20-4BC8DFF8A2D1}
@@ -134,5 +159,6 @@ Global
 		{9C3F8D6B-0CA9-4C37-9EE1-E2D8CCEA097A} = {C78B23CF-38CD-4C34-8C20-4BC8DFF8A2D1}
 		{6D3A260F-13BD-46C4-A4E4-A7F99A9AB1C0} = {C78B23CF-38CD-4C34-8C20-4BC8DFF8A2D1}
 		{D901FA77-07BF-4C48-859D-7A6B62F4E733} = {C78B23CF-38CD-4C34-8C20-4BC8DFF8A2D1}
+		{6652E4DE-40F4-42F5-9C8E-707C49DEA570} = {C78B23CF-38CD-4C34-8C20-4BC8DFF8A2D1}
 	EndGlobalSection
 EndGlobal

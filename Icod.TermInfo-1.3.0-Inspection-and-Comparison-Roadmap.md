@@ -9,8 +9,11 @@
 **Runtime API contract:** frozen at 1.0  
 **Source API contract:** frozen at 1.1  
 **Compiler API contract:** frozen at 1.2  
-**Proposed new package:** `Icod.TermInfo.Inspection`  
-**Proposed development sequence:** `1.3.0-Alpha-1` through `1.3.0-Alpha-7`  
+**New package:** `Icod.TermInfo.Inspection`
+**Current development version:** `1.3.0-Alpha-1`
+**Development sequence:** `1.3.0-Alpha-1` through `1.3.0-Alpha-7`
+**Status:** active 1.3 development
+**Current tranche:** I01 — Inspection package foundation and contract freeze
 **Release objective:** reusable managed inspection, canonical rendering, and semantic-comparison APIs underlying future `infocmp`-style tooling without destabilizing the existing Runtime, Source, or Compiler contracts.
 
 ---

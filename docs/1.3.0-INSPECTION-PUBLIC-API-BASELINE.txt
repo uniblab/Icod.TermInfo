@@ -1,0 +1,4 @@
+# Icod.TermInfo.Inspection public API baseline
+# Format: Icod.TermInfo.PublicApiSnapshot/v1
+# AssemblyVersion: 1.0.0.0
+

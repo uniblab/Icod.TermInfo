@@ -45,7 +45,8 @@ jobs:
           $projects = @(
               @{ Name = 'Runtime'; Path = 'Icod.TermInfo.csproj' },
               @{ Name = 'Source'; Path = 'Icod.TermInfo.Source/Icod.TermInfo.Source.csproj' },
-              @{ Name = 'Compiler'; Path = 'Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj' }
+              @{ Name = 'Compiler'; Path = 'Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj' },
+              @{ Name = 'Inspection'; Path = 'Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj' }
           )
 
           $coordinatedVersion = $null
@@ -105,6 +106,7 @@ jobs:
           dotnet pack Icod.TermInfo.csproj -c Release --no-build --output artifacts
           dotnet pack Icod.TermInfo.Source/Icod.TermInfo.Source.csproj -c Release --no-build --output artifacts
           dotnet pack Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj -c Release --no-build --output artifacts
+          dotnet pack Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj -c Release --no-build --output artifacts
 
       - name: Verify Release packages on Windows
         if: matrix.os == 'windows-latest'
@@ -128,6 +130,8 @@ jobs:
             artifacts/Icod.TermInfo.Source.${{ needs.metadata.outputs.version }}.snupkg
             artifacts/Icod.TermInfo.Compiler.${{ needs.metadata.outputs.version }}.nupkg
             artifacts/Icod.TermInfo.Compiler.${{ needs.metadata.outputs.version }}.snupkg
+            artifacts/Icod.TermInfo.Inspection.${{ needs.metadata.outputs.version }}.nupkg
+            artifacts/Icod.TermInfo.Inspection.${{ needs.metadata.outputs.version }}.snupkg
           if-no-files-found: error
           retention-days: 7
 
@@ -163,7 +167,8 @@ jobs:
           $packages = @(
               "artifacts/package/Icod.TermInfo.$version.nupkg",
               "artifacts/package/Icod.TermInfo.Source.$version.nupkg",
-              "artifacts/package/Icod.TermInfo.Compiler.$version.nupkg"
+              "artifacts/package/Icod.TermInfo.Compiler.$version.nupkg",
+              "artifacts/package/Icod.TermInfo.Inspection.$version.nupkg"
           )
 
           foreach ($package in $packages) {
@@ -217,7 +222,8 @@ jobs:
           $packages = @(
               "artifacts/package/Icod.TermInfo.$version.nupkg",
               "artifacts/package/Icod.TermInfo.Source.$version.nupkg",
-              "artifacts/package/Icod.TermInfo.Compiler.$version.nupkg"
+              "artifacts/package/Icod.TermInfo.Compiler.$version.nupkg",
+              "artifacts/package/Icod.TermInfo.Inspection.$version.nupkg"
           )
 
           foreach ($package in $packages) {
@@ -254,8 +260,8 @@ jobs:
                   Where-Object { $_.Extension -in @('.nupkg', '.snupkg') } |
                   Sort-Object Name
           )
-          if (6 -ne $files.Count) {
-              throw "Expected six release packages before checksumming; found $($files.Count)."
+          if (8 -ne $files.Count) {
+              throw "Expected eight release packages before checksumming; found $($files.Count)."
           }
 
           $lines = foreach ($file in $files) {
@@ -284,15 +290,17 @@ jobs:
           dotnet add package Icod.TermInfo --version {0}
           dotnet add package Icod.TermInfo.Source --version {0}
           dotnet add package Icod.TermInfo.Compiler --version {0}
+          dotnet add package Icod.TermInfo.Inspection --version {0}
           ```
 
-          `Icod.TermInfo`, `Icod.TermInfo.Source`, and `Icod.TermInfo.Compiler`
-          target `net8.0`, `net9.0`, and `net10.0`. Source depends on the matching
-          Runtime package. Compiler depends on the matching Runtime and Source
-          packages.
+          `Icod.TermInfo`, `Icod.TermInfo.Source`, `Icod.TermInfo.Compiler`, and
+          `Icod.TermInfo.Inspection` target `net8.0`, `net9.0`, and `net10.0`.
+          Source depends on the matching Runtime package. Compiler and Inspection
+          each depend on the matching Runtime and Source packages; Inspection does
+          not depend on Compiler.
 
-          All three NuGet packages, all three symbol packages, and SHA-256
-          checksums are attached to this release.
+          All four NuGet packages, all four symbol packages, and SHA-256 checksums
+          are attached to this release.
           '@ -f $version
 
           $assets = @(
@@ -301,8 +309,8 @@ jobs:
                   Sort-Object Name |
                   ForEach-Object { $_.FullName }
           )
-          if (7 -ne $assets.Count) {
-              throw "Expected seven GitHub Release assets; found $($assets.Count)."
+          if (9 -ne $assets.Count) {
+              throw "Expected nine GitHub Release assets; found $($assets.Count)."
           }
 
           $arguments = @(
