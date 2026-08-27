@@ -214,14 +214,17 @@ internal static class Program
         ArgumentException.ThrowIfNullOrWhiteSpace(
             path);
 
+        string assemblyPath =
+            Path.GetFullPath(path);
         SnapshotAssemblyLoadContext context =
-            new();
+            new(
+                assemblyPath);
 
         try
         {
             Assembly assembly =
                 context.LoadFromAssemblyPath(
-                    Path.GetFullPath(path));
+                    assemblyPath);
 
             return CreateManifest(
                 assembly);
@@ -1299,10 +1302,20 @@ internal static class Program
     private sealed class SnapshotAssemblyLoadContext
         : AssemblyLoadContext
     {
-        internal SnapshotAssemblyLoadContext()
+        private readonly AssemblyDependencyResolver _resolver;
+
+        internal SnapshotAssemblyLoadContext(
+            string assemblyPath)
             : base(
                 isCollectible: true)
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(
+                assemblyPath);
+
+            _resolver =
+                new AssemblyDependencyResolver(
+                    Path.GetFullPath(
+                        assemblyPath));
         }
 
         protected override Assembly? Load(
@@ -1311,7 +1324,17 @@ internal static class Program
             ArgumentNullException.ThrowIfNull(
                 assemblyName);
 
-            return null;
+            string? assemblyPath =
+                _resolver.ResolveAssemblyToPath(
+                    assemblyName);
+
+            if (assemblyPath is null)
+            {
+                return null;
+            }
+
+            return LoadFromAssemblyPath(
+                assemblyPath);
         }
     }
 }
