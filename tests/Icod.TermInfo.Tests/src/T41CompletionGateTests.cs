@@ -113,9 +113,17 @@ public sealed class T41CompletionGateTests
 						".github",
 						"workflows",
 						"pr-build-and-test.yaml")));
+		string release =
+			NormalizeLineEndings(
+				File.ReadAllText(
+					Path.Combine(
+						root,
+						".github",
+						"workflows",
+						"release.yaml")));
 
 		Assert.StartsWith(
-			"name: build and publish\n"
+			"name: main validation\n"
 			+ "\n"
 			+ "on:\n"
 			+ "  push:\n"
@@ -134,10 +142,7 @@ public sealed class T41CompletionGateTests
 			"verify-release-package.sh artifacts Release",
 			pushMain);
 		Assert.Contains(
-			"NuGet/login@v1",
-			pushMain);
-		Assert.Contains(
-			"dotnet nuget push",
+			"verify-release-package.cmd artifacts Release",
 			pushMain);
 
 		Assert.StartsWith(
@@ -173,6 +178,30 @@ public sealed class T41CompletionGateTests
 			"artifacts/*.snupkg",
 			pullRequest);
 
+		Assert.StartsWith(
+			"name: release\n"
+			+ "\n"
+			+ "on:\n"
+			+ "  push:\n"
+			+ "    tags:\n"
+			+ "      - \'v*\'\n",
+			release);
+		Assert.Contains(
+			"Require tagged commit on main",
+			release);
+		Assert.Contains(
+			"Validate tag and coordinated package versions",
+			release);
+		Assert.Contains(
+			"NuGet/login@v1",
+			release);
+		Assert.Contains(
+			"dotnet nuget push",
+			release);
+		Assert.Contains(
+			"gh @arguments",
+			release);
+
 		string[] forbiddenPublicationFragments =
 		[
 			"NuGet/login",
@@ -182,13 +211,16 @@ public sealed class T41CompletionGateTests
 			"deploy:",
 		];
 
-		foreach (string fragment in forbiddenPublicationFragments)
+		foreach (string workflow in new[] { pullRequest, pushMain })
 		{
-			Assert.False(
-				pullRequest.Contains(
-					fragment,
-					StringComparison.Ordinal),
-				$"Pull-request workflow contains forbidden publication fragment '{fragment}'.");
+			foreach (string fragment in forbiddenPublicationFragments)
+			{
+				Assert.False(
+					workflow.Contains(
+						fragment,
+						StringComparison.Ordinal),
+					$"Non-publishing workflow contains forbidden publication fragment '{fragment}'.");
+			}
 		}
 	}
 
