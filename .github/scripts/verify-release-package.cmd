@@ -56,8 +56,22 @@ dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.c
 if errorlevel 1 goto fail
 
 echo.
+echo === Verify Icod.TermInfo.Compiler net8.0/net9.0/net10.0 API equivalence (%CONFIGURATION%) ===
+dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c %CONFIGURATION% --no-build -- --compare Icod.TermInfo.Compiler\bin\%CONFIGURATION%\net8.0\Icod.TermInfo.Compiler.dll Icod.TermInfo.Compiler\bin\%CONFIGURATION%\net9.0\Icod.TermInfo.Compiler.dll
+if errorlevel 1 goto fail
+dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c %CONFIGURATION% --no-build -- --compare Icod.TermInfo.Compiler\bin\%CONFIGURATION%\net8.0\Icod.TermInfo.Compiler.dll Icod.TermInfo.Compiler\bin\%CONFIGURATION%\net10.0\Icod.TermInfo.Compiler.dll
+if errorlevel 1 goto fail
+
+echo.
+echo === Verify approved Icod.TermInfo.Compiler public API baseline (%CONFIGURATION%) ===
+dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c %CONFIGURATION% --no-build -- --check docs\1.2.0-COMPILER-PUBLIC-API-BASELINE.txt Icod.TermInfo.Compiler\bin\%CONFIGURATION%\net10.0\Icod.TermInfo.Compiler.dll
+if errorlevel 1 goto fail
+
+echo.
 echo === Verify package structure and symbols (%CONFIGURATION%) ===
 dotnet run --project tools\package-verifier\Icod.TermInfo.PackageVerifier.csproj -c %CONFIGURATION% -f net10.0 -- "%ARTIFACT_DIR%"
+if errorlevel 1 goto fail
+dotnet run --project tools\compiler-package-verifier\Icod.TermInfo.Compiler.PackageVerifier.csproj -c %CONFIGURATION% -f net10.0 -- "%ARTIFACT_DIR%"
 if errorlevel 1 goto fail
 
 set "PACKAGE_VERSION="
@@ -83,6 +97,25 @@ if not exist "%ARTIFACT_DIR%\Icod.TermInfo.Source.%SOURCE_PACKAGE_VERSION%.nupkg
 )
 if not exist "%ARTIFACT_DIR%\Icod.TermInfo.Source.%SOURCE_PACKAGE_VERSION%.snupkg" (
     echo Icod.TermInfo.Source symbol package not found. 1>&2
+    goto fail
+)
+
+set "COMPILER_PACKAGE_VERSION="
+for /f "delims=" %%V in ('dotnet msbuild Icod.TermInfo.Compiler\Icod.TermInfo.Compiler.csproj -nologo -getProperty:PackageVersion') do set "COMPILER_PACKAGE_VERSION=%%V"
+if not defined COMPILER_PACKAGE_VERSION (
+    echo Unable to determine Icod.TermInfo.Compiler PackageVersion. 1>&2
+    goto fail
+)
+if not "%COMPILER_PACKAGE_VERSION%"=="%PACKAGE_VERSION%" (
+    echo Icod.TermInfo and Icod.TermInfo.Compiler PackageVersion values must match. 1>&2
+    goto fail
+)
+if not exist "%ARTIFACT_DIR%\Icod.TermInfo.Compiler.%COMPILER_PACKAGE_VERSION%.nupkg" (
+    echo Icod.TermInfo.Compiler package not found. 1>&2
+    goto fail
+)
+if not exist "%ARTIFACT_DIR%\Icod.TermInfo.Compiler.%COMPILER_PACKAGE_VERSION%.snupkg" (
+    echo Icod.TermInfo.Compiler symbol package not found. 1>&2
     goto fail
 )
 
@@ -141,6 +174,33 @@ echo === Fresh Icod.TermInfo.Source package consumer: net10.0 ===
 dotnet run --project "%SOURCE_SMOKE_ROOT%\Icod.TermInfo.Source.PackageSmoke.csproj" -c %CONFIGURATION% -f net10.0 --no-restore -p:IcodTermInfoSourcePackageVersion=%SOURCE_PACKAGE_VERSION%
 if errorlevel 1 goto fail
 
+set "COMPILER_SMOKE_ROOT=%TEMP%\Icod.TermInfo.Compiler-package-smoke-%RANDOM%-%RANDOM%"
+if exist "%COMPILER_SMOKE_ROOT%" rmdir /s /q "%COMPILER_SMOKE_ROOT%"
+mkdir "%COMPILER_SMOKE_ROOT%" || goto fail
+
+copy /y tools\compiler-package-smoke\Icod.TermInfo.Compiler.PackageSmoke.csproj "%COMPILER_SMOKE_ROOT%\Icod.TermInfo.Compiler.PackageSmoke.csproj" >nul || goto fail
+copy /y tools\compiler-package-smoke\Program.cs "%COMPILER_SMOKE_ROOT%\Program.cs" >nul || goto fail
+
+set "NUGET_PACKAGES=%COMPILER_SMOKE_ROOT%\packages"
+
+echo.
+echo === Fresh Icod.TermInfo.Compiler package consumer: net8.0 ===
+dotnet restore "%COMPILER_SMOKE_ROOT%\Icod.TermInfo.Compiler.PackageSmoke.csproj" --configfile "%SMOKE_NUGET_CONFIG%" -p:IcodTermInfoCompilerPackageVersion=%COMPILER_PACKAGE_VERSION%
+if errorlevel 1 goto fail
+
+dotnet run --project "%COMPILER_SMOKE_ROOT%\Icod.TermInfo.Compiler.PackageSmoke.csproj" -c %CONFIGURATION% -f net8.0 --no-restore -p:IcodTermInfoCompilerPackageVersion=%COMPILER_PACKAGE_VERSION%
+if errorlevel 1 goto fail
+
+echo.
+echo === Fresh Icod.TermInfo.Compiler package consumer: net9.0 ===
+dotnet run --project "%COMPILER_SMOKE_ROOT%\Icod.TermInfo.Compiler.PackageSmoke.csproj" -c %CONFIGURATION% -f net9.0 --no-restore -p:IcodTermInfoCompilerPackageVersion=%COMPILER_PACKAGE_VERSION%
+if errorlevel 1 goto fail
+
+echo.
+echo === Fresh Icod.TermInfo.Compiler package consumer: net10.0 ===
+dotnet run --project "%COMPILER_SMOKE_ROOT%\Icod.TermInfo.Compiler.PackageSmoke.csproj" -c %CONFIGURATION% -f net10.0 --no-restore -p:IcodTermInfoCompilerPackageVersion=%COMPILER_PACKAGE_VERSION%
+if errorlevel 1 goto fail
+
 echo.
 echo === Non-interactive repository sample ===
 dotnet run --project samples\Icod.TermInfo.Sample\Icod.TermInfo.Sample.csproj -c %CONFIGURATION% -f net10.0 -- --describe-only --profile ms-terminal-direct
@@ -159,6 +219,7 @@ if "%RESULT%"=="0" set "RESULT=1"
 :cleanup
 if defined SMOKE_ROOT if exist "%SMOKE_ROOT%" rmdir /s /q "%SMOKE_ROOT%"
 if defined SOURCE_SMOKE_ROOT if exist "%SOURCE_SMOKE_ROOT%" rmdir /s /q "%SOURCE_SMOKE_ROOT%"
+if defined COMPILER_SMOKE_ROOT if exist "%COMPILER_SMOKE_ROOT%" rmdir /s /q "%COMPILER_SMOKE_ROOT%"
 if defined OLD_NUGET_PACKAGES (
     set "NUGET_PACKAGES=%OLD_NUGET_PACKAGES%"
 ) else (

@@ -57,9 +57,27 @@ dotnet run \
   docs/1.1.0-SOURCE-PUBLIC-API-BASELINE.txt \
   Icod.TermInfo.Source/bin/${configuration}/net10.0/Icod.TermInfo.Source.dll
 
+# The Compiler package must expose the same API on all shipped frameworks.
+dotnet run   --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj   -c "${configuration}"   --no-build   -- --compare   Icod.TermInfo.Compiler/bin/${configuration}/net8.0/Icod.TermInfo.Compiler.dll   Icod.TermInfo.Compiler/bin/${configuration}/net9.0/Icod.TermInfo.Compiler.dll
+dotnet run   --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj   -c "${configuration}"   --no-build   -- --compare   Icod.TermInfo.Compiler/bin/${configuration}/net8.0/Icod.TermInfo.Compiler.dll   Icod.TermInfo.Compiler/bin/${configuration}/net10.0/Icod.TermInfo.Compiler.dll
+
+# C01 freezes the initial Compiler public surface independently.
+dotnet run \
+  --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj \
+  -c "${configuration}" \
+  --no-build \
+  -- --check \
+  docs/1.2.0-COMPILER-PUBLIC-API-BASELINE.txt \
+  Icod.TermInfo.Compiler/bin/${configuration}/net10.0/Icod.TermInfo.Compiler.dll
+
 # Structural package, Source Link, dependency, and architecture verification.
 dotnet run \
   --project tools/package-verifier/Icod.TermInfo.PackageVerifier.csproj \
+  -c "${configuration}" \
+  -f net10.0 \
+  -- "${artifact_dir}"
+dotnet run \
+  --project tools/compiler-package-verifier/Icod.TermInfo.Compiler.PackageVerifier.csproj \
   -c "${configuration}" \
   -f net10.0 \
   -- "${artifact_dir}"
@@ -101,11 +119,38 @@ if [[ ! -f "${artifact_dir}/Icod.TermInfo.Source.${source_package_version}.snupk
   exit 1
 fi
 
+compiler_package_version="$(
+  dotnet msbuild Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj \
+    -nologo \
+    -getProperty:PackageVersion
+)"
+
+if [[ -z "${compiler_package_version}" ]]; then
+  echo "Unable to determine Icod.TermInfo.Compiler PackageVersion." >&2
+  exit 1
+fi
+
+if [[ "${compiler_package_version}" != "${package_version}" ]]; then
+  echo "Icod.TermInfo and Icod.TermInfo.Compiler PackageVersion values must match." >&2
+  exit 1
+fi
+
+if [[ ! -f "${artifact_dir}/Icod.TermInfo.Compiler.${compiler_package_version}.nupkg" ]]; then
+  echo "Icod.TermInfo.Compiler package not found." >&2
+  exit 1
+fi
+
+if [[ ! -f "${artifact_dir}/Icod.TermInfo.Compiler.${compiler_package_version}.snupkg" ]]; then
+  echo "Icod.TermInfo.Compiler symbol package not found." >&2
+  exit 1
+fi
+
 # Copy the package-reference-only consumer to a temporary directory so the smoke
 # test cannot accidentally use a project reference or stale repository outputs.
 smoke_root="$(mktemp -d)"
 source_smoke_root=""
-trap 'rm -rf "${smoke_root}" "${source_smoke_root}"' EXIT
+compiler_smoke_root=""
+trap 'rm -rf "${smoke_root}" "${source_smoke_root}" "${compiler_smoke_root}"' EXIT
 
 cp \
   tools/package-smoke/Icod.TermInfo.PackageSmoke.csproj \
@@ -177,6 +222,41 @@ dotnet run \
   -f net10.0 \
   --no-restore \
   -p:IcodTermInfoSourcePackageVersion="${source_package_version}"
+
+compiler_smoke_root="$(mktemp -d)"
+
+cp \
+  tools/compiler-package-smoke/Icod.TermInfo.Compiler.PackageSmoke.csproj \
+  "${compiler_smoke_root}/Icod.TermInfo.Compiler.PackageSmoke.csproj"
+cp \
+  tools/compiler-package-smoke/Program.cs \
+  "${compiler_smoke_root}/Program.cs"
+
+export NUGET_PACKAGES="${compiler_smoke_root}/packages"
+
+dotnet restore \
+  "${compiler_smoke_root}/Icod.TermInfo.Compiler.PackageSmoke.csproj" \
+  --configfile "${smoke_nuget_config}" \
+  -p:IcodTermInfoCompilerPackageVersion="${compiler_package_version}"
+
+dotnet run \
+  --project "${compiler_smoke_root}/Icod.TermInfo.Compiler.PackageSmoke.csproj" \
+  -c "${configuration}" \
+  -f net8.0 \
+  --no-restore \
+  -p:IcodTermInfoCompilerPackageVersion="${compiler_package_version}"
+dotnet run \
+  --project "${compiler_smoke_root}/Icod.TermInfo.Compiler.PackageSmoke.csproj" \
+  -c "${configuration}" \
+  -f net9.0 \
+  --no-restore \
+  -p:IcodTermInfoCompilerPackageVersion="${compiler_package_version}"
+dotnet run \
+  --project "${compiler_smoke_root}/Icod.TermInfo.Compiler.PackageSmoke.csproj" \
+  -c "${configuration}" \
+  -f net10.0 \
+  --no-restore \
+  -p:IcodTermInfoCompilerPackageVersion="${compiler_package_version}"
 
 # The repository sample must retain a non-interactive path suitable for CI.
 dotnet run \

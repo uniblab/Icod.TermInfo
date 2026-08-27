@@ -41,18 +41,15 @@ changes must likewise be reconciled with
 
 ## Version metadata
 
-`Icod.TermInfo.csproj` and `Icod.TermInfo.Source/Icod.TermInfo.Source.csproj`
-contain `<Version />`, `<PackageVersion />`, and the stable 1.x
-`<AssemblyVersion />`. Keep `Version` and `PackageVersion` identical within each
-project, and keep the two package versions synchronized.
+`Icod.TermInfo.csproj`, `Icod.TermInfo.Source/Icod.TermInfo.Source.csproj`, and
+`Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj` contain `<Version />`,
+`<PackageVersion />`, and the stable 1.x `<AssemblyVersion />`. Keep `Version`
+and `PackageVersion` identical within each project, and keep all three package
+versions synchronized.
 
-The 1.x assembly version remains `1.0.0.0` for both assemblies, and both remain
-unsigned.
-
-Beginning with C01, `Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj` joins
-that coordinated version set. Runtime, Source, and Compiler use the same
-`1.2.0-Alpha-X` package version for each 1.2 development tranche while all three
-retain assembly version `1.0.0.0`.
+Runtime, Source, and Compiler use the same `1.2.0-Alpha-X` package version for
+each 1.2 development tranche. The 1.x assembly version remains `1.0.0.0` for
+all three assemblies, and all three remain unsigned.
 
 Prerelease development should use the active version roadmap's alpha/beta/RC
 sequence. A final release tag must be exactly `v<PackageVersion>`.

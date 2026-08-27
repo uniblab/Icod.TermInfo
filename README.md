@@ -32,12 +32,13 @@ The same validated package artifacts are intended for NuGet.org and GitHub Packa
 The 1.x line keeps runtime assembly identity `Icod.TermInfo, Version=1.0.0.0` and
 remains unsigned. The frozen 1.0 and 1.1 releases support `net8.0` and
 `net10.0`; beginning with 1.2, the supported consumer targets are `net8.0`,
-`net9.0`, and `net10.0`. `Icod.TermInfo.Source` also retains assembly version
-`1.0.0.0` throughout its 1.x line. Public API, binary/package compatibility,
+`net9.0`, and `net10.0`. `Icod.TermInfo.Source` and `Icod.TermInfo.Compiler`
+retain assembly version `1.0.0.0` throughout their 1.x lines. Public API,
+binary/package compatibility,
 deprecation, and target-framework policy are documented in `docs/VERSIONING.md`
 and `docs/COMPATIBILITY.md`.
 
-The runtime 1.0 public API remains frozen. Version 1.1 adds source-language functionality in the separate `Icod.TermInfo.Source` package rather than making the runtime package depend on parser/front-end code. Live terminal sessions, PTYs, curses/UI, terminal emulation, compiler/tool commands, termcap conversion, and active protocol negotiation remain later or sibling work.
+The runtime 1.0 public API remains frozen. Version 1.1 adds source-language functionality in the separate `Icod.TermInfo.Source` package rather than making the runtime package depend on parser/front-end code. The 1.2 line adds deterministic compiled-entry writing in the separate `Icod.TermInfo.Compiler` package. Live terminal sessions, PTYs, curses/UI, terminal emulation, command-line `tic`/`infocmp`/`toe` tooling, termcap conversion, and active protocol negotiation remain later or sibling work.
 
 ## What 1.0 provides
 

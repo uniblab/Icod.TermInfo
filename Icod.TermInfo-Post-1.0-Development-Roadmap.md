@@ -3,14 +3,15 @@
 **Project:** `Icod.TermInfo`  
 **Stable runtime package:** `Icod.TermInfo`  
 **Optional source package:** `Icod.TermInfo.Source`
-**Planned compiler package:** `Icod.TermInfo.Compiler`
+**Optional compiler package:** `Icod.TermInfo.Compiler`
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
 **Current release version:** `1.1.1`
+**Current development version:** `1.2.0-Alpha-1`
 **Next development line:** `1.2.0`
-**Status:** 1.2.0 pre-C01 contract tightening complete — C01 ready
-**Current tranche:** 1.2.0 pre-C01 contract freeze
+**Status:** C01 implementation candidate — build/test/package validation required
+**Current tranche:** C01 — Compiler package foundation and binary writer contract
 **Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
 
 ---
@@ -534,6 +535,8 @@ No unsupported format SHALL be emitted by guesswork.
 as deterministic legacy `0432` bytes and parsed by the existing
 `CompiledTermInfoParser` into a semantically equivalent description, while the
 new package/API/package-consumer gates pass on all three target frameworks.
+
+**Implementation record:** [`docs/1.2.0-C01-COMPILER-PACKAGE-FOUNDATION.md`](docs/1.2.0-C01-COMPILER-PACKAGE-FOUNDATION.md)
 
 ---
 

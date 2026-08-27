@@ -36,6 +36,7 @@ jobs:
         run: |
           dotnet pack Icod.TermInfo.csproj -c Release --no-build --output artifacts
           dotnet pack Icod.TermInfo.Source/Icod.TermInfo.Source.csproj -c Release --no-build --output artifacts
+          dotnet pack Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj -c Release --no-build --output artifacts
 
       - name: Verify Release packages
         if: matrix.os == 'ubuntu-latest'
