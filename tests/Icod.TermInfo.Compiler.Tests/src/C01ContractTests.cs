@@ -6,7 +6,7 @@ using Xunit;
 namespace Icod.TermInfo.Compiler.Tests;
 
 public sealed class C01ContractTests {
-	private const string DevelopmentVersion = "1.2.0-Alpha-3";
+	private const string DevelopmentVersion = "1.2.0-Alpha-4";
 	private const string StableAssemblyVersion = "1.0.0.0";
 
 	[Fact]
@@ -114,7 +114,7 @@ public sealed class C01ContractTests {
 	}
 
 	[Fact]
-	public void CompilerApiBaselineContainsOnlyTheReviewedC01Writer() {
+	public void CompilerApiBaselineContainsReviewedC04WriterSurface() {
 		string root = FindRepositoryRoot();
 		string baseline =
 			File.ReadAllText(
@@ -126,11 +126,51 @@ public sealed class C01ContractTests {
 			);
 
 		Assert.Contains(
+			"TYPE enum Icod.TermInfo.Compiler.CompiledTermInfoFormat [sealed]",
+			baseline
+		);
+		Assert.Contains(
+			"ENUM Automatic = 0",
+			baseline
+		);
+		Assert.Contains(
+			"ENUM Legacy = 1",
+			baseline
+		);
+		Assert.Contains(
+			"ENUM Wide = 2",
+			baseline
+		);
+		Assert.Contains(
 			"TYPE class Icod.TermInfo.Compiler.CompiledTermInfoWriter [static]",
 			baseline
 		);
 		Assert.Contains(
-			"METHOD public static System.Byte[] Write(Icod.TermInfo.TerminalDescription description null=not-null/not-null) return-null=not-null/not-null",
+			"METHOD public static System.Byte[] Write(Icod.TermInfo.TerminalDescription description null=not-null/not-null) return-null=not-null/not-null<not-null/not-null>",
+			baseline
+		);
+		Assert.Contains(
+			"METHOD public static System.Byte[] Write(Icod.TermInfo.TerminalDescription description null=not-null/not-null, Icod.TermInfo.Compiler.CompiledTermInfoWriterOptions options null=not-null/not-null) return-null=not-null/not-null<not-null/not-null>",
+			baseline
+		);
+		Assert.Contains(
+			"TYPE class Icod.TermInfo.Compiler.CompiledTermInfoWriterOptions [sealed]",
+			baseline
+		);
+		Assert.Contains(
+			"CTOR public CompiledTermInfoWriterOptions()",
+			baseline
+		);
+		Assert.Contains(
+			"CTOR public CompiledTermInfoWriterOptions(Icod.TermInfo.Compiler.CompiledTermInfoFormat format null=not-null/not-null, System.Boolean includeExtendedCapabilities null=not-null/not-null default=true)",
+			baseline
+		);
+		Assert.Contains(
+			"PROPERTY Icod.TermInfo.Compiler.CompiledTermInfoFormat Format { public get; } null=not-null/unknown",
+			baseline
+		);
+		Assert.Contains(
+			"PROPERTY System.Boolean IncludeExtendedCapabilities { public get; } null=not-null/unknown",
 			baseline
 		);
 	}

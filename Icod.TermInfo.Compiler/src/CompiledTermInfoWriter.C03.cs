@@ -9,7 +9,9 @@ public static partial class CompiledTermInfoWriter {
 
 	private static byte[] AppendExtendedSection(
 		byte[] conventionalEntry,
-		TerminalDescription description
+		TerminalDescription description,
+		int numericWidth,
+		CompiledTermInfoFormat format
 	) {
 		ArgumentNullException.ThrowIfNull( conventionalEntry );
 		ArgumentNullException.ThrowIfNull( description );
@@ -40,7 +42,10 @@ public static partial class CompiledTermInfoWriter {
 				.ToArray();
 
 		ValidateExtendedBooleans( booleans );
-		ValidateExtendedNumerics( numerics );
+		ValidateExtendedNumerics(
+			numerics,
+			format
+		);
 
 		short[] stringOffsets =
 			new short[strings.Length];
@@ -63,6 +68,14 @@ public static partial class CompiledTermInfoWriter {
 			if ( valueTableSize > short.MaxValue ) {
 				throw new InvalidOperationException(
 					$"The {role} would begin at extended string-table offset {valueTableSize}, exceeding the signed 16-bit offset field."
+				);
+			}
+
+			int valueRemaining =
+				ushort.MaxValue - valueTableSize;
+			if ( value.Length >= valueRemaining ) {
+				throw new InvalidOperationException(
+					$"The {role} would grow the extended string table beyond the unsigned 16-bit size field."
 				);
 			}
 
@@ -96,6 +109,14 @@ public static partial class CompiledTermInfoWriter {
 			if ( nameTableSize > short.MaxValue ) {
 				throw new InvalidOperationException(
 					$"Extended capability name '{name}' would begin at name-table offset {nameTableSize}, exceeding the signed 16-bit offset field."
+				);
+			}
+
+			int nameRemaining =
+				ushort.MaxValue - nameTableSize;
+			if ( name.Length >= nameRemaining ) {
+				throw new InvalidOperationException(
+					$"Extended capability name '{name}' would grow the extended string table beyond the unsigned 16-bit size field."
 				);
 			}
 
@@ -194,7 +215,7 @@ public static partial class CompiledTermInfoWriter {
 		int stringOffsetTableOffset =
 			checked(
 				numericOffset
-				+ checked( numerics.Length * sizeof( short ) )
+				+ checked( numerics.Length * numericWidth )
 			);
 		int nameOffsetTableOffset =
 			checked(
@@ -232,12 +253,11 @@ public static partial class CompiledTermInfoWriter {
 		}
 
 		for ( int index = 0; index < numerics.Length; index++ ) {
-			BinaryPrimitives.WriteInt16LittleEndian(
-				entry.AsSpan(
-					numericOffset + ( index * sizeof( short ) ),
-					sizeof( short )
-				),
-				(short)numerics[index].Value.NumberValue
+			WriteNumericValue(
+				entry,
+				numericOffset + ( index * numericWidth ),
+				numericWidth,
+				numerics[index].Value.NumberValue
 			);
 		}
 
@@ -333,19 +353,18 @@ public static partial class CompiledTermInfoWriter {
 	}
 
 	private static void ValidateExtendedNumerics(
-		IReadOnlyList<KeyValuePair<string, TermInfoCapabilityValue>> numerics
+		IReadOnlyList<KeyValuePair<string, TermInfoCapabilityValue>> numerics,
+		CompiledTermInfoFormat format
 	) {
 		ArgumentNullException.ThrowIfNull( numerics );
 
 		foreach ( KeyValuePair<string, TermInfoCapabilityValue> pair in numerics ) {
 			ValidateExtendedName( pair.Key );
-			int value =
-				pair.Value.NumberValue;
-			if ( value < 0 || value > short.MaxValue ) {
-				throw new InvalidOperationException(
-					$"Extended numeric capability '{pair.Key}' has value {value}, which cannot be represented by legacy 0432 without colliding with sentinels or exceeding the signed 16-bit range."
-				);
-			}
+			ValidateNumericValueForFormat(
+				pair.Value.NumberValue,
+				$"Extended numeric capability '{pair.Key}'",
+				format
+			);
 		}
 	}
 

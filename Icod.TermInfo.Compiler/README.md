@@ -3,23 +3,25 @@
 `Icod.TermInfo.Compiler` is the optional managed compiled-terminfo writing layer
 for `Icod.TermInfo`.
 
-C01 establishes the package and the pure inverse of the runtime compiled-entry
-parser. C02 completes standard Boolean, numeric, and string capability emission.
-C03 adds the supported ncurses extended Boolean, numeric, string, name, offset,
-and alignment representation. Wide-numeric format selection remains C04.
+C01 establishes the package and pure writer contract. C02 completes standard
+capability emission, C03 adds the supported ncurses extended section, and C04
+adds deterministic automatic and explicit `0432` / `01036` format selection.
 
 ## Install
 
-For the C03 development package:
+For the C04 development package:
 
 ```text
-dotnet add package Icod.TermInfo.Compiler --version 1.2.0-Alpha-3
+dotnet add package Icod.TermInfo.Compiler --version 1.2.0-Alpha-4
 ```
 
 The package targets `net8.0`, `net9.0`, and `net10.0` and depends on the matching
-`Icod.TermInfo` package. C03 does not depend on `Icod.TermInfo.Source`.
+`Icod.TermInfo` package. C04 still does not depend on `Icod.TermInfo.Source`.
 
-## Standard and extended compiled writer
+## Automatic format selection
+
+The original writer operation now selects the narrowest representation which can
+encode the description exactly:
 
 ```csharp
 using Icod.TermInfo;
@@ -28,47 +30,56 @@ using Icod.TermInfo.Compiler;
 TerminalDescription description =
 	new TerminalDescriptionBuilder( "example" )
 		.SetDescription( "Example terminal" )
-		.SetBoolean( BooleanCapability.AutoRightMargin )
-		.SetNumber( NumericCapability.Columns, 80 )
-		.SetString(
-			StringCapability.ClearScreen,
-			"\u001b[H\u001b[2J"
-		)
+		.SetNumber( NumericCapability.Colors, 16_777_216 )
 		.SetExtendedBoolean( "AX" )
-		.SetExtendedNumber( "RGB", 8 )
-		.SetExtendedString(
-			"Smulx",
-			"\u001b[4:%p1%dm"
-		)
+		.SetExtendedNumber( "RGB", 16_777_216 )
 		.Build();
 
 byte[] compiled =
 	CompiledTermInfoWriter.Write(
 		description
 	);
+```
 
-TerminalDescription parsed =
-	CompiledTermInfoParser.Parse(
-		compiled
+When every present standard and extended numeric value is in `0..32767`, the
+writer emits legacy `0432`. A representable value greater than `32767` selects
+wide `01036`, where both standard and extended numeric tables use signed 32-bit
+little-endian values. Negative present values remain unrepresentable because
+they collide with compiled absent/canceled sentinel semantics.
+
+## Explicit format policy
+
+Use `CompiledTermInfoWriterOptions` when the output representation is part of the
+caller's contract:
+
+```csharp
+byte[] wide =
+	CompiledTermInfoWriter.Write(
+		description,
+		new CompiledTermInfoWriterOptions(
+			CompiledTermInfoFormat.Wide
+		)
 	);
 ```
 
-The C02 standard-table contract remains unchanged: standard positions derive
-only from `StandardCapabilityCatalog.BinaryIndex`, trailing absent positions are
-omitted, and interior absent positions use conventional sentinels.
+`CompiledTermInfoFormat.Legacy` emits `0432` exactly or fails if any numeric
+requires the wide form. `CompiledTermInfoFormat.Wide` emits `01036` exactly even
+when legacy would suffice. `Automatic` prefers legacy and upgrades only when
+required.
 
-C03 appends an ncurses extended section only when extended capabilities are
-present. Extended Boolean, numeric, and string capabilities are grouped by kind
-and ordered within each kind by ordinal, case-sensitive name. Extended string
-values precede capability names in the shared string table; value offsets are
-relative to the string-table start, while name offsets are relative to the name
-portion, matching the runtime parser contract.
+The options also expose `IncludeExtendedCapabilities`. Setting it to `false` is
+a representation constraint, not a request to discard data: a description
+containing extended capabilities fails rather than being silently truncated.
 
-All names and string values use strict reversible Latin-1 and reject embedded
-NUL. Legacy `0432` numerics remain restricted to non-negative signed 16-bit
-values, and all counts, offsets, alignments, and table sizes are checked before
-narrowing. Values which require `01036` remain C04 work rather than being
-silently truncated.
+All identity, capability-name, and capability-string data retain the strict
+reversible Latin-1 and NUL-termination rules established by C01-C03. Standard
+and extended string/name offsets remain signed 16-bit fields, section counts and
+sizes remain checked, and total-entry arithmetic is checked before allocation.
 
-The writer is pure: it does not inspect environment variables, access terminfo
-directories, invoke native `tic`/ncurses, or write database layouts.
+Invalid arguments use normal argument exceptions. A valid `TerminalDescription`
+which cannot be represented by the requested policy throws
+`InvalidOperationException`. C04 freezes that distinction for the low-level
+writer surface.
+
+The writer remains pure: it does not inspect environment variables, access
+terminfo directories, invoke native `tic`/ncurses, or write database layouts.

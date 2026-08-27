@@ -1,3 +1,4 @@
+using System.Buffers.Binary;
 using System.Reflection;
 using Icod.TermInfo;
 using Icod.TermInfo.Compiler;
@@ -31,13 +32,13 @@ TerminalDescription description =
 		.AddAlias( "compiler-smoke" )
 		.SetDescription( "Compiler package smoke terminal" )
 		.SetBoolean( BooleanCapability.AutoRightMargin )
-		.SetNumber( NumericCapability.Columns, 132 )
+		.SetNumber( NumericCapability.Columns, 100000 )
 		.SetString(
 			StringCapability.ClearScreen,
 			"\u001b[H\u001b[2J"
 		)
 		.SetExtendedBoolean( "XBool" )
-		.SetExtendedNumber( "XNum", 12345 )
+		.SetExtendedNumber( "XNum", 200000 )
 		.SetExtendedString(
 			"XStr",
 			"compiler-extended"
@@ -47,6 +48,12 @@ byte[] compiled =
 	CompiledTermInfoWriter.Write(
 		description
 	);
+Require(
+	BinaryPrimitives.ReadUInt16LittleEndian(
+		compiled.AsSpan( 0, sizeof( ushort ) )
+	) == 0x021E,
+	"The Compiler package did not automatically select wide 01036 for wide numeric values."
+);
 TerminalDescription parsed =
 	CompiledTermInfoParser.Parse(
 		compiled
@@ -57,12 +64,12 @@ Require(
 		&& parsed.Description == description.Description
 		&& parsed.Aliases.SequenceEqual( description.Aliases )
 		&& parsed.GetBoolean( BooleanCapability.AutoRightMargin )
-		&& parsed.GetNumber( NumericCapability.Columns ) == 132
+		&& parsed.GetNumber( NumericCapability.Columns ) == 100000
 		&& parsed.GetString( StringCapability.ClearScreen ) == "\u001b[H\u001b[2J"
 		&& parsed.ExtendedCapabilities["XBool"].BooleanValue
-		&& parsed.ExtendedCapabilities["XNum"].NumberValue == 12345
+		&& parsed.ExtendedCapabilities["XNum"].NumberValue == 200000
 		&& parsed.ExtendedCapabilities["XStr"].StringValue == "compiler-extended",
-	"The Compiler package did not round-trip the C03 standard and extended entry."
+	"The Compiler package did not round-trip the C04 wide standard and extended entry."
 );
 Require(
 	typeof( TerminalDescription ).Assembly.GetName().Version

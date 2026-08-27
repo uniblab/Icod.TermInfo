@@ -292,7 +292,12 @@ public sealed class C03WriterTests {
 				.Build();
 
 		Assert.Throws<InvalidOperationException>(
-			() => CompiledTermInfoWriter.Write( description )
+			() => CompiledTermInfoWriter.Write(
+				description,
+				new CompiledTermInfoWriterOptions(
+					CompiledTermInfoFormat.Legacy
+				)
+			)
 		);
 	}
 

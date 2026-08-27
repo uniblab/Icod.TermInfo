@@ -2,6 +2,22 @@
 # Format: Icod.TermInfo.PublicApiSnapshot/v1
 # AssemblyVersion: 1.0.0.0
 
+TYPE enum Icod.TermInfo.Compiler.CompiledTermInfoFormat [sealed]
+  INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  UNDERLYING System.Int32
+  ENUM Automatic = 0
+  ENUM Legacy = 1
+  ENUM Wide = 2
+END
+
 TYPE class Icod.TermInfo.Compiler.CompiledTermInfoWriter [static]
   METHOD public static System.Byte[] Write(Icod.TermInfo.TerminalDescription description null=not-null/not-null) return-null=not-null/not-null<not-null/not-null>
+  METHOD public static System.Byte[] Write(Icod.TermInfo.TerminalDescription description null=not-null/not-null, Icod.TermInfo.Compiler.CompiledTermInfoWriterOptions options null=not-null/not-null) return-null=not-null/not-null<not-null/not-null>
+END
+
+TYPE class Icod.TermInfo.Compiler.CompiledTermInfoWriterOptions [sealed]
+  CTOR public CompiledTermInfoWriterOptions()
+  CTOR public CompiledTermInfoWriterOptions(Icod.TermInfo.Compiler.CompiledTermInfoFormat format null=not-null/not-null, System.Boolean includeExtendedCapabilities null=not-null/not-null default=true)
+  PROPERTY Icod.TermInfo.Compiler.CompiledTermInfoFormat Format { public get; } null=not-null/unknown
+  PROPERTY System.Boolean IncludeExtendedCapabilities { public get; } null=not-null/unknown
 END

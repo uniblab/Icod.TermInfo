@@ -9,21 +9,21 @@ namespace Icod.TermInfo.Compiler;
 /// terminfo entries.
 /// </summary>
 /// <remarks>
-/// C03 implements deterministic legacy <c>0432</c> entries containing terminal
-/// identity metadata, complete standard capability tables, and the supported
-/// ncurses extended-capability section. Wide-numeric format policy is added by
-/// C04. Writing is pure with respect to filesystem, environment, and native
-/// ncurses state.
+/// C04 supports deterministic legacy <c>0432</c> and wide-numeric <c>01036</c>
+/// entries, including the supported ncurses extended-capability section.
+/// Automatic policy prefers the narrow legacy representation whenever it is
+/// sufficient. Writing is pure with respect to filesystem, environment, and
+/// native ncurses state.
 /// </remarks>
 public static partial class CompiledTermInfoWriter {
 	private const ushort LegacyMagic = 0x011A;
+	private const ushort WideMagic = 0x021E;
 	private const int HeaderSize = 12;
 	private const byte BooleanPresent = 0x01;
-	private const short ValueAbsent = -1;
+	private const int ValueAbsent = -1;
 
 	/// <summary>
-	/// Writes one representable terminal description as deterministic legacy
-	/// <c>0432</c> compiled bytes.
+	/// Writes one terminal description using automatic format selection.
 	/// </summary>
 	/// <param name="description">
 	/// The immutable terminal description to serialize.
@@ -33,13 +33,77 @@ public static partial class CompiledTermInfoWriter {
 	/// <paramref name="description"/> is <see langword="null"/>.
 	/// </exception>
 	/// <exception cref="InvalidOperationException">
-	/// The terminal identity or a standard or extended capability cannot be
-	/// represented exactly by the C03 legacy format.
+	/// The description cannot be represented exactly by a supported compiled
+	/// format.
 	/// </exception>
 	public static byte[] Write(
 		TerminalDescription description
 	) {
+		return Write(
+			description,
+			new CompiledTermInfoWriterOptions()
+		);
+	}
+
+	/// <summary>
+	/// Writes one terminal description using explicit format policy.
+	/// </summary>
+	/// <param name="description">
+	/// The immutable terminal description to serialize.
+	/// </param>
+	/// <param name="options">
+	/// Immutable format-selection options.
+	/// </param>
+	/// <returns>A newly allocated compiled terminfo entry.</returns>
+	/// <exception cref="ArgumentNullException">
+	/// <paramref name="description"/> or <paramref name="options"/> is
+	/// <see langword="null"/>.
+	/// </exception>
+	/// <exception cref="InvalidOperationException">
+	/// The description cannot be represented exactly by the requested compiled
+	/// format and extended-section policy.
+	/// </exception>
+	public static byte[] Write(
+		TerminalDescription description,
+		CompiledTermInfoWriterOptions options
+	) {
 		ArgumentNullException.ThrowIfNull( description );
+		ArgumentNullException.ThrowIfNull( options );
+
+		try {
+			return WriteCore(
+				description,
+				options
+			);
+		} catch ( OverflowException exception ) {
+			throw new InvalidOperationException(
+				"The compiled terminfo entry cannot be represented because size arithmetic overflowed.",
+				exception
+			);
+		}
+	}
+
+	private static byte[] WriteCore(
+		TerminalDescription description,
+		CompiledTermInfoWriterOptions options
+	) {
+		ArgumentNullException.ThrowIfNull( description );
+		ArgumentNullException.ThrowIfNull( options );
+
+		if ( !options.IncludeExtendedCapabilities
+			&& description.ExtendedCapabilities.Count != 0 ) {
+			throw new InvalidOperationException(
+				"The requested writer options exclude the ncurses extended section, but the terminal description contains extended capabilities."
+			);
+		}
+
+		CompiledTermInfoFormat format =
+			ResolveFormat(
+				description,
+				options.Format
+			);
+		int numericWidth =
+			GetNumericWidth( format );
 
 		string identity =
 			CreateIdentity( description );
@@ -50,7 +114,7 @@ public static partial class CompiledTermInfoWriter {
 
 		if ( namesSize > ushort.MaxValue ) {
 			throw new InvalidOperationException(
-				$"The compiled names section requires {namesSize} bytes, exceeding the legacy 16-bit section-size field."
+				$"The compiled names section requires {namesSize} bytes, exceeding the unsigned 16-bit section-size field."
 			);
 		}
 
@@ -80,7 +144,7 @@ public static partial class CompiledTermInfoWriter {
 		int stringOffsetTableOffset =
 			checked(
 				numericOffset
-				+ checked( numericCount * sizeof( short ) )
+				+ checked( numericCount * numericWidth )
 			);
 		int stringTableOffset =
 			checked(
@@ -98,6 +162,7 @@ public static partial class CompiledTermInfoWriter {
 
 		WriteHeader(
 			entry,
+			GetMagic( format ),
 			namesSize,
 			booleanCount,
 			numericCount,
@@ -119,6 +184,8 @@ public static partial class CompiledTermInfoWriter {
 			entry,
 			numericOffset,
 			numericCount,
+			numericWidth,
+			format,
 			description
 		);
 		WriteStringOffsets(
@@ -136,12 +203,15 @@ public static partial class CompiledTermInfoWriter {
 
 		return AppendExtendedSection(
 			entry,
-			description
+			description,
+			numericWidth,
+			format
 		);
 	}
 
 	private static void WriteHeader(
 		Span<byte> entry,
+		ushort magic,
 		int namesSize,
 		int booleanCount,
 		int numericCount,
@@ -150,7 +220,7 @@ public static partial class CompiledTermInfoWriter {
 	) {
 		BinaryPrimitives.WriteUInt16LittleEndian(
 			entry[0..2],
-			LegacyMagic
+			magic
 		);
 		BinaryPrimitives.WriteUInt16LittleEndian(
 			entry[2..4],
@@ -209,16 +279,17 @@ public static partial class CompiledTermInfoWriter {
 		Span<byte> entry,
 		int numericOffset,
 		int numericCount,
+		int numericWidth,
+		CompiledTermInfoFormat format,
 		TerminalDescription description
 	) {
 		ArgumentNullException.ThrowIfNull( description );
 
 		for ( int index = 0; index < numericCount; index++ ) {
-			BinaryPrimitives.WriteInt16LittleEndian(
-				entry.Slice(
-					numericOffset + ( index * sizeof( short ) ),
-					sizeof( short )
-				),
+			WriteNumericValue(
+				entry,
+				numericOffset + ( index * numericWidth ),
+				numericWidth,
 				ValueAbsent
 			);
 		}
@@ -229,19 +300,54 @@ public static partial class CompiledTermInfoWriter {
 		) {
 			StandardCapabilityMetadata<NumericCapability> metadata =
 				StandardCapabilityCatalog.GetMetadata( pair.Key );
-			ValidateLegacyNumericValue(
+			ValidateNumericValueForFormat(
 				pair.Value,
-				metadata.ShortName
+				$"Standard numeric capability '{metadata.ShortName}'",
+				format
 			);
-			BinaryPrimitives.WriteInt16LittleEndian(
-				entry.Slice(
-					numericOffset
-						+ ( metadata.BinaryIndex * sizeof( short ) ),
-					sizeof( short )
-				),
-				(short)pair.Value
+			WriteNumericValue(
+				entry,
+				numericOffset
+					+ ( metadata.BinaryIndex * numericWidth ),
+				numericWidth,
+				pair.Value
 			);
 		}
+	}
+
+	private static void WriteNumericValue(
+		Span<byte> entry,
+		int offset,
+		int numericWidth,
+		int value
+	) {
+		if ( numericWidth == sizeof( short ) ) {
+			BinaryPrimitives.WriteInt16LittleEndian(
+				entry.Slice(
+					offset,
+					sizeof( short )
+				),
+				(short)value
+			);
+			return;
+		}
+
+		if ( numericWidth == sizeof( int ) ) {
+			BinaryPrimitives.WriteInt32LittleEndian(
+				entry.Slice(
+					offset,
+					sizeof( int )
+				),
+				value
+			);
+			return;
+		}
+
+		throw new ArgumentOutOfRangeException(
+			nameof( numericWidth ),
+			numericWidth,
+			"Compiled numeric width must be two or four bytes."
+		);
 	}
 
 	private static void WriteStringOffsets(
@@ -345,7 +451,7 @@ public static partial class CompiledTermInfoWriter {
 			new short[stringCount];
 		Array.Fill(
 			offsets,
-			ValueAbsent
+			(short)ValueAbsent
 		);
 		byte[]?[] encodedStrings =
 			new byte[]?[stringCount];
@@ -413,17 +519,138 @@ public static partial class CompiledTermInfoWriter {
 		);
 	}
 
-	private static void ValidateLegacyNumericValue(
-		int value,
-		string capabilityName
+	private static CompiledTermInfoFormat ResolveFormat(
+		TerminalDescription description,
+		CompiledTermInfoFormat requestedFormat
 	) {
-		ArgumentException.ThrowIfNullOrWhiteSpace( capabilityName );
+		ArgumentNullException.ThrowIfNull( description );
 
-		if ( value < 0 || value > short.MaxValue ) {
+		bool requiresWide =
+			RequiresWideNumericRepresentation( description );
+
+		if ( requestedFormat == CompiledTermInfoFormat.Automatic ) {
+			return requiresWide
+				? CompiledTermInfoFormat.Wide
+				: CompiledTermInfoFormat.Legacy
+			;
+		}
+
+		if ( requestedFormat == CompiledTermInfoFormat.Legacy ) {
+			if ( requiresWide ) {
+				throw new InvalidOperationException(
+					"The requested legacy 0432 representation cannot encode one or more present numeric values without truncation."
+				);
+			}
+
+			return CompiledTermInfoFormat.Legacy;
+		}
+
+		if ( requestedFormat == CompiledTermInfoFormat.Wide ) {
+			return CompiledTermInfoFormat.Wide;
+		}
+
+		throw new ArgumentOutOfRangeException(
+			nameof( requestedFormat ),
+			requestedFormat,
+			"Compiled terminfo format must be Automatic, Legacy, or Wide."
+		);
+	}
+
+	private static bool RequiresWideNumericRepresentation(
+		TerminalDescription description
+	) {
+		ArgumentNullException.ThrowIfNull( description );
+
+		bool requiresWide = false;
+		foreach (
+			KeyValuePair<NumericCapability, int> pair
+			in description.NumericCapabilities
+		) {
+			StandardCapabilityMetadata<NumericCapability> metadata =
+				StandardCapabilityCatalog.GetMetadata( pair.Key );
+			ValidatePresentNumericValue(
+				pair.Value,
+				$"Standard numeric capability '{metadata.ShortName}'"
+			);
+			requiresWide |= pair.Value > short.MaxValue;
+		}
+
+		foreach (
+			KeyValuePair<string, TermInfoCapabilityValue> pair
+			in description.ExtendedCapabilities
+		) {
+			if ( !pair.Value.IsNumber ) {
+				continue;
+			}
+
+			ValidatePresentNumericValue(
+				pair.Value.NumberValue,
+				$"Extended numeric capability '{pair.Key}'"
+			);
+			requiresWide |= pair.Value.NumberValue > short.MaxValue;
+		}
+
+		return requiresWide;
+	}
+
+	private static void ValidateNumericValueForFormat(
+		int value,
+		string role,
+		CompiledTermInfoFormat format
+	) {
+		ArgumentException.ThrowIfNullOrWhiteSpace( role );
+		ValidatePresentNumericValue(
+			value,
+			role
+		);
+
+		if ( format == CompiledTermInfoFormat.Legacy
+			&& value > short.MaxValue ) {
 			throw new InvalidOperationException(
-				$"Standard numeric capability '{capabilityName}' has value {value}, which cannot be represented by legacy 0432 without colliding with sentinels or exceeding the signed 16-bit range."
+				$"{role} has value {value}, which cannot be represented by legacy 0432 without exceeding the signed 16-bit range."
 			);
 		}
+	}
+
+	private static void ValidatePresentNumericValue(
+		int value,
+		string role
+	) {
+		ArgumentException.ThrowIfNullOrWhiteSpace( role );
+
+		if ( value < 0 ) {
+			throw new InvalidOperationException(
+				$"{role} has value {value}, which collides with compiled absent/canceled sentinel semantics."
+			);
+		}
+	}
+
+	private static ushort GetMagic(
+		CompiledTermInfoFormat format
+	) {
+		return format switch {
+			CompiledTermInfoFormat.Legacy => LegacyMagic,
+			CompiledTermInfoFormat.Wide => WideMagic,
+			_ => throw new ArgumentOutOfRangeException(
+				nameof( format ),
+				format,
+				"Resolved compiled terminfo format must be Legacy or Wide."
+			),
+		};
+	}
+
+	private static int GetNumericWidth(
+		CompiledTermInfoFormat format
+	) {
+		return format switch {
+			CompiledTermInfoFormat.Legacy => sizeof( short ),
+			CompiledTermInfoFormat.Wide => sizeof( int ),
+			_ => throw new ArgumentOutOfRangeException(
+				nameof( format ),
+				format,
+				"Resolved compiled terminfo format must be Legacy or Wide."
+			),
+		};
 	}
 
 	private static ushort ToUnsignedShort(

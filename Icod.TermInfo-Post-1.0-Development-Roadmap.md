@@ -8,10 +8,10 @@
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
 **Current release version:** `1.1.1`
-**Current development version:** `1.2.0-Alpha-3`
+**Current development version:** `1.2.0-Alpha-4`
 **Next development line:** `1.2.0`
-**Status:** C03 implementation candidate — build/test/package validation required
-**Current tranche:** C03 — Extended capability emission
+**Status:** C04 implementation candidate — build/test/package validation required
+**Current tranche:** C04 — Format selection
 **Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
 
 ---
@@ -641,6 +641,8 @@ The exact public exception/options surface SHALL be frozen here if C01-C03 have
 not already required it.
 
 **Gate C04:** boundary numeric/string/count cases select or reject formats predictably.
+
+**Implementation record:** [`docs/1.2.0-C04-FORMAT-SELECTION.md`](docs/1.2.0-C04-FORMAT-SELECTION.md)
 
 ---
 
