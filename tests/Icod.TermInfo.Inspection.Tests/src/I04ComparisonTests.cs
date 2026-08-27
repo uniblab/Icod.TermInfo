@@ -231,13 +231,13 @@ public sealed class I04ComparisonTests {
 				.SetDescription( "I04 extended comparison" )
 				.SetExtendedString( "value", "left" )
 				.SetExtendedNumber( "leftOnly", 11 )
-				.SetExtendedNumber( "kind", 7 )
+				.SetExtendedNumber( "kindMismatch", 7 )
 				.SetExtendedBoolean( "Feature" )
 				.Build();
 		TerminalDescription right =
 			new TerminalDescriptionBuilder( "i04-extended" )
 				.SetDescription( "I04 extended comparison" )
-				.SetExtendedString( "kind", "7" )
+				.SetExtendedString( "kindMismatch", "7" )
 				.SetExtendedString( "value", "right" )
 				.SetExtendedBoolean( "feature" )
 				.SetExtendedNumber( "rightOnly", 13 )
@@ -253,7 +253,7 @@ public sealed class I04ComparisonTests {
 			new[] {
 				"Feature",
 				"feature",
-				"kind",
+				"kindMismatch",
 				"leftOnly",
 				"rightOnly",
 				"value",
@@ -322,7 +322,7 @@ public sealed class I04ComparisonTests {
 					NumericCapability.Columns,
 					80
 				)
-				.SetExtendedNumber( "kind", 1 )
+				.SetExtendedNumber( "kindMismatch", 1 )
 				.SetExtendedString( "value", "left" )
 				.SetExtendedBoolean( "leftOnly" )
 				.Build();
@@ -334,7 +334,7 @@ public sealed class I04ComparisonTests {
 					NumericCapability.Columns,
 					132
 				)
-				.SetExtendedString( "kind", "1" )
+				.SetExtendedString( "kindMismatch", "1" )
 				.SetExtendedString( "value", "right" )
 				.SetExtendedBoolean( "rightOnly" )
 				.Build();
