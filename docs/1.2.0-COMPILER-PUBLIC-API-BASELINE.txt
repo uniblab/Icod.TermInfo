@@ -3,5 +3,5 @@
 # AssemblyVersion: 1.0.0.0
 
 TYPE class Icod.TermInfo.Compiler.CompiledTermInfoWriter [static]
-  METHOD public static System.Byte[] Write(Icod.TermInfo.TerminalDescription description null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.Byte[] Write(Icod.TermInfo.TerminalDescription description null=not-null/not-null) return-null=not-null/not-null<not-null/not-null>
 END
