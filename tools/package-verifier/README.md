@@ -6,10 +6,10 @@ an already packed `Icod.TermInfo` `.nupkg` and `.snupkg`.
 It verifies:
 
 - `<Version>` and `<PackageVersion>` remain present and identical;
-- required `net8.0` and `net10.0` package payloads are present;
-- both packaged assemblies retain assembly version `1.0.0.0` and remain
+- required `net8.0`, `net9.0`, and `net10.0` package payloads are present;
+- all packaged assemblies retain assembly version `1.0.0.0` and remain
   unsigned;
-- both framework XML documentation files are non-empty, parseable, identify
+- all framework XML documentation files are non-empty, parseable, identify
   `Icod.TermInfo`, and contain documented members;
 - `README.md` and `icon.png` are present and identified by NuGet metadata;
 - title, authors, project URL, license expression, license-acceptance flag,
@@ -17,7 +17,7 @@ It verifies:
 - no runtime/native dependency payload was introduced;
 - repository-only tests, tools, fixtures, `.ti`, and `.bin` assets are absent;
 - the package has no runtime NuGet dependencies;
-- the symbol package contains portable PDBs for both supported frameworks with
+- the symbol package contains portable PDBs for all supported frameworks with
   the expected Source Link data;
 - the generic parameterization source layer contains no terminal-profile-specific
   reference.

@@ -7,7 +7,7 @@ namespace Icod.TermInfo.Tests;
 
 public sealed class T45CompletionGateTests {
 	[Fact]
-	public void AssemblyRetainsStableIdentityForOneOneRelease() {
+	public void AssemblyRetainsStableIdentityForOneTwoDevelopment() {
 		Assembly assembly =
 			typeof( TerminalDescription ).Assembly;
 		AssemblyName assemblyName =
@@ -30,12 +30,12 @@ public sealed class T45CompletionGateTests {
 					2 )[ 0 ];
 
 		Assert.Equal(
-			"1.1.1",
+			"1.2.0-Alpha-6",
 			semanticVersion );
 	}
 
 	[Fact]
-	public void ProjectMetadataIdentifiesOneOneReleaseAndStableAssembly() {
+	public void ProjectMetadataIdentifiesOneTwoDevelopmentAndStableAssembly() {
 		string root =
 			FindRepositoryRoot();
 		XDocument project =
@@ -46,12 +46,12 @@ public sealed class T45CompletionGateTests {
 				LoadOptions.None );
 
 		Assert.Equal(
-			"1.1.1",
+			"1.2.0-Alpha-6",
 			ReadRequiredProperty(
 				project,
 				"Version" ) );
 		Assert.Equal(
-			"1.1.1",
+			"1.2.0-Alpha-6",
 			ReadRequiredProperty(
 				project,
 				"PackageVersion" ) );
@@ -61,7 +61,7 @@ public sealed class T45CompletionGateTests {
 				project,
 				"AssemblyVersion" ) );
 		Assert.Equal(
-			"net8.0;net10.0",
+			"net8.0;net9.0;net10.0",
 			ReadRequiredProperty(
 				project,
 				"TargetFrameworks" ) );
@@ -129,6 +129,9 @@ public sealed class T45CompletionGateTests {
 				verifier );
 			Assert.Contains(
 				"net8.0",
+				verifier );
+			Assert.Contains(
+				"net9.0",
 				verifier );
 			Assert.Contains(
 				"net10.0",

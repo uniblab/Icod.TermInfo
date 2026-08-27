@@ -19,6 +19,7 @@ jobs:
         with:
           dotnet-version: |
             8.0.x
+            9.0.x
             10.0.x
 
       - run: dotnet clean Icod.TermInfo.sln -c Staging
@@ -31,6 +32,7 @@ jobs:
         run: |
           dotnet pack Icod.TermInfo.csproj -c Staging --no-build --output artifacts
           dotnet pack Icod.TermInfo.Source/Icod.TermInfo.Source.csproj -c Staging --no-build --output artifacts
+          dotnet pack Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj -c Staging --no-build --output artifacts
 
       - name: Verify Staging packages
         if: matrix.os == 'ubuntu-latest'

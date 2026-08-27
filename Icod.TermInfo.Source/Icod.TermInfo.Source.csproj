@@ -4,7 +4,7 @@
 		<Copyright>Copyright (c) 2026 Timothy J. Bruce</Copyright>
 		<LangVersion>13.0</LangVersion>
 		<OutputType>Library</OutputType>
-		<TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -12,17 +12,17 @@
 		<AssemblyName>Icod.TermInfo.Source</AssemblyName>
 		<RootNamespace>Icod.TermInfo.Source</RootNamespace>
 		<Configurations>Debug;Release;Staging</Configurations>
-		<Version>1.1.1</Version>
+		<Version>1.2.0-Alpha-6</Version>
 		<AssemblyVersion>1.0.0.0</AssemblyVersion>
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<PackageVersion>1.1.1</PackageVersion>
+		<PackageVersion>1.2.0-Alpha-6</PackageVersion>
 		<PackageId>Icod.TermInfo.Source</PackageId>
 		<Title>Icod.TermInfo.Source</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed terminfo source-language support for Icod.TermInfo. The 1.1 line parses and resolves .ti source into the stable TerminalDescription model without enlarging the runtime Icod.TermInfo package.</Description>
-		<PackageReleaseNotes>1.1.1 is a coordinated maintenance release of Icod.TermInfo.Source for Icod.TermInfo 1.1.1. It preserves the 1.1.0 source-language public API and semantics while retaining assembly version 1.0.0.0.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.2.0-Alpha-6 coordinates Icod.TermInfo.Source with C06 while preserving the frozen 1.1 source-language public API, semantics, and 1.0.0.0 assembly identity.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>

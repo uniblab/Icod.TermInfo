@@ -4,7 +4,7 @@ using Xunit;
 namespace Icod.TermInfo.Source.Tests;
 
 public sealed class S01ContractTests {
-	private const string DevelopmentVersion = "1.1.1";
+	private const string DevelopmentVersion = "1.2.0-Alpha-6";
 	private const string StableAssemblyVersion = "1.0.0.0";
 
 	[Fact]
@@ -25,7 +25,7 @@ public sealed class S01ContractTests {
 				LoadOptions.None );
 
 		Assert.Equal(
-			"net8.0;net10.0",
+			"net8.0;net9.0;net10.0",
 			ReadRequiredProperty(
 				sourceProject,
 				"TargetFrameworks" ) );
@@ -112,13 +112,13 @@ public sealed class S01ContractTests {
 		string root = FindRepositoryRoot();
 
 		Assert.Equal(
-			"net8.0;net10.0",
+			"net8.0;net9.0;net10.0",
 			ReadProjectProperty(
 				root,
 				"tests/Icod.TermInfo.Source.Tests/Icod.TermInfo.Source.Tests.csproj",
 				"TargetFrameworks" ) );
 		Assert.Equal(
-			"net8.0;net10.0",
+			"net8.0;net9.0;net10.0",
 			ReadProjectProperty(
 				root,
 				"tools/source-package-smoke/Icod.TermInfo.Source.PackageSmoke.csproj",
@@ -196,6 +196,9 @@ public sealed class S01ContractTests {
 				verifier );
 			Assert.Contains(
 				"net8.0",
+				verifier );
+			Assert.Contains(
+				"net9.0",
 				verifier );
 			Assert.Contains(
 				"net10.0",

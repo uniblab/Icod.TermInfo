@@ -4,7 +4,10 @@
 
 Version 1.1.1 is the current maintenance release of the 1.1 line. It preserves the frozen 1.0 runtime contract and the 1.1 source-language feature set provided by the optional `Icod.TermInfo.Source` package.
 
-Both packages target `net8.0` and `net10.0`, use C# 13, contain no native ncurses/terminfo payload, and are intended to run on Windows, Linux, and macOS.
+The published 1.1.1 packages target `net8.0` and `net10.0`. Beginning with the 1.2
+development line, the supported consumer matrix expands to `net8.0`, `net9.0`,
+and `net10.0`; the packages use C# 13, contain no native ncurses/terminfo
+payload, and are intended to run on Windows, Linux, and macOS.
 
 ## Install
 
@@ -26,9 +29,16 @@ The same validated package artifacts are intended for NuGet.org and GitHub Packa
 
 ## 1.x stability contract
 
-The 1.x line keeps runtime assembly identity `Icod.TermInfo, Version=1.0.0.0`, remains unsigned, and treats `net8.0` plus `net10.0` as supported consumer targets. `Icod.TermInfo.Source` also retains assembly version `1.0.0.0` throughout its 1.x line. Public API, binary/package compatibility, deprecation, and target-framework policy are documented in `docs/VERSIONING.md` and `docs/COMPATIBILITY.md`.
+The 1.x line keeps runtime assembly identity `Icod.TermInfo, Version=1.0.0.0` and
+remains unsigned. The frozen 1.0 and 1.1 releases support `net8.0` and
+`net10.0`; beginning with 1.2, the supported consumer targets are `net8.0`,
+`net9.0`, and `net10.0`. `Icod.TermInfo.Source` and `Icod.TermInfo.Compiler`
+retain assembly version `1.0.0.0` throughout their 1.x lines. Public API,
+binary/package compatibility,
+deprecation, and target-framework policy are documented in `docs/VERSIONING.md`
+and `docs/COMPATIBILITY.md`.
 
-The runtime 1.0 public API remains frozen. Version 1.1 adds source-language functionality in the separate `Icod.TermInfo.Source` package rather than making the runtime package depend on parser/front-end code. Live terminal sessions, PTYs, curses/UI, terminal emulation, compiler/tool commands, termcap conversion, and active protocol negotiation remain later or sibling work.
+The runtime 1.0 public API remains frozen. Version 1.1 adds source-language functionality in the separate `Icod.TermInfo.Source` package rather than making the runtime package depend on parser/front-end code. The 1.2 line adds deterministic compiled-entry writing in the separate `Icod.TermInfo.Compiler` package. Live terminal sessions, PTYs, curses/UI, terminal emulation, command-line `tic`/`infocmp`/`toe` tooling, termcap conversion, and active protocol negotiation remain later or sibling work.
 
 ## What 1.0 provides
 
@@ -596,8 +606,9 @@ purposes.
 - redirection handling and explicit Windows VT enablement;
 - a custom provider implementation.
 
-Both sample projects target `net8.0` and `net10.0`; `dotnet run` therefore
-needs an explicit framework. Run the ordinary demonstration with:
+Both sample projects in the 1.2 development line target `net8.0`, `net9.0`,
+and `net10.0`; `dotnet run` therefore needs an explicit framework. Run the
+ordinary demonstration with:
 
 ```text
 dotnet run --project samples/Icod.TermInfo.Sample/Icod.TermInfo.Sample.csproj -f net10.0
@@ -610,7 +621,7 @@ is inappropriate, use the non-interactive descriptive mode:
 dotnet run --project samples/Icod.TermInfo.Sample/Icod.TermInfo.Sample.csproj -f net10.0 -- --describe-only --profile xterm-direct256
 ```
 
-Use `-f net8.0` instead when validating the .NET 8 consumer target.
+Use `-f net8.0` or `-f net9.0` instead when validating those consumer targets.
 
 `--profile <name>` selects an exact built-in profile instead of consulting
 `TERM`. `--describe-only` exercises metadata/enumeration, expansion, byte-output,
@@ -736,9 +747,9 @@ bash .github/scripts/verify-release-package.sh artifacts Release
 ```
 
 Both wrappers run the same capability-metadata check; exact runtime and Source
-public-API baseline checks; net8/net10 API-equivalence checks; runtime
+public-API baseline checks; net8/net9/net10 API-equivalence checks; runtime
 package/XML/symbol validation; isolated runtime and Source package-reference-only
-smoke consumers on both target frameworks; and the sample's non-interactive
+smoke consumers on all three target frameworks; and the sample's non-interactive
 `--describe-only` path. Windows package validation does not require Bash or
 Python.
 

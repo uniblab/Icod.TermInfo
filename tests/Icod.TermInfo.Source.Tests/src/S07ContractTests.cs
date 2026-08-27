@@ -7,11 +7,10 @@ namespace Icod.TermInfo.Source.Tests;
 
 public sealed class S07ContractTests
 {
-    private const string DevelopmentVersion = "1.1.1";
+    private const string DevelopmentVersion = "1.2.0-Alpha-6";
     private const string StableAssemblyVersion = "1.0.0.0";
 
-    [Fact]
-    public void SourceAndRuntimePackagesAdvanceTogetherWithoutChangingAssemblyIdentity()
+    [Fact]    public void SourceAndRuntimePackagesAdvanceTogetherWithoutChangingAssemblyIdentity()
     {
         string root = FindRepositoryRoot();
 
