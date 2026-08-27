@@ -5,7 +5,7 @@ using Xunit;
 namespace Icod.TermInfo.Inspection.Tests;
 
 public sealed class I01ContractTests {
-	private const string DevelopmentVersion = "1.3.0-Alpha-4";
+	private const string DevelopmentVersion = "1.3.0-Alpha-5";
 	private const string StableAssemblyVersion = "1.0.0.0";
 
 	[Fact]
@@ -75,6 +75,7 @@ public sealed class I01ContractTests {
 				"Icod.TermInfo.Inspection.TermInfoComparisonResult",
 				"Icod.TermInfo.Inspection.TermInfoDifference",
 				"Icod.TermInfo.Inspection.TermInfoDifferenceKind",
+				"Icod.TermInfo.Inspection.TermInfoSourceComparer",
 				"Icod.TermInfo.Inspection.TermInfoSourceRenderer",
 				"Icod.TermInfo.Inspection.TerminalDescriptionComparer",
 				"Icod.TermInfo.Inspection.TerminalDescriptionSourceRenderer",
@@ -189,7 +190,7 @@ public sealed class I01ContractTests {
 	}
 
 	[Fact]
-	public void InspectionPublicApiBaselineContainsReviewedI02ThroughI04Surface() {
+	public void InspectionPublicApiBaselineContainsReviewedI02ThroughI05Surface() {
 		string root =
 			FindRepositoryRoot();
 		string baseline =
@@ -213,6 +214,22 @@ public sealed class I01ContractTests {
 		);
 		Assert.Contains(
 			"TYPE enum Icod.TermInfo.Inspection.TermInfoDifferenceKind [sealed]",
+			baseline
+		);
+		Assert.Contains(
+			"TYPE class Icod.TermInfo.Inspection.TermInfoSourceComparer [static]",
+			baseline
+		);
+		Assert.Contains(
+			"METHOD public static Icod.TermInfo.Inspection.TermInfoComparisonResult Compare(Icod.TermInfo.Source.TermInfoSourceDocument left",
+			baseline
+		);
+		Assert.Contains(
+			"PROPERTY Icod.TermInfo.Source.TermInfoSourceField LeftSourceField",
+			baseline
+		);
+		Assert.Contains(
+			"PROPERTY Icod.TermInfo.Source.TermInfoSourceSpan LeftSourceSpan",
 			baseline
 		);
 		Assert.Contains(

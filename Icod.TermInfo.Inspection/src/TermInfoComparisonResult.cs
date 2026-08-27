@@ -18,7 +18,8 @@ public sealed class TermInfoComparisonResult {
 	}
 
 	/// <summary>
-	/// Gets whether the compared effective descriptions are semantically equal.
+	/// Gets whether the compared values are equal in the comparison domain selected
+	/// by the comparer which produced this result.
 	/// </summary>
 	public bool AreEqual =>
 		_differences.Count == 0;

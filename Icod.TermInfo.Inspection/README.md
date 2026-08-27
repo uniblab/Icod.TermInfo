@@ -7,6 +7,37 @@ The 1.3 line provides the reusable API engine underneath future
 `infocmp`-style tooling while preserving the already-frozen Runtime 1.0, Source
 1.1, and Compiler 1.2 public contracts.
 
+## I05 source-aware comparison
+
+`1.3.0-Alpha-5` adds deterministic comparison of unresolved Source 1.1
+entries and documents:
+
+```csharp
+TermInfoComparisonResult sourceComparison =
+	TermInfoSourceComparer.Compare(
+		leftEntry,
+		rightEntry
+	);
+```
+
+The same comparer accepts `TermInfoSourceDocument` values and compares entries
+in document order. Entry identity metadata is compared separately from ordered
+fields. Field comparison keeps duplicate declarations and position observable,
+distinguishes `use=` reference changes, local value changes, one-sided fields,
+and field-kind changes such as present versus cancelled or disabled.
+
+`TermInfoDifference` now carries the retained Source entry/field objects, their
+zero-based document/field indexes when available, and the most specific retained
+source spans for actual differences. Source spans themselves are not treated as
+semantic differences. Comments, incidental whitespace, and equivalent lexical
+spellings of successfully decoded values likewise do not make two source models
+different.
+
+Effective comparison remains deliberately separate: two source programs may
+differ structurally while resolving to identical `TerminalDescription` values.
+Call `TermInfoSourceComparer` when source program structure matters and
+`TerminalDescriptionComparer` when only effective terminal semantics matter.
+
 ## I04 effective semantic comparison
 
 `1.3.0-Alpha-4` adds deterministic, machine-readable comparison of effective
@@ -30,8 +61,8 @@ differences.
 The effective comparer reports left-only, right-only, value, and value-kind
 differences without rendering either terminal to text. It does not invent source
 cancellation, disabled-field, `use=`, or provenance information because those
-facts are not retained by `TerminalDescription`. Source-aware comparison remains
-I05 work.
+facts are not retained by `TerminalDescription`. I05 source-aware comparison is
+therefore a separate operation over the unresolved Source model.
 
 ## I03 normalized unresolved-source rendering
 
@@ -115,10 +146,10 @@ There is no production dependency between Inspection and Compiler.
 
 ## Install
 
-During I04 development:
+During I05 development:
 
 ```text
-dotnet add package Icod.TermInfo.Inspection --version 1.3.0-Alpha-4
+dotnet add package Icod.TermInfo.Inspection --version 1.3.0-Alpha-5
 ```
 
 The package targets `net8.0`, `net9.0`, and `net10.0`, uses C# 13, remains

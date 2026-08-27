@@ -9,12 +9,23 @@ END
 
 TYPE class Icod.TermInfo.Inspection.TermInfoDifference [sealed]
   PROPERTY Icod.TermInfo.Inspection.TermInfoDifferenceKind Kind { public get; } null=not-null/unknown
+  PROPERTY Icod.TermInfo.Source.TermInfoSourceEntry LeftSourceEntry { public get; } null=nullable/unknown
+  PROPERTY Icod.TermInfo.Source.TermInfoSourceEntry RightSourceEntry { public get; } null=nullable/unknown
+  PROPERTY Icod.TermInfo.Source.TermInfoSourceField LeftSourceField { public get; } null=nullable/unknown
+  PROPERTY Icod.TermInfo.Source.TermInfoSourceField RightSourceField { public get; } null=nullable/unknown
+  PROPERTY Icod.TermInfo.Source.TermInfoSourceSpan LeftSourceSpan { public get; } null=nullable/unknown
+  PROPERTY Icod.TermInfo.Source.TermInfoSourceSpan RightSourceSpan { public get; } null=nullable/unknown
   PROPERTY System.Boolean IsCapabilityDifference { public get; } null=not-null/unknown
+  PROPERTY System.Boolean IsSourceDifference { public get; } null=not-null/unknown
   PROPERTY System.Collections.Generic.IReadOnlyList<System.String> LeftAliases { public get; } null=nullable/unknown<not-null/not-null>
   PROPERTY System.Collections.Generic.IReadOnlyList<System.String> RightAliases { public get; } null=nullable/unknown<not-null/not-null>
   PROPERTY System.Nullable<Icod.TermInfo.TermInfoCapabilityValue> LeftCapabilityValue { public get; } null=nullable/unknown
   PROPERTY System.Nullable<Icod.TermInfo.TermInfoCapabilityValue> RightCapabilityValue { public get; } null=nullable/unknown
   PROPERTY System.Nullable<System.Boolean> IsExtendedCapability { public get; } null=nullable/unknown
+  PROPERTY System.Nullable<System.Int32> LeftSourceEntryIndex { public get; } null=nullable/unknown
+  PROPERTY System.Nullable<System.Int32> LeftSourceFieldIndex { public get; } null=nullable/unknown
+  PROPERTY System.Nullable<System.Int32> RightSourceEntryIndex { public get; } null=nullable/unknown
+  PROPERTY System.Nullable<System.Int32> RightSourceFieldIndex { public get; } null=nullable/unknown
   PROPERTY System.String CapabilityName { public get; } null=nullable/unknown
   PROPERTY System.String LeftText { public get; } null=nullable/unknown
   PROPERTY System.String RightText { public get; } null=nullable/unknown
@@ -30,6 +41,19 @@ TYPE enum Icod.TermInfo.Inspection.TermInfoDifferenceKind [sealed]
   ENUM IdentityName = 0
   ENUM OnlyInLeft = 3
   ENUM OnlyInRight = 4
+  ENUM SourceEntryOnlyInLeft = 7
+  ENUM SourceEntryOnlyInRight = 8
+  ENUM SourceFieldCapability = 12
+  ENUM SourceFieldKind = 11
+  ENUM SourceFieldOnlyInLeft = 9
+  ENUM SourceFieldOnlyInRight = 10
+  ENUM SourceFieldValue = 13
+  ENUM SourceUseReference = 14
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoSourceComparer [static]
+  METHOD public static Icod.TermInfo.Inspection.TermInfoComparisonResult Compare(Icod.TermInfo.Source.TermInfoSourceDocument left null=not-null/not-null, Icod.TermInfo.Source.TermInfoSourceDocument right null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static Icod.TermInfo.Inspection.TermInfoComparisonResult Compare(Icod.TermInfo.Source.TermInfoSourceEntry left null=not-null/not-null, Icod.TermInfo.Source.TermInfoSourceEntry right null=not-null/not-null) return-null=not-null/not-null
 END
 
 TYPE class Icod.TermInfo.Inspection.TermInfoSourceRenderer [static]

@@ -31,14 +31,15 @@ Require(
 Type[] exportedTypes =
 	inspectionAssembly.GetExportedTypes();
 Require(
-	exportedTypes.Length == 6
+	exportedTypes.Length == 7
 		&& exportedTypes.Contains( typeof( TermInfoComparisonResult ) )
 		&& exportedTypes.Contains( typeof( TermInfoDifference ) )
 		&& exportedTypes.Contains( typeof( TermInfoDifferenceKind ) )
+		&& exportedTypes.Contains( typeof( TermInfoSourceComparer ) )
 		&& exportedTypes.Contains( typeof( TermInfoSourceRenderer ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionComparer ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceRenderer ) ),
-	"The Inspection package did not expose exactly the reviewed I02-I04 surface."
+	"The Inspection package did not expose exactly the reviewed I02-I05 surface."
 );
 
 Require(
@@ -139,6 +140,33 @@ Require(
 	comparison.AreEqual
 		&& comparison.Differences.Count == 0,
 	"The I04 effective comparer did not report self-comparison as equal."
+);
+
+const string alteredSource =
+	"inspection-smoke|Inspection package smoke,am,cols#132,";
+TermInfoSourceParseResult alteredParsed =
+	TermInfoSourceParser.Parse(
+		alteredSource,
+		"inspection-package-smoke-altered.ti"
+	);
+Require(
+	!alteredParsed.HasErrors
+		&& alteredParsed.Document.Entries.Count == 1,
+	"The Source dependency could not parse the altered I05 smoke entry."
+);
+TermInfoComparisonResult sourceComparison =
+	TermInfoSourceComparer.Compare(
+		parsed.Document.Entries[ 0 ],
+		alteredParsed.Document.Entries[ 0 ]
+	);
+Require(
+	!sourceComparison.AreEqual
+		&& sourceComparison.Differences.Count == 1
+		&& sourceComparison.Differences[ 0 ].Kind
+			== TermInfoDifferenceKind.SourceFieldValue
+		&& sourceComparison.Differences[ 0 ].LeftSourceField is not null
+		&& sourceComparison.Differences[ 0 ].RightSourceField is not null,
+	"The I05 source-aware comparer did not report the local numeric difference."
 );
 
 Console.WriteLine(

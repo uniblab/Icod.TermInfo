@@ -10,10 +10,10 @@
 **Source API contract:** frozen at 1.1  
 **Compiler API contract:** frozen at 1.2  
 **New package:** `Icod.TermInfo.Inspection`
-**Current development version:** `1.3.0-Alpha-4`
+**Current development version:** `1.3.0-Alpha-5`
 **Development sequence:** `1.3.0-Alpha-1` through `1.3.0-Alpha-7`
-**Status:** I04 implementation candidate — build/test/package validation required
-**Current tranche:** I04 — Effective semantic comparison and structured difference model
+**Status:** I05 implementation candidate — build/test/package validation required
+**Current tranche:** I05 — Source-aware comparison
 **Release objective:** reusable managed inspection, canonical rendering, and semantic-comparison APIs underlying future `infocmp`-style tooling without destabilizing the existing Runtime, Source, or Compiler contracts.
 
 ---
@@ -775,6 +775,8 @@ source program" are different questions.
 
 **Gate I05:** callers can choose effective or source-aware comparison and receive
 a deterministic structured answer appropriate to that domain.
+
+**Implementation record:** [`docs/1.3.0-I05-SOURCE-AWARE-COMPARISON.md`](docs/1.3.0-I05-SOURCE-AWARE-COMPARISON.md)
 
 ---
 
