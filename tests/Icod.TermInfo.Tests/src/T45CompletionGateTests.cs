@@ -7,7 +7,7 @@ namespace Icod.TermInfo.Tests;
 
 public sealed class T45CompletionGateTests {
 	[Fact]
-	public void AssemblyRetainsStableIdentityForOneTwoDevelopment() {
+	public void AssemblyRetainsStableIdentityForOneTwoRelease() {
 		Assembly assembly =
 			typeof( TerminalDescription ).Assembly;
 		AssemblyName assemblyName =
@@ -30,12 +30,12 @@ public sealed class T45CompletionGateTests {
 					2 )[ 0 ];
 
 		Assert.Equal(
-			"1.2.0-Alpha-7",
+			"1.2.0",
 			semanticVersion );
 	}
 
 	[Fact]
-	public void ProjectMetadataIdentifiesOneTwoDevelopmentAndStableAssembly() {
+	public void ProjectMetadataIdentifiesOneTwoReleaseAndStableAssembly() {
 		string root =
 			FindRepositoryRoot();
 		XDocument project =
@@ -46,12 +46,12 @@ public sealed class T45CompletionGateTests {
 				LoadOptions.None );
 
 		Assert.Equal(
-			"1.2.0-Alpha-7",
+			"1.2.0",
 			ReadRequiredProperty(
 				project,
 				"Version" ) );
 		Assert.Equal(
-			"1.2.0-Alpha-7",
+			"1.2.0",
 			ReadRequiredProperty(
 				project,
 				"PackageVersion" ) );
@@ -78,13 +78,16 @@ public sealed class T45CompletionGateTests {
 					"README.md" ) );
 
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo --version 1.1.1",
+			"dotnet add package Icod.TermInfo --version 1.2.0",
 			readme );
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo.Source --version 1.1.1",
+			"dotnet add package Icod.TermInfo.Source --version 1.2.0",
+			readme );
+		Assert.Contains(
+			"dotnet add package Icod.TermInfo.Compiler --version 1.2.0",
 			readme );
 		Assert.DoesNotContain(
-			"1.1.0-Alpha-9",
+			"1.2.0-Alpha-7",
 			readme );
 		Assert.Contains(
 			"docs/VERSIONING.md",
@@ -93,7 +96,7 @@ public sealed class T45CompletionGateTests {
 			"docs/COMPATIBILITY.md",
 			readme );
 		Assert.Contains(
-			"docs/1.1.0-RELEASE-AUDIT.md",
+			"docs/1.2.0-RELEASE-AUDIT.md",
 			readme );
 	}
 
@@ -139,6 +142,9 @@ public sealed class T45CompletionGateTests {
 			Assert.Contains(
 				"1.1.0-SOURCE-PUBLIC-API-BASELINE.txt",
 				verifier );
+			Assert.Contains(
+				"1.2.0-COMPILER-PUBLIC-API-BASELINE.txt",
+				verifier );
 			Assert.True(
 				verifier.Contains(
 					"package-smoke",
@@ -147,11 +153,15 @@ public sealed class T45CompletionGateTests {
 				verifier.Contains(
 					"source-package-smoke",
 					StringComparison.OrdinalIgnoreCase ) );
+			Assert.True(
+				verifier.Contains(
+					"compiler-package-smoke",
+					StringComparison.OrdinalIgnoreCase ) );
 		}
 	}
 
 	[Fact]
-	public void OneOneReleaseAuditDefinesReleaseSignOffWithoutClaimingIt() {
+	public void OneTwoReleaseAuditDefinesTagBasedReleaseSignOff() {
 		string root =
 			FindRepositoryRoot();
 		string audit =
@@ -159,10 +169,10 @@ public sealed class T45CompletionGateTests {
 				Path.Combine(
 					root,
 					"docs",
-					"1.1.0-RELEASE-AUDIT.md" ) );
+					"1.2.0-RELEASE-AUDIT.md" ) );
 
 		Assert.Contains(
-			"Release sign-off pending",
+			"Final release candidate",
 			audit );
 		Assert.Contains(
 			"docs/1.0.0-PUBLIC-API-BASELINE.txt",
@@ -171,13 +181,16 @@ public sealed class T45CompletionGateTests {
 			"docs/1.1.0-SOURCE-PUBLIC-API-BASELINE.txt",
 			audit );
 		Assert.Contains(
-			"public-api-snapshot --check",
+			"docs/1.2.0-COMPILER-PUBLIC-API-BASELINE.txt",
 			audit );
 		Assert.Contains(
 			"verify-release-package",
 			audit );
 		Assert.Contains(
-			"v1.1.0",
+			"release.yaml",
+			audit );
+		Assert.Contains(
+			"v1.2.0",
 			audit );
 	}
 

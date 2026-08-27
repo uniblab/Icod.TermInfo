@@ -12,9 +12,11 @@ This document describes the current validation and publication procedure for the
 - Runtime, Source, and Compiler retain 1.x assembly version `1.0.0.0` and remain
   unsigned.
 - Supported consumer targets for the 1.2 line are `net8.0`, `net9.0`, and `net10.0`.
-- A final release tag must be exactly `v<PackageVersion>`.
-- Release validation must pass on Windows, Linux, and macOS before a final tag is
-  created.
+- A release tag must be exactly `v<PackageVersion>` and is the only repository
+  event which may publish packages.
+- Release validation must pass on Windows, Linux, and macOS on `main` before a
+  release tag is created. The tag workflow repeats the Release gate on the exact
+  tagged commit before publication.
 - Release validation must pass the frozen runtime API baseline, the reviewed
   Source and Compiler API baselines, and net8/net9/net10 API-equivalence gates.
 - Release builds treat missing public XML documentation as an error.
@@ -27,8 +29,9 @@ This document describes the current validation and publication procedure for the
 - The six `.nupkg` / `.snupkg` artifacts produced for a version are immutable
   release artifacts. If package contents change, increment the version rather
   than replacing a published package.
-- Publication is downstream of build/test/package validation. No package may be
-  pushed if any validation stage fails.
+- Publication is downstream of tag/version validation and the complete
+  build/test/package gate. Pull requests and ordinary pushes to `main` must not
+  authenticate to or push to package registries.
 
 ## Repository CI
 
@@ -82,21 +85,26 @@ the Release build/test matrix on:
 - `ubuntu-latest`;
 - `macos-latest`.
 
-The Ubuntu matrix leg continues after the shared Release build/test steps and:
+Each matrix leg packs all three package projects and runs the platform-appropriate
+Release verifier. The Windows leg uploads the canonical six `.nupkg` / `.snupkg`
+artifacts for seven days.
 
-1. packs all three package projects into `artifacts`;
-2. runs `.github/scripts/verify-release-package.sh artifacts Release`;
-3. uploads the exact `.nupkg` and `.snupkg` files as workflow artifacts.
+The main-branch workflow stops after validation and artifact upload. It has only
+`contents: read` permission and never authenticates to or pushes to a package
+registry.
 
-There is no second checkout/restore/build/test package-validation job. The
-deployment job waits for the complete three-OS matrix and then downloads the
-artifact produced and verified by the Ubuntu leg.
+### Release tags
 
-After package validation succeeds, the `Release` deployment job downloads those
-exact artifacts and publishes all three `.nupkg` files to NuGet.org and GitHub
-Packages. The NuGet.org push uses trusted publishing/OIDC through `NuGet/login`;
-GitHub Packages uses the repository `GITHUB_TOKEN`. Both pushes use
-`--skip-duplicate`.
+`.github/workflows/release.yaml` runs for pushed tags matching `v*`. Before the
+release build, it requires the tagged commit to be contained in `main`, requires
+Runtime, Source, and Compiler `Version` / `PackageVersion` values to match, and
+requires the tag version to match that coordinated package version exactly.
+
+The tag workflow reruns the complete Release matrix on Windows, Linux, and macOS.
+After all three legs pass, the canonical validated packages are published to
+NuGet.org and GitHub Packages. Finally, the workflow creates a GitHub Release
+containing all three package files, all three symbol packages, and a SHA-256
+checksum manifest. Prerelease package versions create GitHub prereleases.
 
 ## What the release verifier checks
 
@@ -187,11 +195,16 @@ configuration names. They otherwise provide the same validation contract.
 
 ## Automated publication
 
-The current `push-main.yaml` workflow watches only `main` and publishes only
-after the complete Release matrix succeeds, including the Ubuntu-only
-pack/verify/upload steps. Pull-request and development-branch pushes do not
-publish packages. The deploy job consumes that validated matrix artifact rather
-than repacking the repository.
+`push-main.yaml` validates release candidates but never publishes them.
+`release.yaml` is the sole automated publication workflow. A pushed `v*` tag
+must identify a commit contained in `main`, and its version must exactly match
+the coordinated Runtime, Source, and Compiler `Version` / `PackageVersion`
+values.
+
+The tag workflow rebuilds, retests, repacks, and reverifies the tagged commit.
+NuGet.org publication, GitHub Packages publication, and GitHub Release creation
+all consume the canonical validated Actions artifact rather than repacking the
+repository.
 
 Before merging or pushing a release-ready commit to `main`:
 
@@ -199,7 +212,7 @@ Before merging or pushing a release-ready commit to `main`:
    all three package projects and that all six values match;
 2. confirm all three assemblies still declare `AssemblyVersion` `1.0.0.0`;
 3. ensure the NuGet.org trusted-publishing policy authorizes this repository,
-   `push-main.yaml`, the `Release` environment, and all three package IDs:
+   `release.yaml`, the `Release` environment, and all three package IDs:
    `Icod.TermInfo`, `Icod.TermInfo.Source`, and `Icod.TermInfo.Compiler`;
 4. ensure the `NUGET_USER` repository secret identifies the intended NuGet.org
    account;
@@ -207,8 +220,12 @@ Before merging or pushing a release-ready commit to `main`:
 6. remember that a source/package change after validation creates a new release
    candidate and requires validation again.
 
-For a final release, create tag `v<PackageVersion>` only for the exact commit
-whose release validation and publication succeeded.
+After the release-ready commit has passed the `main` Release workflow, create
+and push tag `v<PackageVersion>` for that exact commit. Pushing the tag starts
+publication; do not publish the packages manually first.
+
+If the `Release` environment restricts deployment branches or tags, configure
+it to permit the intended `v*` release tags before the first tag-driven release.
 
 ## NuGet.org authentication
 
@@ -236,7 +253,9 @@ After a final version is published:
   Packages;
 - confirm fresh Runtime, Source, and Compiler consumers can restore the final
   version;
-- create/verify the exact final tag;
+- verify the published version came from the expected immutable release tag;
+- confirm the GitHub Release contains all six package artifacts plus
+  `SHA256SUMS.txt`;
 - treat subsequent public API or package-content changes as changes for the next
   version.
 

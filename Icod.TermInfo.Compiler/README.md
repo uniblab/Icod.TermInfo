@@ -13,10 +13,10 @@ ncurses/`tic` differential validation.
 
 ## Install
 
-For the C07 development package:
+For the 1.2.0 release:
 
 ```text
-dotnet add package Icod.TermInfo.Compiler --version 1.2.0-Alpha-7
+dotnet add package Icod.TermInfo.Compiler --version 1.2.0
 ```
 
 The package targets `net8.0`, `net9.0`, and `net10.0` and depends on the matching

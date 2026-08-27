@@ -7,11 +7,11 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
-**Current release version:** `1.1.1`
-**Current development version:** `1.2.0-Alpha-7`
-**Next development line:** `1.2.0`
-**Status:** C07 implementation candidate — build/test/package validation required
-**Current tranche:** C07 — Round-trip and differential validation
+**Current release version:** `1.2.0`
+**Current development version:** `1.2.0`
+**Next development line:** `1.3.0`
+**Status:** 1.2.0 release closure
+**Current tranche:** Final 1.2.0 release closure
 **Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
 
 ---
@@ -781,8 +781,13 @@ Release closure SHALL:
 - pack and structurally validate all three NuGet and symbol packages;
 - execute fresh runtime, Source, and Compiler package consumers on all three targets;
 - verify the one-way dependency graph;
-- publish the exact validated artifacts to NuGet.org and GitHub Packages;
-- tag the exact validated/published commit as `v1.2.0`.
+- pass the non-publishing Release validation workflow on the exact `main` commit;
+- create and push immutable tag `v1.2.0` for that validated commit;
+- require the tag workflow to repeat the complete Release gate on the tagged
+  commit before publishing the validated artifacts to NuGet.org and GitHub
+  Packages and creating the GitHub Release.
+
+**Release audit:** [`docs/1.2.0-RELEASE-AUDIT.md`](docs/1.2.0-RELEASE-AUDIT.md)
 
 ---
 
