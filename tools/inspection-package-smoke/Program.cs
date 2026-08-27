@@ -31,9 +31,10 @@ Require(
 Type[] exportedTypes =
 	inspectionAssembly.GetExportedTypes();
 Require(
-	exportedTypes.Length == 1
-		&& exportedTypes[ 0 ] == typeof( TerminalDescriptionSourceRenderer ),
-	"The Inspection package did not expose exactly the reviewed I02 renderer surface."
+	exportedTypes.Length == 2
+		&& exportedTypes.Contains( typeof( TermInfoSourceRenderer ) )
+		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceRenderer ) ),
+	"The Inspection package did not expose exactly the reviewed I02/I03 renderer surface."
 );
 
 Require(
@@ -103,6 +104,26 @@ Require(
 	!reparsed.HasErrors
 		&& reparsed.Document.Entries.Count == 1,
 	"The canonical I02 smoke representation did not reparse."
+);
+
+string normalizedUnresolved =
+	TermInfoSourceRenderer.Render(
+		parsed.Document
+	);
+Require(
+	normalizedUnresolved == rendered,
+	"The I03 unresolved renderer did not produce the normalized smoke representation."
+);
+TermInfoSourceParseResult normalizedParsed =
+	TermInfoSourceParser.Parse(
+		normalizedUnresolved,
+		"inspection-package-smoke-normalized.ti"
+	);
+Require(
+	!normalizedParsed.HasErrors
+		&& normalizedParsed.Document.Entries.Count == 1
+		&& normalizedParsed.Document.Entries[ 0 ].Fields.Count == 2,
+	"The normalized I03 smoke representation did not preserve the unresolved source model."
 );
 
 Console.WriteLine(

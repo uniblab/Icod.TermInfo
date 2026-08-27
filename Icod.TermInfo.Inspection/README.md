@@ -7,6 +7,33 @@ The 1.3 line provides the reusable API engine underneath future
 `infocmp`-style tooling while preserving the already-frozen Runtime 1.0, Source
 1.1, and Compiler 1.2 public contracts.
 
+## I03 normalized unresolved-source rendering
+
+`1.3.0-Alpha-3` adds normalized rendering for the unresolved Source 1.1 model:
+
+```csharp
+string normalized =
+	TermInfoSourceRenderer.Render(
+		parsed.Document
+	);
+```
+
+The same API accepts a single `TermInfoSourceEntry`, and both entry/document
+forms have caller-owned `TextWriter` overloads.
+
+I03 preserves entry order and field order, including duplicate declarations,
+`use=` placement, cancellation, and disabled fields. It does not flatten
+inheritance. Boolean, numeric, and string fields are regenerated from structured
+Source values with invariant numeric spelling, canonical source escaping, LF line
+endings, and deterministic wrapping.
+
+The renderer intentionally does not reproduce comments, original whitespace,
+source spans, or equivalent lexical spellings such as hexadecimal versus decimal
+numbers. Disabled operands are not structured Source state, so a declaration such
+as `.clear=\E[H` normalizes to `.clear` while retaining its ordered disabled-field
+semantics. A numeric or string field with no successfully decoded value fails with
+`InvalidOperationException` instead of substituting opaque malformed text.
+
 ## I02 canonical effective source rendering
 
 `1.3.0-Alpha-2` introduces the first public Inspection API:
@@ -62,10 +89,10 @@ There is no production dependency between Inspection and Compiler.
 
 ## Install
 
-During I02 development:
+During I03 development:
 
 ```text
-dotnet add package Icod.TermInfo.Inspection --version 1.3.0-Alpha-2
+dotnet add package Icod.TermInfo.Inspection --version 1.3.0-Alpha-3
 ```
 
 The package targets `net8.0`, `net9.0`, and `net10.0`, uses C# 13, remains

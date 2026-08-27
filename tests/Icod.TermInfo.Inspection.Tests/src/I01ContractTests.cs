@@ -5,7 +5,7 @@ using Xunit;
 namespace Icod.TermInfo.Inspection.Tests;
 
 public sealed class I01ContractTests {
-	private const string DevelopmentVersion = "1.3.0-Alpha-2";
+	private const string DevelopmentVersion = "1.3.0-Alpha-3";
 	private const string StableAssemblyVersion = "1.0.0.0";
 
 	[Fact]
@@ -59,14 +59,23 @@ public sealed class I01ContractTests {
 			new Version( 1, 0, 0, 0 ),
 			inspection.GetName().Version
 		);
-		Type[] exportedTypes =
-			inspection.GetExportedTypes();
-		Assert.Single(
-			exportedTypes
-		);
+		string[] exportedTypes =
+			inspection
+				.GetExportedTypes()
+				.Select(
+					type => type.FullName ?? string.Empty
+				)
+				.OrderBy(
+					name => name,
+					StringComparer.Ordinal
+				)
+				.ToArray();
 		Assert.Equal(
-			"Icod.TermInfo.Inspection.TerminalDescriptionSourceRenderer",
-			exportedTypes[ 0 ].FullName
+			new[] {
+				"Icod.TermInfo.Inspection.TermInfoSourceRenderer",
+				"Icod.TermInfo.Inspection.TerminalDescriptionSourceRenderer",
+			},
+			exportedTypes
 		);
 	}
 
@@ -176,7 +185,7 @@ public sealed class I01ContractTests {
 	}
 
 	[Fact]
-	public void InspectionPublicApiBaselineContainsReviewedI02Renderer() {
+	public void InspectionPublicApiBaselineContainsReviewedI02AndI03Renderers() {
 		string root =
 			FindRepositoryRoot();
 		string baseline =
@@ -190,6 +199,18 @@ public sealed class I01ContractTests {
 				)
 			);
 
+		Assert.Contains(
+			"TYPE class Icod.TermInfo.Inspection.TermInfoSourceRenderer [static]",
+			baseline
+		);
+		Assert.Contains(
+			"METHOD public static System.String Render(Icod.TermInfo.Source.TermInfoSourceDocument document",
+			baseline
+		);
+		Assert.Contains(
+			"METHOD public static System.String Render(Icod.TermInfo.Source.TermInfoSourceEntry entry",
+			baseline
+		);
 		Assert.Contains(
 			"TYPE class Icod.TermInfo.Inspection.TerminalDescriptionSourceRenderer [static]",
 			baseline
