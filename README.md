@@ -2,30 +2,43 @@
 
 `Icod.TermInfo` is a managed, dependency-free .NET implementation of the low-level terminal-capability model traditionally supplied by `libtinfo`.
 
-Version 1.1.1 is the current maintenance release of the 1.1 line. It preserves the frozen 1.0 runtime contract and the 1.1 source-language feature set provided by the optional `Icod.TermInfo.Source` package.
+Version 1.2.0 is the current coordinated release. It preserves the frozen 1.0
+runtime contract and frozen 1.1 Source contract while adding the optional
+`Icod.TermInfo.Compiler` package.
 
-The published 1.1.1 packages target `net8.0` and `net10.0`. Beginning with the 1.2
-development line, the supported consumer matrix expands to `net8.0`, `net9.0`,
-and `net10.0`; the packages use C# 13, contain no native ncurses/terminfo
-payload, and are intended to run on Windows, Linux, and macOS.
+The published 1.2.0 package family targets `net8.0`, `net9.0`, and `net10.0`;
+the packages use C# 13, contain no native ncurses/terminfo payload, and are
+intended to run on Windows, Linux, and macOS.
 
 ## Install
 
-For the 1.1.1 release, runtime-only consumers use:
+For the 1.2.0 release, runtime-only consumers use:
 
 ```text
-dotnet add package Icod.TermInfo --version 1.1.1
+dotnet add package Icod.TermInfo --version 1.2.0
 ```
 
 Applications which need terminfo source-language support use:
 
 ```text
-dotnet add package Icod.TermInfo.Source --version 1.1.1
+dotnet add package Icod.TermInfo.Source --version 1.2.0
 ```
 
-`Icod.TermInfo.Source` depends on the matching `Icod.TermInfo` package. Applications which only load compiled terminfo or consume `TerminalDescription` values continue to reference `Icod.TermInfo` alone.
+Applications which compile terminfo source or write conventional compiled
+terminfo databases use:
 
-The same validated package artifacts are intended for NuGet.org and GitHub Packages. Repository development can reference the corresponding project directly.
+```text
+dotnet add package Icod.TermInfo.Compiler --version 1.2.0
+```
+
+`Icod.TermInfo.Source` depends on the matching `Icod.TermInfo` package.
+`Icod.TermInfo.Compiler` depends on the matching Runtime and Source packages.
+Applications which only load compiled terminfo or consume `TerminalDescription`
+values continue to reference `Icod.TermInfo` alone.
+
+The same validated package artifacts are published to NuGet.org and GitHub
+Packages. Release closure and tag-publication requirements are recorded in
+`docs/1.2.0-RELEASE-AUDIT.md`.
 
 ## 1.x stability contract
 
@@ -79,6 +92,26 @@ The optional `Icod.TermInfo.Source` package adds the source-language path withou
 - bounded source and inheritance processing, deterministic mutation fuzzing, and checked-in source/compiled compatibility fixtures.
 
 The source package is optional. Compiled-database users and higher-level terminal consumers do not acquire it transitively through `Icod.TermInfo`.
+
+## What 1.2 adds
+
+The optional `Icod.TermInfo.Compiler` package completes the managed inverse of
+the existing compiled-term acquisition path:
+
+- deterministic legacy `0432` and wide `01036` compiled-entry writing;
+- standard and ncurses extended-capability emission;
+- automatic or explicit format selection with strict representation validation;
+- direct compilation from resolved `TerminalDescription` values;
+- `.ti` source compilation through the existing Source parser and inheritance
+  resolver, preserving Source diagnostics;
+- controlled publication into explicit conventional terminfo directory layouts;
+- safe path derivation, overwrite policy, and failure-resistant database writes;
+- semantic source → resolve → write → parse round-trip validation;
+- byte-for-byte determinism checks and pinned ncurses/`tic` differential corpus
+  coverage.
+
+Compiler remains opt-in. The Runtime package remains dependency-free, Source
+depends only on Runtime, and Compiler depends on Runtime and Source.
 
 ## Getting started
 
