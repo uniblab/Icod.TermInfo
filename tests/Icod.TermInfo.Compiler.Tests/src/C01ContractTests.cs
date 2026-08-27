@@ -6,7 +6,7 @@ using Xunit;
 namespace Icod.TermInfo.Compiler.Tests;
 
 public sealed class C01ContractTests {
-	private const string DevelopmentVersion = "1.2.0-Alpha-4";
+	private const string DevelopmentVersion = "1.2.0-Alpha-5";
 	private const string StableAssemblyVersion = "1.0.0.0";
 
 	[Fact]
@@ -66,7 +66,7 @@ public sealed class C01ContractTests {
 	}
 
 	[Fact]
-	public void CompilerPackageTargetsThreeFrameworksAndDependsOnlyOnRuntime() {
+	public void CompilerPackageTargetsThreeFrameworksAndDependsOnRuntimeAndSource() {
 		string root = FindRepositoryRoot();
 		XDocument project =
 			XDocument.Load(
@@ -93,23 +93,27 @@ public sealed class C01ContractTests {
 			)
 		);
 
-		XElement reference = Assert.Single(
-			project.Descendants(),
-			element => element.Name.LocalName == "ProjectReference"
-		);
+		string[] references =
+			project
+				.Descendants()
+				.Where(
+					element => element.Name.LocalName == "ProjectReference"
+				)
+				.Select(
+					element => element.Attribute( "Include" )?.Value
+						?? string.Empty
+				)
+				.OrderBy(
+					value => value,
+					StringComparer.Ordinal
+				)
+				.ToArray();
 		Assert.Equal(
-			@"..\Icod.TermInfo.csproj",
-			reference.Attribute( "Include" )?.Value
-		);
-		Assert.DoesNotContain(
-			project.Descendants(),
-			element =>
-				element.Name.LocalName == "ProjectReference"
-				&& ( element.Attribute( "Include" )?.Value
-					.Contains(
-						"Icod.TermInfo.Source",
-						StringComparison.OrdinalIgnoreCase
-					) ?? false )
+			new[] {
+				@"..\Icod.TermInfo.Source\Icod.TermInfo.Source.csproj",
+				@"..\Icod.TermInfo.csproj",
+			},
+			references
 		);
 	}
 
