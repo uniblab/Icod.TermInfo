@@ -11,8 +11,8 @@ TYPE enum Icod.TermInfo.Compiler.CompiledTermInfoFormat [sealed]
 END
 
 TYPE class Icod.TermInfo.Compiler.CompiledTermInfoSourceEntry [sealed]
-  PROPERTY System.Collections.Generic.IReadOnlyList<System.String> Aliases { public get; } null=not-null/unknown<not-null/not-null>
   PROPERTY System.Byte[] Data { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.Collections.Generic.IReadOnlyList<System.String> Aliases { public get; } null=not-null/unknown<not-null/not-null>
   PROPERTY System.String CanonicalName { public get; } null=not-null/unknown
 END
 
