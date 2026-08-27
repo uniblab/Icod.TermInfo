@@ -6,17 +6,65 @@ for `Icod.TermInfo`.
 C01 establishes the package and pure writer contract. C02 completes standard
 capability emission, C03 adds the supported ncurses extended section, and C04
 adds deterministic automatic and explicit `0432` / `01036` format selection.
+C05 composes the 1.1 Source parser/resolver with that writer.
 
 ## Install
 
-For the C04 development package:
+For the C05 development package:
 
 ```text
-dotnet add package Icod.TermInfo.Compiler --version 1.2.0-Alpha-4
+dotnet add package Icod.TermInfo.Compiler --version 1.2.0-Alpha-5
 ```
 
 The package targets `net8.0`, `net9.0`, and `net10.0` and depends on the matching
-`Icod.TermInfo` package. C04 still does not depend on `Icod.TermInfo.Source`.
+`Icod.TermInfo` and `Icod.TermInfo.Source` packages. The dependency remains
+one-way; neither Source nor Runtime depends on Compiler.
+
+## Source compilation
+
+C05 compiles a complete `.ti` source document without duplicating Source
+semantics:
+
+```csharp
+using Icod.TermInfo.Compiler;
+
+const string source =
+	"""
+	example-child|Example child,
+		cols#132,
+		use=example-base,
+
+	example-base|Example base,
+		am,
+		lines#40,
+	""";
+
+TermInfoSourceCompilationResult result =
+	TermInfoSourceCompiler.Compile(
+		source,
+		"example.ti"
+	);
+
+foreach ( CompiledTermInfoSourceEntry entry in result.Entries ) {
+	byte[] compiled = entry.Data;
+	// Store or load this independently as appropriate for the caller.
+}
+```
+
+Entries are returned in source-document order. `use=` dependencies may appear
+before or after their parents because resolution is delegated to the existing
+Source resolver. Parser and resolver diagnostics are returned as the original
+`TermInfoSourceDiagnostic` objects, preserving source names, lines, columns,
+offsets, and spans.
+
+Source cancellation remains source-only state. After inheritance resolution it
+materializes as effective absence in `TerminalDescription`; C05 does not invent
+compiled cancellation tombstones.
+
+`CompiledTermInfoWriterOptions` can be supplied to `Compile` to retain the C04
+automatic/Legacy/Wide and extended-section policies. If a resolved description
+cannot be represented by the requested writer policy, the established C04
+`InvalidOperationException` contract is preserved.
 
 ## Automatic format selection
 

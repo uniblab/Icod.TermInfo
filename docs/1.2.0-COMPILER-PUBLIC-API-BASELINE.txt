@@ -10,6 +10,12 @@ TYPE enum Icod.TermInfo.Compiler.CompiledTermInfoFormat [sealed]
   ENUM Wide = 2
 END
 
+TYPE class Icod.TermInfo.Compiler.CompiledTermInfoSourceEntry [sealed]
+  PROPERTY System.Collections.Generic.IReadOnlyList<System.String> Aliases { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.Byte[] Data { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.String CanonicalName { public get; } null=not-null/unknown
+END
+
 TYPE class Icod.TermInfo.Compiler.CompiledTermInfoWriter [static]
   METHOD public static System.Byte[] Write(Icod.TermInfo.TerminalDescription description null=not-null/not-null) return-null=not-null/not-null<not-null/not-null>
   METHOD public static System.Byte[] Write(Icod.TermInfo.TerminalDescription description null=not-null/not-null, Icod.TermInfo.Compiler.CompiledTermInfoWriterOptions options null=not-null/not-null) return-null=not-null/not-null<not-null/not-null>
@@ -20,4 +26,15 @@ TYPE class Icod.TermInfo.Compiler.CompiledTermInfoWriterOptions [sealed]
   CTOR public CompiledTermInfoWriterOptions(Icod.TermInfo.Compiler.CompiledTermInfoFormat format null=not-null/not-null, System.Boolean includeExtendedCapabilities null=not-null/not-null default=true)
   PROPERTY Icod.TermInfo.Compiler.CompiledTermInfoFormat Format { public get; } null=not-null/unknown
   PROPERTY System.Boolean IncludeExtendedCapabilities { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.Compiler.TermInfoSourceCompilationResult [sealed]
+  PROPERTY System.Boolean HasErrors { public get; } null=not-null/unknown
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Compiler.CompiledTermInfoSourceEntry> Entries { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Source.TermInfoSourceDiagnostic> Diagnostics { public get; } null=not-null/unknown<not-null/not-null>
+END
+
+TYPE class Icod.TermInfo.Compiler.TermInfoSourceCompiler [static]
+  METHOD public static Icod.TermInfo.Compiler.TermInfoSourceCompilationResult Compile(System.IO.TextReader reader null=not-null/not-null, System.String sourceName null=nullable/nullable default=null, Icod.TermInfo.Source.TermInfoSourceLexerOptions lexerOptions null=nullable/nullable default=null, Icod.TermInfo.Source.TermInfoSourceResolverOptions resolverOptions null=nullable/nullable default=null, Icod.TermInfo.Compiler.CompiledTermInfoWriterOptions writerOptions null=nullable/nullable default=null) return-null=not-null/not-null
+  METHOD public static Icod.TermInfo.Compiler.TermInfoSourceCompilationResult Compile(System.String source null=not-null/not-null, System.String sourceName null=nullable/nullable default=null, Icod.TermInfo.Source.TermInfoSourceLexerOptions lexerOptions null=nullable/nullable default=null, Icod.TermInfo.Source.TermInfoSourceResolverOptions resolverOptions null=nullable/nullable default=null, Icod.TermInfo.Compiler.CompiledTermInfoWriterOptions writerOptions null=nullable/nullable default=null) return-null=not-null/not-null
 END

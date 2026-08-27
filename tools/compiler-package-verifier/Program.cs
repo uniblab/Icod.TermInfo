@@ -9,6 +9,7 @@ namespace Icod.TermInfo.Compiler.PackageVerifier;
 internal static class Program {
 	private const string PackageId = "Icod.TermInfo.Compiler";
 	private const string RuntimePackageId = "Icod.TermInfo";
+	private const string SourcePackageId = "Icod.TermInfo.Source";
 	private const string RepositoryUrl = "https://github.com/uniblab/Icod.TermInfo";
 	private const string ExpectedAssemblyVersion = "1.0.0.0";
 	private static readonly string[] TargetFrameworks = [
@@ -43,14 +44,23 @@ internal static class Program {
 						"Icod.TermInfo.Compiler.csproj"
 					)
 				);
+			string sourceVersion =
+				ReadPackageVersion(
+					root,
+					Path.Combine(
+						"Icod.TermInfo.Source",
+						"Icod.TermInfo.Source.csproj"
+					)
+				);
 			string runtimeVersion =
 				ReadPackageVersion(
 					root,
 					"Icod.TermInfo.csproj"
 				);
 			Require(
-				packageVersion == runtimeVersion,
-				"Icod.TermInfo.Compiler and Icod.TermInfo PackageVersion values must match."
+				packageVersion == sourceVersion
+					&& packageVersion == runtimeVersion,
+				"Icod.TermInfo.Compiler, Icod.TermInfo.Source, and Icod.TermInfo PackageVersion values must match."
 			);
 
 			string nupkg =
@@ -77,7 +87,7 @@ internal static class Program {
 			);
 
 			Console.WriteLine(
-				$"Verified {PackageId} multi-target package structure, runtime-only dependency, assembly identity, symbols, and Source Link for {packageVersion}."
+				$"Verified {PackageId} multi-target package structure, Source/Runtime dependencies, assembly identity, symbols, and Source Link for {packageVersion}."
 			);
 			return 0;
 		}
@@ -186,9 +196,36 @@ internal static class Program {
 					element => element.Attribute( "targetFramework" )?.Value == targetFramework
 				);
 			Require( group is not null, $"Missing dependency group for {targetFramework}." );
-			XElement dependency = AssertSingleDependency( group! );
-			Require( dependency.Attribute( "id" )?.Value == RuntimePackageId, $"{targetFramework} has an unexpected dependency." );
-			Require( dependency.Attribute( "version" )?.Value == expectedVersion, $"{targetFramework} does not depend on the matching Runtime package version." );
+			XElement[] dependencies =
+				group!
+					.Elements()
+					.Where(
+						element =>
+							element.Name.LocalName
+								== "dependency"
+					)
+					.OrderBy(
+						element =>
+							element.Attribute( "id" )?.Value,
+						StringComparer.Ordinal
+					)
+					.ToArray();
+			Require(
+				dependencies.Length == 2,
+				$"{targetFramework} must contain exactly the Source and Runtime dependencies."
+			);
+			AssertDependency(
+				dependencies,
+				RuntimePackageId,
+				expectedVersion,
+				targetFramework
+			);
+			AssertDependency(
+				dependencies,
+				SourcePackageId,
+				expectedVersion,
+				targetFramework
+			);
 		}
 
 		XElement? repository =
@@ -301,13 +338,31 @@ internal static class Program {
 		return entries[0];
 	}
 
-	private static XElement AssertSingleDependency(
-		XElement group
+	private static void AssertDependency(
+		IEnumerable<XElement> dependencies,
+		string packageId,
+		string expectedVersion,
+		string targetFramework
 	) {
-		ArgumentNullException.ThrowIfNull( group );
-		XElement[] dependencies = group.Elements().Where( element => element.Name.LocalName == "dependency" ).ToArray();
-		Require( dependencies.Length == 1, $"Expected one Compiler dependency, found {dependencies.Length}." );
-		return dependencies[0];
+		ArgumentNullException.ThrowIfNull( dependencies );
+		ArgumentException.ThrowIfNullOrWhiteSpace( packageId );
+		ArgumentException.ThrowIfNullOrWhiteSpace( expectedVersion );
+		ArgumentException.ThrowIfNullOrWhiteSpace( targetFramework );
+
+		XElement? dependency =
+			dependencies.SingleOrDefault(
+				element =>
+					element.Attribute( "id" )?.Value
+						== packageId
+			);
+		Require(
+			dependency is not null,
+			$"{targetFramework} does not depend on {packageId}."
+		);
+		Require(
+			dependency!.Attribute( "version" )?.Value == expectedVersion,
+			$"{targetFramework} does not depend on the matching {packageId} version."
+		);
 	}
 
 	private static string? GetMetadataText(

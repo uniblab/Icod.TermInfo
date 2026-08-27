@@ -2,6 +2,7 @@ using System.Buffers.Binary;
 using System.Reflection;
 using Icod.TermInfo;
 using Icod.TermInfo.Compiler;
+using Icod.TermInfo.Source;
 
 static void Require(
 	bool condition,
@@ -75,6 +76,48 @@ Require(
 	typeof( TerminalDescription ).Assembly.GetName().Version
 		== new Version( 1, 0, 0, 0 ),
 	"The transitive Runtime package must retain the stable 1.x assembly identity."
+);
+
+const string source =
+	"""
+	compiler-smoke-child|Compiler smoke child,
+		cols#132,
+		use=compiler-smoke-base,
+
+	compiler-smoke-base|Compiler smoke base,
+		am,
+		lines#43,
+	""";
+TermInfoSourceCompilationResult sourceCompilation =
+	TermInfoSourceCompiler.Compile(
+		source,
+		"compiler-package-smoke.ti"
+	);
+Require(
+	!sourceCompilation.HasErrors
+		&& sourceCompilation.Entries.Count == 2,
+	"The Compiler package could not compile a multi-entry source document."
+);
+TerminalDescription compiledChild =
+	CompiledTermInfoParser.Parse(
+		sourceCompilation.Entries[0].Data
+	);
+Require(
+	compiledChild.Name == "compiler-smoke-child"
+		&& compiledChild.GetNumber( NumericCapability.Columns ) == 132
+		&& compiledChild.GetNumber( NumericCapability.Lines ) == 43
+		&& compiledChild.GetBoolean( BooleanCapability.AutoRightMargin ),
+	"The Compiler package did not preserve C05 source inheritance semantics."
+);
+Require(
+	typeof( TermInfoSourceParser ).Assembly.GetName().Name
+		== "Icod.TermInfo.Source",
+	"The Compiler package did not expose its C05 Source dependency."
+);
+Require(
+	typeof( TermInfoSourceParser ).Assembly.GetName().Version
+		== new Version( 1, 0, 0, 0 ),
+	"The transitive Source package must retain the stable 1.x assembly identity."
 );
 
 Console.WriteLine(
