@@ -32,8 +32,8 @@ bash .github/scripts/verify-release-package.sh artifacts Release
 
 The scripts reject any configuration other than `Debug`, `Staging`, or `Release`, and the
 selected configuration controls maintenance tools, API-snapshot build-output
-paths, the runtime and Compiler package verifiers, Runtime/Source/Compiler package
-artifacts, all three fresh-package consumers, and the non-interactive repository
+paths, the Runtime, Compiler, and Inspection package verifiers, all four package
+artifacts, all four fresh-package consumers, and the non-interactive repository
 sample.
 
 The 1.1 source-language line keeps the frozen `Icod.TermInfo` package checks and
@@ -41,7 +41,10 @@ adds `Icod.TermInfo.Source` net8.0/net9.0/net10.0 API-equivalence, reviewed
 public-API baseline, coordinated-version, artifact-presence, and
 package-reference-only consumer gates. C01 adds equivalent Compiler API-baseline,
 three-target API-equivalence, package-structure, coordinated-version, artifact,
-and package-reference-only consumer gates.
+and package-reference-only consumer gates. I01 adds the independent Inspection
+API baseline, three-target API equivalence, exact Runtime+Source dependency
+verification, structural package validation, coordinated-version/artifact gates,
+and the fourth package-reference-only consumer.
 
 Fresh-package consumers use isolated NuGet package caches.
 `package-smoke.NuGet.Config` maps every `Icod.TermInfo*` package exclusively to

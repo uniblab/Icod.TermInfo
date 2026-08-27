@@ -6,7 +6,7 @@ package/layer.
 
 Its purpose is to prevent the existence of a missing terminal feature from
 being mistaken for evidence that the feature belongs in the low-level
-`Icod.TermInfo` runtime package or the optional source-language package.
+`Icod.TermInfo` runtime package or another already-defined package-family layer.
 
 The governing distinction is:
 
@@ -15,6 +15,8 @@ The governing distinction is:
 > `Icod.TermInfo.Source` owns `.ti` source parsing and inheritance resolution.
 > `Icod.TermInfo.Compiler` owns deterministic compiled-entry writing and the
 > reusable source-to-compiled engine introduced in the 1.2 line.
+> `Icod.TermInfo.Inspection` owns canonical human-readable inspection and
+> semantic comparison beginning with the 1.3 line.
 > Live terminal conversations, process plumbing, and virtual-screen/UI policy
 > belong elsewhere.**
 
@@ -22,8 +24,9 @@ The governing distinction is:
 
 ## 1. Current foundation
 
-The 1.1 line preserves the combined 0.8 semantic and 0.9 acquisition runtime
-foundation and adds the optional source-language layer:
+The published 1.2 line preserves the Runtime and Source foundations and adds the
+optional Compiler layer. The active 1.3 line adds the optional Inspection layer
+without moving those responsibilities into the older packages:
 
 - immutable terminal descriptions;
 - complete standard capability metadata;
@@ -46,14 +49,20 @@ foundation and adds the optional source-language layer:
 - standard/extended capability classification;
 - cancellation and `use=` inheritance resolution;
 - materialization into the existing immutable `TerminalDescription` model;
+- deterministic legacy/wide and extended compiled-entry writing;
+- source-to-compiled composition through the existing Source parser/resolver;
+- controlled conventional database-layout output;
+- deterministic compiler round-trip/differential validation;
 - deterministic corpus/fuzz/resource-bound validation;
 - no process-global current terminal;
-- dual-target `net8.0`/`net10.0` package and compatibility gates.
+- three-target `net8.0`/`net9.0`/`net10.0` package and compatibility gates.
 
 The runtime public contract remains the frozen 1.0 contract. Source-language
-functionality is isolated in `Icod.TermInfo.Source`.
+functionality is isolated in `Icod.TermInfo.Source`; compiled writing is isolated
+in `Icod.TermInfo.Compiler`. I01 establishes `Icod.TermInfo.Inspection` as a
+fourth sibling layer before public inspection behavior is introduced.
 
-Beginning with 1.2, active package-family validation expands to the three-target
+Beginning with 1.2, active package-family validation uses the three-target
 `net8.0`/`net9.0`/`net10.0` matrix. This additive support change does not rewrite
 the frozen 1.0/1.1 target-framework contracts.
 
@@ -69,8 +78,9 @@ the frozen 1.0/1.1 target-framework contracts.
 | Hashed databases | Berkeley DB/ncurses hashed stores | optional later provider/package | compiled parser |
 | Historical vendor formats | HP-UX/AIX/OSF/1 divergent binary layouts | optional later | parser abstraction + fixtures |
 | Terminfo source language | completed in 1.1: `.ti`, diagnostics, cancellation, `use=` inheritance, materialization | `Icod.TermInfo.Source` | runtime semantic model |
-| Terminfo compiler | planned for 1.2: deterministic compiled-entry writer, source compiler engine, and safe database-layout output | `Icod.TermInfo.Compiler` | runtime model; Source from C05 |
-| Terminfo tooling | `tic`, `infocmp`, `toe`, conversion tooling | likely `Icod.TermInfo.Tools` | source parser + binary reader/writer |
+| Terminfo compiler | completed in 1.2: deterministic compiled-entry writer, source compiler engine, and safe database-layout output | `Icod.TermInfo.Compiler` | Runtime + Source |
+| Terminfo inspection/comparison | active 1.3 work: canonical effective/source-aware rendering, structured semantic comparison, provider-aware inspection | `Icod.TermInfo.Inspection` | Runtime + Source |
+| Terminfo command-line tooling | future `tic`, `infocmp`, `toe`, conversion applications | later tool projects | Source + Compiler + Inspection as appropriate |
 | Termcap interoperability | termcap syntax, `TERMCAP`, `TERMPATH`, conversion | optional compatibility/tooling | source/conversion model |
 | Live session | raw/cooked/cbreak, restore, tty ownership, full-screen/cursor lifecycle | `Icod.Terminal` | `Icod.TermInfo` + OS interop |
 | Input events | keyboard, modifiers, mouse, focus, paste, resize | `Icod.Terminal` | raw session + incremental decoder |
@@ -122,7 +132,7 @@ inheritance concerns that runtime-only consumers do not need.
 
 ### 3.2 `tic`-class binary writing
 
-The 1.2 line introduces `Icod.TermInfo.Compiler` as an optional sibling package.
+The completed 1.2 line introduced `Icod.TermInfo.Compiler` as an optional sibling package.
 Its low-level writer accepts an already-resolved `TerminalDescription` and emits
 the conventional compiled formats accepted by the 0.9 runtime parser.
 
@@ -147,18 +157,21 @@ separate later layer so the core binary writer remains pure.
 The complete pre-C01 representation and package contract is recorded in
 `docs/1.2.0-PRE-C01-CONTRACT-AUDIT.md`.
 
-### 3.3 `infocmp`-class inspection
+### 3.3 `infocmp`-class inspection — active in 1.3
 
-A tooling layer could provide:
+The 1.3 line establishes `Icod.TermInfo.Inspection` as the reusable engine for:
 
-- compiled-entry decompilation to source;
-- terminal-description comparison;
-- canonical/source ordering;
-- optional resolved/unresolved inheritance views;
-- extended-capability display;
-- machine-readable output useful for tests and diagnostics.
+- canonical effective `TerminalDescription` rendering;
+- normalized unresolved Source rendering without flattening `use=` inheritance;
+- effective and source-aware semantic comparison;
+- deterministic structured differences;
+- provider-aware inspection orchestration;
+- future `infocmp`-style applications without embedding console policy.
 
-This is operational tooling, not required for runtime terminal capability use.
+I01 establishes the package, dependency, API-baseline, smoke, and release
+infrastructure before I02 introduces the first public rendering behavior.
+Inspection depends directly on Runtime and Source and has no production
+dependency on Compiler.
 
 ### 3.4 Termcap conversion
 
@@ -386,7 +399,8 @@ Highest-value fuzz targets include:
 
 - compiled terminfo parsing;
 - the 1.1 terminfo source parser/resolver;
-- future compiled-entry writing;
+- compiled-entry writing;
+- Inspection rendering and comparison inputs;
 - live input escape decoding;
 - active-query response parsing;
 - graphics protocol decoding;
@@ -402,7 +416,8 @@ Where authoritative implementations exist, optional differential tests can
 compare:
 
 - compiled parsing with ncurses `infocmp`;
-- future source compilation with `tic`;
+- Source/Compiler output with `tic`;
+- Inspection semantic/rendering results with pinned `infocmp` evidence where useful;
 - parameter expansion with ncurses behavior for adopted syntax;
 - terminal-emulator sequences with protocol conformance fixtures.
 
@@ -455,7 +470,7 @@ plumbing is largely orthogonal to terminfo source/compiler work.
 
 ---
 
-## 10. 1.1 package-family boundary
+## 10. Current package-family boundaries
 
 The runtime definition remains explicit:
 
@@ -464,13 +479,26 @@ The runtime definition remains explicit:
 > semantics completely, and query/expand/output them correctly without native
 > ncurses or hidden process-global terminal state.
 
-The 1.1 addition is equally explicit:
+The Source boundary is equally explicit:
 
 > `Icod.TermInfo.Source` can parse and resolve supported `.ti` source, preserve
 > deterministic source diagnostics and hostile-input bounds, and materialize the
 > resolved result into the same immutable runtime semantic model.
 
-Compiled writing/tool commands, termcap, live input, probing, graphics, PTYs,
-curses, and terminal emulation remain valuable future systems. They are not
-omissions from the 1.1 package family. New work should preserve the runtime /
-Source boundary unless a future major-version design deliberately revisits it.
+The completed 1.2 Compiler boundary is explicit:
+
+> `Icod.TermInfo.Compiler` can deterministically write the supported conventional
+> compiled formats, compile through the Source parser/resolver, and publish
+> explicit conventional database layouts without moving compiler policy into
+> Runtime or Source.
+
+The active 1.3 Inspection boundary is explicit:
+
+> `Icod.TermInfo.Inspection` owns normalized human-readable representation,
+> semantic comparison, structured differences, and reusable inspection
+> orchestration while Runtime, Source, and Compiler retain their frozen APIs.
+
+Command-line tools, termcap, live input, probing, graphics, PTYs, curses, and
+terminal emulation remain valuable future or sibling systems. New work should
+preserve the four package-family ownership boundaries unless a future deliberate
+compatibility review revisits them.

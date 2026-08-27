@@ -7,7 +7,7 @@ namespace Icod.TermInfo.Tests;
 
 public sealed class T45CompletionGateTests {
 	[Fact]
-	public void AssemblyRetainsStableIdentityForOneTwoRelease() {
+	public void AssemblyRetainsStableIdentityForOneThreeDevelopment() {
 		Assembly assembly =
 			typeof( TerminalDescription ).Assembly;
 		AssemblyName assemblyName =
@@ -30,12 +30,12 @@ public sealed class T45CompletionGateTests {
 					2 )[ 0 ];
 
 		Assert.Equal(
-			"1.2.0",
+			"1.3.0-Alpha-5",
 			semanticVersion );
 	}
 
 	[Fact]
-	public void ProjectMetadataIdentifiesOneTwoReleaseAndStableAssembly() {
+	public void ProjectMetadataIdentifiesOneThreeDevelopmentAndStableAssembly() {
 		string root =
 			FindRepositoryRoot();
 		XDocument project =
@@ -46,12 +46,12 @@ public sealed class T45CompletionGateTests {
 				LoadOptions.None );
 
 		Assert.Equal(
-			"1.2.0",
+			"1.3.0-Alpha-5",
 			ReadRequiredProperty(
 				project,
 				"Version" ) );
 		Assert.Equal(
-			"1.2.0",
+			"1.3.0-Alpha-5",
 			ReadRequiredProperty(
 				project,
 				"PackageVersion" ) );

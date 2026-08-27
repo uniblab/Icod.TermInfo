@@ -35,6 +35,7 @@ jobs:
           dotnet pack Icod.TermInfo.csproj -c Release --no-build --output artifacts
           dotnet pack Icod.TermInfo.Source/Icod.TermInfo.Source.csproj -c Release --no-build --output artifacts
           dotnet pack Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj -c Release --no-build --output artifacts
+          dotnet pack Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj -c Release --no-build --output artifacts
 
       - name: Verify Release packages on Windows
         if: matrix.os == 'windows-latest'

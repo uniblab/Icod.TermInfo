@@ -70,6 +70,31 @@ dotnet run \
   docs/1.2.0-COMPILER-PUBLIC-API-BASELINE.txt \
   Icod.TermInfo.Compiler/bin/${configuration}/net10.0/Icod.TermInfo.Compiler.dll
 
+# The Inspection package must expose the same API on all shipped frameworks.
+dotnet run \
+  --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj \
+  -c "${configuration}" \
+  --no-build \
+  -- --compare \
+  Icod.TermInfo.Inspection/bin/${configuration}/net8.0/Icod.TermInfo.Inspection.dll \
+  Icod.TermInfo.Inspection/bin/${configuration}/net9.0/Icod.TermInfo.Inspection.dll
+dotnet run \
+  --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj \
+  -c "${configuration}" \
+  --no-build \
+  -- --compare \
+  Icod.TermInfo.Inspection/bin/${configuration}/net8.0/Icod.TermInfo.Inspection.dll \
+  Icod.TermInfo.Inspection/bin/${configuration}/net10.0/Icod.TermInfo.Inspection.dll
+
+# I01 establishes the independent Inspection baseline before public behavior.
+dotnet run \
+  --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj \
+  -c "${configuration}" \
+  --no-build \
+  -- --check \
+  docs/1.3.0-INSPECTION-PUBLIC-API-BASELINE.txt \
+  Icod.TermInfo.Inspection/bin/${configuration}/net10.0/Icod.TermInfo.Inspection.dll
+
 # Structural package, Source Link, dependency, and architecture verification.
 dotnet run \
   --project tools/package-verifier/Icod.TermInfo.PackageVerifier.csproj \
@@ -78,6 +103,12 @@ dotnet run \
   -- "${artifact_dir}"
 dotnet run \
   --project tools/compiler-package-verifier/Icod.TermInfo.Compiler.PackageVerifier.csproj \
+  -c "${configuration}" \
+  -f net10.0 \
+  -- "${artifact_dir}"
+
+dotnet run \
+  --project tools/inspection-package-verifier/Icod.TermInfo.Inspection.PackageVerifier.csproj \
   -c "${configuration}" \
   -f net10.0 \
   -- "${artifact_dir}"
@@ -145,12 +176,39 @@ if [[ ! -f "${artifact_dir}/Icod.TermInfo.Compiler.${compiler_package_version}.s
   exit 1
 fi
 
+inspection_package_version="$(
+  dotnet msbuild Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj \
+    -nologo \
+    -getProperty:PackageVersion
+)"
+
+if [[ -z "${inspection_package_version}" ]]; then
+  echo "Unable to determine Icod.TermInfo.Inspection PackageVersion." >&2
+  exit 1
+fi
+
+if [[ "${inspection_package_version}" != "${package_version}" ]]; then
+  echo "Icod.TermInfo and Icod.TermInfo.Inspection PackageVersion values must match." >&2
+  exit 1
+fi
+
+if [[ ! -f "${artifact_dir}/Icod.TermInfo.Inspection.${inspection_package_version}.nupkg" ]]; then
+  echo "Icod.TermInfo.Inspection package not found." >&2
+  exit 1
+fi
+
+if [[ ! -f "${artifact_dir}/Icod.TermInfo.Inspection.${inspection_package_version}.snupkg" ]]; then
+  echo "Icod.TermInfo.Inspection symbol package not found." >&2
+  exit 1
+fi
+
 # Copy the package-reference-only consumer to a temporary directory so the smoke
 # test cannot accidentally use a project reference or stale repository outputs.
 smoke_root="$(mktemp -d)"
 source_smoke_root=""
 compiler_smoke_root=""
-trap 'rm -rf "${smoke_root}" "${source_smoke_root}" "${compiler_smoke_root}"' EXIT
+inspection_smoke_root=""
+trap 'rm -rf "${smoke_root}" "${source_smoke_root}" "${compiler_smoke_root}" "${inspection_smoke_root}"' EXIT
 
 cp \
   tools/package-smoke/Icod.TermInfo.PackageSmoke.csproj \
@@ -257,6 +315,41 @@ dotnet run \
   -f net10.0 \
   --no-restore \
   -p:IcodTermInfoCompilerPackageVersion="${compiler_package_version}"
+
+inspection_smoke_root="$(mktemp -d)"
+
+cp \
+  tools/inspection-package-smoke/Icod.TermInfo.Inspection.PackageSmoke.csproj \
+  "${inspection_smoke_root}/Icod.TermInfo.Inspection.PackageSmoke.csproj"
+cp \
+  tools/inspection-package-smoke/Program.cs \
+  "${inspection_smoke_root}/Program.cs"
+
+export NUGET_PACKAGES="${inspection_smoke_root}/packages"
+
+dotnet restore \
+  "${inspection_smoke_root}/Icod.TermInfo.Inspection.PackageSmoke.csproj" \
+  --configfile "${smoke_nuget_config}" \
+  -p:IcodTermInfoInspectionPackageVersion="${inspection_package_version}"
+
+dotnet run \
+  --project "${inspection_smoke_root}/Icod.TermInfo.Inspection.PackageSmoke.csproj" \
+  -c "${configuration}" \
+  -f net8.0 \
+  --no-restore \
+  -p:IcodTermInfoInspectionPackageVersion="${inspection_package_version}"
+dotnet run \
+  --project "${inspection_smoke_root}/Icod.TermInfo.Inspection.PackageSmoke.csproj" \
+  -c "${configuration}" \
+  -f net9.0 \
+  --no-restore \
+  -p:IcodTermInfoInspectionPackageVersion="${inspection_package_version}"
+dotnet run \
+  --project "${inspection_smoke_root}/Icod.TermInfo.Inspection.PackageSmoke.csproj" \
+  -c "${configuration}" \
+  -f net10.0 \
+  --no-restore \
+  -p:IcodTermInfoInspectionPackageVersion="${inspection_package_version}"
 
 # The repository sample must retain a non-interactive path suitable for CI.
 dotnet run \

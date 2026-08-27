@@ -7,26 +7,29 @@ This document describes the current validation and publication procedure for the
 
 - `<Version />` and `<PackageVersion />` must be present and identical in
   `Icod.TermInfo.csproj`, `Icod.TermInfo.Source/Icod.TermInfo.Source.csproj`,
-  and `Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj`.
-- Beginning with C01, Runtime, Source, and Compiler package versions must match.
-- Runtime, Source, and Compiler retain 1.x assembly version `1.0.0.0` and remain
-  unsigned.
-- Supported consumer targets for the 1.2 line are `net8.0`, `net9.0`, and `net10.0`.
+  `Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj`, and
+  `Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj`.
+- Beginning with I01, Runtime, Source, Compiler, and Inspection package versions
+  must match.
+- Runtime, Source, Compiler, and Inspection retain 1.x assembly version
+  `1.0.0.0` and remain unsigned.
+- Supported consumer targets for the 1.3 line are `net8.0`, `net9.0`, and `net10.0`.
 - A release tag must be exactly `v<PackageVersion>` and is the only repository
   event which may publish packages.
 - Release validation must pass on Windows, Linux, and macOS on `main` before a
   release tag is created. The tag workflow repeats the Release gate on the exact
   tagged commit before publication.
-- Release validation must pass the frozen runtime API baseline, the reviewed
-  Source and Compiler API baselines, and net8/net9/net10 API-equivalence gates.
+- Release validation must pass the frozen Runtime, Source, and Compiler API
+  baselines, the developing Inspection API baseline, and net8/net9/net10
+  API-equivalence gates.
 - Release builds treat missing public XML documentation as an error.
-- All three packages must pass the coordinated release verifier before publication.
+- All four packages must pass the coordinated release verifier before publication.
   Use `.github/scripts/verify-release-package.sh` on a Bash-capable host or
   `.github/scripts/verify-release-package.cmd` from Windows Command Prompt.
 - Release packages must retain deterministic build metadata, repository commit
   metadata, portable symbols, Source Link, README, icon metadata, and all three
   framework XML-documentation assets.
-- The six `.nupkg` / `.snupkg` artifacts produced for a version are immutable
+- The eight `.nupkg` / `.snupkg` artifacts produced for a version are immutable
   release artifacts. If package contents change, increment the version rather
   than replacing a published package.
 - Publication is downstream of tag/version validation and the complete
@@ -45,27 +48,29 @@ This document describes the current validation and publication procedure for the
 - `macos-latest`.
 
 Each matrix job cleans, restores, builds, and tests the whole solution, including
-all three package projects, Source and Compiler tests, repository sample
+all four package projects, Source, Compiler, and Inspection tests, repository sample
 executables, and solution-contained maintenance tools.
 
 The Ubuntu matrix leg continues after the shared Staging build/test steps and:
 
 1. packs `Icod.TermInfo.csproj`,
-   `Icod.TermInfo.Source/Icod.TermInfo.Source.csproj`, and
-   `Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj` into a runner-local
+   `Icod.TermInfo.Source/Icod.TermInfo.Source.csproj`,
+   `Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj`, and
+   `Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj` into a runner-local
    `artifacts` directory;
 2. runs `.github/scripts/verify-release-package.sh artifacts Staging`;
 3. uploads the validated `.nupkg` and `.snupkg` files as the
    `icod-terminfo-pr-packages` Actions artifact for seven days.
 
-There is no second checkout/restore/build/test package-validation job; all three
+There is no second checkout/restore/build/test package-validation job; all four
 packages are produced from the same Staging outputs which just passed the Ubuntu
 matrix tests.
 
 That verifier covers generated capability metadata, the frozen runtime API
-baseline, the reviewed Source and Compiler API baselines, net8/net9/net10 API
-equivalence for all three assemblies, Runtime and Compiler package structure,
-metadata, XML, symbols, all three fresh-package consumers, and the
+baseline, the reviewed Source and Compiler API baselines, the Inspection API
+baseline, net8/net9/net10 API equivalence for all four assemblies, Runtime,
+Compiler, and Inspection package structure, metadata, XML, symbols, all four
+fresh-package consumers, and the
 non-interactive repository sample.
 
 The PR artifact is uploaded only after verification succeeds. It is intended for
@@ -85,8 +90,8 @@ the Release build/test matrix on:
 - `ubuntu-latest`;
 - `macos-latest`.
 
-Each matrix leg packs all three package projects and runs the platform-appropriate
-Release verifier. The Windows leg uploads the canonical six `.nupkg` / `.snupkg`
+Each matrix leg packs all four package projects and runs the platform-appropriate
+Release verifier. The Windows leg uploads the canonical eight `.nupkg` / `.snupkg`
 artifacts for seven days.
 
 The main-branch workflow stops after validation and artifact upload. It has only
@@ -97,13 +102,13 @@ registry.
 
 `.github/workflows/release.yaml` runs for pushed tags matching `v*`. Before the
 release build, it requires the tagged commit to be contained in `main`, requires
-Runtime, Source, and Compiler `Version` / `PackageVersion` values to match, and
+Runtime, Source, Compiler, and Inspection `Version` / `PackageVersion` values to match, and
 requires the tag version to match that coordinated package version exactly.
 
 The tag workflow reruns the complete Release matrix on Windows, Linux, and macOS.
 After all three legs pass, the canonical validated packages are published to
 NuGet.org and GitHub Packages. Finally, the workflow creates a GitHub Release
-containing all three package files, all three symbol packages, and a SHA-256
+containing all four package files, all four symbol packages, and a SHA-256
 checksum manifest. Prerelease package versions create GitHub prereleases.
 
 ## What the release verifier checks
@@ -121,15 +126,18 @@ The Bash and CMD entry points perform equivalent validation. They:
    built Source assembly;
 6. require exact Compiler public API equivalence across `net8.0`, `net9.0`, and
    `net10.0` and require `docs/1.2.0-COMPILER-PUBLIC-API-BASELINE.txt` to match;
-7. run the Runtime and Compiler package verifiers for package structure,
-   dependency closure, metadata, XML documentation, Source Link, and portable
-   symbols;
-8. require Source and Compiler `.nupkg` / `.snupkg` artifacts at the same package
-   version as Runtime;
-9. restore and execute the isolated Runtime package consumer on all three TFMs;
-10. restore and execute the isolated Source package consumer on all three TFMs;
-11. restore and execute the isolated Compiler package consumer on all three TFMs;
-12. run the general repository sample through its non-interactive
+7. require exact Inspection public API equivalence across `net8.0`, `net9.0`, and
+   `net10.0` and require `docs/1.3.0-INSPECTION-PUBLIC-API-BASELINE.txt` to match;
+8. run the Runtime, Compiler, and Inspection package verifiers for package
+   structure, dependency closure, metadata, XML documentation, Source Link, and
+   portable symbols;
+9. require Source, Compiler, and Inspection `.nupkg` / `.snupkg` artifacts at the
+   same package version as Runtime;
+10. restore and execute the isolated Runtime package consumer on all three TFMs;
+11. restore and execute the isolated Source package consumer on all three TFMs;
+12. restore and execute the isolated Compiler package consumer on all three TFMs;
+13. restore and execute the isolated Inspection package consumer on all three TFMs;
+14. run the general repository sample through its non-interactive
     `--describe-only` path.
 
 Both repository sample executables are solution projects and therefore compile
@@ -138,7 +146,7 @@ against the host database because its `system` command intentionally inspects
 host-specific terminfo state; the isolated runtime package-smoke consumer
 supplies the deterministic acquisition acceptance test instead.
 
-The checked-in Runtime, Source, and Compiler package-smoke projects are
+The checked-in Runtime, Source, Compiler, and Inspection package-smoke projects are
 intentionally not part of the solution and contain no project references to the
 packages they consume.
 
@@ -155,7 +163,9 @@ The Source smoke consumer proves the separately packed source-language package
 can restore through its NuGet dependency on the matching runtime package and
 execute on all three supported target frameworks. The Compiler smoke consumer
 likewise proves the Compiler package restores through its Runtime dependency and
-can write and reparse a C01 legacy entry on all three frameworks.
+can write and reparse a C01 legacy entry on all three frameworks. The Inspection
+smoke consumer proves the fourth package restores with matching Runtime and Source
+dependencies while retaining the I01 empty-public-surface contract.
 
 No checked-in runtime fixture is copied into the smoke project, so those checks
 prove the public package surface rather than repository-only outputs.
@@ -171,6 +181,7 @@ dotnet test Icod.TermInfo.sln -c Release
 dotnet pack Icod.TermInfo.csproj -c Release --output artifacts
 dotnet pack Icod.TermInfo.Source/Icod.TermInfo.Source.csproj -c Release --output artifacts
 dotnet pack Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj -c Release --output artifacts
+dotnet pack Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj -c Release --output artifacts
 ```
 
 Then run the coordinated verifier with the same configuration used to build and
@@ -198,7 +209,7 @@ configuration names. They otherwise provide the same validation contract.
 `push-main.yaml` validates release candidates but never publishes them.
 `release.yaml` is the sole automated publication workflow. A pushed `v*` tag
 must identify a commit contained in `main`, and its version must exactly match
-the coordinated Runtime, Source, and Compiler `Version` / `PackageVersion`
+the coordinated Runtime, Source, Compiler, and Inspection `Version` / `PackageVersion`
 values.
 
 The tag workflow rebuilds, retests, repacks, and reverifies the tagged commit.
@@ -209,11 +220,12 @@ repository.
 Before merging or pushing a release-ready commit to `main`:
 
 1. confirm `<Version />` and `<PackageVersion />` are the intended version in
-   all three package projects and that all six values match;
-2. confirm all three assemblies still declare `AssemblyVersion` `1.0.0.0`;
+   all four package projects and that all eight values match;
+2. confirm all four assemblies still declare `AssemblyVersion` `1.0.0.0`;
 3. ensure the NuGet.org trusted-publishing policy authorizes this repository,
-   `release.yaml`, the `Release` environment, and all three package IDs:
-   `Icod.TermInfo`, `Icod.TermInfo.Source`, and `Icod.TermInfo.Compiler`;
+   `release.yaml`, the `Release` environment, and all four package IDs:
+   `Icod.TermInfo`, `Icod.TermInfo.Source`, `Icod.TermInfo.Compiler`, and
+   `Icod.TermInfo.Inspection`;
 4. ensure the `NUGET_USER` repository secret identifies the intended NuGet.org
    account;
 5. preserve `packages: write` permission for GitHub Packages;
@@ -247,14 +259,14 @@ control.
 
 After a final version is published:
 
-- confirm all three package IDs and all three symbol packages are visible on
+- confirm all four package IDs and all four symbol packages are visible on
   NuGet.org;
-- confirm the same package version for all three IDs is visible in GitHub
+- confirm the same package version for all four IDs is visible in GitHub
   Packages;
-- confirm fresh Runtime, Source, and Compiler consumers can restore the final
-  version;
+- confirm fresh Runtime, Source, Compiler, and Inspection consumers can restore
+  the final version;
 - verify the published version came from the expected immutable release tag;
-- confirm the GitHub Release contains all six package artifacts plus
+- confirm the GitHub Release contains all eight package artifacts plus
   `SHA256SUMS.txt`;
 - treat subsequent public API or package-content changes as changes for the next
   version.
@@ -273,10 +285,16 @@ For 1.1, use:
 - `docs/1.0.0-PUBLIC-API-BASELINE.txt` for the unchanged runtime API;
 - `docs/VERSIONING.md` and `docs/COMPATIBILITY.md` for the stable 1.x promises.
 
-For 1.2 development, use `docs/1.2.0-PRE-C01-CONTRACT-AUDIT.md` for the
+For the completed 1.2 line, use `docs/1.2.0-PRE-C01-CONTRACT-AUDIT.md` for the
 frozen compiler architecture, `docs/1.2.0-C01-COMPILER-PACKAGE-FOUNDATION.md`
 for the C01 implementation record, and
-`docs/1.2.0-COMPILER-PUBLIC-API-BASELINE.txt` for the reviewed Compiler API.
+`docs/1.2.0-COMPILER-PUBLIC-API-BASELINE.txt` for the frozen Compiler API.
+
+For 1.3 development, use
+`Icod.TermInfo-1.3.0-Inspection-and-Comparison-Roadmap.md` for the I01-I07
+contract, `docs/1.3.0-PRE-I01-CONTRACT-AUDIT.md` for the package/layer freeze,
+and `docs/1.3.0-INSPECTION-PUBLIC-API-BASELINE.txt` for the developing Inspection
+API.
 
 The final `v<PackageVersion>` tag must identify the exact validated and published `main`
 commit. Do not edit the audit or any other source/package content after that
