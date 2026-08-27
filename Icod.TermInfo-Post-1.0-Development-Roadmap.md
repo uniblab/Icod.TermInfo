@@ -8,10 +8,10 @@
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
 **Current release version:** `1.1.1`
-**Current development version:** `1.2.0-Alpha-6`
+**Current development version:** `1.2.0-Alpha-7`
 **Next development line:** `1.2.0`
-**Status:** C06 implementation candidate — build/test/package validation required
-**Current tranche:** C06 — Database-layout writer
+**Status:** C07 implementation candidate — build/test/package validation required
+**Current tranche:** C07 — Round-trip and differential validation
 **Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
 
 ---
@@ -760,6 +760,8 @@ Tests SHALL include:
 Optional ncurses comparison MAY additionally verify emitted data against `tic`.
 
 **1.2 completion gate:** Icod can compile supported terminfo source into conventional compiled database entries which its existing 1.0 runtime parser reads without semantic loss.
+
+**Implementation record:** [`docs/1.2.0-C07-ROUND-TRIP-DIFFERENTIAL-VALIDATION.md`](docs/1.2.0-C07-ROUND-TRIP-DIFFERENTIAL-VALIDATION.md)
 
 ## 5.9 1.2.0 release closure
 

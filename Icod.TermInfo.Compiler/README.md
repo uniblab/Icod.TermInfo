@@ -8,13 +8,15 @@ capability emission, C03 adds the supported ncurses extended section, and C04
 adds deterministic automatic and explicit `0432` / `01036` format selection.
 C05 composes the 1.1 Source parser/resolver with that writer. C06 adds
 controlled publication into an explicit conventional terminfo directory root.
+C07 closes the implementation program with round-trip, determinism, and pinned
+ncurses/`tic` differential validation.
 
 ## Install
 
-For the C06 development package:
+For the C07 development package:
 
 ```text
-dotnet add package Icod.TermInfo.Compiler --version 1.2.0-Alpha-6
+dotnet add package Icod.TermInfo.Compiler --version 1.2.0-Alpha-7
 ```
 
 The package targets `net8.0`, `net9.0`, and `net10.0` and depends on the matching
@@ -29,6 +31,13 @@ names and aliases in lowercase hexadecimal first-byte directories compatible
 with `DirectoryTerminalDescriptionProvider`. Existing files are rejected by
 default; replacement requires an explicit
 `CompiledTermInfoDatabaseWriterOptions` opt-in.
+
+C07 adds no new public production API. Its validation suite reuses the checked-in
+T29 corpus generated with pinned ncurses `tic`, compares Compiler output and the
+reference binaries at the semantic `TerminalDescription` level, verifies
+byte-for-byte determinism across extended-capability insertion order and culture,
+and exercises temporary database output through the existing directory provider.
+Normal CI remains independent of a host ncurses installation.
 
 ## Source compilation
 
