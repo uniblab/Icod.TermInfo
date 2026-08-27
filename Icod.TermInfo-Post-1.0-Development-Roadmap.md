@@ -8,10 +8,10 @@
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
 **Current release version:** `1.1.1`
-**Current development version:** `1.2.0-Alpha-5`
+**Current development version:** `1.2.0-Alpha-6`
 **Next development line:** `1.2.0`
-**Status:** C04 implementation candidate — build/test/package validation required
-**Current tranche:** C04 — Format selection
+**Status:** C06 implementation candidate — build/test/package validation required
+**Current tranche:** C06 — Database-layout writer
 **Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
 
 ---

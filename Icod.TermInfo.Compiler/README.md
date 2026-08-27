@@ -1,24 +1,34 @@
 # Icod.TermInfo.Compiler
 
-`Icod.TermInfo.Compiler` is the optional managed compiled-terminfo writing layer
-for `Icod.TermInfo`.
+`Icod.TermInfo.Compiler` is the optional managed compiled-terminfo writing and
+database-layout layer for `Icod.TermInfo`.
 
 C01 establishes the package and pure writer contract. C02 completes standard
 capability emission, C03 adds the supported ncurses extended section, and C04
 adds deterministic automatic and explicit `0432` / `01036` format selection.
-C05 composes the 1.1 Source parser/resolver with that writer.
+C05 composes the 1.1 Source parser/resolver with that writer. C06 adds
+controlled publication into an explicit conventional terminfo directory root.
 
 ## Install
 
-For the C05 development package:
+For the C06 development package:
 
 ```text
-dotnet add package Icod.TermInfo.Compiler --version 1.2.0-Alpha-5
+dotnet add package Icod.TermInfo.Compiler --version 1.2.0-Alpha-6
 ```
 
 The package targets `net8.0`, `net9.0`, and `net10.0` and depends on the matching
 `Icod.TermInfo` and `Icod.TermInfo.Source` packages. The dependency remains
 one-way; neither Source nor Runtime depends on Compiler.
+
+C06 adds `CompiledTermInfoDatabaseWriter`. It never discovers a system database
+or installs globally: callers must supply the output root explicitly. It can
+publish a successful C05 compilation result or compile resolved
+`TerminalDescription` values before publication. The writer publishes canonical
+names and aliases in lowercase hexadecimal first-byte directories compatible
+with `DirectoryTerminalDescriptionProvider`. Existing files are rejected by
+default; replacement requires an explicit
+`CompiledTermInfoDatabaseWriterOptions` opt-in.
 
 ## Source compilation
 
@@ -129,5 +139,6 @@ which cannot be represented by the requested policy throws
 `InvalidOperationException`. C04 freezes that distinction for the low-level
 writer surface.
 
-The writer remains pure: it does not inspect environment variables, access
-terminfo directories, invoke native `tic`/ncurses, or write database layouts.
+`CompiledTermInfoWriter` remains pure: it does not inspect environment variables,
+access terminfo directories, invoke native `tic`/ncurses, or write database
+layouts.

@@ -2,6 +2,19 @@
 # Format: Icod.TermInfo.PublicApiSnapshot/v1
 # AssemblyVersion: 1.0.0.0
 
+TYPE class Icod.TermInfo.Compiler.CompiledTermInfoDatabaseWriter [static]
+  METHOD public static System.Void Write(System.String root null=not-null/not-null, Icod.TermInfo.Compiler.TermInfoSourceCompilationResult compilation null=not-null/not-null, Icod.TermInfo.Compiler.CompiledTermInfoDatabaseWriterOptions options null=nullable/nullable default=null) return-null=not-null/not-null
+  METHOD public static System.Void Write(System.String root null=not-null/not-null, Icod.TermInfo.TerminalDescription description null=not-null/not-null, Icod.TermInfo.Compiler.CompiledTermInfoWriterOptions writerOptions null=nullable/nullable default=null, Icod.TermInfo.Compiler.CompiledTermInfoDatabaseWriterOptions databaseOptions null=nullable/nullable default=null) return-null=not-null/not-null
+  METHOD public static System.Void Write(System.String root null=not-null/not-null, System.Collections.Generic.IEnumerable<Icod.TermInfo.Compiler.CompiledTermInfoSourceEntry> entries null=not-null/not-null<not-null/not-null>, Icod.TermInfo.Compiler.CompiledTermInfoDatabaseWriterOptions options null=nullable/nullable default=null) return-null=not-null/not-null
+  METHOD public static System.Void Write(System.String root null=not-null/not-null, System.Collections.Generic.IEnumerable<Icod.TermInfo.TerminalDescription> descriptions null=not-null/not-null<not-null/not-null>, Icod.TermInfo.Compiler.CompiledTermInfoWriterOptions writerOptions null=nullable/nullable default=null, Icod.TermInfo.Compiler.CompiledTermInfoDatabaseWriterOptions databaseOptions null=nullable/nullable default=null) return-null=not-null/not-null
+END
+
+TYPE class Icod.TermInfo.Compiler.CompiledTermInfoDatabaseWriterOptions [sealed]
+  CTOR public CompiledTermInfoDatabaseWriterOptions()
+  CTOR public CompiledTermInfoDatabaseWriterOptions(System.Boolean overwriteExisting null=not-null/not-null)
+  PROPERTY System.Boolean OverwriteExisting { public get; } null=not-null/unknown
+END
+
 TYPE enum Icod.TermInfo.Compiler.CompiledTermInfoFormat [sealed]
   INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
   UNDERLYING System.Int32

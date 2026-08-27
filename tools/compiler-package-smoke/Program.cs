@@ -120,6 +120,46 @@ Require(
 	"The transitive Source package must retain the stable 1.x assembly identity."
 );
 
+string databaseRoot =
+	Path.Combine(
+		Path.GetTempPath(),
+		"Icod.TermInfo.Compiler-package-smoke-"
+			+ Guid.NewGuid().ToString( "N" )
+	);
+
+try {
+	CompiledTermInfoDatabaseWriter.Write(
+		databaseRoot,
+		sourceCompilation
+	);
+	DirectoryTerminalDescriptionProvider databaseProvider =
+		new( databaseRoot );
+	Require(
+		databaseProvider.TryLoad(
+			"compiler-smoke-child",
+			out TerminalDescription? databaseChild
+		)
+			&& databaseChild.GetNumber(
+				NumericCapability.Columns
+			) == 132
+			&& databaseChild.GetNumber(
+				NumericCapability.Lines
+			) == 43
+			&& databaseChild.GetBoolean(
+				BooleanCapability.AutoRightMargin
+			),
+		"The Compiler package did not produce a C06 directory-provider-compatible database."
+	);
+}
+finally {
+	if ( Directory.Exists( databaseRoot ) ) {
+		Directory.Delete(
+			databaseRoot,
+			recursive: true
+		);
+	}
+}
+
 Console.WriteLine(
 	"Icod.TermInfo.Compiler package smoke test passed."
 );
