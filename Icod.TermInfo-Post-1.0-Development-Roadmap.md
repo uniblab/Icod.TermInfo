@@ -8,10 +8,10 @@
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
 **Current release version:** `1.1.1`
-**Current development version:** `1.2.0-Alpha-2`
+**Current development version:** `1.2.0-Alpha-3`
 **Next development line:** `1.2.0`
-**Status:** C02 implementation candidate — build/test/package validation required
-**Current tranche:** C02 — Standard capability emission
+**Status:** C03 implementation candidate — build/test/package validation required
+**Current tranche:** C03 — Extended capability emission
 **Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
 
 ---
@@ -599,6 +599,8 @@ Latin-1, NUL-termination, offset-width, and overflow rules as the conventional
 sections.
 
 **Gate C03:** all extended capability kinds survive writer → parser round-trip.
+
+**Implementation record:** [`docs/1.2.0-C03-EXTENDED-CAPABILITY-EMISSION.md`](docs/1.2.0-C03-EXTENDED-CAPABILITY-EMISSION.md)
 
 ---
 

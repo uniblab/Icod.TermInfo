@@ -36,6 +36,12 @@ TerminalDescription description =
 			StringCapability.ClearScreen,
 			"\u001b[H\u001b[2J"
 		)
+		.SetExtendedBoolean( "XBool" )
+		.SetExtendedNumber( "XNum", 12345 )
+		.SetExtendedString(
+			"XStr",
+			"compiler-extended"
+		)
 		.Build();
 byte[] compiled =
 	CompiledTermInfoWriter.Write(
@@ -52,8 +58,11 @@ Require(
 		&& parsed.Aliases.SequenceEqual( description.Aliases )
 		&& parsed.GetBoolean( BooleanCapability.AutoRightMargin )
 		&& parsed.GetNumber( NumericCapability.Columns ) == 132
-		&& parsed.GetString( StringCapability.ClearScreen ) == "\u001b[H\u001b[2J",
-	"The Compiler package did not round-trip the C02 standard-capability entry."
+		&& parsed.GetString( StringCapability.ClearScreen ) == "\u001b[H\u001b[2J"
+		&& parsed.ExtendedCapabilities["XBool"].BooleanValue
+		&& parsed.ExtendedCapabilities["XNum"].NumberValue == 12345
+		&& parsed.ExtendedCapabilities["XStr"].StringValue == "compiler-extended",
+	"The Compiler package did not round-trip the C03 standard and extended entry."
 );
 Require(
 	typeof( TerminalDescription ).Assembly.GetName().Version

@@ -9,13 +9,13 @@ namespace Icod.TermInfo.Compiler;
 /// terminfo entries.
 /// </summary>
 /// <remarks>
-/// C02 implements deterministic legacy <c>0432</c> entries containing terminal
-/// identity metadata and complete standard Boolean, numeric, and string
-/// capability tables. Extended sections and wide-numeric format policy are
-/// added by later 1.2 tranches. Writing is pure with respect to filesystem,
-/// environment, and native ncurses state.
+/// C03 implements deterministic legacy <c>0432</c> entries containing terminal
+/// identity metadata, complete standard capability tables, and the supported
+/// ncurses extended-capability section. Wide-numeric format policy is added by
+/// C04. Writing is pure with respect to filesystem, environment, and native
+/// ncurses state.
 /// </remarks>
-public static class CompiledTermInfoWriter {
+public static partial class CompiledTermInfoWriter {
 	private const ushort LegacyMagic = 0x011A;
 	private const int HeaderSize = 12;
 	private const byte BooleanPresent = 0x01;
@@ -33,19 +33,13 @@ public static class CompiledTermInfoWriter {
 	/// <paramref name="description"/> is <see langword="null"/>.
 	/// </exception>
 	/// <exception cref="InvalidOperationException">
-	/// The terminal identity or a standard capability cannot be represented
-	/// exactly by the C02 legacy format.
-	/// </exception>
-	/// <exception cref="NotSupportedException">
-	/// The description contains extended capabilities, which are introduced by
-	/// C03.
+	/// The terminal identity or a standard or extended capability cannot be
+	/// represented exactly by the C03 legacy format.
 	/// </exception>
 	public static byte[] Write(
 		TerminalDescription description
 	) {
 		ArgumentNullException.ThrowIfNull( description );
-
-		EnsureC02CapabilityScope( description );
 
 		string identity =
 			CreateIdentity( description );
@@ -136,19 +130,14 @@ public static class CompiledTermInfoWriter {
 			entry.AsSpan( stringTableOffset )
 		);
 
-		return entry;
-	}
-
-	private static void EnsureC02CapabilityScope(
-		TerminalDescription description
-	) {
-		ArgumentNullException.ThrowIfNull( description );
-
-		if ( description.ExtendedCapabilities.Count != 0 ) {
-			throw new NotSupportedException(
-				"C02 writes standard capabilities only. Extended capability tables are introduced by C03."
-			);
+		if ( description.ExtendedCapabilities.Count == 0 ) {
+			return entry;
 		}
+
+		return AppendExtendedSection(
+			entry,
+			description
+		);
 	}
 
 	private static void WriteHeader(

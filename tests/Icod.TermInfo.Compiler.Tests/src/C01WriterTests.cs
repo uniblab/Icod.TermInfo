@@ -169,16 +169,4 @@ public sealed class C01WriterTests {
 		);
 	}
 
-	[Fact]
-	public void ExtendedCapabilityBearingDescriptionsWaitForC03() {
-		TerminalDescription description =
-			new TerminalDescriptionBuilder( "extended" )
-				.SetDescription( "Extended capability terminal" )
-				.SetExtendedBoolean( "AX" )
-				.Build();
-
-		Assert.Throws<NotSupportedException>(
-			() => CompiledTermInfoWriter.Write( description )
-		);
-	}
 }
