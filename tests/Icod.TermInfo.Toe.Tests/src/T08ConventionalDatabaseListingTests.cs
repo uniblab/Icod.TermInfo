@@ -200,8 +200,8 @@ public sealed class T08ConventionalDatabaseListingTests {
 				secondRoot
 			);
 
-			string firstHeading = $"# {Path.GetFullPath( firstRoot )}{Environment.NewLine}";
-			string secondHeading = $"# {Path.GetFullPath( secondRoot )}{Environment.NewLine}";
+			string firstHeading = $"# {System.IO.Path.GetFullPath( firstRoot )}{Environment.NewLine}";
+			string secondHeading = $"# {System.IO.Path.GetFullPath( secondRoot )}{Environment.NewLine}";
 
 			Assert.Equal( CommandExitCodes.Success, result.Status );
 			Assert.Contains(
@@ -422,7 +422,7 @@ public sealed class T08ConventionalDatabaseListingTests {
 	[Fact]
 	public async Task MissingExplicitRootReturnsOperationalFailure() {
 		string parent = CreateTemporaryDirectory();
-		string missing = Path.Combine(
+		string missing = System.IO.Path.Combine(
 			parent,
 			"missing"
 		);
@@ -441,11 +441,11 @@ public sealed class T08ConventionalDatabaseListingTests {
 	[Fact]
 	public async Task NonDirectoryStoreReturnsOperationalFailure() {
 		string parent = CreateTemporaryDirectory();
-		string file = Path.Combine(
+		string file = System.IO.Path.Combine(
 			parent,
 			"terminfo.db"
 		);
-		File.WriteAllText(
+		System.IO.File.WriteAllText(
 			file,
 			"unsupported"
 		);
@@ -620,13 +620,13 @@ public sealed class T08ConventionalDatabaseListingTests {
 		ArgumentException.ThrowIfNullOrWhiteSpace( fileName );
 		ArgumentNullException.ThrowIfNull( bytes );
 
-		string directory = Path.Combine(
+		string directory = System.IO.Path.Combine(
 			root,
 			directoryName
 		);
-		Directory.CreateDirectory( directory );
-		File.WriteAllBytes(
-			Path.Combine(
+		System.IO.Directory.CreateDirectory( directory );
+		System.IO.File.WriteAllBytes(
+			System.IO.Path.Combine(
 				directory,
 				fileName
 			),
@@ -657,7 +657,7 @@ public sealed class T08ConventionalDatabaseListingTests {
 
 	private static string CreateTemporaryDirectory() {
 		string path = Path.Combine(
-			Path.GetTempPath(),
+			System.IO.Path.GetTempPath(),
 			"Icod.TermInfo.Toe.Tests",
 			Guid.NewGuid().ToString( "N" )
 		);
