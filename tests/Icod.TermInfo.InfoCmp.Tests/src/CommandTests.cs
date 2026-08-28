@@ -40,7 +40,7 @@ public sealed class CommandTests {
 		);
 
 		Assert.Equal( CommandExitCodes.Success, status );
-		Assert.Contains( "1.4.0-Alpha-5", ReadText( stdout ) );
+		Assert.Contains( "1.4.0-Alpha-6", ReadText( stdout ) );
 		Assert.Empty( ReadText( stderr ) );
 	}
 
@@ -51,7 +51,7 @@ public sealed class CommandTests {
 		using var stderr = new MemoryStream();
 
 		int status = await Command.RunAsync(
-			[ "--not-a-t01-option" ],
+			[ "--not-an-infocmp-option" ],
 			stdin,
 			stdout,
 			stderr
@@ -59,7 +59,7 @@ public sealed class CommandTests {
 
 		Assert.Equal( CommandExitCodes.UsageError, status );
 		Assert.Empty( ReadText( stdout ) );
-		Assert.Contains( "unsupported T01 argument", ReadText( stderr ) );
+		Assert.Contains( "unsupported option", ReadText( stderr ) );
 	}
 
 	[Fact]

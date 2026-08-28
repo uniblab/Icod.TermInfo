@@ -2,13 +2,13 @@
 
 `toe` is part of the `Icod.TermInfo` managed terminfo tool suite.
 
-## T05 status
+## T06 status
 
-Version `1.4.0-Alpha-5` retains the executable, command-host, stream,
+Version `1.4.0-Alpha-6` retains the executable, command-host, stream,
 cancellation, version, and help contracts established by T01. Operational `toe` behavior is intentionally
 introduced by later 1.4 tranches.
 
-Supported through T05:
+Supported through T06:
 
 ```text
 toe --help

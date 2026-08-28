@@ -20,7 +20,7 @@ namespace Icod.TermInfo.Inspection;
 /// case-sensitive name. Output uses LF line endings and deterministic wrapping.
 /// </para>
 /// </remarks>
-public static class TerminalDescriptionSourceRenderer {
+public static partial class TerminalDescriptionSourceRenderer {
 	private const int MaximumLineLength = 80;
 	private const string CapabilityIndent = "    ";
 	private const string ContinuationIndent = "        ";

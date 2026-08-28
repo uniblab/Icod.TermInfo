@@ -8,6 +8,43 @@ The 1.3 line provides the reusable API engine underneath future
 1.1, and Compiler 1.2 public contracts. Version 1.3.0 is the first stable
 release of this optional package.
 
+## 1.4 T06 effective-source renderer controls
+
+`1.4.0-Alpha-6` adds reviewed additive presentation controls used by the managed
+`infocmp` command while preserving the frozen 1.3 renderer overload output.
+
+```csharp
+TerminalDescriptionSourceRendererOptions options =
+	new(
+		100,
+		TerminalDescriptionSourceLayout.Canonical,
+		TerminalDescriptionSourceCapabilityOrder.TermInfoName,
+		includeExtendedCapabilities: false
+	);
+
+string source =
+	TerminalDescriptionSourceRenderer.Render(
+		description,
+		options
+	);
+```
+
+The configurable renderer supports canonical wrapping at a caller-selected width,
+a single logical line, one capability per line, standard-capability ordering by
+compiled-table position, terminfo short name, long variable name, or termcap
+code, and explicit inclusion/exclusion of effective extended capabilities.
+Ordering is ordinal and deterministic.
+
+A parameterless `TerminalDescriptionSourceRendererOptions` value represents the
+frozen canonical policy: width 80, canonical layout, compiled-table ordering, and
+extended capabilities included. The renderer routes that exact policy through the
+existing implementation so the released 1.3 `Render`/`Write` behavior remains
+unchanged.
+
+T06 adds no Runtime, Source, or Compiler public API and does not add a production
+Compiler dependency to Inspection. The reviewed additive surface is recorded in
+`docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt`.
+
 ## 1.4 T03 conventional database catalog enumeration
 
 `1.4.0-Alpha-3` adds safe read-only enumeration of one explicit conventional

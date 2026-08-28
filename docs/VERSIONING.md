@@ -100,11 +100,13 @@ baseline for 1.4 development. T01 initialized it as an exact copy of the frozen
 1.3 baseline. T02 adds reviewed read-only system database-location inspection,
 and T03 adds reviewed conventional database catalog enumeration, without changing
 Runtime, Source, or Compiler public API. T04 adds the non-mutating `tic -c`
-validation path. T05 advances the coordinated development version to
-`1.4.0-Alpha-5` and adds command-layer database publication through the already
-frozen Compiler writer; it introduces no new public member in any of the four
-library packages. Later library-surface changes require another explicit,
-compatible 1.4 API review.
+validation path. T05 adds command-layer database publication through the already
+frozen Compiler writer without adding library API. T06 advances the coordinated
+development version to `1.4.0-Alpha-6` and adds reviewed, compatible Inspection
+renderer controls for layout, width, standard-capability ordering, and extended-
+capability filtering. The frozen 1.3 renderer overload behavior remains unchanged.
+Later library-surface changes require another explicit, compatible 1.4 API
+review.
 
 The baselines record exported types, public/protected members, enum numeric
 values, parameter names/order/defaults, ref/out/in/params shape, generic

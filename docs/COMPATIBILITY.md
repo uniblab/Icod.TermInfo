@@ -245,6 +245,28 @@ publication transaction begins and then treats the writer call as an indivisible
 commit boundary. T05 does not change Runtime, Source, Compiler, or Inspection
 public API.
 
+## T06 `infocmp` rendering compatibility
+
+T06 makes `infocmp` operational for zero/one-terminal inspection. Normal
+acquisition uses `SystemTerminalDescriptionProvider`; `-A` uses an explicit
+`DirectoryTerminalDescriptionProvider` without mutating process discovery
+environment. A clean provider miss remains distinguishable from malformed data or
+other provider failures.
+
+The additive `TerminalDescriptionSourceRendererOptions`,
+`TerminalDescriptionSourceLayout`, and
+`TerminalDescriptionSourceCapabilityOrder` contracts provide reusable layout,
+wrapping, ordering, and extended-capability filtering. Existing 1.3
+`TerminalDescriptionSourceRenderer.Render(TerminalDescription)` and
+`Write(TextWriter, TerminalDescription)` output is unchanged. A parameterless
+options instance selects that same frozen policy.
+
+Standard-capability ordering is ordinal and deterministic within Boolean, numeric,
+and string groups. `infocmp` defaults to standard capabilities and requires `-x`
+to include effective extended capabilities. This filtering changes presentation
+only; it never mutates the acquired `TerminalDescription`. T06 adds no Runtime,
+Source, or Compiler public API.
+
 ## Discovery and failure compatibility
 
 Runtime discovery precedence, clean-miss behavior, parser failures,

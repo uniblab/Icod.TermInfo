@@ -15,7 +15,7 @@
 **New commands:** `tic`, `infocmp`, `toe`
 **Development branch:** `1.4.0`
 **Development sequence:** `1.4.0-Alpha-1` through `1.4.0-Alpha-11`
-**Status:** T05 implementation candidate
+**Status:** T06 implementation candidate
 **Release objective:** expose the completed Runtime, Source, Compiler, and Inspection engines as useful, deterministic, cross-platform Unix-style command-line tools without moving command policy into the lower-level libraries or weakening their existing compatibility contracts.
 
 ---
@@ -1856,6 +1856,8 @@ Cover:
 **Gate T06:** `infocmp` is a complete one-terminal inspection utility and any
 new renderer API needed by it is explicitly reviewed in the 1.4 Inspection
 baseline.
+
+**Implementation record:** `docs/1.4.0-T06-INFOCMP-ONE-TERMINAL-INSPECTION-AND-RENDERER-CONTROLS.md`
 
 ---
 

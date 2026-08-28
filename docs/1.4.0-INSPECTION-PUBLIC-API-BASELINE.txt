@@ -159,8 +159,36 @@ TYPE class Icod.TermInfo.Inspection.TerminalDescriptionComparer [static]
   METHOD public static Icod.TermInfo.Inspection.TermInfoComparisonResult Compare(Icod.TermInfo.TerminalDescription left null=not-null/not-null, Icod.TermInfo.TerminalDescription right null=not-null/not-null) return-null=not-null/not-null
 END
 
+TYPE enum Icod.TermInfo.Inspection.TerminalDescriptionSourceCapabilityOrder [sealed]
+  INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  UNDERLYING System.Int32
+  ENUM Database = 0
+  ENUM LongName = 2
+  ENUM TermcapCode = 3
+  ENUM TermInfoName = 1
+END
+
+TYPE enum Icod.TermInfo.Inspection.TerminalDescriptionSourceLayout [sealed]
+  INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  UNDERLYING System.Int32
+  ENUM Canonical = 0
+  ENUM OneCapabilityPerLine = 2
+  ENUM SingleLine = 1
+END
+
 TYPE class Icod.TermInfo.Inspection.TerminalDescriptionSourceRenderer [static]
   METHOD public static System.String Render(Icod.TermInfo.TerminalDescription description null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.String Render(Icod.TermInfo.TerminalDescription description null=not-null/not-null, Icod.TermInfo.Inspection.TerminalDescriptionSourceRendererOptions options null=not-null/not-null) return-null=not-null/not-null
   METHOD public static System.Void Write(System.IO.TextWriter writer null=not-null/not-null, Icod.TermInfo.TerminalDescription description null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.Void Write(System.IO.TextWriter writer null=not-null/not-null, Icod.TermInfo.TerminalDescription description null=not-null/not-null, Icod.TermInfo.Inspection.TerminalDescriptionSourceRendererOptions options null=not-null/not-null) return-null=not-null/not-null
+END
+
+TYPE class Icod.TermInfo.Inspection.TerminalDescriptionSourceRendererOptions [sealed]
+  CTOR public TerminalDescriptionSourceRendererOptions()
+  CTOR public TerminalDescriptionSourceRendererOptions(System.Int32 lineWidth null=not-null/not-null, Icod.TermInfo.Inspection.TerminalDescriptionSourceLayout layout null=not-null/not-null default=Canonical, Icod.TermInfo.Inspection.TerminalDescriptionSourceCapabilityOrder capabilityOrder null=not-null/not-null default=Database, System.Boolean includeExtendedCapabilities null=not-null/not-null default=true)
+  PROPERTY Icod.TermInfo.Inspection.TerminalDescriptionSourceCapabilityOrder CapabilityOrder { public get; } null=not-null/unknown
+  PROPERTY Icod.TermInfo.Inspection.TerminalDescriptionSourceLayout Layout { public get; } null=not-null/unknown
+  PROPERTY System.Boolean IncludeExtendedCapabilities { public get; } null=not-null/unknown
+  PROPERTY System.Int32 LineWidth { public get; } null=not-null/unknown
 END
 

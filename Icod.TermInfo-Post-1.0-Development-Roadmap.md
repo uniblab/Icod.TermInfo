@@ -9,10 +9,10 @@
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
 **Current release version:** `1.3.0`
-**Current development version:** `1.4.0-Alpha-5`
+**Current development version:** `1.4.0-Alpha-6`
 **Next development line:** `1.5.0`
 **Status:** 1.4.0 tool-suite development
-**Current tranche:** T05 — `tic` compilation and database publication
+**Current tranche:** T06 — `infocmp` one-terminal inspection and renderer controls
 **Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
 
 ---
@@ -965,7 +965,10 @@ selection, resolves selected inheritance graphs, enforces the command's `-x`
 unknown-extension policy, and validates compiled representability entirely in
 memory. T05 adds the filesystem write path through the frozen
 `CompiledTermInfoDatabaseWriter`, keeps destination and overwrite policy in the
-command layer, and preserves the T04 check-only path as non-mutating.
+command layer, and preserves the T04 check-only path as non-mutating. T06 makes
+`infocmp` operational for zero/one-terminal acquisition and adds reviewed additive
+Inspection renderer controls for layout, width, metadata ordering, and extended-
+capability filtering while preserving the frozen 1.3 renderer overload output.
 
 **1.4 completion gate:** `tic`, `infocmp`, and `toe` are useful standalone
 managed utilities on Windows, Linux, and macOS, backed by the same reusable

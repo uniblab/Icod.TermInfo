@@ -5,7 +5,7 @@ using Xunit;
 namespace Icod.TermInfo.Inspection.Tests;
 
 public sealed class I01ContractTests {
-	private const string DevelopmentVersion = "1.4.0-Alpha-5";
+	private const string DevelopmentVersion = "1.4.0-Alpha-6";
 	private const string StableAssemblyVersion = "1.0.0.0";
 
 	[Fact]
@@ -90,7 +90,10 @@ public sealed class I01ContractTests {
 				"Icod.TermInfo.Inspection.TermInfoSourceComparer",
 				"Icod.TermInfo.Inspection.TermInfoSourceRenderer",
 				"Icod.TermInfo.Inspection.TerminalDescriptionComparer",
+				"Icod.TermInfo.Inspection.TerminalDescriptionSourceCapabilityOrder",
+				"Icod.TermInfo.Inspection.TerminalDescriptionSourceLayout",
 				"Icod.TermInfo.Inspection.TerminalDescriptionSourceRenderer",
+				"Icod.TermInfo.Inspection.TerminalDescriptionSourceRendererOptions",
 			},
 			exportedTypes
 		);
@@ -298,6 +301,39 @@ public sealed class I01ContractTests {
 		);
 		Assert.Contains(
 			"METHOD public static System.Void Write(System.IO.TextWriter writer",
+			baseline
+		);
+	}
+
+	[Fact]
+	public void ActiveInspectionBaselineContainsReviewedT06RendererControls() {
+		string root =
+			FindRepositoryRoot();
+		string baseline =
+			NormalizeLineEndings(
+				File.ReadAllText(
+					Path.Combine(
+						root,
+						"docs",
+						"1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt"
+					)
+				)
+			);
+
+		Assert.Contains(
+			"TYPE enum Icod.TermInfo.Inspection.TerminalDescriptionSourceCapabilityOrder [sealed]",
+			baseline
+		);
+		Assert.Contains(
+			"TYPE enum Icod.TermInfo.Inspection.TerminalDescriptionSourceLayout [sealed]",
+			baseline
+		);
+		Assert.Contains(
+			"TYPE class Icod.TermInfo.Inspection.TerminalDescriptionSourceRendererOptions [sealed]",
+			baseline
+		);
+		Assert.Contains(
+			"METHOD public static System.String Render(Icod.TermInfo.TerminalDescription description null=not-null/not-null, Icod.TermInfo.Inspection.TerminalDescriptionSourceRendererOptions options",
 			baseline
 		);
 	}

@@ -4,7 +4,7 @@ using Xunit;
 namespace Icod.TermInfo.Tic.Tests;
 
 public sealed class T01ContractTests {
-	private const string DevelopmentVersion = "1.4.0-Alpha-5";
+	private const string DevelopmentVersion = "1.4.0-Alpha-6";
 	private const string StableAssemblyVersion = "1.0.0.0";
 
 	[Fact]
@@ -114,10 +114,22 @@ public sealed class T01ContractTests {
 				"TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseInspector [static]",
 				"TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseLocation [sealed]",
 				"TYPE enum Icod.TermInfo.Inspection.TermInfoDatabaseLocationKind [sealed]",
+				"TYPE enum Icod.TermInfo.Inspection.TerminalDescriptionSourceCapabilityOrder [sealed]",
+				"TYPE enum Icod.TermInfo.Inspection.TerminalDescriptionSourceLayout [sealed]",
+				"TYPE class Icod.TermInfo.Inspection.TerminalDescriptionSourceRendererOptions [sealed]",
 			}
 		) {
 			withoutT02 = RemoveTypeBlock( withoutT02, typeHeader );
 		}
+
+		withoutT02 = RemoveLine(
+			withoutT02,
+			"  METHOD public static System.String Render(Icod.TermInfo.TerminalDescription description null=not-null/not-null, Icod.TermInfo.Inspection.TerminalDescriptionSourceRendererOptions options null=not-null/not-null) return-null=not-null/not-null"
+		);
+		withoutT02 = RemoveLine(
+			withoutT02,
+			"  METHOD public static System.Void Write(System.IO.TextWriter writer null=not-null/not-null, Icod.TermInfo.TerminalDescription description null=not-null/not-null, Icod.TermInfo.Inspection.TerminalDescriptionSourceRendererOptions options null=not-null/not-null) return-null=not-null/not-null"
+		);
 
 		Assert.Equal(
 			NormalizeLineEndings( oneThree ),
@@ -201,6 +213,26 @@ public sealed class T01ContractTests {
 		return baseline.Remove(
 			start,
 			terminatorStart + terminator.Length - start
+		);
+	}
+
+	private static string RemoveLine(
+		string baseline,
+		string line
+	) {
+		ArgumentNullException.ThrowIfNull( baseline );
+		ArgumentException.ThrowIfNullOrWhiteSpace( line );
+
+		string lineWithEnding = line + "\n";
+		int start = baseline.IndexOf(
+			lineWithEnding,
+			StringComparison.Ordinal
+		);
+		Assert.True( start >= 0 );
+
+		return baseline.Remove(
+			start,
+			lineWithEnding.Length
 		);
 	}
 

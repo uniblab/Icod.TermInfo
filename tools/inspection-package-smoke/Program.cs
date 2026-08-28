@@ -31,7 +31,7 @@ Require(
 Type[] exportedTypes =
 	inspectionAssembly.GetExportedTypes();
 Require(
-	exportedTypes.Length == 19
+	exportedTypes.Length == 22
 		&& exportedTypes.Contains( typeof( TermInfoComparisonResult ) )
 		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalog ) )
 		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalogEntry ) )
@@ -50,8 +50,11 @@ Require(
 		&& exportedTypes.Contains( typeof( TermInfoSourceComparer ) )
 		&& exportedTypes.Contains( typeof( TermInfoSourceRenderer ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionComparer ) )
-		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceRenderer ) ),
-	"The Inspection package did not expose exactly the reviewed 1.4 Alpha-3 surface."
+		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceCapabilityOrder ) )
+		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceLayout ) )
+		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceRenderer ) )
+		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceRendererOptions ) ),
+	"The Inspection package did not expose exactly the reviewed 1.4 Alpha-6 surface."
 );
 
 Require(
@@ -89,8 +92,8 @@ Require(
 );
 
 string missingCatalogRoot =
-	Path.Combine(
-		Path.GetTempPath(),
+	System.IO.Path.Combine(
+		System.IO.Path.GetTempPath(),
 		$"icod-terminfo-package-smoke-missing-{Guid.NewGuid():N}"
 	);
 TermInfoDatabaseCatalog missingCatalog =
@@ -99,7 +102,7 @@ TermInfoDatabaseCatalog missingCatalog =
 	);
 Require(
 	missingCatalog.Kind == TermInfoDatabaseCatalogKind.Missing
-		&& missingCatalog.Root == Path.GetFullPath( missingCatalogRoot )
+		&& missingCatalog.Root == System.IO.Path.GetFullPath( missingCatalogRoot )
 		&& missingCatalog.Entries.Count == 0
 		&& missingCatalog.Issues.Count == 0
 		&& missingCatalog.DuplicateCanonicalNames.Count == 0
@@ -143,6 +146,28 @@ Require(
 			+ "    am,\n"
 			+ "    cols#80,\n",
 	"The I02 renderer did not produce the canonical smoke representation."
+);
+Require(
+	TerminalDescriptionSourceRenderer.Render(
+		terminal,
+		new TerminalDescriptionSourceRendererOptions()
+	) == rendered,
+	"The T06 default renderer options did not preserve the frozen I02 representation."
+);
+string singleLineStandard =
+	TerminalDescriptionSourceRenderer.Render(
+		terminal,
+		new TerminalDescriptionSourceRendererOptions(
+			80,
+			TerminalDescriptionSourceLayout.SingleLine,
+			TerminalDescriptionSourceCapabilityOrder.TermInfoName,
+			includeExtendedCapabilities: false
+		)
+	);
+Require(
+	singleLineStandard
+		== "inspection-smoke|Inspection package smoke, am, cols#80,\n",
+	"The T06 configurable renderer did not honor single-line standard-only presentation."
 );
 TermInfoSourceParseResult reparsed =
 	TermInfoSourceParser.Parse(
