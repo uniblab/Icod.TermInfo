@@ -67,15 +67,14 @@ public sealed class T01ContractTests {
 			Assert.Equal( assemblyName, ReadRequiredProperty( project, "AssemblyName" ) );
 
 			XElement frameworkReference = Assert.Single(
-				project.Descendants().Where(
-					element =>
-						element.Name.LocalName == "PackageReference"
-						&& string.Equals(
-							element.Attribute( "Include" )?.Value,
-							"Icod.CommandFramework",
-							StringComparison.Ordinal
-						)
-				)
+				project.Descendants(),
+				element =>
+					element.Name.LocalName == "PackageReference"
+					&& string.Equals(
+						element.Attribute( "Include" )?.Value,
+						"Icod.CommandFramework",
+						StringComparison.Ordinal
+					)
 			);
 			Assert.Equal( "2.0.0", frameworkReference.Attribute( "Version" )?.Value );
 
@@ -97,10 +96,10 @@ public sealed class T01ContractTests {
 	public void OneFourInspectionBaselineRetainsFrozenOneThreeSurface() {
 		string root = FindRepositoryRoot();
 		string oneThree = File.ReadAllText(
-			Path.Combine( root, "docs", "1.3.0-INSPECTION-PUBLIC-API-BASELINE.txt" )
+			System.IO.Path.Combine( root, "docs", "1.3.0-INSPECTION-PUBLIC-API-BASELINE.txt" )
 		);
 		string oneFour = File.ReadAllText(
-			Path.Combine( root, "docs", "1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt" )
+			System.IO.Path.Combine( root, "docs", "1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt" )
 		);
 
 		string withoutT02 = NormalizeLineEndings( oneFour );
@@ -124,7 +123,7 @@ public sealed class T01ContractTests {
 	[Fact]
 	public void SolutionContainsAllThreeCommandsAndTests() {
 		string root = FindRepositoryRoot();
-		string solution = File.ReadAllText( Path.Combine( root, "Icod.TermInfo.sln" ) );
+		string solution = System.IO.File.ReadAllText( Path.Combine( root, "Icod.TermInfo.sln" ) );
 
 		foreach (
 			string projectName
@@ -149,11 +148,11 @@ public sealed class T01ContractTests {
 		ArgumentException.ThrowIfNullOrWhiteSpace( relativePath );
 
 		return XDocument.Load(
-			Path.Combine(
+			System.IO.Path.Combine(
 				root,
 				relativePath.Replace(
 					'/',
-					Path.DirectorySeparatorChar
+					System.IO.Path.DirectorySeparatorChar
 				)
 			),
 			LoadOptions.None
@@ -212,7 +211,7 @@ public sealed class T01ContractTests {
 		DirectoryInfo? current = new( AppContext.BaseDirectory );
 
 		while ( current is not null ) {
-			if ( File.Exists( Path.Combine( current.FullName, "Icod.TermInfo.sln" ) ) ) {
+			if ( System.IO.File.Exists( Path.Combine( current.FullName, "Icod.TermInfo.sln" ) ) ) {
 				return current.FullName;
 			}
 
