@@ -36,8 +36,8 @@ public sealed class T06RendererControlsTests {
 			);
 
 		Assert.EndsWith(
-			rendered,
 			"\n",
+			rendered,
 			StringComparison.Ordinal
 		);
 		Assert.DoesNotContain( "\r", rendered, StringComparison.Ordinal );
@@ -70,8 +70,8 @@ public sealed class T06RendererControlsTests {
 		string[] lines = rendered.Split( '\n' );
 		Assert.Equal( 3, lines.Length );
 		Assert.StartsWith(
-			lines[ 1 ],
 			"    clear=",
+			lines[ 1 ],
 			StringComparison.Ordinal
 		);
 		Assert.True( lines[ 1 ].Length > 20 );

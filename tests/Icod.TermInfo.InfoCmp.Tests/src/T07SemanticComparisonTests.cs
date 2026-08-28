@@ -356,8 +356,8 @@ public sealed class T07SemanticComparisonTests {
 
 			Assert.Equal( CommandExitCodes.Success, result.Status );
 			Assert.StartsWith(
-				result.Stdout,
 				"'first' -> 'second'",
+				result.Stdout,
 				StringComparison.Ordinal
 			);
 			Assert.DoesNotContain( "Comparing", result.Stdout, StringComparison.Ordinal );
