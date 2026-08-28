@@ -9,7 +9,7 @@
 		<AssemblyName>infocmp</AssemblyName>
 		<RootNamespace>Icod.TermInfo.InfoCmp</RootNamespace>
 		<Configurations>Debug;Release;Staging</Configurations>
-		<Version>1.4.0-Alpha-3</Version>
+		<Version>1.4.0-Alpha-4</Version>
 		<IsPackable>false</IsPackable>
 	</PropertyGroup>
 

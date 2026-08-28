@@ -15,7 +15,7 @@
 **New commands:** `tic`, `infocmp`, `toe`
 **Development branch:** `1.4.0`
 **Development sequence:** `1.4.0-Alpha-1` through `1.4.0-Alpha-11`
-**Status:** T03 implementation candidate
+**Status:** T04 implementation candidate
 **Release objective:** expose the completed Runtime, Source, Compiler, and Inspection engines as useful, deterministic, cross-platform Unix-style command-line tools without moving command policy into the lower-level libraries or weakening their existing compatibility contracts.
 
 ---
@@ -1664,6 +1664,8 @@ Cover:
 
 **Gate T04:** `tic -c` is a useful standalone managed source validator with
 stable diagnostics and zero database mutation.
+
+**Implementation record:** `docs/1.4.0-T04-TIC-VALIDATION-AND-CHECK-ONLY.md`
 
 ---
 

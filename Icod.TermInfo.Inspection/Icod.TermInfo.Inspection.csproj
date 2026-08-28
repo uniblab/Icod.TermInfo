@@ -12,17 +12,17 @@
 		<AssemblyName>Icod.TermInfo.Inspection</AssemblyName>
 		<RootNamespace>Icod.TermInfo.Inspection</RootNamespace>
 		<Configurations>Debug;Release;Staging</Configurations>
-		<Version>1.4.0-Alpha-3</Version>
+		<Version>1.4.0-Alpha-4</Version>
 		<AssemblyVersion>1.0.0.0</AssemblyVersion>
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<PackageVersion>1.4.0-Alpha-3</PackageVersion>
+		<PackageVersion>1.4.0-Alpha-4</PackageVersion>
 		<PackageId>Icod.TermInfo.Inspection</PackageId>
 		<Title>Icod.TermInfo.Inspection</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed inspection and semantic-comparison foundation for Icod.TermInfo. The 1.3 line provides canonical terminfo rendering and reusable infocmp-style comparison engines without enlarging the frozen Runtime, Source, or Compiler public contracts.</Description>
-		<PackageReleaseNotes>1.4.0-Alpha-3 adds safe deterministic conventional database catalog enumeration, parsed physical-entry metadata, duplicate canonical identity reporting, cancellation, and explicit per-entry issues while preserving the released 1.3 surface, three-target support, and no production Compiler dependency.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.4.0-Alpha-4 coordinates Inspection with tic -D database-location reporting while retaining the reviewed T02/T03 1.4 surface, the released 1.3 contract, three-target support, and no production Compiler dependency. T04 adds no Inspection public API.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>

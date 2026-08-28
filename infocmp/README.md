@@ -2,13 +2,13 @@
 
 `infocmp` is part of the `Icod.TermInfo` managed terminfo tool suite.
 
-## T03 status
+## T04 status
 
-Version `1.4.0-Alpha-3` retains the executable, command-host, stream,
+Version `1.4.0-Alpha-4` retains the executable, command-host, stream,
 cancellation, version, and help contracts established by T01. Operational `infocmp` behavior is intentionally
 introduced by later 1.4 tranches.
 
-Supported through T03:
+Supported through T04:
 
 ```text
 infocmp --help

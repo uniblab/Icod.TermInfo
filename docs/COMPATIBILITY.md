@@ -202,6 +202,29 @@ terminal identity, reports duplicate canonical identities deterministically, and
 retains malformed/I/O/link/placement issues instead of silently discarding them.
 Arbitrary recursion and hashed/Berkeley DB parsing remain outside the contract.
 
+## T04 `tic` validation compatibility
+
+Beginning with T04 in the 1.4 line, the `net10.0` `tic` command exposes a
+non-mutating validation path over the already-frozen Source and Compiler engines.
+`tic -c` reads one strict UTF-8 source document from a file or standard input,
+parses the complete document, preserves Source diagnostic codes and locations,
+optionally selects canonical names or aliases through `-e`, resolves each selected
+entry and its `use=` graph, and performs compiled representability checks through
+`CompiledTermInfoWriter` entirely in memory.
+
+Without `-x`, selected entries and their reachable parents may use standard and
+known extended capabilities, but a syntactically valid capability classified by
+Source as `UnknownExtended` is a command error. `-x` permits those unknown
+extensions to flow through the existing Source/Compiler semantic model. Source
+parser errors anywhere in the supplied document remain errors even when `-e`
+selects only a subset, because T04 parses the complete source before selection.
+Resolver/representation validation is limited to selected entries and the parents
+needed by their inheritance graphs.
+
+T04 adds no public Runtime, Source, Compiler, or Inspection API. It does not call
+`CompiledTermInfoDatabaseWriter`, create terminfo database directories, or publish
+compiled entries. Database mutation remains a T05 command responsibility.
+
 ## Discovery and failure compatibility
 
 Runtime discovery precedence, clean-miss behavior, parser failures,

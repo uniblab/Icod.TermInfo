@@ -1,11 +1,12 @@
 using System.Reflection;
 using System.Text;
 using Icod.CommandFramework.Diagnostics;
+using Icod.TermInfo.Inspection;
 
 namespace Icod.TermInfo.Tic;
 
 /// <summary>
-/// Implements the T01 command-shell contract for <c>tic</c>.
+/// Implements the managed <c>tic</c> command.
 /// </summary>
 public static class Command {
 	private const string CommandName = "tic";
@@ -36,14 +37,7 @@ public static class Command {
 		}
 
 		try {
-			if (
-				args.Length == 1
-				&& string.Equals(
-					args[ 0 ],
-					"--help",
-					StringComparison.Ordinal
-				)
-			) {
+			if ( IsSingleArgument( args, "--help" ) ) {
 				await WriteAsync(
 					stdout,
 					GetHelpText(),
@@ -53,12 +47,8 @@ public static class Command {
 			}
 
 			if (
-				args.Length == 1
-				&& string.Equals(
-					args[ 0 ],
-					"--version",
-					StringComparison.Ordinal
-				)
+				IsSingleArgument( args, "--version" )
+				|| IsSingleArgument( args, "-V" )
 			) {
 				await WriteAsync(
 					stdout,
@@ -68,26 +58,116 @@ public static class Command {
 				return CommandExitCodes.Success;
 			}
 
-			string detail =
-				(args.Length == 0)
-					? "operational command behavior is not available in T01"
-					: $"unsupported T01 argument '{args[ 0 ]}'"
-				;
-			await WriteAsync(
+			if ( IsSingleArgument( args, "-D" ) ) {
+				await WriteDatabaseLocationsAsync(
+					stdout,
+					cancellationToken
+				).ConfigureAwait( false );
+				return CommandExitCodes.Success;
+			}
+
+			TicOptionsParseResult parsedOptions =
+				TicOptionsParser.Parse( args );
+			if ( parsedOptions.Error is string usageError ) {
+				await WriteUsageErrorAsync(
+					stderr,
+					usageError,
+					cancellationToken
+				).ConfigureAwait( false );
+				return CommandExitCodes.UsageError;
+			}
+
+			TicOptions options =
+				parsedOptions.Options
+				?? throw new InvalidOperationException(
+					"The tic option parser returned neither options nor an error."
+				);
+
+			return await TicSourceValidator.ValidateAsync(
+				options,
+				stdin,
 				stderr,
-				$"{CommandName}: {detail}.{Environment.NewLine}Try '{CommandName} --help' for more information.{Environment.NewLine}",
 				cancellationToken
 			).ConfigureAwait( false );
-			return CommandExitCodes.UsageError;
 		} catch ( OperationCanceledException ) {
 			return CommandExitCodes.Canceled;
 		}
 	}
 
+	private static async Task WriteDatabaseLocationsAsync(
+		Stream stdout,
+		CancellationToken cancellationToken
+	) {
+		ArgumentNullException.ThrowIfNull( stdout );
+
+		StringBuilder builder = new();
+		foreach (
+			TermInfoDatabaseLocation location
+			in TermInfoDatabaseInspector.GetSystemLocations()
+		) {
+			cancellationToken.ThrowIfCancellationRequested();
+			builder.Append( location.Kind );
+			builder.Append( '\t' );
+			builder.Append(
+				location.Path
+				?? "<encoded>"
+			);
+			builder.Append( Environment.NewLine );
+		}
+
+		await WriteAsync(
+			stdout,
+			builder.ToString(),
+			cancellationToken
+		).ConfigureAwait( false );
+	}
+
+	private static async Task WriteUsageErrorAsync(
+		Stream stderr,
+		string detail,
+		CancellationToken cancellationToken
+	) {
+		ArgumentNullException.ThrowIfNull( stderr );
+		ArgumentException.ThrowIfNullOrWhiteSpace( detail );
+
+		await WriteAsync(
+			stderr,
+			$"{CommandName}: {detail}.{Environment.NewLine}Try '{CommandName} --help' for more information.{Environment.NewLine}",
+			cancellationToken
+		).ConfigureAwait( false );
+	}
+
+	private static bool IsSingleArgument(
+		IReadOnlyList<string> args,
+		string value
+	) {
+		ArgumentNullException.ThrowIfNull( args );
+		ArgumentNullException.ThrowIfNull( value );
+
+		return args.Count == 1
+			&& string.Equals(
+				args[ 0 ],
+				value,
+				StringComparison.Ordinal
+			);
+	}
+
 	private static string GetHelpText() {
-		return $"Usage: {CommandName} [--help] [--version]{Environment.NewLine}"
-			+ $"{Environment.NewLine}"
-			+ $"Icod.TermInfo 1.4 T01 command shell. Operational {CommandName} behavior is introduced by a later tranche.{Environment.NewLine}";
+		return $"Usage: {CommandName} -c [options] file{Environment.NewLine}"
+			+ $"       {CommandName} -D{Environment.NewLine}"
+			+ $"       {CommandName} -V | --version{Environment.NewLine}"
+			+ Environment.NewLine
+			+ $"Validate terminfo source without modifying a terminfo database.{Environment.NewLine}"
+			+ Environment.NewLine
+			+ $"  -c              check source only; required for source validation in T04{Environment.NewLine}"
+			+ $"  -e name,...     validate only selected canonical names or aliases{Environment.NewLine}"
+			+ $"  -x              permit unknown extended capability names{Environment.NewLine}"
+			+ $"  -D              print Runtime database discovery locations and exit{Environment.NewLine}"
+			+ $"  -V, --version   print the Icod.TermInfo tool-suite version and exit{Environment.NewLine}"
+			+ $"      --help      display this help and exit{Environment.NewLine}"
+			+ Environment.NewLine
+			+ $"Use '-' as file to read UTF-8 source from standard input.{Environment.NewLine}"
+			+ $"Database publication options are introduced by T05.{Environment.NewLine}";
 	}
 
 	private static string GetSemanticVersion() {
