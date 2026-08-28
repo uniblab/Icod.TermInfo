@@ -5,7 +5,87 @@ comparison layer for the `Icod.TermInfo` package family.
 
 The 1.3 line provides the reusable API engine underneath future
 `infocmp`-style tooling while preserving the already-frozen Runtime 1.0, Source
-1.1, and Compiler 1.2 public contracts.
+1.1, and Compiler 1.2 public contracts. Version 1.3.0 is the first stable
+release of this optional package.
+
+## I07 differential validation, robustness, and API/package freeze
+
+`1.3.0-Alpha-7` closes the 1.3 implementation program without adding another
+production API surface. The reviewed I02-I06 Inspection API is now the candidate
+1.3 contract, and the existing public API baseline is treated as frozen for
+release closure.
+
+I07 adds cross-layer validation which deliberately uses
+`Icod.TermInfo.Compiler` only from the Inspection test project. Effective terminal
+descriptions are rendered through Inspection, compiled from the resulting Source,
+parsed back through Runtime, and compared semantically. The production package
+continues to depend only on Source and Runtime:
+
+```text
+Inspection -> Source -> Runtime
+Inspection ----------> Runtime
+```
+
+The validation corpus covers every built-in profile, the pinned T29 compiled
+fixtures, and the checked-in Source corpus. It also locks exact wrapping
+boundaries, culture-independent and insertion-order-independent comparison
+ordering, source cancellation/disabled/`use=`/duplicate sequencing, and the
+four-package release boundary.
+
+Ordinary CI remains independent of a host ncurses installation. Differential
+evidence is semantic: I07 does not claim byte-for-byte formatting identity with
+`infocmp`, and it does not change the existing Runtime, Source, or Compiler public
+contracts.
+
+## I06 provider-aware inspection and reusable `infocmp` engine
+
+`1.3.0-Alpha-6` composes the existing Runtime acquisition contract with the I02
+canonical renderer and I04 effective comparer. An inspection target contains an
+explicit `ITerminalDescriptionProvider`, the exact requested terminal name, and
+an optional caller-owned display label:
+
+```csharp
+TermInfoInspectionTarget target =
+	new(
+		provider,
+		"xterm",
+		"system xterm"
+	);
+
+TermInfoInspectionResult inspected =
+	TermInfoInspectionEngine.Inspect(
+		target
+	);
+```
+
+`TryInspect` preserves the Runtime provider contract's clean-miss semantics;
+provider exceptions continue to propagate. Successful results retain both the
+requested target identity and the provider-returned canonical
+`TerminalDescription`, so aliases do not erase what the caller actually asked
+for.
+
+The engine can render a target or an already acquired result and can compare two
+targets or two acquired results:
+
+```csharp
+TermInfoInspectionComparison comparison =
+	TermInfoInspectionEngine.Compare(
+		leftTarget,
+		rightTarget
+	);
+```
+
+The comparison retains both target/result identities together with the I04
+`TermInfoComparisonResult`. Already acquired results are never reacquired when
+rendered or compared.
+
+The optional display label is caller-owned diagnostic context only. I06 does not
+enumerate providers, expose private system-discovery internals, infer the exact
+compiled database path used by a provider, or add command-line/console-output
+policy. `SystemTerminalDescriptionProvider`, separate
+`DirectoryTerminalDescriptionProvider` roots, `TerminalDatabase.BuiltIn`, and
+caller-defined providers all participate through the same frozen Runtime
+interface.
 
 ## I05 source-aware comparison
 
@@ -146,10 +226,10 @@ There is no production dependency between Inspection and Compiler.
 
 ## Install
 
-During I05 development:
+For the 1.3.0 release:
 
 ```text
-dotnet add package Icod.TermInfo.Inspection --version 1.3.0-Alpha-5
+dotnet add package Icod.TermInfo.Inspection --version 1.3.0
 ```
 
 The package targets `net8.0`, `net9.0`, and `net10.0`, uses C# 13, remains

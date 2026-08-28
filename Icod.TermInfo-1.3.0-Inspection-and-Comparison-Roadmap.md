@@ -10,10 +10,10 @@
 **Source API contract:** frozen at 1.1  
 **Compiler API contract:** frozen at 1.2  
 **New package:** `Icod.TermInfo.Inspection`
-**Current development version:** `1.3.0-Alpha-5`
+**Current development version:** `1.3.0`
 **Development sequence:** `1.3.0-Alpha-1` through `1.3.0-Alpha-7`
-**Status:** I05 implementation candidate — build/test/package validation required
-**Current tranche:** I05 — Source-aware comparison
+**Status:** Release closure — I01-I07 complete and candidate API/package contract frozen
+**Current tranche:** Final 1.3.0 release closure
 **Release objective:** reusable managed inspection, canonical rendering, and semantic-comparison APIs underlying future `infocmp`-style tooling without destabilizing the existing Runtime, Source, or Compiler contracts.
 
 ---
@@ -584,6 +584,8 @@ TermInfoDifference
 TermInfoDifferenceKind
 
 TermInfoInspectionTarget
+TermInfoInspectionResult
+TermInfoInspectionComparison
 TermInfoInspectionEngine
 ```
 
@@ -817,6 +819,8 @@ No console parsing/output policy belongs here.
 inspection/comparison workflows without duplicating acquisition, rendering, or
 comparison logic.
 
+**Implementation record:** [`docs/1.3.0-I06-PROVIDER-AWARE-INSPECTION.md`](docs/1.3.0-I06-PROVIDER-AWARE-INSPECTION.md)
+
 ---
 
 # I07 — Differential validation, robustness, and API/package freeze
@@ -880,6 +884,8 @@ made part of the Icod contract.
 **Gate I07:** the Inspection API is deterministic, cross-platform, corpus-backed,
 package-valid, and ready to freeze for 1.3.0.
 
+**Implementation record:** [`docs/1.3.0-I07-DIFFERENTIAL-VALIDATION-AND-FREEZE.md`](docs/1.3.0-I07-DIFFERENTIAL-VALIDATION-AND-FREEZE.md)
+
 ---
 
 # 8. 1.3.0 release closure
@@ -887,6 +893,8 @@ package-valid, and ready to freeze for 1.3.0.
 I01-I07 constitute the planned 1.3 implementation program.
 
 Release closure is a separate finalization step.
+
+**Release audit:** [`docs/1.3.0-RELEASE-AUDIT.md`](docs/1.3.0-RELEASE-AUDIT.md)
 
 Release closure SHALL:
 
@@ -981,28 +989,14 @@ embedded into it.
 
 ---
 
-# 11. Recommended first implementation step
+# 11. Recommended next implementation step
 
-Create a `1.3.0` working branch from the current `main` release commit and begin
-with I01 only.
+Complete the 1.3.0 release closure and publish the immutable `v1.3.0` tag before
+beginning the 1.4 tool-suite line.
 
-I01 should deliberately avoid implementing the canonical renderer yet.
-
-Its purpose is to freeze:
-
-1. package ownership;
-2. four-package coordinated versioning;
-3. dependency direction;
-4. public API baseline mechanics;
-5. solution/test/package layout;
-6. CI/release support for the fourth package;
-7. effective-versus-source-aware inspection semantics;
-8. the rule that Inspection has no production Compiler dependency.
-
-Once I01 is green locally and in GitHub Actions, proceed to I02.
-
-That keeps 1.3 development incremental and gives every later feature tranche a
-stable package and release environment.
+The first 1.4 work should sit above the frozen Runtime, Source, Compiler, and
+Inspection engines. Command parsing, exit-code policy, and console formatting
+belong in the tool layer rather than enlarging those package contracts.
 
 ---
 

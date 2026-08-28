@@ -51,6 +51,35 @@ TYPE enum Icod.TermInfo.Inspection.TermInfoDifferenceKind [sealed]
   ENUM SourceUseReference = 14
 END
 
+TYPE class Icod.TermInfo.Inspection.TermInfoInspectionComparison [sealed]
+  PROPERTY Icod.TermInfo.Inspection.TermInfoComparisonResult Comparison { public get; } null=not-null/unknown
+  PROPERTY Icod.TermInfo.Inspection.TermInfoInspectionResult Left { public get; } null=not-null/unknown
+  PROPERTY Icod.TermInfo.Inspection.TermInfoInspectionResult Right { public get; } null=not-null/unknown
+  PROPERTY System.Boolean AreEqual { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoInspectionEngine [static]
+  METHOD public static Icod.TermInfo.Inspection.TermInfoInspectionComparison Compare(Icod.TermInfo.Inspection.TermInfoInspectionResult left null=not-null/not-null, Icod.TermInfo.Inspection.TermInfoInspectionResult right null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static Icod.TermInfo.Inspection.TermInfoInspectionComparison Compare(Icod.TermInfo.Inspection.TermInfoInspectionTarget left null=not-null/not-null, Icod.TermInfo.Inspection.TermInfoInspectionTarget right null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static Icod.TermInfo.Inspection.TermInfoInspectionResult Inspect(Icod.TermInfo.Inspection.TermInfoInspectionTarget target null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.Boolean TryInspect(Icod.TermInfo.Inspection.TermInfoInspectionTarget target null=not-null/not-null, out Icod.TermInfo.Inspection.TermInfoInspectionResult result null=nullable/nullable attrs=NotNullWhenAttribute(true)) return-null=not-null/not-null
+  METHOD public static System.String Render(Icod.TermInfo.Inspection.TermInfoInspectionResult result null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.String Render(Icod.TermInfo.Inspection.TermInfoInspectionTarget target null=not-null/not-null) return-null=not-null/not-null
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoInspectionResult [sealed]
+  PROPERTY Icod.TermInfo.Inspection.TermInfoInspectionTarget Target { public get; } null=not-null/unknown
+  PROPERTY Icod.TermInfo.TerminalDescription Terminal { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoInspectionTarget [sealed]
+  CTOR public TermInfoInspectionTarget(Icod.TermInfo.ITerminalDescriptionProvider provider null=not-null/not-null, System.String requestedName null=not-null/not-null, System.String displayLabel null=nullable/nullable default=null)
+  PROPERTY Icod.TermInfo.ITerminalDescriptionProvider Provider { public get; } null=not-null/unknown
+  PROPERTY System.String DisplayLabel { public get; } null=nullable/unknown
+  PROPERTY System.String DisplayName { public get; } null=not-null/unknown
+  PROPERTY System.String RequestedName { public get; } null=not-null/unknown
+END
+
 TYPE class Icod.TermInfo.Inspection.TermInfoSourceComparer [static]
   METHOD public static Icod.TermInfo.Inspection.TermInfoComparisonResult Compare(Icod.TermInfo.Source.TermInfoSourceDocument left null=not-null/not-null, Icod.TermInfo.Source.TermInfoSourceDocument right null=not-null/not-null) return-null=not-null/not-null
   METHOD public static Icod.TermInfo.Inspection.TermInfoComparisonResult Compare(Icod.TermInfo.Source.TermInfoSourceEntry left null=not-null/not-null, Icod.TermInfo.Source.TermInfoSourceEntry right null=not-null/not-null) return-null=not-null/not-null

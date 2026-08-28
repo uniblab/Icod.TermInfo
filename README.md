@@ -2,56 +2,64 @@
 
 `Icod.TermInfo` is a managed, dependency-free .NET implementation of the low-level terminal-capability model traditionally supplied by `libtinfo`.
 
-Version 1.2.0 is the current coordinated release. It preserves the frozen 1.0
-runtime contract and frozen 1.1 Source contract while adding the optional
-`Icod.TermInfo.Compiler` package.
+Version 1.3.0 is the current coordinated release. It preserves the frozen 1.0
+Runtime, 1.1 Source, and 1.2 Compiler contracts while adding the optional
+`Icod.TermInfo.Inspection` package.
 
-The published 1.2.0 package family targets `net8.0`, `net9.0`, and `net10.0`;
+The published 1.3.0 package family targets `net8.0`, `net9.0`, and `net10.0`;
 the packages use C# 13, contain no native ncurses/terminfo payload, and are
 intended to run on Windows, Linux, and macOS.
 
 ## Install
 
-For the 1.2.0 release, runtime-only consumers use:
+For the 1.3.0 release, runtime-only consumers use:
 
 ```text
-dotnet add package Icod.TermInfo --version 1.2.0
+dotnet add package Icod.TermInfo --version 1.3.0
 ```
 
 Applications which need terminfo source-language support use:
 
 ```text
-dotnet add package Icod.TermInfo.Source --version 1.2.0
+dotnet add package Icod.TermInfo.Source --version 1.3.0
 ```
 
 Applications which compile terminfo source or write conventional compiled
 terminfo databases use:
 
 ```text
-dotnet add package Icod.TermInfo.Compiler --version 1.2.0
+dotnet add package Icod.TermInfo.Compiler --version 1.3.0
+```
+
+Applications which need canonical rendering, semantic comparison, or
+provider-aware inspection use:
+
+```text
+dotnet add package Icod.TermInfo.Inspection --version 1.3.0
 ```
 
 `Icod.TermInfo.Source` depends on the matching `Icod.TermInfo` package.
-`Icod.TermInfo.Compiler` depends on the matching Runtime and Source packages.
+`Icod.TermInfo.Compiler` and `Icod.TermInfo.Inspection` each depend on the
+matching Runtime and Source packages; Inspection does not depend on Compiler.
 Applications which only load compiled terminfo or consume `TerminalDescription`
 values continue to reference `Icod.TermInfo` alone.
 
 The same validated package artifacts are published to NuGet.org and GitHub
 Packages. Release closure and tag-publication requirements are recorded in
-`docs/1.2.0-RELEASE-AUDIT.md`.
+`docs/1.3.0-RELEASE-AUDIT.md`.
 
 ## 1.x stability contract
 
 The 1.x line keeps runtime assembly identity `Icod.TermInfo, Version=1.0.0.0` and
 remains unsigned. The frozen 1.0 and 1.1 releases support `net8.0` and
 `net10.0`; beginning with 1.2, the supported consumer targets are `net8.0`,
-`net9.0`, and `net10.0`. `Icod.TermInfo.Source` and `Icod.TermInfo.Compiler`
-retain assembly version `1.0.0.0` throughout their 1.x lines. Public API,
-binary/package compatibility,
-deprecation, and target-framework policy are documented in `docs/VERSIONING.md`
-and `docs/COMPATIBILITY.md`.
+`net9.0`, and `net10.0`. `Icod.TermInfo.Source`, `Icod.TermInfo.Compiler`, and
+`Icod.TermInfo.Inspection` retain assembly version `1.0.0.0` throughout their
+1.x lines. Public API, binary/package compatibility, deprecation, and
+target-framework policy are documented in `docs/VERSIONING.md` and
+`docs/COMPATIBILITY.md`.
 
-The runtime 1.0 public API remains frozen. Version 1.1 adds source-language functionality in the separate `Icod.TermInfo.Source` package rather than making the runtime package depend on parser/front-end code. The 1.2 line adds deterministic compiled-entry writing in the separate `Icod.TermInfo.Compiler` package. Live terminal sessions, PTYs, curses/UI, terminal emulation, command-line `tic`/`infocmp`/`toe` tooling, termcap conversion, and active protocol negotiation remain later or sibling work.
+The runtime 1.0 public API remains frozen. Version 1.1 adds source-language functionality in the separate `Icod.TermInfo.Source` package rather than making the runtime package depend on parser/front-end code. The 1.2 line adds deterministic compiled-entry writing in the separate `Icod.TermInfo.Compiler` package. The 1.3 line adds canonical rendering and semantic comparison in the separate `Icod.TermInfo.Inspection` package. Live terminal sessions, PTYs, curses/UI, terminal emulation, command-line `tic`/`infocmp`/`toe` tooling, termcap conversion, and active protocol negotiation remain later or sibling work.
 
 ## What 1.0 provides
 
@@ -112,6 +120,28 @@ the existing compiled-term acquisition path:
 
 Compiler remains opt-in. The Runtime package remains dependency-free, Source
 depends only on Runtime, and Compiler depends on Runtime and Source.
+
+## What 1.3 adds
+
+The optional `Icod.TermInfo.Inspection` package adds reusable inspection and
+comparison engines without enlarging the already-frozen Runtime, Source, or
+Compiler public contracts:
+
+- canonical `.ti`-style rendering of effective `TerminalDescription` values;
+- normalized rendering of unresolved Source entries and documents while
+  preserving semantically significant field order;
+- deterministic structured comparison of effective terminal descriptions;
+- source-aware comparison which preserves cancellation, disabled fields,
+  duplicate declarations, `use=` references, and source ordering;
+- provider-aware inspection through explicit provider/name targets;
+- deterministic comparison ordering across cultures and extended-capability
+  insertion order;
+- corpus-backed managed render/compile/parse/compare validation across the
+  existing Runtime, Source, and Compiler layers.
+
+Inspection remains opt-in. It depends on matching Runtime and Source packages
+and deliberately has no production dependency on Compiler. Command-line
+`infocmp` policy remains future tooling work.
 
 ## Getting started
 
@@ -639,7 +669,7 @@ purposes.
 - redirection handling and explicit Windows VT enablement;
 - a custom provider implementation.
 
-Both sample projects in the 1.2 development line target `net8.0`, `net9.0`,
+Both sample projects in the 1.3 package family target `net8.0`, `net9.0`,
 and `net10.0`; `dotnet run` therefore needs an explicit framework. Run the
 ordinary demonstration with:
 
@@ -697,13 +727,15 @@ See `samples/README.md`,
 
 ## Project-family boundary
 
-`Icod.TermInfo` owns immutable terminal-description data, acquisition of that data, and pure transformations required to interpret, expand, and output terminal capabilities. `Icod.TermInfo.Source` owns optional source-language parsing and inheritance resolution. Neither package owns a live terminal session, a child pseudo-terminal, or a virtual screen.
+`Icod.TermInfo` owns immutable terminal-description data, acquisition of that data, and pure transformations required to interpret, expand, and output terminal capabilities. `Icod.TermInfo.Source` owns optional source-language parsing and inheritance resolution, `Icod.TermInfo.Compiler` owns compiled output, and `Icod.TermInfo.Inspection` owns canonical rendering and semantic comparison. None of those packages owns a live terminal session, a child pseudo-terminal, or a virtual screen.
 
 The intended family boundary is now explicit:
 
 - **`Icod.TermInfo`** — descriptions, compiled-database acquisition, capability semantics, parameter expansion, and output transformation;
 - **`Icod.TermInfo.Source`** — `.ti` lexical analysis, source diagnostics, unresolved entries, cancellation, `use=` inheritance, and materialization into `TerminalDescription`;
-- **future `Icod.TermInfo.Compiler` / tools** — compiled-entry writing, `tic`/`infocmp`/`toe` engines and commands, termcap conversion, and optional database-maintenance functionality;
+- **`Icod.TermInfo.Compiler`** — deterministic compiled-entry writing, source compilation, and explicit conventional database-layout publication;
+- **`Icod.TermInfo.Inspection`** — canonical effective/source rendering, structured semantic comparison, and provider-aware inspection;
+- **future tools** — `tic`, `infocmp`, and `toe` command applications plus later termcap conversion and optional database-maintenance functionality;
 - **future `Icod.Terminal`** — raw/cooked session ownership, input decoding, keyboard/mouse/paste/focus events, active probing/negotiation, full-screen/cursor lifecycle, clipboard/hyperlink operations, and progress helpers;
 - **future `Icod.Pty`** — Unix PTY and Windows ConPTY creation, resize propagation, and child-process plumbing;
 - **future `Icod.Curses`** — Unicode cell/grid state, damage/refresh optimization, windows, pads, panels, menus, forms, and widgets.
@@ -756,11 +788,15 @@ dotnet build Icod.TermInfo.sln -c Staging
 dotnet test Icod.TermInfo.sln -c Staging
 dotnet pack Icod.TermInfo.csproj -c Staging --output artifacts
 dotnet pack Icod.TermInfo.Source/Icod.TermInfo.Source.csproj -c Staging --output artifacts
+dotnet pack Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj -c Staging --output artifacts
+dotnet pack Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj -c Staging --output artifacts
 
 dotnet build Icod.TermInfo.sln -c Release
 dotnet test Icod.TermInfo.sln -c Release
 dotnet pack Icod.TermInfo.csproj -c Release --output artifacts
 dotnet pack Icod.TermInfo.Source/Icod.TermInfo.Source.csproj -c Release --output artifacts
+dotnet pack Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj -c Release --output artifacts
+dotnet pack Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj -c Release --output artifacts
 ```
 
 Use the verifier with the same configuration used to build and pack.
@@ -779,35 +815,35 @@ For final Release validation:
 bash .github/scripts/verify-release-package.sh artifacts Release
 ```
 
-Both wrappers run the same capability-metadata check; exact runtime and Source
-public-API baseline checks; net8/net9/net10 API-equivalence checks; runtime
-package/XML/symbol validation; isolated runtime and Source package-reference-only
-smoke consumers on all three target frameworks; and the sample's non-interactive
+Both wrappers run the coordinated four-package release verifier: generated
+capability metadata, all four public-API baselines, net8/net9/net10 API
+equivalence, package/XML/symbol/dependency validation, all four isolated
+package-reference-only smoke consumers, and the sample's non-interactive
 `--describe-only` path. Windows package validation does not require Bash or
 Python.
 
-Pull requests use Staging throughout, may upload the verified `.nupkg` and
-`.snupkg` artifacts for both packages, and never publish packages. Only pushes to
-`main` run the Release build/test/package-validation/publication workflow.
+Pull requests use Staging throughout and may upload verified package artifacts,
+but never publish. Pushes to `main` run the non-publishing Release validation
+matrix. Only an immutable `v*` tag matching the coordinated package version may
+start registry publication through `.github/workflows/release.yaml`.
 
 See `docs/RELEASING.md` for the release procedure,
-`Icod.TermInfo-Development-Roadmap-1.0.0.md` for the frozen runtime contract,
-`Icod.TermInfo-Post-1.0-Development-Roadmap.md` for the 1.1 source-language
-program, and `docs/1.1.0-RELEASE-AUDIT.md` for the final release gate. Tag
-`v1.1.1` only on the exact `main` commit whose complete Release validation and
-publication succeeded; no source or package content may change between that
-validation and tagging.
+`Icod.TermInfo-1.3.0-Inspection-and-Comparison-Roadmap.md` for the completed
+I01-I07 contract, and `docs/1.3.0-RELEASE-AUDIT.md` for the final 1.3.0 release
+gate. Tag `v1.3.0` only on the exact validated `main` commit; no source or
+package content may change between that validation and tagging.
 
 ## Scope
 
-`Icod.TermInfo` is not curses, a terminal emulator, a PTY implementation, a termios session manager, an input-event parser, or a general terminal UI toolkit. It intentionally carries low-level descriptive data which those higher-level systems may consume. `Icod.TermInfo.Source` is an optional parser/resolver layer and does not change those runtime boundaries.
+`Icod.TermInfo` is not curses, a terminal emulator, a PTY implementation, a termios session manager, an input-event parser, or a general terminal UI toolkit. It intentionally carries low-level descriptive data which those higher-level systems may consume. Source, Compiler, and Inspection remain optional sibling layers and do not change those runtime boundaries.
 
 See `Icod.TermInfo-Development-Roadmap-0.9.0.md` for the frozen acquisition
 contract, `Icod.TermInfo-Development-Roadmap-1.0.0.md` for the 1.0 runtime
-stability contract, `Icod.TermInfo-Post-1.0-Development-Roadmap.md` for the 1.1
-source-language program, `docs/VERSIONING.md` and `docs/COMPATIBILITY.md` for the
-1.x promises, and `docs/FUTURE-WORK-INVENTORY.md` for the broader terminal-system
-dependency map. The 0.6.0 through 1.0.0 roadmaps remain historical frozen
+stability contract, `Icod.TermInfo-Post-1.0-Development-Roadmap.md` for the
+post-1.0 package-family sequence, `Icod.TermInfo-1.3.0-Inspection-and-Comparison-Roadmap.md`
+for the 1.3 Inspection contract, `docs/VERSIONING.md` and
+`docs/COMPATIBILITY.md` for the 1.x promises, and
+`docs/FUTURE-WORK-INVENTORY.md` for the broader terminal-system dependency map. The 0.6.0 through 1.0.0 roadmaps remain historical frozen
 contracts.
 
 ## Authors

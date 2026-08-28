@@ -4,14 +4,15 @@
 **Stable runtime package:** `Icod.TermInfo`  
 **Optional source package:** `Icod.TermInfo.Source`
 **Optional compiler package:** `Icod.TermInfo.Compiler`
+**Optional inspection package:** `Icod.TermInfo.Inspection`
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
-**Current release version:** `1.2.0`
-**Current development version:** `1.2.0`
-**Next development line:** `1.3.0`
-**Status:** 1.2.0 release closure
-**Current tranche:** Final 1.2.0 release closure
+**Current release version:** `1.3.0`
+**Current development version:** `1.3.0`
+**Next development line:** `1.4.0`
+**Status:** 1.3.0 release closure
+**Current tranche:** Final 1.3.0 release closure
 **Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
 
 ---
@@ -36,21 +37,21 @@ Post-1.0 development SHALL build outward from that foundation rather than repeat
 The principal new family is **terminfo source and tooling**:
 
 ```text
-                 Icod.TermInfo.Tools
-                         |
-                         v
-              Icod.TermInfo.Compiler
-                    /           \
-                   v             v
-      Icod.TermInfo.Source ---> Icod.TermInfo
-                               stable runtime
+                    Icod.TermInfo.Tools
+                    /                 \
+                   v                   v
+      Icod.TermInfo.Compiler   Icod.TermInfo.Inspection
+                 |  \             /  |
+                 |   \           /   |
+                 v    v         v      v
+          Icod.TermInfo.Source ---> Icod.TermInfo
+                                   stable runtime
 ```
 
 The arrows are dependency arrows. `Icod.TermInfo` remains dependency-free.
-`Icod.TermInfo.Source` depends on `Icod.TermInfo`. The compiler depends directly
-on `Icod.TermInfo`; its Source dependency is introduced only when source
-compilation enters the compiler in C05. No dependency may point from the runtime
-package back toward Source, Compiler, or Tools.
+`Icod.TermInfo.Source` depends on `Icod.TermInfo`. Compiler and Inspection each
+depend on matching Runtime and Source packages. No dependency may point from the
+runtime package back toward Source, Compiler, Inspection, or Tools.
 
 Live-terminal state, terminal input, probing, PTYs, curses presentation, and terminal emulation remain outside this roadmap and belong to their respective packages.
 
@@ -1293,4 +1294,4 @@ TerminalDescription materialization + corpus
 1.5 termcap interoperability
 ```
 
-The first implementation target should therefore be **1.1 S01 — `Icod.TermInfo.Source` package foundation**, followed by the lexer/source-location layer. This gives the project a clean new development line while leaving the stable runtime and the ongoing Terminal/DCurses work untouched.
+The 1.1 Source, 1.2 Compiler, and 1.3 Inspection lines are now complete. The next package-family development target is **1.4.0 — Tool Suite**, building the `tic`, `infocmp`, and `toe` command projects on the frozen managed engines without enlarging the Runtime contract.

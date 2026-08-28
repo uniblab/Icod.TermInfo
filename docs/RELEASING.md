@@ -19,9 +19,8 @@ This document describes the current validation and publication procedure for the
 - Release validation must pass on Windows, Linux, and macOS on `main` before a
   release tag is created. The tag workflow repeats the Release gate on the exact
   tagged commit before publication.
-- Release validation must pass the frozen Runtime, Source, and Compiler API
-  baselines, the developing Inspection API baseline, and net8/net9/net10
-  API-equivalence gates.
+- Release validation must pass the frozen Runtime 1.0, Source 1.1, Compiler 1.2,
+  and Inspection 1.3 API baselines and the net8/net9/net10 API-equivalence gates.
 - Release builds treat missing public XML documentation as an error.
 - All four packages must pass the coordinated release verifier before publication.
   Use `.github/scripts/verify-release-package.sh` on a Bash-capable host or
@@ -160,12 +159,13 @@ proves the packed package can:
 - compose system lookup with `TerminalDatabase.BuiltIn` fallback.
 
 The Source smoke consumer proves the separately packed source-language package
-can restore through its NuGet dependency on the matching runtime package and
+can restore through its NuGet dependency on the matching Runtime package and
 execute on all three supported target frameworks. The Compiler smoke consumer
-likewise proves the Compiler package restores through its Runtime dependency and
-can write and reparse a C01 legacy entry on all three frameworks. The Inspection
-smoke consumer proves the fourth package restores with matching Runtime and Source
-dependencies while retaining the I01 empty-public-surface contract.
+likewise proves the Compiler package restores through its Runtime and Source
+dependencies and can write and reparse a C01 legacy entry on all three
+frameworks. The Inspection smoke consumer proves the fourth package restores
+with matching Runtime and Source dependencies and exercises the reviewed I02-I06
+public surface without a production Compiler dependency.
 
 No checked-in runtime fixture is copied into the smoke project, so those checks
 prove the public package surface rather than repository-only outputs.
@@ -290,11 +290,11 @@ frozen compiler architecture, `docs/1.2.0-C01-COMPILER-PACKAGE-FOUNDATION.md`
 for the C01 implementation record, and
 `docs/1.2.0-COMPILER-PUBLIC-API-BASELINE.txt` for the frozen Compiler API.
 
-For 1.3 development, use
+For the completed 1.3 line, use
 `Icod.TermInfo-1.3.0-Inspection-and-Comparison-Roadmap.md` for the I01-I07
 contract, `docs/1.3.0-PRE-I01-CONTRACT-AUDIT.md` for the package/layer freeze,
-and `docs/1.3.0-INSPECTION-PUBLIC-API-BASELINE.txt` for the developing Inspection
-API.
+`docs/1.3.0-INSPECTION-PUBLIC-API-BASELINE.txt` for the frozen Inspection API,
+and `docs/1.3.0-RELEASE-AUDIT.md` for final release sign-off requirements.
 
 The final `v<PackageVersion>` tag must identify the exact validated and published `main`
 commit. Do not edit the audit or any other source/package content after that
