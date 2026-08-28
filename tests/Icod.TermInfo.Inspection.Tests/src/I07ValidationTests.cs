@@ -453,7 +453,7 @@ public sealed class I07ValidationTests {
 				);
 
 			Assert.Contains(
-				"1.3.0-INSPECTION-PUBLIC-API-BASELINE.txt",
+				"1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt",
 				verifier
 			);
 			foreach ( string framework in new[] { "net8.0", "net9.0", "net10.0" } ) {
