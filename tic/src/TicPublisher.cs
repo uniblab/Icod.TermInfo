@@ -336,7 +336,7 @@ internal static class TicDestinationResolver {
 		ArgumentException.ThrowIfNullOrWhiteSpace( directory );
 
 		return TicDestinationResolution.FromPath(
-			Path.GetFullPath( directory )
+			System.IO.Path.GetFullPath( directory )
 		);
 	}
 
