@@ -123,7 +123,7 @@ public sealed class T01ContractTests {
 	[Fact]
 	public void SolutionContainsAllThreeCommandsAndTests() {
 		string root = FindRepositoryRoot();
-		string solution = System.IO.File.ReadAllText( Path.Combine( root, "Icod.TermInfo.sln" ) );
+		string solution = System.IO.File.ReadAllText( System.IO.Path.Combine( root, "Icod.TermInfo.sln" ) );
 
 		foreach (
 			string projectName
@@ -211,7 +211,7 @@ public sealed class T01ContractTests {
 		DirectoryInfo? current = new( AppContext.BaseDirectory );
 
 		while ( current is not null ) {
-			if ( System.IO.File.Exists( Path.Combine( current.FullName, "Icod.TermInfo.sln" ) ) ) {
+			if ( System.IO.File.Exists( System.IO.Path.Combine( current.FullName, "Icod.TermInfo.sln" ) ) ) {
 				return current.FullName;
 			}
 
