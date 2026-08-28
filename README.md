@@ -153,20 +153,17 @@ search the host database first and then fall back to the immutable built-ins:
 ```csharp
 using Icod.TermInfo;
 
-TerminalDatabase database =
-    new(
-        new ITerminalDescriptionProvider[]
-        {
-            new SystemTerminalDescriptionProvider(),
-            TerminalDatabase.BuiltIn,
-        }
-    );
+TerminalDatabase database = new(
+    new ITerminalDescriptionProvider[] {
+        new SystemTerminalDescriptionProvider(),
+        TerminalDatabase.BuiltIn,
+    }
+);
 
-TerminalDescription terminal =
-    TerminalEnvironment.Resolve(
-        database,
-        TerminalProfiles.Dumb
-    );
+TerminalDescription terminal = TerminalEnvironment.Resolve(
+    database,
+    TerminalProfiles.Dumb
+);
 
 Console.WriteLine($"Terminal profile: {terminal.Name}");
 ```
@@ -177,23 +174,12 @@ Unknown names are not silently coerced to ANSI, VT100, or xterm.
 To select a known modern profile explicitly:
 
 ```csharp
-TerminalDescription xterm =
-    TerminalDatabase.BuiltIn.Load("xterm");
-
-TerminalDescription xterm256 =
-    TerminalDatabase.BuiltIn.Load("xterm-256color");
-
-TerminalDescription xtermDirect =
-    TerminalDatabase.BuiltIn.Load("xterm-direct256");
-
-TerminalDescription winConsole =
-    TerminalDatabase.BuiltIn.Load("winconsole");
-
-TerminalDescription windowsTerminal =
-    TerminalDatabase.BuiltIn.Load("ms-terminal");
-
-TerminalDescription windowsTerminalDirect =
-    TerminalDatabase.BuiltIn.Load("ms-terminal-direct");
+TerminalDescription xterm = TerminalDatabase.BuiltIn.Load("xterm");
+TerminalDescription xterm256 = TerminalDatabase.BuiltIn.Load("xterm-256color");
+TerminalDescription xtermDirect = TerminalDatabase.BuiltIn.Load("xterm-direct256");
+TerminalDescription winConsole = TerminalDatabase.BuiltIn.Load("winconsole");
+TerminalDescription windowsTerminal = TerminalDatabase.BuiltIn.Load("ms-terminal");
+TerminalDescription windowsTerminalDirect = TerminalDatabase.BuiltIn.Load("ms-terminal-direct");
 ```
 
 Aliases remain exact and intentional. For example, `vt100-am` resolves to `vt100`, and `vt200` resolves to `vt220`. Windows identities are not aliases for ANSI or xterm.
@@ -203,14 +189,9 @@ Aliases remain exact and intentional. For example, `vt100-am` resolves to `vt100
 Typed lookup is the preferred API for standard capabilities:
 
 ```csharp
-bool automaticMargins =
-    terminal.GetBoolean(BooleanCapability.AutoRightMargin);
-
-int? columns =
-    terminal.GetNumber(NumericCapability.Columns);
-
-string? clear =
-    terminal.GetString(StringCapability.ClearScreen);
+bool automaticMargins = terminal.GetBoolean(BooleanCapability.AutoRightMargin);
+int? columns = terminal.GetNumber(NumericCapability.Columns);
+string? clear = terminal.GetString(StringCapability.ClearScreen);
 ```
 
 Traditional short-name lookup remains available:
@@ -223,18 +204,16 @@ bool hasClear = terminal.TryGetString("clear", out string? clear);
 The complete standard catalog is inspectable in compiled-table order. Managed enum values are deliberately independent from those binary indices:
 
 ```csharp
-StandardCapabilityMetadata<StringCapability> cupMetadata =
-    StandardCapabilityCatalog.GetMetadata(
-        StringCapability.CursorAddress
-    );
+StandardCapabilityMetadata<StringCapability> cupMetadata = StandardCapabilityCatalog.GetMetadata(
+    StringCapability.CursorAddress
+);
 
 Console.WriteLine(
     $"{cupMetadata.ShortName}: binary index {cupMetadata.BinaryIndex}"
 );
 
 foreach (StandardCapabilityMetadata<NumericCapability> metadata
-    in StandardCapabilityCatalog.NumericCapabilities)
-{
+    in StandardCapabilityCatalog.NumericCapabilities) {
     Console.WriteLine(
         $"{metadata.ShortName} / {metadata.LongName}"
     );
@@ -247,8 +226,7 @@ A terminal description also exposes its effective standard capabilities in the s
 Console.WriteLine(terminal.Description ?? "(no verbose description)");
 
 foreach (KeyValuePair<NumericCapability, int> capability
-    in terminal.NumericCapabilities)
-{
+    in terminal.NumericCapabilities) {
     Console.WriteLine($"{capability.Key} = {capability.Value}");
 }
 ```
@@ -258,15 +236,12 @@ Absent and internally canceled capabilities do not appear as effective present v
 Modern capabilities which are not part of the fixed standard terminfo vocabulary are carried through the extended-capability store:
 
 ```csharp
-if (xterm.TryGetExtendedString("BE", out string? enablePaste))
-{
+if (xterm.TryGetExtendedString("BE", out string? enablePaste)) {
     Console.WriteLine("Bracketed-paste enable metadata is present.");
 }
 
-if (xterm.TryGetExtendedString("XM", out _))
-{
-    string enableMouse =
-        xterm.ExpandExtendedString("XM", 1);
+if (xterm.TryGetExtendedString("XM", out _)) {
+    string enableMouse = xterm.ExpandExtendedString("XM", 1);
 }
 ```
 
@@ -275,8 +250,7 @@ Extended names are case-sensitive. Standard capability names cannot be silently 
 Reusable arbitrary-source parameter programs can be parsed once and expanded repeatedly. Structural/type analysis remains internal safety machinery rather than a second public model:
 
 ```csharp
-TermInfoParameterProgram program =
-    TermInfoParameterProgram.Parse("%p1%{1}%+%d");
+TermInfoParameterProgram program = TermInfoParameterProgram.Parse("%p1%{1}%+%d");
 
 Console.WriteLine(program.Source);     // %p1%{1}%+%d
 Console.WriteLine(program.Expand(41)); // 42
@@ -289,8 +263,7 @@ Per-description standard and extended expansion use bounded lazy caches owned by
 Color semantics are derived from raw terminfo data rather than from terminal-name checks:
 
 ```csharp
-TerminalColorSupport support =
-    TerminalColors.GetColorSupport(xterm256);
+TerminalColorSupport support = TerminalColors.GetColorSupport(xterm256);
 
 Console.WriteLine(support.Model);             // Indexed
 Console.WriteLine(support.Tier);              // Color256
@@ -304,11 +277,10 @@ Raw `colors`, `pairs`, `ncv`, selectors, `bce`, `ccc`, `hls`, `initc`, `op`, `oc
 Use the semantic helper rather than embedding ANSI escape strings:
 
 ```csharp
-string foreground =
-    TerminalColors.ExpandForeground(
-        TerminalProfiles.Xterm256Color,
-        196
-    );
+string foreground = TerminalColors.ExpandForeground(
+    TerminalProfiles.Xterm256Color,
+    196
+);
 
 TermInfoOutput.PutP(foreground, Console.Out);
 ```
@@ -320,20 +292,14 @@ The helper validates the terminal's advertised indexed range and expands the ter
 Direct profiles expose an RGB layout and any retained indexed prefix:
 
 ```csharp
-TerminalDescription direct =
-    TerminalProfiles.XtermDirect256;
+TerminalDescription direct = TerminalProfiles.XtermDirect256;
+TerminalColorSupport support = TerminalColors.GetColorSupport(direct);
+TerminalRgbColor purple = new(0x80, 0x40, 0xC0);
 
-TerminalColorSupport support =
-    TerminalColors.GetColorSupport(direct);
-
-TerminalRgbColor purple =
-    new(0x80, 0x40, 0xC0);
-
-string foreground =
-    TerminalColors.ExpandForeground(
-        direct,
-        purple
-    );
+string foreground = TerminalColors.ExpandForeground(
+    direct,
+    purple
+);
 ```
 
 The selected xterm direct profiles use packed 8/8/8 RGB semantics and retain 8, 16, or 256 indexed entries according to their `CO` metadata. The library validates collisions between packed RGB values and that retained indexed prefix instead of guessing.
@@ -343,25 +309,20 @@ The selected xterm direct profiles use packed 8/8/8 RGB semantics and retain 8, 
 Parameterized standard capabilities use the same terminfo expansion engine:
 
 ```csharp
-string move =
-    xterm.Expand(
-        StringCapability.CursorAddress,
-        10,
-        20
-    );
+string move = xterm.Expand(
+    StringCapability.CursorAddress,
+    10,
+    20
+);
 ```
 
 Profiles can also advertise cursor-addressing lifecycle and cursor-visibility primitives:
 
 ```csharp
-string? enter =
-    xterm.GetString(StringCapability.EnterCursorAddressingMode);
-string? leave =
-    xterm.GetString(StringCapability.ExitCursorAddressingMode);
-string? hideCursor =
-    xterm.GetString(StringCapability.CursorInvisible);
-string? normalCursor =
-    xterm.GetString(StringCapability.CursorNormal);
+string? enter = xterm.GetString(StringCapability.EnterCursorAddressingMode);
+string? leave = xterm.GetString(StringCapability.ExitCursorAddressingMode);
+string? hideCursor = xterm.GetString(StringCapability.CursorInvisible);
+string? normalCursor = xterm.GetString(StringCapability.CursorNormal);
 ```
 
 These are capability strings, not a session manager. `Icod.TermInfo` does not decide when to enter full-screen mode, hide the cursor, recover from exceptions, or restore terminal state. A caller or future higher-level terminal library owns that lifecycle.
@@ -386,12 +347,11 @@ VT100 strings preserve their historical terminfo padding annotations through par
 ```csharp
 TerminalDescription vt100 = TerminalProfiles.Vt100;
 
-string move =
-    vt100.Expand(
-        StringCapability.CursorAddress,
-        10,
-        20
-    );
+string move = vt100.Expand(
+    StringCapability.CursorAddress,
+    10,
+    20
+);
 
 // move contains ESC[11;21H$<5>
 ```
@@ -443,12 +403,11 @@ This does **not** prescribe the encoding of application text. Text encoding rema
 When padding policy needs terminal facts, pass immutable `TermInfoOutputOptions` explicitly:
 
 ```csharp
-TermInfoOutputOptions options =
-    new(
-        vt100,
-        baudRate: 9600,
-        paddingMode: PaddingMode.Delay
-    );
+TermInfoOutputOptions options = new(
+    vt100,
+    baudRate: 9600,
+    paddingMode: PaddingMode.Delay
+);
 
 TermInfoOutput.TPuts(
     move,
@@ -465,14 +424,9 @@ The library never discovers baud rate and never owns a tty/file descriptor. Advi
 `TermInfoCompatibility` provides familiar terminfo operation names while retaining managed semantics and explicit terminal ownership:
 
 ```csharp
-bool am =
-    TermInfoCompatibility.TiGetFlag(xterm, "am");
-
-int? colorCount =
-    TermInfoCompatibility.TiGetNum(xterm, "colors");
-
-string? cup =
-    TermInfoCompatibility.TiGetStr(xterm, "cup");
+bool am = TermInfoCompatibility.TiGetFlag(xterm, "am");
+int? colorCount = TermInfoCompatibility.TiGetNum(xterm, "colors");
+string? cup = TermInfoCompatibility.TiGetStr(xterm, "cup");
 ```
 
 There is no process-global `cur_term`, no sentinel-pointer result, and no hidden persistent expansion state. Persistent uppercase `%P/%g` variables require an explicit caller-owned `TermInfoExpansionContext`.
@@ -484,16 +438,11 @@ Live dimensions are distinct from configured and profile-default dimensions:
 ```csharp
 TerminalSize size;
 
-if (TerminalEnvironment.TryGetLiveSize(out size))
-{
+if (TerminalEnvironment.TryGetLiveSize(out size)) {
     Console.WriteLine($"Live: {size.Columns}x{size.Rows}");
-}
-else if (TerminalEnvironment.TryGetEnvironmentSize(out size))
-{
+} else if (TerminalEnvironment.TryGetEnvironmentSize(out size)) {
     Console.WriteLine($"Configured: {size.Columns}x{size.Rows}");
-}
-else if (TerminalEnvironment.TryGetProfileSize(terminal, out size))
-{
+} else if (TerminalEnvironment.TryGetProfileSize(terminal, out size)) {
     Console.WriteLine($"Profile default: {size.Columns}x{size.Rows}");
 }
 ```
@@ -505,8 +454,7 @@ A failed live query never substitutes `COLUMNS`/`LINES` or a profile default. Fa
 Windows VT output mode is always opt-in:
 
 ```csharp
-using IDisposable? mode =
-    WindowsVirtualTerminal.TryEnableOutput();
+using IDisposable? mode = WindowsVirtualTerminal.TryEnableOutput();
 ```
 
 The helper returns `null` on non-Windows systems, redirected output, non-console handles, or when Windows refuses the mode change. When it changes console mode, disposing the returned lease restores the exact previous mode. Loading a terminal profile never changes console state.
@@ -514,14 +462,9 @@ The helper returns `null` on non-Windows systems, redirected output, non-console
 Windows profile selection is separate and side-effect free:
 
 ```csharp
-TerminalDescription console =
-    TerminalProfiles.WinConsole;
-
-TerminalDescription wt =
-    TerminalProfiles.MsTerminal;
-
-TerminalDescription wtDirect =
-    TerminalProfiles.MsTerminalDirect;
+TerminalDescription console = TerminalProfiles.WinConsole;
+TerminalDescription wt = TerminalProfiles.MsTerminal;
+TerminalDescription wtDirect = TerminalProfiles.MsTerminalDirect;
 ```
 
 `winconsole` describes the authoritative modern Windows Console terminfo identity. `ms-terminal` is the indexed-color Windows Terminal identity, while `ms-terminal-direct` advertises direct RGB through the same generic color engine used by other profiles. `WT_SESSION`, `WT_PROFILE_ID`, and `COLORTERM` do not silently select or mutate any profile.
@@ -531,22 +474,19 @@ TerminalDescription wtDirect =
 Applications can add descriptions without changing the built-in database or generic engines:
 
 ```csharp
-TerminalDescription example =
-    new TerminalDescriptionBuilder("example-terminal")
-        .SetBoolean(BooleanCapability.AutoRightMargin)
-        .SetNumber(NumericCapability.Columns, 80)
-        .SetNumber(NumericCapability.Lines, 24)
-        .SetExtendedBoolean("exampleFlag")
-        .SetExtendedString("exampleString", "value")
-        .Build();
+TerminalDescription example = new TerminalDescriptionBuilder("example-terminal")
+    .SetBoolean(BooleanCapability.AutoRightMargin)
+    .SetNumber(NumericCapability.Columns, 80)
+    .SetNumber(NumericCapability.Lines, 24)
+    .SetExtendedBoolean("exampleFlag")
+    .SetExtendedString("exampleString", "value")
+    .Build();
 
-ITerminalDescriptionProvider provider =
-    new InMemoryTerminalDescriptionProvider(
-        new[] { example }
-    );
+ITerminalDescriptionProvider provider = new InMemoryTerminalDescriptionProvider(
+    new[] { example }
+);
 
-TerminalDatabase database =
-    new(new[] { provider });
+TerminalDatabase database = new(new[] { provider });
 ```
 
 Provider ordering is explicit and deterministic; the first provider that resolves a name wins.
@@ -566,9 +506,7 @@ dependency:
 
 ```csharp
 byte[] entry = File.ReadAllBytes("xterm.compiled");
-
-TerminalDescription parsed =
-    CompiledTermInfoParser.Parse(entry);
+TerminalDescription parsed = CompiledTermInfoParser.Parse(entry);
 ```
 
 `CompiledTermInfoParserOptions` bounds accepted entry size. Malformed or
@@ -581,16 +519,14 @@ When an application owns a conventional terminfo directory tree, use
 `DirectoryTerminalDescriptionProvider`:
 
 ```csharp
-ITerminalDescriptionProvider applicationTermInfo =
-    new DirectoryTerminalDescriptionProvider(
-        "/opt/myapp/share/terminfo"
-    );
+ITerminalDescriptionProvider applicationTermInfo = new DirectoryTerminalDescriptionProvider(
+    "/opt/myapp/share/terminfo"
+);
 
-TerminalDescription terminal =
-    new TerminalDatabase(
-        new[] { applicationTermInfo }
-    )
-        .Load("my-terminal");
+TerminalDescription terminal = new TerminalDatabase(
+    new[] { applicationTermInfo }
+)
+    .Load("my-terminal");
 ```
 
 The provider performs exact-name lookup only and propagates malformed-entry,
@@ -601,14 +537,13 @@ permission, and I/O failures.
 Each system discovery category can be disabled independently:
 
 ```csharp
-SystemTerminalDescriptionProvider restricted =
-    new(
-        new SystemTerminalDescriptionProviderOptions(
-            useEnvironment: false,
-            useUserDatabase: false,
-            useSystemDatabases: false
-        )
-    );
+SystemTerminalDescriptionProvider restricted = new(
+    new SystemTerminalDescriptionProviderOptions(
+        useEnvironment: false,
+        useUserDatabase: false,
+        useSystemDatabases: false
+    )
+);
 ```
 
 That provider has no enabled acquisition source and therefore returns a clean
@@ -620,8 +555,7 @@ The default system provider snapshots its permitted discovery inputs at
 construction:
 
 ```csharp
-SystemTerminalDescriptionProvider system =
-    new();
+SystemTerminalDescriptionProvider system = new();
 ```
 
 On non-Windows systems this can search encoded/directory `TERMINFO`, the
@@ -635,14 +569,12 @@ Windows does not invent Unix-style implicit roots; explicit `TERMINFO`,
 fallback remains explicit:
 
 ```csharp
-TerminalDatabase database =
-    new(
-        new ITerminalDescriptionProvider[]
-        {
-            new SystemTerminalDescriptionProvider(),
-            TerminalDatabase.BuiltIn,
-        }
-    );
+TerminalDatabase database = new(
+    new ITerminalDescriptionProvider[] {
+        new SystemTerminalDescriptionProvider(),
+        TerminalDatabase.BuiltIn,
+    }
+);
 ```
 
 The first provider which resolves the requested name wins.

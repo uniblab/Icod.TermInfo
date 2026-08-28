@@ -49,11 +49,10 @@ Parse source, resolve a named entry, and materialize it into the runtime model:
 using Icod.TermInfo;
 using Icod.TermInfo.Source;
 
-TermInfoSourceParseResult parsed =
-    TermInfoSourceParser.Parse(
-        source,
-        "example.ti"
-    );
+TermInfoSourceParseResult parsed = TermInfoSourceParser.Parse(
+    source,
+    "example.ti"
+);
 
 if ( parsed.HasErrors ) {
     throw new InvalidOperationException(
@@ -61,11 +60,10 @@ if ( parsed.HasErrors ) {
     );
 }
 
-TermInfoSourceResolveResult resolved =
-    TermInfoSourceResolver.Resolve(
-        parsed.Document,
-        "example"
-    );
+TermInfoSourceResolveResult resolved = TermInfoSourceResolver.Resolve(
+    parsed.Document,
+    "example"
+);
 
 if ( resolved.Entry is null ) {
     throw new InvalidOperationException(
@@ -73,8 +71,7 @@ if ( resolved.Entry is null ) {
     );
 }
 
-TerminalDescription terminal =
-    resolved.Entry.ToTerminalDescription();
+TerminalDescription terminal = resolved.Entry.ToTerminalDescription();
 ```
 
 For source sets that are not already held in one parsed document, use the

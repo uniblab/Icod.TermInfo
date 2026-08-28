@@ -64,8 +64,7 @@ This constructs:
 
 ```csharp
 new TerminalDatabase(
-    new ITerminalDescriptionProvider[]
-    {
+    new ITerminalDescriptionProvider[] {
         new SystemTerminalDescriptionProvider(),
         TerminalDatabase.BuiltIn,
     }

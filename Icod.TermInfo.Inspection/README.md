@@ -25,19 +25,17 @@ the reviewed T06 surface.
 `infocmp` command while preserving the frozen 1.3 renderer overload output.
 
 ```csharp
-TerminalDescriptionSourceRendererOptions options =
-	new(
-		100,
-		TerminalDescriptionSourceLayout.Canonical,
-		TerminalDescriptionSourceCapabilityOrder.TermInfoName,
-		includeExtendedCapabilities: false
-	);
+TerminalDescriptionSourceRendererOptions options = new(
+	100,
+	TerminalDescriptionSourceLayout.Canonical,
+	TerminalDescriptionSourceCapabilityOrder.TermInfoName,
+	includeExtendedCapabilities: false
+);
 
-string source =
-	TerminalDescriptionSourceRenderer.Render(
-		description,
-		options
-	);
+string source = TerminalDescriptionSourceRenderer.Render(
+	description,
+	options
+);
 ```
 
 The configurable renderer supports canonical wrapping at a caller-selected width,
@@ -64,10 +62,9 @@ terminfo directory root. The catalog parses candidate files through the Runtime
 physical-entry metadata together with deterministic non-fatal issues:
 
 ```csharp
-TermInfoDatabaseCatalog catalog =
-	TermInfoDatabaseInspector.InspectDirectory(
-		"./terminfo"
-	);
+TermInfoDatabaseCatalog catalog = TermInfoDatabaseInspector.InspectDirectory(
+	"./terminfo"
+);
 
 foreach ( TermInfoDatabaseCatalogEntry entry in catalog.Entries ) {
 	Console.WriteLine(
@@ -100,8 +97,7 @@ locations a newly created Runtime system provider would consider. The API is
 intended for later `tic -D`, `infocmp -D`, and `toe` composition:
 
 ```csharp
-IReadOnlyList<TermInfoDatabaseLocation> locations =
-	TermInfoDatabaseInspector.GetSystemLocations();
+IReadOnlyList<TermInfoDatabaseLocation> locations = TermInfoDatabaseInspector.GetSystemLocations();
 ```
 
 Each location identifies whether it came from encoded `TERMINFO`, directory
@@ -151,17 +147,15 @@ explicit `ITerminalDescriptionProvider`, the exact requested terminal name, and
 an optional caller-owned display label:
 
 ```csharp
-TermInfoInspectionTarget target =
-	new(
-		provider,
-		"xterm",
-		"system xterm"
-	);
+TermInfoInspectionTarget target = new(
+	provider,
+	"xterm",
+	"system xterm"
+);
 
-TermInfoInspectionResult inspected =
-	TermInfoInspectionEngine.Inspect(
-		target
-	);
+TermInfoInspectionResult inspected = TermInfoInspectionEngine.Inspect(
+	target
+);
 ```
 
 `TryInspect` preserves the Runtime provider contract's clean-miss semantics;
@@ -174,11 +168,10 @@ The engine can render a target or an already acquired result and can compare two
 targets or two acquired results:
 
 ```csharp
-TermInfoInspectionComparison comparison =
-	TermInfoInspectionEngine.Compare(
-		leftTarget,
-		rightTarget
-	);
+TermInfoInspectionComparison comparison = TermInfoInspectionEngine.Compare(
+	leftTarget,
+	rightTarget
+);
 ```
 
 The comparison retains both target/result identities together with the I04
@@ -199,11 +192,10 @@ interface.
 entries and documents:
 
 ```csharp
-TermInfoComparisonResult sourceComparison =
-	TermInfoSourceComparer.Compare(
-		leftEntry,
-		rightEntry
-	);
+TermInfoComparisonResult sourceComparison = TermInfoSourceComparer.Compare(
+	leftEntry,
+	rightEntry
+);
 ```
 
 The same comparer accepts `TermInfoSourceDocument` values and compares entries
@@ -230,11 +222,10 @@ Call `TermInfoSourceComparer` when source program structure matters and
 `TerminalDescription` values:
 
 ```csharp
-TermInfoComparisonResult comparison =
-	TerminalDescriptionComparer.Compare(
-		left,
-		right
-	);
+TermInfoComparisonResult comparison = TerminalDescriptionComparer.Compare(
+	left,
+	right
+);
 ```
 
 `TermInfoComparisonResult.Differences` contains structured
@@ -255,10 +246,9 @@ therefore a separate operation over the unresolved Source model.
 `1.3.0-Alpha-3` adds normalized rendering for the unresolved Source 1.1 model:
 
 ```csharp
-string normalized =
-	TermInfoSourceRenderer.Render(
-		parsed.Document
-	);
+string normalized = TermInfoSourceRenderer.Render(
+	parsed.Document
+);
 ```
 
 The same API accepts a single `TermInfoSourceEntry`, and both entry/document
@@ -282,10 +272,9 @@ semantics. A numeric or string field with no successfully decoded value fails wi
 `1.3.0-Alpha-2` introduces the first public Inspection API:
 
 ```csharp
-string source =
-	TerminalDescriptionSourceRenderer.Render(
-		terminal
-	);
+string source = TerminalDescriptionSourceRenderer.Render(
+	terminal
+);
 ```
 
 The same canonical representation can be written to a caller-owned
