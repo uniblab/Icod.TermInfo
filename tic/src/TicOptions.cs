@@ -4,7 +4,11 @@ internal sealed class TicOptions {
 	internal TicOptions(
 		string sourceOperand,
 		IReadOnlyList<string> selectedNames,
-		bool allowUnknownExtensions
+		bool allowUnknownExtensions,
+		bool checkOnly,
+		string? outputDirectory,
+		bool summary,
+		bool force
 	) {
 		ArgumentException.ThrowIfNullOrWhiteSpace( sourceOperand );
 		ArgumentNullException.ThrowIfNull( selectedNames );
@@ -12,6 +16,10 @@ internal sealed class TicOptions {
 		SourceOperand = sourceOperand;
 		SelectedNames = selectedNames;
 		AllowUnknownExtensions = allowUnknownExtensions;
+		CheckOnly = checkOnly;
+		OutputDirectory = outputDirectory;
+		Summary = summary;
+		Force = force;
 	}
 
 	internal string SourceOperand {
@@ -23,6 +31,22 @@ internal sealed class TicOptions {
 	}
 
 	internal bool AllowUnknownExtensions {
+		get;
+	}
+
+	internal bool CheckOnly {
+		get;
+	}
+
+	internal string? OutputDirectory {
+		get;
+	}
+
+	internal bool Summary {
+		get;
+	}
+
+	internal bool Force {
 		get;
 	}
 }
@@ -75,7 +99,10 @@ internal static class TicOptionsParser {
 
 		bool checkOnly = false;
 		bool allowUnknownExtensions = false;
+		bool summary = false;
+		bool force = false;
 		List<string> selectedNames = [];
+		string? outputDirectory = null;
 		string? sourceOperand = null;
 
 		for ( int index = 0; index < args.Count; index++ ) {
@@ -87,6 +114,14 @@ internal static class TicOptionsParser {
 
 				case "-x":
 					allowUnknownExtensions = true;
+					break;
+
+				case "-s":
+					summary = true;
+					break;
+
+				case "--force":
+					force = true;
 					break;
 
 				case "-e":
@@ -108,12 +143,32 @@ internal static class TicOptionsParser {
 					}
 					break;
 
+				case "-o":
+					if ( index + 1 >= args.Count ) {
+						return TicOptionsParseResult.FromError(
+							"option '-o' requires an output directory"
+						);
+					}
+					if ( outputDirectory is not null ) {
+						return TicOptionsParseResult.FromError(
+							"option '-o' may be specified only once"
+						);
+					}
+					index++;
+					if ( string.IsNullOrWhiteSpace( args[ index ] ) ) {
+						return TicOptionsParseResult.FromError(
+							"option '-o' requires a non-empty output directory"
+						);
+					}
+					outputDirectory = args[ index ];
+					break;
+
 				case "-D":
 				case "-V":
 				case "--version":
 				case "--help":
 					return TicOptionsParseResult.FromError(
-						$"option '{argument}' must be used by itself in T04"
+						$"option '{argument}' must be used by itself"
 					);
 
 				case "-":
@@ -128,7 +183,7 @@ internal static class TicOptionsParser {
 				default:
 					if ( argument.StartsWith( "-", StringComparison.Ordinal ) ) {
 						return TicOptionsParseResult.FromError(
-							$"unsupported T04 option '{argument}'"
+							$"unsupported option '{argument}'"
 						);
 					}
 					if ( sourceOperand is not null ) {
@@ -141,14 +196,22 @@ internal static class TicOptionsParser {
 			}
 		}
 
-		if ( !checkOnly ) {
-			return TicOptionsParseResult.FromError(
-				"T04 requires check-only mode '-c'; database publication is introduced by T05"
-			);
-		}
 		if ( sourceOperand is null ) {
 			return TicOptionsParseResult.FromError(
 				"exactly one source operand is required"
+			);
+		}
+
+		if (
+			checkOnly
+			&& (
+				outputDirectory is not null
+				|| summary
+				|| force
+			)
+		) {
+			return TicOptionsParseResult.FromError(
+				"options '-o', '-s', and '--force' are not valid with check-only mode '-c'"
 			);
 		}
 
@@ -156,7 +219,11 @@ internal static class TicOptionsParser {
 			new TicOptions(
 				sourceOperand,
 				Array.AsReadOnly( selectedNames.ToArray() ),
-				allowUnknownExtensions
+				allowUnknownExtensions,
+				checkOnly,
+				outputDirectory,
+				summary,
+				force
 			)
 		);
 	}

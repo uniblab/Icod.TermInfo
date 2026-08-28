@@ -9,10 +9,10 @@
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
 **Current release version:** `1.3.0`
-**Current development version:** `1.4.0-Alpha-4`
+**Current development version:** `1.4.0-Alpha-5`
 **Next development line:** `1.5.0`
 **Status:** 1.4.0 tool-suite development
-**Current tranche:** T04 — `tic` validation and check-only mode
+**Current tranche:** T05 — `tic` compilation and database publication
 **Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
 
 ---
@@ -963,8 +963,9 @@ introduces the first operational command semantics: `tic -c` reads strict UTF-8
 terminfo source, parses the complete document, applies optional source-entry
 selection, resolves selected inheritance graphs, enforces the command's `-x`
 unknown-extension policy, and validates compiled representability entirely in
-memory. T04 deliberately performs no conventional database publication; the
-filesystem write path remains T05 work.
+memory. T05 adds the filesystem write path through the frozen
+`CompiledTermInfoDatabaseWriter`, keeps destination and overwrite policy in the
+command layer, and preserves the T04 check-only path as non-mutating.
 
 **1.4 completion gate:** `tic`, `infocmp`, and `toe` are useful standalone
 managed utilities on Windows, Linux, and macOS, backed by the same reusable

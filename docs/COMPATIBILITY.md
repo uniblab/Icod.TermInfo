@@ -223,7 +223,27 @@ needed by their inheritance graphs.
 
 T04 adds no public Runtime, Source, Compiler, or Inspection API. It does not call
 `CompiledTermInfoDatabaseWriter`, create terminfo database directories, or publish
-compiled entries. Database mutation remains a T05 command responsibility.
+compiled entries.
+
+## T05 `tic` publication compatibility
+
+Beginning with T05, omitting `-c` after successful source validation publishes the
+selected effective terminal descriptions through the existing frozen
+`CompiledTermInfoDatabaseWriter`. `-o` chooses an explicit conventional database
+root. Without `-o`, command policy considers only directory-valued `TERMINFO`, then
+the Runtime-defined user database. Encoded `TERMINFO`, `TERMINFO_DIRS`, and
+platform-default/system roots are never selected implicitly for writes.
+
+Existing destinations are rejected by default. `--force` maps to the Compiler
+writer's existing explicit overwrite option, while `-s` reports the normalized
+output root, selected entry count, and warning count on standard error. The command
+does not duplicate Compiler path derivation, alias publication, preflight, staging,
+reparse/link rejection, or final move/replace behavior.
+
+The frozen Compiler writer is synchronous, so T05 checks cancellation before the
+publication transaction begins and then treats the writer call as an indivisible
+commit boundary. T05 does not change Runtime, Source, Compiler, or Inspection
+public API.
 
 ## Discovery and failure compatibility
 

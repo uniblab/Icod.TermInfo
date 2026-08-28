@@ -122,6 +122,15 @@ internal static class TicDiagnosticWriter {
 		);
 	}
 
+	internal static int CountWarnings(
+		IEnumerable<TicDiagnostic> diagnostics
+	) {
+		ArgumentNullException.ThrowIfNull( diagnostics );
+
+		return OrderAndDeduplicate( diagnostics )
+			.Count( diagnostic => !diagnostic.IsError );
+	}
+
 	internal static async Task WriteAsync(
 		Stream stderr,
 		IEnumerable<TicDiagnostic> diagnostics,
@@ -131,40 +140,7 @@ internal static class TicDiagnosticWriter {
 		ArgumentNullException.ThrowIfNull( diagnostics );
 
 		TicDiagnostic[] ordered =
-			diagnostics
-				.Select(
-					( diagnostic, ordinal ) =>
-						new {
-							Diagnostic = diagnostic,
-							Ordinal = ordinal,
-						}
-				)
-				.GroupBy(
-					item =>
-						string.Join(
-							"\u001f",
-							item.Diagnostic.Code,
-							item.Diagnostic.IsError ? "1" : "0",
-							item.Diagnostic.SourceName,
-							item.Diagnostic.Line?.ToString(
-								CultureInfo.InvariantCulture
-							) ?? string.Empty,
-							item.Diagnostic.Column?.ToString(
-								CultureInfo.InvariantCulture
-							) ?? string.Empty,
-							item.Diagnostic.Offset.ToString(
-								CultureInfo.InvariantCulture
-							),
-							item.Diagnostic.Message
-						),
-					StringComparer.Ordinal
-				)
-				.Select( group => group.First() )
-				.OrderBy( item => item.Diagnostic.SourceName, StringComparer.Ordinal )
-				.ThenBy( item => item.Diagnostic.Offset )
-				.ThenBy( item => item.Ordinal )
-				.Select( item => item.Diagnostic )
-				.ToArray();
+			OrderAndDeduplicate( diagnostics );
 
 		using StreamWriter writer =
 			new(
@@ -204,5 +180,46 @@ internal static class TicDiagnosticWriter {
 		await writer.FlushAsync(
 			cancellationToken
 		).ConfigureAwait( false );
+	}
+
+	private static TicDiagnostic[] OrderAndDeduplicate(
+		IEnumerable<TicDiagnostic> diagnostics
+	) {
+		ArgumentNullException.ThrowIfNull( diagnostics );
+
+		return diagnostics
+			.Select(
+				( diagnostic, ordinal ) =>
+					new {
+						Diagnostic = diagnostic,
+						Ordinal = ordinal,
+					}
+			)
+			.GroupBy(
+				item =>
+					string.Join(
+						"\u001f",
+						item.Diagnostic.Code,
+						item.Diagnostic.IsError ? "1" : "0",
+						item.Diagnostic.SourceName,
+						item.Diagnostic.Line?.ToString(
+							CultureInfo.InvariantCulture
+						) ?? string.Empty,
+						item.Diagnostic.Column?.ToString(
+							CultureInfo.InvariantCulture
+						) ?? string.Empty,
+						item.Diagnostic.Offset.ToString(
+							CultureInfo.InvariantCulture
+						),
+						item.Diagnostic.Message
+					),
+				StringComparer.Ordinal
+			)
+			.Select( group => group.First() )
+			.OrderBy( item => item.Diagnostic.SourceName, StringComparer.Ordinal )
+			.ThenBy( item => item.Diagnostic.Offset )
+			.ThenBy( item => item.Ordinal )
+			.Select( item => item.Diagnostic )
+			.ToArray();
 	}
 }

@@ -99,10 +99,12 @@ machine-readable public contract for `Icod.TermInfo.Inspection`, frozen at the
 baseline for 1.4 development. T01 initialized it as an exact copy of the frozen
 1.3 baseline. T02 adds reviewed read-only system database-location inspection,
 and T03 adds reviewed conventional database catalog enumeration, without changing
-Runtime, Source, or Compiler public API. T04 advances the coordinated development
-version to `1.4.0-Alpha-4` and adds `tic` command behavior only; it introduces no
-new public member in any of the four library packages. Later library-surface
-changes require another explicit, compatible 1.4 API review.
+Runtime, Source, or Compiler public API. T04 adds the non-mutating `tic -c`
+validation path. T05 advances the coordinated development version to
+`1.4.0-Alpha-5` and adds command-layer database publication through the already
+frozen Compiler writer; it introduces no new public member in any of the four
+library packages. Later library-surface changes require another explicit,
+compatible 1.4 API review.
 
 The baselines record exported types, public/protected members, enum numeric
 values, parameter names/order/defaults, ref/out/in/params shape, generic

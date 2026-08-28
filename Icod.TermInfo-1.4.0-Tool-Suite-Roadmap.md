@@ -15,7 +15,7 @@
 **New commands:** `tic`, `infocmp`, `toe`
 **Development branch:** `1.4.0`
 **Development sequence:** `1.4.0-Alpha-1` through `1.4.0-Alpha-11`
-**Status:** T04 implementation candidate
+**Status:** T05 implementation candidate
 **Release objective:** expose the completed Runtime, Source, Compiler, and Inspection engines as useful, deterministic, cross-platform Unix-style command-line tools without moving command policy into the lower-level libraries or weakening their existing compatibility contracts.
 
 ---
@@ -1692,7 +1692,7 @@ All T04 options remain supported.
 
 With `-o`, use the explicit directory.
 
-Without `-o`, recommended 1.4 policy is:
+Without `-o`, the T05 policy is:
 
 ```text
 1. directory-valued TERMINFO
@@ -1712,6 +1712,11 @@ Default behavior SHALL reject an existing compiled destination.
 failure-resistant publication mechanism.
 
 Do not prompt interactively from library or command-engine code.
+
+The frozen Compiler database writer is synchronous and does not accept a
+cancellation token. T05 SHALL check cancellation immediately before entering that
+writer and SHALL then treat the publication call as an indivisible commit boundary;
+it must not report cancellation after files have already been committed.
 
 ## Required composition
 
@@ -1738,7 +1743,7 @@ Add:
 - `--force`;
 - multiple compiled entries;
 - `-e` selected compilation;
-- cancellation during publication;
+- cancellation before the synchronous publication transaction begins;
 - permission/write failures;
 - path-safety cases;
 - interrupted/failed publication does not leave a corrupt final entry;
@@ -1757,6 +1762,8 @@ source
 
 **Gate T05:** managed `tic` can validate and publish mainstream terminfo source
 into a conventional database which Runtime can reload without semantic loss.
+
+**Implementation record:** `docs/1.4.0-T05-TIC-COMPILATION-AND-DATABASE-PUBLICATION.md`
 
 ---
 

@@ -327,7 +327,7 @@ T01-T11 contract, `docs/1.4.0-PRE-T01-CONTRACT-AUDIT.md` for the command-layer
 foundation, `docs/1.4.0-T02-SYSTEM-DATABASE-LOCATION-INSPECTION.md` for the T02
 discovery seam, `docs/1.4.0-T03-CONVENTIONAL-DATABASE-CATALOG.md` for T03 catalog
 enumeration, `docs/1.4.0-T04-TIC-VALIDATION-AND-CHECK-ONLY.md` for the first
-operational command contract, and `docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt`
+operational validation contract, `docs/1.4.0-T05-TIC-COMPILATION-AND-DATABASE-PUBLICATION.md` for the first filesystem-mutating command contract, and `docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt`
 for the active Inspection API contract.
 
 The final `v<PackageVersion>` tag must identify the exact validated and published `main`

@@ -1,5 +1,6 @@
 using System.Text;
 using Icod.CommandFramework.Diagnostics;
+using Icod.TermInfo;
 using Icod.TermInfo.Compiler;
 using Icod.TermInfo.Source;
 
@@ -27,6 +28,28 @@ internal static class TicSourceValidator {
 		ArgumentNullException.ThrowIfNull( stdin );
 		ArgumentNullException.ThrowIfNull( stderr );
 
+		TicSourceValidationResult result =
+			await AnalyzeAsync(
+				options,
+				stdin,
+				cancellationToken
+			).ConfigureAwait( false );
+
+		return await FinishAsync(
+			stderr,
+			result.Diagnostics,
+			cancellationToken
+		).ConfigureAwait( false );
+	}
+
+	internal static async Task<TicSourceValidationResult> AnalyzeAsync(
+		TicOptions options,
+		Stream stdin,
+		CancellationToken cancellationToken
+	) {
+		ArgumentNullException.ThrowIfNull( options );
+		ArgumentNullException.ThrowIfNull( stdin );
+
 		(string? source, string sourceName, string? inputError) =
 			await ReadSourceAsync(
 				options.SourceOperand,
@@ -35,8 +58,8 @@ internal static class TicSourceValidator {
 			).ConfigureAwait( false );
 
 		if ( inputError is not null ) {
-			await TicDiagnosticWriter.WriteAsync(
-				stderr,
+			return new TicSourceValidationResult(
+				sourceName,
 				[
 					TicDiagnosticWriter.Error(
 						InputCode,
@@ -44,9 +67,8 @@ internal static class TicSourceValidator {
 						sourceName
 					),
 				],
-				cancellationToken
-			).ConfigureAwait( false );
-			return CommandExitCodes.Failure;
+				[]
+			);
 		}
 
 		cancellationToken.ThrowIfCancellationRequested();
@@ -65,11 +87,11 @@ internal static class TicSourceValidator {
 				.ToList();
 
 		if ( parseResult.HasErrors ) {
-			return await FinishAsync(
-				stderr,
+			return new TicSourceValidationResult(
+				sourceName,
 				diagnostics,
-				cancellationToken
-			).ConfigureAwait( false );
+				[]
+			);
 		}
 
 		if ( parseResult.Document.Entries.Count == 0 ) {
@@ -80,11 +102,11 @@ internal static class TicSourceValidator {
 					sourceName
 				)
 			);
-			return await FinishAsync(
-				stderr,
+			return new TicSourceValidationResult(
+				sourceName,
 				diagnostics,
-				cancellationToken
-			).ConfigureAwait( false );
+				[]
+			);
 		}
 
 		IReadOnlyList<TermInfoSourceEntry> selectedEntries =
@@ -95,11 +117,11 @@ internal static class TicSourceValidator {
 				sourceName
 			);
 		if ( diagnostics.Any( diagnostic => diagnostic.IsError ) ) {
-			return await FinishAsync(
-				stderr,
+			return new TicSourceValidationResult(
+				sourceName,
 				diagnostics,
-				cancellationToken
-			).ConfigureAwait( false );
+				[]
+			);
 		}
 
 		if ( !options.AllowUnknownExtensions ) {
@@ -110,6 +132,7 @@ internal static class TicSourceValidator {
 			);
 		}
 
+		List<TerminalDescription> descriptions = [];
 		foreach ( TermInfoSourceEntry entry in selectedEntries ) {
 			cancellationToken.ThrowIfCancellationRequested();
 
@@ -129,10 +152,13 @@ internal static class TicSourceValidator {
 				continue;
 			}
 
+			TerminalDescription description =
+				resolved.Entry.ToTerminalDescription();
 			try {
 				_ = CompiledTermInfoWriter.Write(
-					resolved.Entry.ToTerminalDescription()
+					description
 				);
+				descriptions.Add( description );
 			} catch ( InvalidOperationException exception ) {
 				diagnostics.Add(
 					TicDiagnosticWriter.Error(
@@ -144,11 +170,11 @@ internal static class TicSourceValidator {
 			}
 		}
 
-		return await FinishAsync(
-			stderr,
+		return new TicSourceValidationResult(
+			sourceName,
 			diagnostics,
-			cancellationToken
-		).ConfigureAwait( false );
+			descriptions
+		);
 	}
 
 	private static async Task<int> FinishAsync(

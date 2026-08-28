@@ -77,8 +77,8 @@ the frozen 1.0/1.1 target-framework contracts.
 Active 1.4 development now adds a `net10.0` command layer. T01 establishes the
 `tic`, `infocmp`, and `toe` shells and command contract; T02 adds reusable system
 database-location inspection; T03 adds reusable conventional database catalog
-enumeration; and T04 adds the first operational command semantics through the
-non-mutating `tic -c` source-validation path.
+enumeration; T04 adds the non-mutating `tic -c` source-validation path; and T05
+adds safe conventional database publication through the existing Compiler writer.
 
 ---
 
@@ -94,7 +94,7 @@ non-mutating `tic -c` source-validation path.
 | Terminfo source language | completed in 1.1: `.ti`, diagnostics, cancellation, `use=` inheritance, materialization | `Icod.TermInfo.Source` | runtime semantic model |
 | Terminfo compiler | completed in 1.2: deterministic compiled-entry writer, source compiler engine, and safe database-layout output | `Icod.TermInfo.Compiler` | Runtime + Source |
 | Terminfo inspection/comparison | completed in 1.3: canonical effective/source-aware rendering, structured semantic comparison, provider-aware inspection | `Icod.TermInfo.Inspection` | Runtime + Source |
-| Terminfo command-line tooling | active in 1.4: T01 establishes command shells; T02 adds reusable system database-location inspection; T03 adds conventional catalog enumeration; T04 adds non-mutating `tic -c` source validation; later command semantics follow tranche-by-tranche | 1.4 command projects | CommandFramework + Source/Compiler/Inspection as appropriate |
+| Terminfo command-line tooling | active in 1.4: T01 establishes command shells; T02 adds reusable system database-location inspection; T03 adds conventional catalog enumeration; T04 adds non-mutating `tic -c` validation; T05 adds safe `tic` database publication; later command semantics follow tranche-by-tranche | 1.4 command projects | CommandFramework + Source/Compiler/Inspection as appropriate |
 | Termcap interoperability | termcap syntax, `TERMCAP`, `TERMPATH`, conversion | optional compatibility/tooling | source/conversion model |
 | Live session | raw/cooked/cbreak, restore, tty ownership, full-screen/cursor lifecycle | `Icod.Terminal` | `Icod.TermInfo` + OS interop |
 | Input events | keyboard, modifiers, mouse, focus, paste, resize | `Icod.Terminal` | raw session + incremental decoder |
@@ -197,10 +197,11 @@ points, injected streams, deterministic help/version output, conventional exit
 codes, cancellation, and strict dependency direction.
 
 Reusable database discovery and conventional catalog enumeration are supplied by
-T02/T03 in Inspection. T04 now composes Source parsing/resolution with Compiler's
-in-memory representation validation to implement `tic -c` without filesystem
-publication. Database writing, `infocmp`, and `toe` operational behavior remain
-assigned to their later tranches. The command layer must reuse these engines
+T02/T03 in Inspection. T04 composes Source parsing/resolution with Compiler's
+in-memory representation validation to implement `tic -c`. T05 adds database
+publication through `CompiledTermInfoDatabaseWriter`, with explicit destination and
+overwrite policy kept in the command layer. `infocmp` and `toe` operational behavior
+remain assigned to their later tranches. The command layer must reuse these engines
 rather than duplicate Source, Compiler, Inspection, or Runtime semantics.
 
 ### 3.5 Termcap conversion

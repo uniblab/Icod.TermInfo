@@ -25,11 +25,13 @@ public sealed class CommandTests {
 
 		Assert.Equal( CommandExitCodes.Success, status );
 		Assert.Contains(
-			"Usage: tic -c",
+			"Usage: tic",
 			ReadText( stdout )
 		);
 		Assert.Contains( "-e name,...", ReadText( stdout ) );
 		Assert.Contains( "-x", ReadText( stdout ) );
+		Assert.Contains( "-o directory", ReadText( stdout ) );
+		Assert.Contains( "--force", ReadText( stdout ) );
 		Assert.Contains( "-D", ReadText( stdout ) );
 		Assert.Empty( ReadText( stderr ) );
 	}
@@ -52,7 +54,7 @@ public sealed class CommandTests {
 		);
 
 		Assert.Equal( CommandExitCodes.Success, status );
-		Assert.Contains( "1.4.0-Alpha-4", ReadText( stdout ) );
+		Assert.Contains( "1.4.0-Alpha-5", ReadText( stdout ) );
 		Assert.Empty( ReadText( stderr ) );
 	}
 
@@ -80,7 +82,7 @@ public sealed class CommandTests {
 		using var stderr = new MemoryStream();
 
 		int status = await Command.RunAsync(
-			[ "--not-a-t04-option" ],
+			[ "--not-a-t05-option" ],
 			stdin,
 			stdout,
 			stderr
@@ -88,7 +90,7 @@ public sealed class CommandTests {
 
 		Assert.Equal( CommandExitCodes.UsageError, status );
 		Assert.Empty( ReadText( stdout ) );
-		Assert.Contains( "unsupported T04 option", ReadText( stderr ) );
+		Assert.Contains( "unsupported option", ReadText( stderr ) );
 	}
 
 	[Fact]
@@ -114,23 +116,6 @@ public sealed class CommandTests {
 			Assert.Equal( CommandExitCodes.UsageError, status );
 			Assert.Contains( "exactly one source operand", ReadText( stderr ) );
 		}
-	}
-
-	[Fact]
-	public async Task ValidationRequiresCheckOnlyMode() {
-		using MemoryStream stdin = CreateInput( SimpleSource );
-		using var stdout = new MemoryStream();
-		using var stderr = new MemoryStream();
-
-		int status = await Command.RunAsync(
-			[ "-" ],
-			stdin,
-			stdout,
-			stderr
-		);
-
-		Assert.Equal( CommandExitCodes.UsageError, status );
-		Assert.Contains( "T04 requires check-only mode '-c'", ReadText( stderr ) );
 	}
 
 	[Fact]
