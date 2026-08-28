@@ -83,10 +83,9 @@ Beginning with C01, `docs/1.2.0-COMPILER-PUBLIC-API-BASELINE.txt` records the
 developing public contract for `Icod.TermInfo.Compiler` and becomes the frozen
 Compiler contract at 1.2 release closure.
 
-Beginning with I01, `docs/1.3.0-INSPECTION-PUBLIC-API-BASELINE.txt` records the
-deliberately developing public contract for `Icod.TermInfo.Inspection` and
-becomes the frozen Inspection contract at 1.3 release closure. I01 intentionally
-starts with no exported Inspection types.
+The approved `docs/1.3.0-INSPECTION-PUBLIC-API-BASELINE.txt` is the independent
+machine-readable public contract for `Icod.TermInfo.Inspection`, frozen at the
+1.3 release closure after the I02-I06 API additions and I07 validation gate.
 
 The baselines record exported types, public/protected members, enum numeric
 values, parameter names/order/defaults, ref/out/in/params shape, generic

@@ -60,10 +60,10 @@ The Source 1.1 public API is independently frozen by
 The Compiler 1.2 public API is frozen through
 `docs/1.2.0-COMPILER-PUBLIC-API-BASELINE.txt` and its compiler-contract tests.
 
-Beginning with I01, the Inspection 1.3 public API is developed independently
-through `docs/1.3.0-INSPECTION-PUBLIC-API-BASELINE.txt` and Inspection contract
-tests. I01 deliberately exports no Inspection public types; later I-tranches add
-reviewed API to that independent baseline.
+The Inspection 1.3 public API is independently frozen by
+`docs/1.3.0-INSPECTION-PUBLIC-API-BASELINE.txt` and Inspection contract tests.
+I01 started with an empty public surface, I02-I06 established the reviewed API,
+and I07 froze that contract for release.
 
 Within 1.x:
 
@@ -169,9 +169,10 @@ tombstones, duplicate-source history, comments, or provenance that
 field order where order is semantically significant and likewise shall not
 invent source information the parsed model does not retain.
 
-I01 establishes only the package, dependency, baseline, and release-validation
-foundation. Canonical rendering and comparison behavior enter in later 1.3
-tranches and are frozen through the independent Inspection baseline.
+The released 1.3 contract includes canonical effective rendering, normalized
+unresolved-source rendering, structured effective and source-aware comparison,
+and provider-aware inspection orchestration. Those behaviors are frozen through
+the independent Inspection baseline and its semantic tests.
 
 ## Discovery and failure compatibility
 

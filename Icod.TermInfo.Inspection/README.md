@@ -5,7 +5,8 @@ comparison layer for the `Icod.TermInfo` package family.
 
 The 1.3 line provides the reusable API engine underneath future
 `infocmp`-style tooling while preserving the already-frozen Runtime 1.0, Source
-1.1, and Compiler 1.2 public contracts.
+1.1, and Compiler 1.2 public contracts. Version 1.3.0 is the first stable
+release of this optional package.
 
 ## I07 differential validation, robustness, and API/package freeze
 
@@ -225,10 +226,10 @@ There is no production dependency between Inspection and Compiler.
 
 ## Install
 
-During I07 development:
+For the 1.3.0 release:
 
 ```text
-dotnet add package Icod.TermInfo.Inspection --version 1.3.0-Alpha-7
+dotnet add package Icod.TermInfo.Inspection --version 1.3.0
 ```
 
 The package targets `net8.0`, `net9.0`, and `net10.0`, uses C# 13, remains

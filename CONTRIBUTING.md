@@ -35,21 +35,22 @@ must carry XML documentation. Public API changes must also be nullable-correct
 and covered by semantic surface tests. Runtime API changes must be reconciled
 deliberately with `docs/1.0.0-PUBLIC-API-BASELINE.txt`; Source API changes must
 be reconciled with `docs/1.1.0-SOURCE-PUBLIC-API-BASELINE.txt`. Do not regenerate
-either baseline merely to silence a mismatch. Beginning with C01, Compiler API
-changes must likewise be reconciled with
-`docs/1.2.0-COMPILER-PUBLIC-API-BASELINE.txt`.
+either baseline merely to silence a mismatch. Compiler API changes must likewise
+be reconciled with `docs/1.2.0-COMPILER-PUBLIC-API-BASELINE.txt`, and Inspection
+API changes with `docs/1.3.0-INSPECTION-PUBLIC-API-BASELINE.txt`.
 
 ## Version metadata
 
-`Icod.TermInfo.csproj`, `Icod.TermInfo.Source/Icod.TermInfo.Source.csproj`, and
-`Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj` contain `<Version />`,
+`Icod.TermInfo.csproj`, `Icod.TermInfo.Source/Icod.TermInfo.Source.csproj`,
+`Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj`, and
+`Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj` contain `<Version />`,
 `<PackageVersion />`, and the stable 1.x `<AssemblyVersion />`. Keep `Version`
-and `PackageVersion` identical within each project, and keep all three package
+and `PackageVersion` identical within each project, and keep all four package
 versions synchronized.
 
-Runtime, Source, and Compiler use the same `1.2.0-Alpha-X` package version for
-each 1.2 development tranche. The 1.x assembly version remains `1.0.0.0` for
-all three assemblies, and all three remain unsigned.
+Beginning with 1.3, Runtime, Source, Compiler, and Inspection advance together.
+The 1.x assembly version remains `1.0.0.0` for all four assemblies, and all four
+remain unsigned.
 
 Prerelease development should use the active version roadmap's alpha/beta/RC
 sequence. A final release tag must be exactly `v<PackageVersion>`.
@@ -127,13 +128,14 @@ Package changes should preserve:
 - unsigned assembly identity throughout 1.x;
 - Source Link information supplied by the .NET SDK;
 - portable PDBs and `.snupkg` generation for all three targets;
-- synchronized `Icod.TermInfo` / `Icod.TermInfo.Source` package versions;
-- synchronized `Icod.TermInfo.Compiler` package versions beginning with C01;
-- runtime and Source fresh-package smoke consumers on all three targets;
-- Compiler fresh-package smoke consumers on all three targets beginning with C01;
+- synchronized Runtime, Source, Compiler, and Inspection package versions;
+- Runtime, Source, Compiler, and Inspection fresh-package smoke consumers on all
+  three targets;
 - each package README, icon metadata, and LGPL license expression;
-- a one-way Source -> runtime package dependency;
-- a one-way Compiler -> runtime/Source dependency;
+- a one-way Source -> Runtime package dependency;
+- a one-way Compiler -> Runtime/Source dependency;
+- a one-way Inspection -> Runtime/Source dependency with no production Compiler
+  dependency;
 - identical validated release artifacts for NuGet.org and GitHub Packages.
 
 See `docs/RELEASING.md` before modifying publication workflows.
@@ -150,6 +152,11 @@ Version 1.2 adds compiled-entry writing and the reusable source compiler engine
 in the optional `Icod.TermInfo.Compiler` package. The low-level writer remains
 pure; filesystem/database-layout output is layered separately, and no compiler
 dependency enters `Icod.TermInfo` or `Icod.TermInfo.Source`.
+
+Version 1.3 adds canonical rendering, structured semantic comparison, and
+provider-aware inspection in the optional `Icod.TermInfo.Inspection` package.
+Inspection depends on Runtime and Source but not on Compiler, and it does not
+enlarge the frozen Runtime, Source, or Compiler public contracts.
 
 Live session ownership, input-event decoding, curses/UI behavior, PTY/ConPTY
 lifecycle, terminal probing, command-line `tic`/`infocmp`/`toe` applications,

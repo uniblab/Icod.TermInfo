@@ -12,17 +12,17 @@
 		<AssemblyName>Icod.TermInfo.Source</AssemblyName>
 		<RootNamespace>Icod.TermInfo.Source</RootNamespace>
 		<Configurations>Debug;Release;Staging</Configurations>
-		<Version>1.3.0-Alpha-7</Version>
+		<Version>1.3.0</Version>
 		<AssemblyVersion>1.0.0.0</AssemblyVersion>
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<PackageVersion>1.3.0-Alpha-7</PackageVersion>
+		<PackageVersion>1.3.0</PackageVersion>
 		<PackageId>Icod.TermInfo.Source</PackageId>
 		<Title>Icod.TermInfo.Source</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed terminfo source-language support for Icod.TermInfo. The 1.1 line parses and resolves .ti source into the stable TerminalDescription model without enlarging the runtime Icod.TermInfo package.</Description>
-		<PackageReleaseNotes>1.3.0-Alpha-7 coordinates Source with I07 corpus-backed inspection validation and package/API freeze while preserving the frozen 1.1 source-language public API, semantics, and 1.0.0.0 assembly identity.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.3.0 coordinates Source with the Inspection release while preserving the frozen 1.1 source-language public API, semantics, and 1.0.0.0 assembly identity.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>

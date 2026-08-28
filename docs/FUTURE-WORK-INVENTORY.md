@@ -24,9 +24,9 @@ The governing distinction is:
 
 ## 1. Current foundation
 
-The published 1.2 line preserves the Runtime and Source foundations and adds the
-optional Compiler layer. The active 1.3 line adds the optional Inspection layer
-without moving those responsibilities into the older packages:
+The published 1.3 line preserves the Runtime, Source, and Compiler foundations
+and adds the optional Inspection layer without moving those responsibilities
+into the older packages:
 
 - immutable terminal descriptions;
 - complete standard capability metadata;
@@ -53,14 +53,17 @@ without moving those responsibilities into the older packages:
 - source-to-compiled composition through the existing Source parser/resolver;
 - controlled conventional database-layout output;
 - deterministic compiler round-trip/differential validation;
+- canonical effective and unresolved-source rendering;
+- structured effective and source-aware semantic comparison;
+- provider-aware inspection orchestration;
 - deterministic corpus/fuzz/resource-bound validation;
 - no process-global current terminal;
 - three-target `net8.0`/`net9.0`/`net10.0` package and compatibility gates.
 
 The runtime public contract remains the frozen 1.0 contract. Source-language
 functionality is isolated in `Icod.TermInfo.Source`; compiled writing is isolated
-in `Icod.TermInfo.Compiler`. I01 establishes `Icod.TermInfo.Inspection` as a
-fourth sibling layer before public inspection behavior is introduced.
+in `Icod.TermInfo.Compiler`; canonical rendering and semantic comparison are
+isolated in `Icod.TermInfo.Inspection`, whose 1.3 public contract is now frozen.
 
 Beginning with 1.2, active package-family validation uses the three-target
 `net8.0`/`net9.0`/`net10.0` matrix. This additive support change does not rewrite
@@ -79,7 +82,7 @@ the frozen 1.0/1.1 target-framework contracts.
 | Historical vendor formats | HP-UX/AIX/OSF/1 divergent binary layouts | optional later | parser abstraction + fixtures |
 | Terminfo source language | completed in 1.1: `.ti`, diagnostics, cancellation, `use=` inheritance, materialization | `Icod.TermInfo.Source` | runtime semantic model |
 | Terminfo compiler | completed in 1.2: deterministic compiled-entry writer, source compiler engine, and safe database-layout output | `Icod.TermInfo.Compiler` | Runtime + Source |
-| Terminfo inspection/comparison | active 1.3 work: canonical effective/source-aware rendering, structured semantic comparison, provider-aware inspection | `Icod.TermInfo.Inspection` | Runtime + Source |
+| Terminfo inspection/comparison | completed in 1.3: canonical effective/source-aware rendering, structured semantic comparison, provider-aware inspection | `Icod.TermInfo.Inspection` | Runtime + Source |
 | Terminfo command-line tooling | future `tic`, `infocmp`, `toe`, conversion applications | later tool projects | Source + Compiler + Inspection as appropriate |
 | Termcap interoperability | termcap syntax, `TERMCAP`, `TERMPATH`, conversion | optional compatibility/tooling | source/conversion model |
 | Live session | raw/cooked/cbreak, restore, tty ownership, full-screen/cursor lifecycle | `Icod.Terminal` | `Icod.TermInfo` + OS interop |
@@ -157,7 +160,7 @@ separate later layer so the core binary writer remains pure.
 The complete pre-C01 representation and package contract is recorded in
 `docs/1.2.0-PRE-C01-CONTRACT-AUDIT.md`.
 
-### 3.3 `infocmp`-class inspection — active in 1.3
+### 3.3 `infocmp`-class inspection — completed in 1.3
 
 The 1.3 line establishes `Icod.TermInfo.Inspection` as the reusable engine for:
 
@@ -168,8 +171,9 @@ The 1.3 line establishes `Icod.TermInfo.Inspection` as the reusable engine for:
 - provider-aware inspection orchestration;
 - future `infocmp`-style applications without embedding console policy.
 
-I01 establishes the package, dependency, API-baseline, smoke, and release
-infrastructure before I02 introduces the first public rendering behavior.
+I01 established the package, dependency, API-baseline, smoke, and release
+infrastructure; I02-I06 added the reviewed rendering, comparison, and inspection
+surface; and I07 froze the API/package boundary with differential validation.
 Inspection depends directly on Runtime and Source and has no production
 dependency on Compiler.
 
