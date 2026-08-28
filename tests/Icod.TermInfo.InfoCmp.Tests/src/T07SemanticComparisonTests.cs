@@ -355,11 +355,10 @@ public sealed class T07SemanticComparisonTests {
 				);
 
 			Assert.Equal( CommandExitCodes.Success, result.Status );
-			Assert.True(
-				result.Stdout.StartsWith(
-					"'first' -> 'second'",
-					StringComparison.Ordinal
-				)
+			Assert.StartsWith(
+				result.Stdout,
+				"'first' -> 'second'",
+				StringComparison.Ordinal
 			);
 			Assert.DoesNotContain( "Comparing", result.Stdout, StringComparison.Ordinal );
 			Assert.Contains( $"{Environment.NewLine}cols: 80, 132.", result.Stdout, StringComparison.Ordinal );

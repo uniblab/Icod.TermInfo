@@ -35,11 +35,10 @@ public sealed class T06RendererControlsTests {
 				)
 			);
 
-		Assert.True(
-			rendered.EndsWith(
-				"\n",
-				StringComparison.Ordinal
-			)
+		Assert.EndsWith(
+			rendered,
+			"\n",
+			StringComparison.Ordinal
 		);
 		Assert.DoesNotContain( "\r", rendered, StringComparison.Ordinal );
 		Assert.Equal( 1, rendered.Count( character => character == '\n' ) );
@@ -70,11 +69,10 @@ public sealed class T06RendererControlsTests {
 
 		string[] lines = rendered.Split( '\n' );
 		Assert.Equal( 3, lines.Length );
-		Assert.True(
-			lines[ 1 ].StartsWith(
-				"    clear=",
-				StringComparison.Ordinal
-			)
+		Assert.StartsWith(
+			lines[ 1 ],
+			"    clear=",
+			StringComparison.Ordinal
 		);
 		Assert.True( lines[ 1 ].Length > 20 );
 		Assert.Equal( string.Empty, lines[ 2 ] );

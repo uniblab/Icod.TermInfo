@@ -25,11 +25,10 @@ public sealed class T06OneTerminalInspectionTests {
 				);
 
 			Assert.Equal( CommandExitCodes.Success, result.Status );
-			Assert.True(
-				result.Stdout.StartsWith(
-					"demo|demo-alias|Demo terminal,\n",
-					StringComparison.Ordinal
-				)
+			Assert.StartsWith(
+				result.Stdout,
+				"demo|demo-alias|Demo terminal,\n",
+				StringComparison.Ordinal
 			);
 			Assert.Contains( "    am,\n", result.Stdout, StringComparison.Ordinal );
 			Assert.Contains( "    cols#80,\n", result.Stdout, StringComparison.Ordinal );
@@ -55,11 +54,10 @@ public sealed class T06OneTerminalInspectionTests {
 				);
 
 			Assert.Equal( CommandExitCodes.Success, result.Status );
-			Assert.True(
-				result.Stdout.StartsWith(
-					"demo|demo-alias|",
-					StringComparison.Ordinal
-				)
+			Assert.StartsWith(
+				result.Stdout,
+				"demo|demo-alias|",
+				StringComparison.Ordinal
 			);
 			Assert.Equal( string.Empty, result.Stderr );
 		} finally {
@@ -84,11 +82,10 @@ public sealed class T06OneTerminalInspectionTests {
 				);
 
 			Assert.Equal( CommandExitCodes.Success, result.Status );
-			Assert.True(
-				result.Stdout.StartsWith(
-					"demo|",
-					StringComparison.Ordinal
-				)
+			Assert.StartsWith(
+				result.Stdout,
+				"demo|",
+				StringComparison.Ordinal
 			);
 			Assert.Equal( string.Empty, result.Stderr );
 		} finally {
@@ -211,11 +208,10 @@ public sealed class T06OneTerminalInspectionTests {
 
 			Assert.Equal( CommandExitCodes.Success, result.Status );
 			Assert.Equal( 3, lines.Length );
-			Assert.True(
-				lines[ 1 ].StartsWith(
-					"    clear=",
-					StringComparison.Ordinal
-				)
+			Assert.StartsWith(
+				lines[ 1 ],
+				"    clear=",
+				StringComparison.Ordinal
 			);
 			Assert.True( lines[ 1 ].Length > 80 );
 		} finally {
