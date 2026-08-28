@@ -11,11 +11,11 @@
 **Source API contract:** frozen at 1.1
 **Compiler API contract:** frozen at 1.2
 **Inspection released API contract:** frozen at 1.3
-**Inspection 1.4 API baseline:** active through reviewed T03 additions
+**Inspection 1.4 API baseline:** active through reviewed T06 additions
 **New commands:** `tic`, `infocmp`, `toe`
 **Development branch:** `1.4.0`
 **Development sequence:** `1.4.0-Alpha-1` through `1.4.0-Alpha-11`
-**Status:** T07 implementation candidate
+**Status:** T08 implementation candidate
 **Release objective:** expose the completed Runtime, Source, Compiler, and Inspection engines as useful, deterministic, cross-platform Unix-style command-line tools without moving command policy into the lower-level libraries or weakening their existing compatibility contracts.
 
 ---
@@ -2014,6 +2014,8 @@ Cover:
 
 **Gate T08:** `toe` can reliably enumerate supported conventional databases
 without native ncurses or duplicated discovery logic.
+
+**Implementation record:** `docs/1.4.0-T08-TOE-CONVENTIONAL-DATABASE-LISTING.md`
 
 ---
 

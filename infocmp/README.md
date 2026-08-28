@@ -2,12 +2,13 @@
 
 `infocmp` is part of the `Icod.TermInfo` managed terminfo tool suite.
 
-## T07 status
+## T08 status
 
-Version `1.4.0-Alpha-7` adds deterministic semantic comparison to the T06
-one-terminal acquisition and effective-source rendering path.
+Version `1.4.0-Alpha-8` retains the T07 deterministic semantic comparison and
+T06 one-terminal acquisition/rendering behavior while T08 work is isolated to
+`toe`.
 
-Supported through T07:
+Supported through T08:
 
 ```text
 infocmp [options] [terminal ...]

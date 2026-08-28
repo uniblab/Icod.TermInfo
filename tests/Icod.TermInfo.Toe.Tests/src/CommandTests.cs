@@ -23,24 +23,30 @@ public sealed class CommandTests {
 			"Usage: toe",
 			ReadText( stdout )
 		);
+		Assert.Contains( "-a", ReadText( stdout ) );
+		Assert.Contains( "-h", ReadText( stdout ) );
+		Assert.Contains( "-s", ReadText( stdout ) );
+		Assert.Contains( "-D", ReadText( stdout ) );
 		Assert.Empty( ReadText( stderr ) );
 	}
 
-	[Fact]
-	public async Task VersionReportsCoordinatedDevelopmentVersion() {
+	[Theory]
+	[InlineData( "-V" )]
+	[InlineData( "--version" )]
+	public async Task VersionReportsCoordinatedDevelopmentVersion( string option ) {
 		using var stdin = new MemoryStream();
 		using var stdout = new MemoryStream();
 		using var stderr = new MemoryStream();
 
 		int status = await Command.RunAsync(
-			[ "--version" ],
+			[ option ],
 			stdin,
 			stdout,
 			stderr
 		);
 
 		Assert.Equal( CommandExitCodes.Success, status );
-		Assert.Contains( "1.4.0-Alpha-7", ReadText( stdout ) );
+		Assert.Contains( "1.4.0-Alpha-8", ReadText( stdout ) );
 		Assert.Empty( ReadText( stderr ) );
 	}
 
@@ -51,7 +57,7 @@ public sealed class CommandTests {
 		using var stderr = new MemoryStream();
 
 		int status = await Command.RunAsync(
-			[ "--not-a-t01-option" ],
+			[ "--not-a-toe-option" ],
 			stdin,
 			stdout,
 			stderr
@@ -59,7 +65,45 @@ public sealed class CommandTests {
 
 		Assert.Equal( CommandExitCodes.UsageError, status );
 		Assert.Empty( ReadText( stdout ) );
-		Assert.Contains( "unsupported T01 argument", ReadText( stderr ) );
+		Assert.Contains( "unsupported option", ReadText( stderr ) );
+	}
+
+	[Theory]
+	[InlineData( "-u" )]
+	[InlineData( "-U" )]
+	public async Task T09DependencyOptionsRemainDeferred( string option ) {
+		using var stdin = new MemoryStream();
+		using var stdout = new MemoryStream();
+		using var stderr = new MemoryStream();
+
+		int status = await Command.RunAsync(
+			[ option, "example.ti" ],
+			stdin,
+			stdout,
+			stderr
+		);
+
+		Assert.Equal( CommandExitCodes.UsageError, status );
+		Assert.Empty( ReadText( stdout ) );
+		Assert.Contains( "introduced by T09", ReadText( stderr ) );
+	}
+
+	[Fact]
+	public async Task SpecialModeCannotBeCombinedWithListingArguments() {
+		using var stdin = new MemoryStream();
+		using var stdout = new MemoryStream();
+		using var stderr = new MemoryStream();
+
+		int status = await Command.RunAsync(
+			[ "-D", "." ],
+			stdin,
+			stdout,
+			stderr
+		);
+
+		Assert.Equal( CommandExitCodes.UsageError, status );
+		Assert.Empty( ReadText( stdout ) );
+		Assert.Contains( "must be used alone", ReadText( stderr ) );
 	}
 
 	[Fact]

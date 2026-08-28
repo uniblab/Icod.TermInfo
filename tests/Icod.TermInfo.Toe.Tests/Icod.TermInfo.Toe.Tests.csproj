@@ -25,6 +25,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\Icod.TermInfo.Compiler\Icod.TermInfo.Compiler.csproj" />
 		<ProjectReference Include="..\..\toe\Icod.TermInfo.Toe.csproj" />
 	</ItemGroup>
 

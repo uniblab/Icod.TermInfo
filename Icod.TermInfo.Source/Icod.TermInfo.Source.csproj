@@ -12,17 +12,17 @@
 		<AssemblyName>Icod.TermInfo.Source</AssemblyName>
 		<RootNamespace>Icod.TermInfo.Source</RootNamespace>
 		<Configurations>Debug;Release;Staging</Configurations>
-		<Version>1.4.0-Alpha-7</Version>
+		<Version>1.4.0-Alpha-8</Version>
 		<AssemblyVersion>1.0.0.0</AssemblyVersion>
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<PackageVersion>1.4.0-Alpha-7</PackageVersion>
+		<PackageVersion>1.4.0-Alpha-8</PackageVersion>
 		<PackageId>Icod.TermInfo.Source</PackageId>
 		<Title>Icod.TermInfo.Source</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed terminfo source-language support for Icod.TermInfo. The 1.1 line parses and resolves .ti source into the stable TerminalDescription model without enlarging the runtime Icod.TermInfo package.</Description>
-		<PackageReleaseNotes>1.4.0-Alpha-7 coordinates Source with the tool-suite comparison tranche while managed infocmp continues to consume effective TerminalDescription values through Inspection, preserving the frozen 1.1 source-language public API, one-way Runtime dependency, and 1.0.0.0 assembly identity. T07 adds no Source public API.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.4.0-Alpha-8 coordinates Source with the tool-suite toe listing tranche while managed toe consumes parsed conventional catalogs through Inspection, preserving the frozen 1.1 source-language public API, one-way Runtime dependency, and 1.0.0.0 assembly identity. T08 adds no Source public API.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>
