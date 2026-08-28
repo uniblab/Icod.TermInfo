@@ -10,11 +10,12 @@
 **Runtime API contract:** frozen at 1.0
 **Source API contract:** frozen at 1.1
 **Compiler API contract:** frozen at 1.2
-**Inspection API contract:** frozen at 1.3
+**Inspection released API contract:** frozen at 1.3
+**Inspection 1.4 API baseline:** active through reviewed T02 additions
 **New commands:** `tic`, `infocmp`, `toe`
 **Development branch:** `1.4.0`
 **Development sequence:** `1.4.0-Alpha-1` through `1.4.0-Alpha-11`
-**Status:** T01 implementation candidate
+**Status:** T02 implementation candidate
 **Release objective:** expose the completed Runtime, Source, Compiler, and Inspection engines as useful, deterministic, cross-platform Unix-style command-line tools without moving command policy into the lower-level libraries or weakening their existing compatibility contracts.
 
 ---
@@ -1510,6 +1511,8 @@ system database disabled
 
 **Gate T02:** Inspection can report the exact ordered database-location model
 used by Runtime while the Runtime 1.0 public baseline remains unchanged.
+
+**Implementation record:** `docs/1.4.0-T02-SYSTEM-DATABASE-LOCATION-INSPECTION.md`
 
 ---
 

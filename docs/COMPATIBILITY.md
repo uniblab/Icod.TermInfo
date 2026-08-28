@@ -184,6 +184,15 @@ unresolved-source rendering, structured effective and source-aware comparison,
 and provider-aware inspection orchestration. Those behaviors are frozen through
 the independent Inspection baseline and its semantic tests.
 
+Beginning with T02 in the 1.4 line, Inspection additionally exposes a read-only
+snapshot of the ordered system database locations considered by Runtime
+discovery. The API distinguishes encoded `TERMINFO`, directory `TERMINFO`, the
+user database, `TERMINFO_DIRS`, and final platform defaults. Encoded payload bytes
+are not exposed. Directory paths are normalized, Runtime precedence and
+platform-specific duplicate handling are preserved, and no database contents are
+enumerated until the separate T03 catalog tranche. Runtime public API remains
+unchanged.
+
 ## Discovery and failure compatibility
 
 Runtime discovery precedence, clean-miss behavior, parser failures,

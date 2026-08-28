@@ -5,7 +5,7 @@ using Xunit;
 namespace Icod.TermInfo.Inspection.Tests;
 
 public sealed class I01ContractTests {
-	private const string DevelopmentVersion = "1.4.0-Alpha-1";
+	private const string DevelopmentVersion = "1.4.0-Alpha-2";
 	private const string StableAssemblyVersion = "1.0.0.0";
 
 	[Fact]
@@ -73,6 +73,9 @@ public sealed class I01ContractTests {
 		Assert.Equal(
 			new[] {
 				"Icod.TermInfo.Inspection.TermInfoComparisonResult",
+				"Icod.TermInfo.Inspection.TermInfoDatabaseInspector",
+				"Icod.TermInfo.Inspection.TermInfoDatabaseLocation",
+				"Icod.TermInfo.Inspection.TermInfoDatabaseLocationKind",
 				"Icod.TermInfo.Inspection.TermInfoDifference",
 				"Icod.TermInfo.Inspection.TermInfoDifferenceKind",
 				"Icod.TermInfo.Inspection.TermInfoInspectionComparison",
@@ -361,7 +364,7 @@ public sealed class I01ContractTests {
 					)
 				);
 			Assert.Contains(
-				"1.3.0-INSPECTION-PUBLIC-API-BASELINE.txt",
+				"1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt",
 				verifier
 			);
 			Assert.Contains(

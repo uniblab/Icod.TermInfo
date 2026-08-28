@@ -13,7 +13,7 @@ This document describes the current validation and publication procedure for the
   must match.
 - Runtime, Source, Compiler, and Inspection retain 1.x assembly version
   `1.0.0.0` and remain unsigned.
-- Supported consumer targets for the 1.3 line are `net8.0`, `net9.0`, and `net10.0`.
+- Supported consumer targets for the 1.4 line are `net8.0`, `net9.0`, and `net10.0`.
 - Beginning with T01 in 1.4, the `tic`, `infocmp`, and `toe` command projects
   target `net10.0`; the four reusable library packages retain all three targets.
 - The T01 command projects are non-packable solution executables. Library-package
@@ -25,7 +25,8 @@ This document describes the current validation and publication procedure for the
   release tag is created. The tag workflow repeats the Release gate on the exact
   tagged commit before publication.
 - Release validation must pass the frozen Runtime 1.0, Source 1.1, Compiler 1.2,
-  and Inspection 1.3 API baselines and the net8/net9/net10 API-equivalence gates.
+  and active Inspection 1.4 API baselines while retaining the historical
+  Inspection 1.3 baseline and the net8/net9/net10 API-equivalence gates.
 - Release builds treat missing public XML documentation as an error.
 - All four packages must pass the coordinated release verifier before publication.
   Use `.github/scripts/verify-release-package.sh` on a Bash-capable host or
@@ -145,7 +146,7 @@ The Bash and CMD entry points perform equivalent validation. They:
 6. require exact Compiler public API equivalence across `net8.0`, `net9.0`, and
    `net10.0` and require `docs/1.2.0-COMPILER-PUBLIC-API-BASELINE.txt` to match;
 7. require exact Inspection public API equivalence across `net8.0`, `net9.0`, and
-   `net10.0` and require `docs/1.3.0-INSPECTION-PUBLIC-API-BASELINE.txt` to match;
+   `net10.0` and require `docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt` to match;
 8. run the Runtime, Compiler, and Inspection package verifiers for package
    structure, dependency closure, metadata, XML documentation, Source Link, and
    portable symbols;
@@ -183,8 +184,9 @@ execute on all three supported target frameworks. The Compiler smoke consumer
 likewise proves the Compiler package restores through its Runtime and Source
 dependencies and can write and reparse a C01 legacy entry on all three
 frameworks. The Inspection smoke consumer proves the fourth package restores
-with matching Runtime and Source dependencies and exercises the reviewed I02-I06
-public surface without a production Compiler dependency.
+with matching Runtime and Source dependencies and exercises the reviewed 1.4
+Inspection public surface, including T02 system database-location inspection,
+without a production Compiler dependency.
 
 No checked-in runtime fixture is copied into the smoke project, so those checks
 prove the public package surface rather than repository-only outputs.
@@ -318,6 +320,12 @@ For the completed 1.3 line, use
 contract, `docs/1.3.0-PRE-I01-CONTRACT-AUDIT.md` for the package/layer freeze,
 `docs/1.3.0-INSPECTION-PUBLIC-API-BASELINE.txt` for the frozen Inspection API,
 and `docs/1.3.0-RELEASE-AUDIT.md` for final release sign-off requirements.
+
+For the active 1.4 line, use `Icod.TermInfo-1.4.0-Tool-Suite-Roadmap.md` for the
+T01-T11 contract, `docs/1.4.0-PRE-T01-CONTRACT-AUDIT.md` for the command-layer
+foundation, `docs/1.4.0-T02-SYSTEM-DATABASE-LOCATION-INSPECTION.md` for the T02
+discovery seam, and `docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt` for the active
+Inspection API contract.
 
 The final `v<PackageVersion>` tag must identify the exact validated and published `main`
 commit. Do not edit the audit or any other source/package content after that

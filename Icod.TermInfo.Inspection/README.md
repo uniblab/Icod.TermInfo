@@ -8,6 +8,27 @@ The 1.3 line provides the reusable API engine underneath future
 1.1, and Compiler 1.2 public contracts. Version 1.3.0 is the first stable
 release of this optional package.
 
+## 1.4 T02 system database-location inspection
+
+`1.4.0-Alpha-2` adds read-only inspection of the ordered system database
+locations a newly created Runtime system provider would consider. The API is
+intended for later `tic -D`, `infocmp -D`, and `toe` composition:
+
+```csharp
+IReadOnlyList<TermInfoDatabaseLocation> locations =
+	TermInfoDatabaseInspector.GetSystemLocations();
+```
+
+Each location identifies whether it came from encoded `TERMINFO`, directory
+`TERMINFO`, the user database, `TERMINFO_DIRS`, or a final platform default.
+Directory paths are normalized and preserve Runtime precedence and duplicate-root
+semantics. Encoded `TERMINFO` is reported without exposing its payload. T02 does
+not enumerate database contents; conventional catalog enumeration remains T03.
+
+The Runtime 1.0 public API remains unchanged. Inspection consumes a narrow
+internal Runtime discovery seam and continues to have no production dependency
+on `Icod.TermInfo.Compiler`.
+
 ## I07 differential validation, robustness, and API/package freeze
 
 `1.3.0-Alpha-7` closes the 1.3 implementation program without adding another

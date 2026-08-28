@@ -30,7 +30,7 @@ public sealed class T45CompletionGateTests {
 					2 )[ 0 ];
 
 		Assert.Equal(
-			"1.4.0-Alpha-1",
+			"1.4.0-Alpha-2",
 			semanticVersion );
 	}
 
@@ -46,12 +46,12 @@ public sealed class T45CompletionGateTests {
 				LoadOptions.None );
 
 		Assert.Equal(
-			"1.4.0-Alpha-1",
+			"1.4.0-Alpha-2",
 			ReadRequiredProperty(
 				project,
 				"Version" ) );
 		Assert.Equal(
-			"1.4.0-Alpha-1",
+			"1.4.0-Alpha-2",
 			ReadRequiredProperty(
 				project,
 				"PackageVersion" ) );
@@ -149,7 +149,7 @@ public sealed class T45CompletionGateTests {
 				"1.2.0-COMPILER-PUBLIC-API-BASELINE.txt",
 				verifier );
 			Assert.Contains(
-				"1.3.0-INSPECTION-PUBLIC-API-BASELINE.txt",
+				"1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt",
 				verifier );
 			Assert.True(
 				verifier.Contains(

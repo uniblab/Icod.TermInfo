@@ -2,13 +2,13 @@
 
 `tic` is part of the `Icod.TermInfo` managed terminfo tool suite.
 
-## T01 status
+## T02 status
 
-Version `1.4.0-Alpha-1` establishes only the executable, command-host, stream,
-cancellation, version, and help contracts. Operational `tic` behavior is intentionally
+Version `1.4.0-Alpha-2` retains the executable, command-host, stream,
+cancellation, version, and help contracts established by T01. Operational `tic` behavior is intentionally
 introduced by later 1.4 tranches.
 
-Supported in T01:
+Supported through T02:
 
 ```text
 tic --help

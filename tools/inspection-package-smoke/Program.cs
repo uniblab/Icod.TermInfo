@@ -31,8 +31,11 @@ Require(
 Type[] exportedTypes =
 	inspectionAssembly.GetExportedTypes();
 Require(
-	exportedTypes.Length == 11
+	exportedTypes.Length == 14
 		&& exportedTypes.Contains( typeof( TermInfoComparisonResult ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseInspector ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseLocation ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseLocationKind ) )
 		&& exportedTypes.Contains( typeof( TermInfoDifference ) )
 		&& exportedTypes.Contains( typeof( TermInfoDifferenceKind ) )
 		&& exportedTypes.Contains( typeof( TermInfoInspectionComparison ) )
@@ -43,7 +46,7 @@ Require(
 		&& exportedTypes.Contains( typeof( TermInfoSourceRenderer ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionComparer ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceRenderer ) ),
-	"The Inspection package did not expose exactly the reviewed I02-I06 surface."
+	"The Inspection package did not expose exactly the reviewed 1.4 Alpha-2 surface."
 );
 
 Require(
@@ -65,6 +68,19 @@ Require(
 	typeof( TermInfoSourceParser ).Assembly.GetName().Version
 		== new Version( 1, 0, 0, 0 ),
 	"The transitive Source package must retain the stable 1.x assembly identity."
+);
+
+IReadOnlyList<TermInfoDatabaseLocation> disabledLocations =
+	TermInfoDatabaseInspector.GetSystemLocations(
+		new SystemTerminalDescriptionProviderOptions(
+			useEnvironment: false,
+			useUserDatabase: false,
+			useSystemDatabases: false
+		)
+	);
+Require(
+	disabledLocations.Count == 0,
+	"The T02 database inspector did not honor a fully restricted system discovery policy."
 );
 
 const string source =

@@ -7,6 +7,25 @@ TYPE class Icod.TermInfo.Inspection.TermInfoComparisonResult [sealed]
   PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Inspection.TermInfoDifference> Differences { public get; } null=not-null/unknown<not-null/not-null>
 END
 
+TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseInspector [static]
+  METHOD public static System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Inspection.TermInfoDatabaseLocation> GetSystemLocations(Icod.TermInfo.SystemTerminalDescriptionProviderOptions options null=nullable/nullable default=null) return-null=not-null/not-null<not-null/not-null>
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseLocation [sealed]
+  PROPERTY Icod.TermInfo.Inspection.TermInfoDatabaseLocationKind Kind { public get; } null=not-null/unknown
+  PROPERTY System.String Path { public get; } null=nullable/unknown
+END
+
+TYPE enum Icod.TermInfo.Inspection.TermInfoDatabaseLocationKind [sealed]
+  INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  UNDERLYING System.Int32
+  ENUM EncodedTermInfo = 0
+  ENUM PlatformDefaultDirectory = 4
+  ENUM TermInfoDirectory = 1
+  ENUM TermInfoDirsDirectory = 3
+  ENUM UserDatabase = 2
+END
+
 TYPE class Icod.TermInfo.Inspection.TermInfoDifference [sealed]
   PROPERTY Icod.TermInfo.Inspection.TermInfoDifferenceKind Kind { public get; } null=not-null/unknown
   PROPERTY Icod.TermInfo.Source.TermInfoSourceEntry LeftSourceEntry { public get; } null=nullable/unknown

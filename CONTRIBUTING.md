@@ -36,8 +36,9 @@ and covered by semantic surface tests. Runtime API changes must be reconciled
 deliberately with `docs/1.0.0-PUBLIC-API-BASELINE.txt`; Source API changes must
 be reconciled with `docs/1.1.0-SOURCE-PUBLIC-API-BASELINE.txt`. Do not regenerate
 either baseline merely to silence a mismatch. Compiler API changes must likewise
-be reconciled with `docs/1.2.0-COMPILER-PUBLIC-API-BASELINE.txt`, and Inspection
-API changes with `docs/1.3.0-INSPECTION-PUBLIC-API-BASELINE.txt`.
+be reconciled with `docs/1.2.0-COMPILER-PUBLIC-API-BASELINE.txt`. The frozen
+1.3 Inspection baseline remains historical; additive 1.4 Inspection changes must
+be reconciled with `docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt`.
 
 ## Version metadata
 

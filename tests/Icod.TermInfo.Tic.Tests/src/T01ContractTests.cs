@@ -4,7 +4,7 @@ using Xunit;
 namespace Icod.TermInfo.Tic.Tests;
 
 public sealed class T01ContractTests {
-	private const string DevelopmentVersion = "1.4.0-Alpha-1";
+	private const string DevelopmentVersion = "1.4.0-Alpha-2";
 	private const string StableAssemblyVersion = "1.0.0.0";
 
 	[Fact]
@@ -94,7 +94,7 @@ public sealed class T01ContractTests {
 	}
 
 	[Fact]
-	public void OneFourInspectionBaselineBeginsAtFrozenOneThreeSurface() {
+	public void OneFourInspectionBaselineRetainsFrozenOneThreeSurface() {
 		string root = FindRepositoryRoot();
 		string oneThree = File.ReadAllText(
 			Path.Combine( root, "docs", "1.3.0-INSPECTION-PUBLIC-API-BASELINE.txt" )
@@ -103,9 +103,21 @@ public sealed class T01ContractTests {
 			Path.Combine( root, "docs", "1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt" )
 		);
 
+		string withoutT02 = NormalizeLineEndings( oneFour );
+		foreach (
+			string typeHeader
+			in new[] {
+				"TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseInspector [static]",
+				"TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseLocation [sealed]",
+				"TYPE enum Icod.TermInfo.Inspection.TermInfoDatabaseLocationKind [sealed]",
+			}
+		) {
+			withoutT02 = RemoveTypeBlock( withoutT02, typeHeader );
+		}
+
 		Assert.Equal(
 			NormalizeLineEndings( oneThree ),
-			NormalizeLineEndings( oneFour )
+			withoutT02
 		);
 	}
 
@@ -162,6 +174,30 @@ public sealed class T01ContractTests {
 			)
 			.Value
 			.Trim();
+	}
+
+	private static string RemoveTypeBlock(
+		string baseline,
+		string typeHeader
+	) {
+		ArgumentNullException.ThrowIfNull( baseline );
+		ArgumentException.ThrowIfNullOrWhiteSpace( typeHeader );
+
+		int start = baseline.IndexOf( typeHeader, StringComparison.Ordinal );
+		Assert.True( start >= 0 );
+
+		const string terminator = "\nEND\n\n";
+		int terminatorStart = baseline.IndexOf(
+			terminator,
+			start,
+			StringComparison.Ordinal
+		);
+		Assert.True( terminatorStart >= 0 );
+
+		return baseline.Remove(
+			start,
+			terminatorStart + terminator.Length - start
+		);
 	}
 
 	private static string NormalizeLineEndings( string value ) {
