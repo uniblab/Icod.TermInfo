@@ -465,7 +465,7 @@ public sealed class T08ConventionalDatabaseListingTests {
 	public async Task LinkedConventionalChildIsDiagnosticWhenLinksAreSupported() {
 		string root = CreateTemporaryDirectory();
 		string target = CreateTemporaryDirectory();
-		string link = Path.Combine(
+		string link = System.IO.Path.Combine(
 			root,
 			"l"
 		);
@@ -656,7 +656,7 @@ public sealed class T08ConventionalDatabaseListingTests {
 	}
 
 	private static string CreateTemporaryDirectory() {
-		string path = Path.Combine(
+		string path = System.IO.Path.Combine(
 			System.IO.Path.GetTempPath(),
 			"Icod.TermInfo.Toe.Tests",
 			Guid.NewGuid().ToString( "N" )
