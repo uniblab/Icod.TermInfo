@@ -9,10 +9,10 @@
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
 **Current release version:** `1.3.0`
-**Current development version:** `1.3.0`
-**Next development line:** `1.4.0`
-**Status:** 1.3.0 release closure
-**Current tranche:** Final 1.3.0 release closure
+**Current development version:** `1.4.0-Alpha-1`
+**Next development line:** `1.5.0`
+**Status:** 1.4.0 tool-suite development
+**Current tranche:** T01 — tool-suite foundation and command contract
 **Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
 
 ---
@@ -904,17 +904,19 @@ The engine SHALL remain usable independently of a console application.
 
 # 7. Version 1.4.0 — Tool Suite
 
+The detailed 1.4 tranche contract is maintained in
+[`Icod.TermInfo-1.4.0-Tool-Suite-Roadmap.md`](Icod.TermInfo-1.4.0-Tool-Suite-Roadmap.md).
+
 ## 7.1 Release objective
 
 `1.4.0` SHALL expose the source/compiler/inspection functionality as Unix-style command-line utilities.
 
-Likely projects:
+Command projects:
 
 ```text
-tools/
-    Icod.TermInfo.Tic
-    Icod.TermInfo.InfoCmp
-    Icod.TermInfo.Toe
+tic/Icod.TermInfo.Tic.csproj
+infocmp/Icod.TermInfo.InfoCmp.csproj
+toe/Icod.TermInfo.Toe.csproj
 ```
 
 Assemblies/executables SHOULD expose conventional command names where packaging permits:
@@ -929,101 +931,37 @@ The tools SHOULD use the established Icod command-entry-point conventions.
 
 ---
 
-## 7.2 T01 — Shared tooling foundation
+## 7.2 Tranche sequence
 
-If substantial CLI behavior is shared, introduce a narrowly scoped tooling library rather than putting command policy into the runtime packages.
+The earlier coarse T01-T05 sketch is superseded by the detailed 1.4 roadmap.
+The active implementation sequence is:
 
-Potential package/project:
+| Tranche | Development version | Gate |
+|---|---|---|
+| T01 | `1.4.0-Alpha-1` | command shells, command contracts, tests, version/CI integration |
+| T02 | `1.4.0-Alpha-2` | reusable database-location discovery seam |
+| T03 | `1.4.0-Alpha-3` | deterministic conventional database catalog |
+| T04 | `1.4.0-Alpha-4` | `tic` validation/check-only path |
+| T05 | `1.4.0-Alpha-5` | `tic` compiled database publication |
+| T06 | `1.4.0-Alpha-6` | `infocmp` one-entry inspection/rendering |
+| T07 | `1.4.0-Alpha-7` | `infocmp` semantic comparison |
+| T08 | `1.4.0-Alpha-8` | `toe` conventional database listing |
+| T09 | `1.4.0-Alpha-9` | `toe` source dependency analysis |
+| T10 | `1.4.0-Alpha-10` | CLI compatibility and distribution hardening |
+| T11 | `1.4.0-Alpha-11` | differential validation, hostile-input audit, API/command freeze |
 
-```text
-Icod.TermInfo.Tools
-```
+The detailed requirements, compatibility decisions, and gates for every tranche
+are authoritative in `Icod.TermInfo-1.4.0-Tool-Suite-Roadmap.md`.
 
-It MAY depend on:
+T01 specifically SHALL remain structural: it creates the three command projects
+and their tests, adopts the `Icod.CommandFramework 2.0.0` command-host contract,
+coordinates the four library packages at `1.4.0-Alpha-1`, and proves dependency
+direction without implementing operational terminfo command behavior.
 
-```text
-Icod.CommandFramework
-Icod.TermInfo
-Icod.TermInfo.Source
-Icod.TermInfo.Compiler
-```
-
-The lower-level TermInfo packages SHALL NOT depend on it.
-
----
-
-## 7.3 T02 — `tic`
-
-Implement the command-line compiler.
-
-Initial scope SHOULD include:
-
-- one or more input files;
-- standard input;
-- output-directory selection;
-- syntax/semantic diagnostics;
-- compile-only validation where appropriate;
-- deterministic exit statuses;
-- safe overwrite behavior;
-- extended capability support.
-
-Command-line compatibility SHALL be documented explicitly rather than claimed wholesale.
-
-**Gate:** useful mainstream `tic` workflows operate without native ncurses.
-
----
-
-## 7.4 T03 — `infocmp`
-
-Implement inspection and comparison.
-
-Initial scope SHOULD include:
-
-- inspect named terminal;
-- render canonical source;
-- compare two terminals;
-- choose explicit provider/database roots;
-- show extended capabilities;
-- deterministic output ordering.
-
-Additional ncurses-compatible switches may be introduced tranche by tranche.
-
-**Gate:** common `infocmp` diagnostic workflows operate entirely on managed TermInfo APIs.
-
----
-
-## 7.5 T04 — `toe`
-
-Implement terminal-table enumeration.
-
-The tool SHALL enumerate descriptions from provider/database sources without duplicating provider discovery logic.
-
-Potential output:
-
-- canonical names;
-- aliases;
-- descriptions;
-- source/database identity where requested.
-
-**Gate:** conventional directory-based terminfo stores can be enumerated reliably.
-
----
-
-## 7.6 T05 — Cross-platform packaging
-
-Validate tools on:
-
-- Windows;
-- Linux;
-- macOS.
-
-Tools SHALL avoid assuming:
-
-- `/usr/share/terminfo`;
-- POSIX path syntax;
-- a native ncurses installation.
-
-**1.4 completion gate:** `tic`, `infocmp`, and `toe` are useful standalone managed utilities backed by the same libraries used by application consumers.
+**1.4 completion gate:** `tic`, `infocmp`, and `toe` are useful standalone
+managed utilities on Windows, Linux, and macOS, backed by the same reusable
+libraries used by application consumers, with the frozen lower-layer contracts
+and explicitly reviewed 1.4 Inspection additions preserved.
 
 ---
 

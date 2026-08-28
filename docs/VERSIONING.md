@@ -12,7 +12,7 @@ MAJOR.MINOR.PATCH
 ```
 
 Development tranches use the repository's established prerelease form, such as
-`1.3.0-Alpha-1`, `1.3.0-Alpha-2`, and later `-Beta-X` / `-RC-X` forms when
+`1.4.0-Alpha-1`, `1.4.0-Alpha-2`, and later `-Beta-X` / `-RC-X` forms when
 needed.
 
 For the 1.x line:
@@ -38,6 +38,14 @@ Beginning with I01 in the 1.3.0 development line,
 Compiler, and Inspection SHALL all carry the same package version for every I01-I07
 development tranche and final release. The I01-I07 development sequence is
 `1.3.0-Alpha-1` through `1.3.0-Alpha-7`.
+
+Beginning with T01 in the 1.4.0 development line, the four library packages
+continue to advance together. The `tic`, `infocmp`, and `toe` command projects
+carry the matching 1.4 development version for command identity, but T01 keeps
+them non-packable executables rather than adding three new coordinated NuGet
+package IDs. The command layer targets `net10.0` because it uses
+`Icod.CommandFramework 2.0.0`; this does not reduce the library package family
+from its `net8.0` / `net9.0` / `net10.0` targets.
 
 ## Assembly identity
 
@@ -87,6 +95,11 @@ The approved `docs/1.3.0-INSPECTION-PUBLIC-API-BASELINE.txt` is the independent
 machine-readable public contract for `Icod.TermInfo.Inspection`, frozen at the
 1.3 release closure after the I02-I06 API additions and I07 validation gate.
 
+`docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt` is the active Inspection
+baseline for 1.4 development. T01 initializes it as an exact copy of the frozen
+1.3 baseline. It may change only after an explicit, compatible 1.4 API review;
+T01 itself adds no Inspection public API.
+
 The baselines record exported types, public/protected members, enum numeric
 values, parameter names/order/defaults, ref/out/in/params shape, generic
 constraints, nullability, and relevant attributes.
@@ -123,6 +136,11 @@ Beginning with I01, `Icod.TermInfo.Inspection` depends directly on the matching
 on Compiler, and Runtime, Source, and Compiler SHALL NOT acquire a dependency on
 Inspection. Inspection tests may reference Compiler for differential evidence
 without changing the production package graph.
+
+Beginning with T01, command projects may depend on `Icod.CommandFramework` and
+on the appropriate TermInfo libraries. Runtime, Source, Compiler, and Inspection
+SHALL NOT acquire an `Icod.CommandFramework` or command-project dependency. No
+command project SHALL depend on another command project.
 
 See `COMPATIBILITY.md` for target-framework, platform, behavioral, and feature-
 boundary promises.

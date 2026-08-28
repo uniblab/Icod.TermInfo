@@ -14,6 +14,11 @@ This document describes the current validation and publication procedure for the
 - Runtime, Source, Compiler, and Inspection retain 1.x assembly version
   `1.0.0.0` and remain unsigned.
 - Supported consumer targets for the 1.3 line are `net8.0`, `net9.0`, and `net10.0`.
+- Beginning with T01 in 1.4, the `tic`, `infocmp`, and `toe` command projects
+  target `net10.0`; the four reusable library packages retain all three targets.
+- The T01 command projects are non-packable solution executables. Library-package
+  publication remains the existing four-package workflow until a later 1.4
+  command-distribution tranche deliberately changes that contract.
 - A release tag must be exactly `v<PackageVersion>` and is the only repository
   event which may publish packages.
 - Release validation must pass on Windows, Linux, and macOS on `main` before a
@@ -48,7 +53,8 @@ This document describes the current validation and publication procedure for the
 
 Each matrix job cleans, restores, builds, and tests the whole solution, including
 all four package projects, Source, Compiler, and Inspection tests, repository sample
-executables, and solution-contained maintenance tools.
+executables, solution-contained maintenance tools, and, beginning with T01 in 1.4,
+the `tic`, `infocmp`, and `toe` command projects plus their command tests.
 
 The Ubuntu matrix leg continues after the shared Staging build/test steps and:
 
@@ -64,6 +70,10 @@ The Ubuntu matrix leg continues after the shared Staging build/test steps and:
 There is no second checkout/restore/build/test package-validation job; all four
 packages are produced from the same Staging outputs which just passed the Ubuntu
 matrix tests.
+
+The T01 commands are not packed by this step. Their cross-platform gate is the
+whole-solution build/test matrix; command artifact/distribution validation is
+deferred until the later 1.4 distribution contract is defined.
 
 That verifier covers generated capability metadata, the frozen runtime API
 baseline, the reviewed Source and Compiler API baselines, the Inspection API
@@ -97,6 +107,10 @@ The main-branch workflow stops after validation and artifact upload. It has only
 `contents: read` permission and never authenticates to or pushes to a package
 registry.
 
+During the T01 1.4 foundation, this workflow continues to upload only the
+canonical four-library validation artifact; command distribution is not added
+implicitly.
+
 ### Release tags
 
 `.github/workflows/release.yaml` runs for pushed tags matching `v*`. Before the
@@ -109,6 +123,11 @@ After all three legs pass, the canonical validated packages are published to
 NuGet.org and GitHub Packages. Finally, the workflow creates a GitHub Release
 containing all four package files, all four symbol packages, and a SHA-256
 checksum manifest. Prerelease package versions create GitHub prereleases.
+
+T01 does not expand that publication surface. Any later decision to distribute
+the command executables through GitHub Release assets, framework-dependent
+bundles, or another mechanism must be introduced and validated explicitly before
+the 1.4 release tag is created.
 
 ## What the release verifier checks
 
@@ -183,6 +202,10 @@ dotnet pack Icod.TermInfo.Source/Icod.TermInfo.Source.csproj -c Release --output
 dotnet pack Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj -c Release --output artifacts
 dotnet pack Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj -c Release --output artifacts
 ```
+
+Beginning with T01, the solution restore/build/test commands above also build and
+test `tic`, `infocmp`, and `toe`. Do not add command `dotnet pack` steps in T01;
+they are non-packable executables and their distribution contract is not frozen.
 
 Then run the coordinated verifier with the same configuration used to build and
 pack.
