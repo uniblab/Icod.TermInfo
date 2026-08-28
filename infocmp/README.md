@@ -2,29 +2,47 @@
 
 `infocmp` is part of the `Icod.TermInfo` managed terminfo tool suite.
 
-## T06 status
+## T07 status
 
-Version `1.4.0-Alpha-6` implements one-terminal acquisition and deterministic
-effective-source rendering over the reusable Runtime and Inspection APIs.
+Version `1.4.0-Alpha-7` adds deterministic semantic comparison to the T06
+one-terminal acquisition and effective-source rendering path.
 
-Supported through T06:
+Supported through T07:
 
 ```text
-infocmp [options] [terminal]
+infocmp [options] [terminal ...]
 infocmp -D
 infocmp -V
 infocmp --version
 infocmp --help
 ```
 
-With no terminal operand, `TERM` supplies the requested name. One operand is
-inspected directly. Two or more operands remain a usage error until T07 adds
-semantic comparison.
-
-Presentation options are:
+Operand behavior is:
 
 ```text
--A <directory>    use one explicit conventional terminfo database
+0 terminals     use TERM and render one effective description
+1 terminal      render that effective description
+2+ terminals    compare the first terminal with each subsequent terminal
+```
+
+With two or more terminals and no explicit comparison selector, difference mode
+(`-d`) is the default. Semantic differences are command output, not a failure, and
+therefore return status `0`.
+
+Database selection is:
+
+```text
+-A <directory>    use this explicit database for the first terminal
+-B <directory>    use this explicit database for subsequent terminals
+```
+
+Neither option mutates `TERMINFO` or other process environment variables. Without
+the matching explicit root, that side uses the normal Runtime
+`SystemTerminalDescriptionProvider` search policy.
+
+One-terminal presentation options remain:
+
+```text
 -0                emit one logical source line
 -1                emit one capability per line
 -w <width>        request canonical wrapping width
@@ -34,14 +52,26 @@ Presentation options are:
 -D                report Runtime database discovery locations
 ```
 
-Default output contains standard capabilities only. `-x` includes extended
-capabilities. The rendered text represents effective `TerminalDescription` state;
-it does not reconstruct original comments, whitespace, `use=` history,
-cancellations, disabled fields, or source provenance.
+Comparison modes are:
 
-`-A` creates an explicit `DirectoryTerminalDescriptionProvider`; it does not
-mutate `TERMINFO` or other process environment variables. Without `-A`, the
-normal Runtime `SystemTerminalDescriptionProvider` search policy is used.
+```text
+-d                report structured semantic differences
+-c                report equal effective capabilities
+-n                report standard capabilities absent from all operands
+-q                use short comparison presentation
+-x                include extended capabilities in -d/-c reports
+```
+
+`-d` delegates semantic comparison to `TerminalDescriptionComparer`. `-c` uses
+the already-acquired immutable descriptions and Runtime capability metadata.
+`-n` deliberately walks only the closed standard capability catalog; arbitrary
+extended names have no defined absent-name universe, so `-x` does not enlarge
+`-n`.
+
+Default one-terminal output contains standard capabilities only. `-x` includes
+effective extended capabilities. Rendered text represents effective
+`TerminalDescription` state; it does not reconstruct original comments,
+whitespace, `use=` history, cancellations, disabled fields, or source provenance.
 
 The command targets .NET 10. The reusable `Icod.TermInfo` libraries remain
 available for `net8.0`, `net9.0`, and `net10.0`.

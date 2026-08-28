@@ -9,10 +9,10 @@
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
 **Current release version:** `1.3.0`
-**Current development version:** `1.4.0-Alpha-6`
+**Current development version:** `1.4.0-Alpha-7`
 **Next development line:** `1.5.0`
 **Status:** 1.4.0 tool-suite development
-**Current tranche:** T06 — `infocmp` one-terminal inspection and renderer controls
+**Current tranche:** T07 — `infocmp` semantic comparison
 **Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
 
 ---
@@ -969,6 +969,10 @@ command layer, and preserves the T04 check-only path as non-mutating. T06 makes
 `infocmp` operational for zero/one-terminal acquisition and adds reviewed additive
 Inspection renderer controls for layout, width, metadata ordering, and extended-
 capability filtering while preserving the frozen 1.3 renderer overload output.
+T07 adds first-versus-each-subsequent semantic comparison to `infocmp`, delegates
+difference detection to the frozen `TerminalDescriptionComparer`, adds common and
+absent-standard capability reports, and keeps all comparison policy in the command
+layer without changing the active Inspection public API baseline.
 
 **1.4 completion gate:** `tic`, `infocmp`, and `toe` are useful standalone
 managed utilities on Windows, Linux, and macOS, backed by the same reusable

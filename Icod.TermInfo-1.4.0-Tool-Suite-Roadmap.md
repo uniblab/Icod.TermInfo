@@ -15,7 +15,7 @@
 **New commands:** `tic`, `infocmp`, `toe`
 **Development branch:** `1.4.0`
 **Development sequence:** `1.4.0-Alpha-1` through `1.4.0-Alpha-11`
-**Status:** T06 implementation candidate
+**Status:** T07 implementation candidate
 **Release objective:** expose the completed Runtime, Source, Compiler, and Inspection engines as useful, deterministic, cross-platform Unix-style command-line tools without moving command policy into the lower-level libraries or weakening their existing compatibility contracts.
 
 ---
@@ -1926,6 +1926,8 @@ Cover:
 
 **Gate T07:** common managed `infocmp` semantic comparison workflows are stable
 and deterministic.
+
+**Implementation record:** `docs/1.4.0-T07-INFOCMP-SEMANTIC-COMPARISON.md`
 
 ---
 

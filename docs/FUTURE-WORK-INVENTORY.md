@@ -79,8 +79,9 @@ Active 1.4 development now adds a `net10.0` command layer. T01 establishes the
 database-location inspection; T03 adds reusable conventional database catalog
 enumeration; T04 adds the non-mutating `tic -c` source-validation path; T05
 adds safe conventional database publication through the existing Compiler writer;
-and T06 adds one-terminal `infocmp` acquisition plus reviewed reusable Inspection
-renderer controls.
+T06 adds one-terminal `infocmp` acquisition plus reviewed reusable Inspection
+renderer controls; and T07 adds managed first-versus-each-subsequent semantic
+comparison, common-capability reporting, and closed-standard absent reporting.
 
 ---
 
@@ -96,7 +97,7 @@ renderer controls.
 | Terminfo source language | completed in 1.1: `.ti`, diagnostics, cancellation, `use=` inheritance, materialization | `Icod.TermInfo.Source` | runtime semantic model |
 | Terminfo compiler | completed in 1.2: deterministic compiled-entry writer, source compiler engine, and safe database-layout output | `Icod.TermInfo.Compiler` | Runtime + Source |
 | Terminfo inspection/comparison | completed in 1.3: canonical effective/source-aware rendering, structured semantic comparison, provider-aware inspection | `Icod.TermInfo.Inspection` | Runtime + Source |
-| Terminfo command-line tooling | active in 1.4: T01 establishes command shells; T02 adds reusable system database-location inspection; T03 adds conventional catalog enumeration; T04 adds non-mutating `tic -c` validation; T05 adds safe `tic` database publication; T06 adds one-terminal `infocmp` acquisition/rendering; later command semantics follow tranche-by-tranche | 1.4 command projects | CommandFramework + Source/Compiler/Inspection as appropriate |
+| Terminfo command-line tooling | active in 1.4: T01 establishes command shells; T02 adds reusable system database-location inspection; T03 adds conventional catalog enumeration; T04 adds non-mutating `tic -c` validation; T05 adds safe `tic` database publication; T06 adds one-terminal `infocmp` acquisition/rendering; T07 adds semantic comparison; later command semantics follow tranche-by-tranche | 1.4 command projects | CommandFramework + Source/Compiler/Inspection as appropriate |
 | Termcap interoperability | termcap syntax, `TERMCAP`, `TERMPATH`, conversion | optional compatibility/tooling | source/conversion model |
 | Live session | raw/cooked/cbreak, restore, tty ownership, full-screen/cursor lifecycle | `Icod.Terminal` | `Icod.TermInfo` + OS interop |
 | Input events | keyboard, modifiers, mouse, focus, paste, resize | `Icod.Terminal` | raw session + incremental decoder |

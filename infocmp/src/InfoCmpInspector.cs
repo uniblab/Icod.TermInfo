@@ -15,6 +15,12 @@ internal static class InfoCmpInspector {
 		ArgumentNullException.ThrowIfNull( stdout );
 		ArgumentNullException.ThrowIfNull( stderr );
 		cancellationToken.ThrowIfCancellationRequested();
+		if ( options.IsComparison ) {
+			throw new ArgumentException(
+				"Comparison options cannot be rendered as one terminal.",
+				nameof( options )
+			);
+		}
 
 		string? requestedName =
 			options.TerminalName
@@ -30,10 +36,117 @@ internal static class InfoCmpInspector {
 			return CommandExitCodes.Failure;
 		}
 
+		InfoCmpTerminal? terminal =
+			await AcquireAsync(
+				requestedName,
+				options.DatabaseDirectory,
+				stderr,
+				cancellationToken
+			).ConfigureAwait( false );
+		if ( terminal is null ) {
+			return CommandExitCodes.Failure;
+		}
+
+		cancellationToken.ThrowIfCancellationRequested();
+		string rendered;
+		try {
+			TerminalDescriptionSourceRendererOptions rendererOptions =
+				new(
+					options.LineWidth,
+					options.Layout,
+					options.CapabilityOrder,
+					options.IncludeExtendedCapabilities
+				);
+			rendered =
+				TerminalDescriptionSourceRenderer.Render(
+					terminal.Description,
+					rendererOptions
+				);
+		} catch ( InvalidOperationException exception ) {
+			await InfoCmpDiagnosticWriter.WriteErrorAsync(
+				stderr,
+				"INFOCMP0004",
+				requestedName,
+				exception.Message,
+				cancellationToken
+			).ConfigureAwait( false );
+			return CommandExitCodes.Failure;
+		}
+
+		await WriteAsync(
+			stdout,
+			rendered,
+			cancellationToken
+		).ConfigureAwait( false );
+		return CommandExitCodes.Success;
+	}
+
+	internal static async Task<int> CompareAsync(
+		InfoCmpOptions options,
+		Stream stdout,
+		Stream stderr,
+		CancellationToken cancellationToken
+	) {
+		ArgumentNullException.ThrowIfNull( options );
+		ArgumentNullException.ThrowIfNull( stdout );
+		ArgumentNullException.ThrowIfNull( stderr );
+		cancellationToken.ThrowIfCancellationRequested();
+		if ( !options.IsComparison ) {
+			throw new ArgumentException(
+				"At least two terminal operands are required for comparison.",
+				nameof( options )
+			);
+		}
+
+		List<InfoCmpTerminal> terminals = [];
+		for ( int index = 0; index < options.TerminalNames.Count; index++ ) {
+			cancellationToken.ThrowIfCancellationRequested();
+			string requestedName = options.TerminalNames[ index ];
+			string? databaseDirectory =
+				index == 0
+					? options.DatabaseDirectory
+					: options.ComparisonDatabaseDirectory;
+			InfoCmpTerminal? terminal =
+				await AcquireAsync(
+					requestedName,
+					databaseDirectory,
+					stderr,
+					cancellationToken
+				).ConfigureAwait( false );
+			if ( terminal is null ) {
+				return CommandExitCodes.Failure;
+			}
+			terminals.Add( terminal );
+		}
+
+		cancellationToken.ThrowIfCancellationRequested();
+		string rendered =
+			InfoCmpComparisonRenderer.Render(
+				options,
+				terminals
+			);
+		await WriteAsync(
+			stdout,
+			rendered,
+			cancellationToken
+		).ConfigureAwait( false );
+		return CommandExitCodes.Success;
+	}
+
+	private static async Task<InfoCmpTerminal?> AcquireAsync(
+		string requestedName,
+		string? databaseDirectory,
+		Stream stderr,
+		CancellationToken cancellationToken
+	) {
+		ArgumentException.ThrowIfNullOrWhiteSpace( requestedName );
+		ArgumentNullException.ThrowIfNull( stderr );
+		cancellationToken.ThrowIfCancellationRequested();
+
 		ITerminalDescriptionProvider provider;
 		string displayLabel;
 		try {
-			if ( options.DatabaseDirectory is string databaseDirectory ) {
+			if ( databaseDirectory is not null ) {
 				DirectoryTerminalDescriptionProvider directoryProvider =
 					new( databaseDirectory );
 				provider = directoryProvider;
@@ -46,11 +159,11 @@ internal static class InfoCmpInspector {
 			await InfoCmpDiagnosticWriter.WriteErrorAsync(
 				stderr,
 				"INFOCMP0003",
-				options.DatabaseDirectory ?? "system terminfo search",
+				databaseDirectory ?? "system terminfo search",
 				exception.Message,
 				cancellationToken
 			).ConfigureAwait( false );
-			return CommandExitCodes.Failure;
+			return null;
 		}
 
 		TermInfoInspectionResult? result;
@@ -72,7 +185,7 @@ internal static class InfoCmpInspector {
 					$"terminal is not available from {displayLabel}",
 					cancellationToken
 				).ConfigureAwait( false );
-				return CommandExitCodes.Failure;
+				return null;
 			}
 		} catch ( Exception exception ) when ( IsOperationalException( exception ) ) {
 			await InfoCmpDiagnosticWriter.WriteErrorAsync(
@@ -82,47 +195,18 @@ internal static class InfoCmpInspector {
 				exception.Message,
 				cancellationToken
 			).ConfigureAwait( false );
-			return CommandExitCodes.Failure;
+			return null;
 		}
 
-		cancellationToken.ThrowIfCancellationRequested();
 		TermInfoInspectionResult inspected =
 			result
 			?? throw new InvalidOperationException(
 				"Inspection succeeded without a result."
 			);
-
-		string rendered;
-		try {
-			TerminalDescriptionSourceRendererOptions rendererOptions =
-				new(
-					options.LineWidth,
-					options.Layout,
-					options.CapabilityOrder,
-					options.IncludeExtendedCapabilities
-				);
-			rendered =
-				TerminalDescriptionSourceRenderer.Render(
-					inspected.Terminal,
-					rendererOptions
-				);
-		} catch ( InvalidOperationException exception ) {
-			await InfoCmpDiagnosticWriter.WriteErrorAsync(
-				stderr,
-				"INFOCMP0004",
-				requestedName,
-				exception.Message,
-				cancellationToken
-			).ConfigureAwait( false );
-			return CommandExitCodes.Failure;
-		}
-
-		await WriteAsync(
-			stdout,
-			rendered,
-			cancellationToken
-		).ConfigureAwait( false );
-		return CommandExitCodes.Success;
+		return new InfoCmpTerminal(
+			requestedName,
+			inspected.Terminal
+		);
 	}
 
 	private static bool IsOperationalException(

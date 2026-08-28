@@ -83,12 +83,20 @@ public static class Command {
 					"The infocmp option parser returned neither options nor an error."
 				);
 
-			return await InfoCmpInspector.RenderAsync(
-				options,
-				stdout,
-				stderr,
-				cancellationToken
-			).ConfigureAwait( false );
+			return options.IsComparison
+				? await InfoCmpInspector.CompareAsync(
+					options,
+					stdout,
+					stderr,
+					cancellationToken
+				).ConfigureAwait( false )
+				: await InfoCmpInspector.RenderAsync(
+					options,
+					stdout,
+					stderr,
+					cancellationToken
+				).ConfigureAwait( false )
+			;
 		} catch ( OperationCanceledException ) {
 			return CommandExitCodes.Canceled;
 		}
@@ -180,27 +188,40 @@ public static class Command {
 	}
 
 	private static string GetHelpText() {
-		return $"Usage: {CommandName} [options] [terminal]{Environment.NewLine}"
+		return $"Usage: {CommandName} [options] [terminal ...]{Environment.NewLine}"
 			+ $"       {CommandName} -D{Environment.NewLine}"
 			+ $"       {CommandName} -V | --version{Environment.NewLine}"
 			+ Environment.NewLine
-			+ $"Inspect one effective terminal description as deterministic terminfo source.{Environment.NewLine}"
-			+ $"With no terminal operand, TERM supplies the requested terminal name.{Environment.NewLine}"
+			+ $"Inspect one effective terminal or compare two or more terminals semantically.{Environment.NewLine}"
+			+ $"With no terminal operand, TERM supplies the requested one-terminal name.{Environment.NewLine}"
+			+ $"With two or more operands, the first is compared with each subsequent terminal.{Environment.NewLine}"
 			+ Environment.NewLine
-			+ $"  -A directory    read the terminal from this explicit database root{Environment.NewLine}"
+			+ $"Database selection:{Environment.NewLine}"
+			+ $"  -A directory    use this explicit database for the first terminal{Environment.NewLine}"
+			+ $"  -B directory    use this explicit database for subsequent terminals{Environment.NewLine}"
+			+ Environment.NewLine
+			+ $"One-terminal source listing:{Environment.NewLine}"
 			+ $"  -0              emit one logical source line without wrapping{Environment.NewLine}"
 			+ $"  -1              emit one capability per line without continuation wrapping{Environment.NewLine}"
 			+ $"  -w width        request canonical string-capability wrapping width{Environment.NewLine}"
 			+ $"  -s key          order standard capabilities by d, i, l, or c{Environment.NewLine}"
-			+ $"  -x              include effective extended capabilities{Environment.NewLine}"
+			+ Environment.NewLine
+			+ $"Comparison modes:{Environment.NewLine}"
+			+ $"  -d              list semantic differences; default for two or more operands{Environment.NewLine}"
+			+ $"  -c              list capabilities with common effective values{Environment.NewLine}"
+			+ $"  -n              list standard capabilities absent from all compared entries{Environment.NewLine}"
+			+ $"  -q              use shorter comparison presentation{Environment.NewLine}"
+			+ Environment.NewLine
+			+ $"Other options:{Environment.NewLine}"
+			+ $"  -x              include effective extended capabilities where defined{Environment.NewLine}"
 			+ $"  -D              print Runtime database discovery locations and exit{Environment.NewLine}"
 			+ $"  -V, --version   print the Icod.TermInfo tool-suite version and exit{Environment.NewLine}"
 			+ $"      --help      display this help and exit{Environment.NewLine}"
 			+ Environment.NewLine
 			+ $"Sort keys: d=compiled-table order, i=terminfo short name, l=long variable name, c=termcap code.{Environment.NewLine}"
-			+ $"Default listing includes standard capabilities only; use -x for extended capabilities.{Environment.NewLine}"
-			+ $"Comparison of two or more terminal operands is introduced by T07.{Environment.NewLine}"
-			+ $"Rendered output is effective state; original comments, whitespace, use= history, cancellations, and provenance are not reconstructed.{Environment.NewLine}";
+			+ $"Default source listing and comparison capability reports include standard capabilities only; use -x for extended capabilities.{Environment.NewLine}"
+			+ $"The -n universe is the closed standard capability catalog even when -x is supplied.{Environment.NewLine}"
+			+ $"Rendered source output is effective state; original comments, whitespace, use= history, cancellations, and provenance are not reconstructed.{Environment.NewLine}";
 	}
 
 	private static string GetSemanticVersion() {

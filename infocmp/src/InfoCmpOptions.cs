@@ -3,38 +3,103 @@ using Icod.TermInfo.Inspection;
 
 namespace Icod.TermInfo.InfoCmp;
 
+internal enum InfoCmpComparisonMode {
+	Differences = 0,
+	Common = 1,
+	Absent = 2,
+}
+
 internal sealed class InfoCmpOptions {
+	private readonly IReadOnlyList<string> _terminalNames;
+
 	internal InfoCmpOptions(
 		string? databaseDirectory,
-		string? terminalName,
+		string? comparisonDatabaseDirectory,
+		IEnumerable<string> terminalNames,
 		TerminalDescriptionSourceLayout layout,
 		int lineWidth,
 		bool lineWidthSpecified,
 		TerminalDescriptionSourceCapabilityOrder capabilityOrder,
-		bool includeExtendedCapabilities
+		bool includeExtendedCapabilities,
+		InfoCmpComparisonMode? comparisonMode,
+		bool shortComparison
 	) {
+		ArgumentNullException.ThrowIfNull( terminalNames );
 		if ( lineWidth <= 0 ) {
 			throw new ArgumentOutOfRangeException(
 				nameof( lineWidth )
 			);
 		}
+		if ( !Enum.IsDefined( typeof( TerminalDescriptionSourceLayout ), layout ) ) {
+			throw new ArgumentOutOfRangeException(
+				nameof( layout )
+			);
+		}
+		if ( !Enum.IsDefined(
+			typeof( TerminalDescriptionSourceCapabilityOrder ),
+			capabilityOrder
+		) ) {
+			throw new ArgumentOutOfRangeException(
+				nameof( capabilityOrder )
+			);
+		}
+		if ( comparisonMode.HasValue
+			&& !Enum.IsDefined(
+				typeof( InfoCmpComparisonMode ),
+				comparisonMode.Value
+			) ) {
+			throw new ArgumentOutOfRangeException(
+				nameof( comparisonMode )
+			);
+		}
+
+		string[] names = terminalNames.ToArray();
+		foreach ( string name in names ) {
+			ArgumentException.ThrowIfNullOrWhiteSpace( name );
+		}
+		if ( names.Length >= 2 && !comparisonMode.HasValue ) {
+			throw new ArgumentException(
+				"Comparison options require an explicit comparison mode.",
+				nameof( comparisonMode )
+			);
+		}
+		if ( names.Length < 2 && comparisonMode.HasValue ) {
+			throw new ArgumentException(
+				"A comparison mode requires at least two terminal names.",
+				nameof( comparisonMode )
+			);
+		}
 
 		DatabaseDirectory = databaseDirectory;
-		TerminalName = terminalName;
+		ComparisonDatabaseDirectory = comparisonDatabaseDirectory;
+		_terminalNames = Array.AsReadOnly( names );
 		Layout = layout;
 		LineWidth = lineWidth;
 		LineWidthSpecified = lineWidthSpecified;
 		CapabilityOrder = capabilityOrder;
 		IncludeExtendedCapabilities = includeExtendedCapabilities;
+		ComparisonMode = comparisonMode;
+		ShortComparison = shortComparison;
 	}
 
 	internal string? DatabaseDirectory {
 		get;
 	}
 
-	internal string? TerminalName {
+	internal string? ComparisonDatabaseDirectory {
 		get;
 	}
+
+	internal IReadOnlyList<string> TerminalNames =>
+		_terminalNames;
+
+	internal string? TerminalName =>
+		_terminalNames.Count == 1
+			? _terminalNames[ 0 ]
+			: null;
+
+	internal bool IsComparison =>
+		_terminalNames.Count >= 2;
 
 	internal TerminalDescriptionSourceLayout Layout {
 		get;
@@ -53,6 +118,14 @@ internal sealed class InfoCmpOptions {
 	}
 
 	internal bool IncludeExtendedCapabilities {
+		get;
+	}
+
+	internal InfoCmpComparisonMode? ComparisonMode {
+		get;
+	}
+
+	internal bool ShortComparison {
 		get;
 	}
 }
@@ -110,7 +183,8 @@ internal static class InfoCmpOptionsParser {
 		ArgumentNullException.ThrowIfNull( args );
 
 		string? databaseDirectory = null;
-		string? terminalName = null;
+		string? comparisonDatabaseDirectory = null;
+		List<string> terminalNames = [];
 		TerminalDescriptionSourceLayout layout =
 			TerminalDescriptionSourceLayout.Canonical;
 		int lineWidth =
@@ -120,6 +194,8 @@ internal static class InfoCmpOptionsParser {
 			TerminalDescriptionSourceCapabilityOrder.Database;
 		bool capabilityOrderSpecified = false;
 		bool includeExtendedCapabilities = false;
+		InfoCmpComparisonMode? comparisonMode = null;
+		bool shortComparison = false;
 		bool optionsEnded = false;
 
 		for ( int index = 0; index < args.Count; index++ ) {
@@ -160,6 +236,26 @@ internal static class InfoCmpOptionsParser {
 							);
 						}
 						databaseDirectory = directory;
+						break;
+
+					case "-B":
+						if ( comparisonDatabaseDirectory is not null ) {
+							return InfoCmpOptionsParseResult.Failure(
+								"option '-B' may be specified only once"
+							);
+						}
+						if ( !TryReadValue(
+								args,
+								ref index,
+								"-B",
+								out string? comparisonDirectory,
+								out string? comparisonDirectoryError
+							) ) {
+							return InfoCmpOptionsParseResult.Failure(
+								comparisonDirectoryError!
+							);
+						}
+						comparisonDatabaseDirectory = comparisonDirectory;
 						break;
 
 					case "-0":
@@ -239,6 +335,46 @@ internal static class InfoCmpOptionsParser {
 						capabilityOrderSpecified = true;
 						break;
 
+					case "-d":
+						if ( !TrySetComparisonMode(
+								ref comparisonMode,
+								InfoCmpComparisonMode.Differences,
+								out string? differenceModeError
+							) ) {
+							return InfoCmpOptionsParseResult.Failure(
+								differenceModeError!
+							);
+						}
+						break;
+
+					case "-c":
+						if ( !TrySetComparisonMode(
+								ref comparisonMode,
+								InfoCmpComparisonMode.Common,
+								out string? commonModeError
+							) ) {
+							return InfoCmpOptionsParseResult.Failure(
+								commonModeError!
+							);
+						}
+						break;
+
+					case "-n":
+						if ( !TrySetComparisonMode(
+								ref comparisonMode,
+								InfoCmpComparisonMode.Absent,
+								out string? absentModeError
+							) ) {
+							return InfoCmpOptionsParseResult.Failure(
+								absentModeError!
+							);
+						}
+						break;
+
+					case "-q":
+						shortComparison = true;
+						break;
+
 					case "-x":
 						includeExtendedCapabilities = true;
 						break;
@@ -251,17 +387,12 @@ internal static class InfoCmpOptionsParser {
 				continue;
 			}
 
-			if ( terminalName is not null ) {
-				return InfoCmpOptionsParseResult.Failure(
-					"two or more terminal operands are not available until T07"
-				);
-			}
 			if ( string.IsNullOrWhiteSpace( argument ) ) {
 				return InfoCmpOptionsParseResult.Failure(
 					"terminal operand cannot be empty or whitespace"
 				);
 			}
-			terminalName = argument;
+			terminalNames.Add( argument );
 		}
 
 		if ( lineWidthSpecified
@@ -271,15 +402,46 @@ internal static class InfoCmpOptionsParser {
 			);
 		}
 
+		if ( terminalNames.Count >= 2 ) {
+			if ( layout != TerminalDescriptionSourceLayout.Canonical
+				|| lineWidthSpecified
+				|| capabilityOrderSpecified ) {
+				return InfoCmpOptionsParseResult.Failure(
+					"options '-0', '-1', '-w', and '-s' apply only to one-terminal source listing"
+				);
+			}
+
+			comparisonMode ??= InfoCmpComparisonMode.Differences;
+		} else {
+			if ( comparisonDatabaseDirectory is not null ) {
+				return InfoCmpOptionsParseResult.Failure(
+					"option '-B' requires two or more terminal operands"
+				);
+			}
+			if ( comparisonMode.HasValue ) {
+				return InfoCmpOptionsParseResult.Failure(
+					"options '-d', '-c', and '-n' require two or more terminal operands"
+				);
+			}
+			if ( shortComparison ) {
+				return InfoCmpOptionsParseResult.Failure(
+					"option '-q' requires two or more terminal operands"
+				);
+			}
+		}
+
 		return InfoCmpOptionsParseResult.Success(
 			new InfoCmpOptions(
 				databaseDirectory,
-				terminalName,
+				comparisonDatabaseDirectory,
+				terminalNames,
 				layout,
 				lineWidth,
 				lineWidthSpecified,
 				capabilityOrder,
-				includeExtendedCapabilities
+				includeExtendedCapabilities,
+				comparisonMode,
+				shortComparison
 			)
 		);
 	}
@@ -312,6 +474,27 @@ internal static class InfoCmpOptionsParser {
 			return false;
 		}
 
+		error = null;
+		return true;
+	}
+
+	private static bool TrySetComparisonMode(
+		ref InfoCmpComparisonMode? currentMode,
+		InfoCmpComparisonMode requestedMode,
+		out string? error
+	) {
+		if ( !Enum.IsDefined( typeof( InfoCmpComparisonMode ), requestedMode ) ) {
+			throw new ArgumentOutOfRangeException(
+				nameof( requestedMode )
+			);
+		}
+
+		if ( currentMode.HasValue ) {
+			error = "options '-d', '-c', and '-n' are mutually exclusive";
+			return false;
+		}
+
+		currentMode = requestedMode;
 		error = null;
 		return true;
 	}

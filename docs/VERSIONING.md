@@ -105,8 +105,11 @@ frozen Compiler writer without adding library API. T06 advances the coordinated
 development version to `1.4.0-Alpha-6` and adds reviewed, compatible Inspection
 renderer controls for layout, width, standard-capability ordering, and extended-
 capability filtering. The frozen 1.3 renderer overload behavior remains unchanged.
-Later library-surface changes require another explicit, compatible 1.4 API
-review.
+T07 advances the coordinated development version to `1.4.0-Alpha-7` and composes
+the already-frozen effective comparer from the command layer; it adds no Runtime,
+Source, Compiler, or Inspection public API, so the active 1.4 Inspection baseline
+remains byte-for-byte unchanged from T06. Later library-surface changes require
+another explicit, compatible 1.4 API review.
 
 The baselines record exported types, public/protected members, enum numeric
 values, parameter names/order/defaults, ref/out/in/params shape, generic

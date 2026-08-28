@@ -267,6 +267,23 @@ to include effective extended capabilities. This filtering changes presentation
 only; it never mutates the acquired `TerminalDescription`. T06 adds no Runtime,
 Source, or Compiler public API.
 
+## T07 `infocmp` comparison compatibility
+
+T07 extends `infocmp` to two or more terminal operands. The first terminal is
+compared with each subsequent terminal. With no explicit `-d`, `-c`, or `-n`
+selector, comparison defaults to semantic differences. `-A` selects the first
+terminal database and `-B` selects the database used for subsequent terminals;
+neither option mutates process environment variables.
+
+Difference mode delegates to the frozen `TerminalDescriptionComparer`; the
+command does not parse rendered source to determine equality. Differences are
+successful command output and return status 0. Common-capability reporting uses
+the already-acquired immutable descriptions and Runtime capability metadata.
+Absent-capability reporting is defined only over the closed standard capability
+catalog and therefore does not invent absent extended names. `-q` changes
+presentation only. T07 adds no Runtime, Source, Compiler, or Inspection public
+API.
+
 ## Discovery and failure compatibility
 
 Runtime discovery precedence, clean-miss behavior, parser failures,

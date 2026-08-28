@@ -8,6 +8,17 @@ The 1.3 line provides the reusable API engine underneath future
 1.1, and Compiler 1.2 public contracts. Version 1.3.0 is the first stable
 release of this optional package.
 
+## 1.4 T07 semantic-comparison composition
+
+`1.4.0-Alpha-7` advances the coordinated package family while the managed
+`infocmp` command composes the existing `TerminalDescriptionComparer` for
+difference reporting. Common-capability and absent-standard-capability reporting
+remain command-layer policy over already-acquired immutable descriptions.
+
+T07 adds no Inspection public API. The active
+`docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt` therefore remains unchanged from
+the reviewed T06 surface.
+
 ## 1.4 T06 effective-source renderer controls
 
 `1.4.0-Alpha-6` adds reviewed additive presentation controls used by the managed

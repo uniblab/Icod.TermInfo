@@ -329,8 +329,9 @@ discovery seam, `docs/1.4.0-T03-CONVENTIONAL-DATABASE-CATALOG.md` for T03 catalo
 enumeration, `docs/1.4.0-T04-TIC-VALIDATION-AND-CHECK-ONLY.md` for the first
 operational validation contract, `docs/1.4.0-T05-TIC-COMPILATION-AND-DATABASE-PUBLICATION.md` for the first filesystem-mutating command contract,
 `docs/1.4.0-T06-INFOCMP-ONE-TERMINAL-INSPECTION-AND-RENDERER-CONTROLS.md` for the
-first operational `infocmp` contract, and
-`docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt` for the active Inspection API
+first operational `infocmp` contract,
+`docs/1.4.0-T07-INFOCMP-SEMANTIC-COMPARISON.md` for managed semantic comparison,
+and `docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt` for the active Inspection API
 contract.
 
 The final `v<PackageVersion>` tag must identify the exact validated and published `main`

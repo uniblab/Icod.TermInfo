@@ -404,18 +404,6 @@ public sealed class T06OneTerminalInspectionTests {
 		Assert.Equal( string.Empty, result.Stderr );
 	}
 
-	[Fact]
-	public async Task TwoOperandsRemainUsageErrorUntilT07() {
-		CommandResult result =
-			await RunAsync(
-				[ "first", "second" ]
-			);
-
-		Assert.Equal( CommandExitCodes.UsageError, result.Status );
-		Assert.Equal( string.Empty, result.Stdout );
-		Assert.Contains( "until T07", result.Stderr, StringComparison.Ordinal );
-	}
-
 	[Theory]
 	[InlineData( "-0", "-1" )]
 	[InlineData( "-w", "0" )]
