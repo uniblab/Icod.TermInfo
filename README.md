@@ -1,5 +1,7 @@
 # Icod.TermInfo
 
+![Icod TUI Toolchain](icod_tui_toolchain.jpg)
+
 `Icod.TermInfo` is a managed, dependency-free .NET implementation of the low-level terminal-capability model traditionally supplied by `libtinfo`.
 
 Version 1.3.0 is the current coordinated release. It preserves the frozen 1.0
