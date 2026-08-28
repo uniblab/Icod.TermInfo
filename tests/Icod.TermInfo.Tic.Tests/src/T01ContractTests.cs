@@ -4,7 +4,7 @@ using Xunit;
 namespace Icod.TermInfo.Tic.Tests;
 
 public sealed class T01ContractTests {
-	private const string DevelopmentVersion = "1.4.0-Alpha-2";
+	private const string DevelopmentVersion = "1.4.0-Alpha-3";
 	private const string StableAssemblyVersion = "1.0.0.0";
 
 	[Fact]
@@ -106,6 +106,11 @@ public sealed class T01ContractTests {
 		foreach (
 			string typeHeader
 			in new[] {
+				"TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseCatalog [sealed]",
+				"TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseCatalogEntry [sealed]",
+				"TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseCatalogIssue [sealed]",
+				"TYPE enum Icod.TermInfo.Inspection.TermInfoDatabaseCatalogIssueKind [sealed]",
+				"TYPE enum Icod.TermInfo.Inspection.TermInfoDatabaseCatalogKind [sealed]",
 				"TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseInspector [static]",
 				"TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseLocation [sealed]",
 				"TYPE enum Icod.TermInfo.Inspection.TermInfoDatabaseLocationKind [sealed]",

@@ -31,8 +31,13 @@ Require(
 Type[] exportedTypes =
 	inspectionAssembly.GetExportedTypes();
 Require(
-	exportedTypes.Length == 14
+	exportedTypes.Length == 19
 		&& exportedTypes.Contains( typeof( TermInfoComparisonResult ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalog ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalogEntry ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalogIssue ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalogIssueKind ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalogKind ) )
 		&& exportedTypes.Contains( typeof( TermInfoDatabaseInspector ) )
 		&& exportedTypes.Contains( typeof( TermInfoDatabaseLocation ) )
 		&& exportedTypes.Contains( typeof( TermInfoDatabaseLocationKind ) )
@@ -46,7 +51,7 @@ Require(
 		&& exportedTypes.Contains( typeof( TermInfoSourceRenderer ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionComparer ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceRenderer ) ),
-	"The Inspection package did not expose exactly the reviewed 1.4 Alpha-2 surface."
+	"The Inspection package did not expose exactly the reviewed 1.4 Alpha-3 surface."
 );
 
 Require(
@@ -81,6 +86,25 @@ IReadOnlyList<TermInfoDatabaseLocation> disabledLocations =
 Require(
 	disabledLocations.Count == 0,
 	"The T02 database inspector did not honor a fully restricted system discovery policy."
+);
+
+string missingCatalogRoot =
+	Path.Combine(
+		Path.GetTempPath(),
+		$"icod-terminfo-package-smoke-missing-{Guid.NewGuid():N}"
+	);
+TermInfoDatabaseCatalog missingCatalog =
+	TermInfoDatabaseInspector.InspectDirectory(
+		missingCatalogRoot
+	);
+Require(
+	missingCatalog.Kind == TermInfoDatabaseCatalogKind.Missing
+		&& missingCatalog.Root == Path.GetFullPath( missingCatalogRoot )
+		&& missingCatalog.Entries.Count == 0
+		&& missingCatalog.Issues.Count == 0
+		&& missingCatalog.DuplicateCanonicalNames.Count == 0
+		&& !missingCatalog.HasIssues,
+	"The T03 database catalog did not report a deterministic missing-root snapshot."
 );
 
 const string source =

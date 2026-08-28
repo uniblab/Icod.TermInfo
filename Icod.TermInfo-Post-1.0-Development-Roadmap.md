@@ -9,10 +9,10 @@
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
 **Current release version:** `1.3.0`
-**Current development version:** `1.4.0-Alpha-2`
+**Current development version:** `1.4.0-Alpha-3`
 **Next development line:** `1.5.0`
 **Status:** 1.4.0 tool-suite development
-**Current tranche:** T02 — system database-location inspection
+**Current tranche:** T03 — conventional database catalog enumeration
 **Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
 
 ---

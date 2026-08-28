@@ -97,9 +97,10 @@ machine-readable public contract for `Icod.TermInfo.Inspection`, frozen at the
 
 `docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt` is the active Inspection
 baseline for 1.4 development. T01 initialized it as an exact copy of the frozen
-1.3 baseline. T02 adds the reviewed read-only system database-location inspection
-surface without changing Runtime, Source, or Compiler public API. Later changes
-require another explicit, compatible 1.4 API review.
+1.3 baseline. T02 adds reviewed read-only system database-location inspection,
+and T03 adds reviewed conventional database catalog enumeration, without changing
+Runtime, Source, or Compiler public API. Later changes require another explicit,
+compatible 1.4 API review.
 
 The baselines record exported types, public/protected members, enum numeric
 values, parameter names/order/defaults, ref/out/in/params shape, generic

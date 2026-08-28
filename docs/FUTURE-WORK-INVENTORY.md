@@ -16,7 +16,8 @@ The governing distinction is:
 > `Icod.TermInfo.Compiler` owns deterministic compiled-entry writing and the
 > reusable source-to-compiled engine introduced in the 1.2 line.
 > `Icod.TermInfo.Inspection` owns canonical human-readable inspection and
-> semantic comparison beginning with the 1.3 line.
+> semantic comparison beginning with the 1.3 line, plus reusable database
+> location/catalog inspection added during 1.4.
 > The 1.4 `tic`, `infocmp`, and `toe` projects own command-line policy and depend
 > downward on the reusable libraries without changing their ownership.
 > Live terminal conversations, process plumbing, and virtual-screen/UI policy
@@ -65,15 +66,18 @@ into the older packages:
 The runtime public contract remains the frozen 1.0 contract. Source-language
 functionality is isolated in `Icod.TermInfo.Source`; compiled writing is isolated
 in `Icod.TermInfo.Compiler`; canonical rendering and semantic comparison are
-isolated in `Icod.TermInfo.Inspection`, whose 1.3 public contract is now frozen.
+isolated in `Icod.TermInfo.Inspection`, whose 1.3 public contract is frozen and
+whose active 1.4 additions now include database-location and conventional catalog
+inspection.
 
 Beginning with 1.2, active package-family validation uses the three-target
 `net8.0`/`net9.0`/`net10.0` matrix. This additive support change does not rewrite
 the frozen 1.0/1.1 target-framework contracts.
 
-Active 1.4 development now adds a `net10.0` command layer. T01 establishes only
-the `tic`, `infocmp`, and `toe` shells, their tests, dependency boundaries, and
-command contract; operational command semantics follow in later 1.4 tranches.
+Active 1.4 development now adds a `net10.0` command layer. T01 establishes the
+`tic`, `infocmp`, and `toe` shells and command contract; T02 adds reusable system
+database-location inspection; T03 adds reusable conventional database catalog
+enumeration. Operational command semantics follow in later 1.4 tranches.
 
 ---
 
@@ -89,7 +93,7 @@ command contract; operational command semantics follow in later 1.4 tranches.
 | Terminfo source language | completed in 1.1: `.ti`, diagnostics, cancellation, `use=` inheritance, materialization | `Icod.TermInfo.Source` | runtime semantic model |
 | Terminfo compiler | completed in 1.2: deterministic compiled-entry writer, source compiler engine, and safe database-layout output | `Icod.TermInfo.Compiler` | Runtime + Source |
 | Terminfo inspection/comparison | completed in 1.3: canonical effective/source-aware rendering, structured semantic comparison, provider-aware inspection | `Icod.TermInfo.Inspection` | Runtime + Source |
-| Terminfo command-line tooling | active in 1.4: T01 establishes command shells; T02 adds reusable system database-location inspection; semantics follow tranche-by-tranche | 1.4 command projects | CommandFramework + Source/Compiler/Inspection as appropriate |
+| Terminfo command-line tooling | active in 1.4: T01 establishes command shells; T02 adds reusable system database-location inspection; T03 adds conventional catalog enumeration; command semantics follow tranche-by-tranche | 1.4 command projects | CommandFramework + Source/Compiler/Inspection as appropriate |
 | Termcap interoperability | termcap syntax, `TERMCAP`, `TERMPATH`, conversion | optional compatibility/tooling | source/conversion model |
 | Live session | raw/cooked/cbreak, restore, tty ownership, full-screen/cursor lifecycle | `Icod.Terminal` | `Icod.TermInfo` + OS interop |
 | Input events | keyboard, modifiers, mouse, focus, paste, resize | `Icod.Terminal` | raw session + incremental decoder |
@@ -191,10 +195,10 @@ command contract: `net10.0`, `Icod.CommandFramework 2.0.0`, thin process entry
 points, injected streams, deterministic help/version output, conventional exit
 codes, cancellation, and strict dependency direction.
 
-Real database discovery, compilation, inspection/comparison, and enumeration
-are intentionally assigned to later 1.4 tranches. The command layer must reuse
-existing engines rather than duplicate Source, Compiler, Inspection, or Runtime
-semantics.
+Reusable database discovery and conventional catalog enumeration are now supplied
+by T02/T03 in Inspection. Compilation and command-level inspection/comparison
+remain assigned to later 1.4 tranches. The command layer must reuse these engines
+rather than duplicate Source, Compiler, Inspection, or Runtime semantics.
 
 ### 3.5 Termcap conversion
 

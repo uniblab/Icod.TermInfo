@@ -8,6 +8,43 @@ The 1.3 line provides the reusable API engine underneath future
 1.1, and Compiler 1.2 public contracts. Version 1.3.0 is the first stable
 release of this optional package.
 
+## 1.4 T03 conventional database catalog enumeration
+
+`1.4.0-Alpha-3` adds safe read-only enumeration of one explicit conventional
+terminfo directory root. The catalog parses candidate files through the Runtime
+`CompiledTermInfoParser` rather than trusting filenames, and returns immutable
+physical-entry metadata together with deterministic non-fatal issues:
+
+```csharp
+TermInfoDatabaseCatalog catalog =
+	TermInfoDatabaseInspector.InspectDirectory(
+		"./terminfo"
+	);
+
+foreach ( TermInfoDatabaseCatalogEntry entry in catalog.Entries ) {
+	Console.WriteLine(
+		$"{entry.Name}: {entry.Description}"
+	);
+}
+```
+
+T03 recognizes only immediate literal first-character and two-digit hexadecimal
+subdirectories. It does not recursively crawl arbitrary trees. Successfully
+parsed entries retain their absolute physical path, canonical name, aliases,
+description, and immutable `TerminalDescription`. Duplicate canonical identities
+are reported separately from the physical entries which produced them.
+
+Malformed, misplaced, inaccessible, and skipped link/reparse candidates are
+reported through deterministic catalog issues so callers such as the later
+`toe` command can continue through mixed-quality databases without silently
+losing failures. Missing roots, conventional directories, unsupported
+non-directory stores, and unavailable roots are distinguished explicitly.
+
+Parser resource limits are snapshotted for the inspection, cancellation is
+supported by an explicit overload, and no filesystem mutation occurs. T03 adds
+no Runtime, Source, or Compiler public API and does not add a production Compiler
+dependency to Inspection.
+
 ## 1.4 T02 system database-location inspection
 
 `1.4.0-Alpha-2` adds read-only inspection of the ordered system database
@@ -262,6 +299,7 @@ unsigned, and retains assembly version `1.0.0.0` throughout the 1.x line.
 - `Icod.TermInfo.Source` owns `.ti` lexical, parsing, and inheritance semantics.
 - `Icod.TermInfo.Compiler` owns deterministic compiled-entry/database writing.
 - `Icod.TermInfo.Inspection` owns canonical human-readable representation,
-  semantic comparison, and inspection orchestration.
+  semantic comparison, inspection orchestration, and read-only database catalog
+  inspection.
 
 Command-line parsing and `infocmp` executable policy remain outside this package.

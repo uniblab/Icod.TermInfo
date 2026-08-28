@@ -4,7 +4,7 @@ namespace Icod.TermInfo.Inspection;
 /// Provides read-only inspection of the system terminfo database locations
 /// considered by the Runtime discovery model.
 /// </summary>
-public static class TermInfoDatabaseInspector {
+public static partial class TermInfoDatabaseInspector {
 	/// <summary>
 	/// Captures and returns the ordered terminfo locations which a newly-created
 	/// <see cref="SystemTerminalDescriptionProvider"/> would consider under the

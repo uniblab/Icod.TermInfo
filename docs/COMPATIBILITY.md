@@ -193,6 +193,15 @@ platform-specific duplicate handling are preserved, and no database contents are
 enumerated until the separate T03 catalog tranche. Runtime public API remains
 unchanged.
 
+Beginning with T03, Inspection can also enumerate one explicit conventional
+terminfo directory without changing Runtime provider semantics. Enumeration is
+limited to immediate literal first-character and two-digit hexadecimal
+subdirectories, parses candidate bytes through `CompiledTermInfoParser`, applies
+the configured Runtime parser size limit, preserves physical paths and parsed
+terminal identity, reports duplicate canonical identities deterministically, and
+retains malformed/I/O/link/placement issues instead of silently discarding them.
+Arbitrary recursion and hashed/Berkeley DB parsing remain outside the contract.
+
 ## Discovery and failure compatibility
 
 Runtime discovery precedence, clean-miss behavior, parser failures,

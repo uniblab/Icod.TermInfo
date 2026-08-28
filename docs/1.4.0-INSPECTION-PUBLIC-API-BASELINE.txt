@@ -7,7 +7,51 @@ TYPE class Icod.TermInfo.Inspection.TermInfoComparisonResult [sealed]
   PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Inspection.TermInfoDifference> Differences { public get; } null=not-null/unknown<not-null/not-null>
 END
 
+TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseCatalog [sealed]
+  PROPERTY Icod.TermInfo.Inspection.TermInfoDatabaseCatalogKind Kind { public get; } null=not-null/unknown
+  PROPERTY System.Boolean HasIssues { public get; } null=not-null/unknown
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Inspection.TermInfoDatabaseCatalogEntry> Entries { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Inspection.TermInfoDatabaseCatalogIssue> Issues { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.Collections.Generic.IReadOnlyList<System.String> DuplicateCanonicalNames { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.String Root { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseCatalogEntry [sealed]
+  PROPERTY Icod.TermInfo.TerminalDescription Terminal { public get; } null=not-null/unknown
+  PROPERTY System.Collections.Generic.IReadOnlyList<System.String> Aliases { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.String Description { public get; } null=nullable/unknown
+  PROPERTY System.String Name { public get; } null=not-null/unknown
+  PROPERTY System.String Path { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseCatalogIssue [sealed]
+  PROPERTY Icod.TermInfo.Inspection.TermInfoDatabaseCatalogIssueKind Kind { public get; } null=not-null/unknown
+  PROPERTY System.String Message { public get; } null=not-null/unknown
+  PROPERTY System.String Path { public get; } null=not-null/unknown
+END
+
+TYPE enum Icod.TermInfo.Inspection.TermInfoDatabaseCatalogIssueKind [sealed]
+  INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  UNDERLYING System.Int32
+  ENUM InvalidPlacement = 1
+  ENUM IoFailure = 3
+  ENUM LinkSkipped = 4
+  ENUM MalformedEntry = 0
+  ENUM PermissionFailure = 2
+END
+
+TYPE enum Icod.TermInfo.Inspection.TermInfoDatabaseCatalogKind [sealed]
+  INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  UNDERLYING System.Int32
+  ENUM ConventionalDirectory = 1
+  ENUM Missing = 0
+  ENUM Unavailable = 3
+  ENUM UnsupportedStore = 2
+END
+
 TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseInspector [static]
+  METHOD public static Icod.TermInfo.Inspection.TermInfoDatabaseCatalog InspectDirectory(System.String root null=not-null/not-null, Icod.TermInfo.CompiledTermInfoParserOptions parserOptions null=nullable/nullable default=null) return-null=not-null/not-null
+  METHOD public static Icod.TermInfo.Inspection.TermInfoDatabaseCatalog InspectDirectory(System.String root null=not-null/not-null, Icod.TermInfo.CompiledTermInfoParserOptions parserOptions null=nullable/nullable, System.Threading.CancellationToken cancellationToken null=not-null/not-null) return-null=not-null/not-null
   METHOD public static System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Inspection.TermInfoDatabaseLocation> GetSystemLocations(Icod.TermInfo.SystemTerminalDescriptionProviderOptions options null=nullable/nullable default=null) return-null=not-null/not-null<not-null/not-null>
 END
 

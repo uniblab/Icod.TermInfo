@@ -185,8 +185,9 @@ likewise proves the Compiler package restores through its Runtime and Source
 dependencies and can write and reparse a C01 legacy entry on all three
 frameworks. The Inspection smoke consumer proves the fourth package restores
 with matching Runtime and Source dependencies and exercises the reviewed 1.4
-Inspection public surface, including T02 system database-location inspection,
-without a production Compiler dependency.
+Inspection public surface, including T02 system database-location inspection and
+T03 conventional database catalog enumeration, without a production Compiler
+dependency.
 
 No checked-in runtime fixture is copied into the smoke project, so those checks
 prove the public package surface rather than repository-only outputs.
@@ -324,7 +325,8 @@ and `docs/1.3.0-RELEASE-AUDIT.md` for final release sign-off requirements.
 For the active 1.4 line, use `Icod.TermInfo-1.4.0-Tool-Suite-Roadmap.md` for the
 T01-T11 contract, `docs/1.4.0-PRE-T01-CONTRACT-AUDIT.md` for the command-layer
 foundation, `docs/1.4.0-T02-SYSTEM-DATABASE-LOCATION-INSPECTION.md` for the T02
-discovery seam, and `docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt` for the active
+discovery seam, `docs/1.4.0-T03-CONVENTIONAL-DATABASE-CATALOG.md` for T03 catalog
+enumeration, and `docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt` for the active
 Inspection API contract.
 
 The final `v<PackageVersion>` tag must identify the exact validated and published `main`
