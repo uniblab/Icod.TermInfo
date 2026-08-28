@@ -164,8 +164,8 @@ TYPE enum Icod.TermInfo.Inspection.TerminalDescriptionSourceCapabilityOrder [sea
   UNDERLYING System.Int32
   ENUM Database = 0
   ENUM LongName = 2
-  ENUM TermcapCode = 3
   ENUM TermInfoName = 1
+  ENUM TermcapCode = 3
 END
 
 TYPE enum Icod.TermInfo.Inspection.TerminalDescriptionSourceLayout [sealed]
