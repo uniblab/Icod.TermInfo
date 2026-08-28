@@ -10,10 +10,10 @@
 **Source API contract:** frozen at 1.1  
 **Compiler API contract:** frozen at 1.2  
 **New package:** `Icod.TermInfo.Inspection`
-**Current development version:** `1.3.0-Alpha-6`
+**Current development version:** `1.3.0-Alpha-7`
 **Development sequence:** `1.3.0-Alpha-1` through `1.3.0-Alpha-7`
-**Status:** I06 implementation candidate — build/test/package validation required
-**Current tranche:** I06 — Provider-aware inspection and reusable `infocmp` engine
+**Status:** I07 implementation candidate — build/test/package validation required
+**Current tranche:** I07 — Differential validation, robustness, and API/package freeze
 **Release objective:** reusable managed inspection, canonical rendering, and semantic-comparison APIs underlying future `infocmp`-style tooling without destabilizing the existing Runtime, Source, or Compiler contracts.
 
 ---
@@ -883,6 +883,8 @@ made part of the Icod contract.
 
 **Gate I07:** the Inspection API is deterministic, cross-platform, corpus-backed,
 package-valid, and ready to freeze for 1.3.0.
+
+**Implementation record:** [`docs/1.3.0-I07-DIFFERENTIAL-VALIDATION-AND-FREEZE.md`](docs/1.3.0-I07-DIFFERENTIAL-VALIDATION-AND-FREEZE.md)
 
 ---
 

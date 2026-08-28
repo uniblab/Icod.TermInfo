@@ -7,6 +7,35 @@ The 1.3 line provides the reusable API engine underneath future
 `infocmp`-style tooling while preserving the already-frozen Runtime 1.0, Source
 1.1, and Compiler 1.2 public contracts.
 
+## I07 differential validation, robustness, and API/package freeze
+
+`1.3.0-Alpha-7` closes the 1.3 implementation program without adding another
+production API surface. The reviewed I02-I06 Inspection API is now the candidate
+1.3 contract, and the existing public API baseline is treated as frozen for
+release closure.
+
+I07 adds cross-layer validation which deliberately uses
+`Icod.TermInfo.Compiler` only from the Inspection test project. Effective terminal
+descriptions are rendered through Inspection, compiled from the resulting Source,
+parsed back through Runtime, and compared semantically. The production package
+continues to depend only on Source and Runtime:
+
+```text
+Inspection -> Source -> Runtime
+Inspection ----------> Runtime
+```
+
+The validation corpus covers every built-in profile, the pinned T29 compiled
+fixtures, and the checked-in Source corpus. It also locks exact wrapping
+boundaries, culture-independent and insertion-order-independent comparison
+ordering, source cancellation/disabled/`use=`/duplicate sequencing, and the
+four-package release boundary.
+
+Ordinary CI remains independent of a host ncurses installation. Differential
+evidence is semantic: I07 does not claim byte-for-byte formatting identity with
+`infocmp`, and it does not change the existing Runtime, Source, or Compiler public
+contracts.
+
 ## I06 provider-aware inspection and reusable `infocmp` engine
 
 `1.3.0-Alpha-6` composes the existing Runtime acquisition contract with the I02
@@ -196,10 +225,10 @@ There is no production dependency between Inspection and Compiler.
 
 ## Install
 
-During I06 development:
+During I07 development:
 
 ```text
-dotnet add package Icod.TermInfo.Inspection --version 1.3.0-Alpha-6
+dotnet add package Icod.TermInfo.Inspection --version 1.3.0-Alpha-7
 ```
 
 The package targets `net8.0`, `net9.0`, and `net10.0`, uses C# 13, remains
