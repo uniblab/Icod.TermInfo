@@ -2298,6 +2298,8 @@ A checksum manifest SHALL cover all fourteen package/archive artifacts.
 **Gate T11:** the complete suite is deterministic, cross-platform,
 corpus-backed, hostile-input tested, API-frozen, and ready for release closure.
 
+**Implementation record:** `docs/1.4.0-T11-DIFFERENTIAL-VALIDATION-HOSTILE-INPUT-AND-FREEZE.md`
+
 ---
 
 # 12. 1.4.0 release closure

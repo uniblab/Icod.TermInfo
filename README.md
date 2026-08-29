@@ -61,11 +61,12 @@ infocmp   render and semantically compare terminal descriptions
 toe       enumerate conventional databases and analyze use= dependencies
 ```
 
-At `1.4.0-Alpha-10`, the command surface is hardened for unambiguous clustered
-short options, adopted attached short-option values, `--` end-of-options,
-deterministic diagnostics/presentation, and explicit rejection of unsupported
-ncurses compatibility switches. The command projects remain non-packable and do
-not introduce command-to-command dependencies.
+At `1.4.0-Alpha-11`, the command surface is frozen after differential
+validation against the checked-in ncurses corpus, hostile-input validation,
+API-boundary review, and structural validation of all six command-suite
+archives. The T10 CLI/presentation contract remains unchanged. The command
+projects remain non-packable and do not introduce command-to-command
+dependencies.
 
 The canonical 1.4 distribution model is a framework-dependent .NET 10 suite
 archive for each supported RID:

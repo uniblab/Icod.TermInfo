@@ -9,7 +9,7 @@
 		<AssemblyName>toe</AssemblyName>
 		<RootNamespace>Icod.TermInfo.Toe</RootNamespace>
 		<Configurations>Debug;Release;Staging</Configurations>
-		<Version>1.4.0-Alpha-10</Version>
+		<Version>1.4.0-Alpha-11</Version>
 		<IsPackable>false</IsPackable>
 	</PropertyGroup>
 

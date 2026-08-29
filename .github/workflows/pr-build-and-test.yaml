@@ -44,6 +44,11 @@ jobs:
         shell: bash
         run: bash .github/scripts/build-tool-archives.sh Staging artifacts/tools
 
+      - name: Verify T11 tool-suite archives
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: bash .github/scripts/verify-tool-archives.sh artifacts/tools
+
       - name: Upload validated Staging packages
         if: matrix.os == 'ubuntu-latest'
         uses: actions/upload-artifact@v4

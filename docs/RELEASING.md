@@ -75,8 +75,11 @@ matrix tests.
 Beginning with T10, the Ubuntu PR leg also runs
 `.github/scripts/build-tool-archives.sh Staging artifacts/tools`, requires all six
 framework-dependent suite archives, and uploads them as the
-`icod-terminfo-pr-tools` validation artifact. This is still validation, not
-publication.
+`icod-terminfo-pr-tools` validation artifact. Beginning with T11, the same leg
+runs `.github/scripts/verify-tool-archives.sh artifacts/tools` before upload so
+the six archive names, manifests, command launchers, managed dependencies,
+documentation payload, path safety, and absence of development-only project/PDB
+files are checked. This is still validation, not publication.
 
 That verifier covers generated capability metadata, the frozen runtime API
 baseline, the reviewed Source and Compiler API baselines, the Inspection API
@@ -112,7 +115,9 @@ registry.
 
 Beginning with T10, the Ubuntu main-validation leg also builds and uploads the
 six canonical framework-dependent tool-suite archives as
-`icod-terminfo-main-tools`. The workflow remains validation-only.
+`icod-terminfo-main-tools`. Beginning with T11, those archives must pass the
+structural tool-archive verifier before upload. The workflow remains
+validation-only.
 
 ### Release tags
 
@@ -128,8 +133,10 @@ containing all four package files, all four symbol packages, and a SHA-256
 checksum manifest. Prerelease package versions create GitHub prereleases.
 
 T10 expands GitHub Release assets with six framework-dependent .NET 10 tool-suite
-archives. The command executables are not NuGet global tools and are not
-published to NuGet.org or GitHub Packages.
+archives. T11 requires those archives to pass the same structural verifier used
+by PR and main validation before they become canonical release artifacts. The
+command executables are not NuGet global tools and are not published to
+NuGet.org or GitHub Packages.
 
 ## What the release verifier checks
 
@@ -220,6 +227,16 @@ bash .github/scripts/build-tool-archives.sh Release artifacts/tools
 The builder verifies coordinated project versions, publishes all three commands
 for the six supported RIDs with `--self-contained false`, normalizes archive
 ordering/timestamps, and requires exactly six output archives.
+
+Beginning with T11, immediately validate the archive structure:
+
+```text
+bash .github/scripts/verify-tool-archives.sh artifacts/tools
+```
+
+The verifier checks all six canonical names, archive path safety, suite manifests,
+command launchers/runtime metadata, reusable managed dependencies, documentation,
+and the absence of `.pdb`, `.csproj`, and `.sln` payload files.
 
 Then run the coordinated package verifier with the same configuration used to
 build and pack.
@@ -342,8 +359,14 @@ operational validation contract, `docs/1.4.0-T05-TIC-COMPILATION-AND-DATABASE-PU
 `docs/1.4.0-T06-INFOCMP-ONE-TERMINAL-INSPECTION-AND-RENDERER-CONTROLS.md` for the
 first operational `infocmp` contract,
 `docs/1.4.0-T07-INFOCMP-SEMANTIC-COMPARISON.md` for managed semantic comparison,
-and `docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt` for the active Inspection API
-contract.
+`docs/1.4.0-T08-TOE-CONVENTIONAL-DATABASE-LISTING.md` for conventional database
+listing, `docs/1.4.0-T09-TOE-SOURCE-DEPENDENCY-AND-DUPLICATE-SEMANTICS.md` for
+source dependency analysis,
+`docs/1.4.0-T10-CLI-COMPATIBILITY-PRESENTATION-AND-DISTRIBUTION-HARDENING.md`
+for the hardened suite/distribution contract, and
+`docs/1.4.0-T11-DIFFERENTIAL-VALIDATION-HOSTILE-INPUT-AND-FREEZE.md` for the
+Alpha-11 release-readiness gate. The active Inspection API contract remains
+`docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt`.
 
 The final `v<PackageVersion>` tag must identify the exact validated and published `main`
 commit. Do not edit the audit or any other source/package content after that
