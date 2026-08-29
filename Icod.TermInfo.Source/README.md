@@ -9,17 +9,17 @@ values continue to reference `Icod.TermInfo` alone.
 
 ## Install
 
-For the 1.3.0 release:
+For the 1.4.0 release:
 
 ```text
-dotnet add package Icod.TermInfo.Source --version 1.3.0
+dotnet add package Icod.TermInfo.Source --version 1.4.0
 ```
 
 The package depends on the matching `Icod.TermInfo` version and targets
 `net8.0`, `net9.0`, and `net10.0`.
 
-Version 1.3.0 coordinates Source with the Inspection release and does not change
-the frozen 1.1 source-language public API or semantics.
+Version 1.4.0 coordinates Source with the managed tool-suite release and does
+not change the frozen 1.1 source-language public API or semantics.
 
 ## What the 1.1 line provides
 

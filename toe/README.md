@@ -3,13 +3,12 @@
 `toe` is the managed conventional terminfo database-listing command in the
 `Icod.TermInfo` tool suite.
 
-## T10 status
+## 1.4.0 status
 
-Version `1.4.0-Alpha-10` retains T08/T09 database and source-dependency semantics
-while hardening option parsing, diagnostic layout, help, documentation, and
-framework-dependent suite distribution. Source parsing/resolution remains
-delegated to `Icod.TermInfo.Source`; duplicate equality remains delegated to
-`TerminalDescriptionComparer`.
+Version `1.4.0` ships the frozen T08/T09 database and source-dependency semantics
+with T10 CLI/distribution hardening and the T11 validation gate. Source
+parsing/resolution remains delegated to `Icod.TermInfo.Source`; duplicate
+equality remains delegated to `TerminalDescriptionComparer`.
 
 Supported forms are:
 

@@ -12,16 +12,16 @@
 		<AssemblyName>Icod.TermInfo</AssemblyName>
 		<RootNamespace>Icod.TermInfo</RootNamespace>
 		<Configurations>Debug;Release;Staging</Configurations>
-		<Version>1.4.0-Alpha-11</Version>
+		<Version>1.4.0</Version>
 		<AssemblyVersion>1.0.0.0</AssemblyVersion>
 	</PropertyGroup>
 	<PropertyGroup>
-		<PackageVersion>1.4.0-Alpha-11</PackageVersion>
+		<PackageVersion>1.4.0</PackageVersion>
 		<PackageId>Icod.TermInfo</PackageId>
 		<Title>Icod.TermInfo</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed, dependency-free .NET terminfo library for terminal capability metadata, compiled terminfo parsing and database discovery, ANSI/DEC/xterm and Windows profiles, parameter expansion, color semantics, and padding-aware output.</Description>
-		<PackageReleaseNotes>1.4.0-Alpha-11 freezes the T11 differential, hostile-input, API, and artifact validation gate while preserving the frozen 1.0 public API, dependency-free Runtime boundary, three-target support, and 1.0.0.0 assembly identity. T11 adds no Runtime public API.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.4.0 coordinates the stable Runtime package with the managed tic, infocmp, and toe tool-suite release while preserving the frozen 1.0 Runtime public API, dependency-free package boundary, net8/net9/net10 support, and 1.0.0.0 assembly identity.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>
