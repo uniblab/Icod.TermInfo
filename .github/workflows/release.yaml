@@ -72,6 +72,22 @@ jobs:
               }
           }
 
+          $commandProjects = @(
+              @{ Name = 'tic'; Path = 'tic/Icod.TermInfo.Tic.csproj' },
+              @{ Name = 'infocmp'; Path = 'infocmp/Icod.TermInfo.InfoCmp.csproj' },
+              @{ Name = 'toe'; Path = 'toe/Icod.TermInfo.Toe.csproj' }
+          )
+          foreach ($commandInfo in $commandProjects) {
+              [xml]$commandProject = Get-Content -LiteralPath $commandInfo.Path -Raw
+              $commandVersionNode = $commandProject.SelectSingleNode('/Project/PropertyGroup/Version')
+              if ($null -eq $commandVersionNode) {
+                  throw "$($commandInfo.Name) project must declare Version."
+              }
+              if ($commandVersionNode.InnerText -ne $coordinatedVersion) {
+                  throw "$($commandInfo.Name) Version '$($commandVersionNode.InnerText)' does not match coordinated version '$coordinatedVersion'."
+              }
+          }
+
           if ($tagVersion -ne $coordinatedVersion) {
               throw "Tag version '$tagVersion' does not match coordinated PackageVersion '$coordinatedVersion'."
           }
@@ -132,6 +148,32 @@ jobs:
             artifacts/Icod.TermInfo.Compiler.${{ needs.metadata.outputs.version }}.snupkg
             artifacts/Icod.TermInfo.Inspection.${{ needs.metadata.outputs.version }}.nupkg
             artifacts/Icod.TermInfo.Inspection.${{ needs.metadata.outputs.version }}.snupkg
+          if-no-files-found: error
+          retention-days: 7
+
+  tool-archives:
+    needs: metadata
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build framework-dependent T10 tool-suite archives
+        shell: bash
+        run: bash .github/scripts/build-tool-archives.sh Release artifacts/tools
+
+      - name: Verify T11 tool-suite archives
+        shell: bash
+        run: bash .github/scripts/verify-tool-archives.sh artifacts/tools
+
+      - name: Upload canonical tool-suite archives
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-tool-archives
+          path: artifacts/tools/*
           if-no-files-found: error
           retention-days: 7
 
@@ -241,7 +283,7 @@ jobs:
           }
 
   github-release:
-    needs: [metadata, validate, publish-nuget, publish-github-packages]
+    needs: [metadata, validate, tool-archives, publish-nuget, publish-github-packages]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -251,17 +293,22 @@ jobs:
           name: release-packages
           path: artifacts/release-assets
 
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-tool-archives
+          path: artifacts/release-assets
+
       - name: Create checksums
         shell: pwsh
         run: |
           $assetDirectory = 'artifacts/release-assets'
           $files = @(
               Get-ChildItem -LiteralPath $assetDirectory -File |
-                  Where-Object { $_.Extension -in @('.nupkg', '.snupkg') } |
+                  Where-Object { $_.Extension -in @('.nupkg', '.snupkg', '.zip', '.gz') } |
                   Sort-Object Name
           )
-          if (8 -ne $files.Count) {
-              throw "Expected eight release packages before checksumming; found $($files.Count)."
+          if (14 -ne $files.Count) {
+              throw "Expected eight package artifacts and six tool archives before checksumming; found $($files.Count)."
           }
 
           $lines = foreach ($file in $files) {
@@ -299,18 +346,23 @@ jobs:
           each depend on the matching Runtime and Source packages; Inspection does
           not depend on Compiler.
 
-          All four NuGet packages, all four symbol packages, and SHA-256 checksums
-          are attached to this release.
+          The framework-dependent .NET 10 tool suite is also attached for
+          win-x64, win-arm64, linux-x64, linux-arm64, osx-x64, and osx-arm64.
+          Each tool archive contains `tic`, `infocmp`, and `toe` plus required
+          managed dependencies; the user supplies the .NET 10 runtime.
+
+          All four NuGet packages, all four symbol packages, all six tool-suite
+          archives, and SHA-256 checksums are attached to this release.
           '@ -f $version
 
           $assets = @(
               Get-ChildItem -LiteralPath $assetDirectory -File |
-                  Where-Object { $_.Extension -in @('.nupkg', '.snupkg', '.txt') } |
+                  Where-Object { $_.Extension -in @('.nupkg', '.snupkg', '.zip', '.gz', '.txt') } |
                   Sort-Object Name |
                   ForEach-Object { $_.FullName }
           )
-          if (9 -ne $assets.Count) {
-              throw "Expected nine GitHub Release assets; found $($assets.Count)."
+          if (15 -ne $assets.Count) {
+              throw "Expected fifteen GitHub Release assets; found $($assets.Count)."
           }
 
           $arguments = @(

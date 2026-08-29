@@ -39,6 +39,16 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: bash .github/scripts/verify-release-package.sh artifacts Staging
 
+      - name: Build T10 tool-suite archives
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: bash .github/scripts/build-tool-archives.sh Staging artifacts/tools
+
+      - name: Verify T11 tool-suite archives
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: bash .github/scripts/verify-tool-archives.sh artifacts/tools
+
       - name: Upload validated Staging packages
         if: matrix.os == 'ubuntu-latest'
         uses: actions/upload-artifact@v4
@@ -47,5 +57,14 @@ jobs:
           path: |
             artifacts/*.nupkg
             artifacts/*.snupkg
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Upload validated T10 tool-suite archives
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: icod-terminfo-pr-tools
+          path: artifacts/tools/*
           if-no-files-found: error
           retention-days: 7

@@ -27,6 +27,10 @@ Release validation requires equivalent public API manifests between target
 frameworks and fresh-package execution for each target for every package present
 in that release.
 
+Beginning with T01 in 1.4, the `tic`, `infocmp`, and `toe` command layer targets
+`net10.0`. This command-host choice follows `Icod.CommandFramework 2.0.0` and
+does not remove `net8.0` or `net9.0` from any reusable TermInfo library package.
+
 Dropping a supported target framework is considered a breaking support-contract
 change and normally requires a new major version.
 
@@ -64,6 +68,12 @@ The Inspection 1.3 public API is independently frozen by
 `docs/1.3.0-INSPECTION-PUBLIC-API-BASELINE.txt` and Inspection contract tests.
 I01 started with an empty public surface, I02-I06 established the reviewed API,
 and I07 froze that contract for release.
+
+The active 1.4 Inspection development baseline is
+`docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt`. At T01 it is byte-for-byte
+identical to the frozen 1.3 baseline. Any later 1.4 addition must be compatible,
+reviewed deliberately, and recorded in the 1.4 baseline rather than rewriting
+the released 1.3 contract.
 
 Within 1.x:
 
@@ -174,6 +184,106 @@ unresolved-source rendering, structured effective and source-aware comparison,
 and provider-aware inspection orchestration. Those behaviors are frozen through
 the independent Inspection baseline and its semantic tests.
 
+Beginning with T02 in the 1.4 line, Inspection additionally exposes a read-only
+snapshot of the ordered system database locations considered by Runtime
+discovery. The API distinguishes encoded `TERMINFO`, directory `TERMINFO`, the
+user database, `TERMINFO_DIRS`, and final platform defaults. Encoded payload bytes
+are not exposed. Directory paths are normalized, Runtime precedence and
+platform-specific duplicate handling are preserved, and no database contents are
+enumerated until the separate T03 catalog tranche. Runtime public API remains
+unchanged.
+
+Beginning with T03, Inspection can also enumerate one explicit conventional
+terminfo directory without changing Runtime provider semantics. Enumeration is
+limited to immediate literal first-character and two-digit hexadecimal
+subdirectories, parses candidate bytes through `CompiledTermInfoParser`, applies
+the configured Runtime parser size limit, preserves physical paths and parsed
+terminal identity, reports duplicate canonical identities deterministically, and
+retains malformed/I/O/link/placement issues instead of silently discarding them.
+Arbitrary recursion and hashed/Berkeley DB parsing remain outside the contract.
+
+## T04 `tic` validation compatibility
+
+Beginning with T04 in the 1.4 line, the `net10.0` `tic` command exposes a
+non-mutating validation path over the already-frozen Source and Compiler engines.
+`tic -c` reads one strict UTF-8 source document from a file or standard input,
+parses the complete document, preserves Source diagnostic codes and locations,
+optionally selects canonical names or aliases through `-e`, resolves each selected
+entry and its `use=` graph, and performs compiled representability checks through
+`CompiledTermInfoWriter` entirely in memory.
+
+Without `-x`, selected entries and their reachable parents may use standard and
+known extended capabilities, but a syntactically valid capability classified by
+Source as `UnknownExtended` is a command error. `-x` permits those unknown
+extensions to flow through the existing Source/Compiler semantic model. Source
+parser errors anywhere in the supplied document remain errors even when `-e`
+selects only a subset, because T04 parses the complete source before selection.
+Resolver/representation validation is limited to selected entries and the parents
+needed by their inheritance graphs.
+
+T04 adds no public Runtime, Source, Compiler, or Inspection API. It does not call
+`CompiledTermInfoDatabaseWriter`, create terminfo database directories, or publish
+compiled entries.
+
+## T05 `tic` publication compatibility
+
+Beginning with T05, omitting `-c` after successful source validation publishes the
+selected effective terminal descriptions through the existing frozen
+`CompiledTermInfoDatabaseWriter`. `-o` chooses an explicit conventional database
+root. Without `-o`, command policy considers only directory-valued `TERMINFO`, then
+the Runtime-defined user database. Encoded `TERMINFO`, `TERMINFO_DIRS`, and
+platform-default/system roots are never selected implicitly for writes.
+
+Existing destinations are rejected by default. `--force` maps to the Compiler
+writer's existing explicit overwrite option, while `-s` reports the normalized
+output root, selected entry count, and warning count on standard error. The command
+does not duplicate Compiler path derivation, alias publication, preflight, staging,
+reparse/link rejection, or final move/replace behavior.
+
+The frozen Compiler writer is synchronous, so T05 checks cancellation before the
+publication transaction begins and then treats the writer call as an indivisible
+commit boundary. T05 does not change Runtime, Source, Compiler, or Inspection
+public API.
+
+## T06 `infocmp` rendering compatibility
+
+T06 makes `infocmp` operational for zero/one-terminal inspection. Normal
+acquisition uses `SystemTerminalDescriptionProvider`; `-A` uses an explicit
+`DirectoryTerminalDescriptionProvider` without mutating process discovery
+environment. A clean provider miss remains distinguishable from malformed data or
+other provider failures.
+
+The additive `TerminalDescriptionSourceRendererOptions`,
+`TerminalDescriptionSourceLayout`, and
+`TerminalDescriptionSourceCapabilityOrder` contracts provide reusable layout,
+wrapping, ordering, and extended-capability filtering. Existing 1.3
+`TerminalDescriptionSourceRenderer.Render(TerminalDescription)` and
+`Write(TextWriter, TerminalDescription)` output is unchanged. A parameterless
+options instance selects that same frozen policy.
+
+Standard-capability ordering is ordinal and deterministic within Boolean, numeric,
+and string groups. `infocmp` defaults to standard capabilities and requires `-x`
+to include effective extended capabilities. This filtering changes presentation
+only; it never mutates the acquired `TerminalDescription`. T06 adds no Runtime,
+Source, or Compiler public API.
+
+## T07 `infocmp` comparison compatibility
+
+T07 extends `infocmp` to two or more terminal operands. The first terminal is
+compared with each subsequent terminal. With no explicit `-d`, `-c`, or `-n`
+selector, comparison defaults to semantic differences. `-A` selects the first
+terminal database and `-B` selects the database used for subsequent terminals;
+neither option mutates process environment variables.
+
+Difference mode delegates to the frozen `TerminalDescriptionComparer`; the
+command does not parse rendered source to determine equality. Differences are
+successful command output and return status 0. Common-capability reporting uses
+the already-acquired immutable descriptions and Runtime capability metadata.
+Absent-capability reporting is defined only over the closed standard capability
+catalog and therefore does not invent absent extended names. `-q` changes
+presentation only. T07 adds no Runtime, Source, Compiler, or Inspection public
+API.
+
 ## Discovery and failure compatibility
 
 Runtime discovery precedence, clean-miss behavior, parser failures,
@@ -206,6 +316,12 @@ managed/XML and symbol assets and depends directly on the matching Runtime and
 Source packages. Inspection does not depend on Compiler. Runtime, Source, and
 Compiler do not depend on Inspection.
 
+Beginning with T01, the three command executables sit above this package family.
+They may use `Icod.CommandFramework` and the appropriate TermInfo libraries, but
+no dependency flows back from Runtime, Source, Compiler, or Inspection into the
+command layer. The command projects are non-packable in T01; command distribution
+is a later 1.4 release concern.
+
 The same validated artifacts for a release are used for NuGet.org and GitHub
 Packages.
 
@@ -223,4 +339,8 @@ The 1.3 package family does not promise:
 - curses/virtual-screen behavior;
 - terminal emulation or graphics protocols.
 
-Those remain future or sibling-system work. See `FUTURE-WORK-INVENTORY.md`.
+For 1.4, the first item above becomes active tranche-by-tranche: `tic`,
+`infocmp`, and `toe` are introduced as managed command projects beginning with
+the T01 shell contract. T01 does not yet implement their operational semantics.
+The remaining items continue to be future or sibling-system work. See
+`FUTURE-WORK-INVENTORY.md`.

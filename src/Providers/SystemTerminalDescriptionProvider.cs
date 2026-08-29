@@ -187,9 +187,52 @@ public sealed class SystemTerminalDescriptionProvider
 		};
 	}
 
-	private static SystemTerminalDescriptionProviderOptions SnapshotOptions(
-		SystemTerminalDescriptionProviderOptions? options)
-	{
+	internal static IReadOnlyList<SystemTerminalDatabaseLocation> GetDatabaseLocations(
+		SystemTerminalDescriptionProviderOptions options,
+		SystemTerminalDiscoverySnapshot snapshot,
+		IReadOnlyList<string> defaultRoots
+	) {
+		ArgumentNullException.ThrowIfNull(options);
+		ArgumentNullException.ThrowIfNull(snapshot);
+		ArgumentNullException.ThrowIfNull(defaultRoots);
+
+		List<SystemTerminalDatabaseLocation> locations = [];
+
+		if (options.UseEnvironment
+			&& IsEncodedTermInfo(
+				snapshot.TermInfo
+			)
+		) {
+			locations.Add(
+				new SystemTerminalDatabaseLocation(
+					SystemTerminalDatabaseLocationKind.EncodedTermInfo,
+					null
+				)
+			);
+		}
+
+		DirectorySource[] directorySources =
+			BuildDirectorySources(
+				options,
+				snapshot,
+				defaultRoots
+			);
+
+		foreach (DirectorySource source in directorySources) {
+			locations.Add(
+				new SystemTerminalDatabaseLocation(
+					source.Kind,
+					source.Provider.Root
+				)
+			);
+		}
+
+		return locations.ToArray();
+	}
+
+	internal static SystemTerminalDescriptionProviderOptions SnapshotOptions(
+		SystemTerminalDescriptionProviderOptions? options
+	) {
 		SystemTerminalDescriptionProviderOptions source =
 			options
 			?? new SystemTerminalDescriptionProviderOptions();
@@ -227,6 +270,7 @@ public sealed class SystemTerminalDescriptionProvider
 			AddDirectorySource(
 				snapshot.TermInfo,
 				"TERMINFO",
+				SystemTerminalDatabaseLocationKind.TermInfoDirectory,
 				snapshot.CurrentDirectory,
 				options.ParserOptions,
 				seen,
@@ -249,6 +293,7 @@ public sealed class SystemTerminalDescriptionProvider
 			AddDirectorySource(
 				userRoot,
 				"user database",
+				SystemTerminalDatabaseLocationKind.UserDatabase,
 				snapshot.CurrentDirectory,
 				options.ParserOptions,
 				seen,
@@ -274,6 +319,7 @@ public sealed class SystemTerminalDescriptionProvider
 				AddDirectorySource(
 					root,
 					"TERMINFO_DIRS",
+					SystemTerminalDatabaseLocationKind.TermInfoDirsDirectory,
 					snapshot.CurrentDirectory,
 					options.ParserOptions,
 					seen,
@@ -288,6 +334,7 @@ public sealed class SystemTerminalDescriptionProvider
 				AddDirectorySource(
 					root,
 					"platform default",
+					SystemTerminalDatabaseLocationKind.PlatformDefaultDirectory,
 					snapshot.CurrentDirectory,
 					options.ParserOptions,
 					seen,
@@ -301,6 +348,7 @@ public sealed class SystemTerminalDescriptionProvider
 	private static void AddDirectorySource(
 		string root,
 		string sourceName,
+		SystemTerminalDatabaseLocationKind kind,
 		string currentDirectory,
 		CompiledTermInfoParserOptions parserOptions,
 		ISet<string> seen,
@@ -333,6 +381,7 @@ public sealed class SystemTerminalDescriptionProvider
 		sources.Add(
 			new DirectorySource(
 				sourceName,
+				kind,
 				new DirectoryTerminalDescriptionProvider(
 					fullPath,
 					parserOptions)));
@@ -383,16 +432,23 @@ public sealed class SystemTerminalDescriptionProvider
 	{
 		internal DirectorySource(
 			string sourceName,
+			SystemTerminalDatabaseLocationKind kind,
 			DirectoryTerminalDescriptionProvider provider)
 		{
 			ArgumentNullException.ThrowIfNull(sourceName);
 			ArgumentNullException.ThrowIfNull(provider);
 
 			SourceName = sourceName;
+			Kind = kind;
 			Provider = provider;
 		}
 
 		internal string SourceName
+		{
+			get;
+		}
+
+		internal SystemTerminalDatabaseLocationKind Kind
 		{
 			get;
 		}

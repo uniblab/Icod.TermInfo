@@ -453,7 +453,7 @@ public sealed class I07ValidationTests {
 				);
 
 			Assert.Contains(
-				"1.3.0-INSPECTION-PUBLIC-API-BASELINE.txt",
+				"1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt",
 				verifier
 			);
 			foreach ( string framework in new[] { "net8.0", "net9.0", "net10.0" } ) {
@@ -491,8 +491,8 @@ public sealed class I07ValidationTests {
 		Assert.DoesNotContain( "dotnet nuget push", pullRequest );
 		Assert.DoesNotContain( "dotnet nuget push", pushMain );
 		Assert.Contains( "dotnet nuget push", release );
-		Assert.Contains( "if (8 -ne $files.Count)", release );
-		Assert.Contains( "if (9 -ne $assets.Count)", release );
+		Assert.Contains( "if (14 -ne $files.Count)", release );
+		Assert.Contains( "if (15 -ne $assets.Count)", release );
 		foreach (
 			string packageId
 			in new[] {

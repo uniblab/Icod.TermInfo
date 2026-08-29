@@ -31,8 +31,16 @@ Require(
 Type[] exportedTypes =
 	inspectionAssembly.GetExportedTypes();
 Require(
-	exportedTypes.Length == 11
+	exportedTypes.Length == 22
 		&& exportedTypes.Contains( typeof( TermInfoComparisonResult ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalog ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalogEntry ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalogIssue ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalogIssueKind ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalogKind ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseInspector ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseLocation ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseLocationKind ) )
 		&& exportedTypes.Contains( typeof( TermInfoDifference ) )
 		&& exportedTypes.Contains( typeof( TermInfoDifferenceKind ) )
 		&& exportedTypes.Contains( typeof( TermInfoInspectionComparison ) )
@@ -42,8 +50,11 @@ Require(
 		&& exportedTypes.Contains( typeof( TermInfoSourceComparer ) )
 		&& exportedTypes.Contains( typeof( TermInfoSourceRenderer ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionComparer ) )
-		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceRenderer ) ),
-	"The Inspection package did not expose exactly the reviewed I02-I06 surface."
+		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceCapabilityOrder ) )
+		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceLayout ) )
+		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceRenderer ) )
+		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceRendererOptions ) ),
+	"The Inspection package did not expose exactly the reviewed 1.4 Alpha-6 surface."
 );
 
 Require(
@@ -65,6 +76,38 @@ Require(
 	typeof( TermInfoSourceParser ).Assembly.GetName().Version
 		== new Version( 1, 0, 0, 0 ),
 	"The transitive Source package must retain the stable 1.x assembly identity."
+);
+
+IReadOnlyList<TermInfoDatabaseLocation> disabledLocations =
+	TermInfoDatabaseInspector.GetSystemLocations(
+		new SystemTerminalDescriptionProviderOptions(
+			useEnvironment: false,
+			useUserDatabase: false,
+			useSystemDatabases: false
+		)
+	);
+Require(
+	disabledLocations.Count == 0,
+	"The T02 database inspector did not honor a fully restricted system discovery policy."
+);
+
+string missingCatalogRoot =
+	System.IO.Path.Combine(
+		System.IO.Path.GetTempPath(),
+		$"icod-terminfo-package-smoke-missing-{Guid.NewGuid():N}"
+	);
+TermInfoDatabaseCatalog missingCatalog =
+	TermInfoDatabaseInspector.InspectDirectory(
+		missingCatalogRoot
+	);
+Require(
+	missingCatalog.Kind == TermInfoDatabaseCatalogKind.Missing
+		&& missingCatalog.Root == System.IO.Path.GetFullPath( missingCatalogRoot )
+		&& missingCatalog.Entries.Count == 0
+		&& missingCatalog.Issues.Count == 0
+		&& missingCatalog.DuplicateCanonicalNames.Count == 0
+		&& !missingCatalog.HasIssues,
+	"The T03 database catalog did not report a deterministic missing-root snapshot."
 );
 
 const string source =
@@ -103,6 +146,28 @@ Require(
 			+ "    am,\n"
 			+ "    cols#80,\n",
 	"The I02 renderer did not produce the canonical smoke representation."
+);
+Require(
+	TerminalDescriptionSourceRenderer.Render(
+		terminal,
+		new TerminalDescriptionSourceRendererOptions()
+	) == rendered,
+	"The T06 default renderer options did not preserve the frozen I02 representation."
+);
+string singleLineStandard =
+	TerminalDescriptionSourceRenderer.Render(
+		terminal,
+		new TerminalDescriptionSourceRendererOptions(
+			80,
+			TerminalDescriptionSourceLayout.SingleLine,
+			TerminalDescriptionSourceCapabilityOrder.TermInfoName,
+			includeExtendedCapabilities: false
+		)
+	);
+Require(
+	singleLineStandard
+		== "inspection-smoke|Inspection package smoke, am, cols#80,\n",
+	"The T06 configurable renderer did not honor single-line standard-only presentation."
 );
 TermInfoSourceParseResult reparsed =
 	TermInfoSourceParser.Parse(

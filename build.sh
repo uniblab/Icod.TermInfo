@@ -18,7 +18,7 @@ build()
     printf '\n=== Build ===\n'
     dotnet build Icod.TermInfo.sln -c Debug --no-restore
 }
-+
+
 test()
 {
     printf '\n=== Test ===\n'

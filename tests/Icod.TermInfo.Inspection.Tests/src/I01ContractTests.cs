@@ -5,7 +5,7 @@ using Xunit;
 namespace Icod.TermInfo.Inspection.Tests;
 
 public sealed class I01ContractTests {
-	private const string DevelopmentVersion = "1.3.0";
+	private const string DevelopmentVersion = "1.4.0-Alpha-11";
 	private const string StableAssemblyVersion = "1.0.0.0";
 
 	[Fact]
@@ -73,6 +73,14 @@ public sealed class I01ContractTests {
 		Assert.Equal(
 			new[] {
 				"Icod.TermInfo.Inspection.TermInfoComparisonResult",
+				"Icod.TermInfo.Inspection.TermInfoDatabaseCatalog",
+				"Icod.TermInfo.Inspection.TermInfoDatabaseCatalogEntry",
+				"Icod.TermInfo.Inspection.TermInfoDatabaseCatalogIssue",
+				"Icod.TermInfo.Inspection.TermInfoDatabaseCatalogIssueKind",
+				"Icod.TermInfo.Inspection.TermInfoDatabaseCatalogKind",
+				"Icod.TermInfo.Inspection.TermInfoDatabaseInspector",
+				"Icod.TermInfo.Inspection.TermInfoDatabaseLocation",
+				"Icod.TermInfo.Inspection.TermInfoDatabaseLocationKind",
 				"Icod.TermInfo.Inspection.TermInfoDifference",
 				"Icod.TermInfo.Inspection.TermInfoDifferenceKind",
 				"Icod.TermInfo.Inspection.TermInfoInspectionComparison",
@@ -82,7 +90,10 @@ public sealed class I01ContractTests {
 				"Icod.TermInfo.Inspection.TermInfoSourceComparer",
 				"Icod.TermInfo.Inspection.TermInfoSourceRenderer",
 				"Icod.TermInfo.Inspection.TerminalDescriptionComparer",
+				"Icod.TermInfo.Inspection.TerminalDescriptionSourceCapabilityOrder",
+				"Icod.TermInfo.Inspection.TerminalDescriptionSourceLayout",
 				"Icod.TermInfo.Inspection.TerminalDescriptionSourceRenderer",
+				"Icod.TermInfo.Inspection.TerminalDescriptionSourceRendererOptions",
 			},
 			exportedTypes
 		);
@@ -295,6 +306,39 @@ public sealed class I01ContractTests {
 	}
 
 	[Fact]
+	public void ActiveInspectionBaselineContainsReviewedT06RendererControls() {
+		string root =
+			FindRepositoryRoot();
+		string baseline =
+			NormalizeLineEndings(
+				File.ReadAllText(
+					Path.Combine(
+						root,
+						"docs",
+						"1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt"
+					)
+				)
+			);
+
+		Assert.Contains(
+			"TYPE enum Icod.TermInfo.Inspection.TerminalDescriptionSourceCapabilityOrder [sealed]",
+			baseline
+		);
+		Assert.Contains(
+			"TYPE enum Icod.TermInfo.Inspection.TerminalDescriptionSourceLayout [sealed]",
+			baseline
+		);
+		Assert.Contains(
+			"TYPE class Icod.TermInfo.Inspection.TerminalDescriptionSourceRendererOptions [sealed]",
+			baseline
+		);
+		Assert.Contains(
+			"METHOD public static System.String Render(Icod.TermInfo.TerminalDescription description null=not-null/not-null, Icod.TermInfo.Inspection.TerminalDescriptionSourceRendererOptions options",
+			baseline
+		);
+	}
+
+	[Fact]
 	public void SolutionAndReleasePipelineAreFourPackageAware() {
 		string root =
 			FindRepositoryRoot();
@@ -361,7 +405,7 @@ public sealed class I01ContractTests {
 					)
 				);
 			Assert.Contains(
-				"1.3.0-INSPECTION-PUBLIC-API-BASELINE.txt",
+				"1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt",
 				verifier
 			);
 			Assert.Contains(
@@ -384,11 +428,11 @@ public sealed class I01ContractTests {
 				)
 			);
 		Assert.Contains(
-			"if (8 -ne $files.Count)",
+			"if (14 -ne $files.Count)",
 			release
 		);
 		Assert.Contains(
-			"if (9 -ne $assets.Count)",
+			"if (15 -ne $assets.Count)",
 			release
 		);
 		Assert.Contains(

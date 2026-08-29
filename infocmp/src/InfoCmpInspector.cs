@@ -1,0 +1,248 @@
+using System.Text;
+using Icod.CommandFramework.Diagnostics;
+using Icod.TermInfo.Inspection;
+
+namespace Icod.TermInfo.InfoCmp;
+
+internal static class InfoCmpInspector {
+	internal static async Task<int> RenderAsync(
+		InfoCmpOptions options,
+		Stream stdout,
+		Stream stderr,
+		CancellationToken cancellationToken
+	) {
+		ArgumentNullException.ThrowIfNull( options );
+		ArgumentNullException.ThrowIfNull( stdout );
+		ArgumentNullException.ThrowIfNull( stderr );
+		cancellationToken.ThrowIfCancellationRequested();
+		if ( options.IsComparison ) {
+			throw new ArgumentException(
+				"Comparison options cannot be rendered as one terminal.",
+				nameof( options )
+			);
+		}
+
+		string? requestedName =
+			options.TerminalName
+			?? Environment.GetEnvironmentVariable( "TERM" );
+		if ( string.IsNullOrWhiteSpace( requestedName ) ) {
+			await InfoCmpDiagnosticWriter.WriteErrorAsync(
+				stderr,
+				"INFOCMP0001",
+				"TERM",
+				"no terminal operand was supplied and TERM is missing or empty",
+				cancellationToken
+			).ConfigureAwait( false );
+			return CommandExitCodes.Failure;
+		}
+
+		InfoCmpTerminal? terminal =
+			await AcquireAsync(
+				requestedName,
+				options.DatabaseDirectory,
+				stderr,
+				cancellationToken
+			).ConfigureAwait( false );
+		if ( terminal is null ) {
+			return CommandExitCodes.Failure;
+		}
+
+		cancellationToken.ThrowIfCancellationRequested();
+		string rendered;
+		try {
+			TerminalDescriptionSourceRendererOptions rendererOptions =
+				new(
+					options.LineWidth,
+					options.Layout,
+					options.CapabilityOrder,
+					options.IncludeExtendedCapabilities
+				);
+			rendered =
+				TerminalDescriptionSourceRenderer.Render(
+					terminal.Description,
+					rendererOptions
+				);
+		} catch ( InvalidOperationException exception ) {
+			await InfoCmpDiagnosticWriter.WriteErrorAsync(
+				stderr,
+				"INFOCMP0004",
+				requestedName,
+				exception.Message,
+				cancellationToken
+			).ConfigureAwait( false );
+			return CommandExitCodes.Failure;
+		}
+
+		await WriteAsync(
+			stdout,
+			rendered,
+			cancellationToken
+		).ConfigureAwait( false );
+		return CommandExitCodes.Success;
+	}
+
+	internal static async Task<int> CompareAsync(
+		InfoCmpOptions options,
+		Stream stdout,
+		Stream stderr,
+		CancellationToken cancellationToken
+	) {
+		ArgumentNullException.ThrowIfNull( options );
+		ArgumentNullException.ThrowIfNull( stdout );
+		ArgumentNullException.ThrowIfNull( stderr );
+		cancellationToken.ThrowIfCancellationRequested();
+		if ( !options.IsComparison ) {
+			throw new ArgumentException(
+				"At least two terminal operands are required for comparison.",
+				nameof( options )
+			);
+		}
+
+		List<InfoCmpTerminal> terminals = [];
+		for ( int index = 0; index < options.TerminalNames.Count; index++ ) {
+			cancellationToken.ThrowIfCancellationRequested();
+			string requestedName = options.TerminalNames[ index ];
+			string? databaseDirectory =
+				index == 0
+					? options.DatabaseDirectory
+					: options.ComparisonDatabaseDirectory;
+			InfoCmpTerminal? terminal =
+				await AcquireAsync(
+					requestedName,
+					databaseDirectory,
+					stderr,
+					cancellationToken
+				).ConfigureAwait( false );
+			if ( terminal is null ) {
+				return CommandExitCodes.Failure;
+			}
+			terminals.Add( terminal );
+		}
+
+		cancellationToken.ThrowIfCancellationRequested();
+		string rendered =
+			InfoCmpComparisonRenderer.Render(
+				options,
+				terminals
+			);
+		await WriteAsync(
+			stdout,
+			rendered,
+			cancellationToken
+		).ConfigureAwait( false );
+		return CommandExitCodes.Success;
+	}
+
+	private static async Task<InfoCmpTerminal?> AcquireAsync(
+		string requestedName,
+		string? databaseDirectory,
+		Stream stderr,
+		CancellationToken cancellationToken
+	) {
+		ArgumentException.ThrowIfNullOrWhiteSpace( requestedName );
+		ArgumentNullException.ThrowIfNull( stderr );
+		cancellationToken.ThrowIfCancellationRequested();
+
+		ITerminalDescriptionProvider provider;
+		string displayLabel;
+		try {
+			if ( databaseDirectory is not null ) {
+				DirectoryTerminalDescriptionProvider directoryProvider =
+					new( databaseDirectory );
+				provider = directoryProvider;
+				displayLabel = directoryProvider.Root;
+			} else {
+				provider = new SystemTerminalDescriptionProvider();
+				displayLabel = "system terminfo search";
+			}
+		} catch ( Exception exception ) when ( IsOperationalException( exception ) ) {
+			await InfoCmpDiagnosticWriter.WriteErrorAsync(
+				stderr,
+				"INFOCMP0003",
+				databaseDirectory ?? "system terminfo search",
+				exception.Message,
+				cancellationToken
+			).ConfigureAwait( false );
+			return null;
+		}
+
+		TermInfoInspectionResult? result;
+		try {
+			TermInfoInspectionTarget target =
+				new(
+					provider,
+					requestedName,
+					displayLabel
+				);
+			if ( !TermInfoInspectionEngine.TryInspect(
+					target,
+					out result
+				) ) {
+				await InfoCmpDiagnosticWriter.WriteErrorAsync(
+					stderr,
+					"INFOCMP0002",
+					requestedName,
+					$"terminal is not available from {displayLabel}",
+					cancellationToken
+				).ConfigureAwait( false );
+				return null;
+			}
+		} catch ( Exception exception ) when ( IsOperationalException( exception ) ) {
+			await InfoCmpDiagnosticWriter.WriteErrorAsync(
+				stderr,
+				"INFOCMP0003",
+				requestedName,
+				exception.Message,
+				cancellationToken
+			).ConfigureAwait( false );
+			return null;
+		}
+
+		TermInfoInspectionResult inspected =
+			result
+			?? throw new InvalidOperationException(
+				"Inspection succeeded without a result."
+			);
+		return new InfoCmpTerminal(
+			requestedName,
+			inspected.Terminal
+		);
+	}
+
+	private static bool IsOperationalException(
+		Exception exception
+	) {
+		ArgumentNullException.ThrowIfNull( exception );
+
+		return exception is ArgumentException
+			or IOException
+			or UnauthorizedAccessException
+			or NotSupportedException
+			or FormatException
+			or InvalidOperationException;
+	}
+
+	private static async Task WriteAsync(
+		Stream stream,
+		string text,
+		CancellationToken cancellationToken
+	) {
+		ArgumentNullException.ThrowIfNull( stream );
+		ArgumentNullException.ThrowIfNull( text );
+
+		using StreamWriter writer =
+			new(
+				stream,
+				new UTF8Encoding( false ),
+				bufferSize: 1024,
+				leaveOpen: true
+			);
+		await writer.WriteAsync(
+			text.AsMemory(),
+			cancellationToken
+		).ConfigureAwait( false );
+		await writer.FlushAsync(
+			cancellationToken
+		).ConfigureAwait( false );
+	}
+}

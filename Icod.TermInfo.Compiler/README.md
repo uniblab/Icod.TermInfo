@@ -60,11 +60,10 @@ const string source =
 		lines#40,
 	""";
 
-TermInfoSourceCompilationResult result =
-	TermInfoSourceCompiler.Compile(
-		source,
-		"example.ti"
-	);
+TermInfoSourceCompilationResult result = TermInfoSourceCompiler.Compile(
+	source,
+	"example.ti"
+);
 
 foreach ( CompiledTermInfoSourceEntry entry in result.Entries ) {
 	byte[] compiled = entry.Data;
@@ -96,18 +95,16 @@ encode the description exactly:
 using Icod.TermInfo;
 using Icod.TermInfo.Compiler;
 
-TerminalDescription description =
-	new TerminalDescriptionBuilder( "example" )
-		.SetDescription( "Example terminal" )
-		.SetNumber( NumericCapability.Colors, 16_777_216 )
-		.SetExtendedBoolean( "AX" )
-		.SetExtendedNumber( "RGB", 16_777_216 )
-		.Build();
+TerminalDescription description = new TerminalDescriptionBuilder( "example" )
+	.SetDescription( "Example terminal" )
+	.SetNumber( NumericCapability.Colors, 16_777_216 )
+	.SetExtendedBoolean( "AX" )
+	.SetExtendedNumber( "RGB", 16_777_216 )
+	.Build();
 
-byte[] compiled =
-	CompiledTermInfoWriter.Write(
-		description
-	);
+byte[] compiled = CompiledTermInfoWriter.Write(
+	description
+);
 ```
 
 When every present standard and extended numeric value is in `0..32767`, the
@@ -122,13 +119,12 @@ Use `CompiledTermInfoWriterOptions` when the output representation is part of th
 caller's contract:
 
 ```csharp
-byte[] wide =
-	CompiledTermInfoWriter.Write(
-		description,
-		new CompiledTermInfoWriterOptions(
-			CompiledTermInfoFormat.Wide
-		)
-	);
+byte[] wide = CompiledTermInfoWriter.Write(
+	description,
+	new CompiledTermInfoWriterOptions(
+		CompiledTermInfoFormat.Wide
+	)
+);
 ```
 
 `CompiledTermInfoFormat.Legacy` emits `0432` exactly or fails if any numeric

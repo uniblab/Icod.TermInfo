@@ -16,7 +16,10 @@ The governing distinction is:
 > `Icod.TermInfo.Compiler` owns deterministic compiled-entry writing and the
 > reusable source-to-compiled engine introduced in the 1.2 line.
 > `Icod.TermInfo.Inspection` owns canonical human-readable inspection and
-> semantic comparison beginning with the 1.3 line.
+> semantic comparison beginning with the 1.3 line, plus reusable database
+> location/catalog inspection added during 1.4.
+> The 1.4 `tic`, `infocmp`, and `toe` projects own command-line policy and depend
+> downward on the reusable libraries without changing their ownership.
 > Live terminal conversations, process plumbing, and virtual-screen/UI policy
 > belong elsewhere.**
 
@@ -63,11 +66,22 @@ into the older packages:
 The runtime public contract remains the frozen 1.0 contract. Source-language
 functionality is isolated in `Icod.TermInfo.Source`; compiled writing is isolated
 in `Icod.TermInfo.Compiler`; canonical rendering and semantic comparison are
-isolated in `Icod.TermInfo.Inspection`, whose 1.3 public contract is now frozen.
+isolated in `Icod.TermInfo.Inspection`, whose 1.3 public contract is frozen and
+whose active 1.4 additions now include database-location and conventional catalog
+inspection.
 
 Beginning with 1.2, active package-family validation uses the three-target
 `net8.0`/`net9.0`/`net10.0` matrix. This additive support change does not rewrite
 the frozen 1.0/1.1 target-framework contracts.
+
+Active 1.4 development now adds a `net10.0` command layer. T01 establishes the
+`tic`, `infocmp`, and `toe` shells and command contract; T02 adds reusable system
+database-location inspection; T03 adds reusable conventional database catalog
+enumeration; T04 adds the non-mutating `tic -c` source-validation path; T05
+adds safe conventional database publication through the existing Compiler writer;
+T06 adds one-terminal `infocmp` acquisition plus reviewed reusable Inspection
+renderer controls; and T07 adds managed first-versus-each-subsequent semantic
+comparison, common-capability reporting, and closed-standard absent reporting.
 
 ---
 
@@ -83,7 +97,7 @@ the frozen 1.0/1.1 target-framework contracts.
 | Terminfo source language | completed in 1.1: `.ti`, diagnostics, cancellation, `use=` inheritance, materialization | `Icod.TermInfo.Source` | runtime semantic model |
 | Terminfo compiler | completed in 1.2: deterministic compiled-entry writer, source compiler engine, and safe database-layout output | `Icod.TermInfo.Compiler` | Runtime + Source |
 | Terminfo inspection/comparison | completed in 1.3: canonical effective/source-aware rendering, structured semantic comparison, provider-aware inspection | `Icod.TermInfo.Inspection` | Runtime + Source |
-| Terminfo command-line tooling | future `tic`, `infocmp`, `toe`, conversion applications | later tool projects | Source + Compiler + Inspection as appropriate |
+| Terminfo command-line tooling | active in 1.4: T01 establishes command shells; T02 adds reusable system database-location inspection; T03 adds conventional catalog enumeration; T04 adds non-mutating `tic -c` validation; T05 adds safe `tic` database publication; T06 adds one-terminal `infocmp` acquisition/rendering; T07 adds semantic comparison; later command semantics follow tranche-by-tranche | 1.4 command projects | CommandFramework + Source/Compiler/Inspection as appropriate |
 | Termcap interoperability | termcap syntax, `TERMCAP`, `TERMPATH`, conversion | optional compatibility/tooling | source/conversion model |
 | Live session | raw/cooked/cbreak, restore, tty ownership, full-screen/cursor lifecycle | `Icod.Terminal` | `Icod.TermInfo` + OS interop |
 | Input events | keyboard, modifiers, mouse, focus, paste, resize | `Icod.Terminal` | raw session + incremental decoder |
@@ -177,13 +191,32 @@ surface; and I07 froze the API/package boundary with differential validation.
 Inspection depends directly on Runtime and Source and has no production
 dependency on Compiler.
 
-### 3.4 Termcap conversion
+### 3.4 Command-line tool suite — active in 1.4
+
+The 1.4 line introduces `tic`, `infocmp`, and `toe` as executable command
+projects above the reusable package family. T01 establishes only the shared
+command contract: `net10.0`, `Icod.CommandFramework 2.0.0`, thin process entry
+points, injected streams, deterministic help/version output, conventional exit
+codes, cancellation, and strict dependency direction.
+
+Reusable database discovery and conventional catalog enumeration are supplied by
+T02/T03 in Inspection. T04 composes Source parsing/resolution with Compiler's
+in-memory representation validation to implement `tic -c`. T05 adds database
+publication through `CompiledTermInfoDatabaseWriter`, with explicit destination and
+overwrite policy kept in the command layer. T06 makes `infocmp` operational for
+zero/one-terminal acquisition and effective-source rendering, backed by additive
+Inspection renderer controls which preserve the frozen 1.3 overload output. T07
+adds comparison; `toe` operational behavior remains assigned to T08/T09. The
+command layer must reuse these engines rather than duplicate Source, Compiler,
+Inspection, or Runtime semantics.
+
+### 3.5 Termcap conversion
 
 Termcap is less expressive and introduces its own source/search semantics.
 Support should be treated as an interoperability/tooling feature rather than as
 part of the 0.9 compiled-term acquisition contract.
 
-### 3.5 Hashed database provider
+### 3.6 Hashed database provider
 
 Contemporary ncurses may store compiled entries in a Berkeley DB-backed hashed
 database. 0.9 deliberately avoids that runtime dependency.
@@ -192,7 +225,7 @@ If real user demand appears, the preferred architecture is an optional provider
 which extracts the same compiled entry bytes and passes them to the existing
 0.9 parser.
 
-### 3.6 Divergent historical binary dialects
+### 3.7 Divergent historical binary dialects
 
 Commercial Unix formats that diverged from the selected System V/ncurses
 baseline should be added only from authoritative documentation/fixtures.
@@ -496,13 +529,19 @@ The completed 1.2 Compiler boundary is explicit:
 > explicit conventional database layouts without moving compiler policy into
 > Runtime or Source.
 
-The active 1.3 Inspection boundary is explicit:
+The released 1.3 Inspection boundary is explicit:
 
 > `Icod.TermInfo.Inspection` owns normalized human-readable representation,
 > semantic comparison, structured differences, and reusable inspection
 > orchestration while Runtime, Source, and Compiler retain their frozen APIs.
 
-Command-line tools, termcap, live input, probing, graphics, PTYs, curses, and
-terminal emulation remain valuable future or sibling systems. New work should
-preserve the four package-family ownership boundaries unless a future deliberate
-compatibility review revisits them.
+The active 1.4 command-layer boundary is equally explicit:
+
+> `tic`, `infocmp`, and `toe` own process/CLI policy and compose the frozen
+> managed engines; the commands do not move command-framework dependencies or
+> command semantics into Runtime, Source, Compiler, or Inspection.
+
+Termcap, live input, probing, graphics, PTYs, curses, and terminal emulation
+remain valuable future or sibling systems. New work should preserve the four
+package-family ownership boundaries and the one-way command dependency layer
+unless a future deliberate compatibility review revisits them.

@@ -86,13 +86,13 @@ dotnet run \
   Icod.TermInfo.Inspection/bin/${configuration}/net8.0/Icod.TermInfo.Inspection.dll \
   Icod.TermInfo.Inspection/bin/${configuration}/net10.0/Icod.TermInfo.Inspection.dll
 
-# I01 establishes the independent Inspection baseline before public behavior.
+# The active 1.4 Inspection baseline retains 1.3 and records reviewed 1.4 additions.
 dotnet run \
   --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj \
   -c "${configuration}" \
   --no-build \
   -- --check \
-  docs/1.3.0-INSPECTION-PUBLIC-API-BASELINE.txt \
+  docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt \
   Icod.TermInfo.Inspection/bin/${configuration}/net10.0/Icod.TermInfo.Inspection.dll
 
 # Structural package, Source Link, dependency, and architecture verification.
