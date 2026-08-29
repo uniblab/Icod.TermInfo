@@ -5,13 +5,15 @@ comparison layer for the `Icod.TermInfo` package family.
 
 The 1.3 line established the reusable inspection/comparison engine while
 preserving the already-frozen Runtime 1.0, Source 1.1, and Compiler 1.2 public
-contracts. Version 1.4.0 freezes the reviewed additive database-inspection and
-renderer-control APIs used by the managed tool suite.
+contracts. Version 1.4.0 froze the reviewed additive database-inspection and
+renderer-control APIs used by the managed tool suite. Version 1.4.1 corrects
+release-facing documentation and metadata without changing that frozen API or
+its semantics.
 
 ## Install
 
 ```text
-dotnet add package Icod.TermInfo.Inspection --version 1.4.0
+dotnet add package Icod.TermInfo.Inspection --version 1.4.1
 ```
 
 The package targets `net8.0`, `net9.0`, and `net10.0`, depends on matching
@@ -24,9 +26,9 @@ Runtime and Source packages, and retains no production Compiler dependency.
 difference reporting. Common-capability and absent-standard-capability reporting
 remain command-layer policy over already-acquired immutable descriptions.
 
-T07 adds no Inspection public API. The active
+T07 adds no Inspection public API. The frozen
 `docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt` therefore remains unchanged from
-the reviewed T06 surface.
+the reviewed T06 surface and is retained unchanged by 1.4.1.
 
 ## 1.4 T06 effective-source renderer controls
 
@@ -328,16 +330,17 @@ Compiler   ------------> Runtime
 
 There is no production dependency between Inspection and Compiler.
 
-## Install
+## Historical 1.3 package contract
 
-For the 1.3.0 release:
+For the 1.3.0 release, the package installed as:
 
 ```text
 dotnet add package Icod.TermInfo.Inspection --version 1.3.0
 ```
 
-The package targets `net8.0`, `net9.0`, and `net10.0`, uses C# 13, remains
-unsigned, and retains assembly version `1.0.0.0` throughout the 1.x line.
+The package targeted `net8.0`, `net9.0`, and `net10.0`, used C# 13, remained
+unsigned, and retained assembly version `1.0.0.0`; those 1.x identity and target
+framework guarantees continue in 1.4.1.
 
 ## Ownership boundary
 

@@ -30,7 +30,7 @@ public sealed class T45CompletionGateTests {
 					2 )[ 0 ];
 
 		Assert.Equal(
-			"1.4.0",
+			"1.4.1",
 			semanticVersion );
 	}
 
@@ -46,12 +46,12 @@ public sealed class T45CompletionGateTests {
 				LoadOptions.None );
 
 		Assert.Equal(
-			"1.4.0",
+			"1.4.1",
 			ReadRequiredProperty(
 				project,
 				"Version" ) );
 		Assert.Equal(
-			"1.4.0",
+			"1.4.1",
 			ReadRequiredProperty(
 				project,
 				"PackageVersion" ) );
@@ -78,19 +78,22 @@ public sealed class T45CompletionGateTests {
 					"README.md" ) );
 
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo --version 1.4.0",
+			"dotnet add package Icod.TermInfo --version 1.4.1",
 			readme );
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo.Source --version 1.4.0",
+			"dotnet add package Icod.TermInfo.Source --version 1.4.1",
 			readme );
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo.Compiler --version 1.4.0",
+			"dotnet add package Icod.TermInfo.Compiler --version 1.4.1",
 			readme );
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo.Inspection --version 1.4.0",
+			"dotnet add package Icod.TermInfo.Inspection --version 1.4.1",
 			readme );
 		Assert.DoesNotContain(
 			"1.4.0-Alpha-11",
+			readme );
+		Assert.DoesNotContain(
+			"1.4.1-Alpha",
 			readme );
 		Assert.Contains(
 			"docs/VERSIONING.md",
@@ -99,7 +102,7 @@ public sealed class T45CompletionGateTests {
 			"docs/COMPATIBILITY.md",
 			readme );
 		Assert.Contains(
-			"docs/1.4.0-RELEASE-AUDIT.md",
+			"docs/1.4.1-RELEASE-AUDIT.md",
 			readme );
 	}
 

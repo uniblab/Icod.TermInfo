@@ -37,8 +37,9 @@ deliberately with `docs/1.0.0-PUBLIC-API-BASELINE.txt`; Source API changes must
 be reconciled with `docs/1.1.0-SOURCE-PUBLIC-API-BASELINE.txt`. Do not regenerate
 either baseline merely to silence a mismatch. Compiler API changes must likewise
 be reconciled with `docs/1.2.0-COMPILER-PUBLIC-API-BASELINE.txt`. The frozen
-1.3 Inspection baseline remains historical; additive 1.4 Inspection changes must
-be reconciled with `docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt`.
+1.3 Inspection baseline remains historical; the reviewed 1.4 Inspection surface
+is frozen by `docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt`, which patch
+releases such as 1.4.1 must preserve unchanged.
 
 ## Version metadata
 
@@ -160,8 +161,10 @@ Inspection depends on Runtime and Source but not on Compiler, and it does not
 enlarge the frozen Runtime, Source, or Compiler public contracts.
 
 Live session ownership, input-event decoding, curses/UI behavior, PTY/ConPTY
-lifecycle, terminal probing, command-line `tic`/`infocmp`/`toe` applications,
-termcap interoperability, and terminal emulation remain outside the current
-package-family scope.
+lifecycle, terminal probing, termcap interoperability, and terminal emulation
+remain outside the reusable package-family scope. The released `tic`, `infocmp`,
+and `toe` applications form a separate command layer above that family rather
+than becoming library-package responsibilities.
 
-See `docs/FUTURE-WORK-INVENTORY.md` for the maintained project-family boundary.
+See `docs/FUTURE-WORK-INVENTORY.md` for the historical planning inventory which
+established the project-family boundary.

@@ -69,11 +69,11 @@ The Inspection 1.3 public API is independently frozen by
 I01 started with an empty public surface, I02-I06 established the reviewed API,
 and I07 froze that contract for release.
 
-The active 1.4 Inspection development baseline is
-`docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt`. At T01 it is byte-for-byte
-identical to the frozen 1.3 baseline. Any later 1.4 addition must be compatible,
-reviewed deliberately, and recorded in the 1.4 baseline rather than rewriting
-the released 1.3 contract.
+The frozen 1.4 Inspection baseline is
+`docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt`. T01 began from the frozen 1.3
+surface; the reviewed T02/T03 database-inspection additions and T06 renderer
+controls were added compatibly and frozen at 1.4.0. Patch release 1.4.1 reuses
+that baseline unchanged rather than creating a new API contract.
 
 Within 1.x:
 
@@ -316,20 +316,19 @@ managed/XML and symbol assets and depends directly on the matching Runtime and
 Source packages. Inspection does not depend on Compiler. Runtime, Source, and
 Compiler do not depend on Inspection.
 
-Beginning with T01, the three command executables sit above this package family.
-They may use `Icod.CommandFramework` and the appropriate TermInfo libraries, but
-no dependency flows back from Runtime, Source, Compiler, or Inspection into the
-command layer. The command projects are non-packable in T01; command distribution
-is a later 1.4 release concern.
+Beginning with 1.4, the three command executables sit above this package
+family. They may use `Icod.CommandFramework` and the appropriate TermInfo
+libraries, but no dependency flows back from Runtime, Source, Compiler, or
+Inspection into the command layer. The command projects remain non-packable and
+are distributed together as six framework-dependent .NET 10 suite archives.
 
-The same validated artifacts for a release are used for NuGet.org and GitHub
-Packages.
+The same validated package artifacts for a release are used for NuGet.org and
+GitHub Packages.
 
 ## Explicit non-goals
 
-The 1.3 package family does not promise:
+The reusable `Icod.TermInfo` package family does not promise:
 
-- `tic`, `infocmp`, or `toe` command-line applications;
 - termcap parsing/conversion;
 - Berkeley DB/hashed terminfo stores;
 - divergent undocumented vendor binary dialects;
@@ -339,8 +338,9 @@ The 1.3 package family does not promise:
 - curses/virtual-screen behavior;
 - terminal emulation or graphics protocols.
 
-For 1.4, the first item above becomes active tranche-by-tranche: `tic`,
-`infocmp`, and `toe` are introduced as managed command projects beginning with
-the T01 shell contract. T01 does not yet implement their operational semantics.
-The remaining items continue to be future or sibling-system work. See
-`FUTURE-WORK-INVENTORY.md`.
+The 1.4 line does provide the separately distributed managed `tic`, `infocmp`,
+and `toe` command applications. Their compatibility target is the frozen 1.4
+mainstream terminfo workflow contract; exhaustive ncurses option compatibility
+is not claimed. The remaining items stay outside the reusable TermInfo package
+family and belong to later or sibling-system work. The historical architecture
+inventory is retained in `FUTURE-WORK-INVENTORY.md`.
