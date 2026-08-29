@@ -37,6 +37,22 @@ public static class Command {
 		}
 
 		try {
+			InfoCmpCommandLineNormalizationResult normalized =
+				InfoCmpCommandLineNormalizer.Normalize( args );
+			if ( normalized.Error is string normalizationError ) {
+				await WriteUsageErrorAsync(
+					stderr,
+					normalizationError,
+					cancellationToken
+				).ConfigureAwait( false );
+				return CommandExitCodes.UsageError;
+			}
+			args =
+				normalized.Arguments
+				?? throw new InvalidOperationException(
+					"The infocmp command-line normalizer returned neither arguments nor an error."
+				);
+
 			if ( IsSingleArgument( args, "--help" ) ) {
 				await WriteAsync(
 					stdout,
@@ -221,6 +237,7 @@ public static class Command {
 			+ $"Sort keys: d=compiled-table order, i=terminfo short name, l=long variable name, c=termcap code.{Environment.NewLine}"
 			+ $"Default source listing and comparison capability reports include standard capabilities only; use -x for extended capabilities.{Environment.NewLine}"
 			+ $"The -n universe is the closed standard capability catalog even when -x is supplied.{Environment.NewLine}"
+			+ $"Unambiguous short options may be clustered; -A, -B, -w, and -s accept attached values; use -- before a terminal name beginning with '-'.{Environment.NewLine}"
 			+ $"Rendered source output is effective state; original comments, whitespace, use= history, cancellations, and provenance are not reconstructed.{Environment.NewLine}";
 	}
 

@@ -490,6 +490,11 @@ internal static class InfoCmpOptionsParser {
 		}
 
 		if ( currentMode.HasValue ) {
+			if ( currentMode.Value == requestedMode ) {
+				error = null;
+				return true;
+			}
+
 			error = "options '-d', '-c', and '-n' are mutually exclusive";
 			return false;
 		}

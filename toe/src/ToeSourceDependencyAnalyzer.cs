@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using Icod.TermInfo.Source;
 
@@ -254,14 +255,20 @@ internal static class ToeSourceDependencyAnalyzer {
 			TermInfoSourceSpan? span = diagnostic.Span;
 			string location = span is null
 				? "source"
-				: $"{span.SourceName ?? "source"}:{span.Line}:{span.Column}"
+				: string.Concat(
+					span.SourceName ?? "source",
+					":",
+					span.Line.ToString( CultureInfo.InvariantCulture ),
+					":",
+					span.Column.ToString( CultureInfo.InvariantCulture )
+				)
 			;
 			output
 				.Append( "toe: " )
-				.Append( diagnostic.Code )
-				.Append( ": " )
 				.Append( location )
 				.Append( ": " )
+				.Append( diagnostic.Code )
+				.Append( ' ' )
 				.Append(
 					diagnostic.Severity == TermInfoSourceDiagnosticSeverity.Error
 						? "error"
@@ -283,11 +290,11 @@ internal static class ToeSourceDependencyAnalyzer {
 		return string.Join(
 			'\u001f',
 			diagnostic.Code,
-			((int)diagnostic.Severity).ToString( System.Globalization.CultureInfo.InvariantCulture ),
+			((int)diagnostic.Severity).ToString( CultureInfo.InvariantCulture ),
 			diagnostic.Message,
 			span?.SourceName ?? string.Empty,
-			span?.Offset.ToString( System.Globalization.CultureInfo.InvariantCulture ) ?? string.Empty,
-			span?.Length.ToString( System.Globalization.CultureInfo.InvariantCulture ) ?? string.Empty
+			span?.Offset.ToString( CultureInfo.InvariantCulture ) ?? string.Empty,
+			span?.Length.ToString( CultureInfo.InvariantCulture ) ?? string.Empty
 		);
 	}
 
@@ -298,7 +305,7 @@ internal static class ToeSourceDependencyAnalyzer {
 		ArgumentException.ThrowIfNullOrWhiteSpace( sourcePath );
 		ArgumentNullException.ThrowIfNull( message );
 
-		return $"toe: {InputCode}: {sourcePath}: {message}{Environment.NewLine}";
+		return $"toe: {sourcePath}: {InputCode} error: {message}{Environment.NewLine}";
 	}
 
 	private static async Task<(string? Source, string? Error)> ReadSourceAsync(

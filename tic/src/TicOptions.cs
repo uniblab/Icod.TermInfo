@@ -104,9 +104,38 @@ internal static class TicOptionsParser {
 		List<string> selectedNames = [];
 		string? outputDirectory = null;
 		string? sourceOperand = null;
+		bool optionsEnded = false;
 
 		for ( int index = 0; index < args.Count; index++ ) {
 			string argument = args[ index ];
+
+			if (
+				!optionsEnded
+				&& string.Equals(
+					argument,
+					"--",
+					StringComparison.Ordinal
+				)
+			) {
+				optionsEnded = true;
+				continue;
+			}
+
+			if ( optionsEnded ) {
+				if ( string.IsNullOrWhiteSpace( argument ) ) {
+					return TicOptionsParseResult.FromError(
+						"source operand must not be empty or whitespace"
+					);
+				}
+				if ( sourceOperand is not null ) {
+					return TicOptionsParseResult.FromError(
+						"exactly one source operand is required"
+					);
+				}
+				sourceOperand = argument;
+				continue;
+			}
+
 			switch ( argument ) {
 				case "-c":
 					checkOnly = true;
@@ -184,6 +213,11 @@ internal static class TicOptionsParser {
 					if ( argument.StartsWith( "-", StringComparison.Ordinal ) ) {
 						return TicOptionsParseResult.FromError(
 							$"unsupported option '{argument}'"
+						);
+					}
+					if ( string.IsNullOrWhiteSpace( argument ) ) {
+						return TicOptionsParseResult.FromError(
+							"source operand must not be empty or whitespace"
 						);
 					}
 					if ( sourceOperand is not null ) {

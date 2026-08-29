@@ -7,7 +7,7 @@ using Xunit;
 namespace Icod.TermInfo.Source.Tests;
 
 public sealed class S06ContractTests {
-	private const string DevelopmentVersion = "1.4.0-Alpha-9";
+	private const string DevelopmentVersion = "1.4.0-Alpha-10";
 	private const string StableAssemblyVersion = "1.0.0.0";
 
 	[Fact]	public void SourceAndRuntimePackagesAdvanceTogetherWithoutChangingAssemblyIdentity() {

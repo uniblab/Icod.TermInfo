@@ -16,9 +16,9 @@ This document describes the current validation and publication procedure for the
 - Supported consumer targets for the 1.4 line are `net8.0`, `net9.0`, and `net10.0`.
 - Beginning with T01 in 1.4, the `tic`, `infocmp`, and `toe` command projects
   target `net10.0`; the four reusable library packages retain all three targets.
-- The T01 command projects are non-packable solution executables. Library-package
-  publication remains the existing four-package workflow until a later 1.4
-  command-distribution tranche deliberately changes that contract.
+- The command projects remain non-packable solution executables. Beginning with
+  T10, command distribution uses six framework-dependent .NET 10 suite archives;
+  the four NuGet library packages remain the only registry-published artifacts.
 - A release tag must be exactly `v<PackageVersion>` and is the only repository
   event which may publish packages.
 - Release validation must pass on Windows, Linux, and macOS on `main` before a
@@ -72,9 +72,11 @@ There is no second checkout/restore/build/test package-validation job; all four
 packages are produced from the same Staging outputs which just passed the Ubuntu
 matrix tests.
 
-The T01 commands are not packed by this step. Their cross-platform gate is the
-whole-solution build/test matrix; command artifact/distribution validation is
-deferred until the later 1.4 distribution contract is defined.
+Beginning with T10, the Ubuntu PR leg also runs
+`.github/scripts/build-tool-archives.sh Staging artifacts/tools`, requires all six
+framework-dependent suite archives, and uploads them as the
+`icod-terminfo-pr-tools` validation artifact. This is still validation, not
+publication.
 
 That verifier covers generated capability metadata, the frozen runtime API
 baseline, the reviewed Source and Compiler API baselines, the Inspection API
@@ -108,9 +110,9 @@ The main-branch workflow stops after validation and artifact upload. It has only
 `contents: read` permission and never authenticates to or pushes to a package
 registry.
 
-During the T01 1.4 foundation, this workflow continues to upload only the
-canonical four-library validation artifact; command distribution is not added
-implicitly.
+Beginning with T10, the Ubuntu main-validation leg also builds and uploads the
+six canonical framework-dependent tool-suite archives as
+`icod-terminfo-main-tools`. The workflow remains validation-only.
 
 ### Release tags
 
@@ -125,10 +127,9 @@ NuGet.org and GitHub Packages. Finally, the workflow creates a GitHub Release
 containing all four package files, all four symbol packages, and a SHA-256
 checksum manifest. Prerelease package versions create GitHub prereleases.
 
-T01 does not expand that publication surface. Any later decision to distribute
-the command executables through GitHub Release assets, framework-dependent
-bundles, or another mechanism must be introduced and validated explicitly before
-the 1.4 release tag is created.
+T10 expands GitHub Release assets with six framework-dependent .NET 10 tool-suite
+archives. The command executables are not NuGet global tools and are not
+published to NuGet.org or GitHub Packages.
 
 ## What the release verifier checks
 
@@ -207,11 +208,21 @@ dotnet pack Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj -c Release 
 ```
 
 Beginning with T01, the solution restore/build/test commands above also build and
-test `tic`, `infocmp`, and `toe`. Do not add command `dotnet pack` steps in T01;
-they are non-packable executables and their distribution contract is not frozen.
+test `tic`, `infocmp`, and `toe`. The command projects remain non-packable.
 
-Then run the coordinated verifier with the same configuration used to build and
-pack.
+Beginning with T10, build the six framework-dependent suite archives on a
+Bash-capable host with the .NET 10 SDK plus `zip`, GNU `tar`, and `gzip`:
+
+```text
+bash .github/scripts/build-tool-archives.sh Release artifacts/tools
+```
+
+The builder verifies coordinated project versions, publishes all three commands
+for the six supported RIDs with `--self-contained false`, normalizes archive
+ordering/timestamps, and requires exactly six output archives.
+
+Then run the coordinated package verifier with the same configuration used to
+build and pack.
 
 For Staging:
 
@@ -292,8 +303,8 @@ After a final version is published:
 - confirm fresh Runtime, Source, Compiler, and Inspection consumers can restore
   the final version;
 - verify the published version came from the expected immutable release tag;
-- confirm the GitHub Release contains all eight package artifacts plus
-  `SHA256SUMS.txt`;
+- confirm the GitHub Release contains all eight package artifacts, all six
+  framework-dependent tool-suite archives, and `SHA256SUMS.txt`;
 - treat subsequent public API or package-content changes as changes for the next
   version.
 

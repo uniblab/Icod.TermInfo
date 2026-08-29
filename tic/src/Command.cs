@@ -37,6 +37,22 @@ public static class Command {
 		}
 
 		try {
+			TicCommandLineNormalizationResult normalized =
+				TicCommandLineNormalizer.Normalize( args );
+			if ( normalized.Error is string normalizationError ) {
+				await WriteUsageErrorAsync(
+					stderr,
+					normalizationError,
+					cancellationToken
+				).ConfigureAwait( false );
+				return CommandExitCodes.UsageError;
+			}
+			args =
+				normalized.Arguments
+				?? throw new InvalidOperationException(
+					"The tic command-line normalizer returned neither arguments nor an error."
+				);
+
 			if ( IsSingleArgument( args, "--help" ) ) {
 				await WriteAsync(
 					stdout,
@@ -179,6 +195,7 @@ public static class Command {
 			+ $"      --help      display this help and exit{Environment.NewLine}"
 			+ Environment.NewLine
 			+ $"Use '-' as file to read strict UTF-8 source from standard input.{Environment.NewLine}"
+			+ $"Unambiguous short options may be clustered; -e and -o accept attached values; use -- before a source filename beginning with '-'.{Environment.NewLine}"
 			+ $"Without -o, publication uses directory-valued TERMINFO, then the Runtime-defined user database; system roots are never selected implicitly.{Environment.NewLine}";
 	}
 

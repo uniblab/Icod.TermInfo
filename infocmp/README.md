@@ -2,13 +2,13 @@
 
 `infocmp` is part of the `Icod.TermInfo` managed terminfo tool suite.
 
-## T09 status
+## T10 status
 
-Version `1.4.0-Alpha-9` retains the T07 deterministic semantic comparison and
-T06 one-terminal acquisition/rendering behavior while T09 work is isolated to
-`toe`.
+Version `1.4.0-Alpha-10` retains the T06/T07 acquisition, rendering, and semantic
+comparison engines while hardening syntax, help, diagnostics, documentation,
+and suite distribution. T10 adds no new comparison engine.
 
-Supported through T09:
+Supported through T10:
 
 ```text
 infocmp [options] [terminal ...]
@@ -76,3 +76,81 @@ whitespace, `use=` history, cancellations, disabled fields, or source provenance
 
 The command targets .NET 10. The reusable `Icod.TermInfo` libraries remain
 available for `net8.0`, `net9.0`, and `net10.0`.
+
+## Synopsis
+
+```text
+infocmp [options] [terminal ...]
+infocmp -D
+infocmp -V
+infocmp --version
+infocmp --help
+```
+
+## Options
+
+```text
+-A directory    explicit database for the first terminal
+-B directory    explicit database for subsequent terminals
+-0              one logical source line
+-1              one capability per line
+-w width        canonical wrapping width
+-s d|i|l|c      capability ordering key
+-d              semantic differences
+-c              common effective capabilities
+-n              standard capabilities absent from all operands
+-q              short comparison presentation
+-x              include effective extended capabilities where defined
+-D              report Runtime database discovery locations
+-V, --version   print the coordinated tool-suite version
+--help          display help
+--              end option parsing
+```
+
+Unambiguous short options may be clustered. `-A`, `-B`, `-w`, and `-s` accept
+separated or attached values. Repeating the same comparison selector is
+idempotent; conflicting `-d`, `-c`, and `-n` selectors remain a usage error.
+
+## Operands
+
+With no terminal operand, `TERM` supplies the one-terminal name. One operand is
+rendered. Two or more operands compare the first terminal against each later
+terminal. Use `--` before a terminal name beginning with `-`.
+
+## Environment
+
+`TERM` is read only for zero-operand one-terminal inspection. `-A` and `-B`
+construct explicit directory providers and do not mutate `TERMINFO` or other
+process environment variables. Without an explicit database for a side, normal
+Runtime system discovery is used.
+
+## Exit statuses
+
+```text
+0    successful rendering/comparison, including semantic differences
+1    acquisition/database/operational failure
+2    usage error
+130  cancellation
+```
+
+## Examples
+
+```text
+infocmp xterm
+infocmp -1 -xd xterm xterm-256color
+infocmp -w120 xterm
+infocmp -A./first -B./second -q terminal terminal
+```
+
+## Compatibility
+
+Icod uses `TerminalDescriptionComparer` and the Inspection renderer as the
+authoritative semantic engines. Exact ncurses comments, whitespace, provenance,
+or source reconstruction are not claimed. Unsupported ncurses switches are
+reported as usage errors rather than ignored.
+
+## Non-goals
+
+T10 does not add termcap conversion, relative `use=` synthesis, C initializer
+generation, initialization-string analysis, vendor subsets, padding-insensitive
+comparison, or Compiler-backed `-Q` output.

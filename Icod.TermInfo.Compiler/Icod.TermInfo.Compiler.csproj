@@ -12,17 +12,17 @@
 		<AssemblyName>Icod.TermInfo.Compiler</AssemblyName>
 		<RootNamespace>Icod.TermInfo.Compiler</RootNamespace>
 		<Configurations>Debug;Release;Staging</Configurations>
-		<Version>1.4.0-Alpha-9</Version>
+		<Version>1.4.0-Alpha-10</Version>
 		<AssemblyVersion>1.0.0.0</AssemblyVersion>
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<PackageVersion>1.4.0-Alpha-9</PackageVersion>
+		<PackageVersion>1.4.0-Alpha-10</PackageVersion>
 		<PackageId>Icod.TermInfo.Compiler</PackageId>
 		<Title>Icod.TermInfo.Compiler</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed deterministic terminfo compiler for Icod.TermInfo. The 1.2 line compiles .ti source or immutable TerminalDescription values and can publish explicit conventional terminfo directory layouts without native ncurses dependencies.</Description>
-		<PackageReleaseNotes>1.4.0-Alpha-9 coordinates Compiler with the tool-suite development line while managed toe T09 remains independent of Compiler in production, preserving the frozen 1.2 public API, production dependency graph, and 1.0.0.0 assembly identity. T09 adds no Compiler public API.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.4.0-Alpha-10 coordinates Compiler with tool-suite CLI, documentation, and distribution hardening while preserving the frozen 1.2 public API, production dependency graph, and 1.0.0.0 assembly identity. T10 adds no Compiler public API.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>
