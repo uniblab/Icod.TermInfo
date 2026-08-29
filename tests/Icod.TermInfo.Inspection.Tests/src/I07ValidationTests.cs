@@ -491,8 +491,8 @@ public sealed class I07ValidationTests {
 		Assert.DoesNotContain( "dotnet nuget push", pullRequest );
 		Assert.DoesNotContain( "dotnet nuget push", pushMain );
 		Assert.Contains( "dotnet nuget push", release );
-		Assert.Contains( "if (8 -ne $files.Count)", release );
-		Assert.Contains( "if (9 -ne $assets.Count)", release );
+		Assert.Contains( "if (14 -ne $files.Count)", release );
+		Assert.Contains( "if (15 -ne $assets.Count)", release );
 		foreach (
 			string packageId
 			in new[] {

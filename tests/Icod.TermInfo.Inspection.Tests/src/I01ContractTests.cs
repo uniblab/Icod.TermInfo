@@ -428,11 +428,11 @@ public sealed class I01ContractTests {
 				)
 			);
 		Assert.Contains(
-			"if (8 -ne $files.Count)",
+			"if (14 -ne $files.Count)",
 			release
 		);
 		Assert.Contains(
-			"if (9 -ne $assets.Count)",
+			"if (15 -ne $assets.Count)",
 			release
 		);
 		Assert.Contains(
