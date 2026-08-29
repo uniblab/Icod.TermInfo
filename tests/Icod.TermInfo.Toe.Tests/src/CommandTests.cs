@@ -26,6 +26,8 @@ public sealed class CommandTests {
 		Assert.Contains( "-a", ReadText( stdout ) );
 		Assert.Contains( "-h", ReadText( stdout ) );
 		Assert.Contains( "-s", ReadText( stdout ) );
+		Assert.Contains( "-u", ReadText( stdout ) );
+		Assert.Contains( "-U", ReadText( stdout ) );
 		Assert.Contains( "-D", ReadText( stdout ) );
 		Assert.Empty( ReadText( stderr ) );
 	}
@@ -46,7 +48,7 @@ public sealed class CommandTests {
 		);
 
 		Assert.Equal( CommandExitCodes.Success, status );
-		Assert.Contains( "1.4.0-Alpha-8", ReadText( stdout ) );
+		Assert.Contains( "1.4.0-Alpha-9", ReadText( stdout ) );
 		Assert.Empty( ReadText( stderr ) );
 	}
 
@@ -71,13 +73,13 @@ public sealed class CommandTests {
 	[Theory]
 	[InlineData( "-u" )]
 	[InlineData( "-U" )]
-	public async Task T09DependencyOptionsRemainDeferred( string option ) {
+	public async Task SourceDependencyModeRequiresExactlyOneOperand( string option ) {
 		using var stdin = new MemoryStream();
 		using var stdout = new MemoryStream();
 		using var stderr = new MemoryStream();
 
 		int status = await Command.RunAsync(
-			[ option, "example.ti" ],
+			[ option ],
 			stdin,
 			stdout,
 			stderr
@@ -85,7 +87,7 @@ public sealed class CommandTests {
 
 		Assert.Equal( CommandExitCodes.UsageError, status );
 		Assert.Empty( ReadText( stdout ) );
-		Assert.Contains( "introduced by T09", ReadText( stderr ) );
+		Assert.Contains( "exactly one source file operand", ReadText( stderr ) );
 	}
 
 	[Fact]

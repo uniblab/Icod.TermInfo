@@ -92,6 +92,55 @@ public static class Command {
 			}
 
 			if (
+				args.Length > 0
+				&& (
+					string.Equals( args[ 0 ], "-u", StringComparison.Ordinal )
+					|| string.Equals( args[ 0 ], "-U", StringComparison.Ordinal )
+				)
+			) {
+				if (
+					args.Length != 2
+					|| string.IsNullOrWhiteSpace( args[ 1 ] )
+				) {
+					await WriteUsageErrorAsync(
+						stderr,
+						$"source dependency option '{args[ 0 ]}' requires exactly one source file operand",
+						cancellationToken
+					).ConfigureAwait( false );
+					return CommandExitCodes.UsageError;
+				}
+
+				ToeSourceDependencyResult dependency =
+					await ToeSourceDependencyAnalyzer.AnalyzeAsync(
+						args[ 1 ],
+						string.Equals( args[ 0 ], "-u", StringComparison.Ordinal )
+							? ToeSourceDependencyMode.Forward
+							: ToeSourceDependencyMode.Reverse,
+						cancellationToken
+					).ConfigureAwait( false );
+
+				if ( dependency.Stdout.Length != 0 ) {
+					await WriteAsync(
+						stdout,
+						dependency.Stdout,
+						cancellationToken
+					).ConfigureAwait( false );
+				}
+				if ( dependency.Stderr.Length != 0 ) {
+					await WriteAsync(
+						stderr,
+						dependency.Stderr,
+						cancellationToken
+					).ConfigureAwait( false );
+				}
+
+				return dependency.HasOperationalFailure
+					? CommandExitCodes.Failure
+					: CommandExitCodes.Success
+				;
+			}
+
+			if (
 				!TryParseOptions(
 					args,
 					out ToeOptions options,
@@ -176,6 +225,10 @@ public static class Command {
 		bool hasOperationalFailure = false;
 		bool stopAfterFirstConventional = !explicitDirectories
 			&& !options.AllDatabases;
+		Dictionary<string, ToeDuplicateReference>? duplicateReferences =
+			options.AllDatabases && options.SortByName
+				? new Dictionary<string, ToeDuplicateReference>( StringComparer.Ordinal )
+				: null;
 
 		foreach ( string root in roots ) {
 			cancellationToken.ThrowIfCancellationRequested();
@@ -259,6 +312,9 @@ public static class Command {
 							);
 					}
 
+					var namesInCurrentRoot = duplicateReferences is null
+						? null
+						: new HashSet<string>( StringComparer.Ordinal );
 					foreach ( TermInfoDatabaseCatalogEntry entry in entries ) {
 						cancellationToken.ThrowIfCancellationRequested();
 
@@ -267,6 +323,40 @@ public static class Command {
 							.Append( '\t' )
 							.Append( entry.Description ?? string.Empty )
 							.Append( Environment.NewLine );
+
+						if (
+							duplicateReferences is null
+							|| !(namesInCurrentRoot?.Add( entry.Name ) ?? false)
+						) {
+							continue;
+						}
+
+						if (
+							duplicateReferences.TryGetValue(
+								entry.Name,
+								out ToeDuplicateReference? first
+							)
+						) {
+							bool areEqual = TerminalDescriptionComparer.Compare(
+								first.Terminal,
+								entry.Terminal
+							).AreEqual;
+							output
+								.Append( "# Icod duplicate " )
+								.Append( entry.Name )
+								.Append( ": semantically " )
+								.Append( areEqual ? "equal to " : "different from " )
+								.Append( first.Root )
+								.Append( Environment.NewLine );
+						} else {
+							duplicateReferences.Add(
+								entry.Name,
+								new ToeDuplicateReference(
+									entry.Terminal,
+									catalog.Root
+								)
+							);
+						}
 					}
 
 					if ( catalog.Issues.Count != 0 ) {
@@ -393,7 +483,7 @@ public static class Command {
 				case "-u":
 				case "-U":
 					options = ToeOptions.Empty;
-					error = $"source dependency option '{argument}' is introduced by T09 and is not available in T08";
+					error = $"source dependency option '{argument}' is a standalone mode and cannot be combined with listing options or directory operands";
 					return false;
 
 				default:
@@ -490,10 +580,12 @@ public static class Command {
 
 	private static string GetHelpText() {
 		return $"Usage: {CommandName} [options] [directory ...]{Environment.NewLine}"
+			+ $"       {CommandName} -u file{Environment.NewLine}"
+			+ $"       {CommandName} -U file{Environment.NewLine}"
 			+ $"       {CommandName} -D{Environment.NewLine}"
 			+ $"       {CommandName} -V | --version{Environment.NewLine}"
 			+ Environment.NewLine
-			+ "List parsed terminal descriptions from conventional terminfo databases."
+			+ "List parsed terminal descriptions from conventional terminfo databases or analyze terminfo source dependencies."
 			+ Environment.NewLine
 			+ Environment.NewLine
 			+ "With directory operands, inspect exactly those roots in operand order."
@@ -507,7 +599,11 @@ public static class Command {
 			+ Environment.NewLine
 			+ "  -h              write a heading naming each inspected database"
 			+ Environment.NewLine
-			+ "  -s              sort entries by canonical terminal name"
+			+ "  -s              sort entries by canonical terminal name; with -a, mark semantic duplicates"
+			+ Environment.NewLine
+			+ "  -u file         list forward use= dependencies in source order"
+			+ Environment.NewLine
+			+ "  -U file         list reverse use= dependencies deterministically"
 			+ Environment.NewLine
 			+ "  -D              print Runtime database discovery locations and exit"
 			+ Environment.NewLine
@@ -596,6 +692,23 @@ public static class Command {
 		public bool SortByName { get; }
 
 		public IReadOnlyList<string> Directories { get; }
+	}
+
+	private sealed class ToeDuplicateReference {
+		public ToeDuplicateReference(
+			TerminalDescription terminal,
+			string root
+		) {
+			ArgumentNullException.ThrowIfNull( terminal );
+			ArgumentException.ThrowIfNullOrWhiteSpace( root );
+
+			Terminal = terminal;
+			Root = root;
+		}
+
+		public TerminalDescription Terminal { get; }
+
+		public string Root { get; }
 	}
 
 	private sealed class ToeListingResult {

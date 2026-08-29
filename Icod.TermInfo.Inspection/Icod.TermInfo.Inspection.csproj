@@ -12,17 +12,17 @@
 		<AssemblyName>Icod.TermInfo.Inspection</AssemblyName>
 		<RootNamespace>Icod.TermInfo.Inspection</RootNamespace>
 		<Configurations>Debug;Release;Staging</Configurations>
-		<Version>1.4.0-Alpha-8</Version>
+		<Version>1.4.0-Alpha-9</Version>
 		<AssemblyVersion>1.0.0.0</AssemblyVersion>
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<PackageVersion>1.4.0-Alpha-8</PackageVersion>
+		<PackageVersion>1.4.0-Alpha-9</PackageVersion>
 		<PackageId>Icod.TermInfo.Inspection</PackageId>
 		<Title>Icod.TermInfo.Inspection</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed inspection and semantic-comparison foundation for Icod.TermInfo. The 1.3 line provides canonical terminfo rendering and reusable infocmp-style comparison engines without enlarging the frozen Runtime, Source, or Compiler public contracts.</Description>
-		<PackageReleaseNotes>1.4.0-Alpha-8 composes the existing T02 system-location and T03 conventional-catalog APIs through managed toe listing while retaining the reviewed T02/T03/T06 1.4 surface, frozen 1.3 API behavior, three-target support, and no production Compiler dependency. T08 adds no Inspection public API.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.4.0-Alpha-9 composes the existing TerminalDescriptionComparer through optional managed toe duplicate-semantic markers while retaining the reviewed T02/T03/T06 1.4 surface, frozen 1.3 API behavior, three-target support, and no production Compiler dependency. T09 adds no Inspection public API.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>

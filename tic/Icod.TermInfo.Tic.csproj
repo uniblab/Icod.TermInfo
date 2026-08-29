@@ -9,7 +9,7 @@
 		<AssemblyName>tic</AssemblyName>
 		<RootNamespace>Icod.TermInfo.Tic</RootNamespace>
 		<Configurations>Debug;Release;Staging</Configurations>
-		<Version>1.4.0-Alpha-8</Version>
+		<Version>1.4.0-Alpha-9</Version>
 		<IsPackable>false</IsPackable>
 	</PropertyGroup>
 

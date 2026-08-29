@@ -9,13 +9,14 @@
 		<AssemblyName>toe</AssemblyName>
 		<RootNamespace>Icod.TermInfo.Toe</RootNamespace>
 		<Configurations>Debug;Release;Staging</Configurations>
-		<Version>1.4.0-Alpha-8</Version>
+		<Version>1.4.0-Alpha-9</Version>
 		<IsPackable>false</IsPackable>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Icod.CommandFramework" Version="2.0.0" />
 		<ProjectReference Include="..\Icod.TermInfo.Inspection\Icod.TermInfo.Inspection.csproj" />
+		<ProjectReference Include="..\Icod.TermInfo.Source\Icod.TermInfo.Source.csproj" />
 	</ItemGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">

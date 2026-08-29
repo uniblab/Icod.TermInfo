@@ -3,16 +3,20 @@
 `toe` is the managed conventional terminfo database-listing command in the
 `Icod.TermInfo` tool suite.
 
-## T08 status
+## T09 status
 
-Version `1.4.0-Alpha-8` implements the T08 listing tranche by composing the
-existing Inspection database-location and conventional catalog APIs. It does
-not duplicate Runtime discovery policy or compiled-entry parsing.
+Version `1.4.0-Alpha-9` retains T08 conventional database listing and adds
+forward/reverse terminfo source dependency reports plus optional semantic
+duplicate markers. Source parsing/resolution is delegated to
+`Icod.TermInfo.Source`; duplicate equality is delegated to
+`TerminalDescriptionComparer`.
 
 Supported forms are:
 
 ```text
 toe [options] [directory ...]
+toe -u file
+toe -U file
 toe -D
 toe -V
 toe --version
@@ -26,6 +30,23 @@ Supported listing options are:
 -h    identify each conventional database before its entries
 -s    sort entries by canonical terminal name
 ```
+
+When `-a` and `-s` expose a canonical name in more than one database, the first
+entry in database order becomes the comparison reference and each later root is
+marked as either semantically equal or semantically different. The marker is
+explicitly Icod-defined and equality comes from `TerminalDescriptionComparer`,
+not compiled-file byte equality.
+
+Source dependency modes are standalone:
+
+```text
+toe -u file    child<TAB>parent, preserving source use= order
+toe -U file    parent<TAB>child, grouped deterministically by source identity
+```
+
+Alias references resolve to canonical source identities. Missing parents and
+inheritance cycles are diagnosed through the existing Source resolver; safely
+parsed dependency edges are still emitted before the command returns status 1.
 
 With explicit directory operands, `toe` inspects exactly those roots in operand
 order. `-a` does not change explicit-operand processing.
@@ -66,9 +87,6 @@ Exit status follows `Icod.CommandFramework`:
 2    usage error
 130  cancellation
 ```
-
-`-u` and `-U` source dependency analysis belong to T09 and are deliberately
-rejected by T08 rather than approximated.
 
 The command targets .NET 10. The reusable `Icod.TermInfo` package family
 continues to target `net8.0`, `net9.0`, and `net10.0`.

@@ -2,13 +2,13 @@
 
 `tic` is part of the `Icod.TermInfo` managed terminfo tool suite.
 
-## T08 status
+## T09 status
 
-Version `1.4.0-Alpha-8` retains T05 safe conventional database publication and
-the T04 managed source-validation path while T08 work remains isolated to
+Version `1.4.0-Alpha-9` retains T05 safe conventional database publication and
+the T04 managed source-validation path while T09 work remains isolated to
 `toe`.
 
-Supported through T08:
+Supported through T09:
 
 ```text
 tic [options] file
