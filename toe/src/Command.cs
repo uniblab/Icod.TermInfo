@@ -37,6 +37,65 @@ public static class Command {
 		}
 
 		try {
+			ToeSourceCommandLineResult sourceMode =
+				ToeCommandLine.ParseSourceMode( args );
+			if ( sourceMode.IsSourceMode ) {
+				if ( sourceMode.Error is string sourceUsageError ) {
+					await WriteUsageErrorAsync(
+						stderr,
+						sourceUsageError,
+						cancellationToken
+					).ConfigureAwait( false );
+					return CommandExitCodes.UsageError;
+				}
+
+				ToeSourceDependencyResult dependency =
+					await ToeSourceDependencyAnalyzer.AnalyzeAsync(
+						sourceMode.SourcePath
+							?? throw new InvalidOperationException(
+								"The toe source-mode parser returned no source path."
+							),
+						sourceMode.Mode,
+						cancellationToken
+					).ConfigureAwait( false );
+
+				if ( dependency.Stdout.Length != 0 ) {
+					await WriteAsync(
+						stdout,
+						dependency.Stdout,
+						cancellationToken
+					).ConfigureAwait( false );
+				}
+				if ( dependency.Stderr.Length != 0 ) {
+					await WriteAsync(
+						stderr,
+						dependency.Stderr,
+						cancellationToken
+					).ConfigureAwait( false );
+				}
+
+				return dependency.HasOperationalFailure
+					? CommandExitCodes.Failure
+					: CommandExitCodes.Success
+				;
+			}
+
+			ToeCommandLineNormalizationResult normalized =
+				ToeCommandLine.NormalizeListing( args );
+			if ( normalized.Error is string normalizationError ) {
+				await WriteUsageErrorAsync(
+					stderr,
+					normalizationError,
+					cancellationToken
+				).ConfigureAwait( false );
+				return CommandExitCodes.UsageError;
+			}
+			args =
+				normalized.Arguments
+				?? throw new InvalidOperationException(
+					"The toe command-line normalizer returned neither arguments nor an error."
+				);
+
 			if (
 				args.Length == 1
 				&& string.Equals(
@@ -89,55 +148,6 @@ public static class Command {
 					stderr,
 					cancellationToken
 				).ConfigureAwait( false );
-			}
-
-			if (
-				args.Length > 0
-				&& (
-					string.Equals( args[ 0 ], "-u", StringComparison.Ordinal )
-					|| string.Equals( args[ 0 ], "-U", StringComparison.Ordinal )
-				)
-			) {
-				if (
-					args.Length != 2
-					|| string.IsNullOrWhiteSpace( args[ 1 ] )
-				) {
-					await WriteUsageErrorAsync(
-						stderr,
-						$"source dependency option '{args[ 0 ]}' requires exactly one source file operand",
-						cancellationToken
-					).ConfigureAwait( false );
-					return CommandExitCodes.UsageError;
-				}
-
-				ToeSourceDependencyResult dependency =
-					await ToeSourceDependencyAnalyzer.AnalyzeAsync(
-						args[ 1 ],
-						string.Equals( args[ 0 ], "-u", StringComparison.Ordinal )
-							? ToeSourceDependencyMode.Forward
-							: ToeSourceDependencyMode.Reverse,
-						cancellationToken
-					).ConfigureAwait( false );
-
-				if ( dependency.Stdout.Length != 0 ) {
-					await WriteAsync(
-						stdout,
-						dependency.Stdout,
-						cancellationToken
-					).ConfigureAwait( false );
-				}
-				if ( dependency.Stderr.Length != 0 ) {
-					await WriteAsync(
-						stderr,
-						dependency.Stderr,
-						cancellationToken
-					).ConfigureAwait( false );
-				}
-
-				return dependency.HasOperationalFailure
-					? CommandExitCodes.Failure
-					: CommandExitCodes.Success
-				;
 			}
 
 			if (
@@ -337,6 +347,16 @@ public static class Command {
 								out ToeDuplicateReference? first
 							)
 						) {
+							if (
+								string.Equals(
+									first.Root,
+									catalog.Root,
+									StringComparison.Ordinal
+								)
+							) {
+								continue;
+							}
+
 							bool areEqual = TerminalDescriptionComparer.Compare(
 								first.Terminal,
 								entry.Terminal
@@ -421,10 +441,10 @@ public static class Command {
 		diagnostics
 			.Append( CommandName )
 			.Append( ": " )
-			.Append( code )
-			.Append( ": " )
 			.Append( subject )
 			.Append( ": " )
+			.Append( code )
+			.Append( " error: " )
 			.Append( message )
 			.Append( Environment.NewLine );
 	}
@@ -610,6 +630,9 @@ public static class Command {
 			+ "  -V, --version   print version information and exit"
 			+ Environment.NewLine
 			+ "      --help      display this help and exit"
+			+ Environment.NewLine
+			+ Environment.NewLine
+			+ "Unambiguous listing options may be clustered; -u/-U accept attached source paths; use -- before a directory or source filename beginning with '-'."
 			+ Environment.NewLine;
 	}
 
