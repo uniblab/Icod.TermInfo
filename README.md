@@ -4,40 +4,41 @@
 
 `Icod.TermInfo` is a managed, dependency-free .NET implementation of the low-level terminal-capability model traditionally supplied by `libtinfo`.
 
-Version 1.3.0 is the current coordinated release. It preserves the frozen 1.0
-Runtime, 1.1 Source, and 1.2 Compiler contracts while adding the optional
-`Icod.TermInfo.Inspection` package.
+Version 1.4.0 is the current coordinated release. It preserves the frozen 1.0
+Runtime, 1.1 Source, and 1.2 Compiler contracts, freezes the reviewed 1.4
+Inspection additions, and adds the managed `tic`, `infocmp`, and `toe` tool
+suite as separate framework-dependent .NET 10 release archives.
 
-The published 1.3.0 package family targets `net8.0`, `net9.0`, and `net10.0`;
+The published 1.4.0 package family targets `net8.0`, `net9.0`, and `net10.0`;
 the packages use C# 13, contain no native ncurses/terminfo payload, and are
 intended to run on Windows, Linux, and macOS.
 
 ## Install
 
-For the 1.3.0 release, runtime-only consumers use:
+For the 1.4.0 release, runtime-only consumers use:
 
 ```text
-dotnet add package Icod.TermInfo --version 1.3.0
+dotnet add package Icod.TermInfo --version 1.4.0
 ```
 
 Applications which need terminfo source-language support use:
 
 ```text
-dotnet add package Icod.TermInfo.Source --version 1.3.0
+dotnet add package Icod.TermInfo.Source --version 1.4.0
 ```
 
 Applications which compile terminfo source or write conventional compiled
 terminfo databases use:
 
 ```text
-dotnet add package Icod.TermInfo.Compiler --version 1.3.0
+dotnet add package Icod.TermInfo.Compiler --version 1.4.0
 ```
 
 Applications which need canonical rendering, semantic comparison, or
 provider-aware inspection use:
 
 ```text
-dotnet add package Icod.TermInfo.Inspection --version 1.3.0
+dotnet add package Icod.TermInfo.Inspection --version 1.4.0
 ```
 
 `Icod.TermInfo.Source` depends on the matching `Icod.TermInfo` package.
@@ -48,12 +49,12 @@ values continue to reference `Icod.TermInfo` alone.
 
 The same validated package artifacts are published to NuGet.org and GitHub
 Packages. Release closure and tag-publication requirements are recorded in
-`docs/1.3.0-RELEASE-AUDIT.md`.
+`docs/1.4.0-RELEASE-AUDIT.md`.
 
 ## Tool Suite
 
-The active 1.4 development line adds three managed .NET 10 command-line tools
-above the reusable package family:
+The 1.4 release adds three managed .NET 10 command-line tools above the reusable
+package family:
 
 ```text
 tic       validate and publish terminfo source
@@ -61,11 +62,11 @@ infocmp   render and semantically compare terminal descriptions
 toe       enumerate conventional databases and analyze use= dependencies
 ```
 
-At `1.4.0-Alpha-11`, the command surface is frozen after differential
-validation against the checked-in ncurses corpus, hostile-input validation,
-API-boundary review, and structural validation of all six command-suite
-archives. The T10 CLI/presentation contract remains unchanged. The command
-projects remain non-packable and do not introduce command-to-command
+At `1.4.0`, the command surface is frozen after differential validation against
+the checked-in ncurses corpus, hostile-input validation, API-boundary review,
+structural validation of all six command-suite archives, and matching-host
+execution smoke. The T10 CLI/presentation contract remains unchanged. The
+command projects remain non-packable and do not introduce command-to-command
 dependencies.
 
 The canonical 1.4 distribution model is a framework-dependent .NET 10 suite
@@ -95,7 +96,7 @@ remains unsigned. The frozen 1.0 and 1.1 releases support `net8.0` and
 target-framework policy are documented in `docs/VERSIONING.md` and
 `docs/COMPATIBILITY.md`.
 
-The runtime 1.0 public API remains frozen. Version 1.1 adds source-language functionality in the separate `Icod.TermInfo.Source` package rather than making the runtime package depend on parser/front-end code. The 1.2 line adds deterministic compiled-entry writing in the separate `Icod.TermInfo.Compiler` package. The 1.3 line adds canonical rendering and semantic comparison in the separate `Icod.TermInfo.Inspection` package. The active 1.4 line composes those libraries into the separate `tic`, `infocmp`, and `toe` command layer without moving command policy into the reusable packages. Live terminal sessions, PTYs, curses/UI, terminal emulation, termcap conversion, and active protocol negotiation remain later or sibling work.
+The runtime 1.0 public API remains frozen. Version 1.1 adds source-language functionality in the separate `Icod.TermInfo.Source` package rather than making the runtime package depend on parser/front-end code. The 1.2 line adds deterministic compiled-entry writing in the separate `Icod.TermInfo.Compiler` package. The 1.3 line adds canonical rendering and semantic comparison in the separate `Icod.TermInfo.Inspection` package. The 1.4 line composes those libraries into the separate `tic`, `infocmp`, and `toe` command layer without moving command policy into the reusable packages. Live terminal sessions, PTYs, curses/UI, terminal emulation, termcap conversion, and active protocol negotiation remain later or sibling work.
 
 ## What 1.0 provides
 

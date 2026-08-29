@@ -1,4 +1,6 @@
-# Package Validation Scripts
+# Release Validation Scripts
+
+## Package validation
 
 `verify-release-package.sh` and `verify-release-package.cmd` are equivalent host
 wrappers for the same repository package-validation contract.
@@ -30,11 +32,11 @@ For final main-branch release validation:
 bash .github/scripts/verify-release-package.sh artifacts Release
 ```
 
-The scripts reject any configuration other than `Debug`, `Staging`, or `Release`, and the
-selected configuration controls maintenance tools, API-snapshot build-output
-paths, the Runtime, Compiler, and Inspection package verifiers, all four package
-artifacts, all four fresh-package consumers, and the non-interactive repository
-sample.
+The scripts reject any configuration other than `Debug`, `Staging`, or
+`Release`. The selected configuration controls maintenance tools, API-snapshot
+build-output paths, the Runtime, Compiler, and Inspection package verifiers, all
+four package artifacts, all four fresh-package consumers, and the
+non-interactive repository sample.
 
 The 1.1 source-language line keeps the frozen `Icod.TermInfo` package checks and
 adds `Icod.TermInfo.Source` net8.0/net9.0/net10.0 API-equivalence, reviewed
@@ -57,3 +59,39 @@ blocking SDK reference-pack acquisition.
   Actions package-validation jobs.
 - Use `verify-release-package.cmd` from Windows Command Prompt; Bash and Python
   are not required.
+
+## Tool-suite archives
+
+`build-tool-archives.sh` publishes `tic`, `infocmp`, and `toe` for the six
+supported release RIDs and creates the coordinated framework-dependent tool-suite
+archives. It first requires all four libraries and all three commands to declare
+the same version.
+
+```text
+bash .github/scripts/build-tool-archives.sh Release artifacts/tools
+```
+
+The six output archives cover `win-x64`, `win-arm64`, `linux-x64`,
+`linux-arm64`, `osx-x64`, and `osx-arm64`. Archive construction normalizes
+ordering and metadata used by the release workflow.
+
+`verify-tool-archives.sh` is the structural gate. It requires exactly the six
+archives for the coordinated version and validates their paths, launchers, and
+release payload without executing a foreign-architecture binary.
+
+```text
+bash .github/scripts/verify-tool-archives.sh artifacts/tools
+```
+
+`smoke-tool-archive.ps1` is the matching-host execution gate. It selects the
+archive for the current operating system and architecture, unpacks it, verifies
+all three `--version` results, publishes a controlled entry with `tic`, acquires
+it with `infocmp`, and enumerates it with `toe`.
+
+```text
+pwsh -File .github/scripts/smoke-tool-archive.ps1 artifacts/tools
+```
+
+The release workflow runs structural validation for all six archives and the
+execution smoke on matching Windows, Linux, and macOS runners before package
+publication.

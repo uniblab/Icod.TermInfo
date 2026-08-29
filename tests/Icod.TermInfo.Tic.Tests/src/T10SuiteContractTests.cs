@@ -4,7 +4,7 @@ using Xunit;
 namespace Icod.TermInfo.Tic.Tests;
 
 public sealed class T10SuiteContractTests {
-	private const string DevelopmentVersion = "1.4.0-Alpha-11";
+	private const string DevelopmentVersion = "1.4.0";
 
 	[Fact]
 	public void AllProjectsAdvanceTogetherAndLibraryAssemblyIdentityRemainsStable() {

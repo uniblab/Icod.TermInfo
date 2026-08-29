@@ -2,13 +2,13 @@
 
 `infocmp` is part of the `Icod.TermInfo` managed terminfo tool suite.
 
-## T10 status
+## 1.4.0 status
 
-Version `1.4.0-Alpha-10` retains the T06/T07 acquisition, rendering, and semantic
-comparison engines while hardening syntax, help, diagnostics, documentation,
-and suite distribution. T10 adds no new comparison engine.
+Version `1.4.0` ships the frozen T06/T07 acquisition, rendering, and semantic
+comparison engines with T10 CLI/distribution hardening and the T11 validation
+gate. Release closure adds no new comparison engine.
 
-Supported through T10:
+Supported in 1.4.0:
 
 ```text
 infocmp [options] [terminal ...]

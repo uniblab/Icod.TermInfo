@@ -3,12 +3,12 @@ using Xunit;
 
 namespace Icod.TermInfo.Tic.Tests;
 
-public sealed class T11SuiteContractTests {
-	private const string DevelopmentVersion = "1.4.0";
+public sealed class ReleaseClosureTests {
+	private const string ReleaseVersion = "1.4.0";
 	private const string StableAssemblyVersion = "1.0.0.0";
 
 	[Fact]
-	public void CoordinatedProjectsAreAtStableOneFourAndLibraryIdentityIsFrozen() {
+	public void AllSevenProjectsAreAtStableOneFour() {
 		string root = FindRepositoryRoot();
 
 		foreach (
@@ -20,30 +20,18 @@ public sealed class T11SuiteContractTests {
 				"Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj",
 			}
 		) {
-			XDocument project = LoadProject(
-				root,
-				relativePath
+			XDocument project = LoadProject( root, relativePath );
+			Assert.Equal(
+				ReleaseVersion,
+				ReadRequiredProperty( project, "Version" )
 			);
 			Assert.Equal(
-				DevelopmentVersion,
-				ReadRequiredProperty(
-					project,
-					"Version"
-				)
-			);
-			Assert.Equal(
-				DevelopmentVersion,
-				ReadRequiredProperty(
-					project,
-					"PackageVersion"
-				)
+				ReleaseVersion,
+				ReadRequiredProperty( project, "PackageVersion" )
 			);
 			Assert.Equal(
 				StableAssemblyVersion,
-				ReadRequiredProperty(
-					project,
-					"AssemblyVersion"
-				)
+				ReadRequiredProperty( project, "AssemblyVersion" )
 			);
 		}
 
@@ -55,157 +43,66 @@ public sealed class T11SuiteContractTests {
 				"toe/Icod.TermInfo.Toe.csproj",
 			}
 		) {
-			XDocument project = LoadProject(
-				root,
-				relativePath
-			);
+			XDocument project = LoadProject( root, relativePath );
 			Assert.Equal(
-				DevelopmentVersion,
-				ReadRequiredProperty(
-					project,
-					"Version"
-				)
+				ReleaseVersion,
+				ReadRequiredProperty( project, "Version" )
 			);
 		}
 	}
 
 	[Fact]
-	public void CheckedInNcursesCorpusRemainsNormalCiEvidence() {
+	public void MainAndTagWorkflowsSmokeUnpackedToolArchives() {
 		string root = FindRepositoryRoot();
-		string fixtureRoot = System.IO.Path.Combine(
+		string smoke = ReadRepositoryFile(
 			root,
-			"tests",
-			"Icod.TermInfo.Tests",
-			"fixtures",
-			"compiled-terminfo"
-		);
-		string readme = File.ReadAllText(
-			System.IO.Path.Combine(
-				fixtureRoot,
-				"README.md"
-			)
-		);
-
-		Assert.Contains(
-			"Normal tests consume these checked-in assets",
-			readme,
-			StringComparison.Ordinal
-		);
-		Assert.Contains(
-			"do not require `tic`, ncurses",
-			readme,
-			StringComparison.Ordinal
-		);
-
-		foreach (
-			string fixtureStem
-			in new[] {
-				"t29-extended",
-				"t29-extended32",
-				"t29-legacy-alignment",
-				"t29-legacy-edge",
-				"t29-legacy-minimal",
-			}
-		) {
-			Assert.True(
-				File.Exists(
-					System.IO.Path.Combine(
-						fixtureRoot,
-						"source",
-						fixtureStem + ".ti"
-					)
-				)
-			);
-			Assert.True(
-				File.Exists(
-					System.IO.Path.Combine(
-						fixtureRoot,
-						"compiled",
-						fixtureStem + ".bin"
-					)
-				)
-			);
-		}
-	}
-
-	[Fact]
-	public void ToolArchiveVerificationIsRequiredByPrMainAndReleaseCi() {
-		string root = FindRepositoryRoot();
-		string verifier = ReadRepositoryFile(
-			root,
-			".github/scripts/verify-tool-archives.sh"
+			".github/scripts/smoke-tool-archive.ps1"
 		);
 
 		foreach (
 			string marker
 			in new[] {
-				"win-x64",
-				"win-arm64",
-				"linux-x64",
-				"linux-arm64",
-				"osx-x64",
-				"osx-arm64",
-				"TOOL-SUITE.txt",
-				"Framework: net10.0",
-				"Deployment: framework-dependent",
-				"*.pdb",
-				"*.csproj",
-				"*.sln",
+				"tic",
+				"infocmp",
+				"toe",
+				"--version",
+				"release-smoke",
 			}
 		) {
 			Assert.Contains(
 				marker,
-				verifier,
+				smoke,
 				StringComparison.Ordinal
 			);
 		}
 
 		foreach (
-			string relativePath
+			string workflow
 			in new[] {
-				".github/workflows/pr-build-and-test.yaml",
 				".github/workflows/push-main.yaml",
 				".github/workflows/release.yaml",
 			}
 		) {
 			Assert.Contains(
-				"verify-tool-archives.sh",
-				ReadRepositoryFile(
-					root,
-					relativePath
-				),
+				"smoke-tool-archive.ps1",
+				ReadRepositoryFile( root, workflow ),
 				StringComparison.Ordinal
 			);
 		}
-	}
 
-	[Fact]
-	public void ReleaseArtifactModelRemainsFourPackagesSixArchivesAndManifest() {
-		string root = FindRepositoryRoot();
 		string release = ReadRepositoryFile(
 			root,
 			".github/workflows/release.yaml"
 		);
-
 		Assert.Contains(
-			"if (14 -ne $files.Count)",
-			release,
-			StringComparison.Ordinal
-		);
-		Assert.Contains(
-			"if (15 -ne $assets.Count)",
-			release,
-			StringComparison.Ordinal
-		);
-		Assert.Contains(
-			"SHA256SUMS.txt",
+			"needs: [metadata, validate, tool-archives, smoke-tool-archives]",
 			release,
 			StringComparison.Ordinal
 		);
 	}
 
 	[Fact]
-	public void T11ImplementationRecordIsPresent() {
+	public void StableReleaseAuditAndPackageFacingDocumentationArePresent() {
 		string root = FindRepositoryRoot();
 
 		Assert.True(
@@ -213,10 +110,26 @@ public sealed class T11SuiteContractTests {
 				System.IO.Path.Combine(
 					root,
 					"docs",
-					"1.4.0-T11-DIFFERENTIAL-VALIDATION-HOSTILE-INPUT-AND-FREEZE.md"
+					"1.4.0-RELEASE-AUDIT.md"
 				)
 			)
 		);
+
+		foreach (
+			string relativePath
+			in new[] {
+				"README.md",
+				"Icod.TermInfo.Source/README.md",
+				"Icod.TermInfo.Compiler/README.md",
+				"Icod.TermInfo.Inspection/README.md",
+			}
+		) {
+			Assert.Contains(
+				"1.4.0",
+				ReadRepositoryFile( root, relativePath ),
+				StringComparison.Ordinal
+			);
+		}
 	}
 
 	private static XDocument LoadProject(

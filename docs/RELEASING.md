@@ -350,8 +350,8 @@ contract, `docs/1.3.0-PRE-I01-CONTRACT-AUDIT.md` for the package/layer freeze,
 `docs/1.3.0-INSPECTION-PUBLIC-API-BASELINE.txt` for the frozen Inspection API,
 and `docs/1.3.0-RELEASE-AUDIT.md` for final release sign-off requirements.
 
-For the active 1.4 line, use `Icod.TermInfo-1.4.0-Tool-Suite-Roadmap.md` for the
-T01-T11 contract, `docs/1.4.0-PRE-T01-CONTRACT-AUDIT.md` for the command-layer
+For the completed 1.4 line, use `Icod.TermInfo-1.4.0-Tool-Suite-Roadmap.md` for
+the T01-T11 contract, `docs/1.4.0-PRE-T01-CONTRACT-AUDIT.md` for the command-layer
 foundation, `docs/1.4.0-T02-SYSTEM-DATABASE-LOCATION-INSPECTION.md` for the T02
 discovery seam, `docs/1.4.0-T03-CONVENTIONAL-DATABASE-CATALOG.md` for T03 catalog
 enumeration, `docs/1.4.0-T04-TIC-VALIDATION-AND-CHECK-ONLY.md` for the first
@@ -365,7 +365,8 @@ source dependency analysis,
 `docs/1.4.0-T10-CLI-COMPATIBILITY-PRESENTATION-AND-DISTRIBUTION-HARDENING.md`
 for the hardened suite/distribution contract, and
 `docs/1.4.0-T11-DIFFERENTIAL-VALIDATION-HOSTILE-INPUT-AND-FREEZE.md` for the
-Alpha-11 release-readiness gate. The active Inspection API contract remains
+Alpha-11 release-readiness gate. The stable release gate is recorded in
+`docs/1.4.0-RELEASE-AUDIT.md`. The frozen Inspection API contract remains
 `docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt`.
 
 The final `v<PackageVersion>` tag must identify the exact validated and published `main`

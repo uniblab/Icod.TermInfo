@@ -177,8 +177,31 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+  smoke-tool-archives:
+    needs: [metadata, validate, tool-archives]
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-tool-archives
+          path: artifacts/tools
+
+      - name: Smoke matching tool-suite archive
+        shell: pwsh
+        run: ./.github/scripts/smoke-tool-archive.ps1 artifacts/tools
+
   publish-nuget:
-    needs: [metadata, validate]
+    needs: [metadata, validate, tool-archives, smoke-tool-archives]
     runs-on: ubuntu-latest
     environment: Release
     permissions:

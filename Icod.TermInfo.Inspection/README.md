@@ -3,10 +3,19 @@
 `Icod.TermInfo.Inspection` is the optional managed inspection and semantic-
 comparison layer for the `Icod.TermInfo` package family.
 
-The 1.3 line provides the reusable API engine underneath future
-`infocmp`-style tooling while preserving the already-frozen Runtime 1.0, Source
-1.1, and Compiler 1.2 public contracts. Version 1.3.0 is the first stable
-release of this optional package.
+The 1.3 line established the reusable inspection/comparison engine while
+preserving the already-frozen Runtime 1.0, Source 1.1, and Compiler 1.2 public
+contracts. Version 1.4.0 freezes the reviewed additive database-inspection and
+renderer-control APIs used by the managed tool suite.
+
+## Install
+
+```text
+dotnet add package Icod.TermInfo.Inspection --version 1.4.0
+```
+
+The package targets `net8.0`, `net9.0`, and `net10.0`, depends on matching
+Runtime and Source packages, and retains no production Compiler dependency.
 
 ## 1.4 T07 semantic-comparison composition
 
