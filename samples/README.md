@@ -1,10 +1,12 @@
 # Icod.TermInfo Samples
 
-The repository contains two executable samples. They are intentionally separate
-so acquisition examples stay easy to copy without mixing them with interactive
-terminal-control output.
+The repository contains two executable API samples and one command-suite
+walkthrough. The API samples remain separate so acquisition examples stay easy
+to copy without mixing them with interactive terminal-control output; the
+ToolSuite sample demonstrates the coordinated `tic`, `infocmp`, and `toe`
+workflow added in 1.4.
 
-Both sample projects target `net8.0`, `net9.0`, and `net10.0`. Every
+Both executable sample projects target `net8.0`, `net9.0`, and `net10.0`. Every
 `dotnet run` example therefore specifies a framework; substitute `-f net8.0` or
 `-f net9.0` when exercising those consumer targets.
 
@@ -50,6 +52,18 @@ dotnet run --project samples/Icod.TermInfo.Acquisition.Sample/Icod.TermInfo.Acqu
 ```
 
 See `Icod.TermInfo.Acquisition.Sample/README.md`.
+
+## ToolSuite
+
+`ToolSuite` is a data-and-command walkthrough for the managed 1.4 command suite.
+It uses a controlled source file and an explicit local database root, so the
+example does not depend on the host's installed terminfo database.
+
+The walkthrough covers validation, publication, effective rendering, semantic
+comparison, conventional database enumeration, and forward/reverse `use=`
+dependency reports.
+
+See `ToolSuite/README.md`.
 
 ## Acquisition guide
 
