@@ -2,14 +2,14 @@
 
 `tic` is part of the `Icod.TermInfo` managed terminfo tool suite.
 
-## 1.4.0 status
+## 1.4.1 status
 
-Version `1.4.0` ships the frozen T04/T05 semantic engine with the T10 CLI and
-distribution hardening plus the T11 differential, hostile-input, and artifact
-validation gates. Release closure adds no new compiler or source-language
-semantics.
+Version `1.4.1` retains the frozen T04/T05 semantic engine, T10 CLI/distribution
+contract, and T11 differential, hostile-input, and artifact validation gates
+shipped in 1.4.0. This patch release corrects release-facing documentation and
+metadata only; it adds no compiler, source-language, or command semantics.
 
-Supported in 1.4.0:
+Supported in 1.4.1:
 
 ```text
 tic [options] file

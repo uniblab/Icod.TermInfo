@@ -47,6 +47,11 @@ package IDs. The command layer targets `net10.0` because it uses
 `Icod.CommandFramework 2.0.0`; this does not reduce the library package family
 from its `net8.0` / `net9.0` / `net10.0` targets.
 
+Patch release 1.4.1 advances all four package versions and all three command
+versions together. It corrects release-facing documentation and metadata only;
+it does not create a new public API baseline or change the frozen 1.4.0 command
+semantics.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:
@@ -95,21 +100,16 @@ The approved `docs/1.3.0-INSPECTION-PUBLIC-API-BASELINE.txt` is the independent
 machine-readable public contract for `Icod.TermInfo.Inspection`, frozen at the
 1.3 release closure after the I02-I06 API additions and I07 validation gate.
 
-`docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt` is the active Inspection
-baseline for 1.4 development. T01 initialized it as an exact copy of the frozen
-1.3 baseline. T02 adds reviewed read-only system database-location inspection,
-and T03 adds reviewed conventional database catalog enumeration, without changing
-Runtime, Source, or Compiler public API. T04 adds the non-mutating `tic -c`
-validation path. T05 adds command-layer database publication through the already
-frozen Compiler writer without adding library API. T06 advances the coordinated
-development version to `1.4.0-Alpha-6` and adds reviewed, compatible Inspection
+`docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt` is the frozen Inspection
+baseline for the 1.4 line. T01 initialized it as an exact copy of the frozen 1.3
+baseline. T02 added reviewed read-only system database-location inspection, T03
+added reviewed conventional database catalog enumeration, and T06 added reviewed
 renderer controls for layout, width, standard-capability ordering, and extended-
-capability filtering. The frozen 1.3 renderer overload behavior remains unchanged.
-T07 advances the coordinated development version to `1.4.0-Alpha-7` and composes
-the already-frozen effective comparer from the command layer; it adds no Runtime,
-Source, Compiler, or Inspection public API, so the active 1.4 Inspection baseline
-remains byte-for-byte unchanged from T06. Later library-surface changes require
-another explicit, compatible 1.4 API review.
+capability filtering. T04, T05, and T07 changed only command-layer composition.
+The reviewed baseline was frozen at the 1.4.0 release and remains byte-for-byte
+unchanged for 1.4.1. Any later public Inspection surface change requires a new
+compatible minor-release API review rather than changing this historical
+baseline.
 
 The baselines record exported types, public/protected members, enum numeric
 values, parameter names/order/defaults, ref/out/in/params shape, generic

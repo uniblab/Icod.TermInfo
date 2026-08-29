@@ -1,44 +1,45 @@
 # Icod.TermInfo
 
-![Icod TUI Toolchain](https://raw.githubusercontent.com/uniblab/Icod.TermInfo/v1.4.0/icod_tui_toolchain.jpg)
+![Icod TUI Toolchain](https://raw.githubusercontent.com/uniblab/Icod.TermInfo/v1.4.1/icod_tui_toolchain.jpg)
 
 `Icod.TermInfo` is a managed, dependency-free .NET implementation of the low-level terminal-capability model traditionally supplied by `libtinfo`.
 
-Version 1.4.0 is the current coordinated release. It preserves the frozen 1.0
-Runtime, 1.1 Source, and 1.2 Compiler contracts, freezes the reviewed 1.4
-Inspection additions, and adds the managed `tic`, `infocmp`, and `toe` tool
-suite as separate framework-dependent .NET 10 release archives.
+Version 1.4.1 is the current coordinated patch release. It preserves the frozen
+1.0 Runtime, 1.1 Source, 1.2 Compiler, and 1.4 Inspection contracts together
+with the managed `tic`, `infocmp`, and `toe` command semantics introduced in
+1.4.0. Version 1.4.1 corrects release-facing documentation and metadata; it does
+not add or change public API or command behavior.
 
-The published 1.4.0 package family targets `net8.0`, `net9.0`, and `net10.0`;
+The published 1.4.1 package family targets `net8.0`, `net9.0`, and `net10.0`;
 the packages use C# 13, contain no native ncurses/terminfo payload, and are
 intended to run on Windows, Linux, and macOS.
 
 ## Install
 
-For the 1.4.0 release, runtime-only consumers use:
+For the 1.4.1 release, runtime-only consumers use:
 
 ```text
-dotnet add package Icod.TermInfo --version 1.4.0
+dotnet add package Icod.TermInfo --version 1.4.1
 ```
 
 Applications which need terminfo source-language support use:
 
 ```text
-dotnet add package Icod.TermInfo.Source --version 1.4.0
+dotnet add package Icod.TermInfo.Source --version 1.4.1
 ```
 
 Applications which compile terminfo source or write conventional compiled
 terminfo databases use:
 
 ```text
-dotnet add package Icod.TermInfo.Compiler --version 1.4.0
+dotnet add package Icod.TermInfo.Compiler --version 1.4.1
 ```
 
 Applications which need canonical rendering, semantic comparison, or
 provider-aware inspection use:
 
 ```text
-dotnet add package Icod.TermInfo.Inspection --version 1.4.0
+dotnet add package Icod.TermInfo.Inspection --version 1.4.1
 ```
 
 `Icod.TermInfo.Source` depends on the matching `Icod.TermInfo` package.
@@ -49,7 +50,7 @@ values continue to reference `Icod.TermInfo` alone.
 
 The same validated package artifacts are published to NuGet.org and GitHub
 Packages. Release closure and tag-publication requirements are recorded in
-`docs/1.4.0-RELEASE-AUDIT.md`.
+`docs/1.4.1-RELEASE-AUDIT.md`.
 
 ## Tool Suite
 
@@ -62,12 +63,11 @@ infocmp   render and semantically compare terminal descriptions
 toe       enumerate conventional databases and analyze use= dependencies
 ```
 
-At `1.4.0`, the command surface is frozen after differential validation against
-the checked-in ncurses corpus, hostile-input validation, API-boundary review,
-structural validation of all six command-suite archives, and matching-host
-execution smoke. The T10 CLI/presentation contract remains unchanged. The
-command projects remain non-packable and do not introduce command-to-command
-dependencies.
+At `1.4.1`, the command surface remains frozen after the 1.4.0 differential
+validation, hostile-input validation, API-boundary review, structural validation
+of all six command-suite archives, and matching-host execution smoke. The T10
+CLI/presentation contract remains unchanged. The command projects remain
+non-packable and do not introduce command-to-command dependencies.
 
 The canonical 1.4 distribution model is a framework-dependent .NET 10 suite
 archive for each supported RID:
@@ -83,7 +83,7 @@ Icod.TermInfo.Tools.<version>.osx-arm64.tar.gz
 
 Each archive contains all three commands and their required managed
 dependencies. The user supplies the .NET 10 runtime. NuGet global-tool packaging
-is not required for 1.4.0.
+is not required for the 1.4.x line.
 
 ## 1.x stability contract
 
@@ -96,7 +96,7 @@ remains unsigned. The frozen 1.0 and 1.1 releases support `net8.0` and
 target-framework policy are documented in `docs/VERSIONING.md` and
 `docs/COMPATIBILITY.md`.
 
-The runtime 1.0 public API remains frozen. Version 1.1 adds source-language functionality in the separate `Icod.TermInfo.Source` package rather than making the runtime package depend on parser/front-end code. The 1.2 line adds deterministic compiled-entry writing in the separate `Icod.TermInfo.Compiler` package. The 1.3 line adds canonical rendering and semantic comparison in the separate `Icod.TermInfo.Inspection` package. The 1.4 line composes those libraries into the separate `tic`, `infocmp`, and `toe` command layer without moving command policy into the reusable packages. Live terminal sessions, PTYs, curses/UI, terminal emulation, termcap conversion, and active protocol negotiation remain later or sibling work.
+The runtime 1.0 public API remains frozen. Version 1.1 adds source-language functionality in the separate `Icod.TermInfo.Source` package rather than making the runtime package depend on parser/front-end code. The 1.2 line adds deterministic compiled-entry writing in the separate `Icod.TermInfo.Compiler` package. The 1.3 line adds canonical rendering and semantic comparison in the separate `Icod.TermInfo.Inspection` package. The 1.4 line composes those libraries into the separate `tic`, `infocmp`, and `toe` command layer without moving command policy into the reusable packages. Live terminal sessions, input decoding, and active probing belong to the sibling `Icod.Terminal` layer; curses-style screen/window behavior belongs to `Icod.DCurses`. PTYs, termcap conversion, terminal emulation, and graphics protocols remain separate later or sibling work.
 
 ## What 1.0 provides
 
@@ -179,6 +179,32 @@ Compiler public contracts:
 Inspection remains opt-in. It depends on matching Runtime and Source packages
 and deliberately has no production dependency on Compiler. The 1.4 command
 layer consumes Inspection without changing that package dependency boundary.
+
+## What 1.4 adds
+
+The 1.4 line completes the first managed command-toolchain layer above the
+reusable package family while keeping command policy out of Runtime, Source,
+Compiler, and Inspection:
+
+- Inspection adds read-only system database-location inspection and conventional
+  database catalog enumeration without enlarging the frozen Runtime API;
+- Inspection adds configurable effective-source renderer layout, width,
+  capability ordering, and extended-capability filtering while preserving the
+  released 1.3 renderer overload behavior;
+- `tic` validates strict UTF-8 `.ti` source, resolves `use=` inheritance, checks
+  compiled representability, and publishes explicit conventional databases;
+- `infocmp` renders effective descriptions and performs structured semantic
+  difference/common/absent-standard reporting over explicit or discovered
+  providers;
+- `toe` enumerates conventional databases and provides forward/reverse `use=`
+  source-dependency reports with deterministic duplicate handling;
+- the three commands ship together in six framework-dependent .NET 10 archives
+  for Windows, Linux, and macOS, with structural verification and matching-host
+  execution smoke.
+
+Version 1.4.1 retains the exact 1.4.0 API and command semantics. Its changes are
+limited to coordinated version metadata and corrections to release-facing
+documentation.
 
 ## Getting started
 
@@ -360,7 +386,7 @@ string? hideCursor = xterm.GetString(StringCapability.CursorInvisible);
 string? normalCursor = xterm.GetString(StringCapability.CursorNormal);
 ```
 
-These are capability strings, not a session manager. `Icod.TermInfo` does not decide when to enter full-screen mode, hide the cursor, recover from exceptions, or restore terminal state. A caller or future higher-level terminal library owns that lifecycle.
+These are capability strings, not a session manager. `Icod.TermInfo` does not decide when to enter full-screen mode, hide the cursor, recover from exceptions, or restore terminal state. A caller or the sibling `Icod.Terminal` session layer owns that lifecycle; `Icod.DCurses` builds higher-level screen/window policy above it.
 
 ## Mouse, focus, paste, and clipboard metadata
 
@@ -373,7 +399,7 @@ The modern xterm profiles carry descriptive protocol metadata such as:
 - cursor-style and terminal-reporting strings;
 - OSC 52 clipboard/selection metadata where present in the selected profile.
 
-This package does **not** decode mouse events, focus events, keys, or paste payloads. It also does not perform clipboard operations or terminal probing. The metadata is intentionally available so a future `Icod.Terminal`-style layer can consume it without teaching `Icod.TermInfo` about live input state.
+This package does **not** decode mouse events, focus events, keys, or paste payloads. It also does not perform clipboard operations or terminal probing. The metadata is intentionally available so the sibling `Icod.Terminal` layer can consume it without teaching `Icod.TermInfo` about live input state.
 
 ## VT100 and padding
 
@@ -617,8 +643,8 @@ The first provider which resolves the requested name wins.
 
 ## Sample applications
 
-The repository contains two executable samples with deliberately different
-purposes.
+The repository contains two executable API samples plus one command-suite
+walkthrough with deliberately different purposes.
 
 ### General terminal API sample
 
@@ -638,9 +664,9 @@ purposes.
 - redirection handling and explicit Windows VT enablement;
 - a custom provider implementation.
 
-Both sample projects in the 1.3 package family target `net8.0`, `net9.0`,
-and `net10.0`; `dotnet run` therefore needs an explicit framework. Run the
-ordinary demonstration with:
+Both executable API sample projects target `net8.0`, `net9.0`, and
+`net10.0`; `dotnet run` therefore needs an explicit framework. Run the ordinary
+demonstration with:
 
 ```text
 dotnet run --project samples/Icod.TermInfo.Sample/Icod.TermInfo.Sample.csproj -f net10.0
@@ -690,7 +716,15 @@ The sample prints the resolved terminal identity, aliases, selected numeric
 facts, and standard/extended capability counts. It does not write any capability
 string to the terminal.
 
-See `samples/README.md`,
+### Managed tool-suite walkthrough
+
+`samples/ToolSuite` is a data-and-command walkthrough for `tic`, `infocmp`, and
+`toe`. It uses a controlled `.ti` source file and an explicit local database root
+so validation, publication, rendering, comparison, enumeration, and forward/
+reverse `use=` dependency reporting do not depend on the host's installed
+terminfo database.
+
+See `samples/README.md`, `samples/ToolSuite/README.md`,
 `samples/Icod.TermInfo.Acquisition.Sample/README.md`, and
 `docs/0.9.0-ACQUISITION-GUIDE.md` for the complete examples.
 
@@ -704,12 +738,13 @@ The intended family boundary is now explicit:
 - **`Icod.TermInfo.Source`** — `.ti` lexical analysis, source diagnostics, unresolved entries, cancellation, `use=` inheritance, and materialization into `TerminalDescription`;
 - **`Icod.TermInfo.Compiler`** — deterministic compiled-entry writing, source compilation, and explicit conventional database-layout publication;
 - **`Icod.TermInfo.Inspection`** — canonical effective/source rendering, structured semantic comparison, and provider-aware inspection;
-- **future tools** — `tic`, `infocmp`, and `toe` command applications plus later termcap conversion and optional database-maintenance functionality;
-- **future `Icod.Terminal`** — raw/cooked session ownership, input decoding, keyboard/mouse/paste/focus events, active probing/negotiation, full-screen/cursor lifecycle, clipboard/hyperlink operations, and progress helpers;
+- **`tic`, `infocmp`, and `toe`** — released managed command applications which compose the reusable libraries and own command-line policy;
+- **`Icod.Terminal`** — sibling live-terminal/session layer for modes, input decoding, keyboard/mouse/paste/focus events, active probing/negotiation, and reversible presentation lifecycle;
 - **future `Icod.Pty`** — Unix PTY and Windows ConPTY creation, resize propagation, and child-process plumbing;
-- **future `Icod.Curses`** — Unicode cell/grid state, damage/refresh optimization, windows, pads, panels, menus, forms, and widgets.
+- **`Icod.DCurses`** — sibling curses-like virtual-screen/window layer above `Icod.Terminal` and `Icod.TermInfo`.
 
-The broader dependency inventory is recorded in `docs/FUTURE-WORK-INVENTORY.md`.
+The historical architecture inventory which led to these boundaries is retained
+in `docs/FUTURE-WORK-INVENTORY.md`.
 
 ## Acquisition foundation inherited from 0.9.0
 
@@ -797,10 +832,11 @@ matrix. Only an immutable `v*` tag matching the coordinated package version may
 start registry publication through `.github/workflows/release.yaml`.
 
 See `docs/RELEASING.md` for the release procedure,
-`Icod.TermInfo-1.3.0-Inspection-and-Comparison-Roadmap.md` for the completed
-I01-I07 contract, and `docs/1.3.0-RELEASE-AUDIT.md` for the final 1.3.0 release
-gate. Tag `v1.3.0` only on the exact validated `main` commit; no source or
-package content may change between that validation and tagging.
+`Icod.TermInfo-1.4.0-Tool-Suite-Roadmap.md` for the frozen T01-T11 command
+contract, and `docs/1.4.1-RELEASE-AUDIT.md` for the current patch-release gate.
+Tag `v1.4.1` only on the exact validated `main` commit; no source, package,
+archive, or documentation content may change between that validation and
+tagging.
 
 ## Scope
 
@@ -810,10 +846,13 @@ See `Icod.TermInfo-Development-Roadmap-0.9.0.md` for the frozen acquisition
 contract, `Icod.TermInfo-Development-Roadmap-1.0.0.md` for the 1.0 runtime
 stability contract, `Icod.TermInfo-Post-1.0-Development-Roadmap.md` for the
 post-1.0 package-family sequence, `Icod.TermInfo-1.3.0-Inspection-and-Comparison-Roadmap.md`
-for the 1.3 Inspection contract, `docs/VERSIONING.md` and
-`docs/COMPATIBILITY.md` for the 1.x promises, and
-`docs/FUTURE-WORK-INVENTORY.md` for the broader terminal-system dependency map. The 0.6.0 through 1.0.0 roadmaps remain historical frozen
-contracts.
+for the 1.3 Inspection contract,
+`Icod.TermInfo-1.4.0-Tool-Suite-Roadmap.md` for the frozen 1.4 command contract,
+`docs/1.4.1-RELEASE-AUDIT.md` for the current patch-release gate, and
+`docs/VERSIONING.md` and `docs/COMPATIBILITY.md` for the 1.x promises.
+`docs/FUTURE-WORK-INVENTORY.md` is retained as the historical architecture
+inventory which motivated the sibling-system boundaries. The 0.6.0 through
+1.0.0 roadmaps remain historical frozen contracts.
 
 ## Authors
 

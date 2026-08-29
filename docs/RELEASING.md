@@ -25,8 +25,8 @@ This document describes the current validation and publication procedure for the
   release tag is created. The tag workflow repeats the Release gate on the exact
   tagged commit before publication.
 - Release validation must pass the frozen Runtime 1.0, Source 1.1, Compiler 1.2,
-  and active Inspection 1.4 API baselines while retaining the historical
-  Inspection 1.3 baseline and the net8/net9/net10 API-equivalence gates.
+  and Inspection 1.4 API baselines while retaining the historical Inspection
+  1.3 baseline and the net8/net9/net10 API-equivalence gates.
 - Release builds treat missing public XML documentation as an error.
 - All four packages must pass the coordinated release verifier before publication.
   Use `.github/scripts/verify-release-package.sh` on a Bash-capable host or
@@ -365,9 +365,11 @@ source dependency analysis,
 `docs/1.4.0-T10-CLI-COMPATIBILITY-PRESENTATION-AND-DISTRIBUTION-HARDENING.md`
 for the hardened suite/distribution contract, and
 `docs/1.4.0-T11-DIFFERENTIAL-VALIDATION-HOSTILE-INPUT-AND-FREEZE.md` for the
-Alpha-11 release-readiness gate. The stable release gate is recorded in
-`docs/1.4.0-RELEASE-AUDIT.md`. The frozen Inspection API contract remains
-`docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt`.
+Alpha-11 release-readiness gate. The original stable 1.4.0 release gate is
+recorded in `docs/1.4.0-RELEASE-AUDIT.md`. Patch release 1.4.1 corrects
+release-facing documentation and metadata without changing the frozen
+`docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt` or 1.4 command semantics; its
+release gate is `docs/1.4.1-RELEASE-AUDIT.md`.
 
 The final `v<PackageVersion>` tag must identify the exact validated and published `main`
 commit. Do not edit the audit or any other source/package content after that

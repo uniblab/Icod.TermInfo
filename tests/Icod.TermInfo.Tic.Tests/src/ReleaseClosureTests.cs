@@ -4,7 +4,7 @@ using Xunit;
 namespace Icod.TermInfo.Tic.Tests;
 
 public sealed class ReleaseClosureTests {
-	private const string ReleaseVersion = "1.4.0";
+	private const string ReleaseVersion = "1.4.1";
 	private const string StableAssemblyVersion = "1.0.0.0";
 
 	[Fact]
@@ -110,7 +110,7 @@ public sealed class ReleaseClosureTests {
 				System.IO.Path.Combine(
 					root,
 					"docs",
-					"1.4.0-RELEASE-AUDIT.md"
+					"1.4.1-RELEASE-AUDIT.md"
 				)
 			)
 		);
@@ -125,7 +125,7 @@ public sealed class ReleaseClosureTests {
 			}
 		) {
 			Assert.Contains(
-				"1.4.0",
+				"1.4.1",
 				ReadRepositoryFile( root, relativePath ),
 				StringComparison.Ordinal
 			);

@@ -4,7 +4,7 @@ using Xunit;
 namespace Icod.TermInfo.Tic.Tests;
 
 public sealed class T01ContractTests {
-	private const string DevelopmentVersion = "1.4.0";
+	private const string DevelopmentVersion = "1.4.1";
 	private const string StableAssemblyVersion = "1.0.0.0";
 
 	[Fact]

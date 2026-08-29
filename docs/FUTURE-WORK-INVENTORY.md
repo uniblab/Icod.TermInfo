@@ -1,5 +1,13 @@
 # Icod.TermInfo and Terminal-System Future Work Inventory
 
+> **Historical planning snapshot:** this inventory predates completion of the
+> 1.4 command suite and the later implementation of sibling `Icod.Terminal` and
+> `Icod.DCurses` repositories. Its architectural ownership decisions are retained
+> for context, but status phrases such as "active" and "future" below describe the
+> planning state when the inventory was written. Current TermInfo compatibility
+> and release status are defined by `README.md`, `COMPATIBILITY.md`, and the
+> versioned release audits.
+
 This document records terminal-related work which remains outside the current
 `Icod.TermInfo` 1.x package-family boundary and identifies its natural
 package/layer.
