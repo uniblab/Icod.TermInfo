@@ -72,12 +72,7 @@ jobs:
               [xml]$project = Get-Content -LiteralPath $projectInfo.Path -Raw
               $versionNode = $project.SelectSingleNode('/Project/PropertyGroup/Version')
               $packageVersionNode = $project.SelectSingleNode('/Project/PropertyGroup/PackageVersion')
-              if (
-                  $null -eq $versionNode
-                  -or $null -eq $packageVersionNode
-                  -or $versionNode.InnerText -ne $versionReference
-                  -or $packageVersionNode.InnerText -ne $versionReference
-              ) {
+              if ($null -eq $versionNode -or $null -eq $packageVersionNode -or $versionNode.InnerText -ne $versionReference -or $packageVersionNode.InnerText -ne $versionReference) {
                   throw "$($projectInfo.Name) must consume IcodTermInfoSuiteVersion for Version and PackageVersion."
               }
           }
