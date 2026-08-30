@@ -74,6 +74,10 @@ public sealed class ContractTests {
 				"false",
 				ReadRequiredProperty( project, "IsPackable" )
 			);
+			Assert.Equal(
+				"false",
+				ReadRequiredProperty( project, "UseAppHost" )
+			);
 		}
 	}
 
@@ -119,9 +123,8 @@ public sealed class ContractTests {
 		Assert.All(
 			projectReferences,
 			element =>
-				Assert.Equal(
-					"UseAppHost=false",
-					element.Attribute( "AdditionalProperties" )?.Value
+				Assert.Null(
+					element.Attribute( "AdditionalProperties" )
 				)
 		);
 		string[] references =

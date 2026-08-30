@@ -11,6 +11,7 @@
 		<Configurations>Debug;Release;Staging</Configurations>
 		<Version>$(IcodTermInfoSuiteVersion)</Version>
 		<IsPackable>false</IsPackable>
+		<UseAppHost>false</UseAppHost>
 	</PropertyGroup>
 
 	<ItemGroup>
