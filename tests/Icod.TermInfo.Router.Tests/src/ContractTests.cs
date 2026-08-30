@@ -108,13 +108,24 @@ public sealed class ContractTests {
 			ReadRequiredProperty( router, "ToolCommandName" )
 		);
 
-		string[] references =
+		XElement[] projectReferences =
 			router
 				.Descendants()
 				.Where(
 					element =>
 						element.Name.LocalName == "ProjectReference"
 				)
+				.ToArray();
+		Assert.All(
+			projectReferences,
+			element =>
+				Assert.Equal(
+					"UseAppHost=false",
+					element.Attribute( "AdditionalProperties" )?.Value
+				)
+		);
+		string[] references =
+			projectReferences
 				.Select(
 					element =>
 						element.Attribute( "Include" )?.Value
@@ -133,6 +144,43 @@ public sealed class ContractTests {
 			},
 			references
 		);
+	}
+
+	[Fact]
+	public void RouterPackageHasStructuralAndHostNeutralityGates() {
+		string root =
+			FindRepositoryRoot();
+		string shellVerifier =
+			File.ReadAllText(
+				Path.Combine(
+					root,
+					".github",
+					"scripts",
+					"verify-release-package.sh"
+				)
+			);
+		string commandVerifier =
+			File.ReadAllText(
+				Path.Combine(
+					root,
+					".github",
+					"scripts",
+					"verify-release-package.cmd"
+				)
+			);
+		string archiveBuilder =
+			File.ReadAllText(
+				Path.Combine(
+					root,
+					".github",
+					"scripts",
+					"build-tool-archives.sh"
+				)
+			);
+
+		Assert.Contains( "tool-package-verifier", shellVerifier );
+		Assert.Contains( "tool-package-verifier", commandVerifier );
+		Assert.Contains( "-p:UseAppHost=true", archiveBuilder );
 	}
 
 	private static XDocument LoadProject(

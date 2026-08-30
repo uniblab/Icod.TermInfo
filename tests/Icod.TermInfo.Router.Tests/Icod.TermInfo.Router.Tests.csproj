@@ -26,6 +26,9 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\icod-terminfo\Icod.TermInfo.Router.csproj" />
+		<ProjectReference Include="..\..\tic\Icod.TermInfo.Tic.csproj" />
+		<ProjectReference Include="..\..\infocmp\Icod.TermInfo.InfoCmp.csproj" />
+		<ProjectReference Include="..\..\toe\Icod.TermInfo.Toe.csproj" />
 	</ItemGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">

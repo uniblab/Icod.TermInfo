@@ -140,6 +140,10 @@ Icod.TermInfo.Tools
 The four reusable libraries produce `.nupkg` and `.snupkg` artifacts. The router
 produces one `.nupkg`.
 
+The router package SHALL be host-neutral. It may contain the managed command
+assemblies required for in-process dispatch, but it SHALL NOT contain
+RID-specific `tic`, `infocmp`, or `toe` apphosts in its `any` payload.
+
 The package artifact count is therefore:
 
 ```text
@@ -199,6 +203,7 @@ Before merge/tag publication, the exact release-finalization commit SHALL pass:
 - exact cross-target API equivalence;
 - all four reusable-library package verifiers and fresh consumers;
 - Router unit and contract tests;
+- structural verification of the `Icod.TermInfo.Tools` package;
 - structural verification of all six standalone archives;
 - matching-host standalone archive smoke;
 - matching-host installed-router smoke.

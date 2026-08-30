@@ -4,14 +4,16 @@ using Xunit;
 namespace Icod.TermInfo.Router.Tests;
 
 public sealed class CommandTests {
-	[Fact]
-	public async Task HelpListsRoutedCommands() {
+	[Theory]
+	[InlineData( "-h" )]
+	[InlineData( "--help" )]
+	public async Task HelpListsRoutedCommands( string option ) {
 		using var stdin = new MemoryStream();
 		using var stdout = new MemoryStream();
 		using var stderr = new MemoryStream();
 
 		int status = await Command.RunAsync(
-			new string[] { "--help" },
+			new string[] { option },
 			stdin,
 			stdout,
 			stderr
@@ -26,14 +28,18 @@ public sealed class CommandTests {
 		Assert.Empty( ReadText( stderr ) );
 	}
 
-	[Fact]
-	public async Task VersionReportsCentralSuiteVersion() {
+	[Theory]
+	[InlineData( "-V" )]
+	[InlineData( "--version" )]
+	public async Task VersionReportsCentralSuiteVersion(
+		string option
+	) {
 		using var stdin = new MemoryStream();
 		using var stdout = new MemoryStream();
 		using var stderr = new MemoryStream();
 
 		int status = await Command.RunAsync(
-			new string[] { "-V" },
+			new string[] { option },
 			stdin,
 			stdout,
 			stderr
@@ -65,6 +71,70 @@ public sealed class CommandTests {
 		Assert.Equal( 0, status );
 		Assert.Contains( "1.5.0", ReadText( stdout ) );
 		Assert.Empty( ReadText( stderr ) );
+	}
+
+	[Theory]
+	[InlineData( "tic", "Usage: tic" )]
+	[InlineData( "infocmp", "Usage: infocmp" )]
+	[InlineData( "toe", "Usage: toe" )]
+	public async Task RoutesHelpRequestToSelectedCommand(
+		string commandName,
+		string expectedUsage
+	) {
+		using var stdin = new MemoryStream();
+		using var stdout = new MemoryStream();
+		using var stderr = new MemoryStream();
+
+		int status = await Command.RunAsync(
+			new string[] { commandName, "--help" },
+			stdin,
+			stdout,
+			stderr
+		);
+
+		Assert.Equal( 0, status );
+		Assert.Contains( expectedUsage, ReadText( stdout ) );
+		Assert.Empty( ReadText( stderr ) );
+	}
+
+	[Theory]
+	[InlineData( "tic", "--not-a-t05-option" )]
+	[InlineData( "infocmp", "--not-an-infocmp-option" )]
+	[InlineData( "toe", "--not-a-toe-option" )]
+	public async Task RoutedFailureMatchesSelectedCommand(
+		string commandName,
+		string argument
+	) {
+		using var directStdin = new MemoryStream();
+		using var directStdout = new MemoryStream();
+		using var directStderr = new MemoryStream();
+		using var routedStdin = new MemoryStream();
+		using var routedStdout = new MemoryStream();
+		using var routedStderr = new MemoryStream();
+
+		int directStatus = await RunDirectAsync(
+			commandName,
+			new string[] { argument },
+			directStdin,
+			directStdout,
+			directStderr
+		);
+		int routedStatus = await Command.RunAsync(
+			new string[] { commandName, argument },
+			routedStdin,
+			routedStdout,
+			routedStderr
+		);
+
+		Assert.Equal( directStatus, routedStatus );
+		Assert.Equal(
+			ReadText( directStdout ),
+			ReadText( routedStdout )
+		);
+		Assert.Equal(
+			ReadText( directStderr ),
+			ReadText( routedStderr )
+		);
 	}
 
 	[Fact]
@@ -139,6 +209,46 @@ public sealed class CommandTests {
 
 		stdout.WriteByte( 0 );
 		stderr.WriteByte( 0 );
+	}
+
+	private static Task<int> RunDirectAsync(
+		string commandName,
+		string[] arguments,
+		Stream stdin,
+		Stream stdout,
+		Stream stderr
+	) {
+		ArgumentException.ThrowIfNullOrWhiteSpace( commandName );
+		ArgumentNullException.ThrowIfNull( arguments );
+		ArgumentNullException.ThrowIfNull( stdin );
+		ArgumentNullException.ThrowIfNull( stdout );
+		ArgumentNullException.ThrowIfNull( stderr );
+
+		switch ( commandName ) {
+			case "tic":
+				return Icod.TermInfo.Tic.Command.RunAsync(
+					arguments,
+					stdin,
+					stdout,
+					stderr
+				);
+			case "infocmp":
+				return Icod.TermInfo.InfoCmp.Command.RunAsync(
+					arguments,
+					stdin,
+					stdout,
+					stderr
+				);
+			case "toe":
+				return Icod.TermInfo.Toe.Command.RunAsync(
+					arguments,
+					stdin,
+					stdout,
+					stderr
+				);
+			default:
+				throw new ArgumentOutOfRangeException( nameof( commandName ) );
+		}
 	}
 
 	private static string ReadText(

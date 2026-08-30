@@ -35,9 +35,10 @@ bash .github/scripts/verify-release-package.sh artifacts Release
 The scripts reject any configuration other than `Debug`, `Staging`, or
 `Release`. The selected configuration controls maintenance tools, API-snapshot
 build-output paths, the Runtime, Compiler, and Inspection package verifiers, the
-four reusable-library artifacts, all four fresh-library-package consumers, and
-the non-interactive repository sample. The installable `Icod.TermInfo.Tools`
-package has a separate execution smoke described below.
+`Icod.TermInfo.Tools` structural package verifier, the four reusable-library
+artifacts, all four fresh-library-package consumers, and the deterministic
+repository samples. The installable `Icod.TermInfo.Tools` package also has a
+separate execution smoke described below.
 
 The 1.1 source-language line keeps the frozen `Icod.TermInfo` package checks and
 adds `Icod.TermInfo.Source` net8.0/net9.0/net10.0 API-equivalence, reviewed
@@ -101,9 +102,16 @@ publication.
 
 ## Installable tool package
 
-`smoke-tool-package.ps1` validates the fifth registry package,
-`Icod.TermInfo.Tools`. It reads the centralized suite version, installs the
-freshly packed `.nupkg` into an isolated tool path and package cache, verifies
+`tools/tool-package-verifier` structurally validates the fifth registry package,
+`Icod.TermInfo.Tools`. It requires the single `icod-terminfo` .NET tool command,
+the coordinated package metadata and managed router/command payload, and rejects
+host-specific `tic`, `infocmp`, or `toe` apphosts from the
+`tools/net10.0/any/` package directory. The six standalone archives remain the
+only distribution which intentionally carries RID-specific apphosts.
+
+`smoke-tool-package.ps1` then validates execution. It reads the centralized
+suite version, installs the freshly packed `.nupkg` into an isolated tool path
+and package cache, verifies
 `icod-terminfo --version`, routes all three command `-V` forms, and exercises the
 same controlled `tic` -> `infocmp` -> `toe` database path used by the archive
 smoke.

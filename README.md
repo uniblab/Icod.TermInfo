@@ -678,7 +678,7 @@ The first provider which resolves the requested name wins.
 
 ## Sample applications
 
-The repository contains two executable API samples plus one command-suite
+The repository contains three executable API samples plus one command-suite
 walkthrough with deliberately different purposes.
 
 ### General terminal API sample
@@ -699,7 +699,7 @@ walkthrough with deliberately different purposes.
 - redirection handling and explicit Windows VT enablement;
 - a custom provider implementation.
 
-Both executable API sample projects target `net8.0`, `net9.0`, and
+All three executable API sample projects target `net8.0`, `net9.0`, and
 `net10.0`; `dotnet run` therefore needs an explicit framework. Run the ordinary
 demonstration with:
 
@@ -751,6 +751,26 @@ The sample prints the resolved terminal identity, aliases, selected numeric
 facts, and standard/extended capability counts. It does not write any capability
 string to the terminal.
 
+### Reusable library-toolchain sample
+
+`samples/Icod.TermInfo.Toolchain.Sample` demonstrates the reusable post-1.0
+library stack without invoking the command layer. It parses and resolves a
+controlled `.ti` source document, compiles and publishes the entries into a
+temporary conventional database, reloads the child through the Runtime provider,
+and verifies the acquired description through Inspection.
+
+Run it with:
+
+```text
+dotnet run --project samples/Icod.TermInfo.Toolchain.Sample/Icod.TermInfo.Toolchain.Sample.csproj -f net10.0
+```
+
+The sample is deterministic and does not inspect the host terminfo database. It
+is executed by release validation on Windows, Linux, and macOS. Use `-f net8.0`
+or `-f net9.0` when exercising those reusable-library target frameworks.
+
+See `samples/Icod.TermInfo.Toolchain.Sample/README.md` for the complete flow.
+
 ### Managed tool-suite walkthrough
 
 `samples/ToolSuite` is a data-and-command walkthrough for `tic`, `infocmp`, and
@@ -760,7 +780,8 @@ reverse `use=` dependency reporting do not depend on the host's installed
 terminfo database.
 
 See `samples/README.md`, `samples/ToolSuite/README.md`,
-`samples/Icod.TermInfo.Acquisition.Sample/README.md`, and
+`samples/Icod.TermInfo.Acquisition.Sample/README.md`,
+`samples/Icod.TermInfo.Toolchain.Sample/README.md`, and
 `docs/0.9.0-ACQUISITION-GUIDE.md` for the complete examples.
 
 ## Project-family boundary
@@ -860,17 +881,19 @@ bash .github/scripts/verify-release-package.sh artifacts Release
 Both wrappers retain the coordinated four-library release verifier: generated
 capability metadata, all four public-API baselines, net8/net9/net10 API
 equivalence, package/XML/symbol/dependency validation, all four isolated
-package-reference-only smoke consumers, and the sample's non-interactive
-`--describe-only` path. The separate `smoke-tool-package.ps1` gate installs and
-executes the fifth registry package, `Icod.TermInfo.Tools`. Windows package
-validation does not require Bash or Python.
+package-reference-only smoke consumers, the sample's non-interactive
+`--describe-only` path, the deterministic reusable toolchain sample, and
+structural validation of the fifth registry package, `Icod.TermInfo.Tools`.
+The separate `smoke-tool-package.ps1` gate installs and executes that router
+package on each supported host family. Windows package validation does not
+require Bash or Python.
 
 Pull requests use Staging throughout and may upload verified package artifacts,
 but never publish. Pushes to `main` run the non-publishing Release validation
 matrix. Only an immutable `v*` tag matching the coordinated package version may
 start registry publication through `.github/workflows/release.yaml`.
 
-See `docs/RELEASING.md` for the release procedure,
+See `RELEASING.md` for the current release procedure,
 `Icod.TermInfo-1.4.0-Tool-Suite-Roadmap.md` for the frozen T01-T11 command
 semantic contract, and `docs/1.5.0-RELEASE-AUDIT.md` for the current
 distribution/versioning release gate. Tag `v1.5.0` only on the exact validated

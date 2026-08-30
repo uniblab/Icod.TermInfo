@@ -38,9 +38,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\tic\Icod.TermInfo.Tic.csproj" />
-		<ProjectReference Include="..\infocmp\Icod.TermInfo.InfoCmp.csproj" />
-		<ProjectReference Include="..\toe\Icod.TermInfo.Toe.csproj" />
+		<ProjectReference Include="..\tic\Icod.TermInfo.Tic.csproj" AdditionalProperties="UseAppHost=false" />
+		<ProjectReference Include="..\infocmp\Icod.TermInfo.InfoCmp.csproj" AdditionalProperties="UseAppHost=false" />
+		<ProjectReference Include="..\toe\Icod.TermInfo.Toe.csproj" AdditionalProperties="UseAppHost=false" />
 	</ItemGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">

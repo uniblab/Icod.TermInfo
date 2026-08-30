@@ -15,7 +15,7 @@ This document describes the current validation and publication procedure for the
   match the centralized suite version.
 - Runtime, Source, Compiler, and Inspection retain 1.x assembly version
   `1.0.0.0` and remain unsigned.
-- Supported consumer targets for the 1.4 line are `net8.0`, `net9.0`, and `net10.0`.
+- Supported consumer targets for the 1.5 release are `net8.0`, `net9.0`, and `net10.0`.
 - Beginning with T01 in 1.4, the `tic`, `infocmp`, and `toe` command projects
   target `net10.0`; the four reusable library packages retain all three targets.
 - The `tic`, `infocmp`, and `toe` projects remain non-packable solution
@@ -30,12 +30,15 @@ This document describes the current validation and publication procedure for the
 - Release validation must pass the frozen Runtime 1.0, Source 1.1, Compiler 1.2,
   and Inspection 1.4 API baselines while retaining the historical Inspection
   1.3 baseline and the net8/net9/net10 API-equivalence gates.
-- Release builds treat missing public XML documentation as an error.
+- Reusable-library Release builds treat missing public XML documentation as an
+  error. Command and router projects generate XML documentation while retaining
+  their explicit `CS1591` exemption.
 - All four reusable library packages must pass the coordinated release verifier
   before publication. Use `.github/scripts/verify-release-package.sh` on a
   Bash-capable host or `.github/scripts/verify-release-package.cmd` from Windows
-  Command Prompt. `Icod.TermInfo.Tools` must separately pass the isolated
-  install-and-route smoke on Windows, Linux, and macOS.
+  Command Prompt. `Icod.TermInfo.Tools` must pass its structural package verifier
+  and separately pass the isolated install-and-route smoke on Windows, Linux,
+  and macOS.
 - Release packages must retain deterministic build metadata, repository commit
   metadata, portable symbols, Source Link, README, icon metadata, and all three
   framework XML-documentation assets.
@@ -131,8 +134,10 @@ validation-only.
 ### Release tags
 
 `.github/workflows/release.yaml` runs for pushed tags matching `v*`. Before the
-release build, it requires the tagged commit to be contained in `main`, requires
-the tag to match `Directory.Build.props:IcodTermInfoSuiteVersion`, and verifies
+release build, it fetches `origin/main` and requires the tagged commit to equal
+the exact current `main` HEAD. This prevents an older already-merged ancestor
+from being released after a newer validation commit exists. It also requires the
+tag to match `Directory.Build.props:IcodTermInfoSuiteVersion` and verifies
 that all eight coordinated projects consume that version property in their
 appropriate `Version` / `PackageVersion` fields.
 
@@ -169,20 +174,25 @@ The Bash and CMD entry points perform equivalent validation. They:
 8. run the Runtime, Compiler, and Inspection package verifiers for package
    structure, dependency closure, metadata, XML documentation, Source Link, and
    portable symbols;
-9. require Source, Compiler, and Inspection `.nupkg` / `.snupkg` artifacts at the
+9. structurally verify `Icod.TermInfo.Tools`, including its single router command
+   and the absence of host-specific command apphosts from its `any` payload;
+10. require Source, Compiler, and Inspection `.nupkg` / `.snupkg` artifacts at the
    same package version as Runtime;
-10. restore and execute the isolated Runtime package consumer on all three TFMs;
-11. restore and execute the isolated Source package consumer on all three TFMs;
-12. restore and execute the isolated Compiler package consumer on all three TFMs;
-13. restore and execute the isolated Inspection package consumer on all three TFMs;
-14. run the general repository sample through its non-interactive
-    `--describe-only` path.
+11. restore and execute the isolated Runtime package consumer on all three TFMs;
+12. restore and execute the isolated Source package consumer on all three TFMs;
+13. restore and execute the isolated Compiler package consumer on all three TFMs;
+14. restore and execute the isolated Inspection package consumer on all three TFMs;
+15. run the general repository sample through its non-interactive
+    `--describe-only` path;
+16. run the deterministic Source -> Compiler -> database acquisition -> Inspection
+    toolchain sample.
 
-Both repository sample executables are solution projects and therefore compile
-in every CI matrix. The focused acquisition sample is not automatically run
-against the host database because its `system` command intentionally inspects
-host-specific terminfo state; the isolated runtime package-smoke consumer
-supplies the deterministic acquisition acceptance test instead.
+All three executable API samples are solution projects and therefore compile in
+every CI matrix. The deterministic toolchain sample is also executed by the
+release verifier. The focused acquisition sample is not automatically run against
+the host database because its `system` command intentionally inspects host-specific
+terminfo state; the isolated runtime package-smoke consumer supplies the
+deterministic acquisition acceptance test instead.
 
 The checked-in Runtime, Source, Compiler, and Inspection package-smoke projects
 are intentionally not part of the solution and contain no project references to
