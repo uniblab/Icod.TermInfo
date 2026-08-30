@@ -155,7 +155,7 @@ public sealed class ContractTests {
 			FindRepositoryRoot();
 		string shellVerifier =
 			File.ReadAllText(
-				Path.Combine(
+				System.IO.Path.Combine(
 					root,
 					".github",
 					"scripts",
@@ -163,8 +163,8 @@ public sealed class ContractTests {
 				)
 			);
 		string commandVerifier =
-			File.ReadAllText(
-				Path.Combine(
+			System.IO.File.ReadAllText(
+				System.IO.Path.Combine(
 					root,
 					".github",
 					"scripts",
@@ -172,8 +172,8 @@ public sealed class ContractTests {
 				)
 			);
 		string archiveBuilder =
-			File.ReadAllText(
-				Path.Combine(
+			System.IO.File.ReadAllText(
+				System.IO.Path.Combine(
 					root,
 					".github",
 					"scripts",
