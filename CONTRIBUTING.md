@@ -30,9 +30,12 @@ own line. Do not attach it to the final argument or parameter. When xUnit
 provides a predicate overload for an assertion, prefer that overload instead of
 filtering with `Where(...)` and asserting on the filtered sequence.
 
-Release builds treat warnings as errors, including CS1591. Every public member
-must carry XML documentation. Public API changes must also be nullable-correct
-and covered by semantic surface tests. Runtime API changes must be reconciled
+Reusable-library Release builds treat warnings as errors, including CS1591.
+Every public member of Runtime, Source, Compiler, and Inspection must carry XML
+documentation. Command and router projects generate XML documentation while
+retaining their explicit CS1591 exemption. Public API changes must also be
+nullable-correct and covered by semantic surface tests. Runtime API changes must
+be reconciled
 deliberately with `docs/1.0.0-PUBLIC-API-BASELINE.txt`; Source API changes must
 be reconciled with `docs/1.1.0-SOURCE-PUBLIC-API-BASELINE.txt`. Do not regenerate
 either baseline merely to silence a mismatch. Compiler API changes must likewise
@@ -109,8 +112,10 @@ Terminal profile loading must remain side-effect free. In particular, Windows vi
 
 Public behavior changes should update README examples when relevant. Samples must remain safe on redirected output and should not assume the CI runner has a usable `TERM` or interactive TTY.
 
-Both runtime sample projects are multi-targeted. Documentation which invokes
-them with `dotnet run` must specify `-f net8.0`, `-f net9.0`, or `-f net10.0`.
+All three executable API sample projects are multi-targeted. Documentation which
+invokes them with `dotnet run` must specify `-f net8.0`, `-f net9.0`, or
+`-f net10.0`. The Toolchain sample must remain deterministic and use an explicit
+temporary database rather than the host `TERM` value or installed terminfo data.
 
 If a public runtime type or compatibility operation changes, update the semantic
 public API tests deliberately and reconcile the change with
@@ -147,7 +152,7 @@ Package changes should preserve:
 - identical validated registry package artifacts for NuGet.org and GitHub
   Packages.
 
-See `docs/RELEASING.md` before modifying publication workflows.
+See `RELEASING.md` before modifying publication workflows.
 
 ## Scope discipline
 
