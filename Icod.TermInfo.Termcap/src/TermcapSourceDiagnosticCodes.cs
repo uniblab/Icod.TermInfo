@@ -1,7 +1,7 @@
 namespace Icod.TermInfo.Termcap;
 
 /// <summary>
-/// Defines stable diagnostic codes emitted by the termcap source parser.
+/// Defines stable diagnostic codes emitted by termcap source parsing and resolution.
 /// </summary>
 public static class TermcapSourceDiagnosticCodes
 {
@@ -37,4 +37,10 @@ public static class TermcapSourceDiagnosticCodes
 	public const string MissingTrailingColon = "TCAP0015";
 	/// <summary>An octal string escape exceeds one-byte termcap string semantics.</summary>
 	public const string OctalEscapeOutOfRange = "TCAP0016";
+	/// <summary>A requested or inherited termcap source entry could not be found.</summary>
+	public const string MissingSourceEntry = "TCAP0017";
+	/// <summary>A <c>tc=</c> inheritance cycle was detected.</summary>
+	public const string InheritanceCycle = "TCAP0018";
+	/// <summary>The configured maximum <c>tc=</c> inheritance depth was exceeded.</summary>
+	public const string MaximumInheritanceDepthExceeded = "TCAP0019";
 }

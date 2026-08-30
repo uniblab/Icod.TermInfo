@@ -173,7 +173,7 @@ public sealed class TC02ClassificationTests
 	[Fact]
 	public void UnmappedVendorFieldRemainsExplicit() {
 		TermcapSourceField field =
-			ParseSingleField( "ZZ=vendor" );
+			ParseSingleField( "!!=vendor" );
 		TermcapCapabilityClassificationResult classification =
 			TermcapCapabilityClassifier.Classify( field );
 

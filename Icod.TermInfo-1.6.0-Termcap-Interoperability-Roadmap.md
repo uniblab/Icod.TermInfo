@@ -2,9 +2,9 @@
 
 **Development line:** `1.6.0`
 **Initial development version:** `1.6.0-Alpha-1`
-**Current development version:** `1.6.0-Alpha-2`
+**Current development version:** `1.6.0-Alpha-3`
 **Stable assembly version:** `1.0.0.0`
-**Status:** Implementation in progress — TC02 capability metadata and classification
+**Status:** Implementation in progress — TC03 termcap inheritance and cancellation
 **Primary change:** Add explicit termcap parsing, semantic mapping, conversion, acquisition, and tools without changing the frozen Runtime, Source, Compiler, or Inspection contracts.
 
 ---
@@ -274,26 +274,56 @@ remain deterministic, and unknown/vendor fields remain explicit.
 
 **Development version:** `1.6.0-Alpha-3`
 
-TC03 adds a termcap-specific resolver above the unresolved parser.
+TC03 adds a termcap-specific resolver above the unresolved parser. The public
+resolver surface is centered on:
 
-Required behavior:
+```text
+ITermcapSourceEntryProvider
+TermcapSourceResolverOptions
+TermcapSourceResolver
+TermcapSourceResolveResult
+TermcapSourceResolvedEntry
+TermcapSourceResolvedField
+```
 
-- resolve terminal names from a parsed document or caller-supplied provider;
-- apply the referring description before inherited descriptions;
-- preserve the historical rule that local values override inherited values;
-- apply `xx@` cancellation across inheritance;
-- detect missing references;
-- detect direct and indirect cycles;
-- impose a configurable inheritance-depth bound;
-- preserve deterministic diagnostics and source provenance;
-- remain independent of process-global database discovery.
+Document-backed lookup SHALL match TC01 header components case-sensitively in
+source order without prematurely assigning canonical-name, alias, or prose
+description semantics. A caller-supplied provider MAY acquire entries from any
+caller-controlled store, but provider exceptions propagate and clean misses are
+reported as resolver diagnostics. TC03 SHALL NOT inspect files, `TERMCAP`,
+`TERMPATH`, or process-global database configuration.
 
-The resolver SHALL NOT route termcap through the terminfo `use=` resolver merely
-because both mechanisms express inheritance. Their syntax and precedence rules
-remain separately testable.
+Resolution SHALL apply local fields first and then the inherited description.
+Within one entry, the first occurrence of an exact two-character capability code
+claims that code. An active local field supplies the value; `xx@` claims the code
+without supplying a value and therefore suppresses inherited occurrences.
+Period-prefixed disabled fields do not claim capability state. Unknown/vendor
+codes participate in the same exact-code precedence rules without requiring a
+TC02 Runtime mapping.
 
-**Gate TC03:** multi-level and cyclic `tc=` graphs resolve or fail deterministically
-with the adopted precedence and cancellation semantics.
+Effective inherited fields SHALL retain the original `TermcapSourceField`, the
+`TermcapSourceEntry` which supplied them, and their inheritance depth. The
+resolved field list therefore preserves source provenance while cancellation
+materializes as absence. No Runtime conversion occurs merely because inheritance
+has been resolved.
+
+`TermcapSourceResolverOptions` SHALL default to 64 inheritance edges and SHALL
+reject caller-selected bounds above 256. The resolver SHALL report deterministic
+diagnostics for a missing source entry, direct or indirect cycle, and exceeded
+inheritance-depth bound. The failing `tc=` source span SHALL be retained whenever
+the failure occurs on an inheritance edge.
+
+The resolver SHALL NOT route termcap through `TermInfoSourceResolver` merely
+because both `tc=` and `use=` express inheritance. Their lookup, precedence,
+cancellation, diagnostics, and source models remain independently testable.
+
+**Gate TC03:** local-over-inherited precedence, multi-level cancellation,
+caller-supplied lookup, missing references, cycles, depth limits, and source
+provenance resolve or fail deterministically while effective fields remain in
+termcap source form.
+
+**Implementation record:**
+[`docs/1.6.0-TC03-TERMCAP-INHERITANCE-AND-CANCELLATION.md`](docs/1.6.0-TC03-TERMCAP-INHERITANCE-AND-CANCELLATION.md)
 
 ---
 

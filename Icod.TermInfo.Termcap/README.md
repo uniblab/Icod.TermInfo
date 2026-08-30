@@ -3,10 +3,9 @@
 `Icod.TermInfo.Termcap` is the optional termcap interoperability layer for the
 Icod.TermInfo package family.
 
-The `1.6.0-Alpha-2` TC02 tranche retains the bounded TC01 parser and adds
-semantic classification of two-character termcap capability codes against the
-canonical Runtime capability catalog. It still does not resolve `tc=`
-inheritance, construct `TerminalDescription` values, read `TERMCAP` or
+The `1.6.0-Alpha-3` TC03 tranche retains the TC01 parser and TC02 capability
+classifier and adds bounded, deterministic `tc=` inheritance and cancellation.
+It still does not construct `TerminalDescription` values, read `TERMCAP` or
 `TERMPATH`, or provide conversion commands.
 
 The package targets `net8.0`, `net9.0`, and `net10.0` and depends only on
@@ -42,7 +41,38 @@ source syntax value kind and the Runtime mapping's expected value kind remain
 separately observable.
 
 The parser continues to preserve source spans and field order. Classification
-does not resolve inheritance, apply cancellation, or perform conversion.
+does not itself resolve inheritance or perform conversion.
+
+## Inheritance resolution
+
+Resolve a parsed entry explicitly by one of its header components:
+
+```csharp
+TermcapSourceResolveResult resolved = TermcapSourceResolver.Resolve(
+    result.Document,
+    "vt100"
+);
+
+if (!resolved.HasErrors && resolved.Entry is not null)
+{
+    foreach (TermcapSourceResolvedField field in resolved.Entry.Fields)
+    {
+        Console.WriteLine(
+            $"{field.CapabilityName} depth={field.InheritanceDepth}"
+        );
+    }
+}
+```
+
+Local fields take precedence over inherited fields by exact two-character code.
+`xx@` cancellation suppresses inherited occurrences, while period-prefixed
+disabled fields do not claim a capability. Effective fields retain the original
+source field, originating entry, source span, and inheritance depth. Unknown or
+vendor codes are resolved by the same exact-code rules without being discarded.
+
+`ITermcapSourceEntryProvider` supports caller-controlled lookup when a parsed
+document is not the desired store. TC03 performs no process-global or file-system
+discovery.
 
 ## Resource limits
 

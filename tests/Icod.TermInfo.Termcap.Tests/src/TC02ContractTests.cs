@@ -10,16 +10,8 @@ public sealed class TC02ContractTests
 	private const string Tc02DevelopmentVersion = "1.6.0-Alpha-2";
 
 	[Fact]
-	public void CoordinatedDevelopmentVersionAdvancesToTc02() {
+	public void Tc02VersionAndCentralVersionWiringRemainRecorded() {
 		string root = FindRepositoryRoot();
-		XDocument buildProperties =
-			XDocument.Load(
-				Path.Combine(
-					root,
-					"Directory.Build.props"
-				),
-				LoadOptions.None
-			);
 		XDocument termcapProject =
 			XDocument.Load(
 				Path.Combine(
@@ -30,13 +22,16 @@ public sealed class TC02ContractTests
 				LoadOptions.None
 			);
 
-		Assert.Equal(
-			Tc02DevelopmentVersion,
-			ReadRequiredProperty(
-				buildProperties,
-				"IcodTermInfoSuiteVersion"
-			)
-		);
+		string implementation =
+			File.ReadAllText(
+				Path.Combine(
+					root,
+					"docs",
+					"1.6.0-TC02-CAPABILITY-METADATA-AND-CLASSIFICATION.md"
+				)
+			);
+
+		Assert.Contains( Tc02DevelopmentVersion, implementation );
 		Assert.Equal(
 			"$(IcodTermInfoSuiteVersion)",
 			ReadRequiredProperty(

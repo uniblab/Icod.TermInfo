@@ -74,6 +74,12 @@ public termcap capability-mapping and classification APIs only to
 frozen public API baselines. The Termcap public surface remains a development
 contract until the 1.6 release-closure freeze.
 
+TC03 advances the coordinated development version to `1.6.0-Alpha-3` and adds
+termcap-specific bounded `tc=` resolution, cancellation, provider lookup, and
+source-provenance APIs only to `Icod.TermInfo.Termcap`. The resolver does not add
+a Source dependency and does not alter any frozen Runtime, Source, Compiler, or
+Inspection public API baseline.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:
