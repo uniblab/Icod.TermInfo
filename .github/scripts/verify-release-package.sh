@@ -112,6 +112,11 @@ dotnet run \
   -c "${configuration}" \
   -f net10.0 \
   -- "${artifact_dir}"
+dotnet run \
+  --project tools/tool-package-verifier/Icod.TermInfo.Tools.PackageVerifier.csproj \
+  -c "${configuration}" \
+  -f net10.0 \
+  -- "${artifact_dir}"
 
 package_version="$(
   dotnet msbuild Icod.TermInfo.csproj \
@@ -357,3 +362,10 @@ dotnet run \
   -c "${configuration}" \
   -f net10.0 \
   -- --describe-only --profile ms-terminal-direct
+
+# The deterministic library-toolchain sample must compose Source, Compiler,
+# Runtime acquisition, and Inspection without depending on host terminfo state.
+dotnet run \
+  --project samples/Icod.TermInfo.Toolchain.Sample/Icod.TermInfo.Toolchain.Sample.csproj \
+  -c "${configuration}" \
+  -f net10.0

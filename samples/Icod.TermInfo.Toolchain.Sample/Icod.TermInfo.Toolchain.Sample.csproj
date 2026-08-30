@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+		<AssemblyName>Icod.TermInfo.Toolchain.Sample</AssemblyName>
+		<RootNamespace>Icod.TermInfo.Toolchain.Sample</RootNamespace>
+		<IsPackable>false</IsPackable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\Icod.TermInfo.Compiler\Icod.TermInfo.Compiler.csproj" />
+		<ProjectReference Include="..\..\Icod.TermInfo.Inspection\Icod.TermInfo.Inspection.csproj" />
+	</ItemGroup>
+</Project>

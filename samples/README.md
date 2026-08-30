@@ -1,12 +1,14 @@
 # Icod.TermInfo Samples
 
-The repository contains two executable API samples and one command-suite
+The repository contains three executable API samples and one command-suite
 walkthrough. The API samples remain separate so acquisition examples stay easy
-to copy without mixing them with interactive terminal-control output; the
-ToolSuite sample demonstrates the coordinated `tic`, `infocmp`, and `toe`
-workflow added in 1.4.
+to copy without mixing them with interactive terminal-control output. The
+Toolchain sample demonstrates the reusable Source -> Compiler -> Runtime ->
+Inspection flow, while ToolSuite demonstrates the coordinated `tic`, `infocmp`,
+and `toe` workflow added in 1.4.
 
-Both executable sample projects target `net8.0`, `net9.0`, and `net10.0`. Every
+All three executable API sample projects target `net8.0`, `net9.0`, and
+`net10.0`. Every
 `dotnet run` example therefore specifies a framework; substitute `-f net8.0` or
 `-f net9.0` when exercising those consumer targets.
 
@@ -52,6 +54,23 @@ dotnet run --project samples/Icod.TermInfo.Acquisition.Sample/Icod.TermInfo.Acqu
 ```
 
 See `Icod.TermInfo.Acquisition.Sample/README.md`.
+
+## Icod.TermInfo.Toolchain.Sample
+
+`Icod.TermInfo.Toolchain.Sample` is the deterministic reusable-library toolchain
+demonstration introduced for 1.5. It parses and resolves controlled `.ti`
+source, compiles and publishes it into a temporary conventional database,
+reloads the child entry through the Runtime provider, and verifies the acquired
+description through Inspection. It does not depend on the host `TERM` value or
+installed terminfo database.
+
+Run it with:
+
+```text
+dotnet run --project samples/Icod.TermInfo.Toolchain.Sample/Icod.TermInfo.Toolchain.Sample.csproj -f net10.0
+```
+
+See `Icod.TermInfo.Toolchain.Sample/README.md`.
 
 ## ToolSuite
 

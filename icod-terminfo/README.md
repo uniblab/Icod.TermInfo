@@ -3,10 +3,27 @@
 `Icod.TermInfo.Tools` is the installable .NET tool router for the managed
 `Icod.TermInfo` command suite.
 
+The tool targets `net10.0` and therefore requires a .NET 10 runtime.
+
 ## Install
 
 ```text
 dotnet tool install --global Icod.TermInfo.Tools --version 1.5.0
+```
+
+Update or remove the global tool with:
+
+```text
+dotnet tool update --global Icod.TermInfo.Tools --version 1.5.0
+dotnet tool uninstall --global Icod.TermInfo.Tools
+```
+
+For repository-local or application-local use, install through a tool manifest:
+
+```text
+dotnet new tool-manifest
+dotnet tool install Icod.TermInfo.Tools --version 1.5.0
+dotnet tool run icod-terminfo --version
 ```
 
 The package installs one unambiguous command:
@@ -14,6 +31,10 @@ The package installs one unambiguous command:
 ```text
 icod-terminfo
 ```
+
+It does not install global commands named `tic`, `infocmp`, or `toe`. Those
+traditional command names belong to the separately downloaded standalone
+release archives.
 
 Route the existing commands through it:
 

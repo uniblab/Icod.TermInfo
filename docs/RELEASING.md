@@ -1,7 +1,14 @@
 # Releasing Icod.TermInfo
 
-This document describes the current validation and publication procedure for the
-`Icod.TermInfo` package family built from this repository.
+> **Historical compatibility note:** this document preserves the pre-1.5 release
+> procedure for historical links and older release records. It is not the
+> authoritative procedure for 1.5.0 or later. Use [`../RELEASING.md`](../RELEASING.md)
+> for the current repository release process and
+> [`1.5.0-RELEASE-AUDIT.md`](1.5.0-RELEASE-AUDIT.md) for the immutable 1.5.0
+> publication contract.
+
+The material below describes the historical validation and publication procedure
+retained for pre-1.5 release records.
 
 ## Release principles
 

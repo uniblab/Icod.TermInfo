@@ -74,6 +74,10 @@ public sealed class ContractTests {
 				"false",
 				ReadRequiredProperty( project, "IsPackable" )
 			);
+			Assert.Equal(
+				"false",
+				ReadRequiredProperty( project, "UseAppHost" )
+			);
 		}
 	}
 
@@ -108,13 +112,23 @@ public sealed class ContractTests {
 			ReadRequiredProperty( router, "ToolCommandName" )
 		);
 
-		string[] references =
+		XElement[] projectReferences =
 			router
 				.Descendants()
 				.Where(
 					element =>
 						element.Name.LocalName == "ProjectReference"
 				)
+				.ToArray();
+		Assert.All(
+			projectReferences,
+			element =>
+				Assert.Null(
+					element.Attribute( "AdditionalProperties" )
+				)
+		);
+		string[] references =
+			projectReferences
 				.Select(
 					element =>
 						element.Attribute( "Include" )?.Value
@@ -133,6 +147,43 @@ public sealed class ContractTests {
 			},
 			references
 		);
+	}
+
+	[Fact]
+	public void RouterPackageHasStructuralAndHostNeutralityGates() {
+		string root =
+			FindRepositoryRoot();
+		string shellVerifier =
+			File.ReadAllText(
+				System.IO.Path.Combine(
+					root,
+					".github",
+					"scripts",
+					"verify-release-package.sh"
+				)
+			);
+		string commandVerifier =
+			System.IO.File.ReadAllText(
+				System.IO.Path.Combine(
+					root,
+					".github",
+					"scripts",
+					"verify-release-package.cmd"
+				)
+			);
+		string archiveBuilder =
+			System.IO.File.ReadAllText(
+				System.IO.Path.Combine(
+					root,
+					".github",
+					"scripts",
+					"build-tool-archives.sh"
+				)
+			);
+
+		Assert.Contains( "tool-package-verifier", shellVerifier );
+		Assert.Contains( "tool-package-verifier", commandVerifier );
+		Assert.Contains( "-p:UseAppHost=true", archiveBuilder );
 	}
 
 	private static XDocument LoadProject(

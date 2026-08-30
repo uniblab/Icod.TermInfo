@@ -89,6 +89,9 @@ if errorlevel 1 goto fail
 dotnet run --project tools\inspection-package-verifier\Icod.TermInfo.Inspection.PackageVerifier.csproj -c %CONFIGURATION% -f net10.0 -- "%ARTIFACT_DIR%"
 if errorlevel 1 goto fail
 
+dotnet run --project tools\tool-package-verifier\Icod.TermInfo.Tools.PackageVerifier.csproj -c %CONFIGURATION% -f net10.0 -- "%ARTIFACT_DIR%"
+if errorlevel 1 goto fail
+
 set "PACKAGE_VERSION="
 for /f "delims=" %%V in ('dotnet msbuild Icod.TermInfo.csproj -nologo -getProperty:PackageVersion') do set "PACKAGE_VERSION=%%V"
 if not defined PACKAGE_VERSION (
@@ -265,6 +268,11 @@ if errorlevel 1 goto fail
 echo.
 echo === Non-interactive repository sample ===
 dotnet run --project samples\Icod.TermInfo.Sample\Icod.TermInfo.Sample.csproj -c %CONFIGURATION% -f net10.0 -- --describe-only --profile ms-terminal-direct
+if errorlevel 1 goto fail
+
+echo.
+echo === Deterministic Source/Compiler/Inspection toolchain sample ===
+dotnet run --project samples\Icod.TermInfo.Toolchain.Sample\Icod.TermInfo.Toolchain.Sample.csproj -c %CONFIGURATION% -f net10.0
 if errorlevel 1 goto fail
 
 goto cleanup

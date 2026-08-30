@@ -187,7 +187,16 @@ public sealed class T41CompletionGateTests
 			+ "      - \'v*\'\n",
 			release);
 		Assert.Contains(
-			"Require tagged commit on main",
+			"Require tag on exact main HEAD",
+			release);
+		Assert.Contains(
+			"refs/heads/main:refs/remotes/origin/main",
+			release);
+		Assert.Contains(
+			"git rev-parse origin/main",
+			release);
+		Assert.DoesNotContain(
+			"merge-base --is-ancestor",
 			release);
 		Assert.Contains(
 			"Validate tag and centralized suite version",
