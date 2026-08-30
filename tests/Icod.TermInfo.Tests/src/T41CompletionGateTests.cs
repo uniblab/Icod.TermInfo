@@ -190,10 +190,12 @@ public sealed class T41CompletionGateTests
 			"Require tag on exact main HEAD",
 			release);
 		Assert.Contains(
-			"refs/heads/main:refs/remotes/origin/main",
-			release);
-		Assert.Contains(
-			"git rev-parse origin/main",
+			"git fetch origin refs/heads/main:refs/remotes/origin/main --no-tags\n"
+			+ "          if (0 -ne $LASTEXITCODE) {\n"
+			+ "              throw 'Unable to refresh the current origin/main commit.'\n"
+			+ "          }\n"
+			+ "\n"
+			+ "          $mainCommit = (git rev-parse origin/main).Trim()",
 			release);
 		Assert.DoesNotContain(
 			"merge-base --is-ancestor",
