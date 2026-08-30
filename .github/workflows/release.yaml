@@ -26,7 +26,7 @@ jobs:
       - name: Require tag on exact main HEAD
         shell: pwsh
         run: |
-          git fetch origin main --no-tags
+          git fetch origin refs/heads/main:refs/remotes/origin/main --no-tags
           $mainCommit = (git rev-parse origin/main).Trim()
           if (0 -ne $LASTEXITCODE -or [string]::IsNullOrWhiteSpace($mainCommit)) {
               throw 'Unable to resolve the current origin/main commit.'
