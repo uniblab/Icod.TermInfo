@@ -11,22 +11,32 @@ public sealed class TC03ContractTests
 	private const string Tc03DevelopmentVersion = "1.6.0-Alpha-3";
 
 	[Fact]
-	public void CoordinatedDevelopmentVersionAdvancesToTc03() {
+	public void Tc03VersionAndCentralVersionWiringRemainRecorded() {
 		string root = FindRepositoryRoot();
-		XDocument buildProperties =
+		XDocument termcapProject =
 			XDocument.Load(
 				Path.Combine(
 					root,
-					"Directory.Build.props"
+					"Icod.TermInfo.Termcap",
+					"Icod.TermInfo.Termcap.csproj"
 				),
 				LoadOptions.None
 			);
+		string implementation =
+			File.ReadAllText(
+				Path.Combine(
+					root,
+					"docs",
+					"1.6.0-TC03-TERMCAP-INHERITANCE-AND-CANCELLATION.md"
+				)
+			);
 
+		Assert.Contains( Tc03DevelopmentVersion, implementation );
 		Assert.Equal(
-			Tc03DevelopmentVersion,
+			"$(IcodTermInfoSuiteVersion)",
 			ReadRequiredProperty(
-				buildProperties,
-				"IcodTermInfoSuiteVersion"
+				termcapProject,
+				"Version"
 			)
 		);
 	}

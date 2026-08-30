@@ -2,9 +2,9 @@
 
 **Development line:** `1.6.0`
 **Initial development version:** `1.6.0-Alpha-1`
-**Current development version:** `1.6.0-Alpha-3`
+**Current development version:** `1.6.0-Alpha-4`
 **Stable assembly version:** `1.0.0.0`
-**Status:** Implementation in progress — TC03 termcap inheritance and cancellation
+**Status:** Implementation in progress — TC04 termcap semantic conversion
 **Primary change:** Add explicit termcap parsing, semantic mapping, conversion, acquisition, and tools without changing the frozen Runtime, Source, Compiler, or Inspection contracts.
 
 ---
@@ -331,28 +331,84 @@ termcap source form.
 
 **Development version:** `1.6.0-Alpha-4`
 
-TC04 converts a resolved termcap entry into the canonical immutable Runtime
-model.
+TC04 converts a TC03-resolved termcap entry into the canonical immutable Runtime
+model. The public conversion surface is centered on:
+
+```text
+TermcapConverter
+TermcapConversionResult
+TermcapConversionDiagnostic
+TermcapConversionDiagnosticCodes
+TermcapConversionDiagnosticSeverity
+TermcapConversionDecision
+```
+
+Header interpretation SHALL be deterministic. The first header component is the
+canonical Runtime name. Subsequent components are aliases except when the final
+component contains whitespace, in which case it is the verbose description. A
+final component without whitespace remains an alias rather than causing a
+synthetic description. Duplicate header identities SHALL be ignored only with an
+explicit approximation diagnostic.
 
 Conversion SHALL distinguish:
 
 ```text
-exact mapping
-supported historical alias
-explicit approximation
-unsupported/unmapped field
-unrepresentable value
+Exact
+HistoricalAlias
+Extended
+Approximation
+Unsupported
+Unrepresentable
 ```
 
-Loss SHALL be reported through a structured conversion result and SHALL NOT be
-silently hidden.
+Canonical TC02 mappings, including Runtime-retained `OT...` compatibility
+capabilities, SHALL materialize directly through the existing Runtime enums.
+Adopted obsolete aliases SHALL map to their selected canonical Runtime identity
+and remain observable as lossless `HistoricalAlias` decisions. Ambiguous codes
+and source/mapping value-kind mismatches SHALL fail rather than being guessed.
+
+An unmapped two-character Boolean, numeric, or string field SHALL be preserved as
+a Runtime extended capability when its exact name does not collide with a
+standard terminfo short name. This is an observable but lossless `Extended`
+decision. A colliding name is unsupported because Runtime extended capabilities
+may not shadow standard names.
+
+When two effective termcap codes map to the same Runtime capability identity, the
+higher-priority TC03 field SHALL win. The lower-priority field SHALL be ignored
+with an explicit approximation diagnostic rather than overwriting the earlier
+semantic value.
+
+Termcap strings SHALL NOT be copied blindly into Runtime. Traditional leading
+termcap padding SHALL be moved to an equivalent mandatory terminfo `$<.../>`
+delay suffix. TC04 SHALL translate the classic BSD parameter operators `%%`,
+`%d`, `%2`, `%3`, `%.`, `%+x`, `%>xy`, `%r`, `%i`, `%n`, `%B`, and `%D` into
+the Runtime terminfo parameter language for adopted one- and two-numeric-parameter
+capability profiles. `%02` and `%03` SHALL be accepted as compatibility spellings.
+Fixed-width `%2` / `%3` execution SHALL retain BSD-style modulo 100 / 1000 and
+zero-padding semantics. A recognizable parameter program on a capability outside
+the adopted profile set, or any unsupported `%` operator within a supported
+profile, SHALL fail explicitly rather than being silently passed through.
+
+Loss SHALL be reported through `TermcapConversionResult` and SHALL NOT be
+silently hidden. `HistoricalAlias` and `Extended` are observable but lossless;
+`Approximation`, `Unsupported`, and `Unrepresentable` set `HasLoss`. An error
+prevents publication of a partial `TerminalDescription`. Diagnostics SHALL retain
+the originating source entry, effective source field when available, and source
+span.
 
 The resulting `TerminalDescription` SHALL use the same standard capability enums
 and extended-capability storage used by every other Runtime acquisition path.
-Termcap-specific source state SHALL NOT leak into `TerminalDescription`.
+Termcap-specific source state SHALL NOT leak into `TerminalDescription`. TC04
+SHALL NOT inspect `TERMCAP`, `TERMPATH`, conventional database paths, or add
+command/router behavior.
 
 **Gate TC04:** representative resolved termcap entries materialize into semantic
-Runtime descriptions with every non-exact conversion decision observable.
+Runtime descriptions; inherited cancellation, standard mappings, adopted aliases,
+unmapped extended fields, classic parameter programs, and padding retain their
+adopted semantics; and every non-exact or failed decision remains observable.
+
+**Implementation record:**
+[`docs/1.6.0-TC04-TERMCAP-SEMANTIC-CONVERSION.md`](docs/1.6.0-TC04-TERMCAP-SEMANTIC-CONVERSION.md)
 
 ---
 

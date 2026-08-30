@@ -80,6 +80,13 @@ source-provenance APIs only to `Icod.TermInfo.Termcap`. The resolver does not ad
 a Source dependency and does not alter any frozen Runtime, Source, Compiler, or
 Inspection public API baseline.
 
+TC04 advances the coordinated development version to `1.6.0-Alpha-4` and adds
+resolved-termcap semantic conversion APIs only to `Icod.TermInfo.Termcap`. The
+converter materializes the existing Runtime `TerminalDescription` model directly,
+preserves representable unmapped fields through Runtime extended capabilities,
+and does not add a Source dependency or alter any frozen Runtime, Source,
+Compiler, or Inspection public API baseline.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:

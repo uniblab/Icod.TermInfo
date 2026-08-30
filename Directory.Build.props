@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <IcodTermInfoSuiteVersion>1.6.0-Alpha-3</IcodTermInfoSuiteVersion>
+    <IcodTermInfoSuiteVersion>1.6.0-Alpha-4</IcodTermInfoSuiteVersion>
     <LangVersion>13.0</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>

@@ -3,10 +3,10 @@
 `Icod.TermInfo.Termcap` is the optional termcap interoperability layer for the
 Icod.TermInfo package family.
 
-The `1.6.0-Alpha-3` TC03 tranche retains the TC01 parser and TC02 capability
-classifier and adds bounded, deterministic `tc=` inheritance and cancellation.
-It still does not construct `TerminalDescription` values, read `TERMCAP` or
-`TERMPATH`, or provide conversion commands.
+The `1.6.0-Alpha-4` TC04 tranche retains the TC01 parser, TC02 capability
+classifier, and TC03 inheritance resolver, and adds explicit conversion into the
+canonical Runtime `TerminalDescription` model. It still does not render termcap
+text, read `TERMCAP` or `TERMPATH`, or provide conversion commands.
 
 The package targets `net8.0`, `net9.0`, and `net10.0` and depends only on
 `Icod.TermInfo`. Existing Runtime, Source, Compiler, and Inspection package APIs
@@ -73,6 +73,39 @@ vendor codes are resolved by the same exact-code rules without being discarded.
 `ITermcapSourceEntryProvider` supports caller-controlled lookup when a parsed
 document is not the desired store. TC03 performs no process-global or file-system
 discovery.
+
+## Semantic conversion
+
+Convert only after inheritance has been resolved:
+
+```csharp
+TermcapConversionResult converted = TermcapConverter.Convert(
+    resolved.Entry
+);
+
+if (!converted.HasErrors && converted.Description is not null)
+{
+    TerminalDescription description = converted.Description;
+    Console.WriteLine(description.Name);
+}
+```
+
+TC04 maps canonical two-character capabilities to the existing Runtime enums,
+preserves adopted historical aliases as observable lossless decisions, and keeps
+unmapped Boolean/numeric/string fields as Runtime extended capabilities when
+that is representable. Ambiguous historical codes and value-kind mismatches fail
+conversion rather than being guessed.
+
+Traditional termcap padding is translated into mandatory Runtime terminfo delay
+syntax. Classic `%` operators are translated for traditional parameterized
+capabilities, while `%` remains literal in ordinary non-parameterized strings.
+Unsupported operators in a parameterized capability are returned as structured
+conversion errors instead of being copied silently.
+
+`TermcapConversionResult` exposes `HasErrors`, `HasLoss`, and deterministic
+conversion diagnostics. Historical aliases and extended-field preservation are
+observable but lossless; approximations, unsupported constructs, and
+unrepresentable values set `HasLoss`.
 
 ## Resource limits
 

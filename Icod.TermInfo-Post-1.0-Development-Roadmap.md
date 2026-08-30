@@ -11,10 +11,10 @@
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
 **Current release version:** `1.5.0`
-**Current development version:** `1.6.0-Alpha-3`
+**Current development version:** `1.6.0-Alpha-4`
 **Next development line:** post-1.6 demand-driven work
 **Status:** 1.6.0 implementation in progress
-**Current tranche:** TC03 — Termcap `tc=` inheritance and cancellation
+**Current tranche:** TC04 — Termcap semantic conversion into `TerminalDescription`
 **Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
 
 ---
@@ -1025,11 +1025,11 @@ Icod.TermInfo.Termcap
 | TC07 | `1.6.0-Alpha-7` | conversion tools and coordinated router/archive distribution |
 | TC08 | `1.6.0-Alpha-8` | corpus, fuzzing, hostile-input audit, API/package/CLI freeze |
 
-TC01's parser foundation and TC02's Runtime-derived capability classification
-are complete. TC03 is the active tranche and adds bounded, termcap-specific
-`tc=` inheritance and cancellation while retaining source provenance. Semantic
-conversion, environment lookup, and command routing remain assigned to later
-tranches.
+TC01's parser foundation, TC02's Runtime-derived capability classification, and
+TC03's bounded `tc=` inheritance resolver are complete. TC04 is the active
+tranche and converts resolved termcap semantics into ordinary immutable Runtime
+`TerminalDescription` values with explicit loss diagnostics. Reverse rendering,
+environment lookup, and command routing remain assigned to later tranches.
 
 **1.6 completion gate:** common conventional termcap databases can be parsed,
 resolved, converted into the canonical Icod terminfo semantic model, rendered
