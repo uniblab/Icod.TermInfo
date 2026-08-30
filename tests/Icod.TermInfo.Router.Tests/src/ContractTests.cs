@@ -143,11 +143,11 @@ public sealed class ContractTests {
 		ArgumentException.ThrowIfNullOrWhiteSpace( relativePath );
 
 		return XDocument.Load(
-			Path.Combine(
+			System.IO.Path.Combine(
 				root,
 				relativePath.Replace(
 					'/',
-					Path.DirectorySeparatorChar
+					System.IO.Path.DirectorySeparatorChar
 				)
 			),
 			LoadOptions.None
@@ -179,7 +179,7 @@ public sealed class ContractTests {
 		while ( current is not null ) {
 			if (
 				File.Exists(
-					Path.Combine(
+					System.IO.Path.Combine(
 						current.FullName,
 						"Icod.TermInfo.sln"
 					)
