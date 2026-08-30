@@ -8,7 +8,7 @@ namespace Icod.TermInfo.Termcap.Tests;
 
 public sealed class TC01ContractTests
 {
-	private const string DevelopmentVersion = "1.6.0-Alpha-1";
+	private const string Tc01DevelopmentVersion = "1.6.0-Alpha-1";
 	private const string VersionReference = "$(IcodTermInfoSuiteVersion)";
 
 	[Fact]
@@ -63,24 +63,8 @@ public sealed class TC01ContractTests
 	}
 
 	[Fact]
-	public void CoordinatedVersionAndTc01WorkflowBoundaryAreExplicit() {
+	public void Tc01WorkflowBoundaryRemainsExplicit() {
 		string root = FindRepositoryRoot();
-		XDocument buildProperties =
-			XDocument.Load(
-				Path.Combine(
-					root,
-					"Directory.Build.props"
-				),
-				LoadOptions.None
-			);
-
-		Assert.Equal(
-			DevelopmentVersion,
-			ReadRequiredProperty(
-				buildProperties,
-				"IcodTermInfoSuiteVersion"
-			)
-		);
 
 		string pullRequest =
 			File.ReadAllText(
@@ -125,7 +109,8 @@ public sealed class TC01ContractTests
 	}
 
 	[Fact]
-	public void TermcapAssemblyAdvancesPackageVersionWithoutChangingAssemblyIdentity() {
+	public void TermcapAssemblyRetainsStableIdentityAndCentralVersion() {
+		string root = FindRepositoryRoot();
 		Assembly assembly =
 			typeof( TermcapSourceParser ).Assembly;
 		Assert.Equal(
@@ -138,8 +123,23 @@ public sealed class TC01ContractTests
 				.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
 				?.InformationalVersion;
 		Assert.NotNull( informationalVersion );
+
+		XDocument buildProperties =
+			XDocument.Load(
+				Path.Combine(
+					root,
+					"Directory.Build.props"
+				),
+				LoadOptions.None
+			);
+		string currentVersion =
+			ReadRequiredProperty(
+				buildProperties,
+				"IcodTermInfoSuiteVersion"
+			);
+
 		Assert.Equal(
-			DevelopmentVersion,
+			currentVersion,
 			informationalVersion!
 				.Split(
 					'+',
@@ -196,7 +196,7 @@ public sealed class TC01ContractTests
 			File.ReadAllText( roadmapPath )
 		);
 		Assert.Contains(
-			"1.6.0-Alpha-1",
+			Tc01DevelopmentVersion,
 			File.ReadAllText( implementationPath )
 		);
 	}

@@ -22,7 +22,7 @@
 		<Title>Icod.TermInfo.Inspection</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed inspection and semantic-comparison foundation for Icod.TermInfo. The 1.3 line provides canonical terminfo rendering and reusable infocmp-style comparison engines without enlarging the frozen Runtime, Source, or Compiler public contracts.</Description>
-		<PackageReleaseNotes>1.6.0-Alpha-1 coordinates Inspection with the termcap-interoperability development line while preserving the frozen 1.4 Inspection API baseline, deterministic comparison engines, database-location/catalog inspection, renderer controls, and no production Compiler dependency; no Inspection semantics change.</PackageReleaseNotes>
+		<PackageReleaseNotes>The 1.6.0 development line coordinates Inspection with termcap interoperability while preserving the frozen 1.4 Inspection API baseline, deterministic comparison engines, database-location/catalog inspection, renderer controls, and no production Compiler dependency; no Inspection semantics change.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>

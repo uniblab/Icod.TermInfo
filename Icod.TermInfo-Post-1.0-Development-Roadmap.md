@@ -11,10 +11,10 @@
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
 **Current release version:** `1.5.0`
-**Current development version:** `1.6.0-Alpha-1`
+**Current development version:** `1.6.0-Alpha-2`
 **Next development line:** post-1.6 demand-driven work
 **Status:** 1.6.0 implementation in progress
-**Current tranche:** TC01 — Termcap package and parser foundation
+**Current tranche:** TC02 — Termcap capability metadata and semantic classification
 **Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
 
 ---
@@ -1025,9 +1025,10 @@ Icod.TermInfo.Termcap
 | TC07 | `1.6.0-Alpha-7` | conversion tools and coordinated router/archive distribution |
 | TC08 | `1.6.0-Alpha-8` | corpus, fuzzing, hostile-input audit, API/package/CLI freeze |
 
-TC01 is the active tranche. Termcap capability mapping, inheritance resolution,
-conversion, environment lookup, and command routing remain deliberately outside
-the parser foundation.
+TC01's parser foundation is complete. TC02 is the active tranche and adds
+Runtime-derived two-character capability metadata and classification without
+performing conversion. Inheritance resolution, conversion, environment lookup,
+and command routing remain assigned to later tranches.
 
 **1.6 completion gate:** common conventional termcap databases can be parsed,
 resolved, converted into the canonical Icod terminfo semantic model, rendered

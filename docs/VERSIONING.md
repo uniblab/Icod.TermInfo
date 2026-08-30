@@ -68,6 +68,12 @@ the coordinated reusable package family. It targets `net8.0`, `net9.0`, and
 a Termcap dependency. Stable publication of the new package ID and its final API
 baseline are release-closure work for the 1.6 line.
 
+TC02 advances the coordinated development version to `1.6.0-Alpha-2` and adds
+public termcap capability-mapping and classification APIs only to
+`Icod.TermInfo.Termcap`. Runtime, Source, Compiler, and Inspection retain their
+frozen public API baselines. The Termcap public surface remains a development
+contract until the 1.6 release-closure freeze.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:

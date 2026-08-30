@@ -2,8 +2,9 @@
 
 **Development line:** `1.6.0`
 **Initial development version:** `1.6.0-Alpha-1`
+**Current development version:** `1.6.0-Alpha-2`
 **Stable assembly version:** `1.0.0.0`
-**Status:** Implementation in progress — TC01 foundation
+**Status:** Implementation in progress — TC02 capability metadata and classification
 **Primary change:** Add explicit termcap parsing, semantic mapping, conversion, acquisition, and tools without changing the frozen Runtime, Source, Compiler, or Inspection contracts.
 
 ---
@@ -196,22 +197,76 @@ existing reusable-package API baseline.
 TC02 establishes one authoritative mapping from termcap's two-character codes to
 the existing Runtime standard capability metadata.
 
-It SHALL:
+The public classification surface is centered on:
 
-- derive standard mappings from the canonical Runtime catalog wherever a
-  standard termcap code is already recorded;
-- avoid a second hand-maintained standard capability table;
-- distinguish Boolean, numeric, and string type expectations;
-- identify obsolete aliases explicitly;
-- distinguish known standard mappings from unmapped/vendor termcap fields;
-- preserve unmapped fields for diagnostics rather than silently discarding them;
-- define deterministic handling for conflicting or ambiguous historical codes.
+```text
+TermcapCapabilityCatalog
+TermcapStandardCapabilityMapping
+TermcapCapabilityClassifier
+TermcapCapabilityClassificationResult
+TermcapCapabilityClassification
+```
 
-No conversion occurs merely because a field is classified.
+Standard mappings SHALL be derived directly from
+`StandardCapabilityCatalog.BooleanCapabilities`, `.NumericCapabilities`, and
+`.StringCapabilities`, using each Runtime metadata record's existing
+`TermcapCode`. TC02 SHALL NOT introduce a second hand-maintained table of
+standard capability identities, short names, long names, indexes, or value
+kinds.
+
+Each mapping SHALL retain the exact Runtime enum identity and expose:
+
+- the accepted two-character termcap code;
+- the Runtime metadata's canonical termcap code;
+- Boolean, numeric, or string value kind;
+- compiled-table index;
+- terminfo short and long names;
+- whether the Runtime record is an obsolete `OT...` compatibility capability;
+- whether the accepted code is an adopted obsolete non-standard alias.
+
+TC02 adopts direct obsolete alias translations from the selected ncurses
+`captoinfo` compatibility baseline for AT&T, XENIX, Tektronix, and IRIX names.
+The alias table SHALL contain only alias code, canonical termcap code, and
+historical origin. Alias targets SHALL resolve through the Runtime-derived
+canonical mappings. More complex historical transformations remain TC04
+conversion policy.
+
+Classification SHALL distinguish:
+
+```text
+Standard
+ObsoleteStandard
+ObsoleteAlias
+Ambiguous
+Unmapped
+Reference
+```
+
+For active Boolean, numeric, and string fields, classification SHALL expose both
+the source-syntax value kind and the Runtime mapping's expected value kind. A
+unique target remains identifiable when the source uses the wrong syntactic
+kind, with the mismatch reported explicitly rather than changing parser syntax.
+Cancellation and disabled fields may retain a semantic target without inventing
+a source value kind.
+
+When one code has multiple Runtime/compatibility meanings, source value kind MAY
+disambiguate it only when exactly one candidate has the matching kind. Otherwise
+the result SHALL remain `Ambiguous` and expose every candidate in deterministic
+order. Unknown/vendor fields SHALL remain `Unmapped` with the original
+`TermcapSourceField` preserved.
+
+No conversion occurs merely because a field is classified. TC02 SHALL NOT
+resolve `tc=`, apply inherited cancellation or precedence, construct
+`TerminalDescription`, synthesize vendor compatibility transformations, inspect
+process-global termcap configuration, or add command/router behavior.
 
 **Gate TC02:** every adopted standard termcap code maps to the same semantic
-Runtime capability identity used by compiled terminfo and built-in profiles, and
-unknown/vendor fields remain explicit.
+Runtime capability identity used by compiled terminfo and built-in profiles,
+obsolete compatibility names and type mismatches are explicit, ambiguous codes
+remain deterministic, and unknown/vendor fields remain explicit.
+
+**Implementation record:**
+[`docs/1.6.0-TC02-CAPABILITY-METADATA-AND-CLASSIFICATION.md`](docs/1.6.0-TC02-CAPABILITY-METADATA-AND-CLASSIFICATION.md)
 
 ---
 

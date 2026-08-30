@@ -29,7 +29,7 @@
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-		<PackageReleaseNotes>1.6.0-Alpha-1 coordinates the distribution-only icod-terminfo router with the termcap-interoperability development line without adding termcap commands or changing the frozen tic, infocmp, or toe command semantics.</PackageReleaseNotes>
+		<PackageReleaseNotes>The 1.6.0 development line coordinates the distribution-only icod-terminfo router with termcap interoperability without adding termcap commands or changing the frozen tic, infocmp, or toe command semantics.</PackageReleaseNotes>
 		<PackageTags>terminfo;libtinfo;tic;infocmp;toe;terminal;tool;dotnet;csharp;icod</PackageTags>
 	</PropertyGroup>
 

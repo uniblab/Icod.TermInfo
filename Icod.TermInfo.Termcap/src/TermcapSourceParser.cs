@@ -742,11 +742,11 @@ public static class TermcapSourceParser
 
 				char target =
 					spelling[++index];
-				int translated =
+				int controlValue =
 					target == '?'
 						? 0x7f
 						: target & 0x1f;
-				if ( translated == 0 ) {
+				if ( controlValue == 0 ) {
 					diagnostics.Add(
 						CreateStringDiagnostic(
 							record,
@@ -760,7 +760,7 @@ public static class TermcapSourceParser
 					hasErrors = true;
 					continue;
 				}
-				value.Append( (char)translated );
+				value.Append( (char)controlValue );
 				continue;
 			}
 
