@@ -2,6 +2,10 @@
 
 ![Icod TUI Toolchain](https://raw.githubusercontent.com/uniblab/Icod.TermInfo/v1.4.1/icod_tui_toolchain.jpg)
 
+[![PR build and test](https://github.com/uniblab/Icod.TermInfo/actions/workflows/pr-build-and-test.yaml/badge.svg)](https://github.com/uniblab/Icod.TermInfo/actions/workflows/pr-build-and-test.yaml)
+[![Main build and test](https://github.com/uniblab/Icod.TermInfo/actions/workflows/push-main.yaml/badge.svg?branch=main)](https://github.com/uniblab/Icod.TermInfo/actions/workflows/push-main.yaml)
+[![Release publish](https://github.com/uniblab/Icod.TermInfo/actions/workflows/release.yaml/badge.svg?branch=main)](https://github.com/uniblab/Icod.TermInfo/actions/workflows/release.yaml)
+
 `Icod.TermInfo` is a managed, dependency-free .NET implementation of the low-level terminal-capability model traditionally supplied by `libtinfo`.
 
 Version 1.5.0 is the current coordinated release. It preserves the frozen 1.0
