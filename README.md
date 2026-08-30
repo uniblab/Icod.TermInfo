@@ -4,42 +4,43 @@
 
 `Icod.TermInfo` is a managed, dependency-free .NET implementation of the low-level terminal-capability model traditionally supplied by `libtinfo`.
 
-Version 1.4.1 is the current coordinated patch release. It preserves the frozen
-1.0 Runtime, 1.1 Source, 1.2 Compiler, and 1.4 Inspection contracts together
-with the managed `tic`, `infocmp`, and `toe` command semantics introduced in
-1.4.0. Version 1.4.1 corrects release-facing documentation and metadata; it does
-not add or change public API or command behavior.
+Version 1.5.0 is the current coordinated release. It preserves the frozen 1.0
+Runtime, 1.1 Source, 1.2 Compiler, and 1.4 Inspection contracts together with
+the managed `tic`, `infocmp`, and `toe` command semantics introduced in 1.4.
+Version 1.5.0 centralizes suite versioning and adds the installable
+`Icod.TermInfo.Tools` router without changing reusable library API or routed
+command semantics.
 
-The published 1.4.1 package family targets `net8.0`, `net9.0`, and `net10.0`;
+The published 1.5.0 library package family targets `net8.0`, `net9.0`, and `net10.0`;
 the packages use C# 13, contain no native ncurses/terminfo payload, and are
 intended to run on Windows, Linux, and macOS.
 
 ## Install
 
-For the 1.4.1 release, runtime-only consumers use:
+For the 1.5.0 release, runtime-only consumers use:
 
 ```text
-dotnet add package Icod.TermInfo --version 1.4.1
+dotnet add package Icod.TermInfo --version 1.5.0
 ```
 
 Applications which need terminfo source-language support use:
 
 ```text
-dotnet add package Icod.TermInfo.Source --version 1.4.1
+dotnet add package Icod.TermInfo.Source --version 1.5.0
 ```
 
 Applications which compile terminfo source or write conventional compiled
 terminfo databases use:
 
 ```text
-dotnet add package Icod.TermInfo.Compiler --version 1.4.1
+dotnet add package Icod.TermInfo.Compiler --version 1.5.0
 ```
 
 Applications which need canonical rendering, semantic comparison, or
 provider-aware inspection use:
 
 ```text
-dotnet add package Icod.TermInfo.Inspection --version 1.4.1
+dotnet add package Icod.TermInfo.Inspection --version 1.5.0
 ```
 
 `Icod.TermInfo.Source` depends on the matching `Icod.TermInfo` package.
@@ -50,11 +51,11 @@ values continue to reference `Icod.TermInfo` alone.
 
 The same validated package artifacts are published to NuGet.org and GitHub
 Packages. Release closure and tag-publication requirements are recorded in
-`docs/1.4.1-RELEASE-AUDIT.md`.
+`docs/1.5.0-RELEASE-AUDIT.md`.
 
 ## Tool Suite
 
-The 1.4 release adds three managed .NET 10 command-line tools above the reusable
+The 1.4 line added three managed .NET 10 command-line tools above the reusable
 package family:
 
 ```text
@@ -63,14 +64,27 @@ infocmp   render and semantically compare terminal descriptions
 toe       enumerate conventional databases and analyze use= dependencies
 ```
 
-At `1.4.1`, the command surface remains frozen after the 1.4.0 differential
-validation, hostile-input validation, API-boundary review, structural validation
-of all six command-suite archives, and matching-host execution smoke. The T10
-CLI/presentation contract remains unchanged. The command projects remain
-non-packable and do not introduce command-to-command dependencies.
+At `1.5.0`, those command semantics remain frozen. The three standalone command
+projects remain non-packable and do not introduce command-to-command
+dependencies. Version 1.5 adds a distribution-only router project while keeping
+the existing archive distribution.
 
-The canonical 1.4 distribution model is a framework-dependent .NET 10 suite
-archive for each supported RID:
+Install the coordinated router as a .NET tool with:
+
+```text
+dotnet tool install --global Icod.TermInfo.Tools --version 1.5.0
+
+icod-terminfo tic -V
+icod-terminfo infocmp -V
+icod-terminfo toe -V
+```
+
+The router strips the command name and dispatches in-process to the existing
+command implementation. It does not duplicate command option parsing or
+terminfo semantics.
+
+The standalone distribution remains a framework-dependent .NET 10 suite archive
+for each supported RID:
 
 ```text
 Icod.TermInfo.Tools.<version>.win-x64.zip
@@ -81,9 +95,12 @@ Icod.TermInfo.Tools.<version>.osx-x64.tar.gz
 Icod.TermInfo.Tools.<version>.osx-arm64.tar.gz
 ```
 
-Each archive contains all three commands and their required managed
-dependencies. The user supplies the .NET 10 runtime. NuGet global-tool packaging
-is not required for the 1.4.x line.
+Each archive contains the traditional `tic`, `infocmp`, and `toe` command names
+and their required managed dependencies. The user supplies the .NET 10 runtime
+and controls where the archive is unpacked and whether that location is placed
+on `PATH`. The archive therefore remains suitable for intentional drop-in
+installation of the traditional names, while the NuGet tool uses the
+non-colliding `icod-terminfo` router name.
 
 ## 1.x stability contract
 
@@ -202,9 +219,27 @@ Compiler, and Inspection:
   for Windows, Linux, and macOS, with structural verification and matching-host
   execution smoke.
 
-Version 1.4.1 retains the exact 1.4.0 API and command semantics. Its changes are
-limited to coordinated version metadata and corrections to release-facing
-documentation.
+Version 1.4.1 retained the exact 1.4.0 API and command semantics while
+correcting release-facing documentation.
+
+## What 1.5 adds
+
+Version 1.5 changes distribution and release infrastructure rather than terminfo
+semantics:
+
+- `Directory.Build.props` contains the single `IcodTermInfoSuiteVersion` source
+  used by all four libraries, all three standalone commands, and the router;
+- the new `Icod.TermInfo.Tools` NuGet package installs the `icod-terminfo`
+  multi-command router;
+- `icod-terminfo tic`, `icod-terminfo infocmp`, and `icod-terminfo toe` dispatch
+  directly to the existing command implementations;
+- standalone `tic`, `infocmp`, and `toe` remain non-packable projects and remain
+  available in the six framework-dependent release archives;
+- CI installs and executes the packed router tool on Windows, Linux, and macOS
+  in addition to continuing matching-host archive smoke tests.
+
+No frozen Runtime, Source, Compiler, or Inspection public API changes in 1.5.0,
+and no routed command semantics change.
 
 ## Getting started
 
@@ -739,6 +774,7 @@ The intended family boundary is now explicit:
 - **`Icod.TermInfo.Compiler`** — deterministic compiled-entry writing, source compilation, and explicit conventional database-layout publication;
 - **`Icod.TermInfo.Inspection`** — canonical effective/source rendering, structured semantic comparison, and provider-aware inspection;
 - **`tic`, `infocmp`, and `toe`** — released managed command applications which compose the reusable libraries and own command-line policy;
+- **`Icod.TermInfo.Tools` / `icod-terminfo`** — distribution-only .NET tool router which dispatches to the three command applications;
 - **`Icod.Terminal`** — sibling live-terminal/session layer for modes, input decoding, keyboard/mouse/paste/focus events, active probing/negotiation, and reversible presentation lifecycle;
 - **future `Icod.Pty`** — Unix PTY and Windows ConPTY creation, resize propagation, and child-process plumbing;
 - **`Icod.DCurses`** — sibling curses-like virtual-screen/window layer above `Icod.Terminal` and `Icod.TermInfo`.
@@ -794,6 +830,7 @@ dotnet pack Icod.TermInfo.csproj -c Staging --output artifacts
 dotnet pack Icod.TermInfo.Source/Icod.TermInfo.Source.csproj -c Staging --output artifacts
 dotnet pack Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj -c Staging --output artifacts
 dotnet pack Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj -c Staging --output artifacts
+dotnet pack icod-terminfo/Icod.TermInfo.Router.csproj -c Staging --output artifacts
 
 dotnet build Icod.TermInfo.sln -c Release
 dotnet test Icod.TermInfo.sln -c Release
@@ -801,6 +838,7 @@ dotnet pack Icod.TermInfo.csproj -c Release --output artifacts
 dotnet pack Icod.TermInfo.Source/Icod.TermInfo.Source.csproj -c Release --output artifacts
 dotnet pack Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj -c Release --output artifacts
 dotnet pack Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj -c Release --output artifacts
+dotnet pack icod-terminfo/Icod.TermInfo.Router.csproj -c Release --output artifacts
 ```
 
 Use the verifier with the same configuration used to build and pack.
@@ -819,12 +857,13 @@ For final Release validation:
 bash .github/scripts/verify-release-package.sh artifacts Release
 ```
 
-Both wrappers run the coordinated four-package release verifier: generated
+Both wrappers retain the coordinated four-library release verifier: generated
 capability metadata, all four public-API baselines, net8/net9/net10 API
 equivalence, package/XML/symbol/dependency validation, all four isolated
 package-reference-only smoke consumers, and the sample's non-interactive
-`--describe-only` path. Windows package validation does not require Bash or
-Python.
+`--describe-only` path. The separate `smoke-tool-package.ps1` gate installs and
+executes the fifth registry package, `Icod.TermInfo.Tools`. Windows package
+validation does not require Bash or Python.
 
 Pull requests use Staging throughout and may upload verified package artifacts,
 but never publish. Pushes to `main` run the non-publishing Release validation
@@ -833,10 +872,10 @@ start registry publication through `.github/workflows/release.yaml`.
 
 See `docs/RELEASING.md` for the release procedure,
 `Icod.TermInfo-1.4.0-Tool-Suite-Roadmap.md` for the frozen T01-T11 command
-contract, and `docs/1.4.1-RELEASE-AUDIT.md` for the current patch-release gate.
-Tag `v1.4.1` only on the exact validated `main` commit; no source, package,
-archive, or documentation content may change between that validation and
-tagging.
+semantic contract, and `docs/1.5.0-RELEASE-AUDIT.md` for the current
+distribution/versioning release gate. Tag `v1.5.0` only on the exact validated
+`main` commit; no source, package, archive, or documentation content may change
+between that validation and tagging.
 
 ## Scope
 
@@ -848,7 +887,7 @@ stability contract, `Icod.TermInfo-Post-1.0-Development-Roadmap.md` for the
 post-1.0 package-family sequence, `Icod.TermInfo-1.3.0-Inspection-and-Comparison-Roadmap.md`
 for the 1.3 Inspection contract,
 `Icod.TermInfo-1.4.0-Tool-Suite-Roadmap.md` for the frozen 1.4 command contract,
-`docs/1.4.1-RELEASE-AUDIT.md` for the current patch-release gate, and
+`docs/1.5.0-RELEASE-AUDIT.md` for the current distribution/versioning gate, and
 `docs/VERSIONING.md` and `docs/COMPATIBILITY.md` for the 1.x promises.
 `docs/FUTURE-WORK-INVENTORY.md` is retained as the historical architecture
 inventory which motivated the sibling-system boundaries. The 0.6.0 through

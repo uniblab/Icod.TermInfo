@@ -325,8 +325,34 @@ internal static class Program {
 		XDocument project = XDocument.Load( Path.Combine( root, relativeProjectPath ), LoadOptions.None );
 		string? version = project.Descendants().FirstOrDefault( element => element.Name.LocalName == "Version" )?.Value.Trim();
 		string? packageVersion = project.Descendants().FirstOrDefault( element => element.Name.LocalName == "PackageVersion" )?.Value.Trim();
-		Require( !string.IsNullOrWhiteSpace( version ) && version == packageVersion, $"{relativeProjectPath}: Version and PackageVersion must be present and identical." );
-		return packageVersion!;
+		const string versionReference = "$(IcodTermInfoSuiteVersion)";
+		Require(
+			version == versionReference
+				&& packageVersion == versionReference,
+			$"{relativeProjectPath}: Version and PackageVersion must consume IcodTermInfoSuiteVersion."
+		);
+		XDocument buildProperties =
+			XDocument.Load(
+				Path.Combine(
+					root,
+					"Directory.Build.props"
+				),
+				LoadOptions.None
+			);
+		string? suiteVersion =
+			buildProperties
+				.Descendants()
+				.FirstOrDefault(
+					element =>
+						element.Name.LocalName == "IcodTermInfoSuiteVersion"
+				)
+				?.Value
+				.Trim();
+		Require(
+			!string.IsNullOrWhiteSpace( suiteVersion ),
+			"Directory.Build.props must declare IcodTermInfoSuiteVersion."
+		);
+		return suiteVersion!;
 	}
 
 	private static ZipArchiveEntry AssertSingleNuspec(

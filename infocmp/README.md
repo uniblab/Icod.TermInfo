@@ -2,14 +2,15 @@
 
 `infocmp` is part of the `Icod.TermInfo` managed terminfo tool suite.
 
-## 1.4.1 status
+## 1.5.0 status
 
-Version `1.4.1` retains the frozen T06/T07 acquisition, rendering, and semantic
-comparison engines plus the T10 CLI/distribution and T11 validation gates
-shipped in 1.4.0. This patch release corrects release-facing documentation and
-metadata only; it adds no comparison or command semantics.
+Version `1.5.0` retains the frozen T06/T07 acquisition, rendering, and semantic
+comparison engines plus the T10 CLI/distribution and T11 validation gates. The
+1.5 release centralizes suite versioning and adds the installable
+`icod-terminfo` router; it adds no comparison or command semantics.
 
-Supported in 1.4.1:
+Supported as either `infocmp ...` from a release archive or
+`icod-terminfo infocmp ...` from the .NET tool:
 
 ```text
 infocmp [options] [terminal ...]

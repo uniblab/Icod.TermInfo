@@ -14,14 +14,14 @@ $repositoryRoot = [System.IO.Path]::GetFullPath(
 	)
 )
 
-[xml] $ticProject = Get-Content -LiteralPath (
-	Join-Path $repositoryRoot 'tic/Icod.TermInfo.Tic.csproj'
+[xml] $buildProperties = Get-Content -LiteralPath (
+	Join-Path $repositoryRoot 'Directory.Build.props'
 ) -Raw
-$versionNode = $ticProject.SelectSingleNode(
-	'/Project/PropertyGroup/Version'
+$versionNode = $buildProperties.SelectSingleNode(
+	'/Project/PropertyGroup/IcodTermInfoSuiteVersion'
 )
 if ( $null -eq $versionNode ) {
-	throw 'tic project does not declare Version.'
+	throw 'Directory.Build.props does not declare IcodTermInfoSuiteVersion.'
 }
 $version = $versionNode.InnerText
 

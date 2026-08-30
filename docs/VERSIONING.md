@@ -52,6 +52,15 @@ versions together. It corrects release-facing documentation and metadata only;
 it does not create a new public API baseline or change the frozen 1.4.0 command
 semantics.
 
+Beginning with 1.5.0, `Directory.Build.props` contains the single
+`IcodTermInfoSuiteVersion` release-version authority. Runtime, Source, Compiler,
+Inspection, `tic`, `infocmp`, `toe`, and the `Icod.TermInfo.Tools` router consume
+that property rather than carrying independent current-version literals. The
+router is a packable .NET tool with command name `icod-terminfo`; the three
+semantic command projects remain non-packable. The router joins the coordinated
+registry package set without changing any reusable-library assembly identity or
+frozen public API baseline.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:
@@ -107,9 +116,9 @@ added reviewed conventional database catalog enumeration, and T06 added reviewed
 renderer controls for layout, width, standard-capability ordering, and extended-
 capability filtering. T04, T05, and T07 changed only command-layer composition.
 The reviewed baseline was frozen at the 1.4.0 release and remains byte-for-byte
-unchanged for 1.4.1. Any later public Inspection surface change requires a new
-compatible minor-release API review rather than changing this historical
-baseline.
+unchanged through 1.5.0. The 1.5 distribution/versioning changes add no reusable
+library API. Any later public Inspection surface change requires a new compatible
+minor-release API review rather than changing this historical baseline.
 
 The baselines record exported types, public/protected members, enum numeric
 values, parameter names/order/defaults, ref/out/in/params shape, generic

@@ -28,8 +28,9 @@ frameworks and fresh-package execution for each target for every package present
 in that release.
 
 Beginning with T01 in 1.4, the `tic`, `infocmp`, and `toe` command layer targets
-`net10.0`. This command-host choice follows `Icod.CommandFramework 2.0.0` and
-does not remove `net8.0` or `net9.0` from any reusable TermInfo library package.
+`net10.0`. Beginning with 1.5, the `icod-terminfo` router also targets `net10.0`.
+These command-host choices do not remove `net8.0` or `net9.0` from any reusable
+TermInfo library package.
 
 Dropping a supported target framework is considered a breaking support-contract
 change and normally requires a new major version.
@@ -322,8 +323,15 @@ libraries, but no dependency flows back from Runtime, Source, Compiler, or
 Inspection into the command layer. The command projects remain non-packable and
 are distributed together as six framework-dependent .NET 10 suite archives.
 
-The same validated package artifacts for a release are used for NuGet.org and
-GitHub Packages.
+Beginning with 1.5, `Icod.TermInfo.Tools` is a distribution-only .NET tool
+package. Its `icod-terminfo` router may reference `tic`, `infocmp`, and `toe` to
+dispatch to their existing `Command.RunAsync` entry points. The three semantic
+commands still do not reference one another, and the router introduces no
+terminfo semantics of its own. Archive distribution remains independent and
+continues to expose the traditional command names directly.
+
+The same validated registry package artifacts for a release are used for
+NuGet.org and GitHub Packages.
 
 ## Explicit non-goals
 
@@ -338,9 +346,10 @@ The reusable `Icod.TermInfo` package family does not promise:
 - curses/virtual-screen behavior;
 - terminal emulation or graphics protocols.
 
-The 1.4 line does provide the separately distributed managed `tic`, `infocmp`,
-and `toe` command applications. Their compatibility target is the frozen 1.4
-mainstream terminfo workflow contract; exhaustive ncurses option compatibility
-is not claimed. The remaining items stay outside the reusable TermInfo package
-family and belong to later or sibling-system work. The historical architecture
-inventory is retained in `FUTURE-WORK-INVENTORY.md`.
+The 1.4 line provides the managed `tic`, `infocmp`, and `toe` command
+applications. Version 1.5 adds the `Icod.TermInfo.Tools` installation router but
+does not broaden their semantic compatibility target: the frozen 1.4 mainstream
+terminfo workflow contract remains authoritative, and exhaustive ncurses option
+compatibility is not claimed. The remaining items stay outside the reusable
+TermInfo package family and belong to later or sibling-system work. The
+historical architecture inventory is retained in `FUTURE-WORK-INVENTORY.md`.

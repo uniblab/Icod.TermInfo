@@ -7,7 +7,7 @@ namespace Icod.TermInfo.Tests;
 
 public sealed class T45CompletionGateTests {
 	[Fact]
-	public void AssemblyRetainsStableIdentityForOneFourDevelopment() {
+	public void AssemblyRetainsStableIdentityForOneFiveDevelopment() {
 		Assembly assembly =
 			typeof( TerminalDescription ).Assembly;
 		AssemblyName assemblyName =
@@ -30,12 +30,12 @@ public sealed class T45CompletionGateTests {
 					2 )[ 0 ];
 
 		Assert.Equal(
-			"1.4.1",
+			"1.5.0",
 			semanticVersion );
 	}
 
 	[Fact]
-	public void ProjectMetadataIdentifiesOneFourDevelopmentAndStableAssembly() {
+	public void ProjectMetadataIdentifiesOneFiveDevelopmentAndStableAssembly() {
 		string root =
 			FindRepositoryRoot();
 		XDocument project =
@@ -44,14 +44,25 @@ public sealed class T45CompletionGateTests {
 					root,
 					"Icod.TermInfo.csproj" ),
 				LoadOptions.None );
+		XDocument buildProperties =
+			XDocument.Load(
+				Path.Combine(
+					root,
+					"Directory.Build.props" ),
+				LoadOptions.None );
 
 		Assert.Equal(
-			"1.4.1",
+			"1.5.0",
+			ReadRequiredProperty(
+				buildProperties,
+				"IcodTermInfoSuiteVersion" ) );
+		Assert.Equal(
+			"$(IcodTermInfoSuiteVersion)",
 			ReadRequiredProperty(
 				project,
 				"Version" ) );
 		Assert.Equal(
-			"1.4.1",
+			"$(IcodTermInfoSuiteVersion)",
 			ReadRequiredProperty(
 				project,
 				"PackageVersion" ) );
@@ -78,16 +89,19 @@ public sealed class T45CompletionGateTests {
 					"README.md" ) );
 
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo --version 1.4.1",
+			"dotnet add package Icod.TermInfo --version 1.5.0",
 			readme );
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo.Source --version 1.4.1",
+			"dotnet add package Icod.TermInfo.Source --version 1.5.0",
 			readme );
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo.Compiler --version 1.4.1",
+			"dotnet add package Icod.TermInfo.Compiler --version 1.5.0",
 			readme );
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo.Inspection --version 1.4.1",
+			"dotnet add package Icod.TermInfo.Inspection --version 1.5.0",
+			readme );
+		Assert.Contains(
+			"dotnet tool install --global Icod.TermInfo.Tools --version 1.5.0",
 			readme );
 		Assert.DoesNotContain(
 			"1.4.0-Alpha-11",
@@ -102,7 +116,7 @@ public sealed class T45CompletionGateTests {
 			"docs/COMPATIBILITY.md",
 			readme );
 		Assert.Contains(
-			"docs/1.4.1-RELEASE-AUDIT.md",
+			"docs/1.5.0-RELEASE-AUDIT.md",
 			readme );
 	}
 
