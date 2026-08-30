@@ -339,7 +339,7 @@ public sealed class I01ContractTests {
 	}
 
 	[Fact]
-	public void SolutionAndReleasePipelineAreFourPackageAware() {
+	public void SolutionAndReleasePipelineAreFivePackageAware() {
 		string root =
 			FindRepositoryRoot();
 		string solution =
@@ -428,15 +428,19 @@ public sealed class I01ContractTests {
 				)
 			);
 		Assert.Contains(
-			"if (14 -ne $files.Count)",
+			"if (15 -ne $files.Count)",
 			release
 		);
 		Assert.Contains(
-			"if (15 -ne $assets.Count)",
+			"if (16 -ne $assets.Count)",
 			release
 		);
 		Assert.Contains(
 			"dotnet add package Icod.TermInfo.Inspection --version {0}",
+			release
+		);
+		Assert.Contains(
+			"dotnet tool install --global Icod.TermInfo.Tools --version {0}",
 			release
 		);
 	}

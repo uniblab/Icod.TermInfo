@@ -190,7 +190,7 @@ public sealed class T41CompletionGateTests
 			"Require tagged commit on main",
 			release);
 		Assert.Contains(
-			"Validate tag and coordinated package versions",
+			"Validate tag and centralized suite version",
 			release);
 		Assert.Contains(
 			"NuGet/login@v1",

@@ -491,8 +491,8 @@ public sealed class I07ValidationTests {
 		Assert.DoesNotContain( "dotnet nuget push", pullRequest );
 		Assert.DoesNotContain( "dotnet nuget push", pushMain );
 		Assert.Contains( "dotnet nuget push", release );
-		Assert.Contains( "if (14 -ne $files.Count)", release );
-		Assert.Contains( "if (15 -ne $assets.Count)", release );
+		Assert.Contains( "if (15 -ne $files.Count)", release );
+		Assert.Contains( "if (16 -ne $assets.Count)", release );
 		foreach (
 			string packageId
 			in new[] {
@@ -500,6 +500,7 @@ public sealed class I07ValidationTests {
 				"Icod.TermInfo.Source",
 				"Icod.TermInfo.Compiler",
 				"Icod.TermInfo.Inspection",
+				"Icod.TermInfo.Tools",
 			}
 		) {
 			Assert.Contains( packageId, release );
