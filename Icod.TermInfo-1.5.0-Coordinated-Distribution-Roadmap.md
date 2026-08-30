@@ -2,7 +2,10 @@
 
 **Release version:** `1.5.0`
 **Stable assembly version:** `1.0.0.0`
-**Status:** Release finalization
+**Status:** Released
+**Release tag:** `v1.5.0`
+**Release commit:** `8c6331d2a435d9dafefec4529aad94699dc11abc`
+**Published:** 2026-08-30
 **Primary change:** Centralized suite versioning and installable command routing
 **API policy:** No reusable-library public API changes
 **Command policy:** No changes to the frozen 1.4 `tic`, `infocmp`, or `toe` semantics
@@ -11,7 +14,9 @@
 
 ## 1. Release objective
 
-Version 1.5.0 is a distribution and release-engineering release.
+Version 1.5.0 is the completed coordinated-distribution release. This roadmap
+is retained as the historical contract for the release; feature development now
+continues on the 1.6 termcap-interoperability line.
 
 It SHALL:
 

@@ -9,11 +9,11 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
-**Current release version:** `1.4.1`
-**Current development version:** `1.5.0`
-**Next development line:** `1.6.0`
-**Status:** 1.5.0 coordinated distribution release finalization
-**Current tranche:** Release closure — centralized suite versioning and installable router
+**Current release version:** `1.5.0`
+**Current development version:** `1.6.0`
+**Next development line:** post-1.6 demand-driven work
+**Status:** 1.5.0 released; 1.6.0 termcap interoperability planning
+**Current tranche:** 1.6.0 roadmap and TC01 foundation
 **Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
 
 ---
@@ -70,10 +70,15 @@ Live-terminal state, terminal input, probing, PTYs, curses presentation, and ter
 | **1.6.0** | Termcap interoperability | Parse, resolve, and convert termcap and terminfo |
 | **later** | Exotic storage/formats | Berkeley DB provider and historical Unix dialects as justified |
 
-The active 1.5 release plan is recorded in
+The completed 1.5 release contract is recorded in
 [`Icod.TermInfo-1.5.0-Coordinated-Distribution-Roadmap.md`](Icod.TermInfo-1.5.0-Coordinated-Distribution-Roadmap.md)
-and its immutable release requirements are frozen by
+and its immutable release requirements and final sign-off are recorded by
 [`docs/1.5.0-RELEASE-AUDIT.md`](docs/1.5.0-RELEASE-AUDIT.md).
+
+Version 1.5.0 completed the coordinated distribution tranche. The published
+`Icod.TermInfo.Tools` package installs the `icod-terminfo` multi-command router,
+which multiplexes the frozen `tic`, `infocmp`, and `toe` implementations while
+the standalone archives retain the traditional command names.
 
 The sequence is cumulative but intentionally modular. Applications which only need runtime terminfo SHALL continue to depend on `Icod.TermInfo` alone.
 
@@ -1132,7 +1137,7 @@ Highest-value targets:
 3. 1.1 inheritance resolver;
 4. 1.2 compiled writer;
 5. parameter expansion;
-6. 1.5 termcap parser.
+6. 1.6 termcap parser.
 
 Fuzz failures SHALL become deterministic regression tests.
 
@@ -1225,34 +1230,26 @@ Development should proceed:
 1.0 stable runtime
       |
       v
-1.1 S01  source package foundation
+1.1 terminfo source language
       |
       v
-1.1 S02-S04
-lexer + values + unresolved model
+1.2 compiled writer / compiler
       |
       v
-1.1 S05-S07
-capability mapping + cancellation + use=
+1.3 inspection / comparison
       |
       v
-1.1 S08-S09
-TerminalDescription materialization + corpus
+1.4 executable tic / infocmp / toe suite
       |
       v
-1.1.0
+1.5 coordinated distribution / icod-terminfo router
       |
       v
-1.2 binary writer / tic engine
-      |
-      v
-1.3 inspection / infocmp engine
-      |
-      v
-1.4 executable tool suite
-      |
-      v
-1.5 termcap interoperability
+1.6 TC01-TC06 termcap interoperability
 ```
 
-The 1.1 Source, 1.2 Compiler, and 1.3 Inspection lines are now complete. The next package-family development target is **1.4.0 — Tool Suite**, building the `tic`, `infocmp`, and `toe` command projects on the frozen managed engines without enlarging the Runtime contract.
+The 1.1 Source, 1.2 Compiler, 1.3 Inspection, 1.4 Tool Suite, and 1.5
+Coordinated Distribution lines are complete. The next development target is
+**1.6.0 — Termcap Interoperability**, beginning with the TC01 parser foundation
+and preserving the frozen Runtime and previously released reusable-library
+contracts.
