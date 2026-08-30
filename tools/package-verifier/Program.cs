@@ -136,17 +136,37 @@ internal static class Program
                         element.Name.LocalName == "PackageVersion")
                 ?.Value
                 .Trim();
+        const string versionReference =
+            "$(IcodTermInfoSuiteVersion)";
 
         Require(
-            !string.IsNullOrWhiteSpace(version)
-                && !string.IsNullOrWhiteSpace(packageVersion)
+            string.Equals(
+                version,
+                versionReference,
+                StringComparison.Ordinal)
                 && string.Equals(
-                    version,
                     packageVersion,
+                    versionReference,
                     StringComparison.Ordinal),
-            "Version and PackageVersion must both be present and identical.");
+            "Version and PackageVersion must both consume IcodTermInfoSuiteVersion.");
 
-        return packageVersion!;
+        XDocument buildProperties =
+            XDocument.Load(
+                Path.Combine(root, "Directory.Build.props"),
+                LoadOptions.None);
+        string? suiteVersion =
+            buildProperties
+                .Descendants()
+                .FirstOrDefault(
+                    element =>
+                        element.Name.LocalName == "IcodTermInfoSuiteVersion")
+                ?.Value
+                .Trim();
+        Require(
+            !string.IsNullOrWhiteSpace(suiteVersion),
+            "Directory.Build.props must declare IcodTermInfoSuiteVersion.");
+
+        return suiteVersion!;
     }
 
     private static void VerifyParameterizationArchitecture(string root)

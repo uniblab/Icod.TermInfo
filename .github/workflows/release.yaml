@@ -33,7 +33,7 @@ jobs:
           }
 
       - id: version
-        name: Validate tag and coordinated package versions
+        name: Validate tag and centralized suite version
         shell: pwsh
         run: |
           $tag = $env:GITHUB_REF_NAME
@@ -42,54 +42,69 @@ jobs:
           }
 
           $tagVersion = $Matches.version
-          $projects = @(
+          [xml]$buildProperties = Get-Content -LiteralPath 'Directory.Build.props' -Raw
+          $suiteVersionNode = $buildProperties.SelectSingleNode(
+              '/Project/PropertyGroup/IcodTermInfoSuiteVersion'
+          )
+          if ($null -eq $suiteVersionNode) {
+              throw 'Directory.Build.props must declare IcodTermInfoSuiteVersion.'
+          }
+          $coordinatedVersion = $suiteVersionNode.InnerText
+          if ($tagVersion -ne $coordinatedVersion) {
+              throw "Tag version '$tagVersion' does not match IcodTermInfoSuiteVersion '$coordinatedVersion'."
+          }
+
+          $versionReference = '$(IcodTermInfoSuiteVersion)'
+          $libraryProjects = @(
               @{ Name = 'Runtime'; Path = 'Icod.TermInfo.csproj' },
               @{ Name = 'Source'; Path = 'Icod.TermInfo.Source/Icod.TermInfo.Source.csproj' },
               @{ Name = 'Compiler'; Path = 'Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj' },
               @{ Name = 'Inspection'; Path = 'Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj' }
           )
-
-          $coordinatedVersion = $null
-          foreach ($projectInfo in $projects) {
+          foreach ($projectInfo in $libraryProjects) {
               [xml]$project = Get-Content -LiteralPath $projectInfo.Path -Raw
               $versionNode = $project.SelectSingleNode('/Project/PropertyGroup/Version')
               $packageVersionNode = $project.SelectSingleNode('/Project/PropertyGroup/PackageVersion')
-              if ($null -eq $versionNode -or $null -eq $packageVersionNode) {
-                  throw "$($projectInfo.Name) project must declare both Version and PackageVersion."
-              }
-
-              $version = $versionNode.InnerText
-              $packageVersion = $packageVersionNode.InnerText
-              if ($version -ne $packageVersion) {
-                  throw "$($projectInfo.Name) Version '$version' does not match PackageVersion '$packageVersion'."
-              }
-
-              if ($null -eq $coordinatedVersion) {
-                  $coordinatedVersion = $packageVersion
-              }
-              elseif ($packageVersion -ne $coordinatedVersion) {
-                  throw "$($projectInfo.Name) PackageVersion '$packageVersion' does not match coordinated version '$coordinatedVersion'."
+              if (
+                  $null -eq $versionNode
+                  -or $null -eq $packageVersionNode
+                  -or $versionNode.InnerText -ne $versionReference
+                  -or $packageVersionNode.InnerText -ne $versionReference
+              ) {
+                  throw "$($projectInfo.Name) must consume IcodTermInfoSuiteVersion for Version and PackageVersion."
               }
           }
 
-          $commandProjects = @(
-              @{ Name = 'tic'; Path = 'tic/Icod.TermInfo.Tic.csproj' },
-              @{ Name = 'infocmp'; Path = 'infocmp/Icod.TermInfo.InfoCmp.csproj' },
-              @{ Name = 'toe'; Path = 'toe/Icod.TermInfo.Toe.csproj' }
-          )
-          foreach ($commandInfo in $commandProjects) {
-              [xml]$commandProject = Get-Content -LiteralPath $commandInfo.Path -Raw
+          foreach ($commandPath in @(
+              'tic/Icod.TermInfo.Tic.csproj',
+              'infocmp/Icod.TermInfo.InfoCmp.csproj',
+              'toe/Icod.TermInfo.Toe.csproj'
+          )) {
+              [xml]$commandProject = Get-Content -LiteralPath $commandPath -Raw
               $commandVersionNode = $commandProject.SelectSingleNode('/Project/PropertyGroup/Version')
-              if ($null -eq $commandVersionNode) {
-                  throw "$($commandInfo.Name) project must declare Version."
-              }
-              if ($commandVersionNode.InnerText -ne $coordinatedVersion) {
-                  throw "$($commandInfo.Name) Version '$($commandVersionNode.InnerText)' does not match coordinated version '$coordinatedVersion'."
+              if ($null -eq $commandVersionNode -or $commandVersionNode.InnerText -ne $versionReference) {
+                  throw "'$commandPath' must consume IcodTermInfoSuiteVersion for Version."
               }
           }
 
-          if ($tagVersion -ne $coordinatedVersion) {
-              throw "Tag version '$tagVersion' does not match coordinated PackageVersion '$coordinatedVersion'."
+          [xml]$router = Get-Content -LiteralPath 'icod-terminfo/Icod.TermInfo.Router.csproj' -Raw
+          foreach ($propertyName in @('Version', 'PackageVersion')) {
+              $node = $router.SelectSingleNode("/Project/PropertyGroup/$propertyName")
+              if ($null -eq $node -or $node.InnerText -ne $versionReference) {
+                  throw "Router $propertyName must consume IcodTermInfoSuiteVersion."
+              }
+          }
+          $packAsToolNode = $router.SelectSingleNode('/Project/PropertyGroup/PackAsTool')
+          $packageIdNode = $router.SelectSingleNode('/Project/PropertyGroup/PackageId')
+          $toolCommandNameNode = $router.SelectSingleNode('/Project/PropertyGroup/ToolCommandName')
+          if ($null -eq $packAsToolNode -or $packAsToolNode.InnerText -ne 'true') {
+              throw 'Router must remain a .NET tool package.'
+          }
+          if ($null -eq $packageIdNode -or $packageIdNode.InnerText -ne 'Icod.TermInfo.Tools') {
+              throw 'Router PackageId must remain Icod.TermInfo.Tools.'
+          }
+          if ($null -eq $toolCommandNameNode -or $toolCommandNameNode.InnerText -ne 'icod-terminfo') {
+              throw 'Router ToolCommandName must remain icod-terminfo.'
           }
 
           "version=$tagVersion" >> $env:GITHUB_OUTPUT
@@ -123,6 +138,7 @@ jobs:
           dotnet pack Icod.TermInfo.Source/Icod.TermInfo.Source.csproj -c Release --no-build --output artifacts
           dotnet pack Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj -c Release --no-build --output artifacts
           dotnet pack Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj -c Release --no-build --output artifacts
+          dotnet pack icod-terminfo/Icod.TermInfo.Router.csproj -c Release --no-build --output artifacts
 
       - name: Verify Release packages on Windows
         if: matrix.os == 'windows-latest'
@@ -148,6 +164,7 @@ jobs:
             artifacts/Icod.TermInfo.Compiler.${{ needs.metadata.outputs.version }}.snupkg
             artifacts/Icod.TermInfo.Inspection.${{ needs.metadata.outputs.version }}.nupkg
             artifacts/Icod.TermInfo.Inspection.${{ needs.metadata.outputs.version }}.snupkg
+            artifacts/Icod.TermInfo.Tools.${{ needs.metadata.outputs.version }}.nupkg
           if-no-files-found: error
           retention-days: 7
 
@@ -200,8 +217,31 @@ jobs:
         shell: pwsh
         run: ./.github/scripts/smoke-tool-archive.ps1 artifacts/tools
 
+  smoke-tool-package:
+    needs: [metadata, validate]
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-packages
+          path: artifacts
+
+      - name: Smoke installable Icod.TermInfo.Tools package
+        shell: pwsh
+        run: ./.github/scripts/smoke-tool-package.ps1 artifacts
+
   publish-nuget:
-    needs: [metadata, validate, tool-archives, smoke-tool-archives]
+    needs: [metadata, validate, tool-archives, smoke-tool-archives, smoke-tool-package]
     runs-on: ubuntu-latest
     environment: Release
     permissions:
@@ -233,7 +273,8 @@ jobs:
               "artifacts/package/Icod.TermInfo.$version.nupkg",
               "artifacts/package/Icod.TermInfo.Source.$version.nupkg",
               "artifacts/package/Icod.TermInfo.Compiler.$version.nupkg",
-              "artifacts/package/Icod.TermInfo.Inspection.$version.nupkg"
+              "artifacts/package/Icod.TermInfo.Inspection.$version.nupkg",
+              "artifacts/package/Icod.TermInfo.Tools.$version.nupkg"
           )
 
           foreach ($package in $packages) {
@@ -288,7 +329,8 @@ jobs:
               "artifacts/package/Icod.TermInfo.$version.nupkg",
               "artifacts/package/Icod.TermInfo.Source.$version.nupkg",
               "artifacts/package/Icod.TermInfo.Compiler.$version.nupkg",
-              "artifacts/package/Icod.TermInfo.Inspection.$version.nupkg"
+              "artifacts/package/Icod.TermInfo.Inspection.$version.nupkg",
+              "artifacts/package/Icod.TermInfo.Tools.$version.nupkg"
           )
 
           foreach ($package in $packages) {
@@ -330,8 +372,8 @@ jobs:
                   Where-Object { $_.Extension -in @('.nupkg', '.snupkg', '.zip', '.gz') } |
                   Sort-Object Name
           )
-          if (14 -ne $files.Count) {
-              throw "Expected eight package artifacts and six tool archives before checksumming; found $($files.Count)."
+          if (15 -ne $files.Count) {
+              throw "Expected nine package artifacts and six tool archives before checksumming; found $($files.Count)."
           }
 
           $lines = foreach ($file in $files) {
@@ -361,7 +403,12 @@ jobs:
           dotnet add package Icod.TermInfo.Source --version {0}
           dotnet add package Icod.TermInfo.Compiler --version {0}
           dotnet add package Icod.TermInfo.Inspection --version {0}
+          dotnet tool install --global Icod.TermInfo.Tools --version {0}
           ```
+
+          The installed tool exposes `icod-terminfo tic`, `icod-terminfo infocmp`,
+          and `icod-terminfo toe`. The attached standalone archives continue to
+          expose the traditional `tic`, `infocmp`, and `toe` command names.
 
           `Icod.TermInfo`, `Icod.TermInfo.Source`, `Icod.TermInfo.Compiler`, and
           `Icod.TermInfo.Inspection` target `net8.0`, `net9.0`, and `net10.0`.
@@ -374,8 +421,9 @@ jobs:
           Each tool archive contains `tic`, `infocmp`, and `toe` plus required
           managed dependencies; the user supplies the .NET 10 runtime.
 
-          All four NuGet packages, all four symbol packages, all six tool-suite
-          archives, and SHA-256 checksums are attached to this release.
+          All five NuGet packages, the four reusable-library symbol packages,
+          all six tool-suite archives, and SHA-256 checksums are attached to this
+          release.
           '@ -f $version
 
           $assets = @(
@@ -384,8 +432,8 @@ jobs:
                   Sort-Object Name |
                   ForEach-Object { $_.FullName }
           )
-          if (15 -ne $assets.Count) {
-              throw "Expected fifteen GitHub Release assets; found $($assets.Count)."
+          if (16 -ne $assets.Count) {
+              throw "Expected sixteen GitHub Release assets; found $($assets.Count)."
           }
 
           $arguments = @(

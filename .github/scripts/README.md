@@ -34,9 +34,10 @@ bash .github/scripts/verify-release-package.sh artifacts Release
 
 The scripts reject any configuration other than `Debug`, `Staging`, or
 `Release`. The selected configuration controls maintenance tools, API-snapshot
-build-output paths, the Runtime, Compiler, and Inspection package verifiers, all
-four package artifacts, all four fresh-package consumers, and the
-non-interactive repository sample.
+build-output paths, the Runtime, Compiler, and Inspection package verifiers, the
+four reusable-library artifacts, all four fresh-library-package consumers, and
+the non-interactive repository sample. The installable `Icod.TermInfo.Tools`
+package has a separate execution smoke described below.
 
 The 1.1 source-language line keeps the frozen `Icod.TermInfo` package checks and
 adds `Icod.TermInfo.Source` net8.0/net9.0/net10.0 API-equivalence, reviewed
@@ -64,8 +65,10 @@ blocking SDK reference-pack acquisition.
 
 `build-tool-archives.sh` publishes `tic`, `infocmp`, and `toe` for the six
 supported release RIDs and creates the coordinated framework-dependent tool-suite
-archives. It first requires all four libraries and all three commands to declare
-the same version.
+archives. The archive version comes from
+`Directory.Build.props:IcodTermInfoSuiteVersion`, and the builder verifies the
+effective versions of all four libraries, all three commands, and the router
+before publication.
 
 ```text
 bash .github/scripts/build-tool-archives.sh Release artifacts/tools
@@ -95,3 +98,21 @@ pwsh -File .github/scripts/smoke-tool-archive.ps1 artifacts/tools
 The release workflow runs structural validation for all six archives and the
 execution smoke on matching Windows, Linux, and macOS runners before package
 publication.
+
+## Installable tool package
+
+`smoke-tool-package.ps1` validates the fifth registry package,
+`Icod.TermInfo.Tools`. It reads the centralized suite version, installs the
+freshly packed `.nupkg` into an isolated tool path and package cache, verifies
+`icod-terminfo --version`, routes all three command `-V` forms, and exercises the
+same controlled `tic` -> `infocmp` -> `toe` database path used by the archive
+smoke.
+
+```text
+pwsh -File .github/scripts/smoke-tool-package.ps1 artifacts
+```
+
+PR, main, and release workflows run this installation smoke on Windows, Linux,
+and macOS. The standalone archive smoke remains separate because it validates
+the traditional `tic`, `infocmp`, and `toe` executable names rather than the
+NuGet router.

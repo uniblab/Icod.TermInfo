@@ -1,111 +1,106 @@
 using System.Text;
-using Icod.CommandFramework.Diagnostics;
 using Xunit;
 
-namespace Icod.TermInfo.Toe.Tests;
+namespace Icod.TermInfo.Router.Tests;
 
 public sealed class CommandTests {
 	[Fact]
-	public async Task HelpWritesStdoutAndReturnsSuccess() {
+	public async Task HelpListsRoutedCommands() {
 		using var stdin = new MemoryStream();
 		using var stdout = new MemoryStream();
 		using var stderr = new MemoryStream();
 
 		int status = await Command.RunAsync(
-			[ "--help" ],
+			new string[] { "--help" },
 			stdin,
 			stdout,
 			stderr
 		);
 
-		Assert.Equal( CommandExitCodes.Success, status );
-		Assert.Contains(
-			"Usage: toe",
-			ReadText( stdout )
+		Assert.Equal( 0, status );
+		string output =
+			ReadText( stdout );
+		Assert.Contains( "tic", output );
+		Assert.Contains( "infocmp", output );
+		Assert.Contains( "toe", output );
+		Assert.Empty( ReadText( stderr ) );
+	}
+
+	[Fact]
+	public async Task VersionReportsCentralSuiteVersion() {
+		using var stdin = new MemoryStream();
+		using var stdout = new MemoryStream();
+		using var stderr = new MemoryStream();
+
+		int status = await Command.RunAsync(
+			new string[] { "-V" },
+			stdin,
+			stdout,
+			stderr
 		);
-		Assert.Contains( "-a", ReadText( stdout ) );
-		Assert.Contains( "-h", ReadText( stdout ) );
-		Assert.Contains( "-s", ReadText( stdout ) );
-		Assert.Contains( "-u", ReadText( stdout ) );
-		Assert.Contains( "-U", ReadText( stdout ) );
-		Assert.Contains( "-D", ReadText( stdout ) );
+
+		Assert.Equal( 0, status );
+		Assert.Contains( "1.5.0", ReadText( stdout ) );
 		Assert.Empty( ReadText( stderr ) );
 	}
 
 	[Theory]
-	[InlineData( "-V" )]
-	[InlineData( "--version" )]
-	public async Task VersionReportsCoordinatedDevelopmentVersion( string option ) {
+	[InlineData( "tic" )]
+	[InlineData( "infocmp" )]
+	[InlineData( "toe" )]
+	public async Task RoutesVersionRequestToSelectedCommand(
+		string commandName
+	) {
 		using var stdin = new MemoryStream();
 		using var stdout = new MemoryStream();
 		using var stderr = new MemoryStream();
 
 		int status = await Command.RunAsync(
-			[ option ],
+			new string[] { commandName, "-V" },
 			stdin,
 			stdout,
 			stderr
 		);
 
-		Assert.Equal( CommandExitCodes.Success, status );
+		Assert.Equal( 0, status );
 		Assert.Contains( "1.5.0", ReadText( stdout ) );
 		Assert.Empty( ReadText( stderr ) );
 	}
 
 	[Fact]
-	public async Task UnsupportedArgumentWritesStderrAndReturnsUsageError() {
+	public async Task MissingCommandReturnsUsageError() {
 		using var stdin = new MemoryStream();
 		using var stdout = new MemoryStream();
 		using var stderr = new MemoryStream();
 
 		int status = await Command.RunAsync(
-			[ "--not-a-toe-option" ],
+			Array.Empty<string>(),
 			stdin,
 			stdout,
 			stderr
 		);
 
-		Assert.Equal( CommandExitCodes.UsageError, status );
+		Assert.Equal( 2, status );
 		Assert.Empty( ReadText( stdout ) );
-		Assert.Contains( "unsupported option", ReadText( stderr ) );
-	}
-
-	[Theory]
-	[InlineData( "-u" )]
-	[InlineData( "-U" )]
-	public async Task SourceDependencyModeRequiresExactlyOneOperand( string option ) {
-		using var stdin = new MemoryStream();
-		using var stdout = new MemoryStream();
-		using var stderr = new MemoryStream();
-
-		int status = await Command.RunAsync(
-			[ option ],
-			stdin,
-			stdout,
-			stderr
-		);
-
-		Assert.Equal( CommandExitCodes.UsageError, status );
-		Assert.Empty( ReadText( stdout ) );
-		Assert.Contains( "exactly one source file operand", ReadText( stderr ) );
+		Assert.Contains( "missing command", ReadText( stderr ) );
 	}
 
 	[Fact]
-	public async Task SpecialModeCannotBeCombinedWithListingArguments() {
+	public async Task UnknownCommandReturnsUsageError() {
 		using var stdin = new MemoryStream();
 		using var stdout = new MemoryStream();
 		using var stderr = new MemoryStream();
 
 		int status = await Command.RunAsync(
-			[ "-D", "." ],
+			new string[] { "not-a-command" },
 			stdin,
 			stdout,
 			stderr
 		);
 
-		Assert.Equal( CommandExitCodes.UsageError, status );
+		Assert.Equal( 2, status );
 		Assert.Empty( ReadText( stdout ) );
-		Assert.Contains( "must be used alone", ReadText( stderr ) );
+		Assert.Contains( "unknown command", ReadText( stderr ) );
 	}
 
 	[Fact]
@@ -117,26 +112,26 @@ public sealed class CommandTests {
 		cancellation.Cancel();
 
 		int status = await Command.RunAsync(
-			[],
+			new string[] { "tic", "-V" },
 			stdin,
 			stdout,
 			stderr,
 			cancellation.Token
 		);
 
-		Assert.Equal( CommandExitCodes.Canceled, status );
+		Assert.Equal( 130, status );
 		Assert.Empty( ReadText( stdout ) );
 		Assert.Empty( ReadText( stderr ) );
 	}
 
 	[Fact]
-	public async Task CommandLeavesCallerOwnedStreamsOpen() {
+	public async Task RouterLeavesCallerOwnedStreamsOpen() {
 		using var stdin = new MemoryStream();
 		using var stdout = new MemoryStream();
 		using var stderr = new MemoryStream();
 
 		_ = await Command.RunAsync(
-			[ "--help" ],
+			new string[] { "toe", "-V" },
 			stdin,
 			stdout,
 			stderr
@@ -144,26 +139,11 @@ public sealed class CommandTests {
 
 		stdout.WriteByte( 0 );
 		stderr.WriteByte( 0 );
-		Assert.True( stdin.CanRead );
-		Assert.True( stdout.CanWrite );
-		Assert.True( stderr.CanWrite );
 	}
 
-	[Fact]
-	public async Task NullArgumentsAreRejectedBeforeExecution() {
-		using var stream = new MemoryStream();
-
-		await Assert.ThrowsAsync<ArgumentNullException>(
-			() => Command.RunAsync(
-				null!,
-				stream,
-				stream,
-				stream
-			)
-		);
-	}
-
-	private static string ReadText( MemoryStream stream ) {
+	private static string ReadText(
+		MemoryStream stream
+	) {
 		ArgumentNullException.ThrowIfNull( stream );
 
 		return Encoding.UTF8.GetString(

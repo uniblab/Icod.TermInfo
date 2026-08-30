@@ -4,7 +4,7 @@ using Xunit;
 namespace Icod.TermInfo.Tic.Tests;
 
 public sealed class T11SuiteContractTests {
-	private const string DevelopmentVersion = "1.4.1";
+	private const string DevelopmentVersion = "$(IcodTermInfoSuiteVersion)";
 	private const string StableAssemblyVersion = "1.0.0.0";
 
 	[Fact]
@@ -180,7 +180,7 @@ public sealed class T11SuiteContractTests {
 	}
 
 	[Fact]
-	public void ReleaseArtifactModelRemainsFourPackagesSixArchivesAndManifest() {
+	public void ReleaseArtifactModelIsFivePackagesSixArchivesAndManifest() {
 		string root = FindRepositoryRoot();
 		string release = ReadRepositoryFile(
 			root,
@@ -188,12 +188,12 @@ public sealed class T11SuiteContractTests {
 		);
 
 		Assert.Contains(
-			"if (14 -ne $files.Count)",
+			"if (15 -ne $files.Count)",
 			release,
 			StringComparison.Ordinal
 		);
 		Assert.Contains(
-			"if (15 -ne $assets.Count)",
+			"if (16 -ne $assets.Count)",
 			release,
 			StringComparison.Ordinal
 		);

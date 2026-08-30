@@ -36,6 +36,7 @@ jobs:
           dotnet pack Icod.TermInfo.Source/Icod.TermInfo.Source.csproj -c Release --no-build --output artifacts
           dotnet pack Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj -c Release --no-build --output artifacts
           dotnet pack Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj -c Release --no-build --output artifacts
+          dotnet pack icod-terminfo/Icod.TermInfo.Router.csproj -c Release --no-build --output artifacts
 
       - name: Verify Release packages on Windows
         if: matrix.os == 'windows-latest'
@@ -99,3 +100,26 @@ jobs:
       - name: Smoke matching tool-suite archive
         shell: pwsh
         run: ./.github/scripts/smoke-tool-archive.ps1 artifacts/tools
+
+  smoke-tool-package:
+    needs: build-and-test
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: icod-terminfo-main-packages
+          path: artifacts
+
+      - name: Smoke installable Icod.TermInfo.Tools package
+        shell: pwsh
+        run: ./.github/scripts/smoke-tool-package.ps1 artifacts

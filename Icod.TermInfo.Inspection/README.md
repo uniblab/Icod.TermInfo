@@ -6,14 +6,14 @@ comparison layer for the `Icod.TermInfo` package family.
 The 1.3 line established the reusable inspection/comparison engine while
 preserving the already-frozen Runtime 1.0, Source 1.1, and Compiler 1.2 public
 contracts. Version 1.4.0 froze the reviewed additive database-inspection and
-renderer-control APIs used by the managed tool suite. Version 1.4.1 corrects
-release-facing documentation and metadata without changing that frozen API or
-its semantics.
+renderer-control APIs used by the managed tool suite. Version 1.5.0 participates
+in centralized suite versioning and the installable tool-router release without
+changing that frozen API or its semantics.
 
 ## Install
 
 ```text
-dotnet add package Icod.TermInfo.Inspection --version 1.4.1
+dotnet add package Icod.TermInfo.Inspection --version 1.5.0
 ```
 
 The package targets `net8.0`, `net9.0`, and `net10.0`, depends on matching
@@ -28,7 +28,7 @@ remain command-layer policy over already-acquired immutable descriptions.
 
 T07 adds no Inspection public API. The frozen
 `docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt` therefore remains unchanged from
-the reviewed T06 surface and is retained unchanged by 1.4.1.
+the reviewed T06 surface and remains the frozen Inspection contract in 1.5.0.
 
 ## 1.4 T06 effective-source renderer controls
 

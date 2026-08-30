@@ -4,16 +4,26 @@ using Xunit;
 namespace Icod.TermInfo.Tic.Tests;
 
 public sealed class ReleaseClosureTests {
-	private const string ReleaseVersion = "1.4.1";
+	private const string ReleaseVersion = "1.5.0";
+	private const string VersionReference = "$(IcodTermInfoSuiteVersion)";
 	private const string StableAssemblyVersion = "1.0.0.0";
 
 	[Fact]
-	public void AllSevenProjectsAreAtStableOneFour() {
+	public void CoordinatedProjectsConsumeCentralOneFiveVersion() {
 		string root = FindRepositoryRoot();
+		XDocument buildProperties =
+			LoadProject( root, "Directory.Build.props" );
+		Assert.Equal(
+			ReleaseVersion,
+			ReadRequiredProperty(
+				buildProperties,
+				"IcodTermInfoSuiteVersion"
+			)
+		);
 
 		foreach (
 			string relativePath
-			in new[] {
+			in new string[] {
 				"Icod.TermInfo.csproj",
 				"Icod.TermInfo.Source/Icod.TermInfo.Source.csproj",
 				"Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj",
@@ -22,11 +32,11 @@ public sealed class ReleaseClosureTests {
 		) {
 			XDocument project = LoadProject( root, relativePath );
 			Assert.Equal(
-				ReleaseVersion,
+				VersionReference,
 				ReadRequiredProperty( project, "Version" )
 			);
 			Assert.Equal(
-				ReleaseVersion,
+				VersionReference,
 				ReadRequiredProperty( project, "PackageVersion" )
 			);
 			Assert.Equal(
@@ -37,7 +47,7 @@ public sealed class ReleaseClosureTests {
 
 		foreach (
 			string relativePath
-			in new[] {
+			in new string[] {
 				"tic/Icod.TermInfo.Tic.csproj",
 				"infocmp/Icod.TermInfo.InfoCmp.csproj",
 				"toe/Icod.TermInfo.Toe.csproj",
@@ -45,47 +55,102 @@ public sealed class ReleaseClosureTests {
 		) {
 			XDocument project = LoadProject( root, relativePath );
 			Assert.Equal(
-				ReleaseVersion,
+				VersionReference,
 				ReadRequiredProperty( project, "Version" )
 			);
+			Assert.Equal(
+				"false",
+				ReadRequiredProperty( project, "IsPackable" )
+			);
 		}
+
+		XDocument router =
+			LoadProject(
+				root,
+				"icod-terminfo/Icod.TermInfo.Router.csproj"
+			);
+		Assert.Equal(
+			VersionReference,
+			ReadRequiredProperty( router, "Version" )
+		);
+		Assert.Equal(
+			VersionReference,
+			ReadRequiredProperty( router, "PackageVersion" )
+		);
+		Assert.Equal(
+			"true",
+			ReadRequiredProperty( router, "PackAsTool" )
+		);
+		Assert.Equal(
+			"Icod.TermInfo.Tools",
+			ReadRequiredProperty( router, "PackageId" )
+		);
+		Assert.Equal(
+			"icod-terminfo",
+			ReadRequiredProperty( router, "ToolCommandName" )
+		);
 	}
 
 	[Fact]
-	public void MainAndTagWorkflowsSmokeUnpackedToolArchives() {
+	public void MainAndTagWorkflowsSmokeBothToolDistributions() {
 		string root = FindRepositoryRoot();
-		string smoke = ReadRepositoryFile(
+		string archiveSmoke = ReadRepositoryFile(
 			root,
 			".github/scripts/smoke-tool-archive.ps1"
+		);
+		string packageSmoke = ReadRepositoryFile(
+			root,
+			".github/scripts/smoke-tool-package.ps1"
 		);
 
 		foreach (
 			string marker
-			in new[] {
+			in new string[] {
 				"tic",
 				"infocmp",
 				"toe",
-				"--version",
 				"release-smoke",
 			}
 		) {
 			Assert.Contains(
 				marker,
-				smoke,
+				archiveSmoke,
+				StringComparison.Ordinal
+			);
+			Assert.Contains(
+				marker,
+				packageSmoke,
 				StringComparison.Ordinal
 			);
 		}
+		Assert.Contains(
+			"Icod.TermInfo.Tools",
+			packageSmoke,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"icod-terminfo",
+			packageSmoke,
+			StringComparison.Ordinal
+		);
 
 		foreach (
 			string workflow
-			in new[] {
+			in new string[] {
 				".github/workflows/push-main.yaml",
 				".github/workflows/release.yaml",
 			}
 		) {
+			string workflowText =
+				ReadRepositoryFile( root, workflow );
 			Assert.Contains(
 				"smoke-tool-archive.ps1",
-				ReadRepositoryFile( root, workflow ),
+				workflowText,
+				StringComparison.Ordinal
+			);
+			Assert.Contains(
+				"smoke-tool-package.ps1",
+				workflowText,
 				StringComparison.Ordinal
 			);
 		}
@@ -95,7 +160,7 @@ public sealed class ReleaseClosureTests {
 			".github/workflows/release.yaml"
 		);
 		Assert.Contains(
-			"needs: [metadata, validate, tool-archives, smoke-tool-archives]",
+			"needs: [metadata, validate, tool-archives, smoke-tool-archives, smoke-tool-package]",
 			release,
 			StringComparison.Ordinal
 		);
@@ -110,22 +175,23 @@ public sealed class ReleaseClosureTests {
 				System.IO.Path.Combine(
 					root,
 					"docs",
-					"1.4.1-RELEASE-AUDIT.md"
+					"1.5.0-RELEASE-AUDIT.md"
 				)
 			)
 		);
 
 		foreach (
 			string relativePath
-			in new[] {
+			in new string[] {
 				"README.md",
 				"Icod.TermInfo.Source/README.md",
 				"Icod.TermInfo.Compiler/README.md",
 				"Icod.TermInfo.Inspection/README.md",
+				"icod-terminfo/README.md",
 			}
 		) {
 			Assert.Contains(
-				"1.4.1",
+				ReleaseVersion,
 				ReadRepositoryFile( root, relativePath ),
 				StringComparison.Ordinal
 			);

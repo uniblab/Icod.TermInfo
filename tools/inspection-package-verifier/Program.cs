@@ -611,12 +611,36 @@ internal static class Program {
 				)
 				?.Value
 				.Trim();
+		const string versionReference =
+			"$(IcodTermInfoSuiteVersion)";
 		Require(
-			!string.IsNullOrWhiteSpace( version )
-				&& version == packageVersion,
-			$"{relativeProjectPath}: Version and PackageVersion must be present and identical."
+			version == versionReference
+				&& packageVersion == versionReference,
+			$"{relativeProjectPath}: Version and PackageVersion must consume IcodTermInfoSuiteVersion."
 		);
-		return packageVersion!;
+
+		XDocument buildProperties =
+			XDocument.Load(
+				Path.Combine(
+					root,
+					"Directory.Build.props"
+				),
+				LoadOptions.None
+			);
+		string? suiteVersion =
+			buildProperties
+				.Descendants()
+				.FirstOrDefault(
+					element =>
+						element.Name.LocalName == "IcodTermInfoSuiteVersion"
+				)
+				?.Value
+				.Trim();
+		Require(
+			!string.IsNullOrWhiteSpace( suiteVersion ),
+			"Directory.Build.props must declare IcodTermInfoSuiteVersion."
+		);
+		return suiteVersion!;
 	}
 
 	private static ZipArchiveEntry AssertSingleNuspec(

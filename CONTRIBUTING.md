@@ -43,16 +43,16 @@ releases such as 1.4.1 must preserve unchanged.
 
 ## Version metadata
 
-`Icod.TermInfo.csproj`, `Icod.TermInfo.Source/Icod.TermInfo.Source.csproj`,
-`Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj`, and
-`Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj` contain `<Version />`,
-`<PackageVersion />`, and the stable 1.x `<AssemblyVersion />`. Keep `Version`
-and `PackageVersion` identical within each project, and keep all four package
-versions synchronized.
+`Directory.Build.props` contains the sole coordinated release-version literal
+in `IcodTermInfoSuiteVersion`. Runtime, Source, Compiler, Inspection, `tic`,
+`infocmp`, `toe`, and `Icod.TermInfo.Router` must consume that property rather
+than introducing independent current-version literals. The four reusable
+package projects and the router also consume it for `<PackageVersion />`.
 
-Beginning with 1.3, Runtime, Source, Compiler, and Inspection advance together.
-The 1.x assembly version remains `1.0.0.0` for all four assemblies, and all four
-remain unsigned.
+Beginning with 1.3, Runtime, Source, Compiler, and Inspection advance together;
+beginning with 1.5 the `Icod.TermInfo.Tools` router package joins that coordinated
+version. The 1.x assembly version remains `1.0.0.0` for all four reusable
+assemblies, and all four remain unsigned.
 
 Prerelease development should use the active version roadmap's alpha/beta/RC
 sequence. A final release tag must be exactly `v<PackageVersion>`.
@@ -129,16 +129,23 @@ Package changes should preserve:
 - stable assembly version `1.0.0.0` throughout 1.x;
 - unsigned assembly identity throughout 1.x;
 - Source Link information supplied by the .NET SDK;
-- portable PDBs and `.snupkg` generation for all three targets;
-- synchronized Runtime, Source, Compiler, and Inspection package versions;
+- portable PDBs and `.snupkg` generation for all three reusable-library targets;
+- one `IcodTermInfoSuiteVersion` authority for all coordinated projects;
+- synchronized Runtime, Source, Compiler, Inspection, and `Icod.TermInfo.Tools`
+  package versions;
 - Runtime, Source, Compiler, and Inspection fresh-package smoke consumers on all
-  three targets;
+  three library targets;
+- installation and routed-command smoke for `Icod.TermInfo.Tools` on Windows,
+  Linux, and macOS;
 - each package README, icon metadata, and LGPL license expression;
 - a one-way Source -> Runtime package dependency;
 - a one-way Compiler -> Runtime/Source dependency;
 - a one-way Inspection -> Runtime/Source dependency with no production Compiler
   dependency;
-- identical validated release artifacts for NuGet.org and GitHub Packages.
+- no command-to-command dependencies among `tic`, `infocmp`, and `toe`;
+- a distribution-only Router -> tic/infocmp/toe dependency;
+- identical validated registry package artifacts for NuGet.org and GitHub
+  Packages.
 
 See `docs/RELEASING.md` before modifying publication workflows.
 

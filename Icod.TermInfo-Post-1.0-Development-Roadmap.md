@@ -5,14 +5,15 @@
 **Optional source package:** `Icod.TermInfo.Source`
 **Optional compiler package:** `Icod.TermInfo.Compiler`
 **Optional inspection package:** `Icod.TermInfo.Inspection`
+**Installable tool package:** `Icod.TermInfo.Tools`
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
-**Current release version:** `1.3.0`
-**Current development version:** `1.4.0-Alpha-7`
-**Next development line:** `1.5.0`
-**Status:** 1.4.0 tool-suite development
-**Current tranche:** T07 — `infocmp` semantic comparison
+**Current release version:** `1.4.1`
+**Current development version:** `1.5.0`
+**Next development line:** `1.6.0`
+**Status:** 1.5.0 coordinated distribution release finalization
+**Current tranche:** Release closure — centralized suite versioning and installable router
 **Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
 
 ---
@@ -65,8 +66,14 @@ Live-terminal state, terminal input, probing, PTYs, curses presentation, and ter
 | **1.2.0** | Terminfo compiler | Write conventional compiled terminfo entries; provide the `tic` engine |
 | **1.3.0** | Inspection/comparison | `infocmp` engine, canonical source rendering, semantic comparison |
 | **1.4.0** | Tool suite | Actual `tic`, `infocmp`, and `toe` command projects |
-| **1.5.0** | Termcap interoperability | Parse, resolve, and convert termcap and terminfo |
+| **1.5.0** | Coordinated distribution | Centralize suite versioning and add the installable command router without changing frozen library APIs or 1.4 command semantics |
+| **1.6.0** | Termcap interoperability | Parse, resolve, and convert termcap and terminfo |
 | **later** | Exotic storage/formats | Berkeley DB provider and historical Unix dialects as justified |
+
+The active 1.5 release plan is recorded in
+[`Icod.TermInfo-1.5.0-Coordinated-Distribution-Roadmap.md`](Icod.TermInfo-1.5.0-Coordinated-Distribution-Roadmap.md)
+and its immutable release requirements are frozen by
+[`docs/1.5.0-RELEASE-AUDIT.md`](docs/1.5.0-RELEASE-AUDIT.md).
 
 The sequence is cumulative but intentionally modular. Applications which only need runtime terminfo SHALL continue to depend on `Icod.TermInfo` alone.
 
@@ -981,11 +988,11 @@ and explicitly reviewed 1.4 Inspection additions preserved.
 
 ---
 
-# 8. Version 1.5.0 — Termcap Interoperability
+# 8. Version 1.6.0 — Termcap Interoperability
 
 ## 8.1 Release objective
 
-`1.5.0` SHALL add historical termcap compatibility without contaminating the primary terminfo model.
+`1.6.0` SHALL add historical termcap compatibility without contaminating the primary terminfo model.
 
 Termcap SHALL be treated as an interoperability/source family.
 
@@ -1066,7 +1073,7 @@ infotocap
 
 These may be separate executable projects or modes over the shared tooling engine.
 
-**1.5 completion gate:** common termcap databases can be parsed and converted into the canonical Icod terminfo semantic model with loss explicitly reported.
+**1.6 completion gate:** common termcap databases can be parsed and converted into the canonical Icod terminfo semantic model with loss explicitly reported.
 
 ---
 

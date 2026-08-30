@@ -29,15 +29,15 @@ for tool in dotnet zip tar gzip sed touch; do
 	fi
 done
 
-read_version() {
-	local project="$1"
-	sed -n 's/^[[:space:]]*<Version>\([^<]*\)<\/Version>[[:space:]]*$/\1/p' "$project" |
+read_suite_version() {
+	sed -n 's/^[[:space:]]*<IcodTermInfoSuiteVersion>\([^<]*\)<\/IcodTermInfoSuiteVersion>[[:space:]]*$/\1/p' \
+		"$repository_root/Directory.Build.props" |
 		head -n 1
 }
 
-version="$(read_version "$repository_root/tic/Icod.TermInfo.Tic.csproj")"
+version="$(read_suite_version)"
 if [[ -z "$version" ]]; then
-	echo "tic project does not declare Version" >&2
+	echo "Directory.Build.props does not declare IcodTermInfoSuiteVersion" >&2
 	exit 1
 fi
 
@@ -49,12 +49,17 @@ projects=(
 	"$repository_root/tic/Icod.TermInfo.Tic.csproj"
 	"$repository_root/infocmp/Icod.TermInfo.InfoCmp.csproj"
 	"$repository_root/toe/Icod.TermInfo.Toe.csproj"
+	"$repository_root/icod-terminfo/Icod.TermInfo.Router.csproj"
 )
 
 for project in "${projects[@]}"; do
-	project_version="$(read_version "$project")"
+	project_version="$(
+		dotnet msbuild "$project" \
+			-nologo \
+			-getProperty:Version
+	)"
 	if [[ "$project_version" != "$version" ]]; then
-		echo "project '$project' Version '$project_version' does not match '$version'" >&2
+		echo "project '$project' effective Version '$project_version' does not match '$version'" >&2
 		exit 1
 	fi
 done

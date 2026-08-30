@@ -1,11 +1,13 @@
-# Icod.TermInfo 1.4 Tool-Suite Sample
+# Icod.TermInfo 1.5 Tool-Suite Sample
 
 This sample exercises the coordinated `tic`, `infocmp`, and `toe` command suite
 against one controlled terminfo source file. It deliberately uses an explicit
 local database root so results do not depend on the host's installed terminfo
 database.
 
-The commands below assume the 1.4 tool-suite launchers are on `PATH`. Run them
+The commands below use the standalone release-archive launchers. When
+`Icod.TermInfo.Tools` is installed as a .NET tool, prefix the same command lines
+with `icod-terminfo`, for example `icod-terminfo tic -c -x example.ti`. Run them
 from this directory, or adjust the paths as appropriate.
 
 ## Source
