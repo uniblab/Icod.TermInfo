@@ -4,17 +4,18 @@ using Xunit;
 namespace Icod.TermInfo.Tic.Tests;
 
 public sealed class ReleaseClosureTests {
-	private const string ReleaseVersion = "1.5.0";
+	private const string StableReleaseVersion = "1.5.0";
+	private const string DevelopmentVersion = "1.6.0-Alpha-1";
 	private const string VersionReference = "$(IcodTermInfoSuiteVersion)";
 	private const string StableAssemblyVersion = "1.0.0.0";
 
 	[Fact]
-	public void CoordinatedProjectsConsumeCentralOneFiveVersion() {
+	public void CoordinatedProjectsConsumeCentralDevelopmentVersion() {
 		string root = FindRepositoryRoot();
 		XDocument buildProperties =
 			LoadProject( root, "Directory.Build.props" );
 		Assert.Equal(
-			ReleaseVersion,
+			DevelopmentVersion,
 			ReadRequiredProperty(
 				buildProperties,
 				"IcodTermInfoSuiteVersion"
@@ -26,6 +27,7 @@ public sealed class ReleaseClosureTests {
 			in new string[] {
 				"Icod.TermInfo.csproj",
 				"Icod.TermInfo.Source/Icod.TermInfo.Source.csproj",
+				"Icod.TermInfo.Termcap/Icod.TermInfo.Termcap.csproj",
 				"Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj",
 				"Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj",
 			}
@@ -191,7 +193,7 @@ public sealed class ReleaseClosureTests {
 			}
 		) {
 			Assert.Contains(
-				ReleaseVersion,
+				StableReleaseVersion,
 				ReadRepositoryFile( root, relativePath ),
 				StringComparison.Ordinal
 			);

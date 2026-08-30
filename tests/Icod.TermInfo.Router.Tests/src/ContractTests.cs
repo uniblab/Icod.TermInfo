@@ -18,7 +18,7 @@ public sealed class ContractTests {
 				"Directory.Build.props"
 			);
 		Assert.Equal(
-			"1.5.0",
+			"1.6.0-Alpha-1",
 			ReadRequiredProperty(
 				buildProperties,
 				"IcodTermInfoSuiteVersion"
@@ -30,6 +30,7 @@ public sealed class ContractTests {
 			in new string[] {
 				"Icod.TermInfo.csproj",
 				"Icod.TermInfo.Source/Icod.TermInfo.Source.csproj",
+				"Icod.TermInfo.Termcap/Icod.TermInfo.Termcap.csproj",
 				"Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj",
 				"Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj",
 			}

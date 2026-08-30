@@ -5,15 +5,16 @@
 **Optional source package:** `Icod.TermInfo.Source`
 **Optional compiler package:** `Icod.TermInfo.Compiler`
 **Optional inspection package:** `Icod.TermInfo.Inspection`
+**Optional termcap package:** `Icod.TermInfo.Termcap`
 **Installable tool package:** `Icod.TermInfo.Tools`
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
 **Current release version:** `1.5.0`
-**Current development version:** `1.6.0`
+**Current development version:** `1.6.0-Alpha-1`
 **Next development line:** post-1.6 demand-driven work
-**Status:** 1.5.0 released; 1.6.0 termcap interoperability planning
-**Current tranche:** 1.6.0 roadmap and TC01 foundation
+**Status:** 1.6.0 implementation in progress
+**Current tranche:** TC01 — Termcap package and parser foundation
 **Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
 
 ---
@@ -995,90 +996,43 @@ and explicitly reviewed 1.4 Inspection additions preserved.
 
 # 8. Version 1.6.0 — Termcap Interoperability
 
+The detailed and authoritative 1.6 tranche contract is maintained in
+[`Icod.TermInfo-1.6.0-Termcap-Interoperability-Roadmap.md`](Icod.TermInfo-1.6.0-Termcap-Interoperability-Roadmap.md).
+
 ## 8.1 Release objective
 
-`1.6.0` SHALL add historical termcap compatibility without contaminating the primary terminfo model.
+`1.6.0` adds historical termcap compatibility as a separate opt-in reusable
+package without contaminating the primary terminfo model or enlarging the frozen
+Runtime, Source, Compiler, or Inspection APIs.
 
-Termcap SHALL be treated as an interoperability/source family.
-
----
-
-## 8.2 TC01 — Termcap source parser
-
-Support conventional termcap entry syntax, including:
-
-- names and aliases;
-- Boolean values;
-- numeric values;
-- string values;
-- cancellation;
-- continuation;
-- inheritance/reference mechanisms;
-- source diagnostics.
-
-Input limits and recursion limits SHALL match the defensive posture of the terminfo source parser.
-
----
-
-## 8.3 TC02 — Termcap semantic model
-
-Do not force termcap's unresolved syntax directly into `TerminalDescription`.
-
-Use an intermediate representation where necessary, followed by explicit conversion.
-
-Capability mapping SHALL be centralized and testable.
-
----
-
-## 8.4 TC03 — Termcap → terminfo conversion
-
-Implement controlled semantic conversion.
-
-The converter SHALL identify:
-
-- exact mappings;
-- approximations;
-- unsupported termcap capabilities;
-- terminfo capabilities with no termcap equivalent;
-- lossy conversion.
-
-Loss SHALL NOT be silently hidden.
-
----
-
-## 8.5 TC04 — Terminfo → termcap conversion
-
-Provide reverse conversion where representable.
-
-The API SHALL report when a `TerminalDescription` cannot be faithfully expressed using termcap.
-
----
-
-## 8.6 TC05 — Environment/search compatibility
-
-Optionally support explicit termcap-style acquisition semantics such as:
-
-- `TERMCAP`;
-- `TERMPATH`;
-
-without changing the default 1.0 terminfo discovery contract.
-
-Any runtime provider SHOULD be explicitly opt-in.
-
----
-
-## 8.7 TC06 — Conversion tools
-
-Add command functionality equivalent in purpose to:
+The active package boundary is:
 
 ```text
-captoinfo
-infotocap
+Icod.TermInfo.Termcap
+    -> Icod.TermInfo
 ```
 
-These may be separate executable projects or modes over the shared tooling engine.
+## 8.2 Active tranche sequence
 
-**1.6 completion gate:** common termcap databases can be parsed and converted into the canonical Icod terminfo semantic model with loss explicitly reported.
+| Tranche | Development version | Gate |
+|---|---|---|
+| TC01 | `1.6.0-Alpha-1` | package foundation, unresolved model, bounded parser |
+| TC02 | `1.6.0-Alpha-2` | two-character capability metadata and classification |
+| TC03 | `1.6.0-Alpha-3` | `tc=` inheritance, cancellation, cycle/depth handling |
+| TC04 | `1.6.0-Alpha-4` | termcap → `TerminalDescription` conversion with explicit loss |
+| TC05 | `1.6.0-Alpha-5` | reverse representability and deterministic termcap rendering |
+| TC06 | `1.6.0-Alpha-6` | explicit opt-in `TERMCAP` / `TERMPATH` acquisition |
+| TC07 | `1.6.0-Alpha-7` | conversion tools and coordinated router/archive distribution |
+| TC08 | `1.6.0-Alpha-8` | corpus, fuzzing, hostile-input audit, API/package/CLI freeze |
+
+TC01 is the active tranche. Termcap capability mapping, inheritance resolution,
+conversion, environment lookup, and command routing remain deliberately outside
+the parser foundation.
+
+**1.6 completion gate:** common conventional termcap databases can be parsed,
+resolved, converted into the canonical Icod terminfo semantic model, rendered
+back where representable, acquired explicitly, and exercised through conversion
+tools with loss reported rather than hidden.
 
 ---
 

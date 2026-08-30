@@ -61,6 +61,13 @@ semantic command projects remain non-packable. The router joins the coordinated
 registry package set without changing any reusable-library assembly identity or
 frozen public API baseline.
 
+Beginning with TC01 in the 1.6.0 development line, `Icod.TermInfo.Termcap` joins
+the coordinated reusable package family. It targets `net8.0`, `net9.0`, and
+`net10.0`, consumes the centralized suite version, retains assembly version
+`1.0.0.0`, and depends only on Runtime. Existing reusable packages do not acquire
+a Termcap dependency. Stable publication of the new package ID and its final API
+baseline are release-closure work for the 1.6 line.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:
@@ -81,13 +88,17 @@ Strong-name signed no
 AssemblyName       Icod.TermInfo.Inspection
 AssemblyVersion    1.0.0.0
 Strong-name signed no
+
+AssemblyName       Icod.TermInfo.Termcap
+AssemblyVersion    1.0.0.0
+Strong-name signed no
 ```
 
 Package patch/minor versions do not advance `AssemblyVersion`.
 
 This is deliberate. Advancing `AssemblyVersion` for a compatible package-minor
 release would create a new binary assembly identity and would weaken the 1.x
-binding contract without providing a semantic-versioning benefit. All four coordinated
+binding contract without providing a semantic-versioning benefit. All five reusable
 assemblies remain unsigned throughout 1.x. Adding a strong name changes assembly
 identity and is treated as a major-version design decision unless a future
 compatibility review demonstrates a safe migration.
