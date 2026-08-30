@@ -22,7 +22,7 @@
 		<Title>Icod.TermInfo.Termcap</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed termcap source parsing and interoperability support for Icod.TermInfo.</Description>
-		<PackageReleaseNotes>1.6.0-Alpha-4 adds explicit resolved-termcap to TerminalDescription conversion, structured loss diagnostics, Runtime extended-field preservation, historical-alias mapping, and classic termcap padding/parameter translation while preserving the TC01-TC03 source boundaries and frozen Runtime, Source, Compiler, and Inspection APIs.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.6.0-Alpha-5 adds explicit Runtime-to-termcap representability preflight, deterministic reverse rendering, canonical two-character field selection, historical-safe escaping and wrapping, and exact reversal of the adopted TC04 padding/parameter subset while preserving the TC01-TC04 boundaries and frozen Runtime, Source, Compiler, and Inspection APIs.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>

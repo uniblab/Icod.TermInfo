@@ -11,22 +11,32 @@ public sealed class TC04ContractTests
 	private const string Tc04DevelopmentVersion = "1.6.0-Alpha-4";
 
 	[Fact]
-	public void CoordinatedDevelopmentVersionAdvancesToTc04() {
+	public void Tc04VersionAndCentralVersionWiringRemainRecorded() {
 		string root = FindRepositoryRoot();
-		XDocument buildProperties =
+		XDocument termcapProject =
 			XDocument.Load(
 				Path.Combine(
 					root,
-					"Directory.Build.props"
+					"Icod.TermInfo.Termcap",
+					"Icod.TermInfo.Termcap.csproj"
 				),
 				LoadOptions.None
 			);
+		string implementation =
+			File.ReadAllText(
+				Path.Combine(
+					root,
+					"docs",
+					"1.6.0-TC04-TERMCAP-SEMANTIC-CONVERSION.md"
+				)
+			);
 
+		Assert.Contains( Tc04DevelopmentVersion, implementation );
 		Assert.Equal(
-			Tc04DevelopmentVersion,
+			"$(IcodTermInfoSuiteVersion)",
 			ReadRequiredProperty(
-				buildProperties,
-				"IcodTermInfoSuiteVersion"
+				termcapProject,
+				"Version"
 			)
 		);
 	}

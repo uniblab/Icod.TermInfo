@@ -3,10 +3,11 @@
 `Icod.TermInfo.Termcap` is the optional termcap interoperability layer for the
 Icod.TermInfo package family.
 
-The `1.6.0-Alpha-4` TC04 tranche retains the TC01 parser, TC02 capability
-classifier, and TC03 inheritance resolver, and adds explicit conversion into the
-canonical Runtime `TerminalDescription` model. It still does not render termcap
-text, read `TERMCAP` or `TERMPATH`, or provide conversion commands.
+The `1.6.0-Alpha-5` TC05 tranche retains the TC01 parser, TC02 capability
+classifier, TC03 inheritance resolver, and TC04 semantic converter, and adds
+explicit representability preflight plus deterministic reverse rendering from
+the canonical Runtime `TerminalDescription` model. It still does not read
+`TERMCAP` or `TERMPATH` or provide conversion commands.
 
 The package targets `net8.0`, `net9.0`, and `net10.0` and depends only on
 `Icod.TermInfo`. Existing Runtime, Source, Compiler, and Inspection package APIs
@@ -106,6 +107,40 @@ conversion errors instead of being copied silently.
 conversion diagnostics. Historical aliases and extended-field preservation are
 observable but lossless; approximations, unsupported constructs, and
 unrepresentable values set `HasLoss`.
+
+## Reverse rendering
+
+Preflight representability separately when desired, or render directly:
+
+```csharp
+TermcapRepresentabilityResult analysis = TermcapRenderer.Analyze(description);
+
+if (analysis.IsRepresentable)
+{
+    TermcapRenderResult rendered = TermcapRenderer.Render(description);
+    Console.Write(rendered.Text);
+}
+```
+
+TC05 reverses canonical Runtime standard capabilities through the existing
+Runtime-derived termcap catalog and emits a code only when TC02 would classify it
+back to the same Runtime identity. Representable two-character extended fields
+remain extended; mapped, reserved, or otherwise ambiguous names fail preflight.
+
+Strings use deterministic historical-safe escaping. Literal colon is emitted as
+`\072`, traditional leading padding is recovered from TC04's mandatory Runtime
+delay suffix, and parameterized standard capabilities are rendered only when the
+Runtime program is exactly expressible by the adopted TC04 classic operator
+subset. No partial termcap text is returned when representability fails.
+
+Fields are emitted in stable ordinal code order. `TermcapRenderOptions` controls
+the preferred physical line width; wrapping occurs only between complete fields
+and uses an unindented continuation so the TC01 logical-record parser sees no
+synthetic whitespace.
+
+TC05 performs no environment or filesystem discovery. `TERMCAP` / `TERMPATH`
+acquisition remains TC06, while `captoinfo`, `infotocap`, and router integration
+remain TC07.
 
 ## Resource limits
 

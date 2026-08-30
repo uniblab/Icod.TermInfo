@@ -87,6 +87,13 @@ preserves representable unmapped fields through Runtime extended capabilities,
 and does not add a Source dependency or alter any frozen Runtime, Source,
 Compiler, or Inspection public API baseline.
 
+TC05 advances the coordinated development version to `1.6.0-Alpha-5` and adds
+Runtime-to-termcap representability and deterministic reverse-rendering APIs only
+to `Icod.TermInfo.Termcap`. The renderer consumes the existing Runtime model and
+TC02 mapping metadata directly, does not add a Source dependency, performs no
+environment or filesystem acquisition, and does not alter any frozen Runtime,
+Source, Compiler, or Inspection public API baseline.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:

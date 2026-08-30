@@ -2,9 +2,9 @@
 
 **Development line:** `1.6.0`
 **Initial development version:** `1.6.0-Alpha-1`
-**Current development version:** `1.6.0-Alpha-4`
+**Current development version:** `1.6.0-Alpha-5`
 **Stable assembly version:** `1.0.0.0`
-**Status:** Implementation in progress — TC04 termcap semantic conversion
+**Status:** Implementation in progress — TC05 reverse termcap conversion and rendering
 **Primary change:** Add explicit termcap parsing, semantic mapping, conversion, acquisition, and tools without changing the frozen Runtime, Source, Compiler, or Inspection contracts.
 
 ---
@@ -419,6 +419,23 @@ adopted semantics; and every non-exact or failed decision remains observable.
 TC05 supplies the reverse interoperability path for descriptions which can be
 represented by termcap.
 
+The public reverse-rendering surface is centered on:
+
+```text
+TermcapRenderer
+TermcapRenderOptions
+TermcapRepresentabilityResult
+TermcapRenderResult
+TermcapRenderDiagnostic
+TermcapRenderDiagnosticCodes
+TermcapRenderDiagnosticSeverity
+```
+
+`TermcapRenderer.Analyze` SHALL complete representability preflight without
+emitting text. `TermcapRenderer.Render` SHALL perform the same preflight and
+SHALL NOT publish partial text when any error would require guessing or semantic
+loss.
+
 It SHALL:
 
 - determine representability before emitting text;
@@ -430,9 +447,35 @@ It SHALL:
 - produce stable field ordering and wrapping;
 - support semantic terminfo → termcap → parse/resolve round trips where lossless.
 
+Reverse standard mapping SHALL use the existing Runtime-derived TC02 catalog
+rather than introducing a second capability table. A proposed canonical code is
+representable only when TC02 value-kind selection would classify that field back
+to the same Runtime capability identity. Historical collisions SHALL therefore
+remain explicit nonrepresentability instead of being guessed in reverse.
+
+Runtime extended capabilities SHALL render only when their exact names are
+parser-safe, two-character, unmapped termcap codes. Reserved `tc` syntax,
+standard/historical mapping collisions, negative numeric values, and extended
+parameter strings without an adopted TC04 profile SHALL fail preflight.
+
+String rendering SHALL reverse TC04's mandatory delay suffix back to traditional
+leading padding when the suffix is exactly representable. The classic parameter
+operator subset adopted by TC04 SHALL be inverted exactly; broader terminfo
+parameter programs SHALL be rejected rather than approximated. Historical-safe
+escaping SHALL use canonical control escapes and three-digit octal where needed,
+with literal colon always rendered as `\072`.
+
+Fields SHALL be emitted in ordinal two-character-code order. Physical wrapping
+SHALL occur only between complete colon-terminated fields, using backslash plus
+LF without continuation indentation so TC01 logical-record reconstruction does
+not acquire whitespace.
+
 **Gate TC05:** representable descriptions render deterministically and parse back
 to equivalent adopted termcap semantics; nonrepresentable descriptions return
 explicit loss/representability information.
+
+**Implementation record:**
+[`docs/1.6.0-TC05-TERMCAP-REVERSE-CONVERSION-AND-RENDERING.md`](docs/1.6.0-TC05-TERMCAP-REVERSE-CONVERSION-AND-RENDERING.md)
 
 ---
 
