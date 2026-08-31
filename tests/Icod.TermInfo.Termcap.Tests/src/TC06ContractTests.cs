@@ -6,67 +6,73 @@ using Xunit;
 
 namespace Icod.TermInfo.Termcap.Tests;
 
-public sealed class TC05ContractTests
+public sealed class TC06ContractTests
 {
-	private const string Tc05DevelopmentVersion = "1.6.0-Alpha-5";
+	private const string Tc06DevelopmentVersion = "1.6.0-Alpha-6";
 
 	[Fact]
-	public void Tc05VersionAndCentralVersionWiringRemainRecorded() {
+	public void CoordinatedDevelopmentVersionAdvancesToTc06() {
 		string root = FindRepositoryRoot();
-		XDocument termcapProject =
+		XDocument buildProperties =
 			XDocument.Load(
 				Path.Combine(
 					root,
-					"Icod.TermInfo.Termcap",
-					"Icod.TermInfo.Termcap.csproj"
+					"Directory.Build.props"
 				),
 				LoadOptions.None
 			);
-		string implementation =
-			File.ReadAllText(
-				Path.Combine(
-					root,
-					"docs",
-					"1.6.0-TC05-TERMCAP-REVERSE-CONVERSION-AND-RENDERING.md"
-				)
-			);
 
-		Assert.Contains( Tc05DevelopmentVersion, implementation );
 		Assert.Equal(
-			"$(IcodTermInfoSuiteVersion)",
+			Tc06DevelopmentVersion,
 			ReadRequiredProperty(
-				termcapProject,
-				"Version"
+				buildProperties,
+				"IcodTermInfoSuiteVersion"
 			)
 		);
 	}
 
 	[Fact]
-	public void RendererRemainsInTermcapPackageAndUsesRuntimeModelDirectly() {
+	public void AcquisitionRemainsInTermcapPackageAndRuntimeDiscoveryIsNotComposed() {
 		Assembly termcapAssembly =
-			typeof( TermcapRenderer ).Assembly;
+			typeof( TermcapAcquirer ).Assembly;
 		Assert.DoesNotContain(
 			termcapAssembly.GetReferencedAssemblies(),
 			assembly => assembly.Name == "Icod.TermInfo.Source"
 		);
-		Assert.NotNull(
-			typeof( TermcapRenderer ).GetMethod(
-				nameof( TermcapRenderer.Analyze ),
-				new[] { typeof( TerminalDescription ) }
-			)
-		);
 		Assert.Equal(
-			typeof( string ),
-			typeof( TermcapRenderResult )
+			typeof( TerminalDescription ),
+			typeof( TermcapAcquisitionResult )
 				.GetProperty(
-					nameof( TermcapRenderResult.Text )
+					nameof( TermcapAcquisitionResult.Description )
 				)!
 				.PropertyType
 		);
 	}
 
 	[Fact]
-	public void TC05DocumentationFreezesReverseRenderingBoundary() {
+	public void EnvironmentAndFilesystemAccessHaveExplicitProviderSeams() {
+		Assert.True( typeof( ITermcapEnvironmentProvider ).IsInterface );
+		Assert.True( typeof( ITermcapFileProvider ).IsInterface );
+		Assert.True(
+			typeof( ITermcapEnvironmentProvider ).IsAssignableFrom(
+				typeof( SystemTermcapEnvironmentProvider )
+			)
+		);
+		Assert.True(
+			typeof( ITermcapFileProvider ).IsAssignableFrom(
+				typeof( SystemTermcapFileProvider )
+			)
+		);
+		Assert.NotNull(
+			typeof( TermcapAcquisitionOptions ).GetMethod(
+				nameof( TermcapAcquisitionOptions.FromEnvironment ),
+				BindingFlags.Public | BindingFlags.Static
+			)
+		);
+	}
+
+	[Fact]
+	public void TC06DocumentationFreezesAcquisitionBoundary() {
 		string root = FindRepositoryRoot();
 		string roadmap =
 			File.ReadAllText(
@@ -79,16 +85,16 @@ public sealed class TC05ContractTests
 			Path.Combine(
 				root,
 				"docs",
-				"1.6.0-TC05-TERMCAP-REVERSE-CONVERSION-AND-RENDERING.md"
+				"1.6.0-TC06-EXPLICIT-TERMCAP-ACQUISITION.md"
 			);
 
 		Assert.True( File.Exists( implementationPath ) );
 		string implementation = File.ReadAllText( implementationPath );
-		Assert.Contains( Tc05DevelopmentVersion, implementation );
-		Assert.Contains( "determine representability before emitting text", roadmap );
-		Assert.Contains( "\\072", roadmap );
-		Assert.Contains( "TermcapRenderer", implementation );
-		Assert.Contains( "TC06", implementation );
+		Assert.Contains( Tc06DevelopmentVersion, implementation );
+		Assert.Contains( "TermcapAcquirer", roadmap );
+		Assert.Contains( "TERMPATH", implementation );
+		Assert.Contains( "SystemTermcapFileProvider", implementation );
+		Assert.Contains( "Runtime discovery", implementation );
 		Assert.Contains( "TC07", implementation );
 	}
 

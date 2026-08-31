@@ -2,9 +2,9 @@
 
 **Development line:** `1.6.0`
 **Initial development version:** `1.6.0-Alpha-1`
-**Current development version:** `1.6.0-Alpha-5`
+**Current development version:** `1.6.0-Alpha-6`
 **Stable assembly version:** `1.0.0.0`
-**Status:** Implementation in progress — TC05 reverse termcap conversion and rendering
+**Status:** Implementation in progress — TC06 explicit termcap acquisition
 **Primary change:** Add explicit termcap parsing, semantic mapping, conversion, acquisition, and tools without changing the frozen Runtime, Source, Compiler, or Inspection contracts.
 
 ---
@@ -485,21 +485,76 @@ explicit loss/representability information.
 
 TC06 adds opt-in acquisition compatible with historical termcap environments.
 
-The API SHALL make environment dependence explicit. It MAY support:
+The public acquisition surface is centered on:
+
+```text
+TermcapAcquirer
+TermcapAcquisitionOptions
+TermcapAcquisitionResult
+TermcapAcquisitionSource
+TermcapAcquisitionSourceKind
+TermcapDefaultPathPolicy
+ITermcapEnvironmentProvider
+ITermcapFileProvider
+SystemTermcapEnvironmentProvider
+SystemTermcapFileProvider
+```
+
+The API SHALL make environment and filesystem dependence explicit. Acquisition
+SHALL support:
 
 - a caller-supplied inline `TERMCAP` description;
 - a caller-supplied `TERMCAP` database path;
 - ordered `TERMPATH` database paths;
 - an explicitly selected conventional default path policy.
 
+Source precedence SHALL be inline source, explicit `TERMCAP` database path,
+ordered `TERMPATH` databases, and then conventional defaults only when the
+caller selected such a policy. The same ordered provider SHALL serve both the
+requested root entry and `tc=` parents so inheritance may cross database-file
+boundaries while retaining TC03 precedence and cycle/depth behavior.
+
+`TermcapAcquisitionOptions.FromEnvironment` SHALL be an explicit snapshotting
+operation rather than ambient discovery. It SHALL read only the historical
+termcap inputs `TERMCAP`, `TERMPATH`, and `HOME` through an
+`ITermcapEnvironmentProvider`. The requested terminal name SHALL remain an
+explicit `TermcapAcquirer.Acquire` argument; TC06 SHALL NOT begin consulting
+`TERM` on behalf of existing Runtime callers.
+
+For the environment helper, a non-empty slash-rooted Unix `TERMCAP` value SHALL
+be interpreted as a database path; rooted Windows path spellings SHALL also be
+accepted for cross-platform managed callers. Other non-empty `TERMCAP` values
+SHALL be treated as inline source. `TERMPATH` SHALL preserve configured search
+order. Direct options construction SHALL remain available when callers do not
+want historical environment-string interpretation.
+
+The default `TermcapDefaultPathPolicy` SHALL be `None`. The explicitly selected
+`Ncurses` policy SHALL append `/etc/termcap`, `/usr/share/misc/termcap`, and then
+`$HOME/.termcap` when a home directory was supplied. No conventional path SHALL
+be inspected merely because the Termcap package is referenced.
+
+File-backed acquisition SHALL use `ITermcapFileProvider` and SHALL feed its
+`TextReader` directly to the bounded TC01 parser. A missing file is a clean
+search miss; other provider failures propagate. Parser errors from a configured
+source SHALL remain observable and SHALL prevent publication of a Runtime
+description rather than being silently hidden by a later matching database.
+
+Successful acquisition SHALL resolve through TC03 and convert through TC04 to
+the ordinary immutable Runtime `TerminalDescription`. Parser/resolver and
+conversion diagnostics SHALL remain separately observable through
+`TermcapAcquisitionResult`; TC06 SHALL NOT introduce another semantic model.
+
 It SHALL NOT alter the existing Runtime `TERMINFO`, `TERMINFO_DIRS`, user
 `.terminfo`, or built-in fallback behavior.
 
-Filesystem and environment access SHALL be isolated behind explicit provider or
-options types so tests can remain deterministic.
+TC06 SHALL NOT add a command or router route. `captoinfo` / `infotocap` command
+composition remains TC07.
 
 **Gate TC06:** a caller can opt into termcap acquisition without changing the
 behavior or dependency graph of existing Runtime terminal discovery.
+
+**Implementation record:**
+[`docs/1.6.0-TC06-EXPLICIT-TERMCAP-ACQUISITION.md`](docs/1.6.0-TC06-EXPLICIT-TERMCAP-ACQUISITION.md)
 
 ---
 

@@ -94,6 +94,14 @@ TC02 mapping metadata directly, does not add a Source dependency, performs no
 environment or filesystem acquisition, and does not alter any frozen Runtime,
 Source, Compiler, or Inspection public API baseline.
 
+TC06 advances the coordinated development version to `1.6.0-Alpha-6` and adds
+explicit opt-in termcap acquisition APIs only to `Icod.TermInfo.Termcap`.
+Environment and filesystem access are isolated behind caller-selected provider
+seams, and acquisition composes the existing Termcap parser, resolver, and
+converter without joining Runtime terminal discovery. The Termcap package still
+depends only on Runtime, and no frozen Runtime, Source, Compiler, or Inspection
+public API baseline changes.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:

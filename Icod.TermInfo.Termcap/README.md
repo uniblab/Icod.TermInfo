@@ -3,11 +3,12 @@
 `Icod.TermInfo.Termcap` is the optional termcap interoperability layer for the
 Icod.TermInfo package family.
 
-The `1.6.0-Alpha-5` TC05 tranche retains the TC01 parser, TC02 capability
-classifier, TC03 inheritance resolver, and TC04 semantic converter, and adds
-explicit representability preflight plus deterministic reverse rendering from
-the canonical Runtime `TerminalDescription` model. It still does not read
-`TERMCAP` or `TERMPATH` or provide conversion commands.
+The `1.6.0-Alpha-6` TC06 tranche retains the TC01 parser, TC02 capability
+classifier, TC03 inheritance resolver, TC04 semantic converter, and TC05 reverse
+renderer, and adds explicit opt-in termcap acquisition. It can read
+caller-selected inline `TERMCAP`, database paths, ordered `TERMPATH` sources, and an
+explicit conventional default path policy without joining Runtime discovery.
+Conversion commands remain TC07.
 
 The package targets `net8.0`, `net9.0`, and `net10.0` and depends only on
 `Icod.TermInfo`. Existing Runtime, Source, Compiler, and Inspection package APIs
@@ -138,9 +139,53 @@ the preferred physical line width; wrapping occurs only between complete fields
 and uses an unindented continuation so the TC01 logical-record parser sees no
 synthetic whitespace.
 
-TC05 performs no environment or filesystem discovery. `TERMCAP` / `TERMPATH`
-acquisition remains TC06, while `captoinfo`, `infotocap`, and router integration
-remain TC07.
+TC05 itself performs no environment or filesystem discovery. TC06 adds that
+behavior only through the explicit acquisition API below.
+
+## Explicit acquisition
+
+Acquisition is a separate opt-in operation. Inline-only source needs no filesystem
+provider:
+
+```csharp
+TermcapAcquisitionResult acquired = TermcapAcquirer.Acquire(
+    "vt100",
+    new TermcapAcquisitionOptions(
+        inlineTermcap: "vt100|DEC VT100:am:co#80:"
+    )
+);
+```
+
+To snapshot the historical environment variables, supply both provider seams
+explicitly:
+
+```csharp
+TermcapAcquisitionOptions options =
+    TermcapAcquisitionOptions.FromEnvironment(
+        new SystemTermcapEnvironmentProvider(),
+        new SystemTermcapFileProvider(),
+        TermcapDefaultPathPolicy.Ncurses
+    );
+
+TermcapAcquisitionResult acquired =
+    TermcapAcquirer.Acquire("vt100", options);
+```
+
+The environment factory snapshots `TERMCAP`, `TERMPATH`, and `HOME`; it does not
+modify or compose Runtime `TERMINFO` discovery. Historical slash-rooted `TERMCAP`
+is treated as a database path, while another non-empty value is treated as inline
+source. `TERMPATH` databases are searched in order. Missing files are clean
+search misses; parser, resolver, conversion, and provider failures remain visible.
+
+`TermcapDefaultPathPolicy.None` is the default. Selecting
+`TermcapDefaultPathPolicy.Ncurses` appends `/etc/termcap`,
+`/usr/share/misc/termcap`, and then `$HOME/.termcap` when a home directory was
+supplied. File-backed acquisition requires an `ITermcapFileProvider`, and
+process-environment access occurs only through an `ITermcapEnvironmentProvider`.
+This keeps ordinary tests deterministic and leaves existing Runtime discovery
+unchanged.
+
+`captoinfo`, `infotocap`, and router integration remain TC07.
 
 ## Resource limits
 
