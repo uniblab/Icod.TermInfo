@@ -63,7 +63,7 @@ public sealed class TC01ContractTests
 	}
 
 	[Fact]
-	public void Tc01WorkflowBoundaryRemainsExplicit() {
+	public void TermcapWorkflowCoverageRemainsExplicit() {
 		string root = FindRepositoryRoot();
 
 		string pullRequest =
@@ -102,8 +102,8 @@ public sealed class TC01ContractTests
 			"dotnet pack Icod.TermInfo.Termcap/Icod.TermInfo.Termcap.csproj -c Release",
 			pushMain
 		);
-		Assert.DoesNotContain(
-			"Icod.TermInfo.Termcap/Icod.TermInfo.Termcap.csproj",
+		Assert.Contains(
+			"dotnet pack Icod.TermInfo.Termcap/Icod.TermInfo.Termcap.csproj -c Release",
 			release
 		);
 	}

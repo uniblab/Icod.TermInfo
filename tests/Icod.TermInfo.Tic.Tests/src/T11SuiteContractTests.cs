@@ -180,7 +180,7 @@ public sealed class T11SuiteContractTests {
 	}
 
 	[Fact]
-	public void ReleaseArtifactModelIsFivePackagesSixArchivesAndManifest() {
+	public void ReleaseArtifactModelIsSixPackagesSixArchivesAndManifest() {
 		string root = FindRepositoryRoot();
 		string release = ReadRepositoryFile(
 			root,
@@ -188,12 +188,12 @@ public sealed class T11SuiteContractTests {
 		);
 
 		Assert.Contains(
-			"if (15 -ne $files.Count)",
+			"if (17 -ne $files.Count)",
 			release,
 			StringComparison.Ordinal
 		);
 		Assert.Contains(
-			"if (16 -ne $assets.Count)",
+			"if (18 -ne $assets.Count)",
 			release,
 			StringComparison.Ordinal
 		);
