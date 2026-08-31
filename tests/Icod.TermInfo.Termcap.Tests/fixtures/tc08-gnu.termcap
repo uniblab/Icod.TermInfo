@@ -1,0 +1,5 @@
+# TC08 GNU/ncurses-style corpus fixture.
+# Hex/octal numbers, disabled fields, cancellation, octal string escape, and padding.
+
+tc08-gnu-base|TC08 GNU base terminal:am:co#0x50:li#030:cl=5.5*\E[H:
+tc08-gnu|tc08-gnu-alias|TC08 GNU terminal:.ta=8\t:am@:co#0x84:ce=ab\072cd:tc=tc08-gnu-base:

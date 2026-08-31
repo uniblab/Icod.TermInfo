@@ -11,10 +11,10 @@
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
 **Current release version:** `1.5.0`
-**Current development version:** `1.6.0-Alpha-7`
+**Current development version:** `1.6.0-Alpha-8`
 **Next development line:** post-1.6 demand-driven work
-**Status:** 1.6.0 implementation in progress
-**Current tranche:** TC07 — Conversion tools and coordinated distribution
+**Status:** 1.6.0 release-closure validation in progress
+**Current tranche:** TC08 — Differential validation, fuzzing, and freeze
 **Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
 
 ---

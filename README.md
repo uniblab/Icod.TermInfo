@@ -17,6 +17,8 @@ command semantics.
 
 The active `1.6.0` development line adds the optional `Icod.TermInfo.Termcap`
 package and, at TC07, managed `captoinfo` / `infotocap` conversion commands.
+TC08 advances that line to `1.6.0-Alpha-8` for differential and hostile-input
+validation, the Termcap API/package freeze, and release-closure verification.
 
 The published 1.5.0 library package family targets `net8.0`, `net9.0`, and `net10.0`;
 the packages use C# 13, contain no native ncurses/terminfo payload, and are
@@ -285,9 +287,15 @@ the existing terminfo-first Runtime discovery contract:
   original formatting, cancellations/disabled fields, and inheritance ancestry
   are not reconstructed;
 - conversion loss and termcap representability failures are reported instead of
-  being silently hidden.
+  being silently hidden;
+- TC08 adds checked-in differential/hostile-input coverage, bounded seeded
+  mutation validation, the frozen Termcap public API baseline, a structural
+  Termcap package verifier, and isolated package-reference consumers on
+  `net8.0`, `net9.0`, and `net10.0`.
 
-The final 1.6 API/package/CLI freeze remains TC08 work.
+The Alpha-8 code/API/package/CLI freeze is now represented in the repository.
+Stable `v1.6.0` publication remains gated on final Release validation and the
+external NuGet.org trusted-publishing authorization for `Icod.TermInfo.Termcap`.
 
 ## Getting started
 
@@ -834,7 +842,7 @@ See `samples/README.md`, `samples/ToolSuite/README.md`,
 
 ## Project-family boundary
 
-`Icod.TermInfo` owns immutable terminal-description data, acquisition of that data, and pure transformations required to interpret, expand, and output terminal capabilities. `Icod.TermInfo.Source` owns optional source-language parsing and inheritance resolution, `Icod.TermInfo.Compiler` owns compiled output, and `Icod.TermInfo.Inspection` owns canonical rendering and semantic comparison. None of those packages owns a live terminal session, a child pseudo-terminal, or a virtual screen.
+`Icod.TermInfo` owns immutable terminal-description data, acquisition of that data, and pure transformations required to interpret, expand, and output terminal capabilities. `Icod.TermInfo.Source` owns optional source-language parsing and inheritance resolution, `Icod.TermInfo.Compiler` owns compiled output, `Icod.TermInfo.Inspection` owns canonical rendering and semantic comparison, and `Icod.TermInfo.Termcap` owns optional termcap interoperability. None of those packages owns a live terminal session, a child pseudo-terminal, or a virtual screen.
 
 The intended family boundary is now explicit:
 
@@ -842,8 +850,9 @@ The intended family boundary is now explicit:
 - **`Icod.TermInfo.Source`** — `.ti` lexical analysis, source diagnostics, unresolved entries, cancellation, `use=` inheritance, and materialization into `TerminalDescription`;
 - **`Icod.TermInfo.Compiler`** — deterministic compiled-entry writing, source compilation, and explicit conventional database-layout publication;
 - **`Icod.TermInfo.Inspection`** — canonical effective/source rendering, structured semantic comparison, and provider-aware inspection;
-- **`tic`, `infocmp`, and `toe`** — released managed command applications which compose the reusable libraries and own command-line policy;
-- **`Icod.TermInfo.Tools` / `icod-terminfo`** — distribution-only .NET tool router which dispatches to the three command applications;
+- **`Icod.TermInfo.Termcap`** — bounded termcap parsing, classification, `tc=` resolution, Runtime conversion, reverse rendering, and explicit termcap acquisition;
+- **`tic`, `infocmp`, `toe`, `captoinfo`, and `infotocap`** — managed command applications which compose the reusable libraries and own command-line policy;
+- **`Icod.TermInfo.Tools` / `icod-terminfo`** — distribution-only .NET tool router which dispatches to the five command applications;
 - **`Icod.Terminal`** — sibling live-terminal/session layer for modes, input decoding, keyboard/mouse/paste/focus events, active probing/negotiation, and reversible presentation lifecycle;
 - **future `Icod.Pty`** — Unix PTY and Windows ConPTY creation, resize propagation, and child-process plumbing;
 - **`Icod.DCurses`** — sibling curses-like virtual-screen/window layer above `Icod.Terminal` and `Icod.TermInfo`.
@@ -897,6 +906,7 @@ dotnet build Icod.TermInfo.sln -c Staging
 dotnet test Icod.TermInfo.sln -c Staging
 dotnet pack Icod.TermInfo.csproj -c Staging --output artifacts
 dotnet pack Icod.TermInfo.Source/Icod.TermInfo.Source.csproj -c Staging --output artifacts
+dotnet pack Icod.TermInfo.Termcap/Icod.TermInfo.Termcap.csproj -c Staging --output artifacts
 dotnet pack Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj -c Staging --output artifacts
 dotnet pack Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj -c Staging --output artifacts
 dotnet pack icod-terminfo/Icod.TermInfo.Router.csproj -c Staging --output artifacts
@@ -905,6 +915,7 @@ dotnet build Icod.TermInfo.sln -c Release
 dotnet test Icod.TermInfo.sln -c Release
 dotnet pack Icod.TermInfo.csproj -c Release --output artifacts
 dotnet pack Icod.TermInfo.Source/Icod.TermInfo.Source.csproj -c Release --output artifacts
+dotnet pack Icod.TermInfo.Termcap/Icod.TermInfo.Termcap.csproj -c Release --output artifacts
 dotnet pack Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj -c Release --output artifacts
 dotnet pack Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj -c Release --output artifacts
 dotnet pack icod-terminfo/Icod.TermInfo.Router.csproj -c Release --output artifacts
@@ -926,12 +937,12 @@ For final Release validation:
 bash .github/scripts/verify-release-package.sh artifacts Release
 ```
 
-Both wrappers retain the coordinated four-library release verifier: generated
-capability metadata, all four public-API baselines, net8/net9/net10 API
-equivalence, package/XML/symbol/dependency validation, all four isolated
+Both wrappers retain the coordinated five-library release verifier: generated
+capability metadata, all five public-API baselines, net8/net9/net10 API
+equivalence, package/XML/symbol/dependency validation, all five isolated
 package-reference-only smoke consumers, the sample's non-interactive
 `--describe-only` path, the deterministic reusable toolchain sample, and
-structural validation of the fifth registry package, `Icod.TermInfo.Tools`.
+structural validation of the sixth registry package, `Icod.TermInfo.Tools`.
 The separate `smoke-tool-package.ps1` gate installs and executes that router
 package on each supported host family. Windows package validation does not
 require Bash or Python.
@@ -943,10 +954,12 @@ start registry publication through `.github/workflows/release.yaml`.
 
 See `RELEASING.md` for the current release procedure,
 `Icod.TermInfo-1.4.0-Tool-Suite-Roadmap.md` for the frozen T01-T11 command
-semantic contract, and `docs/1.5.0-RELEASE-AUDIT.md` for the current
-distribution/versioning release gate. Tag `v1.5.0` only on the exact validated
-`main` commit; no source, package, archive, or documentation content may change
-between that validation and tagging.
+semantic contract, `docs/1.5.0-RELEASE-AUDIT.md` for the published 1.5
+distribution/versioning gate, and
+`docs/1.6.0-TC08-DIFFERENTIAL-VALIDATION-FUZZING-AND-FREEZE.md` for the active
+1.6 closure record. Stable `v1.6.0` publication is permitted only from the exact
+validated `main` commit after the external Termcap package authorization is in
+place.
 
 ## Scope
 

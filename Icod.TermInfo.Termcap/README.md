@@ -3,11 +3,11 @@
 `Icod.TermInfo.Termcap` is the optional termcap interoperability layer for the
 Icod.TermInfo package family.
 
-The `1.6.0-Alpha-7` TC07 tranche retains the TC01 parser, TC02 capability
+The `1.6.0-Alpha-8` TC08 tranche retains the TC01 parser, TC02 capability
 classifier, TC03 inheritance resolver, TC04 semantic converter, TC05 reverse
-renderer, and TC06 explicit acquisition APIs, and composes them into managed
-`captoinfo` and `infotocap` commands. Both commands are available as standalone
-archive launchers and through the `icod-terminfo` router.
+renderer, TC06 explicit acquisition APIs, and TC07 conversion-command
+composition. TC08 adds closure validation and freezes the Termcap API/package
+contract without adding another public semantic layer or command.
 
 The package itself still targets `net8.0`, `net9.0`, and `net10.0` and depends
 only on `Icod.TermInfo`. Command-only dependencies on Source or Inspection live

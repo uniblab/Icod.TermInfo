@@ -78,6 +78,12 @@ surface; the reviewed T02/T03 database-inspection additions and T06 renderer
 controls were added compatibly and frozen at 1.4.0. Patch release 1.4.1 reuses
 that baseline unchanged rather than creating a new API contract.
 
+TC08 freezes the 1.6 Termcap public API in
+`docs/1.6.0-TERMCAP-PUBLIC-API-BASELINE.txt`. Release verification requires the
+full `PublicApiSnapshot/v1` reflection-manifest SHA-256
+`1e24b8a555b506594c58cf58d03bf87b2b60192f6316537cb4200498c6a92ab0`, exact compiled-assembly API equivalence across net8/net9/net10, and the
+packaged XML documentation member-ID inventory recorded by the same baseline.
+
 Within 1.x:
 
 - existing public signatures remain source/binary compatible;
@@ -223,10 +229,12 @@ history. `captoinfo` composes Termcap with Inspection's effective terminfo sourc
 renderer; `infotocap` composes Source with the Termcap reverse renderer.
 Representational loss and incompatibility remain explicit diagnostics.
 
-The Termcap public API remains a development contract until TC08 performs the
-1.6 regret review and freezes the active baseline. Frozen Runtime, Source,
-Compiler, Inspection, `tic`, `infocmp`, and `toe` contracts are not reopened by
-TC07.
+TC08 freezes the active 1.6 Termcap public API and package graph without adding
+new semantics. Checked-in BSD/GNU-style corpus tests, hostile-input and bounded
+seeded mutation tests, package-structure verification, and isolated package-only
+consumers become normal release evidence. Runtime, Source, Compiler, Inspection,
+`tic`, `infocmp`, `toe`, `captoinfo`, `infotocap`, and router semantics are not
+reopened by the freeze.
 
 ## T04 `tic` validation compatibility
 

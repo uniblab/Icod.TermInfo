@@ -29,7 +29,7 @@
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-		<PackageReleaseNotes>1.6.0-Alpha-7 adds routed captoinfo and infotocap conversion commands to the coordinated tool distribution while preserving the frozen tic, infocmp, and toe command semantics and keeping the reusable Termcap package dependency graph unchanged.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.6.0-Alpha-8 freezes the 1.6 command/distribution surface after TC08 differential, hostile-input, API, package, and release-closure validation; the routed tic, infocmp, toe, captoinfo, and infotocap semantics remain those established by the earlier tranches.</PackageReleaseNotes>
 		<PackageTags>terminfo;termcap;libtinfo;tic;infocmp;toe;captoinfo;infotocap;terminal;tool;dotnet;csharp;icod</PackageTags>
 	</PropertyGroup>
 

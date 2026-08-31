@@ -647,6 +647,9 @@ representable, acquired explicitly through termcap environment conventions, and
 used through the selected conversion tools with all loss and incompatibility
 reported rather than hidden.
 
+**Implementation record:**
+[`docs/1.6.0-TC08-DIFFERENTIAL-VALIDATION-FUZZING-AND-FREEZE.md`](docs/1.6.0-TC08-DIFFERENTIAL-VALIDATION-FUZZING-AND-FREEZE.md)
+
 ---
 
 ## 13. Deferred work

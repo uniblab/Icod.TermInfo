@@ -111,6 +111,14 @@ composes Source with Termcap, and `Icod.TermInfo.Termcap` itself continues to
 depend only on Runtime. The existing `tic`, `infocmp`, and `toe` command
 semantics remain frozen.
 
+TC08 advances the coordinated development version to `1.6.0-Alpha-8` without
+adding reusable API or command semantics. It freezes the active Termcap public
+surface, adds checked-in differential and bounded hostile-input/mutation
+validation, requires structural verification of the packed Termcap artifact,
+and executes an isolated package-reference-only Termcap consumer on `net8.0`,
+`net9.0`, and `net10.0`. The Runtime-only Termcap dependency and the TC07
+command/router/archive topology are frozen for 1.6 release closure.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:
@@ -174,6 +182,14 @@ unchanged through 1.5.0. The 1.5 distribution/versioning changes add no reusable
 library API. Any later public Inspection surface change requires a new compatible
 minor-release API review rather than changing this historical baseline.
 
+`docs/1.6.0-TERMCAP-PUBLIC-API-BASELINE.txt` is the frozen Termcap public
+surface established by TC08. The validated Alpha-7 `PublicApiSnapshot/v1` rich
+reflection manifest has SHA-256 `1e24b8a555b506594c58cf58d03bf87b2b60192f6316537cb4200498c6a92ab0`; release verification requires that
+exact fingerprint and net8/net9/net10 equivalence. The same file also records the
+241 sorted packaged XML documentation member IDs as a human-reviewable inventory.
+The baseline must not be regenerated merely to accept an unintended public
+Termcap change.
+
 The baselines record exported types, public/protected members, enum numeric
 values, parameter names/order/defaults, ref/out/in/params shape, generic
 constraints, nullability, and relevant attributes.
@@ -211,10 +227,15 @@ on Compiler, and Runtime, Source, and Compiler SHALL NOT acquire a dependency on
 Inspection. Inspection tests may reference Compiler for differential evidence
 without changing the production package graph.
 
+Beginning with TC01, `Icod.TermInfo.Termcap` depends directly and exclusively on
+the matching `Icod.TermInfo` package. Runtime, Source, Compiler, and Inspection
+SHALL NOT acquire a Termcap dependency. TC08 freezes that Runtime-only package
+graph for the 1.6 release.
+
 Beginning with T01, command projects may depend on `Icod.CommandFramework` and
-on the appropriate TermInfo libraries. Runtime, Source, Compiler, and Inspection
-SHALL NOT acquire an `Icod.CommandFramework` or command-project dependency. No
-command project SHALL depend on another command project.
+on the appropriate TermInfo libraries. Runtime, Source, Compiler, Inspection, and
+Termcap SHALL NOT acquire an `Icod.CommandFramework` or command-project
+dependency. No command project SHALL depend on another command project.
 
 See `COMPATIBILITY.md` for target-framework, platform, behavioral, and feature-
 boundary promises.

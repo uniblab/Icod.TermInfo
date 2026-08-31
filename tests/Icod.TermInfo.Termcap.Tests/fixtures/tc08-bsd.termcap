@@ -1,0 +1,6 @@
+# TC08 BSD-style corpus fixture.
+# Comments, blank lines, continuation, empty fields, inheritance, and classic % syntax.
+
+tc08-base|TC08 base terminal:am:co#80:li#24:cl=\E[H\E[2J:
+tc08-bsd|tc08-bsd-alias|TC08 BSD terminal:co#132:\
+	:cm=\E[%i%d;%dH:!!=vendor::tc=tc08-base:

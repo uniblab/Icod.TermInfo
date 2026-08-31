@@ -48,15 +48,26 @@ dotnet run   --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot
 dotnet run   --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj   -c "${configuration}"   --no-build   -- --compare   Icod.TermInfo.Source/bin/${configuration}/net8.0/Icod.TermInfo.Source.dll   Icod.TermInfo.Source/bin/${configuration}/net9.0/Icod.TermInfo.Source.dll
 dotnet run   --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj   -c "${configuration}"   --no-build   -- --compare   Icod.TermInfo.Source/bin/${configuration}/net8.0/Icod.TermInfo.Source.dll   Icod.TermInfo.Source/bin/${configuration}/net10.0/Icod.TermInfo.Source.dll
 
-# The developing Termcap package must expose the same API on all shipped frameworks.
-# Its final public API baseline is frozen at TC08 rather than during TC07.
-dotnet run \
-  --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj \
-  -c "${configuration}" \
-  --no-build \
-  -- --compare \
-  Icod.TermInfo.Termcap/bin/${configuration}/net8.0/Icod.TermInfo.Termcap.dll \
-  Icod.TermInfo.Termcap/bin/${configuration}/net9.0/Icod.TermInfo.Termcap.dll
+# TC08 freezes both cross-framework equality and the exact rich reflection
+# manifest which was produced by the validated Alpha-7 package.
+termcap_api_baseline_sha256="1e24b8a555b506594c58cf58d03bf87b2b60192f6316537cb4200498c6a92ab0"
+termcap_api_compare_output="$(
+  dotnet run \
+    --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj \
+    -c "${configuration}" \
+    --no-build \
+    -- --compare \
+    Icod.TermInfo.Termcap/bin/${configuration}/net8.0/Icod.TermInfo.Termcap.dll \
+    Icod.TermInfo.Termcap/bin/${configuration}/net9.0/Icod.TermInfo.Termcap.dll
+)"
+printf '%s\n' "${termcap_api_compare_output}"
+if ! grep -Fqx \
+  "SHA-256 ${termcap_api_baseline_sha256}" \
+  <<< "${termcap_api_compare_output}"
+then
+  echo "Icod.TermInfo.Termcap public API differs from the frozen TC08 reflection-manifest fingerprint." >&2
+  exit 1
+fi
 dotnet run \
   --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj \
   -c "${configuration}" \
@@ -115,6 +126,11 @@ dotnet run \
 # Structural package, Source Link, dependency, and architecture verification.
 dotnet run \
   --project tools/package-verifier/Icod.TermInfo.PackageVerifier.csproj \
+  -c "${configuration}" \
+  -f net10.0 \
+  -- "${artifact_dir}"
+dotnet run \
+  --project tools/termcap-package-verifier/Icod.TermInfo.Termcap.PackageVerifier.csproj \
   -c "${configuration}" \
   -f net10.0 \
   -- "${artifact_dir}"
@@ -254,9 +270,10 @@ fi
 # test cannot accidentally use a project reference or stale repository outputs.
 smoke_root="$(mktemp -d)"
 source_smoke_root=""
+termcap_smoke_root=""
 compiler_smoke_root=""
 inspection_smoke_root=""
-trap 'rm -rf "${smoke_root}" "${source_smoke_root}" "${compiler_smoke_root}" "${inspection_smoke_root}"' EXIT
+trap 'rm -rf "${smoke_root}" "${source_smoke_root}" "${termcap_smoke_root}" "${compiler_smoke_root}" "${inspection_smoke_root}"' EXIT
 
 cp \
   tools/package-smoke/Icod.TermInfo.PackageSmoke.csproj \
@@ -328,6 +345,41 @@ dotnet run \
   -f net10.0 \
   --no-restore \
   -p:IcodTermInfoSourcePackageVersion="${source_package_version}"
+
+termcap_smoke_root="$(mktemp -d)"
+
+cp \
+  tools/termcap-package-smoke/Icod.TermInfo.Termcap.PackageSmoke.csproj \
+  "${termcap_smoke_root}/Icod.TermInfo.Termcap.PackageSmoke.csproj"
+cp \
+  tools/termcap-package-smoke/Program.cs \
+  "${termcap_smoke_root}/Program.cs"
+
+export NUGET_PACKAGES="${termcap_smoke_root}/packages"
+
+dotnet restore \
+  "${termcap_smoke_root}/Icod.TermInfo.Termcap.PackageSmoke.csproj" \
+  --configfile "${smoke_nuget_config}" \
+  -p:IcodTermInfoTermcapPackageVersion="${termcap_package_version}"
+
+dotnet run \
+  --project "${termcap_smoke_root}/Icod.TermInfo.Termcap.PackageSmoke.csproj" \
+  -c "${configuration}" \
+  -f net8.0 \
+  --no-restore \
+  -p:IcodTermInfoTermcapPackageVersion="${termcap_package_version}"
+dotnet run \
+  --project "${termcap_smoke_root}/Icod.TermInfo.Termcap.PackageSmoke.csproj" \
+  -c "${configuration}" \
+  -f net9.0 \
+  --no-restore \
+  -p:IcodTermInfoTermcapPackageVersion="${termcap_package_version}"
+dotnet run \
+  --project "${termcap_smoke_root}/Icod.TermInfo.Termcap.PackageSmoke.csproj" \
+  -c "${configuration}" \
+  -f net10.0 \
+  --no-restore \
+  -p:IcodTermInfoTermcapPackageVersion="${termcap_package_version}"
 
 compiler_smoke_root="$(mktemp -d)"
 
