@@ -82,8 +82,8 @@ public sealed class TC07ContractTests {
 		string root =
 			FindRepositoryRoot();
 		string router =
-			File.ReadAllText(
-				Path.Combine(
+			System.IO.File.ReadAllText(
+				System.IO.Path.Combine(
 					root,
 					"icod-terminfo",
 					"src",
@@ -162,7 +162,7 @@ public sealed class TC07ContractTests {
 		string root =
 			FindRepositoryRoot();
 		string implementationPath =
-			Path.Combine(
+			System.IO.Path.Combine(
 				root,
 				"docs",
 				"1.6.0-TC07-CONVERSION-TOOLS-AND-DISTRIBUTION.md"
@@ -248,11 +248,11 @@ public sealed class TC07ContractTests {
 		ArgumentException.ThrowIfNullOrWhiteSpace( relativePath );
 
 		return XDocument.Load(
-			Path.Combine(
+			System.IO.Path.Combine(
 				root,
 				relativePath.Replace(
 					'/',
-					Path.DirectorySeparatorChar
+					System.IO.Path.DirectorySeparatorChar
 				)
 			),
 			LoadOptions.None
@@ -284,11 +284,11 @@ public sealed class TC07ContractTests {
 		ArgumentException.ThrowIfNullOrWhiteSpace( relativePath );
 
 		return File.ReadAllText(
-			Path.Combine(
+			System.IO.Path.Combine(
 				root,
 				relativePath.Replace(
 					'/',
-					Path.DirectorySeparatorChar
+					System.IO.Path.DirectorySeparatorChar
 				)
 			)
 		);
@@ -302,8 +302,8 @@ public sealed class TC07ContractTests {
 
 		while ( current is not null ) {
 			if (
-				File.Exists(
-					Path.Combine(
+				System.IO.File.Exists(
+					System.IO.Path.Combine(
 						current.FullName,
 						"Icod.TermInfo.sln"
 					)
