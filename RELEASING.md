@@ -47,9 +47,11 @@ This document describes the current validation and publication procedure for the
 - The six `.nupkg` artifacts and five reusable-library `.snupkg` artifacts
   produced for a version are immutable release artifacts. If package contents
   change, increment the version rather than replacing a published package.
-- Before a stable `v1.6.0` tag, confirm NuGet.org trusted-publishing authorization
-  for the new `Icod.TermInfo.Termcap` package ID and this repository's release
-  workflow. This external permission cannot be established by repository tests.
+- The 1.6.0 release audit records maintainer confirmation that NuGet.org trusted
+  publishing authorizes all six coordinated package IDs for this repository,
+  `release.yaml`, and the `Release` environment. This external permission cannot
+  be established by repository tests and must be reconfirmed if the policy
+  changes before tagging.
 - Publication is downstream of tag/version validation and the complete
   build/test/package gate. Pull requests and ordinary pushes to `main` must not
   authenticate to or push to package registries.
@@ -313,6 +315,11 @@ NuGet.org publication, GitHub Packages publication, and GitHub Release creation
 all consume the canonical validated Actions artifact rather than repacking the
 repository.
 
+For 1.6.0, maintainer confirmation of the required NuGet.org trusted-publishing
+scope is recorded in `docs/1.6.0-RELEASE-AUDIT.md`: all six coordinated package
+IDs are authorized for this repository, `release.yaml`, and the `Release`
+environment. Reconfirm the policy if it changes before the stable tag.
+
 Before merging or pushing a release-ready commit to `main`:
 
 1. confirm `Directory.Build.props:IcodTermInfoSuiteVersion` is the intended
@@ -419,6 +426,12 @@ release gate is `docs/1.4.1-RELEASE-AUDIT.md`.
 For 1.5, centralized versioning and the installable router are frozen by
 `docs/1.5.0-RELEASE-AUDIT.md`. The 1.4 command semantic contract and the frozen
 `docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt` remain unchanged.
+
+For 1.6, use `Icod.TermInfo-1.6.0-Termcap-Interoperability-Roadmap.md` for the
+TC01-TC08 contract, `docs/1.6.0-TC01-TERMCAP-PACKAGE-AND-PARSER-FOUNDATION.md`
+through `docs/1.6.0-TC08-DIFFERENTIAL-VALIDATION-FUZZING-AND-FREEZE.md` for
+tranche evidence, `docs/1.6.0-TERMCAP-PUBLIC-API-BASELINE.txt` for the frozen
+Termcap surface, and `docs/1.6.0-RELEASE-AUDIT.md` for stable release closure.
 
 The final `v<IcodTermInfoSuiteVersion>` tag must identify the exact validated and
 published `main` commit. Do not edit the audit or any other source/package

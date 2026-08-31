@@ -29,7 +29,7 @@
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-		<PackageReleaseNotes>1.6.0-Alpha-8 freezes the 1.6 command/distribution surface after TC08 differential, hostile-input, API, package, and release-closure validation; the routed tic, infocmp, toe, captoinfo, and infotocap semantics remain those established by the earlier tranches.</PackageReleaseNotes>
+		<PackageReleaseNotes>Version 1.6.0 adds captoinfo and infotocap to the coordinated icod-terminfo router and standalone archive distribution while preserving the frozen tic, infocmp, and toe semantics and the conversion-command contracts established by TC07 and frozen by TC08.</PackageReleaseNotes>
 		<PackageTags>terminfo;termcap;libtinfo;tic;infocmp;toe;captoinfo;infotocap;terminal;tool;dotnet;csharp;icod</PackageTags>
 	</PropertyGroup>
 

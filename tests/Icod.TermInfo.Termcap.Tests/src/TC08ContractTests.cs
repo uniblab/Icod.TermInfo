@@ -4,13 +4,14 @@ using Xunit;
 namespace Icod.TermInfo.Termcap.Tests;
 
 public sealed class TC08ContractTests {
-	private const string DevelopmentVersion = "1.6.0-Alpha-8";
+	private const string StableReleaseVersion = "1.6.0";
+	private const string HistoricalTc08Version = "1.6.0-Alpha-8";
 	private const string HistoricalTc07Version = "1.6.0-Alpha-7";
 	private const string TermcapApiSnapshotSha256 =
 		"1e24b8a555b506594c58cf58d03bf87b2b60192f6316537cb4200498c6a92ab0";
 
 	[Fact]
-	public void Tc08AdvancesCentralVersionWithoutRewritingTc07History() {
+	public void StablePromotionPreservesTc07AndTc08History() {
 		string root = FindRepositoryRoot();
 		XDocument buildProperties =
 			XDocument.Load(
@@ -18,7 +19,7 @@ public sealed class TC08ContractTests {
 				LoadOptions.None
 			);
 		Assert.Equal(
-			DevelopmentVersion,
+			StableReleaseVersion,
 			buildProperties
 				.Descendants()
 				.Single( element => element.Name.LocalName == "IcodTermInfoSuiteVersion" )
@@ -34,7 +35,16 @@ public sealed class TC08ContractTests {
 					"1.6.0-TC07-CONVERSION-TOOLS-AND-DISTRIBUTION.md"
 				)
 			);
+		string tc08 =
+			File.ReadAllText(
+				Path.Combine(
+					root,
+					"docs",
+					"1.6.0-TC08-DIFFERENTIAL-VALIDATION-FUZZING-AND-FREEZE.md"
+				)
+			);
 		Assert.Contains( HistoricalTc07Version, tc07 );
+		Assert.Contains( HistoricalTc08Version, tc08 );
 	}
 
 	[Fact]
@@ -101,7 +111,7 @@ public sealed class TC08ContractTests {
 	}
 
 	[Fact]
-	public void ReleaseAccountingAndTrustedPublishingPrerequisiteRemainExplicit() {
+	public void ReleaseAccountingAndTrustedPublishingAuthorizationRemainExplicit() {
 		string root = FindRepositoryRoot();
 		string release =
 			File.ReadAllText(
@@ -124,10 +134,24 @@ public sealed class TC08ContractTests {
 					"1.6.0-TC08-DIFFERENTIAL-VALIDATION-FUZZING-AND-FREEZE.md"
 				)
 			);
-		Assert.Contains( DevelopmentVersion, implementation );
+		Assert.Contains( HistoricalTc08Version, implementation );
 		Assert.Contains( "trusted publishing", implementation, StringComparison.OrdinalIgnoreCase );
 		Assert.Contains( "17", implementation );
 		Assert.Contains( "18", implementation );
+
+		string releaseAudit =
+			File.ReadAllText(
+				Path.Combine(
+					root,
+					"docs",
+					"1.6.0-RELEASE-AUDIT.md"
+				)
+			);
+		Assert.Contains( "Trusted publishing", releaseAudit, StringComparison.Ordinal );
+		Assert.Contains( "Confirmed", releaseAudit, StringComparison.Ordinal );
+		Assert.Contains( "Icod.TermInfo.Termcap", releaseAudit, StringComparison.Ordinal );
+		Assert.Contains( "release.yaml", releaseAudit, StringComparison.Ordinal );
+		Assert.Contains( "Release", releaseAudit, StringComparison.Ordinal );
 	}
 
 	private static string FindRepositoryRoot() {

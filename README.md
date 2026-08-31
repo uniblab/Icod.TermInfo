@@ -8,59 +8,61 @@
 
 `Icod.TermInfo` is a managed, dependency-free .NET implementation of the low-level terminal-capability model traditionally supplied by `libtinfo`.
 
-Version 1.5.0 is the current coordinated release. It preserves the frozen 1.0
-Runtime, 1.1 Source, 1.2 Compiler, and 1.4 Inspection contracts together with
-the managed `tic`, `infocmp`, and `toe` command semantics introduced in 1.4.
-Version 1.5.0 centralizes suite versioning and adds the installable
-`Icod.TermInfo.Tools` router without changing reusable library API or routed
-command semantics.
+Version 1.6.0 is the current coordinated release. It preserves the frozen 1.0
+Runtime, 1.1 Source, 1.2 Compiler, and 1.4 Inspection contracts, adds the frozen
+1.6 Termcap interoperability contract, and retains the managed `tic`, `infocmp`,
+and `toe` semantics introduced in 1.4. The coordinated tool suite also includes
+`captoinfo` and `infotocap` conversion commands introduced by the 1.6 line.
 
-The active `1.6.0` development line adds the optional `Icod.TermInfo.Termcap`
-package and, at TC07, managed `captoinfo` / `infotocap` conversion commands.
-TC08 advances that line to `1.6.0-Alpha-8` for differential and hostile-input
-validation, the Termcap API/package freeze, and release-closure verification.
-
-The published 1.5.0 library package family targets `net8.0`, `net9.0`, and `net10.0`;
-the packages use C# 13, contain no native ncurses/terminfo payload, and are
-intended to run on Windows, Linux, and macOS.
+The 1.6.0 library package family targets `net8.0`, `net9.0`, and `net10.0`; the
+packages use C# 13, contain no native ncurses/terminfo payload, and are intended
+to run on Windows, Linux, and macOS.
 
 ## Install
 
-For the 1.5.0 release, runtime-only consumers use:
+Runtime-only consumers use:
 
 ```text
-dotnet add package Icod.TermInfo --version 1.5.0
+dotnet add package Icod.TermInfo --version 1.6.0
 ```
 
 Applications which need terminfo source-language support use:
 
 ```text
-dotnet add package Icod.TermInfo.Source --version 1.5.0
+dotnet add package Icod.TermInfo.Source --version 1.6.0
+```
+
+Applications which need opt-in termcap parsing, conversion, rendering, or
+explicit historical termcap acquisition use:
+
+```text
+dotnet add package Icod.TermInfo.Termcap --version 1.6.0
 ```
 
 Applications which compile terminfo source or write conventional compiled
 terminfo databases use:
 
 ```text
-dotnet add package Icod.TermInfo.Compiler --version 1.5.0
+dotnet add package Icod.TermInfo.Compiler --version 1.6.0
 ```
 
 Applications which need canonical rendering, semantic comparison, or
 provider-aware inspection use:
 
 ```text
-dotnet add package Icod.TermInfo.Inspection --version 1.5.0
+dotnet add package Icod.TermInfo.Inspection --version 1.6.0
 ```
 
-`Icod.TermInfo.Source` depends on the matching `Icod.TermInfo` package.
-`Icod.TermInfo.Compiler` and `Icod.TermInfo.Inspection` each depend on the
-matching Runtime and Source packages; Inspection does not depend on Compiler.
-Applications which only load compiled terminfo or consume `TerminalDescription`
-values continue to reference `Icod.TermInfo` alone.
+`Icod.TermInfo.Source` and `Icod.TermInfo.Termcap` each depend on the matching
+`Icod.TermInfo` package. `Icod.TermInfo.Compiler` and
+`Icod.TermInfo.Inspection` each depend on matching Runtime and Source packages;
+Inspection does not depend on Compiler, and no existing reusable package depends
+on Termcap. Applications which only load compiled terminfo or consume
+`TerminalDescription` values continue to reference `Icod.TermInfo` alone.
 
 The same validated package artifacts are published to NuGet.org and GitHub
 Packages. Release closure and tag-publication requirements are recorded in
-`docs/1.5.0-RELEASE-AUDIT.md`.
+`docs/1.6.0-RELEASE-AUDIT.md`.
 
 ## Tool Suite
 
@@ -73,31 +75,25 @@ infocmp   render and semantically compare terminal descriptions
 toe       enumerate conventional databases and analyze use= dependencies
 ```
 
-TC07 in the 1.6 development line adds two additional non-packable commands:
+Version 1.6.0 adds two additional non-packable conversion commands:
 
 ```text
 captoinfo convert termcap descriptions to effective terminfo source
 infotocap convert effective terminfo source to conventional termcap
 ```
 
-At `1.5.0`, those command semantics remain frozen. The three standalone command
-projects remain non-packable and do not introduce command-to-command
-dependencies. Version 1.5 adds a distribution-only router project while keeping
-the existing archive distribution.
+All five standalone command projects remain non-packable and do not introduce
+command-to-command dependencies. `Icod.TermInfo.Tools` remains the separate
+distribution-only router package.
 
 Install the coordinated router as a .NET tool with:
 
 ```text
-dotnet tool install --global Icod.TermInfo.Tools --version 1.5.0
+dotnet tool install --global Icod.TermInfo.Tools --version 1.6.0
 
 icod-terminfo tic -V
 icod-terminfo infocmp -V
 icod-terminfo toe -V
-```
-
-TC07 development builds additionally route the conversion commands:
-
-```text
 icod-terminfo captoinfo -V
 icod-terminfo infotocap -V
 ```
@@ -118,11 +114,11 @@ Icod.TermInfo.Tools.<version>.osx-x64.tar.gz
 Icod.TermInfo.Tools.<version>.osx-arm64.tar.gz
 ```
 
-On the 1.6 development line, each archive contains the traditional `tic`,
-`infocmp`, `toe`, `captoinfo`, and `infotocap` command names and their required
-managed dependencies. The user supplies the .NET 10 runtime and controls where
-the archive is unpacked and whether that location is placed on `PATH`. The
-archive therefore remains suitable for intentional drop-in installation of the
+Each 1.6.0 archive contains the traditional `tic`, `infocmp`, `toe`,
+`captoinfo`, and `infotocap` command names and their required managed
+dependencies. The user supplies the .NET 10 runtime and controls where the
+archive is unpacked and whether that location is placed on `PATH`. The archive
+therefore remains suitable for intentional drop-in installation of the
 traditional names, while the NuGet tool uses the non-colliding `icod-terminfo`
 router name.
 
@@ -131,8 +127,9 @@ router name.
 The 1.x line keeps runtime assembly identity `Icod.TermInfo, Version=1.0.0.0` and
 remains unsigned. The frozen 1.0 and 1.1 releases support `net8.0` and
 `net10.0`; beginning with 1.2, the supported consumer targets are `net8.0`,
-`net9.0`, and `net10.0`. `Icod.TermInfo.Source`, `Icod.TermInfo.Compiler`, and
-`Icod.TermInfo.Inspection` retain assembly version `1.0.0.0` throughout their
+`net9.0`, and `net10.0`. `Icod.TermInfo.Source`, `Icod.TermInfo.Compiler`,
+`Icod.TermInfo.Inspection`, and `Icod.TermInfo.Termcap` retain assembly version
+`1.0.0.0` throughout their
 1.x lines. Public API, binary/package compatibility, deprecation, and
 target-framework policy are documented in `docs/VERSIONING.md` and
 `docs/COMPATIBILITY.md`.
@@ -265,13 +262,13 @@ semantics:
 No frozen Runtime, Source, Compiler, or Inspection public API changes in 1.5.0,
 and no routed command semantics change.
 
-## What 1.6 adds — in development
+## What 1.6 adds
 
-The 1.6 line adds opt-in historical termcap interoperability while preserving
+Version 1.6.0 adds opt-in historical termcap interoperability while preserving
 the existing terminfo-first Runtime discovery contract:
 
 - `Icod.TermInfo.Termcap` is a fifth coordinated reusable library package and
-  still depends only on Runtime;
+  depends only on Runtime;
 - TC01-TC06 provide bounded termcap parsing, Runtime-derived capability
   classification, `tc=` resolution, semantic conversion, reverse
   representability/rendering, and explicit `TERMCAP` / `TERMPATH` acquisition;
@@ -281,21 +278,22 @@ the existing terminfo-first Runtime discovery contract:
   source renderer;
 - `infotocap` composes the existing terminfo Source parser/resolver with the
   Termcap reverse renderer;
-- all six RID archives now carry five standalone launchers: `tic`, `infocmp`,
-  `toe`, `captoinfo`, and `infotocap`;
-- conversion output is documented as effective resolved state; comments,
-  original formatting, cancellations/disabled fields, and inheritance ancestry
-  are not reconstructed;
+- all six RID archives carry five standalone launchers: `tic`, `infocmp`, `toe`,
+  `captoinfo`, and `infotocap`;
+- conversion output is effective resolved state; comments, original formatting,
+  cancellations/disabled fields, and inheritance ancestry are not reconstructed;
 - conversion loss and termcap representability failures are reported instead of
   being silently hidden;
-- TC08 adds checked-in differential/hostile-input coverage, bounded seeded
+- TC08 provides checked-in differential/hostile-input coverage, bounded seeded
   mutation validation, the frozen Termcap public API baseline, a structural
   Termcap package verifier, and isolated package-reference consumers on
   `net8.0`, `net9.0`, and `net10.0`.
 
-The Alpha-8 code/API/package/CLI freeze is now represented in the repository.
-Stable `v1.6.0` publication remains gated on final Release validation and the
-external NuGet.org trusted-publishing authorization for `Icod.TermInfo.Termcap`.
+The 1.6.0 code/API/package/CLI contract is frozen. NuGet.org trusted publishing
+for all six coordinated package IDs has been confirmed for this repository's
+`release.yaml` workflow and `Release` environment; publication remains gated on
+final Release validation and an exact-main `v1.6.0` tag. See
+`docs/1.6.0-RELEASE-AUDIT.md`.
 
 ## Getting started
 

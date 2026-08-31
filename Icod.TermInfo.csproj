@@ -21,7 +21,7 @@
 		<Title>Icod.TermInfo</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed, dependency-free .NET terminfo library for terminal capability metadata, compiled terminfo parsing and database discovery, ANSI/DEC/xterm and Windows profiles, parameter expansion, color semantics, and padding-aware output.</Description>
-		<PackageReleaseNotes>The 1.6.0 development line coordinates Runtime with the opt-in Icod.TermInfo.Termcap interoperability package while preserving the frozen 1.0 Runtime public API, dependency-free Runtime package boundary, net8/net9/net10 support, 1.0.0.0 assembly identity, and existing command semantics.</PackageReleaseNotes>
+		<PackageReleaseNotes>Version 1.6.0 coordinates Runtime with the opt-in Icod.TermInfo.Termcap interoperability package and the captoinfo/infotocap tool distribution while preserving the frozen 1.0 Runtime public API, dependency-free Runtime package boundary, net8/net9/net10 support, 1.0.0.0 assembly identity, and existing Runtime semantics.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>

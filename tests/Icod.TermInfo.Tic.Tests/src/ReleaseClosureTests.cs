@@ -4,18 +4,17 @@ using Xunit;
 namespace Icod.TermInfo.Tic.Tests;
 
 public sealed class ReleaseClosureTests {
-	private const string StableReleaseVersion = "1.5.0";
-	private const string DevelopmentVersion = "1.6.0-Alpha-8";
+	private const string StableReleaseVersion = "1.6.0";
 	private const string VersionReference = "$(IcodTermInfoSuiteVersion)";
 	private const string StableAssemblyVersion = "1.0.0.0";
 
 	[Fact]
-	public void CoordinatedProjectsConsumeCentralDevelopmentVersion() {
+	public void CoordinatedProjectsConsumeCentralStableVersion() {
 		string root = FindRepositoryRoot();
 		XDocument buildProperties =
 			LoadProject( root, "Directory.Build.props" );
 		Assert.Equal(
-			DevelopmentVersion,
+			StableReleaseVersion,
 			ReadRequiredProperty(
 				buildProperties,
 				"IcodTermInfoSuiteVersion"
@@ -175,25 +174,29 @@ public sealed class ReleaseClosureTests {
 	[Fact]
 	public void StableReleaseAuditAndPackageFacingDocumentationArePresent() {
 		string root = FindRepositoryRoot();
+		string auditPath =
+			System.IO.Path.Combine(
+				root,
+				"docs",
+				"1.6.0-RELEASE-AUDIT.md"
+			);
 
-		Assert.True(
-			File.Exists(
-				System.IO.Path.Combine(
-					root,
-					"docs",
-					"1.5.0-RELEASE-AUDIT.md"
-				)
-			)
-		);
+		Assert.True( File.Exists( auditPath ) );
 
 		foreach (
 			string relativePath
 			in new string[] {
 				"README.md",
 				"Icod.TermInfo.Source/README.md",
+				"Icod.TermInfo.Termcap/README.md",
 				"Icod.TermInfo.Compiler/README.md",
 				"Icod.TermInfo.Inspection/README.md",
 				"icod-terminfo/README.md",
+				"tic/README.md",
+				"infocmp/README.md",
+				"toe/README.md",
+				"captoinfo/README.md",
+				"infotocap/README.md",
 			}
 		) {
 			Assert.Contains(
@@ -202,6 +205,38 @@ public sealed class ReleaseClosureTests {
 				StringComparison.Ordinal
 			);
 		}
+
+		string audit = File.ReadAllText( auditPath );
+		Assert.Contains( "Trusted publishing", audit, StringComparison.Ordinal );
+		Assert.Contains( "Confirmed", audit, StringComparison.Ordinal );
+		Assert.Contains( "Icod.TermInfo.Termcap", audit, StringComparison.Ordinal );
+		Assert.Contains( "release.yaml", audit, StringComparison.Ordinal );
+		Assert.Contains( "Release", audit, StringComparison.Ordinal );
+		Assert.Contains( "17", audit, StringComparison.Ordinal );
+		Assert.Contains( "18", audit, StringComparison.Ordinal );
+	}
+
+	[Fact]
+	public void StableToolSuiteSampleExercisesBothConversionDirections() {
+		string root = FindRepositoryRoot();
+		string sampleReadme =
+			ReadRepositoryFile(
+				root,
+				"samples/ToolSuite/README.md"
+			);
+
+		Assert.Contains( "captoinfo example.termcap", sampleReadme );
+		Assert.Contains( "infotocap converted-from-termcap.ti", sampleReadme );
+		Assert.True(
+			File.Exists(
+				System.IO.Path.Combine(
+					root,
+					"samples",
+					"ToolSuite",
+					"example.termcap"
+				)
+			)
+		);
 	}
 
 	private static XDocument LoadProject(

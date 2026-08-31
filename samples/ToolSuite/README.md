@@ -1,27 +1,28 @@
-# Icod.TermInfo 1.5 Tool-Suite Sample
+# Icod.TermInfo 1.6 Tool-Suite Sample
 
-This sample exercises the coordinated `tic`, `infocmp`, and `toe` command suite
-against one controlled terminfo source file. It deliberately uses an explicit
-local database root so results do not depend on the host's installed terminfo
-database.
+This sample exercises the coordinated `tic`, `infocmp`, `toe`, `captoinfo`, and
+`infotocap` command suite against controlled terminfo and termcap source. It uses
+an explicit local terminfo database root and checked-in source files so results do
+not depend on host-installed terminfo or termcap databases.
 
 The commands below use the standalone release-archive launchers. When
 `Icod.TermInfo.Tools` is installed as a .NET tool, prefix the same command lines
 with `icod-terminfo`, for example `icod-terminfo tic -c -x example.ti`. Run them
 from this directory, or adjust the paths as appropriate.
 
-## Source
+## Terminfo source
 
 `example.ti` defines two entries:
 
 - `icod-demo-base` (`idb`) supplies basic screen geometry and cursor/screen
   capabilities;
-- `icod-demo-child` (`idc`) inherits the base through `use=`, overrides
-  `cols`, and adds the deliberately unknown extended string capability
-  `IcodDemo`.
+- `icod-demo-child` (`idc`) inherits the base through `use=`, overrides `cols`,
+  and adds the deliberately unknown extended string capability `IcodDemo`.
 
 The unknown extended capability makes `-x` meaningful in the validation,
-publication, and rendering examples.
+publication, and rendering examples. It is intentionally not conventional
+termcap-representable, so the successful `infotocap` walkthrough below uses the
+separate representable `example.termcap` path instead of flattening `example.ti`.
 
 ## Validate without publishing
 
@@ -30,10 +31,8 @@ tic -c -x example.ti
 ```
 
 Validation parses the complete source document, resolves `use=` inheritance,
-and checks compiled representability without creating a database.
-
-Omitting `-x` demonstrates the stricter default policy for unknown extended
-capability names.
+and checks compiled representability without creating a database. Omitting `-x`
+demonstrates the stricter default policy for unknown extended capability names.
 
 ## Publish to a controlled database
 
@@ -103,10 +102,43 @@ The same relationship is reported as:
 icod-demo-base	icod-demo-child
 ```
 
+## Convert termcap to effective terminfo
+
+`example.termcap` is deliberately simple and fully representable. Convert it to
+resolved terminfo source with:
+
+```text
+captoinfo example.termcap > converted-from-termcap.ti
+```
+
+The resulting source should contain the `icod-demo-cap` identity together with
+`am`, `cols#80`, `lines#24`, and the clear-screen capability. The conversion is
+effective state; original termcap formatting and source ancestry are not
+reconstructed.
+
+## Convert the effective terminfo back to termcap
+
+Use the just-produced representable terminfo source for the reverse direction:
+
+```text
+infotocap converted-from-termcap.ti > roundtrip.termcap
+```
+
+The rendered termcap should contain `am`, `co#80`, and `li#24`. A description
+which cannot be represented faithfully is rejected rather than silently
+approximated.
+
 ## Cleanup
 
-The only generated state is the explicit local database root. Remove
-`./terminfo` when the walkthrough is complete.
+Remove the explicit local database and redirected conversion outputs when the
+walkthrough is complete:
+
+```text
+rm -rf ./terminfo converted-from-termcap.ti roundtrip.termcap
+```
+
+On shells without `rm`, remove the same paths with the host's normal file tools.
 
 For the complete command contracts and supported options, see
-`../../tic/README.md`, `../../infocmp/README.md`, and `../../toe/README.md`.
+`../../tic/README.md`, `../../infocmp/README.md`, `../../toe/README.md`,
+`../../captoinfo/README.md`, and `../../infotocap/README.md`.

@@ -1,12 +1,14 @@
 # captoinfo
 
-`captoinfo` is the managed Icod.TermInfo termcap-to-terminfo conversion command.
+`captoinfo` is the managed Icod.TermInfo termcap-to-terminfo conversion command,
+introduced in version 1.6.0.
 
 TC07 deliberately keeps the executable thin. Conventional termcap text is
 parsed by `Icod.TermInfo.Termcap`, `tc=` inheritance is resolved by the TC03
 resolver, semantic conversion uses TC04, and the resulting immutable
 `TerminalDescription` is rendered as deterministic terminfo source by
-`Icod.TermInfo.Inspection`.
+`Icod.TermInfo.Inspection`. TC08 freezes that composition for the stable 1.6.0
+release.
 
 ```text
 Usage: captoinfo [OPTION]... [FILE]...

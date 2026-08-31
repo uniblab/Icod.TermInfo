@@ -9,18 +9,19 @@ values continue to reference `Icod.TermInfo` alone.
 
 ## Install
 
-For the 1.5.0 release:
+For the 1.6.0 release:
 
 ```text
-dotnet add package Icod.TermInfo.Source --version 1.5.0
+dotnet add package Icod.TermInfo.Source --version 1.6.0
 ```
 
 The package depends on the matching `Icod.TermInfo` version and targets
 `net8.0`, `net9.0`, and `net10.0`.
 
-Version 1.5.0 participates in centralized suite versioning and the installable
-tool-router release. It does not change the frozen 1.1 source-language public API
-or semantics.
+Version 1.6.0 participates in the coordinated Termcap/tool release without
+changing the frozen 1.1 source-language public API or semantics. The
+`infotocap` command consumes Source at the executable-composition layer; Source
+does not acquire a Termcap dependency.
 
 ## What the 1.1 line provides
 

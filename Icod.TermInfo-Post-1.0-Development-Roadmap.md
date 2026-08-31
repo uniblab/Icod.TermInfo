@@ -10,11 +10,11 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
-**Current release version:** `1.5.0`
-**Current development version:** `1.6.0-Alpha-8`
+**Current release version:** `1.6.0`
+**Final 1.6 prerelease:** `1.6.0-Alpha-8`
 **Next development line:** post-1.6 demand-driven work
-**Status:** 1.6.0 release-closure validation in progress
-**Current tranche:** TC08 — Differential validation, fuzzing, and freeze
+**Status:** 1.6.0 stable release contract frozen
+**Current tranche:** Release closure — exact-main validation and publication
 **Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
 
 ---
@@ -1005,14 +1005,14 @@ The detailed and authoritative 1.6 tranche contract is maintained in
 package without contaminating the primary terminfo model or enlarging the frozen
 Runtime, Source, Compiler, or Inspection APIs.
 
-The active package boundary is:
+The stable package boundary is:
 
 ```text
 Icod.TermInfo.Termcap
     -> Icod.TermInfo
 ```
 
-## 8.2 Active tranche sequence
+## 8.2 Completed tranche sequence
 
 | Tranche | Development version | Gate |
 |---|---|---|
@@ -1025,17 +1025,16 @@ Icod.TermInfo.Termcap
 | TC07 | `1.6.0-Alpha-7` | conversion tools and coordinated router/archive distribution |
 | TC08 | `1.6.0-Alpha-8` | corpus, fuzzing, hostile-input audit, API/package/CLI freeze |
 
-TC01's parser foundation, TC02's Runtime-derived capability classification,
-TC03's bounded `tc=` inheritance resolver, TC04's semantic conversion, TC05's
-reverse representability/rendering, and TC06's explicit acquisition are
-complete. TC07 is the active tranche and adds standalone plus routed `captoinfo`
-and `infotocap` composition together with coordinated archive, package, smoke,
-and release-artifact accounting. TC08 remains the validation and freeze gate.
+TC01-TC08 are complete. The Termcap public API baseline, Runtime-only dependency,
+conversion-command composition, router/archive topology, package verification,
+and hostile-input/differential validation are frozen for 1.6.0.
 
 **1.6 completion gate:** common conventional termcap databases can be parsed,
 resolved, converted into the canonical Icod terminfo semantic model, rendered
 back where representable, acquired explicitly, and exercised through conversion
 tools with loss reported rather than hidden.
+
+**Release audit:** [`docs/1.6.0-RELEASE-AUDIT.md`](docs/1.6.0-RELEASE-AUDIT.md).
 
 ---
 

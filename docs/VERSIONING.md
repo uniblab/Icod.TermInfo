@@ -119,6 +119,11 @@ and executes an isolated package-reference-only Termcap consumer on `net8.0`,
 `net9.0`, and `net10.0`. The Runtime-only Termcap dependency and the TC07
 command/router/archive topology are frozen for 1.6 release closure.
 
+Stable 1.6.0 promotes that frozen Alpha-8 surface without further public API or
+command-semantic changes. Runtime, Source, Termcap, Compiler, Inspection, all
+five standalone commands, and `Icod.TermInfo.Tools` consume the centralized
+`1.6.0` suite version while the five reusable assemblies retain `1.0.0.0`.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:

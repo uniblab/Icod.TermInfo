@@ -2,9 +2,10 @@
 
 **Development line:** `1.6.0`
 **Initial development version:** `1.6.0-Alpha-1`
-**Current development version:** `1.6.0-Alpha-7`
+**Final prerelease version:** `1.6.0-Alpha-8`
+**Release version:** `1.6.0`
 **Stable assembly version:** `1.0.0.0`
-**Status:** Implementation in progress — TC07 conversion tools and coordinated distribution
+**Status:** Feature/API/CLI freeze complete — stable release closure
 **Primary change:** Add explicit termcap parsing, semantic mapping, conversion, acquisition, and tools without changing the frozen Runtime, Source, Compiler, or Inspection contracts.
 
 ---
@@ -637,9 +638,11 @@ TC08 SHALL perform the public API regret review for `Icod.TermInfo.Termcap` and
 freeze its active 1.6 baseline. Package-reference-only consumers and structural
 package verification SHALL cover all supported target frameworks.
 
-Before stable publication, trusted publishing SHALL authorize the new
-`Icod.TermInfo.Termcap` package ID. TC08 SHALL re-verify the Termcap package and
-GitHub Release artifact accounting introduced by TC07 before the final tag.
+The maintainer confirmed NuGet.org trusted publishing for all six coordinated
+package IDs, including `Icod.TermInfo.Termcap`, on 2026-08-31 for this repository,
+`release.yaml`, and the `Release` environment. TC08 re-verifies the Termcap
+package and GitHub Release artifact accounting introduced by TC07 before the
+final tag.
 
 **1.6 completion gate:** common conventional termcap databases can be parsed,
 resolved, converted into the canonical Runtime model, rendered back where

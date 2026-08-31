@@ -1,10 +1,12 @@
 # infotocap
 
-`infotocap` is the managed Icod.TermInfo terminfo-to-termcap conversion command.
+`infotocap` is the managed Icod.TermInfo terminfo-to-termcap conversion command,
+introduced in version 1.6.0.
 
 TC07 composes the existing Source parser/resolver with the TC05 termcap
 representability and rendering engine. It does not add another termcap semantic
-model or conversion table.
+model or conversion table. TC08 freezes that composition for the stable 1.6.0
+release.
 
 ```text
 Usage: infotocap [OPTION]... FILE...

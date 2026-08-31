@@ -8,13 +8,13 @@ The tool targets `net10.0` and therefore requires a .NET 10 runtime.
 ## Install
 
 ```text
-dotnet tool install --global Icod.TermInfo.Tools --version 1.5.0
+dotnet tool install --global Icod.TermInfo.Tools --version 1.6.0
 ```
 
 Update or remove the global tool with:
 
 ```text
-dotnet tool update --global Icod.TermInfo.Tools --version 1.5.0
+dotnet tool update --global Icod.TermInfo.Tools --version 1.6.0
 dotnet tool uninstall --global Icod.TermInfo.Tools
 ```
 
@@ -22,7 +22,7 @@ For repository-local or application-local use, install through a tool manifest:
 
 ```text
 dotnet new tool-manifest
-dotnet tool install Icod.TermInfo.Tools --version 1.5.0
+dotnet tool install Icod.TermInfo.Tools --version 1.6.0
 dotnet tool run icod-terminfo --version
 ```
 
@@ -36,18 +36,12 @@ It does not install global commands named `tic`, `infocmp`, `toe`, `captoinfo`,
 or `infotocap`. Those traditional command names belong to separately downloaded
 standalone release archives.
 
-Route the existing commands through it:
+Version 1.6.0 routes all five coordinated commands:
 
 ```text
 icod-terminfo tic -V
 icod-terminfo infocmp -V
 icod-terminfo toe -V
-```
-
-Beginning with TC07 on the 1.6 development line, the same router additionally
-exposes the conversion commands:
-
-```text
 icod-terminfo captoinfo -V
 icod-terminfo infotocap -V
 ```
@@ -74,20 +68,15 @@ For command-specific help, route the command's normal help option:
 icod-terminfo tic --help
 icod-terminfo infocmp --help
 icod-terminfo toe --help
-```
-
-TC07 development builds also support:
-
-```text
 icod-terminfo captoinfo --help
 icod-terminfo infotocap --help
 ```
 
 ## Standalone distribution
 
-The router package complements rather than replaces the release archives. At
-TC07 on the 1.6 development line, each of the six framework-dependent
-tool-suite archives contains standalone executables named exactly:
+The router package complements rather than replaces the release archives. Each
+of the six framework-dependent 1.6.0 tool-suite archives contains standalone
+executables named exactly:
 
 ```text
 tic

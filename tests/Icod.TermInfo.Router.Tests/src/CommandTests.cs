@@ -48,7 +48,8 @@ public sealed class CommandTests {
 		);
 
 		Assert.Equal( 0, status );
-		Assert.Contains( "1.6.0-Alpha-8", ReadText( stdout ) );
+		Assert.Contains( "1.6.0", ReadText( stdout ) );
+		Assert.DoesNotContain( "Alpha", ReadText( stdout ) );
 		Assert.Empty( ReadText( stderr ) );
 	}
 
@@ -73,7 +74,8 @@ public sealed class CommandTests {
 		);
 
 		Assert.Equal( 0, status );
-		Assert.Contains( "1.6.0-Alpha-8", ReadText( stdout ) );
+		Assert.Contains( "1.6.0", ReadText( stdout ) );
+		Assert.DoesNotContain( "Alpha", ReadText( stdout ) );
 		Assert.Empty( ReadText( stderr ) );
 	}
 
