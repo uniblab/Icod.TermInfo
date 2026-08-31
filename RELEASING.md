@@ -7,44 +7,51 @@ This document describes the current validation and publication procedure for the
 
 - `Directory.Build.props:IcodTermInfoSuiteVersion` is the sole coordinated
   release-version literal.
-- Runtime, Source, Compiler, and Inspection must consume that property for
-  `<Version />` and `<PackageVersion />`; `tic`, `infocmp`, and `toe` consume it
-  for `<Version />`; the `Icod.TermInfo.Tools` router consumes it for both
-  `<Version />` and `<PackageVersion />`.
-- Runtime, Source, Compiler, Inspection, and the router package versions must
-  match the centralized suite version.
-- Runtime, Source, Compiler, and Inspection retain 1.x assembly version
+- Runtime, Source, Termcap, Compiler, and Inspection must consume that property
+  for `<Version />` and `<PackageVersion />`; `tic`, `infocmp`, `toe`,
+  `captoinfo`, and `infotocap` consume it for `<Version />`; the
+  `Icod.TermInfo.Tools` router consumes it for both `<Version />` and
+  `<PackageVersion />`.
+- Runtime, Source, Termcap, Compiler, Inspection, and the router package versions
+  must match the centralized suite version.
+- Runtime, Source, Termcap, Compiler, and Inspection retain 1.x assembly version
   `1.0.0.0` and remain unsigned.
-- Supported consumer targets for the 1.5 release are `net8.0`, `net9.0`, and `net10.0`.
-- Beginning with T01 in 1.4, the `tic`, `infocmp`, and `toe` command projects
-  target `net10.0`; the four reusable library packages retain all three targets.
-- The `tic`, `infocmp`, and `toe` projects remain non-packable solution
-  executables. Command distribution uses six framework-dependent .NET 10 suite
-  archives and, beginning with 1.5, the `Icod.TermInfo.Tools` .NET tool package
-  exposing the `icod-terminfo` router.
+- Supported consumer targets for the 1.6 release are `net8.0`, `net9.0`, and `net10.0`.
+- Beginning with T01 in 1.4, `tic`, `infocmp`, and `toe` target `net10.0`; TC07
+  adds `captoinfo` and `infotocap` on `net10.0`. The five reusable library
+  packages retain all three target frameworks.
+- All five command projects remain non-packable solution executables. Command
+  distribution uses six framework-dependent .NET 10 suite archives and the
+  `Icod.TermInfo.Tools` .NET tool package exposing the `icod-terminfo` router.
 - A release tag must be exactly `v<PackageVersion>` and is the only repository
   event which may publish packages.
 - Release validation must pass on Windows, Linux, and macOS on `main` before a
   release tag is created. The tag workflow repeats the Release gate on the exact
   tagged commit before publication.
 - Release validation must pass the frozen Runtime 1.0, Source 1.1, Compiler 1.2,
-  and Inspection 1.4 API baselines while retaining the historical Inspection
-  1.3 baseline and the net8/net9/net10 API-equivalence gates.
+  Inspection 1.4, and Termcap 1.6 API baselines while retaining the historical
+  Inspection 1.3 baseline and the net8/net9/net10 API-equivalence gates.
 - Reusable-library Release builds treat missing public XML documentation as an
   error. Command and router projects generate XML documentation while retaining
   their explicit `CS1591` exemption.
-- All four reusable library packages must pass the coordinated release verifier
-  before publication. Use `.github/scripts/verify-release-package.sh` on a
-  Bash-capable host or `.github/scripts/verify-release-package.cmd` from Windows
-  Command Prompt. `Icod.TermInfo.Tools` must pass its structural package verifier
-  and separately pass the isolated install-and-route smoke on Windows, Linux,
-  and macOS.
+- All five reusable library packages must pass the coordinated release verifier
+  before publication. Termcap additionally has a dedicated structural verifier
+  and package-reference-only smoke consumer. Use
+  `.github/scripts/verify-release-package.sh` on a Bash-capable host or
+  `.github/scripts/verify-release-package.cmd` from Windows Command Prompt.
+  `Icod.TermInfo.Tools` must pass its structural package verifier and separately
+  pass the isolated install-and-route smoke on Windows, Linux, and macOS.
 - Release packages must retain deterministic build metadata, repository commit
   metadata, portable symbols, Source Link, README, icon metadata, and all three
   framework XML-documentation assets.
-- The five `.nupkg` artifacts and four reusable-library `.snupkg` artifacts
+- The six `.nupkg` artifacts and five reusable-library `.snupkg` artifacts
   produced for a version are immutable release artifacts. If package contents
   change, increment the version rather than replacing a published package.
+- The 1.6.0 release audit records maintainer confirmation that NuGet.org trusted
+  publishing authorizes all six coordinated package IDs for this repository,
+  `release.yaml`, and the `Release` environment. This external permission cannot
+  be established by repository tests and must be reconfirmed if the policy
+  changes before tagging.
 - Publication is downstream of tag/version validation and the complete
   build/test/package gate. Pull requests and ordinary pushes to `main` must not
   authenticate to or push to package registries.
@@ -61,15 +68,15 @@ This document describes the current validation and publication procedure for the
 - `macos-latest`.
 
 Each matrix job cleans, restores, builds, and tests the whole solution, including
-all four reusable package projects, Source, Compiler, Inspection, command, and
-router tests, repository sample executables, solution-contained maintenance
-tools, the `tic`, `infocmp`, and `toe` command projects, and the
-`Icod.TermInfo.Router` project.
+all five reusable package projects, command/router tests, repository sample
+executables, solution-contained maintenance tools, the five standalone command
+projects, and the `Icod.TermInfo.Router` project.
 
 The Ubuntu matrix leg continues after the shared Staging build/test steps and:
 
 1. packs `Icod.TermInfo.csproj`,
    `Icod.TermInfo.Source/Icod.TermInfo.Source.csproj`,
+   `Icod.TermInfo.Termcap/Icod.TermInfo.Termcap.csproj`,
    `Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj`,
    `Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj`, and the
    `Icod.TermInfo.Tools` router package into a runner-local `artifacts`
@@ -92,11 +99,11 @@ documentation payload, path safety, and absence of development-only project/PDB
 files are checked. This is still validation, not publication.
 
 The library verifier covers generated capability metadata, the frozen Runtime,
-Source, Compiler, and Inspection API baselines, net8/net9/net10 API equivalence,
-package structure, metadata, XML, symbols, all four fresh-library-package
-consumers, and the non-interactive repository sample. A separate
-`smoke-tool-package.ps1` job installs and exercises `Icod.TermInfo.Tools` on all
-three host families.
+Source, Termcap, Compiler, and Inspection API baselines, net8/net9/net10 API
+equivalence, package structure, metadata, XML, symbols, all five
+fresh-library-package consumers, and the non-interactive repository sample. A
+separate `smoke-tool-package.ps1` job installs and exercises
+`Icod.TermInfo.Tools` on all three host families.
 
 The PR artifact is uploaded only after verification succeeds. It is intended for
 inspection, installation, and testing and is not a registry publication.
@@ -115,9 +122,9 @@ the Release build/test matrix on:
 - `ubuntu-latest`;
 - `macos-latest`.
 
-Each matrix leg packs all four reusable package projects plus
+Each matrix leg packs all five reusable package projects plus
 `Icod.TermInfo.Tools` and runs the platform-appropriate library Release verifier.
-The Windows leg uploads the canonical five `.nupkg` and four `.snupkg` artifacts
+The Windows leg uploads the canonical six `.nupkg` and five `.snupkg` artifacts
 for seven days. A separate three-host job installs and exercises the router
 package from that canonical artifact set.
 
@@ -138,16 +145,17 @@ release build, it fetches `origin/main` and requires the tagged commit to equal
 the exact current `main` HEAD. This prevents an older already-merged ancestor
 from being released after a newer validation commit exists. It also requires the
 tag to match `Directory.Build.props:IcodTermInfoSuiteVersion` and verifies
-that all eight coordinated projects consume that version property in their
-appropriate `Version` / `PackageVersion` fields.
+that all coordinated library, command, and router projects consume the suite
+version through their appropriate `Version` / `PackageVersion` fields.
 
 The tag workflow reruns the complete Release matrix on Windows, Linux, and macOS.
 After all three legs pass and both tool-distribution smoke gates succeed, the
 canonical validated packages are published to NuGet.org and GitHub Packages.
-Finally, the workflow creates a GitHub Release containing all five package files,
-all four reusable-library symbol packages, the six framework-dependent .NET 10
-tool-suite archives, and a SHA-256 checksum manifest. Prerelease package versions
-create GitHub prereleases.
+Finally, the workflow creates a GitHub Release containing all six `.nupkg` files,
+all five reusable-library symbol packages, the six framework-dependent .NET 10
+tool-suite archives, and a SHA-256 checksum manifest. The 17 package/archive files
+become 18 release assets after `SHA256SUMS.txt` is added. Prerelease package
+versions create GitHub prereleases.
 
 The archives retain the traditional command names and pass structural plus
 matching-host execution gates. `Icod.TermInfo.Tools` is the separate
@@ -167,24 +175,29 @@ The Bash and CMD entry points perform equivalent validation. They:
    `net10.0`;
 5. require the reviewed `docs/1.1.0-SOURCE-PUBLIC-API-BASELINE.txt` to match the
    built Source assembly;
-6. require exact Compiler public API equivalence across `net8.0`, `net9.0`, and
+6. require exact Termcap public API equivalence across `net8.0`, `net9.0`, and
+   `net10.0`, require the frozen `PublicApiSnapshot/v1` reflection-manifest
+   fingerprint, and require the packed XML surfaces to match
+   `docs/1.6.0-TERMCAP-PUBLIC-API-BASELINE.txt`;
+7. require exact Compiler public API equivalence across `net8.0`, `net9.0`, and
    `net10.0` and require `docs/1.2.0-COMPILER-PUBLIC-API-BASELINE.txt` to match;
-7. require exact Inspection public API equivalence across `net8.0`, `net9.0`, and
+8. require exact Inspection public API equivalence across `net8.0`, `net9.0`, and
    `net10.0` and require `docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt` to match;
-8. run the Runtime, Compiler, and Inspection package verifiers for package
-   structure, dependency closure, metadata, XML documentation, Source Link, and
-   portable symbols;
-9. structurally verify `Icod.TermInfo.Tools`, including its single router command
-   and the absence of host-specific command apphosts from its `any` payload;
-10. require Source, Compiler, and Inspection `.nupkg` / `.snupkg` artifacts at the
-   same package version as Runtime;
-11. restore and execute the isolated Runtime package consumer on all three TFMs;
-12. restore and execute the isolated Source package consumer on all three TFMs;
-13. restore and execute the isolated Compiler package consumer on all three TFMs;
-14. restore and execute the isolated Inspection package consumer on all three TFMs;
-15. run the general repository sample through its non-interactive
+9. run the Runtime, Termcap, Compiler, and Inspection package verifiers for
+   package structure, dependency closure, metadata, XML documentation, Source
+   Link, and portable symbols;
+10. structurally verify `Icod.TermInfo.Tools`, including its single router command
+    and the absence of host-specific command apphosts from its `any` payload;
+11. require Source, Termcap, Compiler, and Inspection `.nupkg` / `.snupkg` artifacts
+    at the same package version as Runtime;
+12. restore and execute the isolated Runtime package consumer on all three TFMs;
+13. restore and execute the isolated Source package consumer on all three TFMs;
+14. restore and execute the isolated Termcap package consumer on all three TFMs;
+15. restore and execute the isolated Compiler package consumer on all three TFMs;
+16. restore and execute the isolated Inspection package consumer on all three TFMs;
+17. run the general repository sample through its non-interactive
     `--describe-only` path;
-16. run the deterministic Source -> Compiler -> database acquisition -> Inspection
+18. run the deterministic Source -> Compiler -> database acquisition -> Inspection
     toolchain sample.
 
 All three executable API samples are solution projects and therefore compile in
@@ -194,9 +207,9 @@ the host database because its `system` command intentionally inspects host-speci
 terminfo state; the isolated runtime package-smoke consumer supplies the
 deterministic acquisition acceptance test instead.
 
-The checked-in Runtime, Source, Compiler, and Inspection package-smoke projects
-are intentionally not part of the solution and contain no project references to
-the packages they consume.
+The checked-in Runtime, Source, Termcap, Compiler, and Inspection package-smoke
+projects are intentionally not part of the solution and contain no project
+references to the packages they consume.
 
 The runtime smoke consumer creates a conventional compiled entry at runtime and
 proves the packed package can:
@@ -209,14 +222,16 @@ proves the packed package can:
 
 The Source smoke consumer proves the separately packed source-language package
 can restore through its NuGet dependency on the matching Runtime package and
-execute on all three supported target frameworks. The Compiler smoke consumer
-likewise proves the Compiler package restores through its Runtime and Source
-dependencies and can write and reparse a C01 legacy entry on all three
-frameworks. The Inspection smoke consumer proves the fourth package restores
-with matching Runtime and Source dependencies and exercises the reviewed 1.4
-Inspection public surface, including T02 system database-location inspection and
-T03 conventional database catalog enumeration, without a production Compiler
-dependency.
+execute on all three supported target frameworks. The Termcap smoke consumer
+proves the fifth reusable package restores through its Runtime-only dependency
+and executes parsing, `tc=` resolution, Runtime conversion, reverse rendering,
+and explicit inline acquisition on all three frameworks. The Compiler smoke
+consumer likewise proves the Compiler package restores through its Runtime and
+Source dependencies and can write and reparse a C01 legacy entry on all three
+frameworks. The Inspection smoke consumer restores with matching Runtime and
+Source dependencies and exercises the reviewed 1.4 Inspection public surface,
+including T02 system database-location inspection and T03 conventional database
+catalog enumeration, without a production Compiler dependency.
 
 No checked-in runtime fixture is copied into the smoke project, so those checks
 prove the public package surface rather than repository-only outputs.
@@ -231,14 +246,15 @@ dotnet build Icod.TermInfo.sln -c Release
 dotnet test Icod.TermInfo.sln -c Release
 dotnet pack Icod.TermInfo.csproj -c Release --output artifacts
 dotnet pack Icod.TermInfo.Source/Icod.TermInfo.Source.csproj -c Release --output artifacts
+dotnet pack Icod.TermInfo.Termcap/Icod.TermInfo.Termcap.csproj -c Release --output artifacts
 dotnet pack Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj -c Release --output artifacts
 dotnet pack Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj -c Release --output artifacts
 dotnet pack icod-terminfo/Icod.TermInfo.Router.csproj -c Release --output artifacts
 ```
 
 The solution restore/build/test commands above also build and test `tic`,
-`infocmp`, `toe`, the router, and their tests. The three standalone command
-projects remain non-packable.
+`infocmp`, `toe`, `captoinfo`, `infotocap`, the router, and their tests. All five
+standalone command projects remain non-packable.
 
 Run the packed router installation smoke with:
 
@@ -253,7 +269,7 @@ host with the .NET 10 SDK plus `zip`, GNU `tar`, and `gzip`:
 bash .github/scripts/build-tool-archives.sh Release artifacts/tools
 ```
 
-The builder verifies the centralized coordinated version, publishes all three
+The builder verifies the centralized coordinated version, publishes all five
 commands for the six supported RIDs with `--self-contained false`, normalizes
 archive ordering/timestamps, and requires exactly six output archives.
 
@@ -299,16 +315,21 @@ NuGet.org publication, GitHub Packages publication, and GitHub Release creation
 all consume the canonical validated Actions artifact rather than repacking the
 repository.
 
+For 1.6.0, maintainer confirmation of the required NuGet.org trusted-publishing
+scope is recorded in `docs/1.6.0-RELEASE-AUDIT.md`: all six coordinated package
+IDs are authorized for this repository, `release.yaml`, and the `Release`
+environment. Reconfirm the policy if it changes before the stable tag.
+
 Before merging or pushing a release-ready commit to `main`:
 
 1. confirm `Directory.Build.props:IcodTermInfoSuiteVersion` is the intended
    release version and all coordinated projects consume it;
-2. confirm all four reusable assemblies still declare `AssemblyVersion`
+2. confirm all five reusable assemblies still declare `AssemblyVersion`
    `1.0.0.0`;
 3. ensure the NuGet.org trusted-publishing policy authorizes this repository,
-   `release.yaml`, the `Release` environment, and all five package IDs:
-   `Icod.TermInfo`, `Icod.TermInfo.Source`, `Icod.TermInfo.Compiler`,
-   `Icod.TermInfo.Inspection`, and `Icod.TermInfo.Tools`;
+   `release.yaml`, the `Release` environment, and all six package IDs:
+   `Icod.TermInfo`, `Icod.TermInfo.Source`, `Icod.TermInfo.Termcap`,
+   `Icod.TermInfo.Compiler`, `Icod.TermInfo.Inspection`, and `Icod.TermInfo.Tools`;
 4. ensure the `NUGET_USER` repository secret identifies the intended NuGet.org
    account;
 5. preserve `packages: write` permission for GitHub Packages;
@@ -342,15 +363,14 @@ control.
 
 After a final version is published:
 
-- confirm all five package IDs and all four reusable-library symbol packages are
+- confirm all six package IDs and all five reusable-library symbol packages are
   visible on NuGet.org;
-- confirm the same package version for all five IDs is visible in GitHub
-  Packages;
-- confirm fresh Runtime, Source, Compiler, and Inspection consumers can restore
-  the final version;
+- confirm the same package version for all six IDs is visible in GitHub Packages;
+- confirm fresh Runtime, Source, Termcap, Compiler, and Inspection consumers can
+  restore the final version;
 - verify the published version came from the expected immutable release tag;
-- confirm `Icod.TermInfo.Tools` installs and routes all three commands;
-- confirm the GitHub Release contains all nine package artifacts, all six
+- confirm `Icod.TermInfo.Tools` installs and routes all five commands;
+- confirm the GitHub Release contains all eleven package artifacts, all six
   framework-dependent tool-suite archives, and `SHA256SUMS.txt`;
 - treat subsequent public API or package-content changes as changes for the next
   version.
@@ -406,6 +426,12 @@ release gate is `docs/1.4.1-RELEASE-AUDIT.md`.
 For 1.5, centralized versioning and the installable router are frozen by
 `docs/1.5.0-RELEASE-AUDIT.md`. The 1.4 command semantic contract and the frozen
 `docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt` remain unchanged.
+
+For 1.6, use `Icod.TermInfo-1.6.0-Termcap-Interoperability-Roadmap.md` for the
+TC01-TC08 contract, `docs/1.6.0-TC01-TERMCAP-PACKAGE-AND-PARSER-FOUNDATION.md`
+through `docs/1.6.0-TC08-DIFFERENTIAL-VALIDATION-FUZZING-AND-FREEZE.md` for
+tranche evidence, `docs/1.6.0-TERMCAP-PUBLIC-API-BASELINE.txt` for the frozen
+Termcap surface, and `docs/1.6.0-RELEASE-AUDIT.md` for stable release closure.
 
 The final `v<IcodTermInfoSuiteVersion>` tag must identify the exact validated and
 published `main` commit. Do not edit the audit or any other source/package

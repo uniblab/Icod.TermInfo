@@ -44,11 +44,14 @@ fi
 projects=(
 	"$repository_root/Icod.TermInfo.csproj"
 	"$repository_root/Icod.TermInfo.Source/Icod.TermInfo.Source.csproj"
+	"$repository_root/Icod.TermInfo.Termcap/Icod.TermInfo.Termcap.csproj"
 	"$repository_root/Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj"
 	"$repository_root/Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj"
 	"$repository_root/tic/Icod.TermInfo.Tic.csproj"
 	"$repository_root/infocmp/Icod.TermInfo.InfoCmp.csproj"
 	"$repository_root/toe/Icod.TermInfo.Toe.csproj"
+	"$repository_root/captoinfo/Icod.TermInfo.CapToInfo.csproj"
+	"$repository_root/infotocap/Icod.TermInfo.InfoToCap.csproj"
 	"$repository_root/icod-terminfo/Icod.TermInfo.Router.csproj"
 )
 
@@ -71,6 +74,8 @@ publish_projects=(
 	"$repository_root/tic/Icod.TermInfo.Tic.csproj"
 	"$repository_root/infocmp/Icod.TermInfo.InfoCmp.csproj"
 	"$repository_root/toe/Icod.TermInfo.Toe.csproj"
+	"$repository_root/captoinfo/Icod.TermInfo.CapToInfo.csproj"
+	"$repository_root/infotocap/Icod.TermInfo.InfoToCap.csproj"
 )
 
 rids=(
@@ -103,7 +108,7 @@ for rid in "${rids[@]}"; do
 
 	case "$rid" in
 		win-*)
-			for command in tic infocmp toe; do
+			for command in tic infocmp toe captoinfo infotocap; do
 				if [[ ! -f "$stage/$command.exe" ]]; then
 					echo "published $rid payload is missing '$command.exe'" >&2
 					exit 1
@@ -111,7 +116,7 @@ for rid in "${rids[@]}"; do
 			done
 			;;
 		*)
-			for command in tic infocmp toe; do
+			for command in tic infocmp toe captoinfo infotocap; do
 				if [[ ! -f "$stage/$command" ]]; then
 					echo "published $rid payload is missing '$command'" >&2
 					exit 1
@@ -127,6 +132,8 @@ for rid in "${rids[@]}"; do
 	cp "$repository_root/tic/README.md" "$stage/documentation/tic.md"
 	cp "$repository_root/infocmp/README.md" "$stage/documentation/infocmp.md"
 	cp "$repository_root/toe/README.md" "$stage/documentation/toe.md"
+	cp "$repository_root/captoinfo/README.md" "$stage/documentation/captoinfo.md"
+	cp "$repository_root/infotocap/README.md" "$stage/documentation/infotocap.md"
 
 	cat > "$stage/TOOL-SUITE.txt" <<EOF
 Icod.TermInfo tool suite
@@ -134,7 +141,7 @@ Version: $version
 RID: $rid
 Framework: net10.0
 Deployment: framework-dependent
-Commands: tic infocmp toe
+Commands: tic infocmp toe captoinfo infotocap
 EOF
 
 	TZ=UTC find "$stage" -exec touch -h -t 198001010000 {} +

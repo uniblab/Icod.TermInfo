@@ -163,8 +163,11 @@ internal static class Program {
 			ToolRoot + "tic.dll",
 			ToolRoot + "infocmp.dll",
 			ToolRoot + "toe.dll",
+			ToolRoot + "captoinfo.dll",
+			ToolRoot + "infotocap.dll",
 			ToolRoot + "Icod.TermInfo.dll",
 			ToolRoot + "Icod.TermInfo.Source.dll",
+			ToolRoot + "Icod.TermInfo.Termcap.dll",
 			ToolRoot + "Icod.TermInfo.Compiler.dll",
 			ToolRoot + "Icod.TermInfo.Inspection.dll",
 		];
@@ -184,6 +187,10 @@ internal static class Program {
 			ToolRoot + "infocmp.exe",
 			ToolRoot + "toe",
 			ToolRoot + "toe.exe",
+			ToolRoot + "captoinfo",
+			ToolRoot + "captoinfo.exe",
+			ToolRoot + "infotocap",
+			ToolRoot + "infotocap.exe",
 		];
 		foreach ( string forbiddenAppHost in forbiddenAppHosts ) {
 			Require(

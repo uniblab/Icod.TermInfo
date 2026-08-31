@@ -25,6 +25,8 @@ public sealed class CommandTests {
 		Assert.Contains( "tic", output );
 		Assert.Contains( "infocmp", output );
 		Assert.Contains( "toe", output );
+		Assert.Contains( "captoinfo", output );
+		Assert.Contains( "infotocap", output );
 		Assert.Empty( ReadText( stderr ) );
 	}
 
@@ -46,7 +48,8 @@ public sealed class CommandTests {
 		);
 
 		Assert.Equal( 0, status );
-		Assert.Contains( "1.5.0", ReadText( stdout ) );
+		Assert.Contains( "1.6.0", ReadText( stdout ) );
+		Assert.DoesNotContain( "Alpha", ReadText( stdout ) );
 		Assert.Empty( ReadText( stderr ) );
 	}
 
@@ -54,6 +57,8 @@ public sealed class CommandTests {
 	[InlineData( "tic" )]
 	[InlineData( "infocmp" )]
 	[InlineData( "toe" )]
+	[InlineData( "captoinfo" )]
+	[InlineData( "infotocap" )]
 	public async Task RoutesVersionRequestToSelectedCommand(
 		string commandName
 	) {
@@ -69,7 +74,8 @@ public sealed class CommandTests {
 		);
 
 		Assert.Equal( 0, status );
-		Assert.Contains( "1.5.0", ReadText( stdout ) );
+		Assert.Contains( "1.6.0", ReadText( stdout ) );
+		Assert.DoesNotContain( "Alpha", ReadText( stdout ) );
 		Assert.Empty( ReadText( stderr ) );
 	}
 
@@ -77,6 +83,8 @@ public sealed class CommandTests {
 	[InlineData( "tic", "Usage: tic" )]
 	[InlineData( "infocmp", "Usage: infocmp" )]
 	[InlineData( "toe", "Usage: toe" )]
+	[InlineData( "captoinfo", "Usage: captoinfo" )]
+	[InlineData( "infotocap", "Usage: infotocap" )]
 	public async Task RoutesHelpRequestToSelectedCommand(
 		string commandName,
 		string expectedUsage
@@ -101,6 +109,8 @@ public sealed class CommandTests {
 	[InlineData( "tic", "--not-a-t05-option" )]
 	[InlineData( "infocmp", "--not-an-infocmp-option" )]
 	[InlineData( "toe", "--not-a-toe-option" )]
+	[InlineData( "captoinfo", "--not-a-captoinfo-option" )]
+	[InlineData( "infotocap", "--not-an-infotocap-option" )]
 	public async Task RoutedFailureMatchesSelectedCommand(
 		string commandName,
 		string argument
@@ -241,6 +251,20 @@ public sealed class CommandTests {
 				);
 			case "toe":
 				return Icod.TermInfo.Toe.Command.RunAsync(
+					arguments,
+					stdin,
+					stdout,
+					stderr
+				);
+			case "captoinfo":
+				return Icod.TermInfo.CapToInfo.Command.RunAsync(
+					arguments,
+					stdin,
+					stdout,
+					stderr
+				);
+			case "infotocap":
+				return Icod.TermInfo.InfoToCap.Command.RunAsync(
 					arguments,
 					stdin,
 					stdout,

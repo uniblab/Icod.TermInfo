@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<Copyright>Copyright (c) 2026 Timothy J. Bruce</Copyright>
+		<LangVersion>13.0</LangVersion>
+		<OutputType>Library</OutputType>
+		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+		<AssemblyName>Icod.TermInfo.Termcap</AssemblyName>
+		<RootNamespace>Icod.TermInfo.Termcap</RootNamespace>
+		<Configurations>Debug;Release;Staging</Configurations>
+		<Version>$(IcodTermInfoSuiteVersion)</Version>
+		<AssemblyVersion>1.0.0.0</AssemblyVersion>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<PackageVersion>$(IcodTermInfoSuiteVersion)</PackageVersion>
+		<PackageId>Icod.TermInfo.Termcap</PackageId>
+		<Title>Icod.TermInfo.Termcap</Title>
+		<Authors>Timothy J. Bruce</Authors>
+		<Description>Managed termcap source parsing and interoperability support for Icod.TermInfo.</Description>
+		<PackageReleaseNotes>Version 1.6.0 introduces the opt-in managed termcap interoperability package with bounded parsing, Runtime-derived capability classification, tc= inheritance resolution, semantic conversion, deterministic reverse rendering, explicit acquisition, a frozen public API baseline, structural package verification, and isolated net8/net9/net10 package-reference smoke while retaining a Runtime-only dependency.</PackageReleaseNotes>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageIcon>icon.png</PackageIcon>
+		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>
+		<PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<Deterministic>true</Deterministic>
+		<PackageTags>terminfo;termcap;libtinfo;terminal;source;parser;compatibility;dotnet;csharp</PackageTags>
+		<RepositoryUrl>https://github.com/uniblab/Icod.TermInfo</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<GenerateAppxPackageOnBuild>false</GenerateAppxPackageOnBuild>
+		<EnablePackageValidation>true</EnablePackageValidation>
+	</PropertyGroup>
+
+	<PropertyGroup Condition=" '$(PlatformTarget)' == '' ">
+		<PlatformTarget>AnyCPU</PlatformTarget>
+	</PropertyGroup>
+
+	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+		<ErrorReport>prompt</ErrorReport>
+		<WarningLevel>2</WarningLevel>
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>full</DebugType>
+		<Optimize>false</Optimize>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+		<SignAssembly>false</SignAssembly>
+		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+	</PropertyGroup>
+
+	<PropertyGroup Condition=" '$(Configuration)' == 'Staging' ">
+		<ErrorReport>prompt</ErrorReport>
+		<WarningLevel>3</WarningLevel>
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>portable</DebugType>
+		<Optimize>false</Optimize>
+		<DefineConstants>TRACE</DefineConstants>
+		<SignAssembly>false</SignAssembly>
+		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+	</PropertyGroup>
+
+	<PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+		<ErrorReport>prompt</ErrorReport>
+		<WarningLevel>4</WarningLevel>
+		<DebugType>portable</DebugType>
+		<Optimize>true</Optimize>
+		<SignAssembly>false</SignAssembly>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="src\**\*.cs" />
+		<None Include="README.md" Pack="true" PackagePath="\" />
+		<None Include="..\icon.png" Link="icon.png" Pack="true" PackagePath="" />
+		<None Include="..\LICENSE" Link="LICENSE" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Icod.TermInfo.csproj" />
+	</ItemGroup>
+</Project>

@@ -5,15 +5,16 @@
 **Optional source package:** `Icod.TermInfo.Source`
 **Optional compiler package:** `Icod.TermInfo.Compiler`
 **Optional inspection package:** `Icod.TermInfo.Inspection`
+**Optional termcap package:** `Icod.TermInfo.Termcap`
 **Installable tool package:** `Icod.TermInfo.Tools`
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
-**Current release version:** `1.4.1`
-**Current development version:** `1.5.0`
-**Next development line:** `1.6.0`
-**Status:** 1.5.0 coordinated distribution release finalization
-**Current tranche:** Release closure — centralized suite versioning and installable router
+**Current release version:** `1.6.0`
+**Final 1.6 prerelease:** `1.6.0-Alpha-8`
+**Next development line:** post-1.6 demand-driven work
+**Status:** 1.6.0 stable release contract frozen
+**Current tranche:** Release closure — exact-main validation and publication
 **Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
 
 ---
@@ -70,10 +71,15 @@ Live-terminal state, terminal input, probing, PTYs, curses presentation, and ter
 | **1.6.0** | Termcap interoperability | Parse, resolve, and convert termcap and terminfo |
 | **later** | Exotic storage/formats | Berkeley DB provider and historical Unix dialects as justified |
 
-The active 1.5 release plan is recorded in
+The completed 1.5 release contract is recorded in
 [`Icod.TermInfo-1.5.0-Coordinated-Distribution-Roadmap.md`](Icod.TermInfo-1.5.0-Coordinated-Distribution-Roadmap.md)
-and its immutable release requirements are frozen by
+and its immutable release requirements and final sign-off are recorded by
 [`docs/1.5.0-RELEASE-AUDIT.md`](docs/1.5.0-RELEASE-AUDIT.md).
+
+Version 1.5.0 completed the coordinated distribution tranche. The published
+`Icod.TermInfo.Tools` package installs the `icod-terminfo` multi-command router,
+which multiplexes the frozen `tic`, `infocmp`, and `toe` implementations while
+the standalone archives retain the traditional command names.
 
 The sequence is cumulative but intentionally modular. Applications which only need runtime terminfo SHALL continue to depend on `Icod.TermInfo` alone.
 
@@ -990,90 +996,45 @@ and explicitly reviewed 1.4 Inspection additions preserved.
 
 # 8. Version 1.6.0 — Termcap Interoperability
 
+The detailed and authoritative 1.6 tranche contract is maintained in
+[`Icod.TermInfo-1.6.0-Termcap-Interoperability-Roadmap.md`](Icod.TermInfo-1.6.0-Termcap-Interoperability-Roadmap.md).
+
 ## 8.1 Release objective
 
-`1.6.0` SHALL add historical termcap compatibility without contaminating the primary terminfo model.
+`1.6.0` adds historical termcap compatibility as a separate opt-in reusable
+package without contaminating the primary terminfo model or enlarging the frozen
+Runtime, Source, Compiler, or Inspection APIs.
 
-Termcap SHALL be treated as an interoperability/source family.
-
----
-
-## 8.2 TC01 — Termcap source parser
-
-Support conventional termcap entry syntax, including:
-
-- names and aliases;
-- Boolean values;
-- numeric values;
-- string values;
-- cancellation;
-- continuation;
-- inheritance/reference mechanisms;
-- source diagnostics.
-
-Input limits and recursion limits SHALL match the defensive posture of the terminfo source parser.
-
----
-
-## 8.3 TC02 — Termcap semantic model
-
-Do not force termcap's unresolved syntax directly into `TerminalDescription`.
-
-Use an intermediate representation where necessary, followed by explicit conversion.
-
-Capability mapping SHALL be centralized and testable.
-
----
-
-## 8.4 TC03 — Termcap → terminfo conversion
-
-Implement controlled semantic conversion.
-
-The converter SHALL identify:
-
-- exact mappings;
-- approximations;
-- unsupported termcap capabilities;
-- terminfo capabilities with no termcap equivalent;
-- lossy conversion.
-
-Loss SHALL NOT be silently hidden.
-
----
-
-## 8.5 TC04 — Terminfo → termcap conversion
-
-Provide reverse conversion where representable.
-
-The API SHALL report when a `TerminalDescription` cannot be faithfully expressed using termcap.
-
----
-
-## 8.6 TC05 — Environment/search compatibility
-
-Optionally support explicit termcap-style acquisition semantics such as:
-
-- `TERMCAP`;
-- `TERMPATH`;
-
-without changing the default 1.0 terminfo discovery contract.
-
-Any runtime provider SHOULD be explicitly opt-in.
-
----
-
-## 8.7 TC06 — Conversion tools
-
-Add command functionality equivalent in purpose to:
+The stable package boundary is:
 
 ```text
-captoinfo
-infotocap
+Icod.TermInfo.Termcap
+    -> Icod.TermInfo
 ```
 
-These may be separate executable projects or modes over the shared tooling engine.
+## 8.2 Completed tranche sequence
 
-**1.6 completion gate:** common termcap databases can be parsed and converted into the canonical Icod terminfo semantic model with loss explicitly reported.
+| Tranche | Development version | Gate |
+|---|---|---|
+| TC01 | `1.6.0-Alpha-1` | package foundation, unresolved model, bounded parser |
+| TC02 | `1.6.0-Alpha-2` | two-character capability metadata and classification |
+| TC03 | `1.6.0-Alpha-3` | `tc=` inheritance, cancellation, cycle/depth handling |
+| TC04 | `1.6.0-Alpha-4` | termcap → `TerminalDescription` conversion with explicit loss |
+| TC05 | `1.6.0-Alpha-5` | reverse representability and deterministic termcap rendering |
+| TC06 | `1.6.0-Alpha-6` | explicit opt-in `TERMCAP` / `TERMPATH` acquisition |
+| TC07 | `1.6.0-Alpha-7` | conversion tools and coordinated router/archive distribution |
+| TC08 | `1.6.0-Alpha-8` | corpus, fuzzing, hostile-input audit, API/package/CLI freeze |
+
+TC01-TC08 are complete. The Termcap public API baseline, Runtime-only dependency,
+conversion-command composition, router/archive topology, package verification,
+and hostile-input/differential validation are frozen for 1.6.0.
+
+**1.6 completion gate:** common conventional termcap databases can be parsed,
+resolved, converted into the canonical Icod terminfo semantic model, rendered
+back where representable, acquired explicitly, and exercised through conversion
+tools with loss reported rather than hidden.
+
+**Release audit:** [`docs/1.6.0-RELEASE-AUDIT.md`](docs/1.6.0-RELEASE-AUDIT.md).
 
 ---
 
@@ -1132,7 +1093,7 @@ Highest-value targets:
 3. 1.1 inheritance resolver;
 4. 1.2 compiled writer;
 5. parameter expansion;
-6. 1.5 termcap parser.
+6. 1.6 termcap parser.
 
 Fuzz failures SHALL become deterministic regression tests.
 
@@ -1225,34 +1186,26 @@ Development should proceed:
 1.0 stable runtime
       |
       v
-1.1 S01  source package foundation
+1.1 terminfo source language
       |
       v
-1.1 S02-S04
-lexer + values + unresolved model
+1.2 compiled writer / compiler
       |
       v
-1.1 S05-S07
-capability mapping + cancellation + use=
+1.3 inspection / comparison
       |
       v
-1.1 S08-S09
-TerminalDescription materialization + corpus
+1.4 executable tic / infocmp / toe suite
       |
       v
-1.1.0
+1.5 coordinated distribution / icod-terminfo router
       |
       v
-1.2 binary writer / tic engine
-      |
-      v
-1.3 inspection / infocmp engine
-      |
-      v
-1.4 executable tool suite
-      |
-      v
-1.5 termcap interoperability
+1.6 TC01-TC06 termcap interoperability
 ```
 
-The 1.1 Source, 1.2 Compiler, and 1.3 Inspection lines are now complete. The next package-family development target is **1.4.0 — Tool Suite**, building the `tic`, `infocmp`, and `toe` command projects on the frozen managed engines without enlarging the Runtime contract.
+The 1.1 Source, 1.2 Compiler, 1.3 Inspection, 1.4 Tool Suite, and 1.5
+Coordinated Distribution lines are complete. The next development target is
+**1.6.0 — Termcap Interoperability**, beginning with the TC01 parser foundation
+and preserving the frozen Runtime and previously released reusable-library
+contracts.

@@ -29,6 +29,8 @@
 		<ProjectReference Include="..\..\tic\Icod.TermInfo.Tic.csproj" />
 		<ProjectReference Include="..\..\infocmp\Icod.TermInfo.InfoCmp.csproj" />
 		<ProjectReference Include="..\..\toe\Icod.TermInfo.Toe.csproj" />
+		<ProjectReference Include="..\..\captoinfo\Icod.TermInfo.CapToInfo.csproj" />
+		<ProjectReference Include="..\..\infotocap\Icod.TermInfo.InfoToCap.csproj" />
 	</ItemGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">

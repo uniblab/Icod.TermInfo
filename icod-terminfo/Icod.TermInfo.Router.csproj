@@ -20,7 +20,7 @@
 		<PackageId>Icod.TermInfo.Tools</PackageId>
 		<Title>Icod.TermInfo Tools</Title>
 		<Authors>Timothy J. Bruce</Authors>
-		<Description>Installable .NET tool router for the managed Icod.TermInfo tic, infocmp, and toe commands.</Description>
+		<Description>Installable .NET tool router for the managed Icod.TermInfo tic, infocmp, toe, captoinfo, and infotocap commands.</Description>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>
@@ -29,8 +29,8 @@
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-		<PackageReleaseNotes>1.5.0 introduces the distribution-only icod-terminfo router and centralized suite versioning without changing the frozen 1.4 tic, infocmp, or toe command semantics.</PackageReleaseNotes>
-		<PackageTags>terminfo;libtinfo;tic;infocmp;toe;terminal;tool;dotnet;csharp;icod</PackageTags>
+		<PackageReleaseNotes>Version 1.6.0 adds captoinfo and infotocap to the coordinated icod-terminfo router and standalone archive distribution while preserving the frozen tic, infocmp, and toe semantics and the conversion-command contracts established by TC07 and frozen by TC08.</PackageReleaseNotes>
+		<PackageTags>terminfo;termcap;libtinfo;tic;infocmp;toe;captoinfo;infotocap;terminal;tool;dotnet;csharp;icod</PackageTags>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(PlatformTarget)' == '' ">
@@ -41,6 +41,8 @@
 		<ProjectReference Include="..\tic\Icod.TermInfo.Tic.csproj" />
 		<ProjectReference Include="..\infocmp\Icod.TermInfo.InfoCmp.csproj" />
 		<ProjectReference Include="..\toe\Icod.TermInfo.Toe.csproj" />
+		<ProjectReference Include="..\captoinfo\Icod.TermInfo.CapToInfo.csproj" />
+		<ProjectReference Include="..\infotocap\Icod.TermInfo.InfoToCap.csproj" />
 	</ItemGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">

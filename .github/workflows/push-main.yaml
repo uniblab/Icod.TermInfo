@@ -34,9 +34,24 @@ jobs:
         run: |
           dotnet pack Icod.TermInfo.csproj -c Release --no-build --output artifacts
           dotnet pack Icod.TermInfo.Source/Icod.TermInfo.Source.csproj -c Release --no-build --output artifacts
+          dotnet pack Icod.TermInfo.Termcap/Icod.TermInfo.Termcap.csproj -c Release --no-build --output artifacts
           dotnet pack Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj -c Release --no-build --output artifacts
           dotnet pack Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj -c Release --no-build --output artifacts
           dotnet pack icod-terminfo/Icod.TermInfo.Router.csproj -c Release --no-build --output artifacts
+
+      - name: Verify Termcap Release package artifacts
+        shell: pwsh
+        run: |
+          $version = (dotnet msbuild Icod.TermInfo.Termcap/Icod.TermInfo.Termcap.csproj -nologo -getProperty:PackageVersion).Trim()
+          if ([string]::IsNullOrWhiteSpace($version)) {
+              throw 'Unable to determine Icod.TermInfo.Termcap PackageVersion.'
+          }
+          foreach ($extension in @('nupkg', 'snupkg')) {
+              $path = "artifacts/Icod.TermInfo.Termcap.$version.$extension"
+              if (-not (Test-Path -LiteralPath $path)) {
+                  throw "Expected Termcap package artifact '$path' was not produced."
+              }
+          }
 
       - name: Verify Release packages on Windows
         if: matrix.os == 'windows-latest'

@@ -56,6 +56,28 @@ dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.c
 if errorlevel 1 goto fail
 
 echo.
+echo === Verify Icod.TermInfo.Termcap frozen TC08 API (%CONFIGURATION%) ===
+set "TERMCAP_API_BASELINE_SHA256=1e24b8a555b506594c58cf58d03bf87b2b60192f6316537cb4200498c6a92ab0"
+set "TERMCAP_API_COMPARE=%TEMP%\Icod.TermInfo.Termcap-api-%RANDOM%-%RANDOM%.txt"
+dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c %CONFIGURATION% --no-build -- --compare Icod.TermInfo.Termcap\bin\%CONFIGURATION%\net8.0\Icod.TermInfo.Termcap.dll Icod.TermInfo.Termcap\bin\%CONFIGURATION%\net9.0\Icod.TermInfo.Termcap.dll > "%TERMCAP_API_COMPARE%"
+if errorlevel 1 (
+    type "%TERMCAP_API_COMPARE%"
+    del /q "%TERMCAP_API_COMPARE%" >nul 2>&1
+    goto fail
+)
+type "%TERMCAP_API_COMPARE%"
+findstr /x /c:"SHA-256 %TERMCAP_API_BASELINE_SHA256%" "%TERMCAP_API_COMPARE%" >nul
+if errorlevel 1 (
+    echo Icod.TermInfo.Termcap public API differs from the frozen TC08 reflection-manifest fingerprint. 1>&2
+    del /q "%TERMCAP_API_COMPARE%" >nul 2>&1
+    goto fail
+)
+del /q "%TERMCAP_API_COMPARE%" >nul 2>&1
+set "TERMCAP_API_COMPARE="
+dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c %CONFIGURATION% --no-build -- --compare Icod.TermInfo.Termcap\bin\%CONFIGURATION%\net8.0\Icod.TermInfo.Termcap.dll Icod.TermInfo.Termcap\bin\%CONFIGURATION%\net10.0\Icod.TermInfo.Termcap.dll
+if errorlevel 1 goto fail
+
+echo.
 echo === Verify Icod.TermInfo.Compiler net8.0/net9.0/net10.0 API equivalence (%CONFIGURATION%) ===
 dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c %CONFIGURATION% --no-build -- --compare Icod.TermInfo.Compiler\bin\%CONFIGURATION%\net8.0\Icod.TermInfo.Compiler.dll Icod.TermInfo.Compiler\bin\%CONFIGURATION%\net9.0\Icod.TermInfo.Compiler.dll
 if errorlevel 1 goto fail
@@ -82,6 +104,8 @@ if errorlevel 1 goto fail
 echo.
 echo === Verify package structure and symbols (%CONFIGURATION%) ===
 dotnet run --project tools\package-verifier\Icod.TermInfo.PackageVerifier.csproj -c %CONFIGURATION% -f net10.0 -- "%ARTIFACT_DIR%"
+if errorlevel 1 goto fail
+dotnet run --project tools\termcap-package-verifier\Icod.TermInfo.Termcap.PackageVerifier.csproj -c %CONFIGURATION% -f net10.0 -- "%ARTIFACT_DIR%"
 if errorlevel 1 goto fail
 dotnet run --project tools\compiler-package-verifier\Icod.TermInfo.Compiler.PackageVerifier.csproj -c %CONFIGURATION% -f net10.0 -- "%ARTIFACT_DIR%"
 if errorlevel 1 goto fail
@@ -134,6 +158,25 @@ if not exist "%ARTIFACT_DIR%\Icod.TermInfo.Compiler.%COMPILER_PACKAGE_VERSION%.n
 )
 if not exist "%ARTIFACT_DIR%\Icod.TermInfo.Compiler.%COMPILER_PACKAGE_VERSION%.snupkg" (
     echo Icod.TermInfo.Compiler symbol package not found. 1>&2
+    goto fail
+)
+
+set "TERMCAP_PACKAGE_VERSION="
+for /f "delims=" %%V in ('dotnet msbuild Icod.TermInfo.Termcap\Icod.TermInfo.Termcap.csproj -nologo -getProperty:PackageVersion') do set "TERMCAP_PACKAGE_VERSION=%%V"
+if not defined TERMCAP_PACKAGE_VERSION (
+    echo Unable to determine Icod.TermInfo.Termcap PackageVersion. 1>&2
+    goto fail
+)
+if not "%TERMCAP_PACKAGE_VERSION%"=="%PACKAGE_VERSION%" (
+    echo Icod.TermInfo and Icod.TermInfo.Termcap PackageVersion values must match. 1>&2
+    goto fail
+)
+if not exist "%ARTIFACT_DIR%\Icod.TermInfo.Termcap.%TERMCAP_PACKAGE_VERSION%.nupkg" (
+    echo Icod.TermInfo.Termcap package not found. 1>&2
+    goto fail
+)
+if not exist "%ARTIFACT_DIR%\Icod.TermInfo.Termcap.%TERMCAP_PACKAGE_VERSION%.snupkg" (
+    echo Icod.TermInfo.Termcap symbol package not found. 1>&2
     goto fail
 )
 
@@ -209,6 +252,32 @@ if errorlevel 1 goto fail
 echo.
 echo === Fresh Icod.TermInfo.Source package consumer: net10.0 ===
 dotnet run --project "%SOURCE_SMOKE_ROOT%\Icod.TermInfo.Source.PackageSmoke.csproj" -c %CONFIGURATION% -f net10.0 --no-restore -p:IcodTermInfoSourcePackageVersion=%SOURCE_PACKAGE_VERSION%
+if errorlevel 1 goto fail
+
+set "TERMCAP_SMOKE_ROOT=%TEMP%\Icod.TermInfo.Termcap-package-smoke-%RANDOM%-%RANDOM%"
+if exist "%TERMCAP_SMOKE_ROOT%" rmdir /s /q "%TERMCAP_SMOKE_ROOT%"
+mkdir "%TERMCAP_SMOKE_ROOT%" || goto fail
+
+copy /y tools\termcap-package-smoke\Icod.TermInfo.Termcap.PackageSmoke.csproj "%TERMCAP_SMOKE_ROOT%\Icod.TermInfo.Termcap.PackageSmoke.csproj" >nul || goto fail
+copy /y tools\termcap-package-smoke\Program.cs "%TERMCAP_SMOKE_ROOT%\Program.cs" >nul || goto fail
+
+set "NUGET_PACKAGES=%TERMCAP_SMOKE_ROOT%\packages"
+
+echo.
+echo === Fresh Icod.TermInfo.Termcap package consumer: net8.0 ===
+dotnet restore "%TERMCAP_SMOKE_ROOT%\Icod.TermInfo.Termcap.PackageSmoke.csproj" --configfile "%SMOKE_NUGET_CONFIG%" -p:IcodTermInfoTermcapPackageVersion=%TERMCAP_PACKAGE_VERSION%
+if errorlevel 1 goto fail
+dotnet run --project "%TERMCAP_SMOKE_ROOT%\Icod.TermInfo.Termcap.PackageSmoke.csproj" -c %CONFIGURATION% -f net8.0 --no-restore -p:IcodTermInfoTermcapPackageVersion=%TERMCAP_PACKAGE_VERSION%
+if errorlevel 1 goto fail
+
+echo.
+echo === Fresh Icod.TermInfo.Termcap package consumer: net9.0 ===
+dotnet run --project "%TERMCAP_SMOKE_ROOT%\Icod.TermInfo.Termcap.PackageSmoke.csproj" -c %CONFIGURATION% -f net9.0 --no-restore -p:IcodTermInfoTermcapPackageVersion=%TERMCAP_PACKAGE_VERSION%
+if errorlevel 1 goto fail
+
+echo.
+echo === Fresh Icod.TermInfo.Termcap package consumer: net10.0 ===
+dotnet run --project "%TERMCAP_SMOKE_ROOT%\Icod.TermInfo.Termcap.PackageSmoke.csproj" -c %CONFIGURATION% -f net10.0 --no-restore -p:IcodTermInfoTermcapPackageVersion=%TERMCAP_PACKAGE_VERSION%
 if errorlevel 1 goto fail
 
 set "COMPILER_SMOKE_ROOT=%TEMP%\Icod.TermInfo.Compiler-package-smoke-%RANDOM%-%RANDOM%"
@@ -288,6 +357,7 @@ if "%RESULT%"=="0" set "RESULT=1"
 :cleanup
 if defined SMOKE_ROOT if exist "%SMOKE_ROOT%" rmdir /s /q "%SMOKE_ROOT%"
 if defined SOURCE_SMOKE_ROOT if exist "%SOURCE_SMOKE_ROOT%" rmdir /s /q "%SOURCE_SMOKE_ROOT%"
+if defined TERMCAP_SMOKE_ROOT if exist "%TERMCAP_SMOKE_ROOT%" rmdir /s /q "%TERMCAP_SMOKE_ROOT%"
 if defined COMPILER_SMOKE_ROOT if exist "%COMPILER_SMOKE_ROOT%" rmdir /s /q "%COMPILER_SMOKE_ROOT%"
 if defined INSPECTION_SMOKE_ROOT if exist "%INSPECTION_SMOKE_ROOT%" rmdir /s /q "%INSPECTION_SMOKE_ROOT%"
 if defined OLD_NUGET_PACKAGES (

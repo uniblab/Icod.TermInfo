@@ -121,7 +121,7 @@ for rid in "${rids[@]}"; do
 		"RID: $rid" \
 		"Framework: net10.0" \
 		"Deployment: framework-dependent" \
-		"Commands: tic infocmp toe"
+		"Commands: tic infocmp toe captoinfo infotocap"
 	do
 		if ! grep -Fxq "$required_line" "$manifest"; then
 			echo "archive '$archive' manifest is missing '$required_line'" >&2
@@ -129,7 +129,7 @@ for rid in "${rids[@]}"; do
 		fi
 	done
 
-	for document in README.md LICENSE.txt tic.md infocmp.md toe.md; do
+	for document in README.md LICENSE.txt tic.md infocmp.md toe.md captoinfo.md infotocap.md; do
 		if [[ ! -f "$stage/documentation/$document" ]]; then
 			echo "archive '$archive' is missing documentation/$document" >&2
 			exit 1
@@ -140,6 +140,7 @@ for rid in "${rids[@]}"; do
 		Icod.CommandFramework.dll \
 		Icod.TermInfo.dll \
 		Icod.TermInfo.Source.dll \
+		Icod.TermInfo.Termcap.dll \
 		Icod.TermInfo.Compiler.dll \
 		Icod.TermInfo.Inspection.dll
 	do
@@ -149,7 +150,7 @@ for rid in "${rids[@]}"; do
 		fi
 	done
 
-	for command in tic infocmp toe; do
+	for command in tic infocmp toe captoinfo infotocap; do
 		if [[ "$rid" == win-* ]]; then
 			launcher="$stage/$command.exe"
 		else

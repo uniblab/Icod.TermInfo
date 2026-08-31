@@ -13,17 +13,17 @@ ncurses/`tic` differential validation.
 
 ## Install
 
-For the 1.5.0 release:
+For the 1.6.0 release:
 
 ```text
-dotnet add package Icod.TermInfo.Compiler --version 1.5.0
+dotnet add package Icod.TermInfo.Compiler --version 1.6.0
 ```
 
 The package targets `net8.0`, `net9.0`, and `net10.0` and depends on the matching
-`Icod.TermInfo` and `Icod.TermInfo.Source` packages. Version 1.5.0 participates
-in centralized suite versioning and the installable tool-router release without
-changing the frozen 1.2 Compiler public API. The dependency remains one-way;
-neither Source nor Runtime depends on Compiler.
+`Icod.TermInfo` and `Icod.TermInfo.Source` packages. Version 1.6.0 participates
+in the coordinated Termcap/tool release without changing the frozen 1.2
+Compiler public API. The dependency remains one-way; neither Source nor Runtime
+depends on Compiler, and Compiler does not acquire a Termcap dependency.
 
 C06 adds `CompiledTermInfoDatabaseWriter`. It never discovers a system database
 or installs globally: callers must supply the output root explicitly. It can

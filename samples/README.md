@@ -4,8 +4,8 @@ The repository contains three executable API samples and one command-suite
 walkthrough. The API samples remain separate so acquisition examples stay easy
 to copy without mixing them with interactive terminal-control output. The
 Toolchain sample demonstrates the reusable Source -> Compiler -> Runtime ->
-Inspection flow, while ToolSuite demonstrates the coordinated `tic`, `infocmp`,
-and `toe` workflow added in 1.4.
+Inspection flow, while ToolSuite demonstrates the coordinated five-command 1.6
+suite: `tic`, `infocmp`, `toe`, `captoinfo`, and `infotocap`.
 
 All three executable API sample projects target `net8.0`, `net9.0`, and
 `net10.0`. Every
@@ -74,13 +74,14 @@ See `Icod.TermInfo.Toolchain.Sample/README.md`.
 
 ## ToolSuite
 
-`ToolSuite` is a data-and-command walkthrough for the managed 1.4 command suite.
-It uses a controlled source file and an explicit local database root, so the
-example does not depend on the host's installed terminfo database.
+`ToolSuite` is a data-and-command walkthrough for the managed 1.6 command suite.
+It uses controlled terminfo and termcap source files plus an explicit local
+database root, so the example does not depend on the host's installed terminfo or
+termcap databases.
 
 The walkthrough covers validation, publication, effective rendering, semantic
-comparison, conventional database enumeration, and forward/reverse `use=`
-dependency reports.
+comparison, conventional database enumeration, forward/reverse `use=` dependency
+reports, termcap-to-terminfo conversion, and terminfo-to-termcap round trips.
 
 See `ToolSuite/README.md`.
 

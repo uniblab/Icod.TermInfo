@@ -2,13 +2,12 @@
 
 `tic` is part of the `Icod.TermInfo` managed terminfo tool suite.
 
-## 1.5.0 status
+## 1.6.0 status
 
-Version `1.5.0` retains the frozen T04/T05 semantic engine, T10 CLI/distribution
+Version `1.6.0` retains the frozen T04/T05 semantic engine, T10 CLI/distribution
 contract, and T11 differential, hostile-input, and artifact validation gates.
-The 1.5 release centralizes suite versioning and adds the installable
-`icod-terminfo` router; it adds no compiler, source-language, or command
-semantics.
+The 1.6 release adds the separate Termcap package and conversion commands without
+changing `tic` compiler, source-language, or command semantics.
 
 Supported as either `tic ...` from a release archive or
 `icod-terminfo tic ...` from the .NET tool:

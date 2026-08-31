@@ -339,7 +339,7 @@ public sealed class I01ContractTests {
 	}
 
 	[Fact]
-	public void SolutionAndReleasePipelineAreFivePackageAware() {
+	public void SolutionAndReleasePipelineRetainInspectionCoverage() {
 		string root =
 			FindRepositoryRoot();
 		string solution =
@@ -428,11 +428,11 @@ public sealed class I01ContractTests {
 				)
 			);
 		Assert.Contains(
-			"if (15 -ne $files.Count)",
+			"if (17 -ne $files.Count)",
 			release
 		);
 		Assert.Contains(
-			"if (16 -ne $assets.Count)",
+			"if (18 -ne $assets.Count)",
 			release
 		);
 		Assert.Contains(

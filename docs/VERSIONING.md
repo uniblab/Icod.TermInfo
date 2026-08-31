@@ -61,6 +61,69 @@ semantic command projects remain non-packable. The router joins the coordinated
 registry package set without changing any reusable-library assembly identity or
 frozen public API baseline.
 
+Beginning with TC01 in the 1.6.0 development line, `Icod.TermInfo.Termcap` joins
+the coordinated reusable package family. It targets `net8.0`, `net9.0`, and
+`net10.0`, consumes the centralized suite version, retains assembly version
+`1.0.0.0`, and depends only on Runtime. Existing reusable packages do not acquire
+a Termcap dependency. Stable publication of the new package ID and its final API
+baseline are release-closure work for the 1.6 line.
+
+TC02 advances the coordinated development version to `1.6.0-Alpha-2` and adds
+public termcap capability-mapping and classification APIs only to
+`Icod.TermInfo.Termcap`. Runtime, Source, Compiler, and Inspection retain their
+frozen public API baselines. The Termcap public surface remains a development
+contract until the 1.6 release-closure freeze.
+
+TC03 advances the coordinated development version to `1.6.0-Alpha-3` and adds
+termcap-specific bounded `tc=` resolution, cancellation, provider lookup, and
+source-provenance APIs only to `Icod.TermInfo.Termcap`. The resolver does not add
+a Source dependency and does not alter any frozen Runtime, Source, Compiler, or
+Inspection public API baseline.
+
+TC04 advances the coordinated development version to `1.6.0-Alpha-4` and adds
+resolved-termcap semantic conversion APIs only to `Icod.TermInfo.Termcap`. The
+converter materializes the existing Runtime `TerminalDescription` model directly,
+preserves representable unmapped fields through Runtime extended capabilities,
+and does not add a Source dependency or alter any frozen Runtime, Source,
+Compiler, or Inspection public API baseline.
+
+TC05 advances the coordinated development version to `1.6.0-Alpha-5` and adds
+Runtime-to-termcap representability and deterministic reverse-rendering APIs only
+to `Icod.TermInfo.Termcap`. The renderer consumes the existing Runtime model and
+TC02 mapping metadata directly, does not add a Source dependency, performs no
+environment or filesystem acquisition, and does not alter any frozen Runtime,
+Source, Compiler, or Inspection public API baseline.
+
+TC06 advances the coordinated development version to `1.6.0-Alpha-6` and adds
+explicit opt-in termcap acquisition APIs only to `Icod.TermInfo.Termcap`.
+Environment and filesystem access are isolated behind caller-selected provider
+seams, and acquisition composes the existing Termcap parser, resolver, and
+converter without joining Runtime terminal discovery. The Termcap package still
+depends only on Runtime, and no frozen Runtime, Source, Compiler, or Inspection
+public API baseline changes.
+
+TC07 advances the coordinated development version to `1.6.0-Alpha-7` and adds
+the non-packable `captoinfo` and `infotocap` command projects. They consume the
+central suite version and are distributed both as standalone archive launchers
+and as routes of the single `Icod.TermInfo.Tools` command. TC07 adds no reusable
+Termcap public API: `captoinfo` composes Termcap with Inspection, `infotocap`
+composes Source with Termcap, and `Icod.TermInfo.Termcap` itself continues to
+depend only on Runtime. The existing `tic`, `infocmp`, and `toe` command
+semantics remain frozen.
+
+TC08 advances the coordinated development version to `1.6.0-Alpha-8` without
+adding reusable API or command semantics. It freezes the active Termcap public
+surface, adds checked-in differential and bounded hostile-input/mutation
+validation, requires structural verification of the packed Termcap artifact,
+and executes an isolated package-reference-only Termcap consumer on `net8.0`,
+`net9.0`, and `net10.0`. The Runtime-only Termcap dependency and the TC07
+command/router/archive topology are frozen for 1.6 release closure.
+
+Stable 1.6.0 promotes that frozen Alpha-8 surface without further public API or
+command-semantic changes. Runtime, Source, Termcap, Compiler, Inspection, all
+five standalone commands, and `Icod.TermInfo.Tools` consume the centralized
+`1.6.0` suite version while the five reusable assemblies retain `1.0.0.0`.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:
@@ -81,13 +144,17 @@ Strong-name signed no
 AssemblyName       Icod.TermInfo.Inspection
 AssemblyVersion    1.0.0.0
 Strong-name signed no
+
+AssemblyName       Icod.TermInfo.Termcap
+AssemblyVersion    1.0.0.0
+Strong-name signed no
 ```
 
 Package patch/minor versions do not advance `AssemblyVersion`.
 
 This is deliberate. Advancing `AssemblyVersion` for a compatible package-minor
 release would create a new binary assembly identity and would weaken the 1.x
-binding contract without providing a semantic-versioning benefit. All four coordinated
+binding contract without providing a semantic-versioning benefit. All five reusable
 assemblies remain unsigned throughout 1.x. Adding a strong name changes assembly
 identity and is treated as a major-version design decision unless a future
 compatibility review demonstrates a safe migration.
@@ -119,6 +186,14 @@ The reviewed baseline was frozen at the 1.4.0 release and remains byte-for-byte
 unchanged through 1.5.0. The 1.5 distribution/versioning changes add no reusable
 library API. Any later public Inspection surface change requires a new compatible
 minor-release API review rather than changing this historical baseline.
+
+`docs/1.6.0-TERMCAP-PUBLIC-API-BASELINE.txt` is the frozen Termcap public
+surface established by TC08. The validated Alpha-7 `PublicApiSnapshot/v1` rich
+reflection manifest has SHA-256 `1e24b8a555b506594c58cf58d03bf87b2b60192f6316537cb4200498c6a92ab0`; release verification requires that
+exact fingerprint and net8/net9/net10 equivalence. The same file also records the
+241 sorted packaged XML documentation member IDs as a human-reviewable inventory.
+The baseline must not be regenerated merely to accept an unintended public
+Termcap change.
 
 The baselines record exported types, public/protected members, enum numeric
 values, parameter names/order/defaults, ref/out/in/params shape, generic
@@ -157,10 +232,15 @@ on Compiler, and Runtime, Source, and Compiler SHALL NOT acquire a dependency on
 Inspection. Inspection tests may reference Compiler for differential evidence
 without changing the production package graph.
 
+Beginning with TC01, `Icod.TermInfo.Termcap` depends directly and exclusively on
+the matching `Icod.TermInfo` package. Runtime, Source, Compiler, and Inspection
+SHALL NOT acquire a Termcap dependency. TC08 freezes that Runtime-only package
+graph for the 1.6 release.
+
 Beginning with T01, command projects may depend on `Icod.CommandFramework` and
-on the appropriate TermInfo libraries. Runtime, Source, Compiler, and Inspection
-SHALL NOT acquire an `Icod.CommandFramework` or command-project dependency. No
-command project SHALL depend on another command project.
+on the appropriate TermInfo libraries. Runtime, Source, Compiler, Inspection, and
+Termcap SHALL NOT acquire an `Icod.CommandFramework` or command-project
+dependency. No command project SHALL depend on another command project.
 
 See `COMPATIBILITY.md` for target-framework, platform, behavioral, and feature-
 boundary promises.

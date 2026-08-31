@@ -7,7 +7,7 @@ namespace Icod.TermInfo.Tests;
 
 public sealed class T45CompletionGateTests {
 	[Fact]
-	public void AssemblyRetainsStableIdentityForOneFiveDevelopment() {
+	public void AssemblyRetainsStableIdentityForOneSixRelease() {
 		Assembly assembly =
 			typeof( TerminalDescription ).Assembly;
 		AssemblyName assemblyName =
@@ -30,12 +30,12 @@ public sealed class T45CompletionGateTests {
 					2 )[ 0 ];
 
 		Assert.Equal(
-			"1.5.0",
+			"1.6.0",
 			semanticVersion );
 	}
 
 	[Fact]
-	public void ProjectMetadataIdentifiesOneFiveDevelopmentAndStableAssembly() {
+	public void ProjectMetadataIdentifiesOneSixReleaseAndStableAssembly() {
 		string root =
 			FindRepositoryRoot();
 		XDocument project =
@@ -52,7 +52,7 @@ public sealed class T45CompletionGateTests {
 				LoadOptions.None );
 
 		Assert.Equal(
-			"1.5.0",
+			"1.6.0",
 			ReadRequiredProperty(
 				buildProperties,
 				"IcodTermInfoSuiteVersion" ) );
@@ -89,25 +89,25 @@ public sealed class T45CompletionGateTests {
 					"README.md" ) );
 
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo --version 1.5.0",
+			"dotnet add package Icod.TermInfo --version 1.6.0",
 			readme );
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo.Source --version 1.5.0",
+			"dotnet add package Icod.TermInfo.Source --version 1.6.0",
 			readme );
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo.Compiler --version 1.5.0",
+			"dotnet add package Icod.TermInfo.Termcap --version 1.6.0",
 			readme );
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo.Inspection --version 1.5.0",
+			"dotnet add package Icod.TermInfo.Compiler --version 1.6.0",
 			readme );
 		Assert.Contains(
-			"dotnet tool install --global Icod.TermInfo.Tools --version 1.5.0",
+			"dotnet add package Icod.TermInfo.Inspection --version 1.6.0",
+			readme );
+		Assert.Contains(
+			"dotnet tool install --global Icod.TermInfo.Tools --version 1.6.0",
 			readme );
 		Assert.DoesNotContain(
-			"1.4.0-Alpha-11",
-			readme );
-		Assert.DoesNotContain(
-			"1.4.1-Alpha",
+			"1.6.0-Alpha-8 is the current",
 			readme );
 		Assert.Contains(
 			"docs/VERSIONING.md",
@@ -116,7 +116,7 @@ public sealed class T45CompletionGateTests {
 			"docs/COMPATIBILITY.md",
 			readme );
 		Assert.Contains(
-			"docs/1.5.0-RELEASE-AUDIT.md",
+			"docs/1.6.0-RELEASE-AUDIT.md",
 			readme );
 	}
 
@@ -124,6 +124,20 @@ public sealed class T45CompletionGateTests {
 	public void ReleaseVerifierRetainsAllFinalCompatibilityGates() {
 		string root =
 			FindRepositoryRoot();
+		string termcapPackageVerifier =
+			File.ReadAllText(
+				Path.Combine(
+					root,
+					"tools",
+					"termcap-package-verifier",
+					"Program.cs" ) );
+
+		Assert.Contains(
+			"docs/1.6.0-TERMCAP-PUBLIC-API-BASELINE.txt",
+			termcapPackageVerifier );
+		Assert.Contains(
+			"TERMCAP-API-DOC-ID-SNAPSHOT-V1",
+			termcapPackageVerifier );
 
 		foreach (
 			string relativePath
@@ -168,6 +182,14 @@ public sealed class T45CompletionGateTests {
 			Assert.Contains(
 				"1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt",
 				verifier );
+			Assert.True(
+				verifier.Contains(
+					"termcap-package-verifier",
+					StringComparison.OrdinalIgnoreCase ) );
+			Assert.True(
+				verifier.Contains(
+					"termcap-package-smoke",
+					StringComparison.OrdinalIgnoreCase ) );
 			Assert.True(
 				verifier.Contains(
 					"package-smoke",
