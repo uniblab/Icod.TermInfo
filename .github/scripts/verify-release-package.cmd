@@ -56,6 +56,13 @@ dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.c
 if errorlevel 1 goto fail
 
 echo.
+echo === Verify Icod.TermInfo.Termcap net8.0/net9.0/net10.0 API equivalence (%CONFIGURATION%) ===
+dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c %CONFIGURATION% --no-build -- --compare Icod.TermInfo.Termcap\bin\%CONFIGURATION%\net8.0\Icod.TermInfo.Termcap.dll Icod.TermInfo.Termcap\bin\%CONFIGURATION%\net9.0\Icod.TermInfo.Termcap.dll
+if errorlevel 1 goto fail
+dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c %CONFIGURATION% --no-build -- --compare Icod.TermInfo.Termcap\bin\%CONFIGURATION%\net8.0\Icod.TermInfo.Termcap.dll Icod.TermInfo.Termcap\bin\%CONFIGURATION%\net10.0\Icod.TermInfo.Termcap.dll
+if errorlevel 1 goto fail
+
+echo.
 echo === Verify Icod.TermInfo.Compiler net8.0/net9.0/net10.0 API equivalence (%CONFIGURATION%) ===
 dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c %CONFIGURATION% --no-build -- --compare Icod.TermInfo.Compiler\bin\%CONFIGURATION%\net8.0\Icod.TermInfo.Compiler.dll Icod.TermInfo.Compiler\bin\%CONFIGURATION%\net9.0\Icod.TermInfo.Compiler.dll
 if errorlevel 1 goto fail
@@ -134,6 +141,25 @@ if not exist "%ARTIFACT_DIR%\Icod.TermInfo.Compiler.%COMPILER_PACKAGE_VERSION%.n
 )
 if not exist "%ARTIFACT_DIR%\Icod.TermInfo.Compiler.%COMPILER_PACKAGE_VERSION%.snupkg" (
     echo Icod.TermInfo.Compiler symbol package not found. 1>&2
+    goto fail
+)
+
+set "TERMCAP_PACKAGE_VERSION="
+for /f "delims=" %%V in ('dotnet msbuild Icod.TermInfo.Termcap\Icod.TermInfo.Termcap.csproj -nologo -getProperty:PackageVersion') do set "TERMCAP_PACKAGE_VERSION=%%V"
+if not defined TERMCAP_PACKAGE_VERSION (
+    echo Unable to determine Icod.TermInfo.Termcap PackageVersion. 1>&2
+    goto fail
+)
+if not "%TERMCAP_PACKAGE_VERSION%"=="%PACKAGE_VERSION%" (
+    echo Icod.TermInfo and Icod.TermInfo.Termcap PackageVersion values must match. 1>&2
+    goto fail
+)
+if not exist "%ARTIFACT_DIR%\Icod.TermInfo.Termcap.%TERMCAP_PACKAGE_VERSION%.nupkg" (
+    echo Icod.TermInfo.Termcap package not found. 1>&2
+    goto fail
+)
+if not exist "%ARTIFACT_DIR%\Icod.TermInfo.Termcap.%TERMCAP_PACKAGE_VERSION%.snupkg" (
+    echo Icod.TermInfo.Termcap symbol package not found. 1>&2
     goto fail
 )
 

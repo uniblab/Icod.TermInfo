@@ -48,6 +48,23 @@ dotnet run   --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot
 dotnet run   --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj   -c "${configuration}"   --no-build   -- --compare   Icod.TermInfo.Source/bin/${configuration}/net8.0/Icod.TermInfo.Source.dll   Icod.TermInfo.Source/bin/${configuration}/net9.0/Icod.TermInfo.Source.dll
 dotnet run   --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj   -c "${configuration}"   --no-build   -- --compare   Icod.TermInfo.Source/bin/${configuration}/net8.0/Icod.TermInfo.Source.dll   Icod.TermInfo.Source/bin/${configuration}/net10.0/Icod.TermInfo.Source.dll
 
+# The developing Termcap package must expose the same API on all shipped frameworks.
+# Its final public API baseline is frozen at TC08 rather than during TC07.
+dotnet run \
+  --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj \
+  -c "${configuration}" \
+  --no-build \
+  -- --compare \
+  Icod.TermInfo.Termcap/bin/${configuration}/net8.0/Icod.TermInfo.Termcap.dll \
+  Icod.TermInfo.Termcap/bin/${configuration}/net9.0/Icod.TermInfo.Termcap.dll
+dotnet run \
+  --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj \
+  -c "${configuration}" \
+  --no-build \
+  -- --compare \
+  Icod.TermInfo.Termcap/bin/${configuration}/net8.0/Icod.TermInfo.Termcap.dll \
+  Icod.TermInfo.Termcap/bin/${configuration}/net10.0/Icod.TermInfo.Termcap.dll
+
 # The first Source public surface is reviewed and frozen independently.
 dotnet run \
   --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj \
@@ -152,6 +169,32 @@ fi
 
 if [[ ! -f "${artifact_dir}/Icod.TermInfo.Source.${source_package_version}.snupkg" ]]; then
   echo "Icod.TermInfo.Source symbol package not found." >&2
+  exit 1
+fi
+
+termcap_package_version="$(
+  dotnet msbuild Icod.TermInfo.Termcap/Icod.TermInfo.Termcap.csproj \
+    -nologo \
+    -getProperty:PackageVersion
+)"
+
+if [[ -z "${termcap_package_version}" ]]; then
+  echo "Unable to determine Icod.TermInfo.Termcap PackageVersion." >&2
+  exit 1
+fi
+
+if [[ "${termcap_package_version}" != "${package_version}" ]]; then
+  echo "Icod.TermInfo and Icod.TermInfo.Termcap PackageVersion values must match." >&2
+  exit 1
+fi
+
+if [[ ! -f "${artifact_dir}/Icod.TermInfo.Termcap.${termcap_package_version}.nupkg" ]]; then
+  echo "Icod.TermInfo.Termcap package not found." >&2
+  exit 1
+fi
+
+if [[ ! -f "${artifact_dir}/Icod.TermInfo.Termcap.${termcap_package_version}.snupkg" ]]; then
+  echo "Icod.TermInfo.Termcap symbol package not found." >&2
   exit 1
 fi
 

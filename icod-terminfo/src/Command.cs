@@ -1,5 +1,7 @@
 using System.Reflection;
 using System.Text;
+using CapToInfoCommand = Icod.TermInfo.CapToInfo.Command;
+using InfoToCapCommand = Icod.TermInfo.InfoToCap.Command;
 using InfoCmpCommand = Icod.TermInfo.InfoCmp.Command;
 using TicCommand = Icod.TermInfo.Tic.Command;
 using ToeCommand = Icod.TermInfo.Toe.Command;
@@ -111,6 +113,22 @@ public static class Command {
 						stderr,
 						cancellationToken
 					).ConfigureAwait( false );
+				case "captoinfo":
+					return await CapToInfoCommand.RunAsync(
+						commandArguments,
+						stdin,
+						stdout,
+						stderr,
+						cancellationToken
+					).ConfigureAwait( false );
+				case "infotocap":
+					return await InfoToCapCommand.RunAsync(
+						commandArguments,
+						stdin,
+						stdout,
+						stderr,
+						cancellationToken
+					).ConfigureAwait( false );
 				default:
 					throw new InvalidOperationException(
 						"Known command dispatch was incomplete."
@@ -129,7 +147,9 @@ public static class Command {
 		return commandName is
 			"tic"
 			or "infocmp"
-			or "toe";
+			or "toe"
+			or "captoinfo"
+			or "infotocap";
 	}
 
 	private static string[] CopyCommandArguments(
@@ -153,6 +173,8 @@ public static class Command {
 			+ $" tic       validate and publish terminfo source{Environment.NewLine}"
 			+ $" infocmp   render and semantically compare terminal descriptions{Environment.NewLine}"
 			+ $" toe       enumerate databases and analyze use= dependencies{Environment.NewLine}"
+			+ $" captoinfo convert termcap descriptions to effective terminfo source{Environment.NewLine}"
+			+ $" infotocap convert effective terminfo source to termcap descriptions{Environment.NewLine}"
 			+ Environment.NewLine
 			+ $"Router options:{Environment.NewLine}"
 			+ $" -h, --help       display this help and exit{Environment.NewLine}"

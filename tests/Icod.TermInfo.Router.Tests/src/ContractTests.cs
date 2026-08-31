@@ -18,7 +18,7 @@ public sealed class ContractTests {
 				"Directory.Build.props"
 			);
 		Assert.Equal(
-			"1.6.0-Alpha-6",
+			"1.6.0-Alpha-7",
 			ReadRequiredProperty(
 				buildProperties,
 				"IcodTermInfoSuiteVersion"
@@ -60,6 +60,8 @@ public sealed class ContractTests {
 				"tic/Icod.TermInfo.Tic.csproj",
 				"infocmp/Icod.TermInfo.InfoCmp.csproj",
 				"toe/Icod.TermInfo.Toe.csproj",
+				"captoinfo/Icod.TermInfo.CapToInfo.csproj",
+				"infotocap/Icod.TermInfo.InfoToCap.csproj",
 			}
 		) {
 			XDocument project =
@@ -142,7 +144,9 @@ public sealed class ContractTests {
 				.ToArray();
 		Assert.Equal(
 			new string[] {
+				@"..\captoinfo\Icod.TermInfo.CapToInfo.csproj",
 				@"..\infocmp\Icod.TermInfo.InfoCmp.csproj",
+				@"..\infotocap\Icod.TermInfo.InfoToCap.csproj",
 				@"..\tic\Icod.TermInfo.Tic.csproj",
 				@"..\toe\Icod.TermInfo.Toe.csproj",
 			},

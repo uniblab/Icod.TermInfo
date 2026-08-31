@@ -102,6 +102,15 @@ converter without joining Runtime terminal discovery. The Termcap package still
 depends only on Runtime, and no frozen Runtime, Source, Compiler, or Inspection
 public API baseline changes.
 
+TC07 advances the coordinated development version to `1.6.0-Alpha-7` and adds
+the non-packable `captoinfo` and `infotocap` command projects. They consume the
+central suite version and are distributed both as standalone archive launchers
+and as routes of the single `Icod.TermInfo.Tools` command. TC07 adds no reusable
+Termcap public API: `captoinfo` composes Termcap with Inspection, `infotocap`
+composes Source with Termcap, and `Icod.TermInfo.Termcap` itself continues to
+depend only on Runtime. The existing `tic`, `infocmp`, and `toe` command
+semantics remain frozen.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:

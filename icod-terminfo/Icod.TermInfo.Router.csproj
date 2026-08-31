@@ -20,7 +20,7 @@
 		<PackageId>Icod.TermInfo.Tools</PackageId>
 		<Title>Icod.TermInfo Tools</Title>
 		<Authors>Timothy J. Bruce</Authors>
-		<Description>Installable .NET tool router for the managed Icod.TermInfo tic, infocmp, and toe commands.</Description>
+		<Description>Installable .NET tool router for the managed Icod.TermInfo tic, infocmp, toe, captoinfo, and infotocap commands.</Description>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>
@@ -29,8 +29,8 @@
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-		<PackageReleaseNotes>The 1.6.0 development line coordinates the distribution-only icod-terminfo router with termcap interoperability without adding termcap commands or changing the frozen tic, infocmp, or toe command semantics.</PackageReleaseNotes>
-		<PackageTags>terminfo;libtinfo;tic;infocmp;toe;terminal;tool;dotnet;csharp;icod</PackageTags>
+		<PackageReleaseNotes>1.6.0-Alpha-7 adds routed captoinfo and infotocap conversion commands to the coordinated tool distribution while preserving the frozen tic, infocmp, and toe command semantics and keeping the reusable Termcap package dependency graph unchanged.</PackageReleaseNotes>
+		<PackageTags>terminfo;termcap;libtinfo;tic;infocmp;toe;captoinfo;infotocap;terminal;tool;dotnet;csharp;icod</PackageTags>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(PlatformTarget)' == '' ">
@@ -41,6 +41,8 @@
 		<ProjectReference Include="..\tic\Icod.TermInfo.Tic.csproj" />
 		<ProjectReference Include="..\infocmp\Icod.TermInfo.InfoCmp.csproj" />
 		<ProjectReference Include="..\toe\Icod.TermInfo.Toe.csproj" />
+		<ProjectReference Include="..\captoinfo\Icod.TermInfo.CapToInfo.csproj" />
+		<ProjectReference Include="..\infotocap\Icod.TermInfo.InfoToCap.csproj" />
 	</ItemGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">

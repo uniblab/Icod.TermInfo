@@ -2,9 +2,9 @@
 
 **Development line:** `1.6.0`
 **Initial development version:** `1.6.0-Alpha-1`
-**Current development version:** `1.6.0-Alpha-6`
+**Current development version:** `1.6.0-Alpha-7`
 **Stable assembly version:** `1.0.0.0`
-**Status:** Implementation in progress — TC06 explicit termcap acquisition
+**Status:** Implementation in progress — TC07 conversion tools and coordinated distribution
 **Primary change:** Add explicit termcap parsing, semantic mapping, conversion, acquisition, and tools without changing the frozen Runtime, Source, Compiler, or Inspection contracts.
 
 ---
@@ -562,33 +562,52 @@ behavior or dependency graph of existing Runtime terminal discovery.
 
 **Development version:** `1.6.0-Alpha-7`
 
-TC07 exposes managed command functionality equivalent in purpose to:
+TC07 selects two standalone `net10.0` command projects, both routed by
+`icod-terminfo`:
 
 ```text
 captoinfo
 infotocap
 ```
 
-The preferred command design SHALL reuse the parser/resolver/conversion/rendering
-engines rather than duplicate them in console projects.
+The commands SHALL remain composition layers. `captoinfo` SHALL use TC01 parsing,
+TC03 `tc=` resolution, TC04 conversion to `TerminalDescription`, and Inspection's
+existing effective-source renderer. `infotocap` SHALL use the frozen terminfo
+Source parser/resolver/materializer and TC05 reverse renderer. Neither command
+SHALL introduce another capability mapping table or another semantic model.
 
-At this tranche, review whether the commands should be:
+The standalone commands SHALL consume the centralized suite version, remain
+non-packable, and SHALL NOT depend on another command project. The reusable
+`Icod.TermInfo.Termcap` package SHALL continue to depend only on Runtime;
+Source/Inspection dependencies belong to the command composition projects.
 
-- new standalone command projects routed by `icod-terminfo`;
-- explicit modes of an existing inspection command; or
-- both, if compatibility and distribution value justify both surfaces.
+Both commands SHALL support deterministic width selection, help/version output,
+`--`, explicit `-` standard input, caller-owned streams, and cancellation.
+`captoinfo` MAY additionally use the historical no-file convention by reading
+`TERM` at command level and explicitly composing the TC06 `TERMCAP` / `TERMPATH`
+acquisition policy. This SHALL NOT change Runtime `TERMINFO` discovery.
 
-Whichever command topology is chosen, update:
+Conversion output SHALL be effective resolved state. The commands SHALL document
+that comments, original whitespace, cancellation/disabled syntax, and original
+`tc=` / `use=` ancestry are not reconstructed. Conversion loss and termcap
+representability failures SHALL be reported instead of silently hidden.
 
-- router dispatch and tests;
-- standalone archive construction and smoke tests;
-- tool-package structure checks;
-- release artifact accounting;
-- README/install documentation.
+TC07 distribution SHALL:
+
+- route both commands through `icod-terminfo`;
+- add both standalone launchers to all six RID archives;
+- add command documentation and `Icod.TermInfo.Termcap.dll` to archive checks;
+- include both command assemblies and Termcap in tool-package structure checks;
+- execute both directions in standalone-archive and installed-router smoke tests;
+- account for the Termcap `.nupkg` / `.snupkg` in the tag-release workflow;
+- retain exactly one NuGet tool command name, `icod-terminfo`.
 
 **Gate TC07:** both conversion directions execute through packaged command
 surfaces on Windows, Linux, and macOS without changing frozen `tic`, `infocmp`,
 or `toe` behavior.
+
+**Implementation record:**
+[`docs/1.6.0-TC07-CONVERSION-TOOLS-AND-DISTRIBUTION.md`](docs/1.6.0-TC07-CONVERSION-TOOLS-AND-DISTRIBUTION.md)
 
 ---
 
@@ -619,9 +638,8 @@ freeze its active 1.6 baseline. Package-reference-only consumers and structural
 package verification SHALL cover all supported target frameworks.
 
 Before stable publication, trusted publishing SHALL authorize the new
-`Icod.TermInfo.Termcap` package ID. Release workflow package counts and GitHub
-Release asset accounting SHALL be updated for the additional `.nupkg` and
-`.snupkg`.
+`Icod.TermInfo.Termcap` package ID. TC08 SHALL re-verify the Termcap package and
+GitHub Release artifact accounting introduced by TC07 before the final tag.
 
 **1.6 completion gate:** common conventional termcap databases can be parsed,
 resolved, converted into the canonical Runtime model, rendered back where

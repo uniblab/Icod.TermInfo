@@ -3,16 +3,16 @@
 `Icod.TermInfo.Termcap` is the optional termcap interoperability layer for the
 Icod.TermInfo package family.
 
-The `1.6.0-Alpha-6` TC06 tranche retains the TC01 parser, TC02 capability
-classifier, TC03 inheritance resolver, TC04 semantic converter, and TC05 reverse
-renderer, and adds explicit opt-in termcap acquisition. It can read
-caller-selected inline `TERMCAP`, database paths, ordered `TERMPATH` sources, and an
-explicit conventional default path policy without joining Runtime discovery.
-Conversion commands remain TC07.
+The `1.6.0-Alpha-7` TC07 tranche retains the TC01 parser, TC02 capability
+classifier, TC03 inheritance resolver, TC04 semantic converter, TC05 reverse
+renderer, and TC06 explicit acquisition APIs, and composes them into managed
+`captoinfo` and `infotocap` commands. Both commands are available as standalone
+archive launchers and through the `icod-terminfo` router.
 
-The package targets `net8.0`, `net9.0`, and `net10.0` and depends only on
-`Icod.TermInfo`. Existing Runtime, Source, Compiler, and Inspection package APIs
-remain unchanged.
+The package itself still targets `net8.0`, `net9.0`, and `net10.0` and depends
+only on `Icod.TermInfo`. Command-only dependencies on Source or Inspection live
+in the executable projects, so existing Runtime, Source, Compiler, Inspection,
+and Termcap package dependency boundaries remain unchanged.
 
 ## Parsing and classification
 
@@ -185,7 +185,40 @@ process-environment access occurs only through an `ITermcapEnvironmentProvider`.
 This keeps ordinary tests deterministic and leaves existing Runtime discovery
 unchanged.
 
-`captoinfo`, `infotocap`, and router integration remain TC07.
+## Conversion commands
+
+TC07 adds two `net10.0` command composition projects without moving command
+policy into this reusable package:
+
+```text
+captoinfo [OPTION]... [FILE]...
+infotocap [OPTION]... FILE...
+```
+
+`captoinfo` composes the termcap parser/resolver/converter with Inspection's
+effective terminfo source renderer. `infotocap` composes the existing terminfo
+Source parser/resolver with `TermcapRenderer`. Both support `-w WIDTH`, help,
+version reporting, `--`, and `-` for standard input.
+
+With no file operand, `captoinfo` uses command-level `TERM` plus an explicit
+TC06 snapshot of `TERMCAP`, `TERMPATH`, and `HOME` with the ncurses default path
+policy. This does not join or replace Runtime `TERMINFO` discovery.
+
+Both commands emit effective resolved state. They do not reconstruct comments,
+source formatting, cancellations/disabled fields, or `tc=` / `use=` ancestry.
+Representational loss and incompatibility remain visible through diagnostics;
+`infotocap` does not emit a silently lossy substitute when TC05 preflight fails.
+
+The installable NuGet tool continues to expose only the unambiguous
+`icod-terminfo` launcher:
+
+```text
+icod-terminfo captoinfo ...
+icod-terminfo infotocap ...
+```
+
+Standalone release archives expose `captoinfo` and `infotocap` directly beside
+`tic`, `infocmp`, and `toe`.
 
 ## Resource limits
 

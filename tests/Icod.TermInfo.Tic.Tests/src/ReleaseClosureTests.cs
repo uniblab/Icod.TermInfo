@@ -5,7 +5,7 @@ namespace Icod.TermInfo.Tic.Tests;
 
 public sealed class ReleaseClosureTests {
 	private const string StableReleaseVersion = "1.5.0";
-	private const string DevelopmentVersion = "1.6.0-Alpha-6";
+	private const string DevelopmentVersion = "1.6.0-Alpha-7";
 	private const string VersionReference = "$(IcodTermInfoSuiteVersion)";
 	private const string StableAssemblyVersion = "1.0.0.0";
 
@@ -53,6 +53,8 @@ public sealed class ReleaseClosureTests {
 				"tic/Icod.TermInfo.Tic.csproj",
 				"infocmp/Icod.TermInfo.InfoCmp.csproj",
 				"toe/Icod.TermInfo.Toe.csproj",
+				"captoinfo/Icod.TermInfo.CapToInfo.csproj",
+				"infotocap/Icod.TermInfo.InfoToCap.csproj",
 			}
 		) {
 			XDocument project = LoadProject( root, relativePath );
@@ -111,6 +113,8 @@ public sealed class ReleaseClosureTests {
 				"tic",
 				"infocmp",
 				"toe",
+				"captoinfo",
+				"infotocap",
 				"release-smoke",
 			}
 		) {

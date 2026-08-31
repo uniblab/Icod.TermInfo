@@ -18,6 +18,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Icod.TermInfo.InfoCmp", "in
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Icod.TermInfo.Toe", "toe\Icod.TermInfo.Toe.csproj", "{BA64B5B1-9F54-5E34-9557-19E0EB84DA3B}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Icod.TermInfo.CapToInfo", "captoinfo\Icod.TermInfo.CapToInfo.csproj", "{6F0F4046-7D1D-46B3-8C5D-2CE3D1B85C07}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Icod.TermInfo.InfoToCap", "infotocap\Icod.TermInfo.InfoToCap.csproj", "{B51EEA4A-2081-4B82-A80F-8D91E0E5F707}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Icod.TermInfo.Router", "icod-terminfo\Icod.TermInfo.Router.csproj", "{7A736D8C-77CE-47DD-92AE-91EF6402E3B8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{B55F5A14-2D39-4D4C-AEAC-916B6A25F23E}"
@@ -197,6 +201,18 @@ Global
 		{BA64B5B1-9F54-5E34-9557-19E0EB84DA3B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BA64B5B1-9F54-5E34-9557-19E0EB84DA3B}.Staging|Any CPU.ActiveCfg = Staging|Any CPU
 		{BA64B5B1-9F54-5E34-9557-19E0EB84DA3B}.Staging|Any CPU.Build.0 = Staging|Any CPU
+		{6F0F4046-7D1D-46B3-8C5D-2CE3D1B85C07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F0F4046-7D1D-46B3-8C5D-2CE3D1B85C07}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F0F4046-7D1D-46B3-8C5D-2CE3D1B85C07}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F0F4046-7D1D-46B3-8C5D-2CE3D1B85C07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F0F4046-7D1D-46B3-8C5D-2CE3D1B85C07}.Staging|Any CPU.ActiveCfg = Staging|Any CPU
+		{6F0F4046-7D1D-46B3-8C5D-2CE3D1B85C07}.Staging|Any CPU.Build.0 = Staging|Any CPU
+		{B51EEA4A-2081-4B82-A80F-8D91E0E5F707}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B51EEA4A-2081-4B82-A80F-8D91E0E5F707}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B51EEA4A-2081-4B82-A80F-8D91E0E5F707}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B51EEA4A-2081-4B82-A80F-8D91E0E5F707}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B51EEA4A-2081-4B82-A80F-8D91E0E5F707}.Staging|Any CPU.ActiveCfg = Staging|Any CPU
+		{B51EEA4A-2081-4B82-A80F-8D91E0E5F707}.Staging|Any CPU.Build.0 = Staging|Any CPU
 		{359885AD-D3AD-5A28-A3B8-98CF04811374}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{359885AD-D3AD-5A28-A3B8-98CF04811374}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{359885AD-D3AD-5A28-A3B8-98CF04811374}.Release|Any CPU.ActiveCfg = Release|Any CPU

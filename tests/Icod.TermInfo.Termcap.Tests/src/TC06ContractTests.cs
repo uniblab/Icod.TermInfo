@@ -11,22 +11,32 @@ public sealed class TC06ContractTests
 	private const string Tc06DevelopmentVersion = "1.6.0-Alpha-6";
 
 	[Fact]
-	public void CoordinatedDevelopmentVersionAdvancesToTc06() {
+	public void Tc06VersionAndCentralVersionWiringRemainRecorded() {
 		string root = FindRepositoryRoot();
-		XDocument buildProperties =
+		XDocument termcapProject =
 			XDocument.Load(
 				Path.Combine(
 					root,
-					"Directory.Build.props"
+					"Icod.TermInfo.Termcap",
+					"Icod.TermInfo.Termcap.csproj"
 				),
 				LoadOptions.None
 			);
+		string implementation =
+			File.ReadAllText(
+				Path.Combine(
+					root,
+					"docs",
+					"1.6.0-TC06-EXPLICIT-TERMCAP-ACQUISITION.md"
+				)
+			);
 
+		Assert.Contains( Tc06DevelopmentVersion, implementation );
 		Assert.Equal(
-			Tc06DevelopmentVersion,
+			"$(IcodTermInfoSuiteVersion)",
 			ReadRequiredProperty(
-				buildProperties,
-				"IcodTermInfoSuiteVersion"
+				termcapProject,
+				"Version"
 			)
 		);
 	}

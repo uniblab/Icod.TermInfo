@@ -2,8 +2,9 @@
 
 This document defines the supported 1.x compatibility boundary for
 `Icod.TermInfo`, the optional `Icod.TermInfo.Source` and
-`Icod.TermInfo.Compiler` packages, and, beginning with 1.3, the optional
-`Icod.TermInfo.Inspection` package.
+`Icod.TermInfo.Compiler` packages, beginning with 1.3 the optional
+`Icod.TermInfo.Inspection` package, and beginning with 1.6 the optional
+`Icod.TermInfo.Termcap` package.
 
 ## Supported target frameworks
 
@@ -29,8 +30,9 @@ in that release.
 
 Beginning with T01 in 1.4, the `tic`, `infocmp`, and `toe` command layer targets
 `net10.0`. Beginning with 1.5, the `icod-terminfo` router also targets `net10.0`.
-These command-host choices do not remove `net8.0` or `net9.0` from any reusable
-TermInfo library package.
+TC07 in 1.6 adds `captoinfo` and `infotocap` as additional `net10.0` command
+projects. These command-host choices do not remove `net8.0` or `net9.0` from any
+reusable TermInfo library package.
 
 Dropping a supported target framework is considered a breaking support-contract
 change and normally requires a new major version.
@@ -86,7 +88,7 @@ Within 1.x:
 - behavior changes must preserve documented semantic contracts unless they
   correct an acknowledged defect.
 
-Runtime, Source, Compiler, and Inspection assemblies retain version `1.0.0.0`
+Runtime, Source, Compiler, Inspection, and Termcap assemblies retain version `1.0.0.0`
 and remain unsigned throughout 1.x.
 
 ## Runtime terminfo semantic compatibility
@@ -202,6 +204,29 @@ the configured Runtime parser size limit, preserves physical paths and parsed
 terminal identity, reports duplicate canonical identities deterministically, and
 retains malformed/I/O/link/placement issues instead of silently discarding them.
 Arbitrary recursion and hashed/Berkeley DB parsing remain outside the contract.
+
+## 1.6 termcap interoperability compatibility
+
+Beginning with TC01, `Icod.TermInfo.Termcap` is a fifth coordinated reusable
+package targeting `net8.0`, `net9.0`, and `net10.0`. It depends only on Runtime;
+no existing reusable package acquires a Termcap dependency.
+
+TC01-TC06 establish bounded conventional termcap parsing, Runtime-derived
+two-character capability classification, bounded `tc=` inheritance resolution,
+explicit semantic conversion to `TerminalDescription`, deterministic reverse
+representability/rendering, and opt-in `TERMCAP` / `TERMPATH` acquisition.
+Termcap acquisition remains separate from Runtime `TERMINFO` discovery.
+
+TC07 composes those engines into `net10.0` `captoinfo` and `infotocap` commands.
+Both commands emit effective resolved state rather than reconstructing source
+history. `captoinfo` composes Termcap with Inspection's effective terminfo source
+renderer; `infotocap` composes Source with the Termcap reverse renderer.
+Representational loss and incompatibility remain explicit diagnostics.
+
+The Termcap public API remains a development contract until TC08 performs the
+1.6 regret review and freezes the active baseline. Frozen Runtime, Source,
+Compiler, Inspection, `tic`, `infocmp`, and `toe` contracts are not reopened by
+TC07.
 
 ## T04 `tic` validation compatibility
 

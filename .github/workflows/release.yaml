@@ -65,6 +65,7 @@ jobs:
           $libraryProjects = @(
               @{ Name = 'Runtime'; Path = 'Icod.TermInfo.csproj' },
               @{ Name = 'Source'; Path = 'Icod.TermInfo.Source/Icod.TermInfo.Source.csproj' },
+              @{ Name = 'Termcap'; Path = 'Icod.TermInfo.Termcap/Icod.TermInfo.Termcap.csproj' },
               @{ Name = 'Compiler'; Path = 'Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj' },
               @{ Name = 'Inspection'; Path = 'Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj' }
           )
@@ -80,7 +81,9 @@ jobs:
           foreach ($commandPath in @(
               'tic/Icod.TermInfo.Tic.csproj',
               'infocmp/Icod.TermInfo.InfoCmp.csproj',
-              'toe/Icod.TermInfo.Toe.csproj'
+              'toe/Icod.TermInfo.Toe.csproj',
+              'captoinfo/Icod.TermInfo.CapToInfo.csproj',
+              'infotocap/Icod.TermInfo.InfoToCap.csproj'
           )) {
               [xml]$commandProject = Get-Content -LiteralPath $commandPath -Raw
               $commandVersionNode = $commandProject.SelectSingleNode('/Project/PropertyGroup/Version')
@@ -138,6 +141,7 @@ jobs:
         run: |
           dotnet pack Icod.TermInfo.csproj -c Release --no-build --output artifacts
           dotnet pack Icod.TermInfo.Source/Icod.TermInfo.Source.csproj -c Release --no-build --output artifacts
+          dotnet pack Icod.TermInfo.Termcap/Icod.TermInfo.Termcap.csproj -c Release --no-build --output artifacts
           dotnet pack Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj -c Release --no-build --output artifacts
           dotnet pack Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj -c Release --no-build --output artifacts
           dotnet pack icod-terminfo/Icod.TermInfo.Router.csproj -c Release --no-build --output artifacts
@@ -162,6 +166,8 @@ jobs:
             artifacts/Icod.TermInfo.${{ needs.metadata.outputs.version }}.snupkg
             artifacts/Icod.TermInfo.Source.${{ needs.metadata.outputs.version }}.nupkg
             artifacts/Icod.TermInfo.Source.${{ needs.metadata.outputs.version }}.snupkg
+            artifacts/Icod.TermInfo.Termcap.${{ needs.metadata.outputs.version }}.nupkg
+            artifacts/Icod.TermInfo.Termcap.${{ needs.metadata.outputs.version }}.snupkg
             artifacts/Icod.TermInfo.Compiler.${{ needs.metadata.outputs.version }}.nupkg
             artifacts/Icod.TermInfo.Compiler.${{ needs.metadata.outputs.version }}.snupkg
             artifacts/Icod.TermInfo.Inspection.${{ needs.metadata.outputs.version }}.nupkg
@@ -274,6 +280,7 @@ jobs:
           $packages = @(
               "artifacts/package/Icod.TermInfo.$version.nupkg",
               "artifacts/package/Icod.TermInfo.Source.$version.nupkg",
+              "artifacts/package/Icod.TermInfo.Termcap.$version.nupkg",
               "artifacts/package/Icod.TermInfo.Compiler.$version.nupkg",
               "artifacts/package/Icod.TermInfo.Inspection.$version.nupkg",
               "artifacts/package/Icod.TermInfo.Tools.$version.nupkg"
@@ -330,6 +337,7 @@ jobs:
           $packages = @(
               "artifacts/package/Icod.TermInfo.$version.nupkg",
               "artifacts/package/Icod.TermInfo.Source.$version.nupkg",
+              "artifacts/package/Icod.TermInfo.Termcap.$version.nupkg",
               "artifacts/package/Icod.TermInfo.Compiler.$version.nupkg",
               "artifacts/package/Icod.TermInfo.Inspection.$version.nupkg",
               "artifacts/package/Icod.TermInfo.Tools.$version.nupkg"
@@ -374,8 +382,8 @@ jobs:
                   Where-Object { $_.Extension -in @('.nupkg', '.snupkg', '.zip', '.gz') } |
                   Sort-Object Name
           )
-          if (15 -ne $files.Count) {
-              throw "Expected nine package artifacts and six tool archives before checksumming; found $($files.Count)."
+          if (17 -ne $files.Count) {
+              throw "Expected eleven package artifacts and six tool archives before checksumming; found $($files.Count)."
           }
 
           $lines = foreach ($file in $files) {
@@ -403,27 +411,29 @@ jobs:
           ```text
           dotnet add package Icod.TermInfo --version {0}
           dotnet add package Icod.TermInfo.Source --version {0}
+          dotnet add package Icod.TermInfo.Termcap --version {0}
           dotnet add package Icod.TermInfo.Compiler --version {0}
           dotnet add package Icod.TermInfo.Inspection --version {0}
           dotnet tool install --global Icod.TermInfo.Tools --version {0}
           ```
 
-          The installed tool exposes `icod-terminfo tic`, `icod-terminfo infocmp`,
-          and `icod-terminfo toe`. The attached standalone archives continue to
-          expose the traditional `tic`, `infocmp`, and `toe` command names.
+          The installed tool exposes routed `tic`, `infocmp`, `toe`, `captoinfo`,
+          and `infotocap` commands. The attached standalone archives expose the
+          same five command names directly.
 
-          `Icod.TermInfo`, `Icod.TermInfo.Source`, `Icod.TermInfo.Compiler`, and
-          `Icod.TermInfo.Inspection` target `net8.0`, `net9.0`, and `net10.0`.
-          Source depends on the matching Runtime package. Compiler and Inspection
-          each depend on the matching Runtime and Source packages; Inspection does
-          not depend on Compiler.
+          `Icod.TermInfo`, `Icod.TermInfo.Source`, `Icod.TermInfo.Termcap`,
+          `Icod.TermInfo.Compiler`, and `Icod.TermInfo.Inspection` target `net8.0`,
+          `net9.0`, and `net10.0`. Termcap depends only on matching Runtime; Source
+          also depends on Runtime. Compiler and Inspection each depend on matching
+          Runtime and Source packages; Inspection does not depend on Compiler.
 
           The framework-dependent .NET 10 tool suite is also attached for
           win-x64, win-arm64, linux-x64, linux-arm64, osx-x64, and osx-arm64.
-          Each tool archive contains `tic`, `infocmp`, and `toe` plus required
-          managed dependencies; the user supplies the .NET 10 runtime.
+          Each tool archive contains `tic`, `infocmp`, `toe`, `captoinfo`, and
+          `infotocap` plus required managed dependencies; the user supplies the
+          .NET 10 runtime.
 
-          All five NuGet packages, the four reusable-library symbol packages,
+          All six NuGet packages, the five reusable-library symbol packages,
           all six tool-suite archives, and SHA-256 checksums are attached to this
           release.
           '@ -f $version
@@ -434,8 +444,8 @@ jobs:
                   Sort-Object Name |
                   ForEach-Object { $_.FullName }
           )
-          if (16 -ne $assets.Count) {
-              throw "Expected sixteen GitHub Release assets; found $($assets.Count)."
+          if (18 -ne $assets.Count) {
+              throw "Expected eighteen GitHub Release assets; found $($assets.Count)."
           }
 
           $arguments = @(

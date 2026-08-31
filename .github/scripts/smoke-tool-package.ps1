@@ -122,7 +122,7 @@ try {
 		throw "'icod-terminfo --version' did not report '$version'."
 	}
 
-	foreach ( $command in @( 'tic', 'infocmp', 'toe' ) ) {
+	foreach ( $command in @( 'tic', 'infocmp', 'toe', 'captoinfo', 'infotocap' ) ) {
 		$versionOutput = Invoke-Router -Arguments @(
 			$command,
 			'-V'
@@ -171,6 +171,29 @@ release-smoke|Icod.TermInfo release smoke terminal,
 	)
 	if ( -not $toeOutput.Contains( 'release-smoke' ) ) {
 		throw 'Routed toe did not enumerate the entry published by routed tic.'
+	}
+
+	$termcapPath = Join-Path $workRoot 'release-smoke.cap'
+	[System.IO.File]::WriteAllText(
+		$termcapPath,
+		"release-cap|Release cap terminal:am:co#80:`n",
+		[System.Text.UTF8Encoding]::new( $false )
+	)
+
+	$capToInfoOutput = Invoke-Router -Arguments @(
+		'captoinfo',
+		$termcapPath
+	)
+	if ( -not $capToInfoOutput.Contains( 'cols#80' ) ) {
+		throw 'Routed captoinfo did not convert the release smoke termcap entry.'
+	}
+
+	$infoToCapOutput = Invoke-Router -Arguments @(
+		'infotocap',
+		$sourcePath
+	)
+	if ( -not $infoToCapOutput.Contains( 'co#80' ) ) {
+		throw 'Routed infotocap did not convert the release smoke terminfo entry.'
 	}
 
 	Write-Host "Smoke-tested Icod.TermInfo.Tools $version successfully."

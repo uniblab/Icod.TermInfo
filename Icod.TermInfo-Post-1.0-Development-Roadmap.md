@@ -11,10 +11,10 @@
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
 **Current release version:** `1.5.0`
-**Current development version:** `1.6.0-Alpha-6`
+**Current development version:** `1.6.0-Alpha-7`
 **Next development line:** post-1.6 demand-driven work
 **Status:** 1.6.0 implementation in progress
-**Current tranche:** TC06 — Explicit opt-in termcap acquisition
+**Current tranche:** TC07 — Conversion tools and coordinated distribution
 **Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
 
 ---
@@ -1026,11 +1026,11 @@ Icod.TermInfo.Termcap
 | TC08 | `1.6.0-Alpha-8` | corpus, fuzzing, hostile-input audit, API/package/CLI freeze |
 
 TC01's parser foundation, TC02's Runtime-derived capability classification,
-TC03's bounded `tc=` inheritance resolver, TC04's semantic conversion, and TC05's
-reverse representability/rendering are complete. TC06 is the active tranche and
-adds explicit opt-in `TERMCAP` / `TERMPATH` acquisition through isolated
-environment and filesystem providers. Conversion command routing remains
-assigned to TC07.
+TC03's bounded `tc=` inheritance resolver, TC04's semantic conversion, TC05's
+reverse representability/rendering, and TC06's explicit acquisition are
+complete. TC07 is the active tranche and adds standalone plus routed `captoinfo`
+and `infotocap` composition together with coordinated archive, package, smoke,
+and release-artifact accounting. TC08 remains the validation and freeze gate.
 
 **1.6 completion gate:** common conventional termcap databases can be parsed,
 resolved, converted into the canonical Icod terminfo semantic model, rendered
