@@ -84,6 +84,7 @@ public sealed class TC05RenderingTests
 	[InlineData( "demo|Demo terminal:cm=%n%B%d;%D%d:" )]
 	[InlineData( "demo|Demo terminal:cm=%B%r%i%d;%d:" )]
 	[InlineData( "demo|Demo terminal:cm=%>AZ%r%i%d;%d:" )]
+	[InlineData( "demo|Demo terminal:cm=%i%r%d:" )]
 	public void Tc04ParameterizedProgramsRenderBackToEquivalentRuntimePrograms(
 		string source
 	) {

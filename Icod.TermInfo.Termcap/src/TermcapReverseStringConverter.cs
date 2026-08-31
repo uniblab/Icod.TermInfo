@@ -434,7 +434,8 @@ internal static class TermcapReverseStringConverter
 				builder,
 				failed,
 				transformed,
-				depth
+				depth,
+				false
 			)
 			|| TryTransform(
 				source,
@@ -444,7 +445,8 @@ internal static class TermcapReverseStringConverter
 				builder,
 				failed,
 				transformed,
-				depth
+				depth,
+				false
 			)
 			|| TryTransform(
 				source,
@@ -454,7 +456,8 @@ internal static class TermcapReverseStringConverter
 				builder,
 				failed,
 				transformed,
-				depth
+				depth,
+				false
 			)
 			|| TryTransform(
 				source,
@@ -464,7 +467,8 @@ internal static class TermcapReverseStringConverter
 				builder,
 				failed,
 				transformed,
-				depth
+				depth,
+				true
 			)
 			|| TryTransform(
 				source,
@@ -474,7 +478,8 @@ internal static class TermcapReverseStringConverter
 				builder,
 				failed,
 				transformed,
-				depth
+				depth,
+				true
 			)
 		) {
 			return true;
@@ -498,7 +503,14 @@ internal static class TermcapReverseStringConverter
 							candidate.Increment
 						)
 				);
-			if ( !CouldParticipateInTarget( source, position, conditional ) ) {
+			if (
+				!CouldParticipateInTarget(
+					source,
+					position,
+					conditional,
+					true
+				)
+			) {
 				continue;
 			}
 
@@ -532,11 +544,19 @@ internal static class TermcapReverseStringConverter
 		StringBuilder builder,
 		ISet<DecodeStateKey> failed,
 		ISet<ParameterState> transformed,
-		int depth
+		int depth,
+		bool currentExpressionOnly
 	) {
 		ArgumentException.ThrowIfNullOrWhiteSpace( termcapOperator );
 
-		if ( !CouldParticipateInTarget( source, position, transformedState ) ) {
+		if (
+			!CouldParticipateInTarget(
+				source,
+				position,
+				transformedState,
+				currentExpressionOnly
+			)
+		) {
 			return false;
 		}
 
@@ -766,7 +786,8 @@ internal static class TermcapReverseStringConverter
 	private static bool CouldParticipateInTarget(
 		string source,
 		int position,
-		ParameterState state
+		ParameterState state,
+		bool currentExpressionOnly
 	) {
 		ArgumentNullException.ThrowIfNull( source );
 		if ( position < 0 || position > source.Length ) {
@@ -775,16 +796,36 @@ internal static class TermcapReverseStringConverter
 			);
 		}
 
-		return source.IndexOf(
-			state.First,
-			position,
-			StringComparison.Ordinal
-		) >= 0
-			|| source.IndexOf(
-				state.Second,
-				position,
-				StringComparison.Ordinal
-			) >= 0
+		int remainingLength =
+			source.Length - position;
+		if ( currentExpressionOnly ) {
+			string expression =
+				state.CurrentExpression;
+			return expression.Length <= remainingLength
+				&& source.IndexOf(
+					expression,
+					position,
+					StringComparison.Ordinal
+				) >= 0
+			;
+		}
+
+		return (
+				state.First.Length <= remainingLength
+				&& source.IndexOf(
+					state.First,
+					position,
+					StringComparison.Ordinal
+				) >= 0
+			)
+			|| (
+				state.Second.Length <= remainingLength
+				&& source.IndexOf(
+					state.Second,
+					position,
+					StringComparison.Ordinal
+				) >= 0
+			)
 		;
 	}
 
