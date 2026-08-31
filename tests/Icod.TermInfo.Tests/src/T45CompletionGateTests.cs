@@ -124,6 +124,20 @@ public sealed class T45CompletionGateTests {
 	public void ReleaseVerifierRetainsAllFinalCompatibilityGates() {
 		string root =
 			FindRepositoryRoot();
+		string termcapPackageVerifier =
+			File.ReadAllText(
+				Path.Combine(
+					root,
+					"tools",
+					"termcap-package-verifier",
+					"Program.cs" ) );
+
+		Assert.Contains(
+			"docs/1.6.0-TERMCAP-PUBLIC-API-BASELINE.txt",
+			termcapPackageVerifier );
+		Assert.Contains(
+			"TERMCAP-API-DOC-ID-SNAPSHOT-V1",
+			termcapPackageVerifier );
 
 		foreach (
 			string relativePath
@@ -167,9 +181,6 @@ public sealed class T45CompletionGateTests {
 				verifier );
 			Assert.Contains(
 				"1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt",
-				verifier );
-			Assert.Contains(
-				"1.6.0-TERMCAP-PUBLIC-API-BASELINE.txt",
 				verifier );
 			Assert.True(
 				verifier.Contains(
