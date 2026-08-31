@@ -10,20 +10,36 @@ public sealed class TC07ContractTests {
 		"$(IcodTermInfoSuiteVersion)";
 
 	[Fact]
-	public void Tc07AdvancesTheCentralSuiteVersion() {
+	public void Tc07VersionAndCentralVersionWiringRemainRecorded() {
 		string root =
 			FindRepositoryRoot();
-		XDocument buildProperties =
+		XDocument router =
 			LoadProject(
 				root,
-				"Directory.Build.props"
+				"icod-terminfo/Icod.TermInfo.Router.csproj"
+			);
+		string implementation =
+			ReadRepositoryFile(
+				root,
+				"docs/1.6.0-TC07-CONVERSION-TOOLS-AND-DISTRIBUTION.md"
 			);
 
-		Assert.Equal(
+		Assert.Contains(
 			DevelopmentVersion,
+			implementation
+		);
+		Assert.Equal(
+			VersionReference,
 			ReadRequiredProperty(
-				buildProperties,
-				"IcodTermInfoSuiteVersion"
+				router,
+				"Version"
+			)
+		);
+		Assert.Equal(
+			VersionReference,
+			ReadRequiredProperty(
+				router,
+				"PackageVersion"
 			)
 		);
 	}
