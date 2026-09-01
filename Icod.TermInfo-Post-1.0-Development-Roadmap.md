@@ -10,11 +10,11 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
-**Current coordinated version:** `1.7.0-Alpha-3`
+**Current coordinated version:** `1.7.0-Alpha-4`
 **Final 1.6 prerelease:** `1.6.0-Alpha-8`
 **Next development line:** `1.7.0` — Relative Terminfo Source Synthesis
 **Status:** 1.7.0 implementation in progress
-**Current tranche:** RS03 — Extended capability synthesis
+**Current tranche:** RS04 — Ordered multi-parent semantics and reference fidelity
 **Primary objective:** Synthesize deterministic relative terminfo source in Inspection and ultimately expose it through `infocmp -u` without destabilizing the frozen Runtime, Source, Compiler, or Termcap contracts.
 
 ---
@@ -112,8 +112,12 @@ the standard Boolean, numeric, and string parent aggregate, local delta, and
 cancellation engine. RS03 extends the same engine to ordinal case-sensitive
 extended capabilities, kind changes, inherited cancellation, deterministic
 ordering, and semantically safe extended-output filtering while preserving the
-frozen Runtime, Source, Compiler, and Termcap APIs. Ordered-parent stress remains
-RS04 work, and `infocmp -u` remains assigned to RS06.
+frozen Runtime, Source, Compiler, and Termcap APIs. RS04 freezes exact ordered
+multi-parent composition and source-reference fidelity: `UseName` spelling is
+preserved independently of effective parent identity, repeated/equivalent
+parents remain legal under distinct references, and Source-backed cross-checks
+confirm leftmost-parent precedence across the complete capability universe.
+RS05 remains the rendering/verifier tranche, and `infocmp -u` remains RS06 work.
 
 The sequence is cumulative but intentionally modular. Applications which only need runtime terminfo SHALL continue to depend on `Icod.TermInfo` alone.
 

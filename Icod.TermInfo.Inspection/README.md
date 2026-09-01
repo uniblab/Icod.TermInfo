@@ -21,6 +21,23 @@ The package targets `net8.0`, `net9.0`, and `net10.0`, depends on matching
 Runtime and Source packages, and retains no production Compiler or Termcap
 dependency.
 
+## 1.7 RS04 ordered multi-parent/reference fidelity
+
+`1.7.0-Alpha-4` freezes caller-supplied parent order and exact `UseName`
+spelling across the complete standard and extended capability universe.
+Parent aggregation continues right-to-left so present values from leftward
+parents win collisions, while emitted `use=` fields preserve the original
+left-to-right parent sequence without sorting, canonicalization, or pruning.
+
+`UseName` is source-reference identity and may intentionally be an alias rather
+than `Description.Name`. The same effective `TerminalDescription` may also be
+supplied more than once under distinct valid references; duplicate `UseName`
+values remain rejected under the ordinal, case-sensitive RS01 policy.
+
+RS04 adds no public API. Source-backed fixtures independently resolve use-only
+multi-parent entries to verify that synthesis assumptions match the frozen
+Source precedence contract.
+
 ## 1.7 RS03 extended capability synthesis
 
 `1.7.0-Alpha-3` extends the relative synthesis engine across the complete

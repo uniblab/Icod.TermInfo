@@ -156,6 +156,15 @@ changes, deterministic ordering, and semantically safe filtering. Runtime,
 Source, Compiler, and Termcap remain frozen; Inspection retains its
 Runtime-and-Source-only dependency graph and assembly version `1.0.0.0`.
 
+RS04 advances the coordinated development version to `1.7.0-Alpha-4` without
+adding public API. Inspection now freezes exact ordered multi-parent composition
+and source-reference fidelity: `UseName` is emitted independently of effective
+parent canonical identity, repeated/equivalent parents remain legal under
+distinct references, and Source-backed cross-checks verify the existing
+leftmost-parent precedence across standard and extended capabilities. Runtime,
+Source, Compiler, and Termcap remain frozen; Inspection retains its
+Runtime-and-Source-only dependency graph and assembly version `1.0.0.0`.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:

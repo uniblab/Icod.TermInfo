@@ -4,6 +4,17 @@ namespace Icod.TermInfo.Inspection;
 /// Associates one effective parent terminal description with the exact source
 /// reference name to emit in a synthesized <c>use=</c> field.
 /// </summary>
+/// <remarks>
+/// <para>
+/// <see cref="UseName"/> is source-reference identity and is preserved exactly;
+/// it may intentionally differ from <see cref="TerminalDescription.Name"/>,
+/// for example when the caller wants to emit an alias.
+/// </para>
+/// <para>
+/// The same effective description may be supplied more than once when each
+/// occurrence has a distinct valid <see cref="UseName"/>.
+/// </para>
+/// </remarks>
 public sealed class TerminalDescriptionSourceSynthesisParent {
 	/// <summary>
 	/// Initializes one ordered synthesis parent.

@@ -8,8 +8,12 @@ namespace Icod.TermInfo.Inspection;
 /// RS01 validates and freezes synthesis inputs. RS02 adds deterministic standard
 /// Boolean, numeric, and string capability deltas and cancellations for ordered
 /// parent sets. RS03 extends the same engine to ordinal, case-sensitive extended
-/// capabilities, including kind changes and inherited cancellation. The zero-
-/// parent form remains equivalent to effective-source rendering.
+/// capabilities, including kind changes and inherited cancellation. RS04 freezes
+/// exact multi-parent order and source-reference fidelity: supplied
+/// <see cref="TerminalDescriptionSourceSynthesisParent.UseName"/> values are
+/// emitted without canonicalization or pruning, including repeated effective
+/// parents under distinct references. The zero-parent form remains equivalent
+/// to effective-source rendering.
 /// </remarks>
 public static class TerminalDescriptionSourceSynthesizer {
 	/// <summary>

@@ -192,6 +192,7 @@ Require(
 );
 TerminalDescription synthesisParentDescription =
 	new TerminalDescriptionBuilder( "inspection-smoke-parent" )
+		.AddAlias( "inspection-smoke-parent-alias" )
 		.SetDescription( "Inspection package smoke parent" )
 		.SetBoolean( BooleanCapability.AutoRightMargin )
 		.SetNumber( NumericCapability.Columns, 80 )
@@ -222,6 +223,28 @@ Require(
 		== "inspection-smoke|Inspection package smoke,\n"
 			+ "    use=inspection-smoke-parent,\n",
 	"The RS02 package synthesizer did not omit inherited standard capabilities."
+);
+TerminalDescriptionSourceSynthesisParent synthesisAliasParent =
+	new(
+		"inspection-smoke-parent-alias",
+		synthesisParentDescription
+	);
+string synthesizedWithRepeatedParents =
+	TerminalDescriptionSourceSynthesizer.Synthesize(
+		terminal,
+		new[] {
+			synthesisParent,
+			synthesisAliasParent,
+		},
+		synthesisOptions
+	);
+Require(
+	synthesizedWithRepeatedParents
+		== "inspection-smoke|Inspection package smoke,\n"
+			+ "    use=inspection-smoke-parent,\n"
+			+ "    use=inspection-smoke-parent-alias,\n",
+	"The RS04 package synthesizer did not preserve repeated canonical/alias "
+		+ "parent references in caller order."
 );
 TerminalDescription extendedSmokeParent =
 	new TerminalDescriptionBuilder( "inspection-smoke-extended-parent" )

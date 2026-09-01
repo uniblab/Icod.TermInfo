@@ -145,6 +145,8 @@ public static partial class TerminalDescriptionSourceRenderer {
 			plan.Options.IncludeExtendedCapabilities
 		);
 
+		// RS04: emit the materialized caller order exactly; do not canonicalize,
+		// deduplicate, prune, or reorder parent references.
 		foreach (
 			TerminalDescriptionSourceSynthesisParent parent
 			in plan.Parents
@@ -171,6 +173,9 @@ public static partial class TerminalDescriptionSourceRenderer {
 		ParentAggregate aggregate =
 			new();
 
+		// RS04: overlay effective parents from right to left. Absence in a
+		// higher-priority effective description is no contribution, not a
+		// reconstructed source cancellation tombstone.
 		for ( int index = parents.Count - 1; index >= 0; index-- ) {
 			TerminalDescription description =
 				parents[ index ].Description;

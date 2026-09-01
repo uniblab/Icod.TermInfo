@@ -1,5 +1,4 @@
 using System.Text;
-using System.Xml.Linq;
 using Icod.TermInfo;
 using Icod.TermInfo.Inspection;
 using Icod.TermInfo.Source;
@@ -8,29 +7,11 @@ using Xunit;
 namespace Icod.TermInfo.Inspection.Tests;
 
 public sealed class RS03ContractTests {
-	private const string DevelopmentVersion = "1.7.0-Alpha-3";
+	private const string HistoricalDevelopmentVersion = "1.7.0-Alpha-3";
 
 	[Fact]
-	public void CoordinatedVersionAndImplementationRecordIdentifyRs03() {
-		string root =
-			FindRepositoryRoot();
-		XDocument buildProperties =
-			XDocument.Load(
-				Path.Combine(
-					root,
-					"Directory.Build.props"
-				),
-				LoadOptions.None
-			);
-		string version =
-			buildProperties
-				.Descendants()
-				.Single(
-					element =>
-						element.Name.LocalName == "IcodTermInfoSuiteVersion"
-				)
-				.Value
-				.Trim();
+	public void ImplementationRecordPreservesRs03History() {
+		string root = FindRepositoryRoot();
 		string implementation =
 			File.ReadAllText(
 				Path.Combine(
@@ -40,8 +21,7 @@ public sealed class RS03ContractTests {
 				)
 			);
 
-		Assert.Equal( DevelopmentVersion, version );
-		Assert.Contains( DevelopmentVersion, implementation );
+		Assert.Contains( HistoricalDevelopmentVersion, implementation );
 		Assert.Contains( "ordinal", implementation, StringComparison.OrdinalIgnoreCase );
 		Assert.Contains( "case-sensitive", implementation, StringComparison.OrdinalIgnoreCase );
 		Assert.Contains( "IncludeExtendedCapabilities", implementation );
