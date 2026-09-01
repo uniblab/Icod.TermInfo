@@ -61,8 +61,8 @@ on Termcap. Applications which only load compiled terminfo or consume
 `TerminalDescription` values continue to reference `Icod.TermInfo` alone.
 
 The same validated package artifacts are published to NuGet.org and GitHub
-Packages. Release closure and tag-publication requirements are recorded in
-`docs/1.6.0-RELEASE-AUDIT.md`.
+Packages. The completed 1.6 release contract and post-publication record are
+recorded in `docs/1.6.0-RELEASE-AUDIT.md`.
 
 ## Tool Suite
 
@@ -289,11 +289,10 @@ the existing terminfo-first Runtime discovery contract:
   Termcap package verifier, and isolated package-reference consumers on
   `net8.0`, `net9.0`, and `net10.0`.
 
-The 1.6.0 code/API/package/CLI contract is frozen. NuGet.org trusted publishing
-for all six coordinated package IDs has been confirmed for this repository's
-`release.yaml` workflow and `Release` environment; publication remains gated on
-final Release validation and an exact-main `v1.6.0` tag. See
-`docs/1.6.0-RELEASE-AUDIT.md`.
+The 1.6.0 code/API/package/CLI contract is frozen. The stable `v1.6.0` release
+was published on 2026-08-31 from the exact validated release commit
+`4238632f22fce41726f1f94e5621383a9d3303a7`. The frozen release contract and
+post-publication record are documented in `docs/1.6.0-RELEASE-AUDIT.md`.
 
 ## Getting started
 
@@ -827,11 +826,12 @@ See `samples/Icod.TermInfo.Toolchain.Sample/README.md` for the complete flow.
 
 ### Managed tool-suite walkthrough
 
-`samples/ToolSuite` is a data-and-command walkthrough for `tic`, `infocmp`, and
-`toe`. It uses a controlled `.ti` source file and an explicit local database root
-so validation, publication, rendering, comparison, enumeration, and forward/
-reverse `use=` dependency reporting do not depend on the host's installed
-terminfo database.
+`samples/ToolSuite` is a data-and-command walkthrough for `tic`, `infocmp`, `toe`,
+`captoinfo`, and `infotocap`. It uses controlled terminfo and termcap source files
+and an explicit local database root so validation, publication, rendering,
+comparison, enumeration, forward/reverse `use=` dependency reporting, and
+bidirectional conversion do not depend on host-installed terminfo or termcap
+databases.
 
 See `samples/README.md`, `samples/ToolSuite/README.md`,
 `samples/Icod.TermInfo.Acquisition.Sample/README.md`,
@@ -952,15 +952,15 @@ start registry publication through `.github/workflows/release.yaml`.
 See `RELEASING.md` for the current release procedure,
 `Icod.TermInfo-1.4.0-Tool-Suite-Roadmap.md` for the frozen T01-T11 command
 semantic contract, `docs/1.5.0-RELEASE-AUDIT.md` for the published 1.5
-distribution/versioning gate, and
-`docs/1.6.0-TC08-DIFFERENTIAL-VALIDATION-FUZZING-AND-FREEZE.md` for the active
-1.6 closure record. Stable `v1.6.0` publication is permitted only from the exact
-validated `main` commit after the external Termcap package authorization is in
-place.
+distribution/versioning gate,
+`docs/1.6.0-TC08-DIFFERENTIAL-VALIDATION-FUZZING-AND-FREEZE.md` for frozen 1.6
+pre-release closure evidence, and `docs/1.6.0-RELEASE-AUDIT.md` for the published
+1.6 release contract and post-publication record. Stable version 1.6.0 was
+published from tag `v1.6.0` on 2026-08-31.
 
 ## Scope
 
-`Icod.TermInfo` is not curses, a terminal emulator, a PTY implementation, a termios session manager, an input-event parser, or a general terminal UI toolkit. It intentionally carries low-level descriptive data which those higher-level systems may consume. Source, Compiler, and Inspection remain optional sibling layers and do not change those runtime boundaries.
+`Icod.TermInfo` is not curses, a terminal emulator, a PTY implementation, a termios session manager, an input-event parser, or a general terminal UI toolkit. It intentionally carries low-level descriptive data which those higher-level systems may consume. Source, Compiler, Inspection, and Termcap remain optional sibling layers and do not change those runtime boundaries.
 
 See `Icod.TermInfo-Development-Roadmap-0.9.0.md` for the frozen acquisition
 contract, `Icod.TermInfo-Development-Roadmap-1.0.0.md` for the 1.0 runtime
