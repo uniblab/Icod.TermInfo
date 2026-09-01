@@ -10,11 +10,11 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
-**Current release version:** `1.6.0`
+**Current coordinated version:** `1.6.1`
 **Final 1.6 prerelease:** `1.6.0-Alpha-8`
 **Next development line:** post-1.6 demand-driven work
-**Status:** 1.6.0 stable release contract frozen
-**Current tranche:** Release closure — exact-main validation and publication
+**Status:** 1.6.1 patch release in validation
+**Current tranche:** 1.6.1 hotfix — release-verifier NuGet-cache isolation
 **Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
 
 ---
@@ -43,19 +43,33 @@ The principal new family is **terminfo source and tooling**:
                     /                 \
                    v                   v
       Icod.TermInfo.Compiler   Icod.TermInfo.Inspection
-                 |  \             /  |
-                 |   \           /   |
-                 v    v         v      v
-          Icod.TermInfo.Source ---> Icod.TermInfo
+                 |  \             /  |             Icod.TermInfo.Termcap
+                 |   \           /   |                      |
+                 v    v         v    v                      v
+          Icod.TermInfo.Source ---> Icod.TermInfo <----------+
                                    stable runtime
 ```
 
 The arrows are dependency arrows. `Icod.TermInfo` remains dependency-free.
-`Icod.TermInfo.Source` depends on `Icod.TermInfo`. Compiler and Inspection each
-depend on matching Runtime and Source packages. No dependency may point from the
-runtime package back toward Source, Compiler, Inspection, or Tools.
+`Icod.TermInfo.Source` and `Icod.TermInfo.Termcap` each depend on
+`Icod.TermInfo`. Compiler and Inspection each depend on matching Runtime and
+Source packages. No dependency may point from the runtime package back toward
+Source, Compiler, Inspection, Termcap, or Tools.
 
 Live-terminal state, terminal input, probing, PTYs, curses presentation, and terminal emulation remain outside this roadmap and belong to their respective packages.
+
+---
+
+## 1.1 Roadmap authority
+
+This document is the authoritative active roadmap for work after the frozen 1.0
+Runtime contract. Version-specific roadmaps and release audits remain the
+authoritative historical records for completed releases.
+
+`docs/FUTURE-WORK-INVENTORY.md` is retired as an active planning document. It is
+retained only so historical 0.9 through 1.3 records which link to it do not break.
+New work, ownership decisions, and release sequencing SHALL be recorded here or
+in a new version-specific roadmap, not in the retired inventory.
 
 ---
 
@@ -69,6 +83,7 @@ Live-terminal state, terminal input, probing, PTYs, curses presentation, and ter
 | **1.4.0** | Tool suite | Actual `tic`, `infocmp`, and `toe` command projects |
 | **1.5.0** | Coordinated distribution | Centralize suite versioning and add the installable command router without changing frozen library APIs or 1.4 command semantics |
 | **1.6.0** | Termcap interoperability | Parse, resolve, and convert termcap and terminfo |
+| **1.6.1** | Release-verifier hotfix | Restore caller NuGet-cache state before repository sample/toolchain validation; no public API or command-semantic changes |
 | **later** | Exotic storage/formats | Berkeley DB provider and historical Unix dialects as justified |
 
 The completed 1.5 release contract is recorded in
@@ -80,6 +95,14 @@ Version 1.5.0 completed the coordinated distribution tranche. The published
 `Icod.TermInfo.Tools` package installs the `icod-terminfo` multi-command router,
 which multiplexes the frozen `tic`, `infocmp`, and `toe` implementations while
 the standalone archives retain the traditional command names.
+
+Version 1.6.0 adds the optional `Icod.TermInfo.Termcap` package plus the
+`captoinfo` and `infotocap` command implementations. The `icod-terminfo` router
+and standalone suite archives therefore expose five commands.
+
+Version 1.6.1 preserves that frozen package/API/command surface and corrects a
+release-verifier environment leak: package-smoke validation must restore the
+caller's `NUGET_PACKAGES` state before repository sample/toolchain builds.
 
 The sequence is cumulative but intentionally modular. Applications which only need runtime terminfo SHALL continue to depend on `Icod.TermInfo` alone.
 

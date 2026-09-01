@@ -10,6 +10,9 @@ resolver, semantic conversion uses TC04, and the resulting immutable
 `Icod.TermInfo.Inspection`. TC08 freezes that composition for the stable 1.6.0
 release.
 
+Version `1.6.1` carries that frozen conversion behavior unchanged. It is a
+release-infrastructure hotfix and does not alter `captoinfo` command semantics.
+
 ```text
 Usage: captoinfo [OPTION]... [FILE]...
 

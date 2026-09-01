@@ -124,6 +124,13 @@ command-semantic changes. Runtime, Source, Termcap, Compiler, Inspection, all
 five standalone commands, and `Icod.TermInfo.Tools` consume the centralized
 `1.6.0` suite version while the five reusable assemblies retain `1.0.0.0`.
 
+Patch release 1.6.1 advances the coordinated package and command version to
+`1.6.1` while preserving every frozen reusable API baseline, command contract,
+dependency direction, target framework, and assembly identity. Its production
+change is limited to release-verifier environment isolation: temporary
+package-smoke `NUGET_PACKAGES` values must not leak into repository sample or
+toolchain builds.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:

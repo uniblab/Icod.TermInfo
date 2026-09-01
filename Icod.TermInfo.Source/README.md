@@ -9,17 +9,17 @@ values continue to reference `Icod.TermInfo` alone.
 
 ## Install
 
-For the 1.6.0 release:
+For the 1.6.1 release:
 
 ```text
-dotnet add package Icod.TermInfo.Source --version 1.6.0
+dotnet add package Icod.TermInfo.Source --version 1.6.1
 ```
 
 The package depends on the matching `Icod.TermInfo` version and targets
 `net8.0`, `net9.0`, and `net10.0`.
 
-Version 1.6.0 participates in the coordinated Termcap/tool release without
-changing the frozen 1.1 source-language public API or semantics. The
+Version 1.6.1 preserves the frozen 1.1 source-language public API and semantics.
+The coordinated patch corrects release-verifier NuGet-cache isolation only. The
 `infotocap` command consumes Source at the executable-composition layer; Source
 does not acquire a Termcap dependency.
 

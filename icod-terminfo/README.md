@@ -8,13 +8,13 @@ The tool targets `net10.0` and therefore requires a .NET 10 runtime.
 ## Install
 
 ```text
-dotnet tool install --global Icod.TermInfo.Tools --version 1.6.0
+dotnet tool install --global Icod.TermInfo.Tools --version 1.6.1
 ```
 
 Update or remove the global tool with:
 
 ```text
-dotnet tool update --global Icod.TermInfo.Tools --version 1.6.0
+dotnet tool update --global Icod.TermInfo.Tools --version 1.6.1
 dotnet tool uninstall --global Icod.TermInfo.Tools
 ```
 
@@ -22,7 +22,7 @@ For repository-local or application-local use, install through a tool manifest:
 
 ```text
 dotnet new tool-manifest
-dotnet tool install Icod.TermInfo.Tools --version 1.6.0
+dotnet tool install Icod.TermInfo.Tools --version 1.6.1
 dotnet tool run icod-terminfo --version
 ```
 
@@ -36,7 +36,7 @@ It does not install global commands named `tic`, `infocmp`, `toe`, `captoinfo`,
 or `infotocap`. Those traditional command names belong to separately downloaded
 standalone release archives.
 
-Version 1.6.0 routes all five coordinated commands:
+Version 1.6.1 retains all five coordinated commands introduced in 1.6.0:
 
 ```text
 icod-terminfo tic -V
@@ -75,7 +75,7 @@ icod-terminfo infotocap --help
 ## Standalone distribution
 
 The router package complements rather than replaces the release archives. Each
-of the six framework-dependent 1.6.0 tool-suite archives contains standalone
+of the six framework-dependent 1.6.1 tool-suite archives contains standalone
 executables named exactly:
 
 ```text

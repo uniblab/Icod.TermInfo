@@ -350,11 +350,15 @@ managed/XML and symbol assets and depends directly on the matching Runtime and
 Source packages. Inspection does not depend on Compiler. Runtime, Source, and
 Compiler do not depend on Inspection.
 
-Beginning with 1.4, the three command executables sit above this package
-family. They may use `Icod.CommandFramework` and the appropriate TermInfo
-libraries, but no dependency flows back from Runtime, Source, Compiler, or
-Inspection into the command layer. The command projects remain non-packable and
-are distributed together as six framework-dependent .NET 10 suite archives.
+Beginning with 1.6, `Icod.TermInfo.Termcap` contains corresponding three-target
+managed/XML and symbol assets and depends only on the matching Runtime package.
+No existing reusable package depends on Termcap.
+
+Beginning with 1.4, the command executables sit above this package family. They
+may use `Icod.CommandFramework` and the appropriate TermInfo libraries, but no
+dependency flows back from Runtime, Source, Compiler, Inspection, or Termcap
+into the command layer. The command projects remain non-packable and are
+distributed together as six framework-dependent .NET 10 suite archives.
 
 Beginning with 1.5, `Icod.TermInfo.Tools` is a distribution-only .NET tool
 package. Its `icod-terminfo` router may reference `tic`, `infocmp`, and `toe` to
@@ -363,6 +367,10 @@ commands still do not reference one another, and the router introduces no
 terminfo semantics of its own. Archive distribution remains independent and
 continues to expose the traditional command names directly.
 
+Beginning with 1.6, the router and archives additionally expose `captoinfo` and
+`infotocap`. All five command projects remain mutually independent; the router
+is the only project which references command implementations for dispatch.
+
 The same validated registry package artifacts for a release are used for
 NuGet.org and GitHub Packages.
 
@@ -370,7 +378,6 @@ NuGet.org and GitHub Packages.
 
 The reusable `Icod.TermInfo` package family does not promise:
 
-- termcap parsing/conversion;
 - Berkeley DB/hashed terminfo stores;
 - divergent undocumented vendor binary dialects;
 - live raw/cooked terminal session ownership;
@@ -380,9 +387,12 @@ The reusable `Icod.TermInfo` package family does not promise:
 - terminal emulation or graphics protocols.
 
 The 1.4 line provides the managed `tic`, `infocmp`, and `toe` command
-applications. Version 1.5 adds the `Icod.TermInfo.Tools` installation router but
-does not broaden their semantic compatibility target: the frozen 1.4 mainstream
-terminfo workflow contract remains authoritative, and exhaustive ncurses option
-compatibility is not claimed. The remaining items stay outside the reusable
-TermInfo package family and belong to later or sibling-system work. The
-historical architecture inventory is retained in `FUTURE-WORK-INVENTORY.md`.
+applications. Version 1.5 adds the `Icod.TermInfo.Tools` installation router.
+Version 1.6 adds the optional Termcap package plus `captoinfo` and `infotocap`
+without reopening the frozen 1.4 mainstream terminfo command semantics.
+Exhaustive ncurses option compatibility is not claimed.
+
+The remaining non-goals stay outside the reusable TermInfo package family and
+belong to later or sibling-system work. Current post-1.0 planning is governed by
+`../Icod.TermInfo-Post-1.0-Development-Roadmap.md`; the old
+`FUTURE-WORK-INVENTORY.md` is retained only as a retired historical document.

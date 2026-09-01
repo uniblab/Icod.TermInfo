@@ -22,7 +22,7 @@
 		<Title>Icod.TermInfo.Termcap</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed termcap source parsing and interoperability support for Icod.TermInfo.</Description>
-		<PackageReleaseNotes>Version 1.6.0 introduces the opt-in managed termcap interoperability package with bounded parsing, Runtime-derived capability classification, tc= inheritance resolution, semantic conversion, deterministic reverse rendering, explicit acquisition, a frozen public API baseline, structural package verification, and isolated net8/net9/net10 package-reference smoke while retaining a Runtime-only dependency.</PackageReleaseNotes>
+		<PackageReleaseNotes>Version 1.6.1 is a coordinated patch release correcting release-verifier NuGet-cache isolation while preserving the frozen 1.6 Termcap public API, Runtime-only dependency, conversion semantics, and net8/net9/net10 package contract.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>
@@ -47,7 +47,7 @@
 		<ErrorReport>prompt</ErrorReport>
 		<WarningLevel>2</WarningLevel>
 		<DebugSymbols>true</DebugSymbols>
-		<DebugType>full</DebugType>
+		<DebugType>portable</DebugType>
 		<Optimize>false</Optimize>
 		<DefineConstants>DEBUG;TRACE</DefineConstants>
 		<SignAssembly>false</SignAssembly>

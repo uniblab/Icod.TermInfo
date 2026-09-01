@@ -8,13 +8,12 @@
 
 `Icod.TermInfo` is a managed, dependency-free .NET implementation of the low-level terminal-capability model traditionally supplied by `libtinfo`.
 
-Version 1.6.0 is the current coordinated release. It preserves the frozen 1.0
-Runtime, 1.1 Source, 1.2 Compiler, and 1.4 Inspection contracts, adds the frozen
-1.6 Termcap interoperability contract, and retains the managed `tic`, `infocmp`,
-and `toe` semantics introduced in 1.4. The coordinated tool suite also includes
-`captoinfo` and `infotocap` conversion commands introduced by the 1.6 line.
+Version 1.6.1 is the current coordinated patch release. It preserves the frozen
+1.0 Runtime, 1.1 Source, 1.2 Compiler, 1.4 Inspection, and 1.6 Termcap contracts
+and all five command semantics. The patch corrects release-verifier NuGet-cache
+isolation; it does not change reusable-library public API or terminal semantics.
 
-The 1.6.0 library package family targets `net8.0`, `net9.0`, and `net10.0`; the
+The 1.6.1 library package family targets `net8.0`, `net9.0`, and `net10.0`; the
 packages use C# 13, contain no native ncurses/terminfo payload, and are intended
 to run on Windows, Linux, and macOS.
 
@@ -23,34 +22,34 @@ to run on Windows, Linux, and macOS.
 Runtime-only consumers use:
 
 ```text
-dotnet add package Icod.TermInfo --version 1.6.0
+dotnet add package Icod.TermInfo --version 1.6.1
 ```
 
 Applications which need terminfo source-language support use:
 
 ```text
-dotnet add package Icod.TermInfo.Source --version 1.6.0
+dotnet add package Icod.TermInfo.Source --version 1.6.1
 ```
 
 Applications which need opt-in termcap parsing, conversion, rendering, or
 explicit historical termcap acquisition use:
 
 ```text
-dotnet add package Icod.TermInfo.Termcap --version 1.6.0
+dotnet add package Icod.TermInfo.Termcap --version 1.6.1
 ```
 
 Applications which compile terminfo source or write conventional compiled
 terminfo databases use:
 
 ```text
-dotnet add package Icod.TermInfo.Compiler --version 1.6.0
+dotnet add package Icod.TermInfo.Compiler --version 1.6.1
 ```
 
 Applications which need canonical rendering, semantic comparison, or
 provider-aware inspection use:
 
 ```text
-dotnet add package Icod.TermInfo.Inspection --version 1.6.0
+dotnet add package Icod.TermInfo.Inspection --version 1.6.1
 ```
 
 `Icod.TermInfo.Source` and `Icod.TermInfo.Termcap` each depend on the matching
@@ -61,8 +60,9 @@ on Termcap. Applications which only load compiled terminfo or consume
 `TerminalDescription` values continue to reference `Icod.TermInfo` alone.
 
 The same validated package artifacts are published to NuGet.org and GitHub
-Packages. Release closure and tag-publication requirements are recorded in
-`docs/1.6.0-RELEASE-AUDIT.md`.
+Packages. The frozen 1.6.0 release contract remains recorded in
+`docs/1.6.0-RELEASE-AUDIT.md`; the 1.6.1 verifier hotfix and publication gate are
+recorded in `docs/1.6.1-RELEASE-AUDIT.md`.
 
 ## Tool Suite
 
@@ -89,7 +89,7 @@ distribution-only router package.
 Install the coordinated router as a .NET tool with:
 
 ```text
-dotnet tool install --global Icod.TermInfo.Tools --version 1.6.0
+dotnet tool install --global Icod.TermInfo.Tools --version 1.6.1
 
 icod-terminfo tic -V
 icod-terminfo infocmp -V
@@ -114,7 +114,7 @@ Icod.TermInfo.Tools.<version>.osx-x64.tar.gz
 Icod.TermInfo.Tools.<version>.osx-arm64.tar.gz
 ```
 
-Each 1.6.0 archive contains the traditional `tic`, `infocmp`, `toe`,
+Each 1.6.1 archive contains the traditional `tic`, `infocmp`, `toe`,
 `captoinfo`, and `infotocap` command names and their required managed
 dependencies. The user supplies the .NET 10 runtime and controls where the
 archive is unpacked and whether that location is placed on `PATH`. The archive
@@ -289,11 +289,10 @@ the existing terminfo-first Runtime discovery contract:
   Termcap package verifier, and isolated package-reference consumers on
   `net8.0`, `net9.0`, and `net10.0`.
 
-The 1.6.0 code/API/package/CLI contract is frozen. NuGet.org trusted publishing
-for all six coordinated package IDs has been confirmed for this repository's
-`release.yaml` workflow and `Release` environment; publication remains gated on
-final Release validation and an exact-main `v1.6.0` tag. See
-`docs/1.6.0-RELEASE-AUDIT.md`.
+The 1.6.0 code/API/package/CLI contract is frozen. The stable `v1.6.0` release
+was published on 2026-08-31 from the exact validated release commit
+`4238632f22fce41726f1f94e5621383a9d3303a7`. The frozen release contract and
+post-publication record are documented in `docs/1.6.0-RELEASE-AUDIT.md`.
 
 ## Getting started
 
@@ -827,11 +826,12 @@ See `samples/Icod.TermInfo.Toolchain.Sample/README.md` for the complete flow.
 
 ### Managed tool-suite walkthrough
 
-`samples/ToolSuite` is a data-and-command walkthrough for `tic`, `infocmp`, and
-`toe`. It uses a controlled `.ti` source file and an explicit local database root
-so validation, publication, rendering, comparison, enumeration, and forward/
-reverse `use=` dependency reporting do not depend on the host's installed
-terminfo database.
+`samples/ToolSuite` is a data-and-command walkthrough for `tic`, `infocmp`, `toe`,
+`captoinfo`, and `infotocap`. It uses controlled terminfo and termcap source files
+and an explicit local database root so validation, publication, rendering,
+comparison, enumeration, forward/reverse `use=` dependency reporting, and
+bidirectional conversion do not depend on host-installed terminfo or termcap
+databases.
 
 See `samples/README.md`, `samples/ToolSuite/README.md`,
 `samples/Icod.TermInfo.Acquisition.Sample/README.md`,
@@ -855,8 +855,8 @@ The intended family boundary is now explicit:
 - **future `Icod.Pty`** — Unix PTY and Windows ConPTY creation, resize propagation, and child-process plumbing;
 - **`Icod.DCurses`** — sibling curses-like virtual-screen/window layer above `Icod.Terminal` and `Icod.TermInfo`.
 
-The historical architecture inventory which led to these boundaries is retained
-in `docs/FUTURE-WORK-INVENTORY.md`.
+Current post-1.0 package-family ownership and future release planning are governed
+by `Icod.TermInfo-Post-1.0-Development-Roadmap.md`.
 
 ## Acquisition foundation inherited from 0.9.0
 
@@ -889,8 +889,7 @@ See `docs/0.9.0-ACQUISITION-GUIDE.md` for the consumer-facing acquisition
 guide, `Icod.TermInfo-Development-Roadmap-0.9.0.md` for the detailed frozen
 tranche contract, `docs/0.9.0-CONTRACT-AUDIT.md` for the final completion
 evidence, `docs/0.9.0-T40-API-PACKAGE-FREEZE.md` for the release-candidate
-API/package freeze, and `docs/FUTURE-WORK-INVENTORY.md` for the post-0.9
-dependency map.
+API/package freeze.
 
 ## Build, test, and pack
 
@@ -953,15 +952,15 @@ start registry publication through `.github/workflows/release.yaml`.
 See `RELEASING.md` for the current release procedure,
 `Icod.TermInfo-1.4.0-Tool-Suite-Roadmap.md` for the frozen T01-T11 command
 semantic contract, `docs/1.5.0-RELEASE-AUDIT.md` for the published 1.5
-distribution/versioning gate, and
-`docs/1.6.0-TC08-DIFFERENTIAL-VALIDATION-FUZZING-AND-FREEZE.md` for the active
-1.6 closure record. Stable `v1.6.0` publication is permitted only from the exact
-validated `main` commit after the external Termcap package authorization is in
-place.
+distribution/versioning gate,
+`docs/1.6.0-TC08-DIFFERENTIAL-VALIDATION-FUZZING-AND-FREEZE.md` for frozen 1.6
+pre-release closure evidence, `docs/1.6.0-RELEASE-AUDIT.md` for the published
+1.6.0 contract and post-publication record, and `docs/1.6.1-RELEASE-AUDIT.md`
+for the release-verifier isolation hotfix and 1.6.1 publication gate.
 
 ## Scope
 
-`Icod.TermInfo` is not curses, a terminal emulator, a PTY implementation, a termios session manager, an input-event parser, or a general terminal UI toolkit. It intentionally carries low-level descriptive data which those higher-level systems may consume. Source, Compiler, and Inspection remain optional sibling layers and do not change those runtime boundaries.
+`Icod.TermInfo` is not curses, a terminal emulator, a PTY implementation, a termios session manager, an input-event parser, or a general terminal UI toolkit. It intentionally carries low-level descriptive data which those higher-level systems may consume. Source, Compiler, Inspection, and Termcap remain optional sibling layers and do not change those runtime boundaries.
 
 See `Icod.TermInfo-Development-Roadmap-0.9.0.md` for the frozen acquisition
 contract, `Icod.TermInfo-Development-Roadmap-1.0.0.md` for the 1.0 runtime
@@ -969,11 +968,10 @@ stability contract, `Icod.TermInfo-Post-1.0-Development-Roadmap.md` for the
 post-1.0 package-family sequence, `Icod.TermInfo-1.3.0-Inspection-and-Comparison-Roadmap.md`
 for the 1.3 Inspection contract,
 `Icod.TermInfo-1.4.0-Tool-Suite-Roadmap.md` for the frozen 1.4 command contract,
-`docs/1.5.0-RELEASE-AUDIT.md` for the current distribution/versioning gate, and
+`docs/1.6.0-RELEASE-AUDIT.md` for the frozen 1.6.0 release contract,
+`docs/1.6.1-RELEASE-AUDIT.md` for the current patch-release contract, and
 `docs/VERSIONING.md` and `docs/COMPATIBILITY.md` for the 1.x promises.
-`docs/FUTURE-WORK-INVENTORY.md` is retained as the historical architecture
-inventory which motivated the sibling-system boundaries. The 0.6.0 through
-1.0.0 roadmaps remain historical frozen contracts.
+The 0.6.0 through 1.0.0 roadmaps remain historical frozen contracts.
 
 ## Authors
 
