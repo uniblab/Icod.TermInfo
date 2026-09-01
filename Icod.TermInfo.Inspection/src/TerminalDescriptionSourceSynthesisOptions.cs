@@ -54,6 +54,34 @@ public sealed class TerminalDescriptionSourceSynthesisOptions {
 		TerminalDescriptionSourceCapabilityOrder capabilityOrder =
 			TerminalDescriptionSourceCapabilityOrder.Database,
 		int maximumParentCount = DefaultMaximumParentCount
+	) : this(
+		lineWidth,
+		layout,
+		capabilityOrder,
+		maximumParentCount,
+		includeExtendedCapabilities: true
+	) {
+	}
+
+	/// <summary>
+	/// Initializes explicit relative-source synthesis policy, including extended-
+	/// capability emission control.
+	/// </summary>
+	/// <param name="lineWidth">The requested canonical wrapping width.</param>
+	/// <param name="layout">The physical source layout.</param>
+	/// <param name="capabilityOrder">The standard-capability ordering policy.</param>
+	/// <param name="maximumParentCount">The maximum accepted ordered-parent count.</param>
+	/// <param name="includeExtendedCapabilities">
+	/// Whether local extended-capability directives may be emitted. Disabling
+	/// extended directives is valid only when the target already matches the
+	/// ordered-parent extended aggregate.
+	/// </param>
+	public TerminalDescriptionSourceSynthesisOptions(
+		int lineWidth,
+		TerminalDescriptionSourceLayout layout,
+		TerminalDescriptionSourceCapabilityOrder capabilityOrder,
+		int maximumParentCount,
+		bool includeExtendedCapabilities
 	) {
 		if ( lineWidth <= 0 ) {
 			throw new ArgumentOutOfRangeException(
@@ -95,6 +123,7 @@ public sealed class TerminalDescriptionSourceSynthesisOptions {
 		Layout = layout;
 		CapabilityOrder = capabilityOrder;
 		MaximumParentCount = maximumParentCount;
+		IncludeExtendedCapabilities = includeExtendedCapabilities;
 	}
 
 	/// <summary>
@@ -125,12 +154,19 @@ public sealed class TerminalDescriptionSourceSynthesisOptions {
 		get;
 	}
 
+	/// <summary>
+	/// Gets whether synthesis may emit local extended-capability directives.
+	/// </summary>
+	public bool IncludeExtendedCapabilities {
+		get;
+	}
+
 	internal TerminalDescriptionSourceRendererOptions CreateRendererOptions() {
 		return new TerminalDescriptionSourceRendererOptions(
 			LineWidth,
 			Layout,
 			CapabilityOrder,
-			includeExtendedCapabilities: true
+			includeExtendedCapabilities: IncludeExtendedCapabilities
 		);
 	}
 }

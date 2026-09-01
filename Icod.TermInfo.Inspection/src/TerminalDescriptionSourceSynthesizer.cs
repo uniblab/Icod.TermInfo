@@ -7,9 +7,9 @@ namespace Icod.TermInfo.Inspection;
 /// <remarks>
 /// RS01 validates and freezes synthesis inputs. RS02 adds deterministic standard
 /// Boolean, numeric, and string capability deltas and cancellations for ordered
-/// parent sets. Extended-capability relative synthesis remains reserved for
-/// RS03. The zero-parent form remains equivalent to complete effective-source
-/// rendering.
+/// parent sets. RS03 extends the same engine to ordinal, case-sensitive extended
+/// capabilities, including kind changes and inherited cancellation. The zero-
+/// parent form remains equivalent to effective-source rendering.
 /// </remarks>
 public static class TerminalDescriptionSourceSynthesizer {
 	/// <summary>
@@ -32,9 +32,9 @@ public static class TerminalDescriptionSourceSynthesizer {
 	/// <paramref name="target"/> or <paramref name="parents"/> is
 	/// <see langword="null"/>.
 	/// </exception>
-	/// <exception cref="NotSupportedException">
-	/// A parented request contains target or parent extended capabilities. Extended
-	/// relative synthesis begins in RS03.
+	/// <exception cref="InvalidOperationException">
+	/// Extended-capability output is disabled while reproducing the target requires
+	/// one or more local extended declarations or cancellations.
 	/// </exception>
 	public static string Synthesize(
 		TerminalDescription target,
@@ -70,9 +70,9 @@ public static class TerminalDescriptionSourceSynthesizer {
 	/// <exception cref="ArgumentException">
 	/// The parent sequence violates the synthesis parent contract.
 	/// </exception>
-	/// <exception cref="NotSupportedException">
-	/// A parented request contains target or parent extended capabilities. Extended
-	/// relative synthesis begins in RS03.
+	/// <exception cref="InvalidOperationException">
+	/// Extended-capability output is disabled while reproducing the target requires
+	/// one or more local extended declarations or cancellations.
 	/// </exception>
 	public static void Write(
 		TextWriter writer,
@@ -147,13 +147,21 @@ public static class TerminalDescriptionSourceSynthesizer {
 		ArgumentNullException.ThrowIfNull( plan );
 
 		if ( plan.Parents.Count == 0 ) {
+			if ( !plan.Options.IncludeExtendedCapabilities
+				&& plan.Target.ExtendedCapabilities.Count != 0 ) {
+				throw new InvalidOperationException(
+					"Extended-capability output is disabled, but reproducing the target "
+						+ "requires local extended declarations."
+				);
+			}
+
 			return TerminalDescriptionSourceRenderer.Render(
 				plan.Target,
 				plan.Options.CreateRendererOptions()
 			);
 		}
 
-		return TerminalDescriptionSourceRenderer.RenderRelativeStandard(
+		return TerminalDescriptionSourceRenderer.RenderRelative(
 			plan
 		);
 	}

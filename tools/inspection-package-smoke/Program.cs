@@ -176,8 +176,9 @@ TerminalDescriptionSourceSynthesisOptions synthesisOptions =
 	new();
 Require(
 	synthesisOptions.MaximumParentCount == 64
-		&& TerminalDescriptionSourceSynthesisOptions.MaximumSupportedParentCount == 256,
-	"The RS01 package surface did not retain the frozen parent-count bounds."
+		&& TerminalDescriptionSourceSynthesisOptions.MaximumSupportedParentCount == 256
+		&& synthesisOptions.IncludeExtendedCapabilities,
+	"The synthesis package surface did not retain the reviewed defaults."
 );
 string synthesizedWithoutParents =
 	TerminalDescriptionSourceSynthesizer.Synthesize(
@@ -221,6 +222,34 @@ Require(
 		== "inspection-smoke|Inspection package smoke,\n"
 			+ "    use=inspection-smoke-parent,\n",
 	"The RS02 package synthesizer did not omit inherited standard capabilities."
+);
+TerminalDescription extendedSmokeParent =
+	new TerminalDescriptionBuilder( "inspection-smoke-extended-parent" )
+		.SetDescription( "Inspection extended smoke parent" )
+		.SetExtendedNumber( "XSmoke", 1 )
+		.Build();
+TerminalDescription extendedSmokeTarget =
+	new TerminalDescriptionBuilder( "inspection-smoke-extended-child" )
+		.SetDescription( "Inspection extended smoke child" )
+		.SetExtendedString( "XSmoke", "two" )
+		.Build();
+string synthesizedExtended =
+	TerminalDescriptionSourceSynthesizer.Synthesize(
+		extendedSmokeTarget,
+		new[] {
+			new TerminalDescriptionSourceSynthesisParent(
+				extendedSmokeParent.Name,
+				extendedSmokeParent
+			),
+		}
+	);
+Require(
+	synthesizedExtended.Contains( "    XSmoke=two,\n", StringComparison.Ordinal )
+		&& synthesizedExtended.EndsWith(
+			"    use=inspection-smoke-extended-parent,\n",
+			StringComparison.Ordinal
+		),
+	"The RS03 package synthesizer did not emit an extended value-kind override."
 );
 TermInfoSourceParseResult reparsed =
 	TermInfoSourceParser.Parse(

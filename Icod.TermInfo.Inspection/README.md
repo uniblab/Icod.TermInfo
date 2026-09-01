@@ -21,6 +21,21 @@ The package targets `net8.0`, `net9.0`, and `net10.0`, depends on matching
 Runtime and Source packages, and retains no production Compiler or Termcap
 dependency.
 
+## 1.7 RS03 extended capability synthesis
+
+`1.7.0-Alpha-3` extends the relative synthesis engine across the complete
+`TerminalDescription` capability universe. Extended names use ordinal,
+case-sensitive identity; target-only values are declared, equal inherited values
+are omitted, inherited removals produce `name@`, and target overrides may change
+Boolean, numeric, and string value kind without a separate cancellation.
+
+`TerminalDescriptionSourceSynthesisOptions.IncludeExtendedCapabilities` defaults
+to `true`. The existing constructor remains available, and a new additive
+five-argument overload can disable local extended directives. Disabling them is
+accepted only when the target already matches the ordered-parent extended
+aggregate; otherwise synthesis fails explicitly rather than emitting source with
+false round-trip semantics.
+
 ## 1.7 RS02 standard capability delta and cancellation
 
 `1.7.0-Alpha-2` makes the RS01 parented synthesis contract operational for every

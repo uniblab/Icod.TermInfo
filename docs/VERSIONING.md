@@ -148,6 +148,14 @@ their frozen public API baselines; Inspection retains Runtime-and-Source-only
 production dependencies and assembly version `1.0.0.0`. Extended capability
 relative synthesis remains assigned to RS03.
 
+RS03 advances the coordinated development version to `1.7.0-Alpha-3` and adds
+only the additive `TerminalDescriptionSourceSynthesisOptions` extended-output
+property/constructor overload to Inspection. Relative synthesis now covers
+ordinal case-sensitive extended values, inherited cancellation, value-kind
+changes, deterministic ordering, and semantically safe filtering. Runtime,
+Source, Compiler, and Termcap remain frozen; Inspection retains its
+Runtime-and-Source-only dependency graph and assembly version `1.0.0.0`.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:

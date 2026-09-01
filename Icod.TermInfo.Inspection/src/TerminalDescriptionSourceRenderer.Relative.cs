@@ -4,17 +4,16 @@ using Icod.TermInfo;
 namespace Icod.TermInfo.Inspection;
 
 public static partial class TerminalDescriptionSourceRenderer {
-	internal static string RenderRelativeStandard(
+	internal static string RenderRelative(
 		TerminalDescriptionSourceSynthesisPlan plan
 	) {
 		ArgumentNullException.ThrowIfNull( plan );
 		ValidateIdentity( plan.Target );
-		ValidateStandardRelativeScope( plan );
 
 		TerminalDescriptionSourceRendererOptions options =
 			plan.Options.CreateRendererOptions();
-		StandardParentAggregate inherited =
-			CreateStandardParentAggregate(
+		ParentAggregate inherited =
+			CreateParentAggregate(
 				plan.Parents
 			);
 		StringBuilder builder =
@@ -138,6 +137,14 @@ public static partial class TerminalDescriptionSourceRenderer {
 			}
 		}
 
+		AppendRelativeExtendedCapabilities(
+			builder,
+			plan.Target,
+			inherited.ExtendedCapabilities,
+			options,
+			plan.Options.IncludeExtendedCapabilities
+		);
+
 		foreach (
 			TerminalDescriptionSourceSynthesisParent parent
 			in plan.Parents
@@ -156,35 +163,12 @@ public static partial class TerminalDescriptionSourceRenderer {
 		return builder.ToString();
 	}
 
-	private static void ValidateStandardRelativeScope(
-		TerminalDescriptionSourceSynthesisPlan plan
-	) {
-		ArgumentNullException.ThrowIfNull( plan );
-
-		if ( plan.Target.ExtendedCapabilities.Count != 0 ) {
-			throw new NotSupportedException(
-				"Relative synthesis involving extended capabilities is introduced by RS03."
-			);
-		}
-
-		foreach (
-			TerminalDescriptionSourceSynthesisParent parent
-			in plan.Parents
-		) {
-			if ( parent.Description.ExtendedCapabilities.Count != 0 ) {
-				throw new NotSupportedException(
-					"Relative synthesis involving extended capabilities is introduced by RS03."
-				);
-			}
-		}
-	}
-
-	private static StandardParentAggregate CreateStandardParentAggregate(
+	private static ParentAggregate CreateParentAggregate(
 		IReadOnlyList<TerminalDescriptionSourceSynthesisParent> parents
 	) {
 		ArgumentNullException.ThrowIfNull( parents );
 
-		StandardParentAggregate aggregate =
+		ParentAggregate aggregate =
 			new();
 
 		for ( int index = parents.Count - 1; index >= 0; index-- ) {
@@ -213,9 +197,172 @@ public static partial class TerminalDescriptionSourceRenderer {
 				aggregate.StringCapabilities[ pair.Key ] =
 					pair.Value;
 			}
+
+			foreach (
+				KeyValuePair<string, TermInfoCapabilityValue> pair
+				in description.ExtendedCapabilities
+			) {
+				aggregate.ExtendedCapabilities[ pair.Key ] =
+					pair.Value;
+			}
 		}
 
 		return aggregate;
+	}
+
+	private static void AppendRelativeExtendedCapabilities(
+		StringBuilder builder,
+		TerminalDescription target,
+		IReadOnlyDictionary<string, TermInfoCapabilityValue> inherited,
+		TerminalDescriptionSourceRendererOptions options,
+		bool includeExtendedCapabilities
+	) {
+		ArgumentNullException.ThrowIfNull( builder );
+		ArgumentNullException.ThrowIfNull( target );
+		ArgumentNullException.ThrowIfNull( inherited );
+		ArgumentNullException.ThrowIfNull( options );
+
+		List<ExtendedRelativeDirective> directives =
+			CreateExtendedRelativeDirectives(
+				target.ExtendedCapabilities,
+				inherited
+			);
+		if ( directives.Count == 0 ) {
+			return;
+		}
+		if ( !includeExtendedCapabilities ) {
+			throw new InvalidOperationException(
+				"Extended-capability output is disabled, but reproducing the target "
+					+ "requires one or more local extended declarations or cancellations."
+			);
+		}
+
+		foreach (
+			ExtendedRelativeDirective directive
+			in directives
+				.OrderBy( item => item.KindOrder )
+				.ThenBy(
+					item => item.Name,
+					StringComparer.Ordinal
+				)
+		) {
+			if ( directive.TargetValue.HasValue ) {
+				AppendConfiguredExtendedValue(
+					builder,
+					directive.Name,
+					directive.TargetValue.Value,
+					options
+				);
+			} else {
+				AppendConfiguredCancellationField(
+					builder,
+					directive.Name,
+					options
+				);
+			}
+		}
+	}
+
+	private static List<ExtendedRelativeDirective>
+		CreateExtendedRelativeDirectives(
+			IReadOnlyDictionary<string, TermInfoCapabilityValue> target,
+			IReadOnlyDictionary<string, TermInfoCapabilityValue> inherited
+		) {
+		ArgumentNullException.ThrowIfNull( target );
+		ArgumentNullException.ThrowIfNull( inherited );
+
+		SortedSet<string> names =
+			new(
+				StringComparer.Ordinal
+			);
+		names.UnionWith( target.Keys );
+		names.UnionWith( inherited.Keys );
+
+		List<ExtendedRelativeDirective> directives = [];
+		foreach ( string name in names ) {
+			bool targetPresent =
+				target.TryGetValue(
+					name,
+					out TermInfoCapabilityValue targetValue
+				);
+			bool inheritedPresent =
+				inherited.TryGetValue(
+					name,
+					out TermInfoCapabilityValue inheritedValue
+				);
+
+			if ( targetPresent
+				&& inheritedPresent
+				&& targetValue.Equals( inheritedValue ) ) {
+				continue;
+			}
+
+			TermInfoCapabilityValue orderingValue =
+				targetPresent
+					? targetValue
+					: inheritedValue;
+			directives.Add(
+				new ExtendedRelativeDirective(
+					name,
+					targetPresent
+						? targetValue
+						: null,
+					GetExtendedKindOrder( orderingValue )
+				)
+			);
+		}
+
+		return directives;
+	}
+
+	private static void AppendConfiguredExtendedValue(
+		StringBuilder builder,
+		string name,
+		TermInfoCapabilityValue value,
+		TerminalDescriptionSourceRendererOptions options
+	) {
+		ArgumentNullException.ThrowIfNull( builder );
+		ArgumentException.ThrowIfNullOrWhiteSpace( name );
+		ArgumentNullException.ThrowIfNull( options );
+		ValidateExtendedCapabilityName( name );
+
+		switch ( value.Kind ) {
+			case TermInfoCapabilityValueKind.Boolean:
+				if ( !value.BooleanValue ) {
+					throw new InvalidOperationException(
+						$"Extended Boolean capability '{name}' has a false stored value, which cannot be represented as present terminfo source state."
+					);
+				}
+				AppendConfiguredBooleanField(
+					builder,
+					name,
+					options
+				);
+				break;
+
+			case TermInfoCapabilityValueKind.Number:
+				AppendConfiguredNumericField(
+					builder,
+					name,
+					value.NumberValue,
+					options
+				);
+				break;
+
+			case TermInfoCapabilityValueKind.String:
+				AppendConfiguredStringField(
+					builder,
+					name,
+					value.StringValue,
+					options
+				);
+				break;
+
+			default:
+				throw new InvalidOperationException(
+					$"Extended capability '{name}' has unsupported value kind '{value.Kind}'."
+				);
+		}
 	}
 
 	private static void AppendConfiguredCancellationField(
@@ -262,7 +409,7 @@ public static partial class TerminalDescriptionSourceRenderer {
 		);
 	}
 
-	private sealed class StandardParentAggregate {
+	private sealed class ParentAggregate {
 		public HashSet<BooleanCapability> BooleanCapabilities {
 			get;
 		} = [];
@@ -274,5 +421,35 @@ public static partial class TerminalDescriptionSourceRenderer {
 		public Dictionary<StringCapability, string> StringCapabilities {
 			get;
 		} = [];
+
+		public Dictionary<string, TermInfoCapabilityValue> ExtendedCapabilities {
+			get;
+		} = new( StringComparer.Ordinal );
+	}
+
+	private sealed class ExtendedRelativeDirective {
+		public ExtendedRelativeDirective(
+			string name,
+			TermInfoCapabilityValue? targetValue,
+			int kindOrder
+		) {
+			ArgumentException.ThrowIfNullOrWhiteSpace( name );
+
+			Name = name;
+			TargetValue = targetValue;
+			KindOrder = kindOrder;
+		}
+
+		public string Name {
+			get;
+		}
+
+		public TermInfoCapabilityValue? TargetValue {
+			get;
+		}
+
+		public int KindOrder {
+			get;
+		}
 	}
 }

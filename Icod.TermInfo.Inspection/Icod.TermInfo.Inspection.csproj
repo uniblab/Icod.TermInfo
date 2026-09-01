@@ -22,7 +22,7 @@
 		<Title>Icod.TermInfo.Inspection</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed inspection and semantic-comparison foundation for Icod.TermInfo. The 1.3 line provides canonical terminfo rendering and reusable infocmp-style comparison engines without enlarging the frozen Runtime, Source, or Compiler public contracts.</Description>
-		<PackageReleaseNotes>1.7.0-Alpha-2 implements deterministic standard Boolean, numeric, and string parent aggregation, local deltas, and cancellation synthesis while preserving the RS01 public contract, Runtime-and-Source-only production dependencies, net8/net9/net10 support, and 1.0.0.0 assembly identity; extended relative synthesis remains RS03 work.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.7.0-Alpha-3 extends relative source synthesis across ordinal case-sensitive extended Boolean, numeric, and string capabilities, including inherited cancellation, value-kind changes, deterministic ordering, and semantically safe extended-output filtering, while preserving Runtime-and-Source-only production dependencies, net8/net9/net10 support, and 1.0.0.0 assembly identity.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>
