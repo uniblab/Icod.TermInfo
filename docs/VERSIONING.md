@@ -165,6 +165,31 @@ leftmost-parent precedence across standard and extended capabilities. Runtime,
 Source, Compiler, and Termcap remain frozen; Inspection retains its
 Runtime-and-Source-only dependency graph and assembly version `1.0.0.0`.
 
+RS05 advances the coordinated development version to `1.7.0-Alpha-5` without
+adding public API. It freezes deterministic relative-source layout, wrapping,
+capability ordering, LF output, target identity, cancellations, and ordered
+`use=` rendering. Source parser/resolver and Compiler round trips become
+permanent semantic gates while Compiler remains a test/sample dependency only.
+
+RS06 advances the coordinated development version to `1.7.0-Alpha-6` without
+adding reusable API. It exposes relative synthesis through `infocmp -u`, keeps
+the command as a thin adapter over Inspection, preserves `-A` target and `-B`
+parent acquisition policy, freezes presentation-option interactions, and routes
+the same behavior through `icod-terminfo` without duplicating command semantics.
+
+RS07 advances the coordinated development version to `1.7.0-Alpha-7` without
+adding API or command semantics. It adds reproducible generated-state round
+trips, maximum-parent and pathological-input coverage, and a checked-in semantic
+differential corpus pinned to ncurses `6.5.20250216`. Normal validation remains
+independent of host ncurses installation and host terminfo state.
+
+RS08 advances the coordinated development version to `1.7.0-Alpha-8` and
+freezes the complete additive Inspection 1.7 public surface. It validates the
+five reusable packages, router package, six standalone archives, Toolchain
+sample, version reporting, dependency direction, and cross-platform release
+pipeline. Stable 1.7.0 promotes this validated surface without semantic or API
+changes.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:
@@ -235,6 +260,14 @@ exact fingerprint and net8/net9/net10 equivalence. The same file also records th
 241 sorted packaged XML documentation member IDs as a human-reviewable inventory.
 The baseline must not be regenerated merely to accept an unintended public
 Termcap change.
+
+`docs/1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt` is the frozen complete
+Inspection surface for the 1.7 line. It retains every previously released
+Inspection member and adds only `TerminalDescriptionSourceSynthesisParent`,
+`TerminalDescriptionSourceSynthesisOptions`, and
+`TerminalDescriptionSourceSynthesizer`. The historical 1.3 and 1.4 Inspection
+baselines remain immutable. Release verification requires exact net8/net9/net10
+API equivalence and an exact match with the 1.7 baseline.
 
 The baselines record exported types, public/protected members, enum numeric
 values, parameter names/order/defaults, ref/out/in/params shape, generic

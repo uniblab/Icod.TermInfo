@@ -35,6 +35,65 @@ The package targets `net8.0`, `net9.0`, and `net10.0`, depends on matching
 Runtime and Source packages, and retains no production Compiler or Termcap
 dependency.
 
+## Relative-source synthesis
+
+The synthesizer accepts already effective terminal descriptions. Acquisition,
+parent selection, and the exact reference spelling to emit remain caller-owned:
+
+```csharp
+using Icod.TermInfo;
+using Icod.TermInfo.Inspection;
+
+TerminalDescription target =
+	TerminalDatabase.BuiltIn.Load( "xterm-256color" );
+TerminalDescription parent =
+	TerminalDatabase.BuiltIn.Load( "xterm" );
+
+string source = TerminalDescriptionSourceSynthesizer.Synthesize(
+	target,
+	new[] {
+		new TerminalDescriptionSourceSynthesisParent(
+			"xterm",
+			parent
+		),
+	}
+);
+```
+
+For multiple parents, array order is the exact emitted `use=` order and is part
+of the semantic input:
+
+```csharp
+TerminalDescription primary =
+	TerminalDatabase.BuiltIn.Load( "xterm" );
+TerminalDescription fallback =
+	TerminalDatabase.BuiltIn.Load( "vt100" );
+
+string source = TerminalDescriptionSourceSynthesizer.Synthesize(
+	target,
+	new[] {
+		new TerminalDescriptionSourceSynthesisParent( "primary", primary ),
+		new TerminalDescriptionSourceSynthesisParent( "fallback", fallback ),
+	},
+	new TerminalDescriptionSourceSynthesisOptions(
+		100,
+		TerminalDescriptionSourceLayout.Canonical,
+		TerminalDescriptionSourceCapabilityOrder.TermInfoName,
+		maximumParentCount: 64,
+		includeExtendedCapabilities: true
+	)
+);
+```
+
+The leftmost parent has highest parent-to-parent priority, while explicit local
+target state outranks every parent. Parents are never reordered or pruned.
+`UseName` may intentionally be an alias and is preserved exactly.
+
+Setting `IncludeExtendedCapabilities` to `false` is accepted only when no local
+extended declaration or cancellation is required to reproduce the target. The
+synthesizer throws `InvalidOperationException` rather than emitting source with
+different effective semantics.
+
 ## 1.7 RS04 ordered multi-parent/reference fidelity
 
 `1.7.0-Alpha-4` freezes caller-supplied parent order and exact `UseName`
@@ -428,7 +487,7 @@ framework guarantees continue through 1.6.0.
 - `Icod.TermInfo.Source` owns `.ti` lexical, parsing, and inheritance semantics.
 - `Icod.TermInfo.Compiler` owns deterministic compiled-entry/database writing.
 - `Icod.TermInfo.Inspection` owns canonical human-readable representation,
-  semantic comparison, inspection orchestration, and read-only database catalog
-  inspection.
+  relative-source synthesis, semantic comparison, inspection orchestration, and
+  read-only database catalog inspection.
 
 Command-line parsing and `infocmp` executable policy remain outside this package.

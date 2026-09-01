@@ -13,9 +13,9 @@
 **Current coordinated version:** `1.7.0-Alpha-8`
 **Final 1.6 prerelease:** `1.6.0-Alpha-8`
 **Next development line:** `1.7.0` — Relative Terminfo Source Synthesis
-**Status:** 1.7.0 implementation in progress
-**Current tranche:** RS08 — API freeze, packaging, and release closure
-**Primary objective:** Synthesize deterministic relative terminfo source in Inspection and ultimately expose it through `infocmp -u` without destabilizing the frozen Runtime, Source, Compiler, or Termcap contracts.
+**Status:** RS08 complete — Alpha-8 validated; stable transition pending
+**Current tranche:** Stable 1.7.0 transition pending
+**Primary objective:** Synthesize deterministic relative terminfo source in Inspection and expose it through `infocmp -u` without destabilizing the frozen Runtime, Source, Compiler, or Termcap contracts.
 
 ---
 
@@ -117,7 +117,12 @@ multi-parent composition and source-reference fidelity: `UseName` spelling is
 preserved independently of effective parent identity, repeated/equivalent
 parents remain legal under distinct references, and Source-backed cross-checks
 confirm leftmost-parent precedence across the complete capability universe.
-RS05 remains the rendering/verifier tranche, and `infocmp -u` remains RS06 work.
+RS05 freezes deterministic relative rendering plus Source and Compiler semantic
+round trips. RS06 exposes the reusable engine through `infocmp -u`; RS07 adds
+seeded generated-state, pathological-boundary, and pinned ncurses differential
+validation. RS08 freezes the additive Inspection API, package and distribution
+topology, release-verifier gates, documentation, and release audit. The
+validated Alpha-8 surface now awaits only the stable 1.7.0 transition.
 
 The sequence is cumulative but intentionally modular. Applications which only need runtime terminfo SHALL continue to depend on `Icod.TermInfo` alone.
 

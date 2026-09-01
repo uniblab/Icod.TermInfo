@@ -184,7 +184,7 @@ The Bash and CMD entry points perform equivalent validation. They:
 7. require exact Compiler public API equivalence across `net8.0`, `net9.0`, and
    `net10.0` and require `docs/1.2.0-COMPILER-PUBLIC-API-BASELINE.txt` to match;
 8. require exact Inspection public API equivalence across `net8.0`, `net9.0`, and
-   `net10.0` and require `docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt` to match;
+   `net10.0` and require `docs/1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt` to match;
 9. run the Runtime, Termcap, Compiler, and Inspection package verifiers for
    package structure, dependency closure, metadata, XML documentation, Source
    Link, and portable symbols;
