@@ -1,0 +1,13 @@
+# RS07 pinned ncurses differential cases
+# reference=ncurses 6.5.20250216
+# host=Debian GNU/Linux 13 (trixie), x86_64
+# database=/usr/share/terminfo
+# full-entry-command=infocmp -x -1 TERMINAL
+# relative-command=infocmp -x -u TARGET PARENT [PARENT ...]
+id	target	parents	relative-file
+xterm-256color-from-xterm	xterm-256color	xterm	xterm-256color-from-xterm.ti
+screen-256color-from-screen	screen-256color	screen	screen-256color-from-screen.ti
+tmux-256color-from-screen-256color	tmux-256color	screen-256color	tmux-256color-from-screen-256color.ti
+linux-from-vt100	linux	vt100	linux-from-vt100.ti
+vt220-from-vt100	vt220	vt100	vt220-from-vt100.ti
+xterm-256color-from-xterm-and-screen	xterm-256color	xterm,screen-256color	xterm-256color-from-xterm-and-screen.ti

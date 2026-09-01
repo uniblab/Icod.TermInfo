@@ -29,7 +29,7 @@
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-		<PackageReleaseNotes>1.7.0-Alpha-6 routes the additive infocmp -u relative-synthesis command behavior through the existing distribution-only router without adding router-owned terminfo semantics or changing the five-command/archive topology.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.7.0-Alpha-7 hardens the existing infocmp -u path with deterministic differential and pathological validation; it adds no router-owned semantics and preserves the five-command/archive topology.</PackageReleaseNotes>
 		<PackageTags>terminfo;termcap;libtinfo;tic;infocmp;toe;captoinfo;infotocap;terminal;tool;dotnet;csharp;icod</PackageTags>
 	</PropertyGroup>
 

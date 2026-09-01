@@ -2,6 +2,17 @@
 
 `infocmp` is part of the `Icod.TermInfo` managed terminfo tool suite.
 
+## 1.7 RS07 validation and hardening
+
+`1.7.0-Alpha-7` adds no new `infocmp` command semantics. The RS06 `-u`
+contract is hardened by deterministic generated-state round trips, a checked-in
+semantic differential corpus captured from pinned ncurses `infocmp -u`, and
+pathological boundary tests for parent counts, large extended unions, long
+strings, alias-mediated references, culture changes, and cancellation.
+
+Normal CI consumes the checked-in corpus and does not require host ncurses.
+The command remains a thin adapter over `Icod.TermInfo.Inspection`.
+
 ## 1.7 RS06 relative synthesis
 
 `1.7.0-Alpha-6` exposes the reusable Inspection relative-source synthesizer

@@ -10,7 +10,7 @@
 **Target frameworks:** reusable libraries `net8.0`; `net9.0`; `net10.0`; commands `net10.0`  
 **Reusable assembly identity:** retain `1.0.0.0` unless an independently justified compatibility break is discovered  
 **Planned development sequence:** `1.7.0-Alpha-1` through `1.7.0-Alpha-8`, then stable `1.7.0`  
-**Status:** RS06 implementation in progress — `infocmp -u` relative synthesis
+**Status:** RS07 implementation in progress — differential validation, fuzzing, and hardening
 **Primary objective:** synthesize deterministic terminfo source for a target `TerminalDescription` relative to an explicit ordered set of parent descriptions, then expose that capability through `infocmp -u`.
 
 ---

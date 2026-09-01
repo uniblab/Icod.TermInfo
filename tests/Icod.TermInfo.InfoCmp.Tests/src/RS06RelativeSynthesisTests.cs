@@ -1,5 +1,4 @@
 using System.Text;
-using System.Xml.Linq;
 using Icod.CommandFramework.Diagnostics;
 using Icod.TermInfo;
 using Icod.TermInfo.Compiler;
@@ -11,22 +10,11 @@ namespace Icod.TermInfo.InfoCmp.Tests;
 
 [Collection( EnvironmentSensitiveCollection.Name )]
 public sealed class RS06RelativeSynthesisTests {
-	private const string DevelopmentVersion = "1.7.0-Alpha-6";
+	private const string HistoricalDevelopmentVersion = "1.7.0-Alpha-6";
 
 	[Fact]
-	public void CoordinatedVersionAndImplementationRecordIdentifyRs06() {
+	public void ImplementationRecordPreservesRs06History() {
 		string root = FindRepositoryRoot();
-		XDocument buildProperties = XDocument.Load(
-			System.IO.Path.Combine( root, "Directory.Build.props" ),
-			LoadOptions.None
-		);
-		string version = buildProperties
-			.Descendants()
-			.Single(
-				element => element.Name.LocalName == "IcodTermInfoSuiteVersion"
-			)
-			.Value
-			.Trim();
 		string implementation = File.ReadAllText(
 			System.IO.Path.Combine(
 				root,
@@ -35,8 +23,7 @@ public sealed class RS06RelativeSynthesisTests {
 			)
 		);
 
-		Assert.Equal( DevelopmentVersion, version );
-		Assert.Contains( DevelopmentVersion, implementation );
+		Assert.Contains( HistoricalDevelopmentVersion, implementation );
 		Assert.Contains( "-c -u", implementation, StringComparison.Ordinal );
 		Assert.Contains( "RS07", implementation );
 	}
