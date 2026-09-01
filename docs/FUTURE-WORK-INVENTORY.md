@@ -1,16 +1,19 @@
-# Icod.TermInfo and Terminal-System Future Work Inventory
+# Icod.TermInfo and Terminal-System Future Work Inventory — Retired
 
-> **Historical planning snapshot:** this inventory predates completion of the
-> 1.4 command suite and the later implementation of sibling `Icod.Terminal` and
-> `Icod.DCurses` repositories. Its architectural ownership decisions are retained
-> for context, but status phrases such as "active" and "future" below describe the
-> planning state when the inventory was written. Current TermInfo compatibility
-> and release status are defined by `README.md`, `COMPATIBILITY.md`, and the
-> versioned release audits.
+> **Retired historical planning document.** This file is no longer an active
+> backlog, roadmap, or source of current project status. It predates completion
+> of the 1.4 command suite, coordinated distribution in 1.5, termcap
+> interoperability in 1.6, and the later implementation of sibling
+> `Icod.Terminal` and `Icod.DCurses` repositories.
+>
+> Current post-1.0 planning and package-family ownership are governed by
+> `../Icod.TermInfo-Post-1.0-Development-Roadmap.md`, together with the applicable
+> version-specific roadmap and release audit. This file is retained only because
+> historical 0.9 through 1.3 implementation records link to it. Do not add new
+> planned work here.
 
-This document records terminal-related work which remains outside the current
-`Icod.TermInfo` 1.x package-family boundary and identifies its natural
-package/layer.
+When written, this document recorded terminal-related work outside the then-current
+`Icod.TermInfo` package-family boundary and identified its expected package/layer.
 
 Its purpose is to prevent the existence of a missing terminal feature from
 being mistaken for evidence that the feature belongs in the low-level

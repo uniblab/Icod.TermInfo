@@ -855,8 +855,8 @@ The intended family boundary is now explicit:
 - **future `Icod.Pty`** — Unix PTY and Windows ConPTY creation, resize propagation, and child-process plumbing;
 - **`Icod.DCurses`** — sibling curses-like virtual-screen/window layer above `Icod.Terminal` and `Icod.TermInfo`.
 
-The historical architecture inventory which led to these boundaries is retained
-in `docs/FUTURE-WORK-INVENTORY.md`.
+Current post-1.0 package-family ownership and future release planning are governed
+by `Icod.TermInfo-Post-1.0-Development-Roadmap.md`.
 
 ## Acquisition foundation inherited from 0.9.0
 
@@ -889,8 +889,7 @@ See `docs/0.9.0-ACQUISITION-GUIDE.md` for the consumer-facing acquisition
 guide, `Icod.TermInfo-Development-Roadmap-0.9.0.md` for the detailed frozen
 tranche contract, `docs/0.9.0-CONTRACT-AUDIT.md` for the final completion
 evidence, `docs/0.9.0-T40-API-PACKAGE-FREEZE.md` for the release-candidate
-API/package freeze, and `docs/FUTURE-WORK-INVENTORY.md` for the post-0.9
-dependency map.
+API/package freeze.
 
 ## Build, test, and pack
 
@@ -969,11 +968,9 @@ stability contract, `Icod.TermInfo-Post-1.0-Development-Roadmap.md` for the
 post-1.0 package-family sequence, `Icod.TermInfo-1.3.0-Inspection-and-Comparison-Roadmap.md`
 for the 1.3 Inspection contract,
 `Icod.TermInfo-1.4.0-Tool-Suite-Roadmap.md` for the frozen 1.4 command contract,
-`docs/1.5.0-RELEASE-AUDIT.md` for the current distribution/versioning gate, and
+`docs/1.6.0-RELEASE-AUDIT.md` for the current release contract, and
 `docs/VERSIONING.md` and `docs/COMPATIBILITY.md` for the 1.x promises.
-`docs/FUTURE-WORK-INVENTORY.md` is retained as the historical architecture
-inventory which motivated the sibling-system boundaries. The 0.6.0 through
-1.0.0 roadmaps remain historical frozen contracts.
+The 0.6.0 through 1.0.0 roadmaps remain historical frozen contracts.
 
 ## Authors
 

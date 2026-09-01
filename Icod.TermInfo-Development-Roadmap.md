@@ -20,9 +20,9 @@ version contracts live in version-specific roadmap files.
 - `Icod.TermInfo-Development-Roadmap-1.0.0.md` — stable 1.0 readiness contract:
   API-regret audit, dual-target robustness/compatibility, documentation/package
   freeze, and final completion gate; complete and frozen.
-- `Icod.TermInfo-Post-1.0-Development-Roadmap.md` — active post-1.0 program;
-  1.1.0 adds the separately packaged terminfo source language, followed by
-  compiler, inspection/tooling, and termcap interoperability releases.
+- `Icod.TermInfo-Post-1.0-Development-Roadmap.md` — authoritative post-1.0
+  program; 1.1.0 through 1.6.0 are complete and frozen, and the next development
+  line is post-1.6 demand-driven work.
 
 ## Roadmap sequence
 
@@ -32,15 +32,23 @@ version contracts live in version-specific roadmap files.
   -> 0.8.0  semantic completion
   -> 0.9.0  arbitrary compiled acquisition
   -> 1.0.0  stable public contract
-  -> 1.1.0  terminfo source language (active)
+  -> 1.1.0  terminfo source language
+  -> 1.2.0  terminfo compiler
+  -> 1.3.0  inspection/comparison
+  -> 1.4.0  command tool suite
+  -> 1.5.0  coordinated distribution and router
+  -> 1.6.0  termcap interoperability
+  -> post-1.6  demand-driven work
 ```
 
-The stable 1.0 runtime package deliberately does **not** absorb every remaining
-terminal feature. Source-language work now proceeds in the separate
-`Icod.TermInfo.Source` package, while termcap compatibility, hashed Berkeley-DB
-stores, live terminal sessions/input/probing, PTYs, curses/virtual screens,
-graphics protocols, and terminal emulation remain separate work families. Their
-dependencies and likely package homes are recorded in `docs/FUTURE-WORK-INVENTORY.md`.
+The coordinated package family now consists of Runtime, Source, Compiler,
+Inspection, Termcap, and the distribution-only Tools router. The stable Runtime
+package still does **not** absorb source/compiler/inspection/termcap concerns.
+Hashed Berkeley-DB stores and divergent historical binary dialects remain
+demand-driven TermInfo work; live terminal sessions/input/probing, PTYs,
+curses/virtual screens, graphics protocols, and terminal emulation remain sibling
+system concerns. Current post-1.0 planning is governed by
+`Icod.TermInfo-Post-1.0-Development-Roadmap.md`.
 
 The remainder of this file preserves the original 0.6.0 planning document.
 

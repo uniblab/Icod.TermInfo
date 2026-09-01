@@ -31,8 +31,8 @@ provides a predicate overload for an assertion, prefer that overload instead of
 filtering with `Where(...)` and asserting on the filtered sequence.
 
 Reusable-library Release builds treat warnings as errors, including CS1591.
-Every public member of Runtime, Source, Compiler, and Inspection must carry XML
-documentation. Command and router projects generate XML documentation while
+Every public member of Runtime, Source, Compiler, Inspection, and Termcap must
+carry XML documentation. Command and router projects generate XML documentation while
 retaining their explicit CS1591 exemption. Public API changes must also be
 nullable-correct and covered by semantic surface tests. Runtime API changes must
 be reconciled
@@ -42,20 +42,24 @@ either baseline merely to silence a mismatch. Compiler API changes must likewise
 be reconciled with `docs/1.2.0-COMPILER-PUBLIC-API-BASELINE.txt`. The frozen
 1.3 Inspection baseline remains historical; the reviewed 1.4 Inspection surface
 is frozen by `docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt`, which patch
-releases such as 1.4.1 must preserve unchanged.
+releases such as 1.4.1 must preserve unchanged. The frozen 1.6 Termcap surface
+is recorded by `docs/1.6.0-TERMCAP-PUBLIC-API-BASELINE.txt`; changes to that
+public surface must likewise be deliberate compatibility decisions.
 
 ## Version metadata
 
 `Directory.Build.props` contains the sole coordinated release-version literal
-in `IcodTermInfoSuiteVersion`. Runtime, Source, Compiler, Inspection, `tic`,
-`infocmp`, `toe`, and `Icod.TermInfo.Router` must consume that property rather
-than introducing independent current-version literals. The four reusable
-package projects and the router also consume it for `<PackageVersion />`.
+in `IcodTermInfoSuiteVersion`. Runtime, Source, Compiler, Inspection, Termcap,
+`tic`, `infocmp`, `toe`, `captoinfo`, `infotocap`, and `Icod.TermInfo.Router`
+must consume that property rather than introducing independent current-version
+literals. The five reusable package projects and the router also consume it for
+`<PackageVersion />`.
 
 Beginning with 1.3, Runtime, Source, Compiler, and Inspection advance together;
 beginning with 1.5 the `Icod.TermInfo.Tools` router package joins that coordinated
-version. The 1.x assembly version remains `1.0.0.0` for all four reusable
-assemblies, and all four remain unsigned.
+version; beginning with 1.6, Termcap joins the coordinated reusable package
+family. The 1.x assembly version remains `1.0.0.0` for all five reusable
+assemblies, and all five remain unsigned.
 
 Prerelease development should use the active version roadmap's alpha/beta/RC
 sequence. A final release tag must be exactly `v<PackageVersion>`.
@@ -136,10 +140,10 @@ Package changes should preserve:
 - Source Link information supplied by the .NET SDK;
 - portable PDBs and `.snupkg` generation for all three reusable-library targets;
 - one `IcodTermInfoSuiteVersion` authority for all coordinated projects;
-- synchronized Runtime, Source, Compiler, Inspection, and `Icod.TermInfo.Tools`
-  package versions;
-- Runtime, Source, Compiler, and Inspection fresh-package smoke consumers on all
-  three library targets;
+- synchronized Runtime, Source, Compiler, Inspection, Termcap, and
+  `Icod.TermInfo.Tools` package versions;
+- Runtime, Source, Compiler, Inspection, and Termcap fresh-package smoke consumers
+  on all three library targets;
 - installation and routed-command smoke for `Icod.TermInfo.Tools` on Windows,
   Linux, and macOS;
 - each package README, icon metadata, and LGPL license expression;
@@ -147,8 +151,10 @@ Package changes should preserve:
 - a one-way Compiler -> Runtime/Source dependency;
 - a one-way Inspection -> Runtime/Source dependency with no production Compiler
   dependency;
-- no command-to-command dependencies among `tic`, `infocmp`, and `toe`;
-- a distribution-only Router -> tic/infocmp/toe dependency;
+- a one-way Termcap -> Runtime dependency;
+- no command-to-command dependencies among `tic`, `infocmp`, `toe`, `captoinfo`,
+  and `infotocap`;
+- a distribution-only Router dependency on all five command implementations;
 - identical validated registry package artifacts for NuGet.org and GitHub
   Packages.
 
@@ -172,11 +178,22 @@ provider-aware inspection in the optional `Icod.TermInfo.Inspection` package.
 Inspection depends on Runtime and Source but not on Compiler, and it does not
 enlarge the frozen Runtime, Source, or Compiler public contracts.
 
-Live session ownership, input-event decoding, curses/UI behavior, PTY/ConPTY
-lifecycle, terminal probing, termcap interoperability, and terminal emulation
-remain outside the reusable package-family scope. The released `tic`, `infocmp`,
-and `toe` applications form a separate command layer above that family rather
-than becoming library-package responsibilities.
+Version 1.4 adds the `tic`, `infocmp`, and `toe` command applications above the
+reusable package family. Version 1.5 adds the distribution-only
+`Icod.TermInfo.Tools` router without moving command policy into reusable
+libraries.
 
-See `docs/FUTURE-WORK-INVENTORY.md` for the historical planning inventory which
-established the project-family boundary.
+Version 1.6 adds opt-in termcap parsing, resolution, conversion, rendering, and
+acquisition in the separate `Icod.TermInfo.Termcap` package. It also adds the
+`captoinfo` and `infotocap` commands and routes all five command implementations
+through `icod-terminfo`.
+
+Live session ownership, input-event decoding, curses/UI behavior, PTY/ConPTY
+lifecycle, terminal probing, and terminal emulation remain outside the reusable
+package-family scope. The five released command applications form a separate
+command layer above that family rather than becoming library-package
+responsibilities.
+
+Current post-1.0 scope and future-work ownership are governed by
+`Icod.TermInfo-Post-1.0-Development-Roadmap.md`. Historical release roadmaps and
+audits remain authoritative for their frozen releases.
