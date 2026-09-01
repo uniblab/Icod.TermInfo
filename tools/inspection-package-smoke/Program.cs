@@ -31,7 +31,7 @@ Require(
 Type[] exportedTypes =
 	inspectionAssembly.GetExportedTypes();
 Require(
-	exportedTypes.Length == 22
+	exportedTypes.Length == 25
 		&& exportedTypes.Contains( typeof( TermInfoComparisonResult ) )
 		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalog ) )
 		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalogEntry ) )
@@ -53,8 +53,11 @@ Require(
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceCapabilityOrder ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceLayout ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceRenderer ) )
-		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceRendererOptions ) ),
-	"The Inspection package did not expose exactly the reviewed 1.4 Alpha-6 surface."
+		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceRendererOptions ) )
+		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesisOptions ) )
+		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesisParent ) )
+		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesizer ) ),
+	"The Inspection package did not expose exactly the frozen 1.7 public surface."
 );
 
 Require(
@@ -168,6 +171,118 @@ Require(
 	singleLineStandard
 		== "inspection-smoke|Inspection package smoke, am, cols#80,\n",
 	"The T06 configurable renderer did not honor single-line standard-only presentation."
+);
+TerminalDescriptionSourceSynthesisOptions synthesisOptions =
+	new(
+		80,
+		TerminalDescriptionSourceLayout.Canonical,
+		TerminalDescriptionSourceCapabilityOrder.Database,
+		TerminalDescriptionSourceSynthesisOptions.DefaultMaximumParentCount,
+		includeExtendedCapabilities: true
+	);
+Require(
+	synthesisOptions.LineWidth == 80
+		&& synthesisOptions.Layout == TerminalDescriptionSourceLayout.Canonical
+		&& synthesisOptions.CapabilityOrder == TerminalDescriptionSourceCapabilityOrder.Database
+		&& synthesisOptions.MaximumParentCount == 64
+		&& TerminalDescriptionSourceSynthesisOptions.DefaultMaximumParentCount == 64
+		&& TerminalDescriptionSourceSynthesisOptions.MaximumSupportedParentCount == 256
+		&& synthesisOptions.IncludeExtendedCapabilities,
+	"The frozen 1.7 synthesis options surface did not retain its reviewed contract."
+);
+string synthesizedWithoutParents =
+	TerminalDescriptionSourceSynthesizer.Synthesize(
+		terminal,
+		Array.Empty<TerminalDescriptionSourceSynthesisParent>(),
+		synthesisOptions
+	);
+Require(
+	synthesizedWithoutParents == rendered,
+	"The RS01 zero-parent synthesizer did not preserve effective renderer semantics."
+);
+TerminalDescription synthesisParentDescription =
+	new TerminalDescriptionBuilder( "inspection-smoke-parent" )
+		.AddAlias( "inspection-smoke-parent-alias" )
+		.SetDescription( "Inspection package smoke parent" )
+		.SetBoolean( BooleanCapability.AutoRightMargin )
+		.SetNumber( NumericCapability.Columns, 80 )
+		.Build();
+TerminalDescriptionSourceSynthesisParent synthesisParent =
+	new(
+		synthesisParentDescription.Name,
+		synthesisParentDescription
+	);
+Require(
+	synthesisParent.UseName == "inspection-smoke-parent"
+		&& ReferenceEquals(
+			synthesisParent.Description,
+			synthesisParentDescription
+		),
+	"The RS01 package parent descriptor did not preserve source and effective identity."
+);
+string synthesizedWithParent =
+	TerminalDescriptionSourceSynthesizer.Synthesize(
+		terminal,
+		new[] {
+			synthesisParent,
+		},
+		synthesisOptions
+	);
+Require(
+	synthesizedWithParent
+		== "inspection-smoke|Inspection package smoke,\n"
+			+ "    use=inspection-smoke-parent,\n",
+	"The RS02 package synthesizer did not omit inherited standard capabilities."
+);
+TerminalDescriptionSourceSynthesisParent synthesisAliasParent =
+	new(
+		"inspection-smoke-parent-alias",
+		synthesisParentDescription
+	);
+string synthesizedWithRepeatedParents =
+	TerminalDescriptionSourceSynthesizer.Synthesize(
+		terminal,
+		new[] {
+			synthesisParent,
+			synthesisAliasParent,
+		},
+		synthesisOptions
+	);
+Require(
+	synthesizedWithRepeatedParents
+		== "inspection-smoke|Inspection package smoke,\n"
+			+ "    use=inspection-smoke-parent,\n"
+			+ "    use=inspection-smoke-parent-alias,\n",
+	"The RS04 package synthesizer did not preserve repeated canonical/alias "
+		+ "parent references in caller order."
+);
+TerminalDescription extendedSmokeParent =
+	new TerminalDescriptionBuilder( "inspection-smoke-extended-parent" )
+		.SetDescription( "Inspection extended smoke parent" )
+		.SetExtendedNumber( "XSmoke", 1 )
+		.Build();
+TerminalDescription extendedSmokeTarget =
+	new TerminalDescriptionBuilder( "inspection-smoke-extended-child" )
+		.SetDescription( "Inspection extended smoke child" )
+		.SetExtendedString( "XSmoke", "two" )
+		.Build();
+string synthesizedExtended =
+	TerminalDescriptionSourceSynthesizer.Synthesize(
+		extendedSmokeTarget,
+		new[] {
+			new TerminalDescriptionSourceSynthesisParent(
+				extendedSmokeParent.Name,
+				extendedSmokeParent
+			),
+		}
+	);
+Require(
+	synthesizedExtended.Contains( "    XSmoke=two,\n", StringComparison.Ordinal )
+		&& synthesizedExtended.EndsWith(
+			"    use=inspection-smoke-extended-parent,\n",
+			StringComparison.Ordinal
+		),
+	"The RS03 package synthesizer did not emit an extended value-kind override."
 );
 TermInfoSourceParseResult reparsed =
 	TermInfoSourceParser.Parse(

@@ -1,6 +1,62 @@
 # infocmp
 
+## 1.7 relative synthesis
+
+Version 1.7.0 adds the frozen RS06 `infocmp -u` command contract. The RS07
+differential and pathological validation remains permanent release evidence.
+The command remains a thin adapter over the frozen Inspection synthesis API.
+
 `infocmp` is part of the `Icod.TermInfo` managed terminfo tool suite.
+
+## 1.7 RS07 validation and hardening
+
+`1.7.0-Alpha-7` adds no new `infocmp` command semantics. The RS06 `-u`
+contract is hardened by deterministic generated-state round trips, a checked-in
+semantic differential corpus captured from pinned ncurses `infocmp -u`, and
+pathological boundary tests for parent counts, large extended unions, long
+strings, alias-mediated references, culture changes, and cancellation.
+
+Normal CI consumes the checked-in corpus and does not require host ncurses.
+The command remains a thin adapter over `Icod.TermInfo.Inspection`.
+
+## 1.7 RS06 relative synthesis
+
+`1.7.0-Alpha-6` exposes the reusable Inspection relative-source synthesizer
+through `infocmp -u`.
+
+The command form is:
+
+```text
+infocmp -u [options] target parent [parent ...]
+```
+
+The first operand is acquired through the normal first-terminal path (`-A` when
+supplied). Every later operand is an ordered parent acquired through the
+subsequent-terminal path (`-B` when supplied). Parent operand spelling and order
+are preserved exactly in the emitted `use=` references, even when an operand is
+an alias for a canonical compiled entry.
+
+`-c -u` is accepted as an ncurses-compatible synonym for `-u`. `-d -u` and
+`-n -u` are usage errors. `-q` remains comparison-only and is therefore also a
+usage error with `-u`.
+
+The existing source-presentation controls apply to synthesis:
+
+```text
+-0
+-1
+-w <width>
+-s d|i|l|c
+```
+
+`-x` permits required local extended-capability declarations and cancellations.
+Without `-x`, synthesis succeeds only when suppressing local extended directives
+still reproduces the target's extended state. Otherwise the command fails rather
+than emitting source that would resolve to different semantics.
+
+The command layer owns only argument parsing, acquisition, diagnostics, and
+presentation-option mapping. Delta, cancellation, ordered-parent, and rendering
+semantics remain owned by `Icod.TermInfo.Inspection`.
 
 ## 1.6.x status
 
@@ -18,6 +74,7 @@ Supported as either `infocmp ...` from a release archive or
 
 ```text
 infocmp [options] [terminal ...]
+infocmp -u [options] target parent [parent ...]
 infocmp -D
 infocmp -V
 infocmp --version
@@ -27,14 +84,15 @@ infocmp --help
 Operand behavior is:
 
 ```text
-0 terminals     use TERM and render one effective description
-1 terminal      render that effective description
-2+ terminals    compare the first terminal with each subsequent terminal
+0 terminals             use TERM and render one effective description
+1 terminal              render that effective description
+2+ terminals            compare first with each later terminal
+-u target parent [...]  synthesize target relative to ordered parents
 ```
 
-With two or more terminals and no explicit comparison selector, difference mode
-(`-d`) is the default. Semantic differences are command output, not a failure, and
-therefore return status `0`.
+With two or more terminals and no explicit comparison selector or `-u`,
+difference mode (`-d`) is the default. Semantic differences are command output,
+not a failure, and therefore return status `0`.
 
 Database selection is:
 
@@ -47,7 +105,7 @@ Neither option mutates `TERMINFO` or other process environment variables. Withou
 the matching explicit root, that side uses the normal Runtime
 `SystemTerminalDescriptionProvider` search policy.
 
-One-terminal presentation options remain:
+Source-presentation options are:
 
 ```text
 -0                emit one logical source line
@@ -55,7 +113,7 @@ One-terminal presentation options remain:
 -w <width>        request canonical wrapping width
 -s d|i|l|c        order standard capabilities by database, short name,
                   long name, or termcap code
--x                include effective extended capabilities
+-x                include/permit extended capabilities where defined
 -D                report Runtime database discovery locations
 ```
 
@@ -87,6 +145,7 @@ available for `net8.0`, `net9.0`, and `net10.0`.
 
 ```text
 infocmp [options] [terminal ...]
+infocmp -u [options] target parent [parent ...]
 infocmp -D
 infocmp -V
 infocmp --version
@@ -102,11 +161,12 @@ infocmp --help
 -1              one capability per line
 -w width        canonical wrapping width
 -s d|i|l|c      capability ordering key
+-u              synthesize first terminal relative to ordered parents
 -d              semantic differences
--c              common effective capabilities
+-c              common effective capabilities; with -u, synonym for -u
 -n              standard capabilities absent from all operands
 -q              short comparison presentation
--x              include effective extended capabilities where defined
+-x              include/permit extended capabilities where defined
 -D              report Runtime database discovery locations
 -V, --version   print the coordinated tool-suite version
 --help          display help
@@ -121,7 +181,9 @@ idempotent; conflicting `-d`, `-c`, and `-n` selectors remain a usage error.
 
 With no terminal operand, `TERM` supplies the one-terminal name. One operand is
 rendered. Two or more operands compare the first terminal against each later
-terminal. Use `--` before a terminal name beginning with `-`.
+terminal unless `-u` selects relative synthesis. In synthesis mode, the first
+operand is the target and every later operand is an ordered parent. Use `--`
+before a terminal name beginning with `-`.
 
 ## Environment
 
@@ -133,8 +195,8 @@ Runtime system discovery is used.
 ## Exit statuses
 
 ```text
-0    successful rendering/comparison, including semantic differences
-1    acquisition/database/operational failure
+0    successful rendering/comparison/synthesis, including semantic differences
+1    acquisition/database/operational synthesis failure
 2    usage error
 130  cancellation
 ```
@@ -145,18 +207,22 @@ Runtime system discovery is used.
 infocmp xterm
 infocmp -1 -xd xterm xterm-256color
 infocmp -w120 xterm
-infocmp -A./first -B./second -q terminal terminal
+infocmp -u xterm-256color xterm
+infocmp -1 -x -u child base
+infocmp -A./target-db -B./parent-db -u child base1 base2
 ```
 
 ## Compatibility
 
-Icod uses `TerminalDescriptionComparer` and the Inspection renderer as the
-authoritative semantic engines. Exact ncurses comments, whitespace, provenance,
-or source reconstruction are not claimed. Unsupported ncurses switches are
-reported as usage errors rather than ignored.
+Icod uses `TerminalDescriptionComparer`, `TerminalDescriptionSourceRenderer`,
+and `TerminalDescriptionSourceSynthesizer` as the authoritative semantic
+engines. Current ncurses behavior is followed for `-c -u`, while the existing
+Icod Source resolver remains authoritative for parent precedence. Exact ncurses
+comments, whitespace, provenance, or original source reconstruction are not
+claimed. Unsupported switches are reported as usage errors rather than ignored.
 
 ## Non-goals
 
-T10 does not add termcap conversion, relative `use=` synthesis, C initializer
-generation, initialization-string analysis, vendor subsets, padding-insensitive
-comparison, or Compiler-backed `-Q` output.
+RS06 does not add C initializer generation, initialization-string analysis,
+vendor subsets, padding-insensitive comparison, Compiler-backed `-Q` output, or
+parent discovery/reordering/minimization.

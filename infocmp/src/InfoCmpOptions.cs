@@ -21,6 +21,7 @@ internal sealed class InfoCmpOptions {
 		bool lineWidthSpecified,
 		TerminalDescriptionSourceCapabilityOrder capabilityOrder,
 		bool includeExtendedCapabilities,
+		bool relativeSynthesis,
 		InfoCmpComparisonMode? comparisonMode,
 		bool shortComparison
 	) {
@@ -57,17 +58,38 @@ internal sealed class InfoCmpOptions {
 		foreach ( string name in names ) {
 			ArgumentException.ThrowIfNullOrWhiteSpace( name );
 		}
-		if ( names.Length >= 2 && !comparisonMode.HasValue ) {
-			throw new ArgumentException(
-				"Comparison options require an explicit comparison mode.",
-				nameof( comparisonMode )
-			);
-		}
-		if ( names.Length < 2 && comparisonMode.HasValue ) {
-			throw new ArgumentException(
-				"A comparison mode requires at least two terminal names.",
-				nameof( comparisonMode )
-			);
+		if ( relativeSynthesis ) {
+			if ( names.Length < 2 ) {
+				throw new ArgumentException(
+					"Relative synthesis requires a target and at least one parent terminal.",
+					nameof( terminalNames )
+				);
+			}
+			if ( comparisonMode.HasValue ) {
+				throw new ArgumentException(
+					"Relative synthesis cannot retain a comparison mode.",
+					nameof( comparisonMode )
+				);
+			}
+			if ( shortComparison ) {
+				throw new ArgumentException(
+					"Relative synthesis cannot use short comparison presentation.",
+					nameof( shortComparison )
+				);
+			}
+		} else {
+			if ( names.Length >= 2 && !comparisonMode.HasValue ) {
+				throw new ArgumentException(
+					"Comparison options require an explicit comparison mode.",
+					nameof( comparisonMode )
+				);
+			}
+			if ( names.Length < 2 && comparisonMode.HasValue ) {
+				throw new ArgumentException(
+					"A comparison mode requires at least two terminal names.",
+					nameof( comparisonMode )
+				);
+			}
 		}
 
 		DatabaseDirectory = databaseDirectory;
@@ -78,6 +100,7 @@ internal sealed class InfoCmpOptions {
 		LineWidthSpecified = lineWidthSpecified;
 		CapabilityOrder = capabilityOrder;
 		IncludeExtendedCapabilities = includeExtendedCapabilities;
+		RelativeSynthesis = relativeSynthesis;
 		ComparisonMode = comparisonMode;
 		ShortComparison = shortComparison;
 	}
@@ -98,8 +121,12 @@ internal sealed class InfoCmpOptions {
 			? _terminalNames[ 0 ]
 			: null;
 
+	internal bool IsSynthesis =>
+		RelativeSynthesis;
+
 	internal bool IsComparison =>
-		_terminalNames.Count >= 2;
+		!RelativeSynthesis
+			&& _terminalNames.Count >= 2;
 
 	internal TerminalDescriptionSourceLayout Layout {
 		get;
@@ -118,6 +145,10 @@ internal sealed class InfoCmpOptions {
 	}
 
 	internal bool IncludeExtendedCapabilities {
+		get;
+	}
+
+	internal bool RelativeSynthesis {
 		get;
 	}
 
@@ -194,6 +225,7 @@ internal static class InfoCmpOptionsParser {
 			TerminalDescriptionSourceCapabilityOrder.Database;
 		bool capabilityOrderSpecified = false;
 		bool includeExtendedCapabilities = false;
+		bool relativeSynthesis = false;
 		InfoCmpComparisonMode? comparisonMode = null;
 		bool shortComparison = false;
 		bool optionsEnded = false;
@@ -375,6 +407,10 @@ internal static class InfoCmpOptionsParser {
 						shortComparison = true;
 						break;
 
+					case "-u":
+						relativeSynthesis = true;
+						break;
+
 					case "-x":
 						includeExtendedCapabilities = true;
 						break;
@@ -402,12 +438,47 @@ internal static class InfoCmpOptionsParser {
 			);
 		}
 
-		if ( terminalNames.Count >= 2 ) {
+		if ( relativeSynthesis ) {
+			if ( terminalNames.Count < 2 ) {
+				return InfoCmpOptionsParseResult.Failure(
+					"option '-u' requires a target and at least one parent terminal operand"
+				);
+			}
+			if ( terminalNames.Count - 1
+				> TerminalDescriptionSourceSynthesisOptions.DefaultMaximumParentCount ) {
+				return InfoCmpOptionsParseResult.Failure(
+					$"option '-u' accepts at most "
+						+ $"{TerminalDescriptionSourceSynthesisOptions.DefaultMaximumParentCount} parent operands"
+				);
+			}
+			if ( comparisonMode.HasValue
+				&& comparisonMode.Value != InfoCmpComparisonMode.Common ) {
+				return InfoCmpOptionsParseResult.Failure(
+					"options '-d' and '-n' cannot be combined with '-u'"
+				);
+			}
+			if ( shortComparison ) {
+				return InfoCmpOptionsParseResult.Failure(
+					"option '-q' cannot be combined with '-u'"
+				);
+			}
+
+			HashSet<string> parentReferences = new( StringComparer.Ordinal );
+			for ( int index = 1; index < terminalNames.Count; index++ ) {
+				if ( !parentReferences.Add( terminalNames[ index ] ) ) {
+					return InfoCmpOptionsParseResult.Failure(
+						$"relative synthesis parent reference '{terminalNames[ index ]}' is duplicated"
+					);
+				}
+			}
+
+			comparisonMode = null;
+		} else if ( terminalNames.Count >= 2 ) {
 			if ( layout != TerminalDescriptionSourceLayout.Canonical
 				|| lineWidthSpecified
 				|| capabilityOrderSpecified ) {
 				return InfoCmpOptionsParseResult.Failure(
-					"options '-0', '-1', '-w', and '-s' apply only to one-terminal source listing"
+					"options '-0', '-1', '-w', and '-s' apply only to source listing or relative synthesis"
 				);
 			}
 
@@ -440,6 +511,7 @@ internal static class InfoCmpOptionsParser {
 				lineWidthSpecified,
 				capabilityOrder,
 				includeExtendedCapabilities,
+				relativeSynthesis,
 				comparisonMode,
 				shortComparison
 			)

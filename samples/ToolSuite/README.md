@@ -1,4 +1,4 @@
-# Icod.TermInfo 1.6 Tool-Suite Sample
+# Icod.TermInfo 1.7 Tool-Suite Sample
 
 This sample exercises the coordinated `tic`, `infocmp`, `toe`, `captoinfo`, and
 `infotocap` command suite against controlled terminfo and termcap source. It uses
@@ -56,6 +56,27 @@ infocmp -A ./terminfo -1 -x icod-demo-child
 
 The effective child description should include the inherited base capabilities,
 `cols#120`, and the extended `IcodDemo` value.
+
+## Synthesize the child relative to the base
+
+Version 1.7 adds deterministic relative-source synthesis through `infocmp -u`.
+Use the same controlled database for the target and parent:
+
+```text
+infocmp -A ./terminfo -B ./terminfo -1 -x -u icod-demo-child icod-demo-base
+```
+
+The output preserves the target identity, emits the child-local `cols#120` and
+`IcodDemo` values, and ends with:
+
+```text
+use=icod-demo-base,
+```
+
+Capabilities already supplied by `icod-demo-base` are omitted from the local
+delta. The emitted source can therefore be combined with source for the base and
+resolved back to the same effective child description. Omitting `-x` fails
+rather than silently discarding the child-local extended capability.
 
 ## Compare the base and child
 

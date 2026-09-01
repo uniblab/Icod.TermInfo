@@ -48,7 +48,7 @@ public sealed class CommandTests {
 		);
 
 		Assert.Equal( CommandExitCodes.Success, status );
-		Assert.Contains( "1.6.1", ReadText( stdout ) );
+		Assert.Contains( "1.7.0", ReadText( stdout ) );
 		Assert.DoesNotContain( "Alpha", ReadText( stdout ) );
 		Assert.Empty( ReadText( stderr ) );
 	}

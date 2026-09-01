@@ -4,16 +4,15 @@
 
 [![PR build and test](https://github.com/uniblab/Icod.TermInfo/actions/workflows/pr-build-and-test.yaml/badge.svg)](https://github.com/uniblab/Icod.TermInfo/actions/workflows/pr-build-and-test.yaml)
 [![Main build and test](https://github.com/uniblab/Icod.TermInfo/actions/workflows/push-main.yaml/badge.svg?branch=main)](https://github.com/uniblab/Icod.TermInfo/actions/workflows/push-main.yaml)
-[![Release publish](https://github.com/uniblab/Icod.TermInfo/actions/workflows/release.yaml/badge.svg?branch=main)](https://github.com/uniblab/Icod.TermInfo/actions/workflows/release.yaml)
 
 `Icod.TermInfo` is a managed, dependency-free .NET implementation of the low-level terminal-capability model traditionally supplied by `libtinfo`.
 
-Version 1.6.1 is the current coordinated patch release. It preserves the frozen
-1.0 Runtime, 1.1 Source, 1.2 Compiler, 1.4 Inspection, and 1.6 Termcap contracts
-and all five command semantics. The patch corrects release-verifier NuGet-cache
-isolation; it does not change reusable-library public API or terminal semantics.
+Version 1.7.0 is the current coordinated release. It adds the frozen Inspection
+relative-source synthesis API and `infocmp -u` while preserving the Runtime,
+Source, Compiler, and Termcap public surfaces, all existing package dependency
+directions, and all established command semantics.
 
-The 1.6.1 library package family targets `net8.0`, `net9.0`, and `net10.0`; the
+The 1.7.0 library package family targets `net8.0`, `net9.0`, and `net10.0`; the
 packages use C# 13, contain no native ncurses/terminfo payload, and are intended
 to run on Windows, Linux, and macOS.
 
@@ -22,34 +21,34 @@ to run on Windows, Linux, and macOS.
 Runtime-only consumers use:
 
 ```text
-dotnet add package Icod.TermInfo --version 1.6.1
+dotnet add package Icod.TermInfo --version 1.7.0
 ```
 
 Applications which need terminfo source-language support use:
 
 ```text
-dotnet add package Icod.TermInfo.Source --version 1.6.1
+dotnet add package Icod.TermInfo.Source --version 1.7.0
 ```
 
 Applications which need opt-in termcap parsing, conversion, rendering, or
 explicit historical termcap acquisition use:
 
 ```text
-dotnet add package Icod.TermInfo.Termcap --version 1.6.1
+dotnet add package Icod.TermInfo.Termcap --version 1.7.0
 ```
 
 Applications which compile terminfo source or write conventional compiled
 terminfo databases use:
 
 ```text
-dotnet add package Icod.TermInfo.Compiler --version 1.6.1
+dotnet add package Icod.TermInfo.Compiler --version 1.7.0
 ```
 
 Applications which need canonical rendering, semantic comparison, or
 provider-aware inspection use:
 
 ```text
-dotnet add package Icod.TermInfo.Inspection --version 1.6.1
+dotnet add package Icod.TermInfo.Inspection --version 1.7.0
 ```
 
 `Icod.TermInfo.Source` and `Icod.TermInfo.Termcap` each depend on the matching
@@ -60,9 +59,9 @@ on Termcap. Applications which only load compiled terminfo or consume
 `TerminalDescription` values continue to reference `Icod.TermInfo` alone.
 
 The same validated package artifacts are published to NuGet.org and GitHub
-Packages. The frozen 1.6.0 release contract remains recorded in
-`docs/1.6.0-RELEASE-AUDIT.md`; the 1.6.1 verifier hotfix and publication gate are
-recorded in `docs/1.6.1-RELEASE-AUDIT.md`.
+Packages. Historical release contracts remain recorded in the versioned release
+audits; the 1.7 publication gate is recorded in
+`docs/1.7.0-RELEASE-AUDIT.md`.
 
 ## Tool Suite
 
@@ -89,7 +88,7 @@ distribution-only router package.
 Install the coordinated router as a .NET tool with:
 
 ```text
-dotnet tool install --global Icod.TermInfo.Tools --version 1.6.1
+dotnet tool install --global Icod.TermInfo.Tools --version 1.7.0
 
 icod-terminfo tic -V
 icod-terminfo infocmp -V
@@ -114,7 +113,7 @@ Icod.TermInfo.Tools.<version>.osx-x64.tar.gz
 Icod.TermInfo.Tools.<version>.osx-arm64.tar.gz
 ```
 
-Each 1.6.1 archive contains the traditional `tic`, `infocmp`, `toe`,
+Each 1.7.0 archive contains the traditional `tic`, `infocmp`, `toe`,
 `captoinfo`, and `infotocap` command names and their required managed
 dependencies. The user supplies the .NET 10 runtime and controls where the
 archive is unpacked and whether that location is placed on `PATH`. The archive
@@ -293,6 +292,57 @@ The 1.6.0 code/API/package/CLI contract is frozen. The stable `v1.6.0` release
 was published on 2026-08-31 from the exact validated release commit
 `4238632f22fce41726f1f94e5621383a9d3303a7`. The frozen release contract and
 post-publication record are documented in `docs/1.6.0-RELEASE-AUDIT.md`.
+
+## What 1.7 adds
+
+Version 1.7.0 adds deterministic relative terminfo source synthesis while
+preserving the frozen Runtime, Source, Compiler, and Termcap public contracts:
+
+- `Icod.TermInfo.Inspection` adds
+  `TerminalDescriptionSourceSynthesisParent`,
+  `TerminalDescriptionSourceSynthesisOptions`, and
+  `TerminalDescriptionSourceSynthesizer`;
+- callers supply an effective target and an explicit ordered parent list whose
+  exact `UseName` values become ordered `use=` references;
+- the synthesizer omits inherited values already equal to the target, emits
+  local additions and overrides, and emits `cap@` cancellations where inherited
+  state must be removed;
+- standard and ordinal case-sensitive extended capabilities participate in the
+  same deterministic semantic model;
+- canonical, single-line, and one-capability-per-line layouts retain the existing
+  width and standard-capability ordering controls and always produce LF source;
+- `infocmp -u target parent [parent ...]` exposes the reusable engine through
+  the standalone command and `icod-terminfo` router;
+- Source and Compiler round trips, reproducible generated-state tests, a pinned
+  ncurses semantic differential corpus, package consumers, router smoke, and all
+  six standalone archives permanently validate the feature.
+
+Applications which already have effective target and parent descriptions can
+synthesize relative source directly:
+
+```csharp
+using Icod.TermInfo;
+using Icod.TermInfo.Inspection;
+
+TerminalDescription target =
+	TerminalDatabase.BuiltIn.Load( "xterm-256color" );
+TerminalDescription parent =
+	TerminalDatabase.BuiltIn.Load( "xterm" );
+
+string relativeSource = TerminalDescriptionSourceSynthesizer.Synthesize(
+	target,
+	new[] {
+		new TerminalDescriptionSourceSynthesisParent(
+			"xterm",
+			parent
+		),
+	}
+);
+```
+
+Parent order is semantic and is never optimized, reordered, or pruned. The
+generated source resolves to the target when combined with source representations
+of the supplied effective parents.
 
 ## Getting started
 
@@ -808,9 +858,10 @@ string to the terminal.
 
 `samples/Icod.TermInfo.Toolchain.Sample` demonstrates the reusable post-1.0
 library stack without invoking the command layer. It parses and resolves a
-controlled `.ti` source document, compiles and publishes the entries into a
+controlled `.ti` source document, synthesizes the child relative to its base,
+reparses and resolves the synthesized source, compiles and publishes it into a
 temporary conventional database, reloads the child through the Runtime provider,
-and verifies the acquired description through Inspection.
+and verifies semantic equality through Inspection.
 
 Run it with:
 
@@ -829,9 +880,9 @@ See `samples/Icod.TermInfo.Toolchain.Sample/README.md` for the complete flow.
 `samples/ToolSuite` is a data-and-command walkthrough for `tic`, `infocmp`, `toe`,
 `captoinfo`, and `infotocap`. It uses controlled terminfo and termcap source files
 and an explicit local database root so validation, publication, rendering,
-comparison, enumeration, forward/reverse `use=` dependency reporting, and
-bidirectional conversion do not depend on host-installed terminfo or termcap
-databases.
+comparison, relative synthesis through `infocmp -u`, enumeration,
+forward/reverse `use=` dependency reporting, and bidirectional conversion do not
+depend on host-installed terminfo or termcap databases.
 
 See `samples/README.md`, `samples/ToolSuite/README.md`,
 `samples/Icod.TermInfo.Acquisition.Sample/README.md`,
@@ -847,7 +898,7 @@ The intended family boundary is now explicit:
 - **`Icod.TermInfo`** — descriptions, compiled-database acquisition, capability semantics, parameter expansion, and output transformation;
 - **`Icod.TermInfo.Source`** — `.ti` lexical analysis, source diagnostics, unresolved entries, cancellation, `use=` inheritance, and materialization into `TerminalDescription`;
 - **`Icod.TermInfo.Compiler`** — deterministic compiled-entry writing, source compilation, and explicit conventional database-layout publication;
-- **`Icod.TermInfo.Inspection`** — canonical effective/source rendering, structured semantic comparison, and provider-aware inspection;
+- **`Icod.TermInfo.Inspection`** — canonical effective/source rendering, relative-source synthesis, structured semantic comparison, and provider-aware inspection;
 - **`Icod.TermInfo.Termcap`** — bounded termcap parsing, classification, `tc=` resolution, Runtime conversion, reverse rendering, and explicit termcap acquisition;
 - **`tic`, `infocmp`, `toe`, `captoinfo`, and `infotocap`** — managed command applications which compose the reusable libraries and own command-line policy;
 - **`Icod.TermInfo.Tools` / `icod-terminfo`** — distribution-only .NET tool router which dispatches to the five command applications;
@@ -956,7 +1007,11 @@ distribution/versioning gate,
 `docs/1.6.0-TC08-DIFFERENTIAL-VALIDATION-FUZZING-AND-FREEZE.md` for frozen 1.6
 pre-release closure evidence, `docs/1.6.0-RELEASE-AUDIT.md` for the published
 1.6.0 contract and post-publication record, and `docs/1.6.1-RELEASE-AUDIT.md`
-for the release-verifier isolation hotfix and 1.6.1 publication gate.
+for the release-verifier isolation hotfix and 1.6.1 publication gate. The 1.7
+release contract is defined by
+`Icod.TermInfo 1.7.0 - Relative Terminfo Source Synthesis Roadmap.md` and its
+publication gate is recorded in
+`docs/1.7.0-RELEASE-AUDIT.md`.
 
 ## Scope
 
@@ -969,8 +1024,11 @@ post-1.0 package-family sequence, `Icod.TermInfo-1.3.0-Inspection-and-Comparison
 for the 1.3 Inspection contract,
 `Icod.TermInfo-1.4.0-Tool-Suite-Roadmap.md` for the frozen 1.4 command contract,
 `docs/1.6.0-RELEASE-AUDIT.md` for the frozen 1.6.0 release contract,
-`docs/1.6.1-RELEASE-AUDIT.md` for the current patch-release contract, and
-`docs/VERSIONING.md` and `docs/COMPATIBILITY.md` for the 1.x promises.
+`docs/1.6.1-RELEASE-AUDIT.md` for the published patch-release contract, and
+`Icod.TermInfo 1.7.0 - Relative Terminfo Source Synthesis Roadmap.md` and
+`docs/1.7.0-RELEASE-AUDIT.md` for the current 1.7 synthesis and release
+contracts, and `docs/VERSIONING.md` and `docs/COMPATIBILITY.md` for the 1.x
+promises.
 The 0.6.0 through 1.0.0 roadmaps remain historical frozen contracts.
 
 ## Authors

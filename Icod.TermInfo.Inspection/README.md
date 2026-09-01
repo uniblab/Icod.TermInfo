@@ -6,20 +6,157 @@ comparison layer for the `Icod.TermInfo` package family.
 The 1.3 line established the reusable inspection/comparison engine while
 preserving the already-frozen Runtime 1.0, Source 1.1, and Compiler 1.2 public
 contracts. Version 1.4.0 froze the reviewed additive database-inspection and
-renderer-control APIs used by the managed tool suite. Version 1.6.1 preserves
-that frozen API and its semantics; the coordinated patch corrects
-release-verifier NuGet-cache isolation only. `captoinfo` consumes Inspection
-only at the executable-composition layer.
+renderer-control APIs used by the managed tool suite. Version 1.7.0 adds the
+frozen relative-source synthesis API while preserving all earlier Inspection
+contracts. `captoinfo` consumes Inspection only at the executable-composition
+layer.
+
+## 1.7 synthesis contract
+
+Version 1.7.0 freezes the additive relative-source synthesis surface in
+`docs/1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt`. The frozen additions are
+`TerminalDescriptionSourceSynthesisParent`,
+`TerminalDescriptionSourceSynthesisOptions`, and
+`TerminalDescriptionSourceSynthesizer`. Their standard/extended delta,
+cancellation, exact ordered-parent reference, deterministic LF rendering, and
+semantic round-trip contracts are the stable 1.7 compatibility boundary.
+
+Inspection continues to target `net8.0`, `net9.0`, and `net10.0`, retains
+assembly version `1.0.0.0`, and depends in production only on matching Runtime
+and Source packages.
 
 ## Install
 
 ```text
-dotnet add package Icod.TermInfo.Inspection --version 1.6.1
+dotnet add package Icod.TermInfo.Inspection --version 1.7.0
 ```
 
 The package targets `net8.0`, `net9.0`, and `net10.0`, depends on matching
 Runtime and Source packages, and retains no production Compiler or Termcap
 dependency.
+
+## Relative-source synthesis
+
+The synthesizer accepts already effective terminal descriptions. Acquisition,
+parent selection, and the exact reference spelling to emit remain caller-owned:
+
+```csharp
+using Icod.TermInfo;
+using Icod.TermInfo.Inspection;
+
+TerminalDescription target =
+	TerminalDatabase.BuiltIn.Load( "xterm-256color" );
+TerminalDescription parent =
+	TerminalDatabase.BuiltIn.Load( "xterm" );
+
+string source = TerminalDescriptionSourceSynthesizer.Synthesize(
+	target,
+	new[] {
+		new TerminalDescriptionSourceSynthesisParent(
+			"xterm",
+			parent
+		),
+	}
+);
+```
+
+For multiple parents, array order is the exact emitted `use=` order and is part
+of the semantic input:
+
+```csharp
+TerminalDescription primary =
+	TerminalDatabase.BuiltIn.Load( "xterm" );
+TerminalDescription fallback =
+	TerminalDatabase.BuiltIn.Load( "vt100" );
+
+string source = TerminalDescriptionSourceSynthesizer.Synthesize(
+	target,
+	new[] {
+		new TerminalDescriptionSourceSynthesisParent( "primary", primary ),
+		new TerminalDescriptionSourceSynthesisParent( "fallback", fallback ),
+	},
+	new TerminalDescriptionSourceSynthesisOptions(
+		100,
+		TerminalDescriptionSourceLayout.Canonical,
+		TerminalDescriptionSourceCapabilityOrder.TermInfoName,
+		maximumParentCount: 64,
+		includeExtendedCapabilities: true
+	)
+);
+```
+
+The leftmost parent has highest parent-to-parent priority, while explicit local
+target state outranks every parent. Parents are never reordered or pruned.
+`UseName` may intentionally be an alias and is preserved exactly.
+
+Setting `IncludeExtendedCapabilities` to `false` is accepted only when no local
+extended declaration or cancellation is required to reproduce the target. The
+synthesizer throws `InvalidOperationException` rather than emitting source with
+different effective semantics.
+
+## 1.7 RS04 ordered multi-parent/reference fidelity
+
+`1.7.0-Alpha-4` freezes caller-supplied parent order and exact `UseName`
+spelling across the complete standard and extended capability universe.
+Parent aggregation continues right-to-left so present values from leftward
+parents win collisions, while emitted `use=` fields preserve the original
+left-to-right parent sequence without sorting, canonicalization, or pruning.
+
+`UseName` is source-reference identity and may intentionally be an alias rather
+than `Description.Name`. The same effective `TerminalDescription` may also be
+supplied more than once under distinct valid references; duplicate `UseName`
+values remain rejected under the ordinal, case-sensitive RS01 policy.
+
+RS04 adds no public API. Source-backed fixtures independently resolve use-only
+multi-parent entries to verify that synthesis assumptions match the frozen
+Source precedence contract.
+
+## 1.7 RS03 extended capability synthesis
+
+`1.7.0-Alpha-3` extends the relative synthesis engine across the complete
+`TerminalDescription` capability universe. Extended names use ordinal,
+case-sensitive identity; target-only values are declared, equal inherited values
+are omitted, inherited removals produce `name@`, and target overrides may change
+Boolean, numeric, and string value kind without a separate cancellation.
+
+`TerminalDescriptionSourceSynthesisOptions.IncludeExtendedCapabilities` defaults
+to `true`. The existing constructor remains available, and a new additive
+five-argument overload can disable local extended directives. Disabling them is
+accepted only when the target already matches the ordered-parent extended
+aggregate; otherwise synthesis fails explicitly rather than emitting source with
+false round-trip semantics.
+
+## 1.7 RS02 standard capability delta and cancellation
+
+`1.7.0-Alpha-2` makes the RS01 parented synthesis contract operational for every
+standard Boolean, numeric, and string capability. The synthesizer computes the
+effective ordered-parent baseline, omits inherited values which already match
+the target, emits target-local additions and overrides, and emits `cap@`
+cancellations when inherited state must be removed.
+
+Parent order is preserved exactly and follows the existing Source precedence
+contract: the leftmost parent has the highest parent-to-parent priority. The
+target header remains authoritative, and existing layout and capability-order
+options remain deterministic.
+
+Extended-capability relative synthesis remains RS03 work. A parented request
+containing target or parent extended capabilities fails explicitly rather than
+emitting source whose effective semantics could differ from the target.
+
+## 1.7 RS01 relative-source synthesis contract
+
+`1.7.0-Alpha-1` begins additive relative terminfo source synthesis in Inspection.
+RS01 introduces `TerminalDescriptionSourceSynthesisParent`,
+`TerminalDescriptionSourceSynthesisOptions`, and
+`TerminalDescriptionSourceSynthesizer`. Parent references are explicit and
+ordered, reference names are unique under ordinal comparison, and synthesis is
+bounded to 64 parents by default with a hard supported maximum of 256.
+
+The zero-parent form already delegates to the existing effective source renderer.
+Relative capability delta and cancellation execution for one or more parents is
+reserved for RS02 so Alpha-1 does not emit semantically incomplete `use=` source.
+Runtime, Source, Compiler, and Termcap public APIs remain unchanged, and
+Inspection retains no production Compiler or Termcap dependency.
 
 ## 1.4 T07 semantic-comparison composition
 
@@ -350,7 +487,7 @@ framework guarantees continue through 1.6.0.
 - `Icod.TermInfo.Source` owns `.ti` lexical, parsing, and inheritance semantics.
 - `Icod.TermInfo.Compiler` owns deterministic compiled-entry/database writing.
 - `Icod.TermInfo.Inspection` owns canonical human-readable representation,
-  semantic comparison, inspection orchestration, and read-only database catalog
-  inspection.
+  relative-source synthesis, semantic comparison, inspection orchestration, and
+  read-only database catalog inspection.
 
 Command-line parsing and `infocmp` executable policy remain outside this package.

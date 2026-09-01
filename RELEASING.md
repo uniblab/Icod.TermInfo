@@ -16,7 +16,7 @@ This document describes the current validation and publication procedure for the
   must match the centralized suite version.
 - Runtime, Source, Termcap, Compiler, and Inspection retain 1.x assembly version
   `1.0.0.0` and remain unsigned.
-- Supported consumer targets for the 1.6 release are `net8.0`, `net9.0`, and `net10.0`.
+- Supported consumer targets for the 1.7 release are `net8.0`, `net9.0`, and `net10.0`.
 - Beginning with T01 in 1.4, `tic`, `infocmp`, and `toe` target `net10.0`; TC07
   adds `captoinfo` and `infotocap` on `net10.0`. The five reusable library
   packages retain all three target frameworks.
@@ -28,9 +28,11 @@ This document describes the current validation and publication procedure for the
 - Release validation must pass on Windows, Linux, and macOS on `main` before a
   release tag is created. The tag workflow repeats the Release gate on the exact
   tagged commit before publication.
-- Release validation must pass the frozen Runtime 1.0, Source 1.1, Compiler 1.2,
-  Inspection 1.4, and Termcap 1.6 API baselines while retaining the historical
-  Inspection 1.3 baseline and the net8/net9/net10 API-equivalence gates.
+- Runtime 1.0, Source 1.1, Compiler 1.2, and Termcap 1.6 remain exact API-
+  baseline gates. The Inspection 1.3 and 1.4 baselines remain immutable historical
+  compatibility records. RS08 freezes
+  `docs/1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt`; every Alpha-8 and stable 1.7
+  release gate must pass that exact manifest on net8.0, net9.0, and net10.0.
 - Reusable-library Release builds treat missing public XML documentation as an
   error. Command and router projects generate XML documentation while retaining
   their explicit `CS1591` exemption.
@@ -182,7 +184,7 @@ The Bash and CMD entry points perform equivalent validation. They:
 7. require exact Compiler public API equivalence across `net8.0`, `net9.0`, and
    `net10.0` and require `docs/1.2.0-COMPILER-PUBLIC-API-BASELINE.txt` to match;
 8. require exact Inspection public API equivalence across `net8.0`, `net9.0`, and
-   `net10.0` and require `docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt` to match;
+   `net10.0` and require `docs/1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt` to match;
 9. run the Runtime, Termcap, Compiler, and Inspection package verifiers for
    package structure, dependency closure, metadata, XML documentation, Source
    Link, and portable symbols;

@@ -29,7 +29,7 @@
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-		<PackageReleaseNotes>Version 1.6.1 is a coordinated patch release correcting release-verifier NuGet-cache isolation while preserving all five routed command contracts and the standalone archive topology frozen in 1.6.0.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.7.0 adds infocmp -u relative-source synthesis to the coordinated tool distribution while preserving router-owned semantic neutrality, five-command dispatch, package topology, and six standalone archive targets.</PackageReleaseNotes>
 		<PackageTags>terminfo;termcap;libtinfo;tic;infocmp;toe;captoinfo;infotocap;terminal;tool;dotnet;csharp;icod</PackageTags>
 	</PropertyGroup>
 

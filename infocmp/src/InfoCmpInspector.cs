@@ -15,9 +15,9 @@ internal static class InfoCmpInspector {
 		ArgumentNullException.ThrowIfNull( stdout );
 		ArgumentNullException.ThrowIfNull( stderr );
 		cancellationToken.ThrowIfCancellationRequested();
-		if ( options.IsComparison ) {
+		if ( options.IsComparison || options.IsSynthesis ) {
 			throw new ArgumentException(
-				"Comparison options cannot be rendered as one terminal.",
+				"Comparison or synthesis options cannot be rendered as one terminal.",
 				nameof( options )
 			);
 		}
@@ -67,6 +67,95 @@ internal static class InfoCmpInspector {
 				stderr,
 				"INFOCMP0004",
 				requestedName,
+				exception.Message,
+				cancellationToken
+			).ConfigureAwait( false );
+			return CommandExitCodes.Failure;
+		}
+
+		await WriteAsync(
+			stdout,
+			rendered,
+			cancellationToken
+		).ConfigureAwait( false );
+		return CommandExitCodes.Success;
+	}
+
+	internal static async Task<int> SynthesizeAsync(
+		InfoCmpOptions options,
+		Stream stdout,
+		Stream stderr,
+		CancellationToken cancellationToken
+	) {
+		ArgumentNullException.ThrowIfNull( options );
+		ArgumentNullException.ThrowIfNull( stdout );
+		ArgumentNullException.ThrowIfNull( stderr );
+		cancellationToken.ThrowIfCancellationRequested();
+		if ( !options.IsSynthesis ) {
+			throw new ArgumentException(
+				"Relative synthesis options are required.",
+				nameof( options )
+			);
+		}
+
+		string targetName = options.TerminalNames[ 0 ];
+		InfoCmpTerminal? target =
+			await AcquireAsync(
+				targetName,
+				options.DatabaseDirectory,
+				stderr,
+				cancellationToken
+			).ConfigureAwait( false );
+		if ( target is null ) {
+			return CommandExitCodes.Failure;
+		}
+
+		List<TerminalDescriptionSourceSynthesisParent> parents = [];
+		for ( int index = 1; index < options.TerminalNames.Count; index++ ) {
+			cancellationToken.ThrowIfCancellationRequested();
+			string requestedName = options.TerminalNames[ index ];
+			InfoCmpTerminal? parent =
+				await AcquireAsync(
+					requestedName,
+					options.ComparisonDatabaseDirectory,
+					stderr,
+					cancellationToken
+				).ConfigureAwait( false );
+			if ( parent is null ) {
+				return CommandExitCodes.Failure;
+			}
+			parents.Add(
+				new TerminalDescriptionSourceSynthesisParent(
+					requestedName,
+					parent.Description
+				)
+			);
+		}
+
+		string rendered;
+		try {
+			TerminalDescriptionSourceSynthesisOptions synthesisOptions =
+				new(
+					options.LineWidth,
+					options.Layout,
+					options.CapabilityOrder,
+					TerminalDescriptionSourceSynthesisOptions.DefaultMaximumParentCount,
+					options.IncludeExtendedCapabilities
+				);
+			rendered =
+				TerminalDescriptionSourceSynthesizer.Synthesize(
+					target.Description,
+					parents,
+					synthesisOptions
+				);
+		} catch ( Exception exception ) when (
+			exception is ArgumentException
+			or InvalidOperationException
+		) {
+			await InfoCmpDiagnosticWriter.WriteErrorAsync(
+				stderr,
+				"INFOCMP0004",
+				targetName,
 				exception.Message,
 				cancellationToken
 			).ConfigureAwait( false );
