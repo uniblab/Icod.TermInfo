@@ -183,7 +183,7 @@ public sealed class T45CompletionGateTests {
 				"1.2.0-COMPILER-PUBLIC-API-BASELINE.txt",
 				verifier );
 			Assert.Contains(
-				"1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt",
+				"1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt",
 				verifier );
 			Assert.True(
 				verifier.Contains(

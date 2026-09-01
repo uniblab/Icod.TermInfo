@@ -408,7 +408,7 @@ public sealed class I01ContractTests {
 					)
 				);
 			Assert.Contains(
-				"1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt",
+				"1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt",
 				verifier
 			);
 			Assert.Contains(
