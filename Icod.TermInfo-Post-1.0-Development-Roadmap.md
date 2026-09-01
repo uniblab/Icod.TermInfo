@@ -10,11 +10,12 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
-**Current coordinated version:** `1.7.0-Alpha-8`
+**Current coordinated version:** `1.7.0`
 **Final 1.6 prerelease:** `1.6.0-Alpha-8`
-**Next development line:** `1.7.0` — Relative Terminfo Source Synthesis
-**Status:** RS08 complete — Alpha-8 validated; stable transition pending
-**Current tranche:** Stable 1.7.0 transition pending
+**Final 1.7 prerelease:** `1.7.0-Alpha-8`
+**Next development line:** post-1.7 demand-driven work
+**Status:** 1.7.0 stable release contract frozen
+**Current tranche:** Release closure — exact-main validation and publication
 **Primary objective:** Synthesize deterministic relative terminfo source in Inspection and expose it through `infocmp -u` without destabilizing the frozen Runtime, Source, Compiler, or Termcap contracts.
 
 ---
@@ -122,7 +123,8 @@ round trips. RS06 exposes the reusable engine through `infocmp -u`; RS07 adds
 seeded generated-state, pathological-boundary, and pinned ncurses differential
 validation. RS08 freezes the additive Inspection API, package and distribution
 topology, release-verifier gates, documentation, and release audit. The
-validated Alpha-8 surface now awaits only the stable 1.7.0 transition.
+stable 1.7.0 release promotes that validated Alpha-8 surface without semantic or
+public-API changes.
 
 The sequence is cumulative but intentionally modular. Applications which only need runtime terminfo SHALL continue to depend on `Icod.TermInfo` alone.
 

@@ -8,8 +8,9 @@ representability and rendering engine. It does not add another termcap semantic
 model or conversion table. TC08 freezes that composition for the stable 1.6.0
 release.
 
-Version `1.6.1` carries that frozen conversion behavior unchanged. It is a
-release-infrastructure hotfix and does not alter `infotocap` command semantics.
+Version `1.7.0` carries that frozen conversion behavior unchanged. Relative
+terminfo source synthesis is isolated in Inspection and `infocmp -u`; it does
+not alter `infotocap` command semantics or dependencies.
 
 ```text
 Usage: infotocap [OPTION]... FILE...

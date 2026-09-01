@@ -5,7 +5,7 @@ using Xunit;
 namespace Icod.TermInfo.Inspection.Tests;
 
 public sealed class RS08ContractTests {
-	private const string DevelopmentVersion = "1.7.0-Alpha-8";
+	private const string ReleaseVersion = "1.7.0";
 
 	[Fact]
 	public void CoordinatedVersionAndReleaseRecordsIdentifyRs08() {
@@ -35,9 +35,9 @@ public sealed class RS08ContractTests {
 			)
 		);
 
-		Assert.Equal( DevelopmentVersion, version );
+		Assert.Equal( ReleaseVersion, version );
 		Assert.Contains( "RS08", roadmap, StringComparison.Ordinal );
-		Assert.Contains( DevelopmentVersion, audit, StringComparison.Ordinal );
+		Assert.Contains( ReleaseVersion, audit, StringComparison.Ordinal );
 		Assert.Contains(
 			"Stable release commit: pending stable publication",
 			audit,

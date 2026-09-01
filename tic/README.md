@@ -2,7 +2,13 @@
 
 `tic` is part of the `Icod.TermInfo` managed terminfo tool suite.
 
-## 1.6.x status
+## 1.7 status
+
+Version `1.7.0` carries the frozen `tic` compiler, source-language, database,
+and command contracts forward unchanged. Relative-source synthesis is isolated
+in Inspection and `infocmp -u`; `tic` acquires no new semantics or dependencies.
+
+## 1.6.x history
 
 Version `1.6.0` retains the frozen T04/T05 semantic engine, T10 CLI/distribution
 contract, and T11 differential, hostile-input, and artifact validation gates.

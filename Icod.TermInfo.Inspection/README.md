@@ -6,14 +6,14 @@ comparison layer for the `Icod.TermInfo` package family.
 The 1.3 line established the reusable inspection/comparison engine while
 preserving the already-frozen Runtime 1.0, Source 1.1, and Compiler 1.2 public
 contracts. Version 1.4.0 froze the reviewed additive database-inspection and
-renderer-control APIs used by the managed tool suite. Version 1.6.1 preserves
-that frozen API and its semantics; the coordinated patch corrects
-release-verifier NuGet-cache isolation only. `captoinfo` consumes Inspection
-only at the executable-composition layer.
+renderer-control APIs used by the managed tool suite. Version 1.7.0 adds the
+frozen relative-source synthesis API while preserving all earlier Inspection
+contracts. `captoinfo` consumes Inspection only at the executable-composition
+layer.
 
-## 1.7 RS08 frozen synthesis contract
+## 1.7 synthesis contract
 
-`1.7.0-Alpha-8` freezes the additive 1.7 relative-source synthesis surface in
+Version 1.7.0 freezes the additive relative-source synthesis surface in
 `docs/1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt`. The frozen additions are
 `TerminalDescriptionSourceSynthesisParent`,
 `TerminalDescriptionSourceSynthesisOptions`, and
@@ -28,7 +28,7 @@ and Source packages.
 ## Install
 
 ```text
-dotnet add package Icod.TermInfo.Inspection --version 1.6.1
+dotnet add package Icod.TermInfo.Inspection --version 1.7.0
 ```
 
 The package targets `net8.0`, `net9.0`, and `net10.0`, depends on matching

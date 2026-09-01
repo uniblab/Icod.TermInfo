@@ -4,18 +4,17 @@ using Xunit;
 namespace Icod.TermInfo.Tic.Tests;
 
 public sealed class ReleaseClosureTests {
-	private const string StableReleaseVersion = "1.6.1";
-	private const string DevelopmentVersion = "1.7.0-Alpha-8";
+	private const string StableReleaseVersion = "1.7.0";
 	private const string VersionReference = "$(IcodTermInfoSuiteVersion)";
 	private const string StableAssemblyVersion = "1.0.0.0";
 
 	[Fact]
-	public void CoordinatedProjectsConsumeCentralDevelopmentVersion() {
+	public void CoordinatedProjectsConsumeCentralStableVersion() {
 		string root = FindRepositoryRoot();
 		XDocument buildProperties =
 			LoadProject( root, "Directory.Build.props" );
 		Assert.Equal(
-			DevelopmentVersion,
+			StableReleaseVersion,
 			ReadRequiredProperty(
 				buildProperties,
 				"IcodTermInfoSuiteVersion"

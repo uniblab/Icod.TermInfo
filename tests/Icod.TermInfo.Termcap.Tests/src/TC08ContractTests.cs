@@ -4,15 +4,14 @@ using Xunit;
 namespace Icod.TermInfo.Termcap.Tests;
 
 public sealed class TC08ContractTests {
-	private const string StableReleaseVersion = "1.6.1";
-	private const string DevelopmentVersion = "1.7.0-Alpha-8";
+	private const string CurrentReleaseVersion = "1.7.0";
 	private const string HistoricalTc08Version = "1.6.0-Alpha-8";
 	private const string HistoricalTc07Version = "1.6.0-Alpha-7";
 	private const string TermcapApiSnapshotSha256 =
 		"1e24b8a555b506594c58cf58d03bf87b2b60192f6316537cb4200498c6a92ab0";
 
 	[Fact]
-	public void OneSevenDevelopmentPreservesTc07AndTc08History() {
+	public void OneSevenReleasePreservesTc07AndTc08History() {
 		string root = FindRepositoryRoot();
 		XDocument buildProperties =
 			XDocument.Load(
@@ -20,7 +19,7 @@ public sealed class TC08ContractTests {
 				LoadOptions.None
 			);
 		Assert.Equal(
-			DevelopmentVersion,
+			CurrentReleaseVersion,
 			buildProperties
 				.Descendants()
 				.Single( element => element.Name.LocalName == "IcodTermInfoSuiteVersion" )

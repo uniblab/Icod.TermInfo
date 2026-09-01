@@ -5,22 +5,23 @@
 
 The tool targets `net10.0` and therefore requires a .NET 10 runtime.
 
-## 1.7 release-closure status
+## 1.7 release status
 
-`1.7.0-Alpha-8` is the 1.7 tool-distribution release candidate. The router still
-owns no terminfo semantics; it forwards `infocmp -u` to the same standalone
-command implementation and retains the five-command dispatch topology.
+Version 1.7.0 adds `infocmp -u` relative-source synthesis to the coordinated
+tool distribution. The router still owns no terminfo semantics; it forwards the
+operation to the same standalone command implementation and retains the
+five-command dispatch topology.
 
 ## Install
 
 ```text
-dotnet tool install --global Icod.TermInfo.Tools --version 1.6.1
+dotnet tool install --global Icod.TermInfo.Tools --version 1.7.0
 ```
 
 Update or remove the global tool with:
 
 ```text
-dotnet tool update --global Icod.TermInfo.Tools --version 1.6.1
+dotnet tool update --global Icod.TermInfo.Tools --version 1.7.0
 dotnet tool uninstall --global Icod.TermInfo.Tools
 ```
 
@@ -28,7 +29,7 @@ For repository-local or application-local use, install through a tool manifest:
 
 ```text
 dotnet new tool-manifest
-dotnet tool install Icod.TermInfo.Tools --version 1.6.1
+dotnet tool install Icod.TermInfo.Tools --version 1.7.0
 dotnet tool run icod-terminfo --version
 ```
 
@@ -42,7 +43,8 @@ It does not install global commands named `tic`, `infocmp`, `toe`, `captoinfo`,
 or `infotocap`. Those traditional command names belong to separately downloaded
 standalone release archives.
 
-Version 1.6.1 retains all five coordinated commands introduced in 1.6.0:
+Version 1.7.0 retains all five coordinated commands introduced in 1.6.0 and
+adds relative synthesis through the existing `infocmp` command:
 
 ```text
 icod-terminfo tic -V
@@ -50,6 +52,7 @@ icod-terminfo infocmp -V
 icod-terminfo toe -V
 icod-terminfo captoinfo -V
 icod-terminfo infotocap -V
+icod-terminfo infocmp -u target parent
 ```
 
 The router owns no terminfo semantics and does not reparse command-specific
@@ -81,7 +84,7 @@ icod-terminfo infotocap --help
 ## Standalone distribution
 
 The router package complements rather than replaces the release archives. Each
-of the six framework-dependent 1.6.1 tool-suite archives contains standalone
+of the six framework-dependent 1.7.0 tool-suite archives contains standalone
 executables named exactly:
 
 ```text

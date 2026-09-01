@@ -37,7 +37,7 @@ compiles the synthesized form, publishes it into a unique temporary database,
 reloads the child through `DirectoryTerminalDescriptionProvider`, and requires
 each stage to remain semantically equal to the original resolved child.
 
-`1.7.0-Alpha-8` also exercises the explicit five-argument
+Version 1.7.0 also exercises the explicit five-argument
 `TerminalDescriptionSourceSynthesisOptions` constructor which is part of the
 frozen `1.7.0` Inspection API baseline.
 

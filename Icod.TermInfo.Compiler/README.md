@@ -11,27 +11,26 @@ controlled publication into an explicit conventional terminfo directory root.
 C07 closes the implementation program with round-trip, determinism, and pinned
 ncurses/`tic` differential validation.
 
-## 1.7 release-closure status
+## 1.7 release status
 
-`1.7.0-Alpha-8` carries Compiler unchanged into the 1.7 release candidate. The
+Version 1.7.0 carries Compiler unchanged into the stable 1.7 release. The
 frozen 1.2 API and Runtime/Source dependency graph remain unchanged. Compiler is
 used only by tests and samples to validate synthesized source; Inspection does
 not acquire a production Compiler dependency.
 
 ## Install
 
-For the 1.6.1 release:
+For the 1.7.0 release:
 
 ```text
-dotnet add package Icod.TermInfo.Compiler --version 1.6.1
+dotnet add package Icod.TermInfo.Compiler --version 1.7.0
 ```
 
 The package targets `net8.0`, `net9.0`, and `net10.0` and depends on the matching
-`Icod.TermInfo` and `Icod.TermInfo.Source` packages. Version 1.6.1 preserves the
-frozen 1.2 Compiler public API and semantics; the coordinated patch corrects
-release-verifier NuGet-cache isolation only. The dependency remains one-way;
-neither Source nor Runtime
-depends on Compiler, and Compiler does not acquire a Termcap dependency.
+`Icod.TermInfo` and `Icod.TermInfo.Source` packages. Version 1.7.0 preserves the
+frozen 1.2 Compiler public API and semantics. The dependency remains one-way;
+neither Source nor Runtime depends on Compiler, and Compiler does not acquire an
+Inspection or Termcap dependency.
 
 C06 adds `CompiledTermInfoDatabaseWriter`. It never discovers a system database
 or installs globally: callers must supply the output root explicitly. It can

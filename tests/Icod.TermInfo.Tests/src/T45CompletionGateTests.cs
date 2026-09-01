@@ -7,7 +7,7 @@ namespace Icod.TermInfo.Tests;
 
 public sealed class T45CompletionGateTests {
 	[Fact]
-	public void AssemblyRetainsStableIdentityForOneSevenDevelopment() {
+	public void AssemblyRetainsStableIdentityForOneSevenRelease() {
 		Assembly assembly =
 			typeof( TerminalDescription ).Assembly;
 		AssemblyName assemblyName =
@@ -30,12 +30,12 @@ public sealed class T45CompletionGateTests {
 					2 )[ 0 ];
 
 		Assert.Equal(
-			"1.7.0-Alpha-8",
+			"1.7.0",
 			semanticVersion );
 	}
 
 	[Fact]
-	public void ProjectMetadataIdentifiesOneSevenDevelopmentAndStableAssembly() {
+	public void ProjectMetadataIdentifiesOneSevenReleaseAndStableAssembly() {
 		string root =
 			FindRepositoryRoot();
 		XDocument project =
@@ -52,7 +52,7 @@ public sealed class T45CompletionGateTests {
 				LoadOptions.None );
 
 		Assert.Equal(
-			"1.7.0-Alpha-8",
+			"1.7.0",
 			ReadRequiredProperty(
 				buildProperties,
 				"IcodTermInfoSuiteVersion" ) );
@@ -89,22 +89,22 @@ public sealed class T45CompletionGateTests {
 					"README.md" ) );
 
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo --version 1.6.1",
+			"dotnet add package Icod.TermInfo --version 1.7.0",
 			readme );
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo.Source --version 1.6.1",
+			"dotnet add package Icod.TermInfo.Source --version 1.7.0",
 			readme );
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo.Termcap --version 1.6.1",
+			"dotnet add package Icod.TermInfo.Termcap --version 1.7.0",
 			readme );
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo.Compiler --version 1.6.1",
+			"dotnet add package Icod.TermInfo.Compiler --version 1.7.0",
 			readme );
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo.Inspection --version 1.6.1",
+			"dotnet add package Icod.TermInfo.Inspection --version 1.7.0",
 			readme );
 		Assert.Contains(
-			"dotnet tool install --global Icod.TermInfo.Tools --version 1.6.1",
+			"dotnet tool install --global Icod.TermInfo.Tools --version 1.7.0",
 			readme );
 		Assert.DoesNotContain(
 			"1.6.0-Alpha-8 is the current",
@@ -119,7 +119,7 @@ public sealed class T45CompletionGateTests {
 			"docs/1.6.0-RELEASE-AUDIT.md",
 			readme );
 		Assert.Contains(
-			"docs/1.6.1-RELEASE-AUDIT.md",
+			"docs/1.7.0-RELEASE-AUDIT.md",
 			readme );
 	}
 
