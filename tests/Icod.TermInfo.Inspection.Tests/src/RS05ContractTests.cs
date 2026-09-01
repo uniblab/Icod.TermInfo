@@ -379,16 +379,14 @@ public sealed class RS05ContractTests {
 				"rs05-compiler-roundtrip.ti"
 			);
 		Assert.False( compiled.HasErrors );
-		CompiledTermInfoSourceEntry compiledTarget =
-			Assert.Single(
-				compiled.Entries.Where(
-					entry => string.Equals(
-						entry.CanonicalName,
-						target.Name,
-						StringComparison.Ordinal
-					)
-				)
-			);
+		CompiledTermInfoSourceEntry compiledTarget = Assert.Single(
+			compiled.Entries,
+			entry => string.Equals(
+				entry.CanonicalName,
+				target.Name,
+				StringComparison.Ordinal
+			)
+		);
 		TerminalDescription compiledDescription =
 			CompiledTermInfoParser.Parse(
 				compiledTarget.Data
