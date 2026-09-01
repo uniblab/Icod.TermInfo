@@ -10,11 +10,11 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
-**Current coordinated version:** `1.7.0-Alpha-7`
+**Current coordinated version:** `1.7.0-Alpha-8`
 **Final 1.6 prerelease:** `1.6.0-Alpha-8`
 **Next development line:** `1.7.0` — Relative Terminfo Source Synthesis
 **Status:** 1.7.0 implementation in progress
-**Current tranche:** RS07 — Differential validation, fuzzing, and hardening
+**Current tranche:** RS08 — API freeze, packaging, and release closure
 **Primary objective:** Synthesize deterministic relative terminfo source in Inspection and ultimately expose it through `infocmp -u` without destabilizing the frozen Runtime, Source, Compiler, or Termcap contracts.
 
 ---

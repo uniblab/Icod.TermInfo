@@ -11,6 +11,13 @@ controlled publication into an explicit conventional terminfo directory root.
 C07 closes the implementation program with round-trip, determinism, and pinned
 ncurses/`tic` differential validation.
 
+## 1.7 release-closure status
+
+`1.7.0-Alpha-8` carries Compiler unchanged into the 1.7 release candidate. The
+frozen 1.2 API and Runtime/Source dependency graph remain unchanged. Compiler is
+used only by tests and samples to validate synthesized source; Inspection does
+not acquire a production Compiler dependency.
+
 ## Install
 
 For the 1.6.1 release:

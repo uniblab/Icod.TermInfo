@@ -10,6 +10,14 @@ Icod.TermInfo.Source
     parse + resolve .ti source
         |
         v
+Icod.TermInfo.Inspection
+    synthesize child relative to base
+        |
+        v
+Icod.TermInfo.Source
+    reparse + resolve synthesized source
+        |
+        v
 Icod.TermInfo.Compiler
     compile + publish a temporary conventional database
         |
@@ -19,14 +27,19 @@ Icod.TermInfo
         |
         v
 Icod.TermInfo.Inspection
-    compare + render the acquired result
+    compare acquired state with the original target
 ```
 
 The source contains a base entry and a child using `use=` inheritance. The
-sample resolves the child in memory, compiles the complete document, publishes
-both entries into a unique temporary database, reloads the child through
-`DirectoryTerminalDescriptionProvider`, and requires the acquired description
-to be semantically equal to the resolved source description.
+sample resolves both entries, synthesizes deterministic child source relative to
+the base through the frozen 1.7 Inspection API, reparses and resolves that source,
+compiles the synthesized form, publishes it into a unique temporary database,
+reloads the child through `DirectoryTerminalDescriptionProvider`, and requires
+each stage to remain semantically equal to the original resolved child.
+
+`1.7.0-Alpha-8` also exercises the explicit five-argument
+`TerminalDescriptionSourceSynthesisOptions` constructor which is part of the
+frozen `1.7.0` Inspection API baseline.
 
 Run it with:
 

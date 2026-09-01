@@ -22,7 +22,7 @@
 		<Title>Icod.TermInfo.Termcap</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed termcap source parsing and interoperability support for Icod.TermInfo.</Description>
-		<PackageReleaseNotes>The 1.7.0 development line coordinates Termcap with relative terminfo source synthesis while preserving the frozen 1.6 Termcap public API, Runtime-only dependency, conversion semantics, net8/net9/net10 support, and 1.0.0.0 assembly identity; no Termcap semantics change.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.7.0-Alpha-8 is the 1.7 release-closure candidate. It preserves the frozen 1.6 Termcap public API, Runtime-only dependency, conversion semantics, net8/net9/net10 support, and 1.0.0.0 assembly identity.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>

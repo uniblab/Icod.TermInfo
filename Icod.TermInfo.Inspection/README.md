@@ -11,6 +11,20 @@ that frozen API and its semantics; the coordinated patch corrects
 release-verifier NuGet-cache isolation only. `captoinfo` consumes Inspection
 only at the executable-composition layer.
 
+## 1.7 RS08 frozen synthesis contract
+
+`1.7.0-Alpha-8` freezes the additive 1.7 relative-source synthesis surface in
+`docs/1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt`. The frozen additions are
+`TerminalDescriptionSourceSynthesisParent`,
+`TerminalDescriptionSourceSynthesisOptions`, and
+`TerminalDescriptionSourceSynthesizer`. Their standard/extended delta,
+cancellation, exact ordered-parent reference, deterministic LF rendering, and
+semantic round-trip contracts are the stable 1.7 compatibility boundary.
+
+Inspection continues to target `net8.0`, `net9.0`, and `net10.0`, retains
+assembly version `1.0.0.0`, and depends in production only on matching Runtime
+and Source packages.
+
 ## Install
 
 ```text

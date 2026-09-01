@@ -7,6 +7,13 @@ The package is intentionally separate from the stable runtime package. Ordinary
 applications that only load compiled terminfo or use `TerminalDescription`
 values continue to reference `Icod.TermInfo` alone.
 
+## 1.7 release-closure status
+
+`1.7.0-Alpha-8` carries Source unchanged into the 1.7 release candidate. The
+frozen 1.1 API, parser/resolver semantics, right-to-left `use=` processing, and
+one-way Runtime dependency remain unchanged. Source is used by Inspection to
+verify synthesized relative source, but it does not depend on Inspection.
+
 ## Install
 
 For the 1.6.1 release:

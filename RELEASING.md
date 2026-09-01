@@ -16,7 +16,7 @@ This document describes the current validation and publication procedure for the
   must match the centralized suite version.
 - Runtime, Source, Termcap, Compiler, and Inspection retain 1.x assembly version
   `1.0.0.0` and remain unsigned.
-- Supported consumer targets for the 1.6 release are `net8.0`, `net9.0`, and `net10.0`.
+- Supported consumer targets for the 1.7 release are `net8.0`, `net9.0`, and `net10.0`.
 - Beginning with T01 in 1.4, `tic`, `infocmp`, and `toe` target `net10.0`; TC07
   adds `captoinfo` and `infotocap` on `net10.0`. The five reusable library
   packages retain all three target frameworks.
@@ -30,9 +30,9 @@ This document describes the current validation and publication procedure for the
   tagged commit before publication.
 - Runtime 1.0, Source 1.1, Compiler 1.2, and Termcap 1.6 remain exact API-
   baseline gates. The Inspection 1.3 and 1.4 baselines remain immutable historical
-  compatibility records. During 1.7 prerelease development, Inspection retains
-  cross-framework API equality and reviewed additive-contract/package-smoke gates;
-  RS08 freezes the exact 1.7 Inspection baseline which stable 1.7 must then pass.
+  compatibility records. RS08 freezes
+  `docs/1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt`; every Alpha-8 and stable 1.7
+  release gate must pass that exact manifest on net8.0, net9.0, and net10.0.
 - Reusable-library Release builds treat missing public XML documentation as an
   error. Command and router projects generate XML documentation while retaining
   their explicit `CS1591` exemption.

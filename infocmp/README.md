@@ -1,5 +1,12 @@
 # infocmp
 
+## 1.7 RS08 release closure
+
+`1.7.0-Alpha-8` freezes the RS06 `infocmp -u` command contract for the 1.7
+release. The RS07 differential and pathological validation remains permanent
+release evidence. The command remains a thin adapter over the frozen Inspection
+synthesis API.
+
 `infocmp` is part of the `Icod.TermInfo` managed terminfo tool suite.
 
 ## 1.7 RS07 validation and hardening

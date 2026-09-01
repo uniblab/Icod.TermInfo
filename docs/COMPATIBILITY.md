@@ -78,6 +78,13 @@ surface; the reviewed T02/T03 database-inspection additions and T06 renderer
 controls were added compatibly and frozen at 1.4.0. Patch release 1.4.1 reuses
 that baseline unchanged rather than creating a new API contract.
 
+RS08 freezes the additive 1.7 Inspection public API in
+`docs/1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt`. Relative-source synthesis adds
+only `TerminalDescriptionSourceSynthesisParent`,
+`TerminalDescriptionSourceSynthesisOptions`, and
+`TerminalDescriptionSourceSynthesizer` to the already-frozen 1.4 Inspection
+surface. The 1.3 and 1.4 baselines remain immutable historical records.
+
 TC08 freezes the 1.6 Termcap public API in
 `docs/1.6.0-TERMCAP-PUBLIC-API-BASELINE.txt`. Release verification requires the
 full `PublicApiSnapshot/v1` reflection-manifest SHA-256
@@ -96,6 +103,23 @@ Within 1.x:
 
 Runtime, Source, Compiler, Inspection, and Termcap assemblies retain version `1.0.0.0`
 and remain unsigned throughout 1.x.
+
+## 1.7 relative-source synthesis compatibility
+
+Inspection 1.7 may synthesize deterministic terminfo source for an effective
+`TerminalDescription` relative to an explicit ordered parent list. The caller's
+parent order and exact `UseName` spelling are semantic inputs. Parent aggregation
+follows the existing Source resolver precedence, required inherited removals are
+rendered as cancellations, and extended capability names remain ordinal and
+case-sensitive.
+
+The stable command adapter is `infocmp -u target parent [parent ...]`; `-A`
+selects the target database and `-B` the parent database. `-c -u` is the frozen
+ncurses-compatible synonym, while `-d -u`, `-n -u`, and `-q -u` remain usage
+errors. The command does not duplicate synthesis semantics.
+
+The production Inspection package continues to depend only on Runtime and Source.
+Compiler and ncurses are verification references only.
 
 ## Runtime terminfo semantic compatibility
 

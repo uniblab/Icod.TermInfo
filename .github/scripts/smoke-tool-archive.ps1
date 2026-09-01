@@ -149,6 +149,46 @@ release-smoke|Icod.TermInfo release smoke terminal,
 		throw 'infocmp did not acquire the entry published by tic.'
 	}
 
+	$relativeSourcePath = Join-Path $workRoot 'release-relative.ti'
+	[System.IO.File]::WriteAllText(
+		$relativeSourcePath,
+		@"
+release-base|Icod.TermInfo release base,
+	am,
+	lines#24,
+
+release-child|Icod.TermInfo release child,
+	cols#120,
+	clear=\E[H\E[2J,
+	use=release-base,
+"@,
+		[System.Text.UTF8Encoding]::new( $false )
+	)
+
+	[void] (
+		Invoke-ReleaseTool -Name 'tic' -Arguments @(
+			'-o',
+			$databaseRoot,
+			$relativeSourcePath
+		)
+	)
+
+	$relativeOutput = Invoke-ReleaseTool -Name 'infocmp' -Arguments @(
+		'-A',
+		$databaseRoot,
+		'-B',
+		$databaseRoot,
+		'-u',
+		'release-child',
+		'release-base'
+	)
+	if ( -not $relativeOutput.Contains( 'use=release-base' ) ) {
+		throw 'infocmp -u did not emit the expected release-base reference.'
+	}
+	if ( -not $relativeOutput.Contains( 'cols#120' ) ) {
+		throw 'infocmp -u did not preserve the release-child local override.'
+	}
+
 	$toeOutput = Invoke-ReleaseTool -Name 'toe' -Arguments @(
 		'-s',
 		$databaseRoot

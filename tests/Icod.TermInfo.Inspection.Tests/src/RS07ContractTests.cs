@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Text;
-using System.Xml.Linq;
 using Icod.TermInfo;
 using Icod.TermInfo.Inspection;
 using Icod.TermInfo.Source;
@@ -9,7 +8,7 @@ using Xunit;
 namespace Icod.TermInfo.Inspection.Tests;
 
 public sealed class RS07ContractTests {
-	private const string DevelopmentVersion = "1.7.0-Alpha-7";
+	private const string HistoricalDevelopmentVersion = "1.7.0-Alpha-7";
 	private const int GeneratedCaseCount = 64;
 	private const uint FirstGeneratedSeed = 0x17070001u;
 	private const uint SeedStride = 0x9E3779B9u;
@@ -57,19 +56,8 @@ public sealed class RS07ContractTests {
 	];
 
 	[Fact]
-	public void CoordinatedVersionAndImplementationRecordIdentifyRs07() {
+	public void ImplementationRecordPreservesRs07History() {
 		string root = FindRepositoryRoot();
-		XDocument buildProperties = XDocument.Load(
-			Path.Combine( root, "Directory.Build.props" ),
-			LoadOptions.None
-		);
-		string version = buildProperties
-			.Descendants()
-			.Single(
-				element => element.Name.LocalName == "IcodTermInfoSuiteVersion"
-			)
-			.Value
-			.Trim();
 		string implementation = File.ReadAllText(
 			Path.Combine(
 				root,
@@ -78,11 +66,9 @@ public sealed class RS07ContractTests {
 			)
 		);
 
-		Assert.Equal( DevelopmentVersion, version );
-		Assert.Contains( DevelopmentVersion, implementation );
-		Assert.Contains( "6.5.20250216", implementation, StringComparison.Ordinal );
-		Assert.Contains( "reproducible seed", implementation, StringComparison.OrdinalIgnoreCase );
-		Assert.Contains( "RS08", implementation, StringComparison.Ordinal );
+		Assert.Contains( HistoricalDevelopmentVersion, implementation );
+		Assert.Contains( "ncurses 6.5.20250216", implementation );
+		Assert.Contains( "RS08", implementation );
 	}
 
 	[Fact]

@@ -9,6 +9,13 @@ explicit acquisition APIs, and the TC08-frozen public/package contract used by
 the TC07 conversion-command composition. The patch changes release-verifier
 environment isolation only.
 
+## 1.7 release-closure status
+
+`1.7.0-Alpha-8` carries the TC08-frozen Termcap API and Runtime-only dependency
+unchanged into the 1.7 release candidate. Relative terminfo source synthesis does
+not alter termcap parsing, conversion, rendering, acquisition, or package
+direction.
+
 ## Install
 
 ```text

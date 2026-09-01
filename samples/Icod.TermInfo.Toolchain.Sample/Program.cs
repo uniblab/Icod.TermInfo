@@ -62,15 +62,35 @@ TerminalDescription expected =
 TerminalDescriptionSourceSynthesisParent[] synthesisParents = [
 	new( parent.Name, parent ),
 ];
+TerminalDescriptionSourceSynthesisOptions synthesisOptions =
+	new(
+		80,
+		TerminalDescriptionSourceLayout.Canonical,
+		TerminalDescriptionSourceCapabilityOrder.Database,
+		TerminalDescriptionSourceSynthesisOptions.DefaultMaximumParentCount,
+		includeExtendedCapabilities: true
+	);
 string relativeSource =
 	TerminalDescriptionSourceSynthesizer.Synthesize(
 		expected,
-		synthesisParents
+		synthesisParents,
+		synthesisOptions
 	);
 if ( relativeSource.Contains( '\r' )
 	|| !relativeSource.EndsWith( '\n' ) ) {
 	throw new InvalidOperationException(
 		"The synthesized sample source did not preserve the RS05 LF-only rendering contract."
+	);
+}
+
+const string expectedRelativeSource =
+	"icod-toolchain-child|Toolchain sample child,\n"
+		+ "    cols#120,\n"
+		+ "    clear=\\E[H\\E[2J,\n"
+		+ "    use=icod-toolchain-base,\n";
+if ( !string.Equals( relativeSource, expectedRelativeSource, StringComparison.Ordinal ) ) {
+	throw new InvalidOperationException(
+		"The synthesized sample source did not match the frozen deterministic 1.7 representation."
 	);
 }
 

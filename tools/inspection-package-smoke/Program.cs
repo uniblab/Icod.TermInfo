@@ -57,7 +57,7 @@ Require(
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesisOptions ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesisParent ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesizer ) ),
-	"The Inspection package did not expose exactly the reviewed 1.7 Alpha-1 surface."
+	"The Inspection package did not expose exactly the frozen 1.7 public surface."
 );
 
 Require(
@@ -173,12 +173,22 @@ Require(
 	"The T06 configurable renderer did not honor single-line standard-only presentation."
 );
 TerminalDescriptionSourceSynthesisOptions synthesisOptions =
-	new();
+	new(
+		80,
+		TerminalDescriptionSourceLayout.Canonical,
+		TerminalDescriptionSourceCapabilityOrder.Database,
+		TerminalDescriptionSourceSynthesisOptions.DefaultMaximumParentCount,
+		includeExtendedCapabilities: true
+	);
 Require(
-	synthesisOptions.MaximumParentCount == 64
+	synthesisOptions.LineWidth == 80
+		&& synthesisOptions.Layout == TerminalDescriptionSourceLayout.Canonical
+		&& synthesisOptions.CapabilityOrder == TerminalDescriptionSourceCapabilityOrder.Database
+		&& synthesisOptions.MaximumParentCount == 64
+		&& TerminalDescriptionSourceSynthesisOptions.DefaultMaximumParentCount == 64
 		&& TerminalDescriptionSourceSynthesisOptions.MaximumSupportedParentCount == 256
 		&& synthesisOptions.IncludeExtendedCapabilities,
-	"The synthesis package surface did not retain the reviewed defaults."
+	"The frozen 1.7 synthesis options surface did not retain its reviewed contract."
 );
 string synthesizedWithoutParents =
 	TerminalDescriptionSourceSynthesizer.Synthesize(

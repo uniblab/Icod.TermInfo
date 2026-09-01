@@ -16,6 +16,12 @@ The 1.6.1 library package family targets `net8.0`, `net9.0`, and `net10.0`; the
 packages use C# 13, contain no native ncurses/terminfo payload, and are intended
 to run on Windows, Linux, and macOS.
 
+The `1.7.0-Alpha-8` branch is the release-closure candidate for Relative Terminfo
+Source Synthesis. It adds the frozen Inspection synthesis API and `infocmp -u`
+while preserving the Runtime, Source, Compiler, and Termcap public surfaces and
+all existing package dependency directions. Stable `1.6.1` remains the published
+version until the Alpha-8 release gate is completed and `1.7.0` is tagged.
+
 ## Install
 
 Runtime-only consumers use:

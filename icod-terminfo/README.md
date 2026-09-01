@@ -5,6 +5,12 @@
 
 The tool targets `net10.0` and therefore requires a .NET 10 runtime.
 
+## 1.7 release-closure status
+
+`1.7.0-Alpha-8` is the 1.7 tool-distribution release candidate. The router still
+owns no terminfo semantics; it forwards `infocmp -u` to the same standalone
+command implementation and retains the five-command dispatch topology.
+
 ## Install
 
 ```text
