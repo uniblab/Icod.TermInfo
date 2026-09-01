@@ -8,13 +8,12 @@
 
 `Icod.TermInfo` is a managed, dependency-free .NET implementation of the low-level terminal-capability model traditionally supplied by `libtinfo`.
 
-Version 1.6.0 is the current coordinated release. It preserves the frozen 1.0
-Runtime, 1.1 Source, 1.2 Compiler, and 1.4 Inspection contracts, adds the frozen
-1.6 Termcap interoperability contract, and retains the managed `tic`, `infocmp`,
-and `toe` semantics introduced in 1.4. The coordinated tool suite also includes
-`captoinfo` and `infotocap` conversion commands introduced by the 1.6 line.
+Version 1.6.1 is the current coordinated patch release. It preserves the frozen
+1.0 Runtime, 1.1 Source, 1.2 Compiler, 1.4 Inspection, and 1.6 Termcap contracts
+and all five command semantics. The patch corrects release-verifier NuGet-cache
+isolation; it does not change reusable-library public API or terminal semantics.
 
-The 1.6.0 library package family targets `net8.0`, `net9.0`, and `net10.0`; the
+The 1.6.1 library package family targets `net8.0`, `net9.0`, and `net10.0`; the
 packages use C# 13, contain no native ncurses/terminfo payload, and are intended
 to run on Windows, Linux, and macOS.
 
@@ -23,34 +22,34 @@ to run on Windows, Linux, and macOS.
 Runtime-only consumers use:
 
 ```text
-dotnet add package Icod.TermInfo --version 1.6.0
+dotnet add package Icod.TermInfo --version 1.6.1
 ```
 
 Applications which need terminfo source-language support use:
 
 ```text
-dotnet add package Icod.TermInfo.Source --version 1.6.0
+dotnet add package Icod.TermInfo.Source --version 1.6.1
 ```
 
 Applications which need opt-in termcap parsing, conversion, rendering, or
 explicit historical termcap acquisition use:
 
 ```text
-dotnet add package Icod.TermInfo.Termcap --version 1.6.0
+dotnet add package Icod.TermInfo.Termcap --version 1.6.1
 ```
 
 Applications which compile terminfo source or write conventional compiled
 terminfo databases use:
 
 ```text
-dotnet add package Icod.TermInfo.Compiler --version 1.6.0
+dotnet add package Icod.TermInfo.Compiler --version 1.6.1
 ```
 
 Applications which need canonical rendering, semantic comparison, or
 provider-aware inspection use:
 
 ```text
-dotnet add package Icod.TermInfo.Inspection --version 1.6.0
+dotnet add package Icod.TermInfo.Inspection --version 1.6.1
 ```
 
 `Icod.TermInfo.Source` and `Icod.TermInfo.Termcap` each depend on the matching
@@ -61,8 +60,9 @@ on Termcap. Applications which only load compiled terminfo or consume
 `TerminalDescription` values continue to reference `Icod.TermInfo` alone.
 
 The same validated package artifacts are published to NuGet.org and GitHub
-Packages. The completed 1.6 release contract and post-publication record are
-recorded in `docs/1.6.0-RELEASE-AUDIT.md`.
+Packages. The frozen 1.6.0 release contract remains recorded in
+`docs/1.6.0-RELEASE-AUDIT.md`; the 1.6.1 verifier hotfix and publication gate are
+recorded in `docs/1.6.1-RELEASE-AUDIT.md`.
 
 ## Tool Suite
 
@@ -89,7 +89,7 @@ distribution-only router package.
 Install the coordinated router as a .NET tool with:
 
 ```text
-dotnet tool install --global Icod.TermInfo.Tools --version 1.6.0
+dotnet tool install --global Icod.TermInfo.Tools --version 1.6.1
 
 icod-terminfo tic -V
 icod-terminfo infocmp -V
@@ -114,7 +114,7 @@ Icod.TermInfo.Tools.<version>.osx-x64.tar.gz
 Icod.TermInfo.Tools.<version>.osx-arm64.tar.gz
 ```
 
-Each 1.6.0 archive contains the traditional `tic`, `infocmp`, `toe`,
+Each 1.6.1 archive contains the traditional `tic`, `infocmp`, `toe`,
 `captoinfo`, and `infotocap` command names and their required managed
 dependencies. The user supplies the .NET 10 runtime and controls where the
 archive is unpacked and whether that location is placed on `PATH`. The archive
@@ -954,9 +954,9 @@ See `RELEASING.md` for the current release procedure,
 semantic contract, `docs/1.5.0-RELEASE-AUDIT.md` for the published 1.5
 distribution/versioning gate,
 `docs/1.6.0-TC08-DIFFERENTIAL-VALIDATION-FUZZING-AND-FREEZE.md` for frozen 1.6
-pre-release closure evidence, and `docs/1.6.0-RELEASE-AUDIT.md` for the published
-1.6 release contract and post-publication record. Stable version 1.6.0 was
-published from tag `v1.6.0` on 2026-08-31.
+pre-release closure evidence, `docs/1.6.0-RELEASE-AUDIT.md` for the published
+1.6.0 contract and post-publication record, and `docs/1.6.1-RELEASE-AUDIT.md`
+for the release-verifier isolation hotfix and 1.6.1 publication gate.
 
 ## Scope
 
@@ -968,7 +968,8 @@ stability contract, `Icod.TermInfo-Post-1.0-Development-Roadmap.md` for the
 post-1.0 package-family sequence, `Icod.TermInfo-1.3.0-Inspection-and-Comparison-Roadmap.md`
 for the 1.3 Inspection contract,
 `Icod.TermInfo-1.4.0-Tool-Suite-Roadmap.md` for the frozen 1.4 command contract,
-`docs/1.6.0-RELEASE-AUDIT.md` for the current release contract, and
+`docs/1.6.0-RELEASE-AUDIT.md` for the frozen 1.6.0 release contract,
+`docs/1.6.1-RELEASE-AUDIT.md` for the current patch-release contract, and
 `docs/VERSIONING.md` and `docs/COMPATIBILITY.md` for the 1.x promises.
 The 0.6.0 through 1.0.0 roadmaps remain historical frozen contracts.
 

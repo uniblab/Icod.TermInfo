@@ -30,6 +30,14 @@ artifact_dir="$(cd "${artifact_dir}" && pwd)"
 export ICOD_TERMINFO_ARTIFACT_DIR="${artifact_dir}"
 smoke_nuget_config="${repository_root}/.github/scripts/package-smoke.NuGet.Config"
 
+if [[ ${NUGET_PACKAGES+x} == x ]]; then
+  original_nuget_packages="${NUGET_PACKAGES}"
+  original_nuget_packages_was_set=true
+else
+  original_nuget_packages=""
+  original_nuget_packages_was_set=false
+fi
+
 # Repository-only maintenance tools are executed on one explicit framework.
 dotnet run \
   --project tools/terminfo-metadata/Icod.TermInfo.MetadataGenerator.csproj \
@@ -451,11 +459,21 @@ dotnet run \
   --no-restore \
   -p:IcodTermInfoInspectionPackageVersion="${inspection_package_version}"
 
+# Package-smoke consumers intentionally use isolated NuGet caches. Restore the
+# caller's cache before executing repository projects so that isolation does
+# not leak into repository sample/toolchain validation.
+if [[ "${original_nuget_packages_was_set}" == "true" ]]; then
+  export NUGET_PACKAGES="${original_nuget_packages}"
+else
+  unset NUGET_PACKAGES
+fi
+
 # The repository sample must retain a non-interactive path suitable for CI.
 dotnet run \
   --project samples/Icod.TermInfo.Sample/Icod.TermInfo.Sample.csproj \
   -c "${configuration}" \
   -f net10.0 \
+  --no-build \
   -- --describe-only --profile ms-terminal-direct
 
 # The deterministic library-toolchain sample must compose Source, Compiler,
@@ -463,4 +481,5 @@ dotnet run \
 dotnet run \
   --project samples/Icod.TermInfo.Toolchain.Sample/Icod.TermInfo.Toolchain.Sample.csproj \
   -c "${configuration}" \
-  -f net10.0
+  -f net10.0 \
+  --no-build

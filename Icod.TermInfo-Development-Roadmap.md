@@ -21,8 +21,8 @@ version contracts live in version-specific roadmap files.
   API-regret audit, dual-target robustness/compatibility, documentation/package
   freeze, and final completion gate; complete and frozen.
 - `Icod.TermInfo-Post-1.0-Development-Roadmap.md` — authoritative post-1.0
-  program; 1.1.0 through 1.6.0 are complete and frozen, and the next development
-  line is post-1.6 demand-driven work.
+  program; 1.1.0 through 1.6.0 are complete and frozen, 1.6.1 is a compatibility-
+  preserving release-verifier hotfix, and later work remains demand-driven.
 
 ## Roadmap sequence
 
@@ -38,6 +38,7 @@ version contracts live in version-specific roadmap files.
   -> 1.4.0  command tool suite
   -> 1.5.0  coordinated distribution and router
   -> 1.6.0  termcap interoperability
+  -> 1.6.1  release-verifier isolation hotfix
   -> post-1.6  demand-driven work
 ```
 

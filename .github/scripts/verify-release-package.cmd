@@ -334,14 +334,23 @@ echo === Fresh Icod.TermInfo.Inspection package consumer: net10.0 ===
 dotnet run --project "%INSPECTION_SMOKE_ROOT%\Icod.TermInfo.Inspection.PackageSmoke.csproj" -c %CONFIGURATION% -f net10.0 --no-restore -p:IcodTermInfoInspectionPackageVersion=%INSPECTION_PACKAGE_VERSION%
 if errorlevel 1 goto fail
 
+rem Package-smoke consumers intentionally use isolated NuGet caches. Restore the
+rem caller's cache before executing repository projects so that isolation does
+rem not leak into repository sample/toolchain validation.
+if defined OLD_NUGET_PACKAGES (
+    set "NUGET_PACKAGES=%OLD_NUGET_PACKAGES%"
+) else (
+    set "NUGET_PACKAGES="
+)
+
 echo.
 echo === Non-interactive repository sample ===
-dotnet run --project samples\Icod.TermInfo.Sample\Icod.TermInfo.Sample.csproj -c %CONFIGURATION% -f net10.0 -- --describe-only --profile ms-terminal-direct
+dotnet run --project samples\Icod.TermInfo.Sample\Icod.TermInfo.Sample.csproj -c %CONFIGURATION% -f net10.0 --no-build -- --describe-only --profile ms-terminal-direct
 if errorlevel 1 goto fail
 
 echo.
 echo === Deterministic Source/Compiler/Inspection toolchain sample ===
-dotnet run --project samples\Icod.TermInfo.Toolchain.Sample\Icod.TermInfo.Toolchain.Sample.csproj -c %CONFIGURATION% -f net10.0
+dotnet run --project samples\Icod.TermInfo.Toolchain.Sample\Icod.TermInfo.Toolchain.Sample.csproj -c %CONFIGURATION% -f net10.0 --no-build
 if errorlevel 1 goto fail
 
 goto cleanup

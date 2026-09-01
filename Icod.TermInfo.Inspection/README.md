@@ -6,15 +6,15 @@ comparison layer for the `Icod.TermInfo` package family.
 The 1.3 line established the reusable inspection/comparison engine while
 preserving the already-frozen Runtime 1.0, Source 1.1, and Compiler 1.2 public
 contracts. Version 1.4.0 froze the reviewed additive database-inspection and
-renderer-control APIs used by the managed tool suite. Version 1.6.0 participates
-in the coordinated Termcap/tool release without changing that frozen API or its
-semantics; `captoinfo` consumes Inspection only at the executable-composition
-layer.
+renderer-control APIs used by the managed tool suite. Version 1.6.1 preserves
+that frozen API and its semantics; the coordinated patch corrects
+release-verifier NuGet-cache isolation only. `captoinfo` consumes Inspection
+only at the executable-composition layer.
 
 ## Install
 
 ```text
-dotnet add package Icod.TermInfo.Inspection --version 1.6.0
+dotnet add package Icod.TermInfo.Inspection --version 1.6.1
 ```
 
 The package targets `net8.0`, `net9.0`, and `net10.0`, depends on matching
