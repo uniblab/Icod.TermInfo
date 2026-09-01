@@ -21,7 +21,7 @@
 		<Title>Icod.TermInfo</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed, dependency-free .NET terminfo library for terminal capability metadata, compiled terminfo parsing and database discovery, ANSI/DEC/xterm and Windows profiles, parameter expansion, color semantics, and padding-aware output.</Description>
-		<PackageReleaseNotes>Version 1.6.1 is a coordinated patch release correcting release-verifier NuGet-cache isolation while preserving the frozen 1.0 Runtime public API, dependency-free Runtime package boundary, net8/net9/net10 support, 1.0.0.0 assembly identity, and existing Runtime semantics.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.7.0-Alpha-1 coordinates Runtime with relative terminfo source synthesis development while preserving the frozen 1.0 Runtime public API, dependency-free package boundary, net8/net9/net10 support, and 1.0.0.0 assembly identity; no Runtime semantics change.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>

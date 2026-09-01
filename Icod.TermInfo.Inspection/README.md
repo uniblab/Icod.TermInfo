@@ -21,6 +21,21 @@ The package targets `net8.0`, `net9.0`, and `net10.0`, depends on matching
 Runtime and Source packages, and retains no production Compiler or Termcap
 dependency.
 
+## 1.7 RS01 relative-source synthesis contract
+
+`1.7.0-Alpha-1` begins additive relative terminfo source synthesis in Inspection.
+RS01 introduces `TerminalDescriptionSourceSynthesisParent`,
+`TerminalDescriptionSourceSynthesisOptions`, and
+`TerminalDescriptionSourceSynthesizer`. Parent references are explicit and
+ordered, reference names are unique under ordinal comparison, and synthesis is
+bounded to 64 parents by default with a hard supported maximum of 256.
+
+The zero-parent form already delegates to the existing effective source renderer.
+Relative capability delta and cancellation execution for one or more parents is
+reserved for RS02 so Alpha-1 does not emit semantically incomplete `use=` source.
+Runtime, Source, Compiler, and Termcap public APIs remain unchanged, and
+Inspection retains no production Compiler or Termcap dependency.
+
 ## 1.4 T07 semantic-comparison composition
 
 `1.4.0-Alpha-7` advances the coordinated package family while the managed

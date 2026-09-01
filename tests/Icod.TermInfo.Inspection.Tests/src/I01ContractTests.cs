@@ -94,6 +94,9 @@ public sealed class I01ContractTests {
 				"Icod.TermInfo.Inspection.TerminalDescriptionSourceLayout",
 				"Icod.TermInfo.Inspection.TerminalDescriptionSourceRenderer",
 				"Icod.TermInfo.Inspection.TerminalDescriptionSourceRendererOptions",
+				"Icod.TermInfo.Inspection.TerminalDescriptionSourceSynthesisOptions",
+				"Icod.TermInfo.Inspection.TerminalDescriptionSourceSynthesisParent",
+				"Icod.TermInfo.Inspection.TerminalDescriptionSourceSynthesizer",
 			},
 			exportedTypes
 		);

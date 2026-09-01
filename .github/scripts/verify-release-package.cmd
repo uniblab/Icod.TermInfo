@@ -96,10 +96,10 @@ if errorlevel 1 goto fail
 dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c %CONFIGURATION% --no-build -- --compare Icod.TermInfo.Inspection\bin\%CONFIGURATION%\net8.0\Icod.TermInfo.Inspection.dll Icod.TermInfo.Inspection\bin\%CONFIGURATION%\net10.0\Icod.TermInfo.Inspection.dll
 if errorlevel 1 goto fail
 
-echo.
-echo === Verify approved Icod.TermInfo.Inspection public API baseline (%CONFIGURATION%) ===
-dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c %CONFIGURATION% --no-build -- --check docs\1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt Icod.TermInfo.Inspection\bin\%CONFIGURATION%\net10.0\Icod.TermInfo.Inspection.dll
-if errorlevel 1 goto fail
+rem The frozen 1.4 Inspection baseline remains immutable historical evidence:
+rem docs\1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt
+rem RS01 begins additive 1.7 Inspection API development. Cross-framework equality
+rem remains enforced above; RS08 freezes the exact stable 1.7 Inspection baseline.
 
 echo.
 echo === Verify package structure and symbols (%CONFIGURATION%) ===

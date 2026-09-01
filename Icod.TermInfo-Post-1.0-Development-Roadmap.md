@@ -10,12 +10,12 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
-**Current coordinated version:** `1.6.1`
+**Current coordinated version:** `1.7.0-Alpha-1`
 **Final 1.6 prerelease:** `1.6.0-Alpha-8`
-**Next development line:** post-1.6 demand-driven work
-**Status:** 1.6.1 patch release in validation
-**Current tranche:** 1.6.1 hotfix — release-verifier NuGet-cache isolation
-**Primary objective:** Extend the terminfo ecosystem beyond runtime capability acquisition without destabilizing the frozen 1.0 runtime contract.
+**Next development line:** `1.7.0` — Relative Terminfo Source Synthesis
+**Status:** 1.7.0 implementation in progress
+**Current tranche:** RS01 — Synthesis contract and internal model
+**Primary objective:** Synthesize deterministic relative terminfo source in Inspection and ultimately expose it through `infocmp -u` without destabilizing the frozen Runtime, Source, Compiler, or Termcap contracts.
 
 ---
 
@@ -84,6 +84,7 @@ in a new version-specific roadmap, not in the retired inventory.
 | **1.5.0** | Coordinated distribution | Centralize suite versioning and add the installable command router without changing frozen library APIs or 1.4 command semantics |
 | **1.6.0** | Termcap interoperability | Parse, resolve, and convert termcap and terminfo |
 | **1.6.1** | Release-verifier hotfix | Restore caller NuGet-cache state before repository sample/toolchain validation; no public API or command-semantic changes |
+| **1.7.0** | Relative terminfo source synthesis | Synthesize deterministic relative `.ti` source in Inspection and expose it through `infocmp -u` |
 | **later** | Exotic storage/formats | Berkeley DB provider and historical Unix dialects as justified |
 
 The completed 1.5 release contract is recorded in
@@ -103,6 +104,12 @@ and standalone suite archives therefore expose five commands.
 Version 1.6.1 preserves that frozen package/API/command surface and corrects a
 release-verifier environment leak: package-smoke validation must restore the
 caller's `NUGET_PACKAGES` state before repository sample/toolchain builds.
+
+Version 1.7.0 is governed by
+[`Icod.TermInfo 1.7.0 — Relative Terminfo Source Synthesis Roadmap.md`](Icod.TermInfo%201.7.0%20%E2%80%94%20Relative%20Terminfo%20Source%20Synthesis%20Roadmap.md).
+RS01 establishes the additive synthesis contract in Inspection while preserving
+the frozen Runtime, Source, Compiler, and Termcap APIs; later tranches implement
+relative deltas, cancellations, semantic verification, and `infocmp -u`.
 
 The sequence is cumulative but intentionally modular. Applications which only need runtime terminfo SHALL continue to depend on `Icod.TermInfo` alone.
 

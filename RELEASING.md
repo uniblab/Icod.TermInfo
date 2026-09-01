@@ -28,9 +28,11 @@ This document describes the current validation and publication procedure for the
 - Release validation must pass on Windows, Linux, and macOS on `main` before a
   release tag is created. The tag workflow repeats the Release gate on the exact
   tagged commit before publication.
-- Release validation must pass the frozen Runtime 1.0, Source 1.1, Compiler 1.2,
-  Inspection 1.4, and Termcap 1.6 API baselines while retaining the historical
-  Inspection 1.3 baseline and the net8/net9/net10 API-equivalence gates.
+- Runtime 1.0, Source 1.1, Compiler 1.2, and Termcap 1.6 remain exact API-
+  baseline gates. The Inspection 1.3 and 1.4 baselines remain immutable historical
+  compatibility records. During 1.7 prerelease development, Inspection retains
+  cross-framework API equality and reviewed additive-contract/package-smoke gates;
+  RS08 freezes the exact 1.7 Inspection baseline which stable 1.7 must then pass.
 - Reusable-library Release builds treat missing public XML documentation as an
   error. Command and router projects generate XML documentation while retaining
   their explicit `CS1591` exemption.

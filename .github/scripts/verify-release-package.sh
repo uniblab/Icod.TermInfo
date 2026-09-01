@@ -122,14 +122,10 @@ dotnet run \
   Icod.TermInfo.Inspection/bin/${configuration}/net8.0/Icod.TermInfo.Inspection.dll \
   Icod.TermInfo.Inspection/bin/${configuration}/net10.0/Icod.TermInfo.Inspection.dll
 
-# The active 1.4 Inspection baseline retains 1.3 and records reviewed 1.4 additions.
-dotnet run \
-  --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj \
-  -c "${configuration}" \
-  --no-build \
-  -- --check \
-  docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt \
-  Icod.TermInfo.Inspection/bin/${configuration}/net10.0/Icod.TermInfo.Inspection.dll
+# The frozen 1.4 Inspection baseline remains immutable historical evidence:
+# docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt
+# RS01 begins additive 1.7 Inspection API development. Cross-framework equality
+# remains enforced above; RS08 freezes the exact stable 1.7 Inspection baseline.
 
 # Structural package, Source Link, dependency, and architecture verification.
 dotnet run \

@@ -131,6 +131,15 @@ change is limited to release-verifier environment isolation: temporary
 package-smoke `NUGET_PACKAGES` values must not leak into repository sample or
 toolchain builds.
 
+RS01 advances the coordinated development version to `1.7.0-Alpha-1` and adds
+relative-source synthesis contract types only to `Icod.TermInfo.Inspection`.
+Runtime, Source, Compiler, and Termcap retain their frozen public API baselines;
+Inspection continues to depend only on Runtime and Source in production, and all
+five reusable assemblies retain `1.0.0.0`. During 1.7 development the release
+verifier enforces cross-framework Inspection API equality and package smoke
+coverage for the additive surface. The exact stable 1.7 Inspection API baseline
+is intentionally frozen by RS08 rather than by RS01.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:

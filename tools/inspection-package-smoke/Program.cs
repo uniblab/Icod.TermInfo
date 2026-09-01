@@ -31,7 +31,7 @@ Require(
 Type[] exportedTypes =
 	inspectionAssembly.GetExportedTypes();
 Require(
-	exportedTypes.Length == 22
+	exportedTypes.Length == 25
 		&& exportedTypes.Contains( typeof( TermInfoComparisonResult ) )
 		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalog ) )
 		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalogEntry ) )
@@ -53,8 +53,11 @@ Require(
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceCapabilityOrder ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceLayout ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceRenderer ) )
-		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceRendererOptions ) ),
-	"The Inspection package did not expose exactly the reviewed 1.4 Alpha-6 surface."
+		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceRendererOptions ) )
+		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesisOptions ) )
+		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesisParent ) )
+		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesizer ) ),
+	"The Inspection package did not expose exactly the reviewed 1.7 Alpha-1 surface."
 );
 
 Require(
@@ -168,6 +171,33 @@ Require(
 	singleLineStandard
 		== "inspection-smoke|Inspection package smoke, am, cols#80,\n",
 	"The T06 configurable renderer did not honor single-line standard-only presentation."
+);
+TerminalDescriptionSourceSynthesisOptions synthesisOptions =
+	new();
+Require(
+	synthesisOptions.MaximumParentCount == 64
+		&& TerminalDescriptionSourceSynthesisOptions.MaximumSupportedParentCount == 256,
+	"The RS01 package surface did not retain the frozen parent-count bounds."
+);
+string synthesizedWithoutParents =
+	TerminalDescriptionSourceSynthesizer.Synthesize(
+		terminal,
+		Array.Empty<TerminalDescriptionSourceSynthesisParent>(),
+		synthesisOptions
+	);
+Require(
+	synthesizedWithoutParents == rendered,
+	"The RS01 zero-parent synthesizer did not preserve effective renderer semantics."
+);
+TerminalDescriptionSourceSynthesisParent synthesisParent =
+	new(
+		"inspection-smoke-parent",
+		terminal
+	);
+Require(
+	synthesisParent.UseName == "inspection-smoke-parent"
+		&& ReferenceEquals( synthesisParent.Description, terminal ),
+	"The RS01 package parent descriptor did not preserve source and effective identity."
 );
 TermInfoSourceParseResult reparsed =
 	TermInfoSourceParser.Parse(
