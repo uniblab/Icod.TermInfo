@@ -189,15 +189,38 @@ Require(
 	synthesizedWithoutParents == rendered,
 	"The RS01 zero-parent synthesizer did not preserve effective renderer semantics."
 );
+TerminalDescription synthesisParentDescription =
+	new TerminalDescriptionBuilder( "inspection-smoke-parent" )
+		.SetDescription( "Inspection package smoke parent" )
+		.SetBoolean( BooleanCapability.AutoRightMargin )
+		.SetNumber( NumericCapability.Columns, 80 )
+		.Build();
 TerminalDescriptionSourceSynthesisParent synthesisParent =
 	new(
-		"inspection-smoke-parent",
-		terminal
+		synthesisParentDescription.Name,
+		synthesisParentDescription
 	);
 Require(
 	synthesisParent.UseName == "inspection-smoke-parent"
-		&& ReferenceEquals( synthesisParent.Description, terminal ),
+		&& ReferenceEquals(
+			synthesisParent.Description,
+			synthesisParentDescription
+		),
 	"The RS01 package parent descriptor did not preserve source and effective identity."
+);
+string synthesizedWithParent =
+	TerminalDescriptionSourceSynthesizer.Synthesize(
+		terminal,
+		new[] {
+			synthesisParent,
+		},
+		synthesisOptions
+	);
+Require(
+	synthesizedWithParent
+		== "inspection-smoke|Inspection package smoke,\n"
+			+ "    use=inspection-smoke-parent,\n",
+	"The RS02 package synthesizer did not omit inherited standard capabilities."
 );
 TermInfoSourceParseResult reparsed =
 	TermInfoSourceParser.Parse(

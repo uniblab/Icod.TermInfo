@@ -5,7 +5,7 @@ namespace Icod.TermInfo.Termcap.Tests;
 
 public sealed class TC08ContractTests {
 	private const string StableReleaseVersion = "1.6.1";
-	private const string DevelopmentVersion = "1.7.0-Alpha-1";
+	private const string DevelopmentVersion = "1.7.0-Alpha-2";
 	private const string HistoricalTc08Version = "1.6.0-Alpha-8";
 	private const string HistoricalTc07Version = "1.6.0-Alpha-7";
 	private const string TermcapApiSnapshotSha256 =

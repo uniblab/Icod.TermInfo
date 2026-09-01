@@ -339,29 +339,23 @@ public sealed class RS01ContractTests {
 	}
 
 	[Fact]
-	public void RelativeExecutionRemainsReservedForRs02() {
-		TerminalDescription target =
-			CreateTerminal(
-				"target-terminal"
-			);
-		TerminalDescriptionSourceSynthesisParent parent =
-			new(
-				"base-terminal",
-				CreateTerminal( "base-terminal" )
-			);
-
-		NotSupportedException exception =
-			Assert.Throws<NotSupportedException>(
-				() =>
-					TerminalDescriptionSourceSynthesizer.Synthesize(
-						target,
-						new[] {
-							parent,
-						}
-					)
+	public void Rs01RecordRetainsOriginalRelativeExecutionBoundary() {
+		string root =
+			FindRepositoryRoot();
+		string implementation =
+			File.ReadAllText(
+				Path.Combine(
+					root,
+					"docs",
+					"1.7.0-RS01-SYNTHESIS-CONTRACT-AND-MODEL.md"
+				)
 			);
 
-		Assert.Contains( "RS02", exception.Message, StringComparison.Ordinal );
+		Assert.Contains(
+			"reserved for RS02",
+			implementation,
+			StringComparison.OrdinalIgnoreCase
+		);
 	}
 
 	[Fact]

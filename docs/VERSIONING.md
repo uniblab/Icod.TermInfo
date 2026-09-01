@@ -140,6 +140,14 @@ verifier enforces cross-framework Inspection API equality and package smoke
 coverage for the additive surface. The exact stable 1.7 Inspection API baseline
 is intentionally frozen by RS08 rather than by RS01.
 
+RS02 advances the coordinated development version to `1.7.0-Alpha-2` without
+adding public API. Inspection now executes deterministic standard Boolean,
+numeric, and string relative-source deltas and cancellations against the ordered
+parent contract frozen by RS01. Runtime, Source, Compiler, and Termcap retain
+their frozen public API baselines; Inspection retains Runtime-and-Source-only
+production dependencies and assembly version `1.0.0.0`. Extended capability
+relative synthesis remains assigned to RS03.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:

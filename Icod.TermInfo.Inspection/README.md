@@ -21,6 +21,23 @@ The package targets `net8.0`, `net9.0`, and `net10.0`, depends on matching
 Runtime and Source packages, and retains no production Compiler or Termcap
 dependency.
 
+## 1.7 RS02 standard capability delta and cancellation
+
+`1.7.0-Alpha-2` makes the RS01 parented synthesis contract operational for every
+standard Boolean, numeric, and string capability. The synthesizer computes the
+effective ordered-parent baseline, omits inherited values which already match
+the target, emits target-local additions and overrides, and emits `cap@`
+cancellations when inherited state must be removed.
+
+Parent order is preserved exactly and follows the existing Source precedence
+contract: the leftmost parent has the highest parent-to-parent priority. The
+target header remains authoritative, and existing layout and capability-order
+options remain deterministic.
+
+Extended-capability relative synthesis remains RS03 work. A parented request
+containing target or parent extended capabilities fails explicitly rather than
+emitting source whose effective semantics could differ from the target.
+
 ## 1.7 RS01 relative-source synthesis contract
 
 `1.7.0-Alpha-1` begins additive relative terminfo source synthesis in Inspection.

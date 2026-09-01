@@ -5,10 +5,11 @@ namespace Icod.TermInfo.Inspection;
 /// description relative to an explicitly ordered parent set.
 /// </summary>
 /// <remarks>
-/// The RS01 contract foundation validates and freezes synthesis inputs. The
-/// zero-parent form is already equivalent to effective-source rendering. Local
-/// capability delta and cancellation generation for one or more parents begins
-/// in RS02.
+/// RS01 validates and freezes synthesis inputs. RS02 adds deterministic standard
+/// Boolean, numeric, and string capability deltas and cancellations for ordered
+/// parent sets. Extended-capability relative synthesis remains reserved for
+/// RS03. The zero-parent form remains equivalent to complete effective-source
+/// rendering.
 /// </remarks>
 public static class TerminalDescriptionSourceSynthesizer {
 	/// <summary>
@@ -32,8 +33,8 @@ public static class TerminalDescriptionSourceSynthesizer {
 	/// <see langword="null"/>.
 	/// </exception>
 	/// <exception cref="NotSupportedException">
-	/// The request contains one or more parents while the RS01 contract
-	/// foundation is active. Relative capability-delta synthesis begins in RS02.
+	/// A parented request contains target or parent extended capabilities. Extended
+	/// relative synthesis begins in RS03.
 	/// </exception>
 	public static string Synthesize(
 		TerminalDescription target,
@@ -70,8 +71,8 @@ public static class TerminalDescriptionSourceSynthesizer {
 	/// The parent sequence violates the synthesis parent contract.
 	/// </exception>
 	/// <exception cref="NotSupportedException">
-	/// The request contains one or more parents while the RS01 contract
-	/// foundation is active. Relative capability-delta synthesis begins in RS02.
+	/// A parented request contains target or parent extended capabilities. Extended
+	/// relative synthesis begins in RS03.
 	/// </exception>
 	public static void Write(
 		TextWriter writer,
@@ -145,16 +146,15 @@ public static class TerminalDescriptionSourceSynthesizer {
 	) {
 		ArgumentNullException.ThrowIfNull( plan );
 
-		if ( plan.Parents.Count != 0 ) {
-			throw new NotSupportedException(
-				"RS01 establishes the relative-source synthesis contract. "
-					+ "Standard capability delta and cancellation synthesis begins in RS02."
+		if ( plan.Parents.Count == 0 ) {
+			return TerminalDescriptionSourceRenderer.Render(
+				plan.Target,
+				plan.Options.CreateRendererOptions()
 			);
 		}
 
-		return TerminalDescriptionSourceRenderer.Render(
-			plan.Target,
-			plan.Options.CreateRendererOptions()
+		return TerminalDescriptionSourceRenderer.RenderRelativeStandard(
+			plan
 		);
 	}
 }

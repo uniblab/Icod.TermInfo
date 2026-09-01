@@ -10,11 +10,11 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
-**Current coordinated version:** `1.7.0-Alpha-1`
+**Current coordinated version:** `1.7.0-Alpha-2`
 **Final 1.6 prerelease:** `1.6.0-Alpha-8`
 **Next development line:** `1.7.0` — Relative Terminfo Source Synthesis
 **Status:** 1.7.0 implementation in progress
-**Current tranche:** RS01 — Synthesis contract and internal model
+**Current tranche:** RS02 — Standard capability delta and cancellation engine
 **Primary objective:** Synthesize deterministic relative terminfo source in Inspection and ultimately expose it through `infocmp -u` without destabilizing the frozen Runtime, Source, Compiler, or Termcap contracts.
 
 ---
@@ -106,10 +106,12 @@ release-verifier environment leak: package-smoke validation must restore the
 caller's `NUGET_PACKAGES` state before repository sample/toolchain builds.
 
 Version 1.7.0 is governed by
-[`Icod.TermInfo 1.7.0 — Relative Terminfo Source Synthesis Roadmap.md`](Icod.TermInfo%201.7.0%20%E2%80%94%20Relative%20Terminfo%20Source%20Synthesis%20Roadmap.md).
-RS01 establishes the additive synthesis contract in Inspection while preserving
-the frozen Runtime, Source, Compiler, and Termcap APIs; later tranches implement
-relative deltas, cancellations, semantic verification, and `infocmp -u`.
+[`Icod.TermInfo 1.7.0 — Relative Terminfo Source Synthesis Roadmap.md`](Icod.TermInfo%201.7.0%20-%20Relative%20Terminfo%20Source%20Synthesis%20Roadmap.md).
+RS01 established the additive synthesis contract in Inspection. RS02 implements
+the standard Boolean, numeric, and string parent aggregate, local delta, and
+cancellation engine while preserving the frozen Runtime, Source, Compiler, and
+Termcap APIs. Extended capabilities remain RS03 work, and `infocmp -u` remains
+assigned to RS06.
 
 The sequence is cumulative but intentionally modular. Applications which only need runtime terminfo SHALL continue to depend on `Icod.TermInfo` alone.
 
