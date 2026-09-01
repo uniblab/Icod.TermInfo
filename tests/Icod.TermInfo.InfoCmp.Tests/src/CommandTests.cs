@@ -19,10 +19,10 @@ public sealed class CommandTests {
 		);
 
 		Assert.Equal( CommandExitCodes.Success, status );
-		Assert.Contains(
-			"Usage: infocmp",
-			ReadText( stdout )
-		);
+		string help = ReadText( stdout );
+		Assert.Contains( "Usage: infocmp", help );
+		Assert.Contains( "-u", help );
+		Assert.Contains( "target parent", help );
 		Assert.Empty( ReadText( stderr ) );
 	}
 
@@ -40,7 +40,7 @@ public sealed class CommandTests {
 		);
 
 		Assert.Equal( CommandExitCodes.Success, status );
-		Assert.Contains( "1.7.0-Alpha-5", ReadText( stdout ) );
+		Assert.Contains( "1.7.0-Alpha-6", ReadText( stdout ) );
 		Assert.Empty( ReadText( stderr ) );
 	}
 

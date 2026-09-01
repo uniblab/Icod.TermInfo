@@ -99,6 +99,15 @@ public static class Command {
 					"The infocmp option parser returned neither options nor an error."
 				);
 
+			if ( options.IsSynthesis ) {
+				return await InfoCmpInspector.SynthesizeAsync(
+					options,
+					stdout,
+					stderr,
+					cancellationToken
+				).ConfigureAwait( false );
+			}
+
 			return options.IsComparison
 				? await InfoCmpInspector.CompareAsync(
 					options,
@@ -205,22 +214,29 @@ public static class Command {
 
 	private static string GetHelpText() {
 		return $"Usage: {CommandName} [options] [terminal ...]{Environment.NewLine}"
+			+ $"       {CommandName} -u [options] target parent [parent ...]{Environment.NewLine}"
 			+ $"       {CommandName} -D{Environment.NewLine}"
 			+ $"       {CommandName} -V | --version{Environment.NewLine}"
 			+ Environment.NewLine
-			+ $"Inspect one effective terminal or compare two or more terminals semantically.{Environment.NewLine}"
+			+ "Inspect one effective terminal, compare terminals semantically, "
+			+ $"or synthesize relative source.{Environment.NewLine}"
 			+ $"With no terminal operand, TERM supplies the requested one-terminal name.{Environment.NewLine}"
-			+ $"With two or more operands, the first is compared with each subsequent terminal.{Environment.NewLine}"
+			+ $"With two or more operands and no -u, the first is compared with each subsequent terminal.{Environment.NewLine}"
 			+ Environment.NewLine
 			+ $"Database selection:{Environment.NewLine}"
 			+ $"  -A directory    use this explicit database for the first terminal{Environment.NewLine}"
 			+ $"  -B directory    use this explicit database for subsequent terminals{Environment.NewLine}"
 			+ Environment.NewLine
-			+ $"One-terminal source listing:{Environment.NewLine}"
+			+ $"Source presentation:{Environment.NewLine}"
 			+ $"  -0              emit one logical source line without wrapping{Environment.NewLine}"
 			+ $"  -1              emit one capability per line without continuation wrapping{Environment.NewLine}"
 			+ $"  -w width        request canonical string-capability wrapping width{Environment.NewLine}"
 			+ $"  -s key          order standard capabilities by d, i, l, or c{Environment.NewLine}"
+			+ Environment.NewLine
+			+ $"Relative synthesis:{Environment.NewLine}"
+			+ $"  -u              rewrite target relative to each ordered parent using use={Environment.NewLine}"
+			+ $"  -c -u           accepted as an ncurses-compatible synonym for -u{Environment.NewLine}"
+			+ $"  -x              allow required local extended declarations/cancellations{Environment.NewLine}"
 			+ Environment.NewLine
 			+ $"Comparison modes:{Environment.NewLine}"
 			+ $"  -d              list semantic differences; default for two or more operands{Environment.NewLine}"
@@ -234,11 +250,15 @@ public static class Command {
 			+ $"  -V, --version   print the Icod.TermInfo tool-suite version and exit{Environment.NewLine}"
 			+ $"      --help      display this help and exit{Environment.NewLine}"
 			+ Environment.NewLine
-			+ $"Sort keys: d=compiled-table order, i=terminfo short name, l=long variable name, c=termcap code.{Environment.NewLine}"
-			+ $"Default source listing and comparison capability reports include standard capabilities only; use -x for extended capabilities.{Environment.NewLine}"
+			+ "Sort keys: d=compiled-table order, i=terminfo short name, "
+			+ $"l=long variable name, c=termcap code.{Environment.NewLine}"
+			+ "Without -x, relative synthesis fails if reproducing the target requires "
+			+ $"local extended directives.{Environment.NewLine}"
 			+ $"The -n universe is the closed standard capability catalog even when -x is supplied.{Environment.NewLine}"
-			+ $"Unambiguous short options may be clustered; -A, -B, -w, and -s accept attached values; use -- before a terminal name beginning with '-'.{Environment.NewLine}"
-			+ $"Rendered source output is effective state; original comments, whitespace, use= history, cancellations, and provenance are not reconstructed.{Environment.NewLine}";
+			+ "Unambiguous short options may be clustered; -A, -B, -w, and -s accept "
+			+ $"attached values; use -- before a terminal name beginning with '-'.{Environment.NewLine}"
+			+ "Relative use= references preserve parent operand spelling and order; "
+			+ $"-B applies to every parent.{Environment.NewLine}";
 	}
 
 	private static string GetSemanticVersion() {

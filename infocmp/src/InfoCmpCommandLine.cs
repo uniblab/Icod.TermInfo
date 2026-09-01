@@ -101,6 +101,7 @@ internal static class InfoCmpCommandLineNormalizer {
 					case 'c':
 					case 'n':
 					case 'q':
+					case 'u':
 					case 'x':
 						normalized.Add( $"-{option}" );
 						break;

@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Text;
-using System.Xml.Linq;
 using Icod.TermInfo;
 using Icod.TermInfo.Compiler;
 using Icod.TermInfo.Inspection;
@@ -10,24 +9,11 @@ using Xunit;
 namespace Icod.TermInfo.Inspection.Tests;
 
 public sealed class RS05ContractTests {
-	private const string DevelopmentVersion = "1.7.0-Alpha-5";
+	private const string HistoricalDevelopmentVersion = "1.7.0-Alpha-5";
 
 	[Fact]
-	public void CoordinatedVersionAndImplementationRecordIdentifyRs05() {
+	public void ImplementationRecordPreservesRs05History() {
 		string root = FindRepositoryRoot();
-		XDocument buildProperties =
-			XDocument.Load(
-				Path.Combine( root, "Directory.Build.props" ),
-				LoadOptions.None
-			);
-		string version =
-			buildProperties
-				.Descendants()
-				.Single(
-					element => element.Name.LocalName == "IcodTermInfoSuiteVersion"
-				)
-				.Value
-				.Trim();
 		string implementation =
 			File.ReadAllText(
 				Path.Combine(
@@ -37,8 +23,7 @@ public sealed class RS05ContractTests {
 				)
 			);
 
-		Assert.Equal( DevelopmentVersion, version );
-		Assert.Contains( DevelopmentVersion, implementation );
+		Assert.Contains( HistoricalDevelopmentVersion, implementation );
 		Assert.Contains( "LF", implementation, StringComparison.Ordinal );
 		Assert.Contains( "TermInfoSourceCompiler", implementation );
 		Assert.Contains( "RS06", implementation );

@@ -29,7 +29,7 @@
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-		<PackageReleaseNotes>The 1.7.0 development line coordinates the distribution-only router with relative terminfo source synthesis. RS05 adds no command semantics; deterministic synthesis rendering and semantic verification remain reusable Inspection concerns while all five routed commands and the standalone archive topology remain unchanged.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.7.0-Alpha-6 routes the additive infocmp -u relative-synthesis command behavior through the existing distribution-only router without adding router-owned terminfo semantics or changing the five-command/archive topology.</PackageReleaseNotes>
 		<PackageTags>terminfo;termcap;libtinfo;tic;infocmp;toe;captoinfo;infotocap;terminal;tool;dotnet;csharp;icod</PackageTags>
 	</PropertyGroup>
 
