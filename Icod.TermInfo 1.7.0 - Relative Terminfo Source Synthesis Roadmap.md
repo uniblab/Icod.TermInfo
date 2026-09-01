@@ -10,7 +10,7 @@
 **Target frameworks:** reusable libraries `net8.0`; `net9.0`; `net10.0`; commands `net10.0`  
 **Reusable assembly identity:** retain `1.0.0.0` unless an independently justified compatibility break is discovered  
 **Planned development sequence:** `1.7.0-Alpha-1` through `1.7.0-Alpha-8`, then stable `1.7.0`  
-**Status:** RS02 implementation in progress — standard capability delta and cancellation engine
+**Status:** RS03 implementation in progress — extended capability synthesis
 **Primary objective:** synthesize deterministic terminfo source for a target `TerminalDescription` relative to an explicit ordered set of parent descriptions, then expose that capability through `infocmp -u`.
 
 ---
@@ -827,6 +827,9 @@ Create:
 ```text
 docs/1.7.0-RS03-EXTENDED-CAPABILITY-SYNTHESIS.md
 ```
+
+**Implementation record:**
+[`docs/1.7.0-RS03-EXTENDED-CAPABILITY-SYNTHESIS.md`](docs/1.7.0-RS03-EXTENDED-CAPABILITY-SYNTHESIS.md)
 
 ---
 

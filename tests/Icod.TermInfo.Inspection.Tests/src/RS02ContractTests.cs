@@ -1,5 +1,4 @@
 using System.Text;
-using System.Xml.Linq;
 using Icod.TermInfo;
 using Icod.TermInfo.Inspection;
 using Icod.TermInfo.Source;
@@ -8,40 +7,20 @@ using Xunit;
 namespace Icod.TermInfo.Inspection.Tests;
 
 public sealed class RS02ContractTests {
-	private const string DevelopmentVersion = "1.7.0-Alpha-2";
+	private const string HistoricalDevelopmentVersion = "1.7.0-Alpha-2";
 
 	[Fact]
-	public void CoordinatedVersionAndImplementationRecordIdentifyRs02() {
-		string root =
-			FindRepositoryRoot();
-		XDocument buildProperties =
-			XDocument.Load(
-				Path.Combine(
-					root,
-					"Directory.Build.props"
-				),
-				LoadOptions.None
-			);
-		string version =
-			buildProperties
-				.Descendants()
-				.Single(
-					element =>
-						element.Name.LocalName == "IcodTermInfoSuiteVersion"
-				)
-				.Value
-				.Trim();
-		string implementation =
-			File.ReadAllText(
-				Path.Combine(
-					root,
-					"docs",
-					"1.7.0-RS02-STANDARD-DELTA-AND-CANCELLATION.md"
-				)
-			);
+	public void ImplementationRecordPreservesRs02History() {
+		string root = FindRepositoryRoot();
+		string implementation = File.ReadAllText(
+			Path.Combine(
+				root,
+				"docs",
+				"1.7.0-RS02-STANDARD-DELTA-AND-CANCELLATION.md"
+			)
+		);
 
-		Assert.Equal( DevelopmentVersion, version );
-		Assert.Contains( DevelopmentVersion, implementation );
+		Assert.Contains( HistoricalDevelopmentVersion, implementation );
 		Assert.Contains( "leftmost", implementation, StringComparison.OrdinalIgnoreCase );
 		Assert.Contains( "cancellation", implementation, StringComparison.OrdinalIgnoreCase );
 		Assert.Contains( "RS03", implementation );
@@ -327,54 +306,6 @@ public sealed class RS02ContractTests {
 			parents,
 			first
 		);
-	}
-
-	[Fact]
-	public void ParentedExtendedCapabilitiesRemainReservedForRs03() {
-		TerminalDescription targetWithExtension =
-			new TerminalDescriptionBuilder( "rs02-child" )
-				.SetDescription( "RS02 child" )
-				.SetExtendedString( "Vendor", "value" )
-				.Build();
-		TerminalDescription plainParent =
-			new TerminalDescriptionBuilder( "rs02-parent" )
-				.SetDescription( "RS02 parent" )
-				.Build();
-		TerminalDescription extendedParent =
-			new TerminalDescriptionBuilder( "rs02-extended-parent" )
-				.SetDescription( "RS02 extended parent" )
-				.SetExtendedNumber( "RGB", 16_777_216 )
-				.Build();
-
-		NotSupportedException targetException =
-			Assert.Throws<NotSupportedException>(
-				() =>
-					TerminalDescriptionSourceSynthesizer.Synthesize(
-						targetWithExtension,
-						new[] {
-							new TerminalDescriptionSourceSynthesisParent(
-								plainParent.Name,
-								plainParent
-							),
-						}
-					)
-			);
-		NotSupportedException parentException =
-			Assert.Throws<NotSupportedException>(
-				() =>
-					TerminalDescriptionSourceSynthesizer.Synthesize(
-						plainParent,
-						new[] {
-							new TerminalDescriptionSourceSynthesisParent(
-								extendedParent.Name,
-								extendedParent
-							),
-						}
-					)
-			);
-
-		Assert.Contains( "RS03", targetException.Message );
-		Assert.Contains( "RS03", parentException.Message );
 	}
 
 	private static TerminalDescription CreateColumnsTerminal(
