@@ -21,8 +21,11 @@ version contracts live in version-specific roadmap files.
   API-regret audit, dual-target robustness/compatibility, documentation/package
   freeze, and final completion gate; complete and frozen.
 - `Icod.TermInfo-Post-1.0-Development-Roadmap.md` — authoritative post-1.0
-  program; 1.1.0 through 1.6.0 are complete and frozen, 1.6.1 is a compatibility-
-  preserving release-verifier hotfix, and later work remains demand-driven.
+  program; 1.1.0 through 1.6.1 are complete, and 1.7.0 relative source synthesis
+  is the active development line.
+- `Icod.TermInfo 1.7.0 — Relative Terminfo Source Synthesis Roadmap.md` — active
+  1.7 contract for reusable Inspection synthesis and the later `infocmp -u`
+  command integration.
 
 ## Roadmap sequence
 
@@ -39,7 +42,7 @@ version contracts live in version-specific roadmap files.
   -> 1.5.0  coordinated distribution and router
   -> 1.6.0  termcap interoperability
   -> 1.6.1  release-verifier isolation hotfix
-  -> post-1.6  demand-driven work
+  -> 1.7.0  relative terminfo source synthesis
 ```
 
 The coordinated package family now consists of Runtime, Source, Compiler,
@@ -49,7 +52,8 @@ Hashed Berkeley-DB stores and divergent historical binary dialects remain
 demand-driven TermInfo work; live terminal sessions/input/probing, PTYs,
 curses/virtual screens, graphics protocols, and terminal emulation remain sibling
 system concerns. Current post-1.0 planning is governed by
-`Icod.TermInfo-Post-1.0-Development-Roadmap.md`.
+`Icod.TermInfo-Post-1.0-Development-Roadmap.md` and the active
+`Icod.TermInfo 1.7.0 — Relative Terminfo Source Synthesis Roadmap.md`.
 
 The remainder of this file preserves the original 0.6.0 planning document.
 
