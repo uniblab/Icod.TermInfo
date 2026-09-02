@@ -28,16 +28,22 @@ jobs:
         include:
           - os: windows-latest
             name: Windows x64
+            distribution_host: false
           - os: windows-11-arm
             name: Windows ARM64
+            distribution_host: false
           - os: ubuntu-24.04
             name: Linux x64
+            distribution_host: true
           - os: ubuntu-24.04-arm
             name: Linux ARM64
+            distribution_host: false
           - os: macos-15-intel
             name: macOS x64
+            distribution_host: false
           - os: macos-15
             name: macOS ARM64
+            distribution_host: false
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     steps:
@@ -51,24 +57,21 @@ jobs:
         run: dotnet build ${{ env.SOLUTION_PATH }} -c ${{ env.CONFIGURATION }} --no-restore -p:ContinuousIntegrationBuild=true
       - name: Test
         run: dotnet test ${{ env.SOLUTION_PATH }} -c ${{ env.CONFIGURATION }} --no-build --no-restore --logger trx
-
-  package:
-    needs: build
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSIONS }}
-      - run: dotnet restore ${{ env.SOLUTION_PATH }}
-      - run: dotnet build ${{ env.SOLUTION_PATH }} -c ${{ env.CONFIGURATION }} --no-restore -p:ContinuousIntegrationBuild=true
       - name: Pack coordinated Release packages
+        if: matrix.distribution_host
         shell: pwsh
         run: ./packaging/PackPackages.ps1 -Configuration '${{ env.CONFIGURATION }}' -OutputDirectory artifacts
       - name: Verify exact Release package artifacts
+        if: matrix.distribution_host
         shell: pwsh
         run: ./packaging/VerifyPackageArtifact.ps1 -ArtifactDirectory artifacts -Configuration '${{ env.CONFIGURATION }}'
-      - uses: actions/upload-artifact@v4
+      - name: Build and verify Release tool archives
+        if: matrix.distribution_host
+        shell: pwsh
+        run: ./packaging/BuildToolArchives.ps1 -Configuration '${{ env.CONFIGURATION }}' -OutputDirectory artifacts/tools
+      - name: Upload validated Release packages
+        if: matrix.distribution_host
+        uses: actions/upload-artifact@v4
         with:
           name: terminfo-main-packages
           path: |
@@ -76,19 +79,9 @@ jobs:
             artifacts/*.snupkg
           if-no-files-found: error
           retention-days: 7
-
-  tool-archives:
-    needs: build
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 10.0.x
-      - name: Build and verify Release tool archives
-        shell: pwsh
-        run: ./packaging/BuildToolArchives.ps1 -Configuration '${{ env.CONFIGURATION }}' -OutputDirectory artifacts/tools
-      - uses: actions/upload-artifact@v4
+      - name: Upload validated Release tool archives
+        if: matrix.distribution_host
+        uses: actions/upload-artifact@v4
         with:
           name: terminfo-main-tools
           path: artifacts/tools/*
@@ -96,7 +89,7 @@ jobs:
           retention-days: 7
 
   smoke-tool-package:
-    needs: package
+    needs: build
     strategy:
       fail-fast: false
       matrix:
@@ -115,7 +108,7 @@ jobs:
         run: ./.github/scripts/smoke-tool-package.ps1 artifacts
 
   smoke-tool-archives:
-    needs: tool-archives
+    needs: build
     strategy:
       fail-fast: false
       matrix:
