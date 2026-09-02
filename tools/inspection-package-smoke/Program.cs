@@ -61,7 +61,7 @@ Require(
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesisOptions ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesisParent ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesizer ) ),
-	"The Inspection package did not expose exactly the reviewed 1.8 Alpha-1 surface."
+	"The Inspection package did not expose exactly the reviewed 1.8 Alpha-2 surface."
 );
 
 Require(
@@ -203,7 +203,7 @@ Require(
 		&& planningOptions.MaximumGeneratedSourceLength
 			== TermInfoSourceLexerOptions.DefaultMaximumSourceLength
 		&& !planningOptions.AllowNonExhaustiveResult,
-	"The RP01 package planning options did not retain the reviewed bounded defaults."
+	"The RP02 package planning options did not retain the reviewed bounded defaults."
 );
 TerminalDescriptionSourcePlanningScore planningScore =
 	new(
@@ -230,23 +230,8 @@ Require(
 				Array.Empty<int>()
 			)
 		) < 0,
-	"The RP01 package planning score did not retain its reviewed component order."
+	"The RP02 package planning score did not retain its reviewed component order."
 );
-try {
-	_ = TerminalDescriptionSourcePlanner.Plan(
-		terminal,
-		Array.Empty<TerminalDescriptionSourceSynthesisParent>(),
-		planningOptions
-	);
-	throw new InvalidOperationException(
-		"RP01 package planning unexpectedly executed search before RP02."
-	);
-} catch ( NotSupportedException exception ) {
-	Require(
-		exception.Message.Contains( "RP02", StringComparison.Ordinal ),
-		"The RP01 package planner did not identify its operational tranche boundary."
-	);
-}
 string synthesizedWithoutParents =
 	TerminalDescriptionSourceSynthesizer.Synthesize(
 		terminal,
@@ -312,6 +297,28 @@ Require(
 			+ "    use=inspection-smoke-parent-alias,\n",
 	"The RS04 package synthesizer did not preserve repeated canonical/alias "
 		+ "parent references in caller order."
+);
+TerminalDescriptionSourcePlan planned =
+	TerminalDescriptionSourcePlanner.Plan(
+		terminal,
+		new[] {
+			synthesisAliasParent,
+		}
+	);
+Require(
+	planned.SelectedParents.Count == 1
+		&& ReferenceEquals( planned.SelectedParents[ 0 ], synthesisAliasParent )
+		&& planned.Source
+			== "inspection-smoke|Inspection package smoke,\n"
+				+ "    use=inspection-smoke-parent-alias,\n"
+		&& planned.Score.LocalDirectiveCount == 0
+		&& planned.Score.CancellationCount == 0
+		&& planned.Score.ParentCount == 1
+		&& planned.Score.SelectedCandidateIndices.SequenceEqual( new[] { 0 } )
+		&& planned.EvaluatedPlanCount == 2
+		&& planned.IsExhaustive
+		&& planned.CandidateCount == 1,
+	"The RP02 package planner did not select the exact single-parent reference with complete evidence."
 );
 TerminalDescription extendedSmokeParent =
 	new TerminalDescriptionBuilder( "inspection-smoke-extended-parent" )

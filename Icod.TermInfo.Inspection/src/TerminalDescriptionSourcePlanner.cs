@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace Icod.TermInfo.Inspection;
 
 /// <summary>
@@ -5,7 +7,8 @@ namespace Icod.TermInfo.Inspection;
 /// </summary>
 /// <remarks>
 /// RP01 freezes planning inputs, score ordering, result evidence, and candidate
-/// snapshot semantics. Operational zero- and single-parent search begins in RP02.
+/// snapshot semantics. RP02 evaluates the zero-parent baseline and every legal
+/// single-parent candidate position.
 /// </remarks>
 public static class TerminalDescriptionSourcePlanner {
 	/// <summary>
@@ -27,9 +30,6 @@ public static class TerminalDescriptionSourcePlanner {
 	/// <exception cref="InvalidOperationException">
 	/// Operational planning cannot satisfy the active exhaustive or representation
 	/// policy.
-	/// </exception>
-	/// <exception cref="NotSupportedException">
-	/// RP01 contract-only planning is active; search begins in RP02.
 	/// </exception>
 	public static TerminalDescriptionSourcePlan Plan(
 		TerminalDescription target,
@@ -66,9 +66,6 @@ public static class TerminalDescriptionSourcePlanner {
 	/// Operational planning cannot satisfy the active exhaustive or representation
 	/// policy.
 	/// </exception>
-	/// <exception cref="NotSupportedException">
-	/// RP01 contract-only planning is active; search begins in RP02.
-	/// </exception>
 	public static TerminalDescriptionSourcePlan Plan(
 		TerminalDescription target,
 		IEnumerable<TerminalDescriptionSourceSynthesisParent> candidates,
@@ -96,8 +93,8 @@ public static class TerminalDescriptionSourcePlanner {
 	/// </param>
 	/// <param name="options">The immutable planning policy.</param>
 	/// <param name="cancellationToken">
-	/// A token observed before and during candidate snapshot and, from RP02,
-	/// deterministic plan evaluation.
+	/// A token observed before and during candidate snapshot and deterministic plan
+	/// evaluation.
 	/// </param>
 	/// <returns>The selected deterministic relative-source plan.</returns>
 	/// <exception cref="ArgumentException">
@@ -109,9 +106,6 @@ public static class TerminalDescriptionSourcePlanner {
 	/// <exception cref="InvalidOperationException">
 	/// Operational planning cannot satisfy the active exhaustive or representation
 	/// policy.
-	/// </exception>
-	/// <exception cref="NotSupportedException">
-	/// RP01 contract-only planning is active; search begins in RP02.
 	/// </exception>
 	/// <exception cref="OperationCanceledException">
 	/// <paramref name="cancellationToken"/> requests cancellation.
@@ -126,17 +120,160 @@ public static class TerminalDescriptionSourcePlanner {
 		ArgumentNullException.ThrowIfNull( candidates );
 		ArgumentNullException.ThrowIfNull( options );
 
-		_ = CreateRequest(
-			target,
-			candidates,
-			options,
+		TerminalDescriptionSourcePlanningRequest request =
+			CreateRequest(
+				target,
+				candidates,
+				options,
+				cancellationToken
+			);
+
+		return EvaluateZeroAndSingleParentPlans(
+			request,
+			cancellationToken
+		);
+	}
+
+	private static TerminalDescriptionSourcePlan EvaluateZeroAndSingleParentPlans(
+		TerminalDescriptionSourcePlanningRequest request,
+		CancellationToken cancellationToken
+	) {
+		ArgumentNullException.ThrowIfNull( request );
+		cancellationToken.ThrowIfCancellationRequested();
+		if ( request.Candidates.Count > 1
+			&& request.Options.MaximumSelectedParentCount > 1 ) {
+			throw new InvalidOperationException(
+				"The active limits admit ordered multi-parent plans, which begin in RP03. Configure MaximumSelectedParentCount as one for exhaustive RP02 planning."
+			);
+		}
+
+		int singleParentPlanCount =
+			request.Options.MaximumSelectedParentCount == 0
+				? 0
+				: request.Candidates.Count;
+		int requiredPlanCount =
+			checked( singleParentPlanCount + 1 );
+		if ( requiredPlanCount > request.Options.MaximumEvaluatedPlanCount
+			&& !request.Options.AllowNonExhaustiveResult ) {
+			throw new InvalidOperationException(
+				$"Exhaustive zero- and single-parent planning requires {requiredPlanCount} evaluations, but the configured maximum is {request.Options.MaximumEvaluatedPlanCount}."
+			);
+		}
+
+		int evaluationLimit =
+			Math.Min(
+				requiredPlanCount,
+				request.Options.MaximumEvaluatedPlanCount
+			);
+		int evaluatedPlanCount = 0;
+		TerminalDescriptionSourcePlanningScore? bestScore = null;
+		string? bestSource = null;
+		TerminalDescriptionSourceSynthesisParent? bestParent = null;
+
+		EvaluatePlan(
+			request,
+			candidateIndex: null,
+			ref evaluatedPlanCount,
+			ref bestScore,
+			ref bestSource,
+			ref bestParent,
 			cancellationToken
 		);
 
-		throw new NotSupportedException(
-			"RP01 establishes the relative-source planning contract. "
-				+ "Operational zero- and single-parent planning begins in RP02."
+		for ( int candidateIndex = 0;
+			candidateIndex < singleParentPlanCount
+				&& evaluatedPlanCount < evaluationLimit;
+			candidateIndex++ ) {
+			EvaluatePlan(
+				request,
+				candidateIndex,
+				ref evaluatedPlanCount,
+				ref bestScore,
+				ref bestSource,
+				ref bestParent,
+				cancellationToken
+			);
+		}
+		cancellationToken.ThrowIfCancellationRequested();
+
+		if ( bestScore is null || bestSource is null ) {
+			throw new InvalidOperationException(
+				"No evaluated zero- or single-parent plan satisfied the active synthesis and generated-source limits."
+			);
+		}
+
+		IEnumerable<TerminalDescriptionSourceSynthesisParent> selectedParents =
+			bestParent is null
+				? []
+				: [ bestParent ];
+		return new TerminalDescriptionSourcePlan(
+			selectedParents,
+			bestSource,
+			bestScore,
+			evaluatedPlanCount,
+			isExhaustive: evaluatedPlanCount == requiredPlanCount,
+			candidateCount: request.Candidates.Count
 		);
+	}
+
+	private static void EvaluatePlan(
+		TerminalDescriptionSourcePlanningRequest request,
+		int? candidateIndex,
+		ref int evaluatedPlanCount,
+		ref TerminalDescriptionSourcePlanningScore? bestScore,
+		ref string? bestSource,
+		ref TerminalDescriptionSourceSynthesisParent? bestParent,
+		CancellationToken cancellationToken
+	) {
+		ArgumentNullException.ThrowIfNull( request );
+
+		cancellationToken.ThrowIfCancellationRequested();
+		evaluatedPlanCount = checked( evaluatedPlanCount + 1 );
+
+		TerminalDescriptionSourceSynthesisParent? candidate =
+			candidateIndex.HasValue
+				? request.Candidates[ candidateIndex.Value ]
+				: null;
+		IEnumerable<TerminalDescriptionSourceSynthesisParent> parents =
+			candidate is null
+				? []
+				: [ candidate ];
+		TerminalDescriptionSourceSynthesisResult result;
+		try {
+			result =
+				TerminalDescriptionSourceSynthesizer.SynthesizeWithEvidence(
+					request.Target,
+					parents,
+					request.Options.SynthesisOptions
+				);
+		} catch ( InvalidOperationException ) {
+			return;
+		}
+
+		if ( result.Source.Length
+			> request.Options.MaximumGeneratedSourceLength ) {
+			return;
+		}
+
+		int[] selectedCandidateIndices =
+			candidateIndex.HasValue
+				? [ candidateIndex.Value ]
+				: [];
+		TerminalDescriptionSourcePlanningScore score =
+			new(
+				result.LocalDirectiveCount,
+				result.CancellationCount,
+				selectedCandidateIndices.Length,
+				Encoding.UTF8.GetByteCount( result.Source ),
+				selectedCandidateIndices
+			);
+		if ( bestScore is not null && score.CompareTo( bestScore ) >= 0 ) {
+			return;
+		}
+
+		bestScore = score;
+		bestSource = result.Source;
+		bestParent = candidate;
 	}
 
 	internal static TerminalDescriptionSourcePlanningRequest CreateRequest(

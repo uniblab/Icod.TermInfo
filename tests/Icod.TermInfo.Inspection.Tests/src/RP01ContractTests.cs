@@ -292,7 +292,7 @@ public sealed class RP01ContractTests {
 	}
 
 	[Fact]
-	public void PlannerValidatesAndObservesCancellationBeforeReservedExecution() {
+	public void PlannerValidatesObservesCancellationAndRetainsRp01Inputs() {
 		TerminalDescription target =
 			CreateTerminal( "target" );
 		TerminalDescriptionSourcePlanningOptions options =
@@ -329,11 +329,11 @@ public sealed class RP01ContractTests {
 				)
 		);
 
-		NotSupportedException exception =
-			Assert.Throws<NotSupportedException>(
-				() => TerminalDescriptionSourcePlanner.Plan( target, [] )
-			);
-		Assert.Contains( "RP02", exception.Message, StringComparison.Ordinal );
+		TerminalDescriptionSourcePlan plan =
+			TerminalDescriptionSourcePlanner.Plan( target, [] );
+		Assert.Empty( plan.SelectedParents );
+		Assert.Equal( 1, plan.EvaluatedPlanCount );
+		Assert.True( plan.IsExhaustive );
 	}
 
 	[Fact]

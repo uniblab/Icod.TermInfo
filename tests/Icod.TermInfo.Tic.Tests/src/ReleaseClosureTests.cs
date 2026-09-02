@@ -5,7 +5,7 @@ namespace Icod.TermInfo.Tic.Tests;
 
 public sealed class ReleaseClosureTests {
 	private const string StableReleaseVersion = "1.7.0";
-	private const string DevelopmentVersion = "1.8.0-Alpha-1";
+	private const string DevelopmentVersion = "1.8.0-Alpha-2";
 	private const string VersionReference = "$(IcodTermInfoSuiteVersion)";
 	private const string StableAssemblyVersion = "1.0.0.0";
 

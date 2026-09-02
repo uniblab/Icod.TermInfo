@@ -48,6 +48,21 @@ public static class TerminalDescriptionSourceSynthesizer {
 		ArgumentNullException.ThrowIfNull( target );
 		ArgumentNullException.ThrowIfNull( parents );
 
+		return SynthesizeWithEvidence(
+			target,
+			parents,
+			options
+		).Source;
+	}
+
+	internal static TerminalDescriptionSourceSynthesisResult SynthesizeWithEvidence(
+		TerminalDescription target,
+		IEnumerable<TerminalDescriptionSourceSynthesisParent> parents,
+		TerminalDescriptionSourceSynthesisOptions? options = null
+	) {
+		ArgumentNullException.ThrowIfNull( target );
+		ArgumentNullException.ThrowIfNull( parents );
+
 		TerminalDescriptionSourceSynthesisPlan plan =
 			CreatePlan(
 				target,
@@ -145,7 +160,7 @@ public static class TerminalDescriptionSourceSynthesizer {
 		);
 	}
 
-	private static string RenderPlan(
+	private static TerminalDescriptionSourceSynthesisResult RenderPlan(
 		TerminalDescriptionSourceSynthesisPlan plan
 	) {
 		ArgumentNullException.ThrowIfNull( plan );
@@ -159,9 +174,23 @@ public static class TerminalDescriptionSourceSynthesizer {
 				);
 			}
 
-			return TerminalDescriptionSourceRenderer.Render(
-				plan.Target,
-				plan.Options.CreateRendererOptions()
+			string source =
+				TerminalDescriptionSourceRenderer.Render(
+					plan.Target,
+					plan.Options.CreateRendererOptions()
+				);
+			int localDirectiveCount =
+				checked(
+					plan.Target.BooleanCapabilities.Count
+						+ plan.Target.NumericCapabilities.Count
+						+ plan.Target.StringCapabilities.Count
+						+ plan.Target.ExtendedCapabilities.Count
+				);
+
+			return new TerminalDescriptionSourceSynthesisResult(
+				source,
+				localDirectiveCount,
+				cancellationCount: 0
 			);
 		}
 

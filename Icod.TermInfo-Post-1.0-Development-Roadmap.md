@@ -10,12 +10,12 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
-**Current coordinated version:** `1.8.0-Alpha-1`
+**Current coordinated version:** `1.8.0-Alpha-2`
 **Final 1.6 prerelease:** `1.6.0-Alpha-8`
 **Final 1.7 prerelease:** `1.7.0-Alpha-8`
 **Next development line:** `1.8.0` - Relative Source Planning and Parent Selection
 **Status:** 1.8.0 implementation in progress
-**Current tranche:** RP01 - Planning contract, cost model, and API foundation
+**Current tranche:** RP02 - Zero- and single-parent planning
 **Primary objective:** Select deterministic, bounded, semantically valid ordered parents in Inspection without changing the frozen Runtime, Source, Compiler, Termcap, or 1.7 synthesis contracts.
 
 ---
@@ -132,8 +132,10 @@ Version 1.8.0 is governed by
 RP01 adds the immutable planning options, lexicographic score, result evidence,
 and planner API foundation to Inspection. Candidate inputs reuse the frozen 1.7
 synthesis-parent type, are snapshotted once, retain distinct input positions, and
-are bounded independently from the future deterministic search. RP02 begins
-operational zero- and single-parent planning.
+are bounded independently from deterministic search. RP02 implements exhaustive
+zero- and single-parent evaluation, obtains frozen score evidence directly from
+the synthesis renderer, rejects unrepresentable plans without approximation, and
+selects the deterministic best result against an independent Source-based oracle.
 
 The sequence is cumulative but intentionally modular. Applications which only need runtime terminfo SHALL continue to depend on `Icod.TermInfo` alone.
 

@@ -11,6 +11,52 @@ frozen relative-source synthesis API while preserving all earlier Inspection
 contracts. `captoinfo` consumes Inspection only at the executable-composition
 layer.
 
+## 1.8 RP02 zero- and single-parent planning
+
+`1.8.0-Alpha-2` makes the RP01 planner operational for the zero-parent baseline
+and every legal single candidate position. Planning snapshots candidates once,
+delegates every source candidate to the frozen 1.7 synthesizer, scores semantic
+emission evidence without parsing generated text, and returns the deterministic
+best valid plan.
+
+```csharp
+using Icod.TermInfo;
+using Icod.TermInfo.Inspection;
+
+TerminalDescription target =
+	TerminalDatabase.BuiltIn.Load( "xterm-256color" );
+TerminalDescription parent =
+	TerminalDatabase.BuiltIn.Load( "xterm" );
+
+TerminalDescriptionSourcePlan plan =
+	TerminalDescriptionSourcePlanner.Plan(
+		target,
+		new[] {
+			new TerminalDescriptionSourceSynthesisParent(
+				"xterm",
+				parent
+			),
+		},
+		new TerminalDescriptionSourcePlanningOptions(
+			new TerminalDescriptionSourceSynthesisOptions(),
+			maximumSelectedParentCount: 1
+		)
+	);
+```
+
+`SelectedParents` retains the exact winning `UseName` spelling. `Score`,
+`EvaluatedPlanCount`, `IsExhaustive`, and `CandidateCount` provide immutable
+selection evidence. A candidate is rejected if synthesis cannot reproduce the
+target under the active policy or its source exceeds the configured length; the
+planner never substitutes an approximate result.
+
+RP02's complete search depth is zero and one. A selected-parent limit of zero
+restricts planning to the baseline. When two or more candidates remain after
+snapshot, configure `MaximumSelectedParentCount` as one: a larger limit admits
+ordered multi-parent plans and is rejected until RP03 implements that legal
+space. `IsExhaustive` retains its RP01 meaning across all plans admitted by the
+active limits.
+
 ## 1.8 RP01 relative-source planning contract
 
 `1.8.0-Alpha-1` begins additive relative-source planning in Inspection. RP01
@@ -28,8 +74,8 @@ candidate-index sequences.
 
 RP01 validates and snapshots candidate input once, preserves equivalent positions,
 excludes ordinal target-name and target-alias self-references, and freezes
-exhaustive versus budget-limited result evidence. Operational zero- and
-single-parent planning is reserved for RP02. The frozen 1.7 synthesizer is
+exhaustive versus budget-limited result evidence. RP02 supplies operational zero-
+and single-parent planning. The frozen 1.7 synthesizer public contract is
 unchanged, and Inspection retains only Runtime and Source production dependencies.
 
 ## 1.7 synthesis contract

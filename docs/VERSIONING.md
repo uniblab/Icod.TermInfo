@@ -200,6 +200,15 @@ verifier enforces cross-framework Inspection API equality and package-smoke
 coverage for the additive surface. RP08 freezes the exact stable 1.8 Inspection
 API baseline.
 
+RP02 advances the coordinated development version to `1.8.0-Alpha-2` and makes
+the planner operational for the zero-parent baseline plus every legal single
+candidate position. The public API surface is unchanged from RP01. Inspection
+adds only internal synthesis evidence so the frozen score can be computed during
+rendering without reparsing generated source; the frozen 1.7 public synthesizer
+contract and Runtime-and-Source-only production dependency boundary remain
+unchanged. The other coordinated packages and commands advance their package and
+reported versions without public API or command-semantic changes.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:
