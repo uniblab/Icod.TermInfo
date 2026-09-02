@@ -151,6 +151,7 @@ public sealed class RP03PlanningTests {
 			new TerminalDescriptionBuilder( "rp03-alias-base" )
 				.AddAlias( "rp03-alias-one" )
 				.AddAlias( "rp03-alias-two" )
+				.SetDescription( "RP03 alias base" )
 				.SetBoolean( BooleanCapability.AutoRightMargin )
 				.Build();
 		TerminalDescriptionSourceSynthesisParent[] candidates = [
