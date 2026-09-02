@@ -10,12 +10,12 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
-**Current coordinated version:** `1.8.0-Alpha-2`
+**Current coordinated version:** `1.8.0-Alpha-3`
 **Final 1.6 prerelease:** `1.6.0-Alpha-8`
 **Final 1.7 prerelease:** `1.7.0-Alpha-8`
 **Next development line:** `1.8.0` - Relative Source Planning and Parent Selection
 **Status:** 1.8.0 implementation in progress
-**Current tranche:** RP02 - Zero- and single-parent planning
+**Current tranche:** RP03 - Ordered multi-parent planning
 **Primary objective:** Select deterministic, bounded, semantically valid ordered parents in Inspection without changing the frozen Runtime, Source, Compiler, Termcap, or 1.7 synthesis contracts.
 
 ---

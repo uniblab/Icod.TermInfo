@@ -11,6 +11,49 @@ frozen relative-source synthesis API while preserving all earlier Inspection
 contracts. `captoinfo` consumes Inspection only at the executable-composition
 layer.
 
+## 1.8 RP03 ordered multi-parent planning
+
+`1.8.0-Alpha-3` evaluates the zero-parent baseline and every ordered
+permutation of distinct candidate positions through the configured parent
+depth. Different parent orders are distinct plans because the frozen 1.7
+synthesizer resolves collisions using leftmost precedence.
+
+```csharp
+TerminalDescriptionSourcePlan plan =
+	TerminalDescriptionSourcePlanner.Plan(
+		target,
+		new[] {
+			new TerminalDescriptionSourceSynthesisParent(
+				"preferred-base",
+				preferredBase
+			),
+			new TerminalDescriptionSourceSynthesisParent(
+				"supplemental-base",
+				supplementalBase
+			),
+		},
+		new TerminalDescriptionSourcePlanningOptions(
+			new TerminalDescriptionSourceSynthesisOptions(
+				80,
+				maximumParentCount: 2
+			),
+			maximumCandidateCount: 2,
+			maximumSelectedParentCount: 2
+		)
+	);
+```
+
+Enumeration starts with the baseline, then proceeds by increasing depth and
+lexicographic candidate-index sequence. One position cannot repeat within a
+plan, but equal descriptions and aliases at different caller positions remain
+distinct candidates. The winning `SelectedParents`, score indices, and emitted
+`use=` directives all retain the exact selected order.
+
+The default limit of 4,097 evaluations exactly covers the baseline, 64 single-
+parent plans, and 4,032 ordered two-parent plans. A larger admitted space is
+rejected before evaluation unless `AllowNonExhaustiveResult` is enabled; an
+opted-in prefix result reports `IsExhaustive` as `false`.
+
 ## 1.8 RP02 zero- and single-parent planning
 
 `1.8.0-Alpha-2` makes the RP01 planner operational for the zero-parent baseline
@@ -50,10 +93,9 @@ selection evidence. A candidate is rejected if synthesis cannot reproduce the
 target under the active policy or its source exceeds the configured length; the
 planner never substitutes an approximate result.
 
-RP02's complete search depth is zero and one. A selected-parent limit of zero
-restricts planning to the baseline. When two or more candidates remain after
-snapshot, configure `MaximumSelectedParentCount` as one: a larger limit admits
-ordered multi-parent plans and is rejected until RP03 implements that legal
+RP02's complete search depth was zero and one. A selected-parent limit of zero
+still restricts planning to the baseline, and an explicit limit of one retains
+the RP02 search domain. RP03 implements the larger ordered multi-parent legal
 space. `IsExhaustive` retains its RP01 meaning across all plans admitted by the
 active limits.
 
@@ -75,7 +117,8 @@ candidate-index sequences.
 RP01 validates and snapshots candidate input once, preserves equivalent positions,
 excludes ordinal target-name and target-alias self-references, and freezes
 exhaustive versus budget-limited result evidence. RP02 supplies operational zero-
-and single-parent planning. The frozen 1.7 synthesizer public contract is
+and single-parent planning; RP03 extends it to ordered multi-parent plans. The
+frozen 1.7 synthesizer public contract is
 unchanged, and Inspection retains only Runtime and Source production dependencies.
 
 ## 1.7 synthesis contract

@@ -61,7 +61,7 @@ Require(
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesisOptions ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesisParent ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesizer ) ),
-	"The Inspection package did not expose exactly the reviewed 1.8 Alpha-2 surface."
+	"The Inspection package did not expose exactly the reviewed 1.8 Alpha-3 surface."
 );
 
 Require(
@@ -203,7 +203,7 @@ Require(
 		&& planningOptions.MaximumGeneratedSourceLength
 			== TermInfoSourceLexerOptions.DefaultMaximumSourceLength
 		&& !planningOptions.AllowNonExhaustiveResult,
-	"The RP02 package planning options did not retain the reviewed bounded defaults."
+	"The RP03 package planning options did not retain the reviewed bounded defaults."
 );
 TerminalDescriptionSourcePlanningScore planningScore =
 	new(
@@ -230,7 +230,7 @@ Require(
 				Array.Empty<int>()
 			)
 		) < 0,
-	"The RP02 package planning score did not retain its reviewed component order."
+	"The RP03 package planning score did not retain its reviewed component order."
 );
 string synthesizedWithoutParents =
 	TerminalDescriptionSourceSynthesizer.Synthesize(
@@ -319,6 +319,65 @@ Require(
 		&& planned.IsExhaustive
 		&& planned.CandidateCount == 1,
 	"The RP02 package planner did not select the exact single-parent reference with complete evidence."
+);
+TerminalDescription smokeBooleanParentDescription =
+	new TerminalDescriptionBuilder( "inspection-smoke-boolean-parent" )
+		.SetBoolean( BooleanCapability.AutoRightMargin )
+		.Build();
+TerminalDescription smokeNumberParentDescription =
+	new TerminalDescriptionBuilder( "inspection-smoke-number-parent" )
+		.SetNumber( NumericCapability.Columns, 80 )
+		.Build();
+TerminalDescriptionSourceSynthesisParent smokeBooleanParent =
+	new(
+		smokeBooleanParentDescription.Name,
+		smokeBooleanParentDescription
+	);
+TerminalDescriptionSourceSynthesisParent smokeNumberParent =
+	new(
+		smokeNumberParentDescription.Name,
+		smokeNumberParentDescription
+	);
+TerminalDescriptionSourcePlan multiParentPlan =
+	TerminalDescriptionSourcePlanner.Plan(
+		terminal,
+		new[] {
+			smokeBooleanParent,
+			smokeNumberParent,
+		},
+		new TerminalDescriptionSourcePlanningOptions(
+			new TerminalDescriptionSourceSynthesisOptions(
+				80,
+				maximumParentCount: 2
+			),
+			maximumCandidateCount: 2,
+			maximumSelectedParentCount: 2
+		)
+	);
+Require(
+	multiParentPlan.SelectedParents.Count == 2
+		&& ReferenceEquals(
+			multiParentPlan.SelectedParents[ 0 ],
+			smokeBooleanParent
+		)
+		&& ReferenceEquals(
+			multiParentPlan.SelectedParents[ 1 ],
+			smokeNumberParent
+		)
+		&& multiParentPlan.Source
+			== "inspection-smoke|Inspection package smoke,\n"
+				+ "    use=inspection-smoke-boolean-parent,\n"
+				+ "    use=inspection-smoke-number-parent,\n"
+		&& multiParentPlan.Score.LocalDirectiveCount == 0
+		&& multiParentPlan.Score.CancellationCount == 0
+		&& multiParentPlan.Score.ParentCount == 2
+		&& multiParentPlan.Score.SelectedCandidateIndices.SequenceEqual(
+			new[] { 0, 1 }
+		)
+		&& multiParentPlan.EvaluatedPlanCount == 5
+		&& multiParentPlan.IsExhaustive
+		&& multiParentPlan.CandidateCount == 2,
+	"The RP03 package planner did not preserve the exact selected two-parent order and evidence."
 );
 TerminalDescription extendedSmokeParent =
 	new TerminalDescriptionBuilder( "inspection-smoke-extended-parent" )

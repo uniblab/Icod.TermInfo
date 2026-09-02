@@ -209,6 +209,13 @@ contract and Runtime-and-Source-only production dependency boundary remain
 unchanged. The other coordinated packages and commands advance their package and
 reported versions without public API or command-semantic changes.
 
+RP03 advances the coordinated development version to `1.8.0-Alpha-3` and makes
+ordered multi-parent planning operational through the configured selected-parent
+bound. Candidate positions cannot repeat within one plan, distinct equal
+positions remain eligible, fixed-depth enumeration is lexicographic, and exact
+selected order is passed unchanged to the frozen leftmost-precedence synthesizer.
+The public API and production dependency graph remain unchanged.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:

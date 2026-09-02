@@ -8,7 +8,8 @@ namespace Icod.TermInfo.Inspection;
 /// <remarks>
 /// RP01 freezes planning inputs, score ordering, result evidence, and candidate
 /// snapshot semantics. RP02 evaluates the zero-parent baseline and every legal
-/// single-parent candidate position.
+/// single-parent candidate position. RP03 evaluates every legal ordered parent
+/// permutation up to the active selected-parent bound.
 /// </remarks>
 public static class TerminalDescriptionSourcePlanner {
 	/// <summary>
@@ -128,69 +129,74 @@ public static class TerminalDescriptionSourcePlanner {
 				cancellationToken
 			);
 
-		return EvaluateZeroAndSingleParentPlans(
+		return EvaluateOrderedPlans(
 			request,
 			cancellationToken
 		);
 	}
 
-	private static TerminalDescriptionSourcePlan EvaluateZeroAndSingleParentPlans(
+	private static TerminalDescriptionSourcePlan EvaluateOrderedPlans(
 		TerminalDescriptionSourcePlanningRequest request,
 		CancellationToken cancellationToken
 	) {
 		ArgumentNullException.ThrowIfNull( request );
 		cancellationToken.ThrowIfCancellationRequested();
-		if ( request.Candidates.Count > 1
-			&& request.Options.MaximumSelectedParentCount > 1 ) {
-			throw new InvalidOperationException(
-				"The active limits admit ordered multi-parent plans, which begin in RP03. Configure MaximumSelectedParentCount as one for exhaustive RP02 planning."
+		bool completePlanCountKnown =
+			TryGetPlanCountWithinLimit(
+				request.Candidates.Count,
+				request.Options.MaximumSelectedParentCount,
+				request.Options.MaximumEvaluatedPlanCount,
+				out int requiredPlanCount
 			);
-		}
-
-		int singleParentPlanCount =
-			request.Options.MaximumSelectedParentCount == 0
-				? 0
-				: request.Candidates.Count;
-		int requiredPlanCount =
-			checked( singleParentPlanCount + 1 );
-		if ( requiredPlanCount > request.Options.MaximumEvaluatedPlanCount
+		if ( !completePlanCountKnown
 			&& !request.Options.AllowNonExhaustiveResult ) {
 			throw new InvalidOperationException(
-				$"Exhaustive zero- and single-parent planning requires {requiredPlanCount} evaluations, but the configured maximum is {request.Options.MaximumEvaluatedPlanCount}."
+				$"Exhaustive ordered planning requires more than the configured maximum of {request.Options.MaximumEvaluatedPlanCount} evaluations."
 			);
 		}
 
 		int evaluationLimit =
-			Math.Min(
-				requiredPlanCount,
-				request.Options.MaximumEvaluatedPlanCount
-			);
+			completePlanCountKnown
+				? requiredPlanCount
+				: request.Options.MaximumEvaluatedPlanCount;
 		int evaluatedPlanCount = 0;
 		TerminalDescriptionSourcePlanningScore? bestScore = null;
 		string? bestSource = null;
-		TerminalDescriptionSourceSynthesisParent? bestParent = null;
+		TerminalDescriptionSourceSynthesisParent[]? bestParents = null;
+		int maximumDepth =
+			Math.Min(
+				request.Candidates.Count,
+				request.Options.MaximumSelectedParentCount
+			);
+		int[] selectedCandidateIndices = new int[ maximumDepth ];
+		bool[] selectedCandidatePositions =
+			new bool[ request.Candidates.Count ];
 
 		EvaluatePlan(
 			request,
-			candidateIndex: null,
+			selectedCandidateIndices,
+			selectedCount: 0,
 			ref evaluatedPlanCount,
 			ref bestScore,
 			ref bestSource,
-			ref bestParent,
+			ref bestParents,
 			cancellationToken
 		);
 
-		for ( int candidateIndex = 0;
-			candidateIndex < singleParentPlanCount
-				&& evaluatedPlanCount < evaluationLimit;
-			candidateIndex++ ) {
-			EvaluatePlan(
+		for ( int depth = 1;
+			depth <= maximumDepth && evaluatedPlanCount < evaluationLimit;
+			depth++ ) {
+			EnumeratePlansAtDepth(
 				request,
-				candidateIndex,
+				depth,
+				selectedCandidateIndices,
+				selectedCandidatePositions,
+				selectedCount: 0,
+				evaluationLimit,
 				ref evaluatedPlanCount,
 				ref bestScore,
 				ref bestSource,
-				ref bestParent,
+				ref bestParents,
 				cancellationToken
 			);
 		}
@@ -198,46 +204,143 @@ public static class TerminalDescriptionSourcePlanner {
 
 		if ( bestScore is null || bestSource is null ) {
 			throw new InvalidOperationException(
-				"No evaluated zero- or single-parent plan satisfied the active synthesis and generated-source limits."
+				"No evaluated ordered plan satisfied the active synthesis and generated-source limits."
 			);
 		}
 
-		IEnumerable<TerminalDescriptionSourceSynthesisParent> selectedParents =
-			bestParent is null
-				? []
-				: [ bestParent ];
 		return new TerminalDescriptionSourcePlan(
-			selectedParents,
+			bestParents ?? [],
 			bestSource,
 			bestScore,
 			evaluatedPlanCount,
-			isExhaustive: evaluatedPlanCount == requiredPlanCount,
+			isExhaustive: completePlanCountKnown
+				&& evaluatedPlanCount == requiredPlanCount,
 			candidateCount: request.Candidates.Count
 		);
 	}
 
-	private static void EvaluatePlan(
+	private static bool TryGetPlanCountWithinLimit(
+		int candidateCount,
+		int maximumSelectedParentCount,
+		int limit,
+		out int planCount
+	) {
+		int total = 1;
+		int permutations = 1;
+		int maximumDepth =
+			Math.Min( candidateCount, maximumSelectedParentCount );
+		for ( int depth = 1; depth <= maximumDepth; depth++ ) {
+			int factor = candidateCount - depth + 1;
+			if ( permutations > ( limit - total ) / factor ) {
+				planCount = limit;
+				return false;
+			}
+
+			permutations *= factor;
+			total += permutations;
+		}
+
+		planCount = total;
+		return true;
+	}
+
+	private static void EnumeratePlansAtDepth(
 		TerminalDescriptionSourcePlanningRequest request,
-		int? candidateIndex,
+		int depth,
+		int[] selectedCandidateIndices,
+		bool[] selectedCandidatePositions,
+		int selectedCount,
+		int evaluationLimit,
 		ref int evaluatedPlanCount,
 		ref TerminalDescriptionSourcePlanningScore? bestScore,
 		ref string? bestSource,
-		ref TerminalDescriptionSourceSynthesisParent? bestParent,
+		ref TerminalDescriptionSourceSynthesisParent[]? bestParents,
 		CancellationToken cancellationToken
 	) {
 		ArgumentNullException.ThrowIfNull( request );
+		ArgumentNullException.ThrowIfNull( selectedCandidateIndices );
+		ArgumentNullException.ThrowIfNull( selectedCandidatePositions );
+
+		cancellationToken.ThrowIfCancellationRequested();
+		if ( evaluatedPlanCount >= evaluationLimit ) {
+			return;
+		}
+		if ( selectedCount == depth ) {
+			EvaluatePlan(
+				request,
+				selectedCandidateIndices,
+				selectedCount,
+				ref evaluatedPlanCount,
+				ref bestScore,
+				ref bestSource,
+				ref bestParents,
+				cancellationToken
+			);
+			return;
+		}
+
+		for ( int candidateIndex = 0;
+			candidateIndex < request.Candidates.Count
+				&& evaluatedPlanCount < evaluationLimit;
+			candidateIndex++ ) {
+			if ( selectedCandidatePositions[ candidateIndex ] ) {
+				continue;
+			}
+
+			selectedCandidateIndices[ selectedCount ] = candidateIndex;
+			selectedCandidatePositions[ candidateIndex ] = true;
+			EnumeratePlansAtDepth(
+				request,
+				depth,
+				selectedCandidateIndices,
+				selectedCandidatePositions,
+				selectedCount + 1,
+				evaluationLimit,
+				ref evaluatedPlanCount,
+				ref bestScore,
+				ref bestSource,
+				ref bestParents,
+				cancellationToken
+			);
+			selectedCandidatePositions[ candidateIndex ] = false;
+		}
+	}
+
+	private static void EvaluatePlan(
+		TerminalDescriptionSourcePlanningRequest request,
+		int[] selectedCandidateIndices,
+		int selectedCount,
+		ref int evaluatedPlanCount,
+		ref TerminalDescriptionSourcePlanningScore? bestScore,
+		ref string? bestSource,
+		ref TerminalDescriptionSourceSynthesisParent[]? bestParents,
+		CancellationToken cancellationToken
+	) {
+		ArgumentNullException.ThrowIfNull( request );
+		ArgumentNullException.ThrowIfNull( selectedCandidateIndices );
 
 		cancellationToken.ThrowIfCancellationRequested();
 		evaluatedPlanCount = checked( evaluatedPlanCount + 1 );
 
-		TerminalDescriptionSourceSynthesisParent? candidate =
-			candidateIndex.HasValue
-				? request.Candidates[ candidateIndex.Value ]
-				: null;
-		IEnumerable<TerminalDescriptionSourceSynthesisParent> parents =
-			candidate is null
-				? []
-				: [ candidate ];
+		TerminalDescriptionSourceSynthesisParent[] parents =
+			new TerminalDescriptionSourceSynthesisParent[ selectedCount ];
+		int[] candidateIndices = new int[ selectedCount ];
+		for ( int index = 0; index < selectedCount; index++ ) {
+			int candidateIndex = selectedCandidateIndices[ index ];
+			TerminalDescriptionSourceSynthesisParent parent =
+				request.Candidates[ candidateIndex ];
+			for ( int priorIndex = 0; priorIndex < index; priorIndex++ ) {
+				if ( string.Equals(
+					parents[ priorIndex ].UseName,
+					parent.UseName,
+					StringComparison.Ordinal
+				) ) {
+					return;
+				}
+			}
+			parents[ index ] = parent;
+			candidateIndices[ index ] = candidateIndex;
+		}
 		TerminalDescriptionSourceSynthesisResult result;
 		try {
 			result =
@@ -255,17 +358,13 @@ public static class TerminalDescriptionSourcePlanner {
 			return;
 		}
 
-		int[] selectedCandidateIndices =
-			candidateIndex.HasValue
-				? [ candidateIndex.Value ]
-				: [];
 		TerminalDescriptionSourcePlanningScore score =
 			new(
 				result.LocalDirectiveCount,
 				result.CancellationCount,
-				selectedCandidateIndices.Length,
+				selectedCount,
 				Encoding.UTF8.GetByteCount( result.Source ),
-				selectedCandidateIndices
+				candidateIndices
 			);
 		if ( bestScore is not null && score.CompareTo( bestScore ) >= 0 ) {
 			return;
@@ -273,7 +372,7 @@ public static class TerminalDescriptionSourcePlanner {
 
 		bestScore = score;
 		bestSource = result.Source;
-		bestParent = candidate;
+		bestParents = parents;
 	}
 
 	internal static TerminalDescriptionSourcePlanningRequest CreateRequest(

@@ -303,23 +303,13 @@ public sealed class RP02PlanningTests {
 	}
 
 	[Fact]
-	public void MultiParentLegalSpaceIsRejectedUntilRp03() {
+	public void ExplicitSingleParentLimitRetainsRp02SearchDomain() {
 		TerminalDescription target =
 			new TerminalDescriptionBuilder( "rp02-depth-target" ).Build();
 		TerminalDescriptionSourceSynthesisParent[] candidates = [
 			CreateCandidate( "rp02-depth-a" ),
 			CreateCandidate( "rp02-depth-b" ),
 		];
-
-		InvalidOperationException exception =
-			Assert.Throws<InvalidOperationException>(
-				() =>
-					TerminalDescriptionSourcePlanner.Plan(
-						target,
-						candidates
-					)
-			);
-		Assert.Contains( "RP03", exception.Message, StringComparison.Ordinal );
 
 		TerminalDescriptionSourcePlan plan =
 			TerminalDescriptionSourcePlanner.Plan(
