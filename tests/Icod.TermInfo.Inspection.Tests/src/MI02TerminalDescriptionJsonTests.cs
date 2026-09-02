@@ -383,7 +383,16 @@ public sealed class MI02TerminalDescriptionJsonTests {
 		) {
 			Assert.Contains( marker, implementation, StringComparison.Ordinal );
 		}
-		Assert.Contains( "**Status:** MI02 complete", roadmap, StringComparison.Ordinal );
+		Assert.Contains(
+			"## MI02 - Effective Description JSON",
+			roadmap,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			$"**Development version:** `{DevelopmentVersion}`",
+			roadmap,
+			StringComparison.Ordinal
+		);
 	}
 
 	private static TerminalDescription CreateFixtureDescription() =>
