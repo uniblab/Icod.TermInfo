@@ -35,7 +35,7 @@ public sealed class CommandTests {
 	[Theory]
 	[InlineData( "-V" )]
 	[InlineData( "--version" )]
-	public async Task VersionReportsCoordinatedStableVersion( string option ) {
+	public async Task VersionReportsCoordinatedDevelopmentVersion( string option ) {
 		using var stdin = new MemoryStream();
 		using var stdout = new MemoryStream();
 		using var stderr = new MemoryStream();
@@ -48,8 +48,7 @@ public sealed class CommandTests {
 		);
 
 		Assert.Equal( CommandExitCodes.Success, status );
-		Assert.Contains( "1.7.0", ReadText( stdout ) );
-		Assert.DoesNotContain( "Alpha", ReadText( stdout ) );
+		Assert.Contains( "1.8.0-Alpha-1", ReadText( stdout ) );
 		Assert.Empty( ReadText( stderr ) );
 	}
 

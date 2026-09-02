@@ -29,10 +29,11 @@ This document describes the current validation and publication procedure for the
   release tag is created. The tag workflow repeats the Release gate on the exact
   tagged commit before publication.
 - Runtime 1.0, Source 1.1, Compiler 1.2, and Termcap 1.6 remain exact API-
-  baseline gates. The Inspection 1.3 and 1.4 baselines remain immutable historical
-  compatibility records. RS08 freezes
-  `docs/1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt`; every Alpha-8 and stable 1.7
-  release gate must pass that exact manifest on net8.0, net9.0, and net10.0.
+  baseline gates. The Inspection 1.3, 1.4, and 1.7 baselines remain immutable
+  historical compatibility records. During 1.8 prerelease development,
+  Inspection retains cross-framework API equality and reviewed additive-contract
+  and package-smoke gates; RP08 freezes the exact 1.8 Inspection baseline which
+  stable 1.8 must then pass.
 - Reusable-library Release builds treat missing public XML documentation as an
   error. Command and router projects generate XML documentation while retaining
   their explicit `CS1591` exemption.
@@ -184,7 +185,9 @@ The Bash and CMD entry points perform equivalent validation. They:
 7. require exact Compiler public API equivalence across `net8.0`, `net9.0`, and
    `net10.0` and require `docs/1.2.0-COMPILER-PUBLIC-API-BASELINE.txt` to match;
 8. require exact Inspection public API equivalence across `net8.0`, `net9.0`, and
-   `net10.0` and require `docs/1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt` to match;
+   `net10.0`; retain `docs/1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt` as immutable
+   historical evidence while RP01-RP07 add reviewed 1.8 API, then require the
+   RP08-frozen 1.8 baseline for Alpha-8 and stable release validation;
 9. run the Runtime, Termcap, Compiler, and Inspection package verifiers for
    package structure, dependency closure, metadata, XML documentation, Source
    Link, and portable symbols;

@@ -190,6 +190,16 @@ sample, version reporting, dependency direction, and cross-platform release
 pipeline. Stable 1.7.0 promotes this validated surface without semantic or API
 changes.
 
+RP01 advances the coordinated development version to `1.8.0-Alpha-1` and adds
+relative-source planning contract types only to `Icod.TermInfo.Inspection`.
+Runtime, Source, Compiler, and Termcap retain their frozen public API baselines;
+the frozen 1.7 Inspection baseline remains immutable historical evidence;
+Inspection continues to depend only on Runtime and Source in production; and all
+five reusable assemblies retain `1.0.0.0`. During 1.8 development the release
+verifier enforces cross-framework Inspection API equality and package-smoke
+coverage for the additive surface. RP08 freezes the exact stable 1.8 Inspection
+API baseline.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:

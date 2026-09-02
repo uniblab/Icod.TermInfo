@@ -11,6 +11,27 @@ frozen relative-source synthesis API while preserving all earlier Inspection
 contracts. `captoinfo` consumes Inspection only at the executable-composition
 layer.
 
+## 1.8 RP01 relative-source planning contract
+
+`1.8.0-Alpha-1` begins additive relative-source planning in Inspection. RP01
+introduces `TerminalDescriptionSourcePlanningOptions`,
+`TerminalDescriptionSourcePlanningScore`, `TerminalDescriptionSourcePlan`, and
+`TerminalDescriptionSourcePlanner`. Candidate inputs and selected outputs reuse
+the frozen `TerminalDescriptionSourceSynthesisParent` type.
+
+The canonical immutable policy accepts 64 candidate positions, considers up to
+two selected ordered parents, and budgets 4,097 evaluations. That budget exactly
+covers the zero-parent plan, all 64 single-parent plans, and all `64 * 63`
+ordered two-parent plans. The score prefers fewer local directives, fewer
+cancellations, fewer parents, fewer rendered UTF-8 bytes, and then earlier
+candidate-index sequences.
+
+RP01 validates and snapshots candidate input once, preserves equivalent positions,
+excludes ordinal target-name and target-alias self-references, and freezes
+exhaustive versus budget-limited result evidence. Operational zero- and
+single-parent planning is reserved for RP02. The frozen 1.7 synthesizer is
+unchanged, and Inspection retains only Runtime and Source production dependencies.
+
 ## 1.7 synthesis contract
 
 Version 1.7.0 freezes the additive relative-source synthesis surface in

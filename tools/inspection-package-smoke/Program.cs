@@ -31,7 +31,7 @@ Require(
 Type[] exportedTypes =
 	inspectionAssembly.GetExportedTypes();
 Require(
-	exportedTypes.Length == 25
+	exportedTypes.Length == 29
 		&& exportedTypes.Contains( typeof( TermInfoComparisonResult ) )
 		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalog ) )
 		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalogEntry ) )
@@ -52,12 +52,16 @@ Require(
 		&& exportedTypes.Contains( typeof( TerminalDescriptionComparer ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceCapabilityOrder ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceLayout ) )
+		&& exportedTypes.Contains( typeof( TerminalDescriptionSourcePlan ) )
+		&& exportedTypes.Contains( typeof( TerminalDescriptionSourcePlanner ) )
+		&& exportedTypes.Contains( typeof( TerminalDescriptionSourcePlanningOptions ) )
+		&& exportedTypes.Contains( typeof( TerminalDescriptionSourcePlanningScore ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceRenderer ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceRendererOptions ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesisOptions ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesisParent ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesizer ) ),
-	"The Inspection package did not expose exactly the frozen 1.7 public surface."
+	"The Inspection package did not expose exactly the reviewed 1.8 Alpha-1 surface."
 );
 
 Require(
@@ -190,6 +194,59 @@ Require(
 		&& synthesisOptions.IncludeExtendedCapabilities,
 	"The frozen 1.7 synthesis options surface did not retain its reviewed contract."
 );
+TerminalDescriptionSourcePlanningOptions planningOptions =
+	new();
+Require(
+	planningOptions.MaximumCandidateCount == 64
+		&& planningOptions.MaximumSelectedParentCount == 2
+		&& planningOptions.MaximumEvaluatedPlanCount == 4_097
+		&& planningOptions.MaximumGeneratedSourceLength
+			== TermInfoSourceLexerOptions.DefaultMaximumSourceLength
+		&& !planningOptions.AllowNonExhaustiveResult,
+	"The RP01 package planning options did not retain the reviewed bounded defaults."
+);
+TerminalDescriptionSourcePlanningScore planningScore =
+	new(
+		1,
+		0,
+		1,
+		128,
+		new[] {
+			0,
+		}
+	);
+Require(
+	planningScore.LocalDirectiveCount == 1
+		&& planningScore.CancellationCount == 0
+		&& planningScore.ParentCount == 1
+		&& planningScore.RenderedUtf8ByteCount == 128
+		&& planningScore.SelectedCandidateIndices.SequenceEqual( new[] { 0 } )
+		&& planningScore.CompareTo(
+			new TerminalDescriptionSourcePlanningScore(
+				2,
+				0,
+				0,
+				1,
+				Array.Empty<int>()
+			)
+		) < 0,
+	"The RP01 package planning score did not retain its reviewed component order."
+);
+try {
+	_ = TerminalDescriptionSourcePlanner.Plan(
+		terminal,
+		Array.Empty<TerminalDescriptionSourceSynthesisParent>(),
+		planningOptions
+	);
+	throw new InvalidOperationException(
+		"RP01 package planning unexpectedly executed search before RP02."
+	);
+} catch ( NotSupportedException exception ) {
+	Require(
+		exception.Message.Contains( "RP02", StringComparison.Ordinal ),
+		"The RP01 package planner did not identify its operational tranche boundary."
+	);
+}
 string synthesizedWithoutParents =
 	TerminalDescriptionSourceSynthesizer.Synthesize(
 		terminal,
