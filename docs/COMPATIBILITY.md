@@ -211,6 +211,12 @@ all-candidates planning requires `--plan-use`, exactly one target, and a
 caller-selected `-B` database directory; it never introduces implicit host-wide
 discovery.
 
+MI06 changes none of those contracts. The package-reference-only consumer,
+checked-in source-plan fixture, repeated-process sample, large and pathological
+inputs, exact UTF-8 boundaries, and tool-package/archive smoke require the same
+JSON bytes and meanings across `net8.0`, `net9.0`, `net10.0`, Windows, Linux,
+macOS, and representative non-default cultures.
+
 ## Runtime terminfo semantic compatibility
 
 The stable runtime responsibility includes:

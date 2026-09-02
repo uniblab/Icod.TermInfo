@@ -2,8 +2,8 @@
 
 ## 1.9 JSON automation
 
-Version `1.9.0-Alpha-5` adds direct machine-readable projections of the frozen
-Inspection values:
+Version `1.9.0-Alpha-6` carries the direct machine-readable projections of the
+frozen Inspection values:
 
 ```text
 infocmp --json target
@@ -24,6 +24,9 @@ duplicates collapse to one canonical candidate, conflicting physical copies or
 incomplete catalogs are rejected, and the target is excluded by the frozen
 planner identity rule. No system database discovery occurs. Without `--json`,
 the same form emits only the selected terminfo source.
+
+MI06 changes no option or document semantics. It adds large escaped-input and
+culture hardening plus real tool-package, archive, and cross-host execution.
 
 ## 1.8 relative-source planning
 

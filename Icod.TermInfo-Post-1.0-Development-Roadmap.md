@@ -10,14 +10,14 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
-**Current coordinated version:** `1.9.0-Alpha-5`
+**Current coordinated version:** `1.9.0-Alpha-6`
 **Final 1.6 prerelease:** `1.6.0-Alpha-8`
 **Final 1.7 prerelease:** `1.7.0-Alpha-8`
 **Final 1.8 prerelease:** `1.8.0-Alpha-8`
 **Planned final 1.9 prerelease:** `1.9.0-Alpha-7`
 **Next development line:** `1.9.0` - Machine-Readable Inspection and Planning Automation
 **Status:** 1.9.0 development active
-**Current tranche:** MI05 - `infocmp` and `toe` Automation
+**Current tranche:** MI06 - Samples, Package Consumers, and Cross-Host Hardening
 **Primary objective:** Render effective descriptions, comparisons, plans, and explicit catalogs as deterministic bounded versioned JSON, then compose that reusable representation through `infocmp` and `toe` without changing frozen lower-layer semantics.
 
 ---

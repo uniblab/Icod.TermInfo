@@ -476,24 +476,27 @@ dotnet run \
 # The deterministic library-toolchain sample must compose planning, synthesis,
 # compilation, publication, Runtime acquisition, and Inspection comparison
 # without depending on host terminfo state. Separate process executions must
-# produce byte-identical planned source.
-toolchain_first="${inspection_smoke_root}/rp07-toolchain-first.ti"
-toolchain_second="${inspection_smoke_root}/rp07-toolchain-second.ti"
+# produce byte-identical, fixture-matched source-plan JSON.
+toolchain_fixture="samples/Icod.TermInfo.Toolchain.Sample/expected-source-plan.json"
+toolchain_first="${inspection_smoke_root}/mi06-toolchain-first.json"
+toolchain_second="${inspection_smoke_root}/mi06-toolchain-second.json"
 dotnet run \
   --project samples/Icod.TermInfo.Toolchain.Sample/Icod.TermInfo.Toolchain.Sample.csproj \
   -c "${configuration}" \
   -f net10.0 \
   --no-build \
+  -- --verify-fixture "${toolchain_fixture}" \
   > "${toolchain_first}"
 dotnet run \
   --project samples/Icod.TermInfo.Toolchain.Sample/Icod.TermInfo.Toolchain.Sample.csproj \
   -c "${configuration}" \
   -f net10.0 \
   --no-build \
+  -- --verify-fixture "${toolchain_fixture}" \
   > "${toolchain_second}"
 if ! cmp -s "${toolchain_first}" "${toolchain_second}"; then
   diff -u "${toolchain_first}" "${toolchain_second}" >&2 || true
-  echo "Toolchain planning output changed across separate process executions." >&2
+  echo "Toolchain JSON output changed across separate process executions." >&2
   exit 1
 fi
 cat "${toolchain_first}"

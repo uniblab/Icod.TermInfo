@@ -350,18 +350,19 @@ dotnet run --project samples\Icod.TermInfo.Sample\Icod.TermInfo.Sample.csproj -c
 if errorlevel 1 goto fail
 
 echo.
-echo === Deterministic planning/Source/Compiler/Inspection toolchain sample ===
-set "TOOLCHAIN_FIRST=%INSPECTION_SMOKE_ROOT%\rp07-toolchain-first.ti"
-set "TOOLCHAIN_SECOND=%INSPECTION_SMOKE_ROOT%\rp07-toolchain-second.ti"
-dotnet run --project samples\Icod.TermInfo.Toolchain.Sample\Icod.TermInfo.Toolchain.Sample.csproj -c %CONFIGURATION% -f net10.0 --no-build > "%TOOLCHAIN_FIRST%"
+echo === Deterministic planning/Source/Compiler/Inspection JSON toolchain sample ===
+set "TOOLCHAIN_FIXTURE=samples\Icod.TermInfo.Toolchain.Sample\expected-source-plan.json"
+set "TOOLCHAIN_FIRST=%INSPECTION_SMOKE_ROOT%\mi06-toolchain-first.json"
+set "TOOLCHAIN_SECOND=%INSPECTION_SMOKE_ROOT%\mi06-toolchain-second.json"
+dotnet run --project samples\Icod.TermInfo.Toolchain.Sample\Icod.TermInfo.Toolchain.Sample.csproj -c %CONFIGURATION% -f net10.0 --no-build -- --verify-fixture "%TOOLCHAIN_FIXTURE%" > "%TOOLCHAIN_FIRST%"
 if errorlevel 1 goto fail
-dotnet run --project samples\Icod.TermInfo.Toolchain.Sample\Icod.TermInfo.Toolchain.Sample.csproj -c %CONFIGURATION% -f net10.0 --no-build > "%TOOLCHAIN_SECOND%"
+dotnet run --project samples\Icod.TermInfo.Toolchain.Sample\Icod.TermInfo.Toolchain.Sample.csproj -c %CONFIGURATION% -f net10.0 --no-build -- --verify-fixture "%TOOLCHAIN_FIXTURE%" > "%TOOLCHAIN_SECOND%"
 if errorlevel 1 goto fail
 fc /b "%TOOLCHAIN_FIRST%" "%TOOLCHAIN_SECOND%" >nul
 if errorlevel 1 (
     type "%TOOLCHAIN_FIRST%"
     type "%TOOLCHAIN_SECOND%"
-    echo Toolchain planning output changed across separate process executions. 1>&2
+    echo Toolchain JSON output changed across separate process executions. 1>&2
     goto fail
 )
 type "%TOOLCHAIN_FIRST%"

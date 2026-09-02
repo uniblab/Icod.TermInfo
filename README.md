@@ -398,9 +398,11 @@ the result reports whether the configured search space was exhausted.
 ## 1.9 development line
 
 Version 1.9 develops deterministic machine-readable Inspection output and
-explicit planning automation. MI04 completes the reusable renderer with
-database-catalog manifests and publishes the complete version-1 schema alongside
-the MI02 effective-description and MI03 comparison and plan payloads:
+explicit planning automation. MI06 hardens the complete reusable and command
+surface after MI04 completed the renderer and MI05 composed commands. The
+reusable renderer includes database-catalog manifests, and the package publishes
+the complete version-1 schema alongside the MI02 effective-description and MI03
+comparison and plan payloads:
 
 ```csharp
 using Icod.TermInfo;
@@ -440,16 +442,20 @@ indices, evaluation count, exhaustive status, and candidate count. Catalog JSON
 preserves the normalized root, explicit catalog kind and completeness, ordered
 entries and issues, and duplicate canonical-name evidence. The published
 `docs/Icod.TermInfo.Inspection.schema.json` describes all four version-1 document
-kinds and is included in the Inspection package. Command composition remains
-owned by MI05.
+kinds and is included in the Inspection package. `infocmp --json` emits
+description, comparison, and source-plan documents; `toe --json` emits catalog
+documents. Explicit-directory all-candidates planning is available only through
+one caller-selected database root.
 
-Later 1.9 tranches compose the reusable renderer through `infocmp` and `toe` and
-add all-candidates planning only for an explicit caller-selected database
-directory. The frozen 1.7 synthesis and 1.8 planning contracts remain unchanged.
+MI06 adds a JSON-producing Toolchain sample, ToolSuite automation examples,
+package-reference-only rendering for all four document kinds, and tool-package
+plus six-archive smoke. Culture, separate-process, large/pathological-input,
+exact UTF-8 boundary, and Windows/Linux/macOS evidence remain release gates. The
+frozen 1.7 synthesis and 1.8 planning contracts remain unchanged.
 
 See
 `Icod.TermInfo-1.9.0-Machine-Readable-Inspection-and-Planning-Automation-Roadmap.md`
-and `docs/1.9.0-MI04-DATABASE-CATALOG-MANIFESTS-AND-JSON-SCHEMA.md` for the
+and `docs/1.9.0-MI06-SAMPLES-PACKAGE-CONSUMERS-AND-CROSS-HOST-HARDENING.md` for the
 current operational contract.
 
 ## Getting started
@@ -969,7 +975,8 @@ library stack without invoking the command layer. It parses and resolves a
 controlled `.ti` source document, synthesizes the child relative to its base,
 reparses and resolves the synthesized source, compiles and publishes it into a
 temporary conventional database, reloads the child through the Runtime provider,
-and verifies semantic equality through Inspection.
+verifies semantic equality through Inspection, and emits the immutable plan as
+one version-1 `sourcePlan` JSON document.
 
 Run it with:
 
@@ -978,8 +985,9 @@ dotnet run --project samples/Icod.TermInfo.Toolchain.Sample/Icod.TermInfo.Toolch
 ```
 
 The sample is deterministic and does not inspect the host terminfo database. It
-is executed by release validation on Windows, Linux, and macOS. Use `-f net8.0`
-or `-f net9.0` when exercising those reusable-library target frameworks.
+is executed twice by release validation on Windows, Linux, and macOS and checked
+against its exact JSON fixture. Use `-f net8.0` or `-f net9.0` when exercising
+those reusable-library target frameworks.
 
 See `samples/Icod.TermInfo.Toolchain.Sample/README.md` for the complete flow.
 
@@ -994,6 +1002,9 @@ dependency reporting, and bidirectional conversion do not depend on
 host-installed terminfo or termcap databases. The planning walkthrough includes
 an inferior decoy, direct and routed forms, and `tic -c` validation of the
 selected source.
+The MI06 walkthrough also covers all four version-1 JSON document kinds,
+explicit-directory all-candidates planning, and byte-identical direct/router
+automation.
 
 See `samples/README.md`, `samples/ToolSuite/README.md`,
 `samples/Icod.TermInfo.Acquisition.Sample/README.md`,

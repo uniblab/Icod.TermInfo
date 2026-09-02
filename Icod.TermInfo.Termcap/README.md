@@ -8,6 +8,12 @@ inheritance resolver, TC04 semantic converter, TC05 reverse renderer, TC06
 explicit acquisition APIs, and the TC08-frozen public/package contract used by
 the TC07 conversion-command composition.
 
+## 1.9 development status
+
+Version `1.9.0-Alpha-6` preserves the frozen Termcap 1.6 API, semantics,
+Runtime-only dependency, and assembly identity. Machine-readable Inspection and
+planning remain outside the Termcap package.
+
 ## 1.8 release status
 
 Version 1.8.0 carries the TC08-frozen Termcap contract unchanged into the stable

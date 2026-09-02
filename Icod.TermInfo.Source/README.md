@@ -7,6 +7,12 @@ The package is intentionally separate from the stable runtime package. Ordinary
 applications that only load compiled terminfo or use `TerminalDescription`
 values continue to reference `Icod.TermInfo` alone.
 
+## 1.9 development status
+
+Version `1.9.0-Alpha-6` preserves the frozen Source 1.1 API, semantics,
+Runtime-only dependency, and assembly identity. MI06 consumes Source only in
+the Toolchain JSON sample; Source adds no Inspection or JSON dependency.
+
 ## 1.8 release status
 
 Version 1.8.0 carries Source unchanged into the stable 1.8 contract. Its frozen

@@ -3,15 +3,18 @@
 `Icod.TermInfo.Inspection` is the optional managed inspection and semantic-
 comparison layer for the `Icod.TermInfo` package family.
 
-## 1.9 MI05 command composition
+## 1.9 MI06 consumer and cross-host hardening
 
-`1.9.0-Alpha-5` leaves the MI04 public API and version-1 JSON Schema unchanged.
-The existing deterministic renderer is now composed by `infocmp --json` and
-`toe --json`; explicit-directory all-candidates command planning delegates to
-the frozen `TerminalDescriptionSourcePlanner.PlanFromDirectory` contract.
-Command success adds one LF after the renderer-owned document. Command argument
-rules, stream separation, status mapping, and router equivalence remain owned by
-the command packages.
+`1.9.0-Alpha-6` leaves the MI04 public API, version-1 JSON Schema, and MI05
+command semantics unchanged. The Toolchain sample now renders an exact
+checked-in source-plan fixture after completing its semantic round trip. The
+fresh package-reference-only consumer renders all four document kinds on
+`net8.0`, `net9.0`, and `net10.0`, and hardens large escaped text, culture
+independence, and exact UTF-8 bounds. Tool-package and six-archive smoke continue
+to execute real `infocmp` and `toe` JSON workflows on Windows, Linux, and macOS.
+
+See
+`docs/1.9.0-MI06-SAMPLES-PACKAGE-CONSUMERS-AND-CROSS-HOST-HARDENING.md`.
 
 The 1.3 line established the reusable inspection/comparison engine while
 preserving the already-frozen Runtime 1.0, Source 1.1, and Compiler 1.2 public

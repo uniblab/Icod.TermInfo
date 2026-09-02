@@ -304,6 +304,15 @@ frozen explicit-catalog planner through `infocmp --plan-use
 retain their original development versions. MI06 owns samples, package-only
 consumers, and cross-host hardening.
 
+MI06 advances the coordinated development version to `1.9.0-Alpha-6` without
+adding public API, changing the version-1 JSON Schema, or changing command
+semantics. It adds JSON-producing Toolchain and ToolSuite samples, exact
+package-reference-only rendering evidence, distributed command smoke, and
+culture, process, host, large-input, pathological-input, and UTF-8 boundary
+hardening. Historical MI01 through MI05 records retain their original
+development versions. MI07 owns final API, schema, packaging, and release
+closure.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:

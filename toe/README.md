@@ -5,7 +5,7 @@
 
 ## 1.9 JSON automation
 
-Version `1.9.0-Alpha-5` adds one explicit machine-readable form:
+Version `1.9.0-Alpha-6` carries one explicit machine-readable form:
 
 ```text
 toe --json directory
@@ -18,6 +18,10 @@ in the catalog object rather than being converted into a human listing.
 Inspector or renderer failures return status 1 with no partial stdout;
 diagnostics remain on stderr. JSON mode rejects discovery, multiple roots, and
 the human listing presentation switches `-a`, `-h`, and `-s`.
+
+MI06 changes no catalog or command semantics. Package and archive smoke execute
+this exact form across the supported Windows, Linux, and macOS distribution
+matrix.
 
 ## 1.8 status
 

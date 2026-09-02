@@ -1,4 +1,6 @@
+using System.Globalization;
 using System.Reflection;
+using System.Text;
 using System.Text.Json;
 using Icod.TermInfo;
 using Icod.TermInfo.Inspection;
@@ -321,6 +323,61 @@ Require(
 		&& terminalJsonNumber.GetProperty( "name" ).GetString() == "cols"
 		&& terminalJsonNumber.GetProperty( "value" ).GetInt32() == 80,
 	"The MI02 package renderer did not emit the reviewed effective-description JSON."
+);
+TerminalDescription pathologicalTerminal =
+	new TerminalDescriptionBuilder( "mi06-package-large" )
+		.SetDescription( "MI06 package-only culture and bound smoke" )
+		.SetExtendedString(
+			"XMI06",
+			string.Concat(
+				Enumerable.Repeat(
+					"I\u0130\u001b\n",
+					8_192
+				)
+			)
+		)
+		.Build();
+string invariantPathologicalJson =
+	TermInfoJsonRenderer.Render( pathologicalTerminal );
+CultureInfo originalCulture = CultureInfo.CurrentCulture;
+CultureInfo originalUiCulture = CultureInfo.CurrentUICulture;
+try {
+	foreach ( string cultureName in new[] { "ar-SA", "tr-TR" } ) {
+		CultureInfo.CurrentCulture =
+			CultureInfo.GetCultureInfo( cultureName );
+		CultureInfo.CurrentUICulture =
+			CultureInfo.GetCultureInfo( cultureName );
+		Require(
+			TermInfoJsonRenderer.Render( pathologicalTerminal )
+				== invariantPathologicalJson,
+			"The MI06 package-only renderer changed across cultures."
+		);
+	}
+} finally {
+	CultureInfo.CurrentCulture = originalCulture;
+	CultureInfo.CurrentUICulture = originalUiCulture;
+}
+int pathologicalByteCount =
+	Encoding.UTF8.GetByteCount( invariantPathologicalJson );
+Require(
+	TermInfoJsonRenderer.Render(
+		pathologicalTerminal,
+		new TermInfoJsonRendererOptions( pathologicalByteCount )
+	) == invariantPathologicalJson,
+	"The MI06 package-only renderer rejected its exact UTF-8 boundary."
+);
+bool rejectedBelowExactBoundary = false;
+try {
+	TermInfoJsonRenderer.Render(
+		pathologicalTerminal,
+		new TermInfoJsonRendererOptions( pathologicalByteCount - 1 )
+	);
+} catch ( InvalidOperationException ) {
+	rejectedBelowExactBoundary = true;
+}
+Require(
+	rejectedBelowExactBoundary,
+	"The MI06 package-only renderer accepted output beyond its UTF-8 boundary."
 );
 TerminalDescriptionSourcePlanningScore planningScore =
 	new(
@@ -738,5 +795,5 @@ Require(
 );
 
 Console.WriteLine(
-	"Icod.TermInfo.Inspection 1.9.0-Alpha-5 package smoke test passed."
+	"Icod.TermInfo.Inspection 1.9.0-Alpha-6 package smoke test passed."
 );

@@ -6,7 +6,7 @@ using Xunit;
 namespace Icod.TermInfo.Inspection.Tests;
 
 public sealed class RP08ReleaseClosureTests {
-	private const string DevelopmentVersion = "1.9.0-Alpha-5";
+	private const string DevelopmentVersion = "1.9.0-Alpha-6";
 	private const string HistoricalDevelopmentVersion = "1.8.0-Alpha-8";
 	private const string Rp07Head =
 		"a88237d0d2f0ecdf74a7d96f6ff1cb9a2e8e647d";
