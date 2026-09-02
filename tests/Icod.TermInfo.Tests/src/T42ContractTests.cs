@@ -133,15 +133,15 @@ public sealed class T42ContractTests
 						root,
 						".github",
 						"workflows",
-						"pr-build-and-test.yaml")));
-		string pushMain =
+						"pull-request.yaml")));
+		string main =
 			NormalizeLineEndings(
 				File.ReadAllText(
 					Path.Combine(
 						root,
 						".github",
 						"workflows",
-						"push-main.yaml")));
+						"main.yaml")));
 		string release =
 			NormalizeLineEndings(
 				File.ReadAllText(
@@ -151,123 +151,81 @@ public sealed class T42ContractTests
 						"workflows",
 						"release.yaml")));
 
-		Assert.Equal(
-			1,
-			CountOccurrences(
-				pullRequest,
-				"dotnet-version: |\n"
-				+ "            8.0.x\n"
-				+ "            9.0.x\n"
-				+ "            10.0.x\n"));
-		foreach (string workflow in new[] { pushMain, release })
+		foreach (string workflow in new[] { pullRequest, main, release })
 		{
-			Assert.Equal(
-				1,
-				CountOccurrences(
-					workflow,
-					"dotnet-version: |\n"
-					+ "            8.0.x\n"
-					+ "            9.0.x\n"
-					+ "            10.0.x\n"));
+			Assert.Contains(
+				"DOTNET_VERSIONS: |\n"
+				+ "    8.0.x\n"
+				+ "    9.0.x\n"
+				+ "    10.0.x\n",
+				workflow);
 		}
 
 		Assert.StartsWith(
-			"name: main validation\n"
+			"name: main\n"
 			+ "\n"
 			+ "on:\n"
 			+ "  push:\n"
 			+ "    branches:\n"
 			+ "      - main\n",
-			pushMain);
+			main);
 		Assert.DoesNotContain(
 			"pull_request:",
-			pushMain);
+			main);
 		Assert.Contains(
-			"dotnet build Icod.TermInfo.sln -c Staging",
-			pullRequest);
-		Assert.Contains(
-			"dotnet test Icod.TermInfo.sln -c Staging",
+			"CONFIGURATION: Staging",
 			pullRequest);
 		Assert.Contains(
-			"dotnet pack Icod.TermInfo.csproj -c Staging",
-			pullRequest);
+			"CONFIGURATION: Release",
+			main);
 		Assert.Contains(
-			"verify-release-package.sh artifacts Staging",
-			pullRequest);
-		Assert.Contains(
-			"if: matrix.os == 'ubuntu-latest'",
-			pullRequest);
-		Assert.DoesNotContain(
-			"\n  package-validation:\n",
-			pullRequest);
-		Assert.DoesNotContain(
-			"-c Release",
-			pullRequest);
+			"CONFIGURATION: Release",
+			release);
 
-		foreach (string workflow in new[] { pushMain, release })
+		foreach (string workflow in new[] { pullRequest, main, release })
 		{
 			Assert.Contains(
-				"dotnet build Icod.TermInfo.sln -c Release",
+				"dotnet build ${{ env.SOLUTION_PATH }}",
 				workflow);
 			Assert.Contains(
-				"dotnet test Icod.TermInfo.sln -c Release",
-				workflow);
-			Assert.Contains(
-				"dotnet pack Icod.TermInfo.csproj -c Release",
-				workflow);
-			Assert.Contains(
-				"verify-release-package.sh artifacts Release",
-				workflow);
-			Assert.Contains(
-				"verify-release-package.cmd artifacts Release",
-				workflow);
-			Assert.DoesNotContain(
-				"\n  package-validation:\n",
+				"dotnet test ${{ env.SOLUTION_PATH }}",
 				workflow);
 		}
+
+		Assert.Contains(
+			"./packaging/PackPackages.ps1",
+			pullRequest);
+		Assert.Contains(
+			"./packaging/VerifyPackageArtifact.ps1",
+			pullRequest);
+		Assert.Contains(
+			"./packaging/PackPackages.ps1",
+			main);
+		Assert.Contains(
+			"./packaging/VerifyPackageArtifact.ps1",
+			main);
+		Assert.Contains(
+			"./packaging/PackPackages.ps1",
+			release);
+		Assert.Contains(
+			"./packaging/VerifyPackageArtifact.ps1",
+			release);
+
 		Assert.Contains(
 			"actions/upload-artifact@v4",
 			pullRequest);
 		Assert.Contains(
-			"name: icod-terminfo-pr-packages",
+			"name: terminfo-pr-packages",
 			pullRequest);
 		Assert.DoesNotContain(
 			"dotnet nuget push",
 			pullRequest);
 		Assert.DoesNotContain(
 			"dotnet nuget push",
-			pushMain);
+			main);
 		Assert.Contains(
 			"dotnet nuget push",
 			release);
-	}
-
-	private static int CountOccurrences(
-		string value,
-		string fragment)
-	{
-		ArgumentNullException.ThrowIfNull(value);
-		ArgumentNullException.ThrowIfNull(fragment);
-
-		int count = 0;
-		int startIndex = 0;
-
-		while (true)
-		{
-			int index =
-				value.IndexOf(
-					fragment,
-					startIndex,
-					StringComparison.Ordinal);
-			if (index < 0)
-			{
-				return count;
-			}
-
-			count++;
-			startIndex =
-				index + fragment.Length;
-		}
 	}
 
 	private static string ReadProjectProperty(
