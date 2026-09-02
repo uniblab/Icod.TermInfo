@@ -14,10 +14,11 @@ if (-not [System.IO.Path]::IsPathRooted($ArtifactDirectory)) {
     $ArtifactDirectory = Join-Path $repositoryRoot $ArtifactDirectory
 }
 $ArtifactDirectory = [System.IO.Path]::GetFullPath($ArtifactDirectory)
+$isWindows = [System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT
 
 Push-Location $repositoryRoot
 try {
-    if ($IsWindows) {
+    if ($isWindows) {
         & cmd /d /c .github\scripts\verify-release-package.cmd $ArtifactDirectory $Configuration
     } else {
         & bash .github/scripts/verify-release-package.sh $ArtifactDirectory $Configuration
