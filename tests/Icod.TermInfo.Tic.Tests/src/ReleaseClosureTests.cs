@@ -143,7 +143,7 @@ public sealed class ReleaseClosureTests {
 		foreach (
 			string workflow
 			in new string[] {
-				".github/workflows/push-main.yaml",
+				".github/workflows/main.yaml",
 				".github/workflows/release.yaml",
 			}
 		) {
@@ -166,7 +166,12 @@ public sealed class ReleaseClosureTests {
 			".github/workflows/release.yaml"
 		);
 		Assert.Contains(
-			"needs: [metadata, validate, tool-archives, smoke-tool-archives, smoke-tool-package]",
+			"needs: [metadata, package, smoke-tool-package, smoke-tool-archives]",
+			release,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"needs: [metadata, package, tool-archives, publish-nuget, publish-github-packages]",
 			release,
 			StringComparison.Ordinal
 		);
