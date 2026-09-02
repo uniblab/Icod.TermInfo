@@ -48,7 +48,7 @@ public sealed class CommandTests {
 		);
 
 		Assert.Equal( 0, status );
-		Assert.Contains( "1.9.0-Alpha-4", ReadText( stdout ) );
+		Assert.Contains( "1.9.0-Alpha-5", ReadText( stdout ) );
 		Assert.Empty( ReadText( stderr ) );
 	}
 
@@ -73,7 +73,7 @@ public sealed class CommandTests {
 		);
 
 		Assert.Equal( 0, status );
-		Assert.Contains( "1.9.0-Alpha-4", ReadText( stdout ) );
+		Assert.Contains( "1.9.0-Alpha-5", ReadText( stdout ) );
 		Assert.Empty( ReadText( stderr ) );
 	}
 

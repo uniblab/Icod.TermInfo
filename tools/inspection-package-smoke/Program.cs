@@ -738,5 +738,5 @@ Require(
 );
 
 Console.WriteLine(
-	"Icod.TermInfo.Inspection 1.9.0-Alpha-4 package smoke test passed."
+	"Icod.TermInfo.Inspection 1.9.0-Alpha-5 package smoke test passed."
 );

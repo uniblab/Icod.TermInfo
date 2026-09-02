@@ -3,6 +3,22 @@
 `toe` is the managed conventional terminfo database-listing command in the
 `Icod.TermInfo` tool suite.
 
+## 1.9 JSON automation
+
+Version `1.9.0-Alpha-5` adds one explicit machine-readable form:
+
+```text
+toe --json directory
+```
+
+It inspects exactly that caller-selected root and writes the exact
+`databaseCatalog` version-1 document followed by one LF. Missing, unavailable,
+unsupported, malformed, or otherwise incomplete catalog state remains visible
+in the catalog object rather than being converted into a human listing.
+Inspector or renderer failures return status 1 with no partial stdout;
+diagnostics remain on stderr. JSON mode rejects discovery, multiple roots, and
+the human listing presentation switches `-a`, `-h`, and `-s`.
+
 ## 1.8 status
 
 Version `1.8.0` carries the frozen `toe` database-listing and source-dependency

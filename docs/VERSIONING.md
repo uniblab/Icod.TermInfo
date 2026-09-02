@@ -296,6 +296,14 @@ complete draft 2020-12 version-1 JSON Schema with checked-in compact and indente
 fixtures for all four document kinds. Historical MI01 through MI03 records
 retain their original development versions. Command JSON remains owned by MI05.
 
+MI05 advances the coordinated development version to `1.9.0-Alpha-5` without
+adding reusable public API or changing the version-1 JSON Schema. It composes
+the frozen renderer through `infocmp --json` and `toe --json`, and composes the
+frozen explicit-catalog planner through `infocmp --plan-use
+--all-candidates -B directory target`. Historical MI01 through MI04 records
+retain their original development versions. MI06 owns samples, package-only
+consumers, and cross-host hardening.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:

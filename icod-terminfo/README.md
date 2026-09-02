@@ -5,6 +5,23 @@
 
 The tool targets `net10.0` and therefore requires a .NET 10 runtime.
 
+## 1.9 JSON automation
+
+Version `1.9.0-Alpha-5` routes the same machine-readable command contracts as
+the standalone commands:
+
+```text
+icod-terminfo infocmp --json target
+icod-terminfo infocmp --json -d left right
+icod-terminfo infocmp --json --plan-use target candidate
+icod-terminfo infocmp --json --plan-use --all-candidates -B directory target
+icod-terminfo toe --json directory
+```
+
+The router adds no JSON or planning semantics. It forwards arguments, streams,
+cancellation, diagnostics, and exit status, so routed and direct output is
+byte-for-byte identical.
+
 ## 1.8 release status
 
 Version 1.8.0 adds routed relative-source planning without adding router-owned

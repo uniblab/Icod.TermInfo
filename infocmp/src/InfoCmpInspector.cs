@@ -50,18 +50,28 @@ internal static class InfoCmpInspector {
 		cancellationToken.ThrowIfCancellationRequested();
 		string rendered;
 		try {
-			TerminalDescriptionSourceRendererOptions rendererOptions =
-				new(
-					options.LineWidth,
-					options.Layout,
-					options.CapabilityOrder,
-					options.IncludeExtendedCapabilities
-				);
-			rendered =
-				TerminalDescriptionSourceRenderer.Render(
-					terminal.Description,
-					rendererOptions
-				);
+			if ( options.Json ) {
+				rendered =
+					TermInfoJsonRenderer.Render(
+						terminal.Description,
+						new TermInfoJsonRendererOptions(),
+						cancellationToken
+					)
+					+ "\n";
+			} else {
+				TerminalDescriptionSourceRendererOptions rendererOptions =
+					new(
+						options.LineWidth,
+						options.Layout,
+						options.CapabilityOrder,
+						options.IncludeExtendedCapabilities
+					);
+				rendered =
+					TerminalDescriptionSourceRenderer.Render(
+						terminal.Description,
+						rendererOptions
+					);
+			}
 		} catch ( InvalidOperationException exception ) {
 			await InfoCmpDiagnosticWriter.WriteErrorAsync(
 				stderr,
@@ -110,28 +120,6 @@ internal static class InfoCmpInspector {
 			return CommandExitCodes.Failure;
 		}
 
-		List<TerminalDescriptionSourceSynthesisParent> candidates = [];
-		for ( int index = 1; index < options.TerminalNames.Count; index++ ) {
-			cancellationToken.ThrowIfCancellationRequested();
-			string requestedName = options.TerminalNames[ index ];
-			InfoCmpTerminal? candidate =
-				await AcquireAsync(
-					requestedName,
-					options.ComparisonDatabaseDirectory,
-					stderr,
-					cancellationToken
-				).ConfigureAwait( false );
-			if ( candidate is null ) {
-				return CommandExitCodes.Failure;
-			}
-			candidates.Add(
-				new TerminalDescriptionSourceSynthesisParent(
-					requestedName,
-					candidate.Description
-				)
-			);
-		}
-
 		TerminalDescriptionSourcePlan plan;
 		try {
 			TerminalDescriptionSourceSynthesisOptions synthesisOptions =
@@ -154,13 +142,62 @@ internal static class InfoCmpInspector {
 					allowNonExhaustiveResult:
 						options.AllowNonExhaustiveResult
 				);
-			plan =
-				TerminalDescriptionSourcePlanner.Plan(
-					target.Description,
-					candidates,
-					planningOptions,
+			if ( options.AllCandidates ) {
+				plan =
+					TerminalDescriptionSourcePlanner.PlanFromDirectory(
+						target.Description,
+						options.ComparisonDatabaseDirectory
+							?? throw new InvalidOperationException(
+								"All-candidates planning requires an explicit candidate directory."
+							),
+						planningOptions,
+						parserOptions: null,
+						cancellationToken: cancellationToken
+					);
+			} else {
+				List<TerminalDescriptionSourceSynthesisParent> candidates = [];
+				for ( int index = 1; index < options.TerminalNames.Count; index++ ) {
+					cancellationToken.ThrowIfCancellationRequested();
+					string requestedName = options.TerminalNames[ index ];
+					InfoCmpTerminal? candidate =
+						await AcquireAsync(
+							requestedName,
+							options.ComparisonDatabaseDirectory,
+							stderr,
+							cancellationToken
+						).ConfigureAwait( false );
+					if ( candidate is null ) {
+						return CommandExitCodes.Failure;
+					}
+					candidates.Add(
+						new TerminalDescriptionSourceSynthesisParent(
+							requestedName,
+							candidate.Description
+						)
+					);
+				}
+
+				plan =
+					TerminalDescriptionSourcePlanner.Plan(
+						target.Description,
+						candidates,
+						planningOptions,
+						cancellationToken
+					);
+			}
+
+			string rendered = options.Json
+				? TermInfoJsonRenderer.Render(
+					plan,
+					new TermInfoJsonRendererOptions(),
 					cancellationToken
-				);
+				) + "\n"
+				: plan.Source;
+			await WriteAsync(
+				stdout,
+				rendered,
+				cancellationToken
+			).ConfigureAwait( false );
 		} catch ( Exception exception ) when (
 			exception is ArgumentException
 			or InvalidOperationException
@@ -175,11 +212,6 @@ internal static class InfoCmpInspector {
 			return CommandExitCodes.Failure;
 		}
 
-		await WriteAsync(
-			stdout,
-			plan.Source,
-			cancellationToken
-		).ConfigureAwait( false );
 		return CommandExitCodes.Success;
 	}
 
@@ -311,11 +343,38 @@ internal static class InfoCmpInspector {
 		}
 
 		cancellationToken.ThrowIfCancellationRequested();
-		string rendered =
-			InfoCmpComparisonRenderer.Render(
-				options,
-				terminals
-			);
+		string rendered;
+		try {
+			if ( options.Json ) {
+				TermInfoComparisonResult comparison =
+					TerminalDescriptionComparer.Compare(
+						terminals[ 0 ].Description,
+						terminals[ 1 ].Description
+					);
+				rendered =
+					TermInfoJsonRenderer.Render(
+						comparison,
+						new TermInfoJsonRendererOptions(),
+						cancellationToken
+					)
+					+ "\n";
+			} else {
+				rendered =
+					InfoCmpComparisonRenderer.Render(
+						options,
+						terminals
+					);
+			}
+		} catch ( InvalidOperationException exception ) {
+			await InfoCmpDiagnosticWriter.WriteErrorAsync(
+				stderr,
+				"INFOCMP0004",
+				options.TerminalNames[ 0 ],
+				exception.Message,
+				cancellationToken
+			).ConfigureAwait( false );
+			return CommandExitCodes.Failure;
+		}
 		await WriteAsync(
 			stdout,
 			rendered,

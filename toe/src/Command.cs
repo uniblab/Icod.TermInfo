@@ -165,6 +165,15 @@ public static class Command {
 				return CommandExitCodes.UsageError;
 			}
 
+			if ( options.Json ) {
+				return await RenderCatalogAsync(
+					options.Directories[ 0 ],
+					stdout,
+					stderr,
+					cancellationToken
+				).ConfigureAwait( false );
+			}
+
 			ToeListingResult listing = BuildListing(
 				options,
 				cancellationToken
@@ -193,6 +202,56 @@ public static class Command {
 		} catch ( OperationCanceledException ) {
 			return CommandExitCodes.Canceled;
 		}
+	}
+
+	private static async Task<int> RenderCatalogAsync(
+		string directory,
+		Stream stdout,
+		Stream stderr,
+		CancellationToken cancellationToken
+	) {
+		ArgumentException.ThrowIfNullOrWhiteSpace( directory );
+		ArgumentNullException.ThrowIfNull( stdout );
+		ArgumentNullException.ThrowIfNull( stderr );
+		cancellationToken.ThrowIfCancellationRequested();
+
+		string rendered;
+		try {
+			TermInfoDatabaseCatalog catalog =
+				TermInfoDatabaseInspector.InspectDirectory(
+					directory,
+					parserOptions: null,
+					cancellationToken: cancellationToken
+				);
+			rendered =
+				TermInfoJsonRenderer.Render(
+					catalog,
+					new TermInfoJsonRendererOptions(),
+					cancellationToken
+				)
+				+ "\n";
+		} catch ( Exception exception ) when ( IsOperationalException( exception ) ) {
+			var diagnostics = new StringBuilder();
+			AppendDiagnostic(
+				diagnostics,
+				"TOE0005",
+				directory,
+				exception.Message
+			);
+			await WriteAsync(
+				stderr,
+				diagnostics.ToString(),
+				cancellationToken
+			).ConfigureAwait( false );
+			return CommandExitCodes.Failure;
+		}
+
+		await WriteAsync(
+			stdout,
+			rendered,
+			cancellationToken
+		).ConfigureAwait( false );
+		return CommandExitCodes.Success;
 	}
 
 	private static ToeListingResult BuildListing(
@@ -459,6 +518,8 @@ public static class Command {
 		bool allDatabases = false;
 		bool showHeadings = false;
 		bool sortByName = false;
+		bool json = false;
+		bool jsonSpecified = false;
 		bool operandsOnly = false;
 		var directories = new List<string>();
 
@@ -490,6 +551,16 @@ public static class Command {
 
 				case "-s":
 					sortByName = true;
+					break;
+
+				case "--json":
+					if ( jsonSpecified ) {
+						options = ToeOptions.Empty;
+						error = "option '--json' may be specified only once";
+						return false;
+					}
+					json = true;
+					jsonSpecified = true;
 					break;
 
 				case "-D":
@@ -524,10 +595,24 @@ public static class Command {
 			}
 		}
 
+		if ( json ) {
+			if ( allDatabases || showHeadings || sortByName ) {
+				options = ToeOptions.Empty;
+				error = "options '-a', '-h', and '-s' cannot be combined with '--json'";
+				return false;
+			}
+			if ( directories.Count != 1 ) {
+				options = ToeOptions.Empty;
+				error = "option '--json' requires exactly one explicit directory operand";
+				return false;
+			}
+		}
+
 		options = new ToeOptions(
 			allDatabases,
 			showHeadings,
 			sortByName,
+			json,
 			directories.ToArray()
 		);
 		error = string.Empty;
@@ -600,6 +685,7 @@ public static class Command {
 
 	private static string GetHelpText() {
 		return $"Usage: {CommandName} [options] [directory ...]{Environment.NewLine}"
+			+ $"       {CommandName} --json directory{Environment.NewLine}"
 			+ $"       {CommandName} -u file{Environment.NewLine}"
 			+ $"       {CommandName} -U file{Environment.NewLine}"
 			+ $"       {CommandName} -D{Environment.NewLine}"
@@ -621,6 +707,8 @@ public static class Command {
 			+ Environment.NewLine
 			+ "  -s              sort entries by canonical terminal name; with -a, mark semantic duplicates"
 			+ Environment.NewLine
+			+ "      --json      inspect exactly one explicit directory and emit its databaseCatalog document"
+			+ Environment.NewLine
 			+ "  -u file         list forward use= dependencies in source order"
 			+ Environment.NewLine
 			+ "  -U file         list reverse use= dependencies deterministically"
@@ -633,6 +721,8 @@ public static class Command {
 			+ Environment.NewLine
 			+ Environment.NewLine
 			+ "Unambiguous listing options may be clustered; -u/-U accept attached source paths; use -- before a directory or source filename beginning with '-'."
+			+ Environment.NewLine
+			+ "JSON mode rejects listing presentation switches and writes one document followed by exactly one LF."
 			+ Environment.NewLine;
 	}
 
@@ -691,6 +781,7 @@ public static class Command {
 			allDatabases: false,
 			showHeadings: false,
 			sortByName: false,
+			json: false,
 			directories: Array.Empty<string>()
 		);
 
@@ -698,6 +789,7 @@ public static class Command {
 			bool allDatabases,
 			bool showHeadings,
 			bool sortByName,
+			bool json,
 			IReadOnlyList<string> directories
 		) {
 			ArgumentNullException.ThrowIfNull( directories );
@@ -705,6 +797,7 @@ public static class Command {
 			AllDatabases = allDatabases;
 			ShowHeadings = showHeadings;
 			SortByName = sortByName;
+			Json = json;
 			Directories = directories;
 		}
 
@@ -713,6 +806,8 @@ public static class Command {
 		public bool ShowHeadings { get; }
 
 		public bool SortByName { get; }
+
+		public bool Json { get; }
 
 		public IReadOnlyList<string> Directories { get; }
 	}

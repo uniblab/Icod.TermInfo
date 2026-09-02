@@ -3,6 +3,16 @@
 `Icod.TermInfo.Inspection` is the optional managed inspection and semantic-
 comparison layer for the `Icod.TermInfo` package family.
 
+## 1.9 MI05 command composition
+
+`1.9.0-Alpha-5` leaves the MI04 public API and version-1 JSON Schema unchanged.
+The existing deterministic renderer is now composed by `infocmp --json` and
+`toe --json`; explicit-directory all-candidates command planning delegates to
+the frozen `TerminalDescriptionSourcePlanner.PlanFromDirectory` contract.
+Command success adds one LF after the renderer-owned document. Command argument
+rules, stream separation, status mapping, and router equivalence remain owned by
+the command packages.
+
 The 1.3 line established the reusable inspection/comparison engine while
 preserving the already-frozen Runtime 1.0, Source 1.1, and Compiler 1.2 public
 contracts. Version 1.4.0 froze the reviewed additive database-inspection and
@@ -50,7 +60,7 @@ malformed, permission-failed, and partial states never claim completeness.
 The complete draft 2020-12 version-1 schema is published as
 `docs/Icod.TermInfo.Inspection.schema.json`, included in the NuGet package, and
 covered by checked-in compact and indented fixtures for all four document kinds.
-Command JSON remains owned by MI05. See
+Command JSON was deliberately deferred to, and is now implemented by, MI05. See
 `docs/1.9.0-MI04-DATABASE-CATALOG-MANIFESTS-AND-JSON-SCHEMA.md`.
 
 ## 1.9 MI03 comparison and planning evidence JSON

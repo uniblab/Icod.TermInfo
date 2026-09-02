@@ -1,5 +1,30 @@
 # infocmp
 
+## 1.9 JSON automation
+
+Version `1.9.0-Alpha-5` adds direct machine-readable projections of the frozen
+Inspection values:
+
+```text
+infocmp --json target
+infocmp --json -d left right
+infocmp --json --plan-use target candidate [candidate ...]
+infocmp --json --plan-use --all-candidates -B directory target
+```
+
+The forms emit, respectively, one `terminalDescription`, `comparison`, or
+`sourcePlan` version-1 document followed by exactly one LF. JSON mode rejects
+human-only source-layout and comparison-presentation combinations when they are
+irrelevant or ambiguous. Failures emit no partial stdout document.
+
+`--all-candidates` requires `--plan-use`, one explicit `-B` conventional
+directory, and exactly one target. The directory is inspected once through the
+frozen catalog contract; candidates retain canonical catalog order, semantic
+duplicates collapse to one canonical candidate, conflicting physical copies or
+incomplete catalogs are rejected, and the target is excluded by the frozen
+planner identity rule. No system database discovery occurs. Without `--json`,
+the same form emits only the selected terminfo source.
+
 ## 1.8 relative-source planning
 
 Version 1.8.0 adds deterministic bounded parent selection without changing the

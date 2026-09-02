@@ -202,10 +202,14 @@ shall not be repurposed. A breaking schema change requires a new schema version
 and identifier.
 
 Existing human-readable commands and the frozen 1.7 synthesis and 1.8 planning
-semantics remain unchanged. Later 1.9 command JSON modes must produce exactly one
-JSON document on successful stdout; diagnostics remain on stderr. Explicit
-all-candidates planning shall require a caller-selected database directory and
-shall never introduce implicit host-wide discovery.
+semantics remain unchanged. MI05 command JSON modes produce exactly one JSON
+document followed by one LF on successful stdout; diagnostics remain on stderr.
+`infocmp --json` projects the effective description, structured difference, or
+source plan already owned by Inspection. `toe --json directory` projects the
+exact explicit catalog, including incomplete catalog evidence. Explicit
+all-candidates planning requires `--plan-use`, exactly one target, and a
+caller-selected `-B` database directory; it never introduces implicit host-wide
+discovery.
 
 ## Runtime terminfo semantic compatibility
 
