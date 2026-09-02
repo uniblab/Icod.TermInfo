@@ -139,14 +139,20 @@ public sealed class S01ContractTests {
 					root,
 					".github",
 					"workflows",
-					"pr-build-and-test.yaml" ) );
-		string pushMain =
+					"pull-request.yaml" ) );
+		string main =
 			File.ReadAllText(
 				Path.Combine(
 					root,
 					".github",
 					"workflows",
-					"push-main.yaml" ) );
+					"main.yaml" ) );
+		string packPackages =
+			File.ReadAllText(
+				Path.Combine(
+					root,
+					"packaging",
+					"PackPackages.ps1" ) );
 
 		Assert.Contains(
 			"Icod.TermInfo.Source",
@@ -155,11 +161,20 @@ public sealed class S01ContractTests {
 			"Icod.TermInfo.Source.Tests",
 			solution );
 		Assert.Contains(
-			"dotnet pack Icod.TermInfo.Source/Icod.TermInfo.Source.csproj -c Staging",
+			"Icod.TermInfo.Source/Icod.TermInfo.Source.csproj",
+			packPackages );
+		Assert.Contains(
+			"CONFIGURATION: Staging",
 			pullRequest );
 		Assert.Contains(
-			"dotnet pack Icod.TermInfo.Source/Icod.TermInfo.Source.csproj -c Release",
-			pushMain );
+			"./packaging/PackPackages.ps1",
+			pullRequest );
+		Assert.Contains(
+			"CONFIGURATION: Release",
+			main );
+		Assert.Contains(
+			"./packaging/PackPackages.ps1",
+			main );
 	}
 
 	[Fact]
