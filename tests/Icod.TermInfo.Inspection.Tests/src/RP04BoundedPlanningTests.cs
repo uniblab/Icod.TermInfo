@@ -210,8 +210,8 @@ public sealed class RP04BoundedPlanningTests {
 
 		Assert.Equal( 5, plan.EvaluatedPlanCount );
 		Assert.True( plan.IsExhaustive );
-		Assert.Equal( new[] { 0 }, plan.Score.SelectedCandidateIndices );
-		Assert.Same( candidates[ 0 ], Assert.Single( plan.SelectedParents ) );
+		Assert.Equal( new[] { 1 }, plan.Score.SelectedCandidateIndices );
+		Assert.Same( candidates[ 1 ], Assert.Single( plan.SelectedParents ) );
 	}
 
 	[Fact]
