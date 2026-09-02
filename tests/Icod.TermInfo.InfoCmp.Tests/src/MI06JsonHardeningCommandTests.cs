@@ -83,8 +83,8 @@ public sealed class MI06JsonHardeningCommandTests {
 	}
 
 	private static string CreateTemporaryDirectory() {
-		string path = Path.Combine(
-			Path.GetTempPath(),
+		string path = System.IO.Path.Combine(
+			System.IO.Path.GetTempPath(),
 			$"icod-terminfo-infocmp-mi06-{Guid.NewGuid():N}"
 		);
 		Directory.CreateDirectory( path );
