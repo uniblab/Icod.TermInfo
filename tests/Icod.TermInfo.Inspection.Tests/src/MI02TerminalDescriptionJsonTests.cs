@@ -313,7 +313,7 @@ public sealed class MI02TerminalDescriptionJsonTests {
 			);
 		TerminalDescriptionSourcePlan plan =
 			TerminalDescriptionSourcePlanner.Plan(
-				description,
+				new TerminalDescriptionBuilder( "mi02-plan" ).Build(),
 				Array.Empty<TerminalDescriptionSourceSynthesisParent>()
 			);
 		TermInfoDatabaseCatalog catalog =
