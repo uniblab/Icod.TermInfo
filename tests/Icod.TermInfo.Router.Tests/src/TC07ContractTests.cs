@@ -343,6 +343,7 @@ public sealed class TC07ContractTests {
 						current.FullName,
 						"Icod.TermInfo.sln"
 					)
+				)
 			) {
 				return current.FullName;
 			}
