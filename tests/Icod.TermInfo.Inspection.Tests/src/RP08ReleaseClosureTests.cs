@@ -216,7 +216,7 @@ public sealed class RP08ReleaseClosureTests {
 				File.Exists(
 					Path.Combine(
 						directory.FullName,
-						"Icod.TermInfo.slnx" ) )
+						"Icod.TermInfo.sln" ) )
 			) {
 				return directory.FullName;
 			}
