@@ -256,7 +256,9 @@ adding another feature tranche. It freezes the complete additive planning API,
 score, bounds, candidate order, completeness evidence, explicit catalog
 orchestration, package-consumer surface, command and archive composition,
 deterministic samples, release verifiers, and release audit. A green Alpha-8 to
-stable `1.8.0` transition is version-only.
+stable `1.8.0` transition changes release metadata and documentation only. The
+stable release promotes the validated Alpha-8 surface without semantic or API
+changes.
 
 ## Assembly identity
 

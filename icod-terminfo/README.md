@@ -5,9 +5,9 @@
 
 The tool targets `net10.0` and therefore requires a .NET 10 runtime.
 
-## 1.8 development status
+## 1.8 release status
 
-Version 1.8 adds routed relative-source planning without adding router-owned
+Version 1.8.0 adds routed relative-source planning without adding router-owned
 semantics:
 
 ```text
@@ -20,9 +20,9 @@ token, diagnostics, and exit status to `Icod.TermInfo.InfoCmp.Command`. Direct
 produce byte-for-byte identical source. The installable package smoke and every
 matching standalone archive smoke execute the same controlled planning case.
 
-RP08 freezes that command and distribution surface at `1.8.0-Alpha-8`. The
-stable transition adds no router option or dispatch behavior after every direct,
-routed, package-installed, and matching-archive planning gate is green.
+Version 1.8.0 freezes that command and distribution surface. The stable release
+adds no router-owned option or dispatch behavior beyond the validated planning
+composition.
 
 ## 1.7 release status
 
@@ -34,13 +34,13 @@ five-command dispatch topology.
 ## Install
 
 ```text
-dotnet tool install --global Icod.TermInfo.Tools --version 1.7.0
+dotnet tool install --global Icod.TermInfo.Tools --version 1.8.0
 ```
 
 Update or remove the global tool with:
 
 ```text
-dotnet tool update --global Icod.TermInfo.Tools --version 1.7.0
+dotnet tool update --global Icod.TermInfo.Tools --version 1.8.0
 dotnet tool uninstall --global Icod.TermInfo.Tools
 ```
 
@@ -48,7 +48,7 @@ For repository-local or application-local use, install through a tool manifest:
 
 ```text
 dotnet new tool-manifest
-dotnet tool install Icod.TermInfo.Tools --version 1.7.0
+dotnet tool install Icod.TermInfo.Tools --version 1.8.0
 dotnet tool run icod-terminfo --version
 ```
 
@@ -62,8 +62,9 @@ It does not install global commands named `tic`, `infocmp`, `toe`, `captoinfo`,
 or `infotocap`. Those traditional command names belong to separately downloaded
 standalone release archives.
 
-Version 1.7.0 retains all five coordinated commands introduced in 1.6.0 and
-adds relative synthesis through the existing `infocmp` command:
+Version 1.8.0 retains all five coordinated commands introduced in 1.6.0,
+preserves 1.7 relative synthesis, and adds relative-source planning through the
+existing `infocmp` command:
 
 ```text
 icod-terminfo tic -V
@@ -104,7 +105,7 @@ icod-terminfo infotocap --help
 ## Standalone distribution
 
 The router package complements rather than replaces the release archives. Each
-of the six framework-dependent 1.7.0 tool-suite archives contains standalone
+of the six framework-dependent 1.8.0 tool-suite archives contains standalone
 executables named exactly:
 
 ```text

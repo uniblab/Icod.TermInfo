@@ -128,6 +128,31 @@ errors. The command does not duplicate synthesis semantics.
 The production Inspection package continues to depend only on Runtime and Source.
 Compiler and ncurses are verification references only.
 
+## 1.8 relative-source planning compatibility
+
+Inspection 1.8 may select a deterministic ordered parent plan for the frozen
+1.7 relative-source synthesizer. Candidate order and candidate position are
+semantic inputs. The planner snapshots the caller sequence once, never selects
+the same position twice, and uses candidate-index order as the final score
+tie-break.
+
+Plans are ranked lexicographically by local directive count, cancellation
+count, parent count, rendered UTF-8 byte count, and selected candidate-index
+sequence. The zero-parent plan is part of the search. Exhaustive search and an
+explicitly bounded deterministic prefix are distinguishable through result
+evidence; a budget limit is never reported as exhaustive completion.
+
+Planning limits, checked plan-space arithmetic, cancellation behavior, and
+source-size enforcement are compatibility contracts. Explicit catalog and
+directory orchestration never consult environment discovery or platform
+defaults. The stable command adapter is `infocmp --plan-use`; it remains a thin
+adapter over Inspection and produces the same source through the standalone
+command, installable router, and matching release archive.
+
+The 1.8 planner does not change 1.7 synthesis semantics, create intermediate
+parents, infer author intent, or introduce a production Compiler or Termcap
+dependency.
+
 ## Runtime terminfo semantic compatibility
 
 The stable runtime responsibility includes:

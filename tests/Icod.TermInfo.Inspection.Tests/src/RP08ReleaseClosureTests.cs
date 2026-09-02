@@ -6,7 +6,8 @@ using Xunit;
 namespace Icod.TermInfo.Inspection.Tests;
 
 public sealed class RP08ReleaseClosureTests {
-	private const string DevelopmentVersion = "1.8.0-Alpha-8";
+	private const string StableReleaseVersion = "1.8.0";
+	private const string HistoricalDevelopmentVersion = "1.8.0-Alpha-8";
 	private const string Rp07Head =
 		"a88237d0d2f0ecdf74a7d96f6ff1cb9a2e8e647d";
 	private const string HistoricalOneSevenBaselineSha256 =
@@ -136,7 +137,10 @@ public sealed class RP08ReleaseClosureTests {
 					"docs",
 					"1.8.0-RP08-API-PACKAGING-AND-RELEASE-CLOSURE.md" ) );
 
-		Assert.Contains( DevelopmentVersion, record, StringComparison.Ordinal );
+		Assert.Contains(
+			HistoricalDevelopmentVersion,
+			record,
+			StringComparison.Ordinal );
 		Assert.Contains( Rp07Head, record, StringComparison.Ordinal );
 		Assert.Contains( "LocalDirectiveCount", record, StringComparison.Ordinal );
 		Assert.Contains( "SelectedCandidateIndices", record, StringComparison.Ordinal );
@@ -172,6 +176,8 @@ public sealed class RP08ReleaseClosureTests {
 				"Toolchain",
 				"v1.8.0",
 				"pending owner publication",
+				"fc75edf470eefc1b3f367d268dd0618f5f03e38e",
+				"33603732871",
 			}
 		) {
 			Assert.Contains(
@@ -182,7 +188,7 @@ public sealed class RP08ReleaseClosureTests {
 	}
 
 	[Fact]
-	public void CoordinatedMetadataAndRoadmapsIdentifyAlphaEightClosure() {
+	public void CoordinatedMetadataAndRoadmapsIdentifyStableClosure() {
 		string root = FindRepositoryRoot();
 		string buildProperties =
 			File.ReadAllText(
@@ -200,13 +206,16 @@ public sealed class RP08ReleaseClosureTests {
 					root,
 					"Icod.TermInfo-Post-1.0-Development-Roadmap.md" ) );
 
-		Assert.Contains( DevelopmentVersion, buildProperties, StringComparison.Ordinal );
 		Assert.Contains(
-			"RP08 stable-intended release contract complete",
+			StableReleaseVersion,
+			buildProperties,
+			StringComparison.Ordinal );
+		Assert.Contains(
+			"Stable 1.8.0 release contract frozen",
 			roadmap,
 			StringComparison.Ordinal );
 		Assert.Contains(
-			"RP08 - API freeze, packaging, and release closure",
+			"Release closure - exact-main validation and publication",
 			activeRoadmap,
 			StringComparison.Ordinal );
 	}

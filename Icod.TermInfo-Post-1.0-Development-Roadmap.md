@@ -10,12 +10,13 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
-**Current coordinated version:** `1.8.0-Alpha-8`
+**Current coordinated version:** `1.8.0`
 **Final 1.6 prerelease:** `1.6.0-Alpha-8`
 **Final 1.7 prerelease:** `1.7.0-Alpha-8`
-**Next development line:** `1.8.0` - Relative Source Planning and Parent Selection
-**Status:** 1.8.0 stable-intended release contract complete
-**Current tranche:** RP08 - API freeze, packaging, and release closure
+**Final 1.8 prerelease:** `1.8.0-Alpha-8`
+**Next development line:** post-1.8 demand-driven work
+**Status:** 1.8.0 stable release contract frozen
+**Current tranche:** Release closure - exact-main validation and publication
 **Primary objective:** Select deterministic, bounded, semantically valid ordered parents in Inspection without changing the frozen Runtime, Source, Compiler, Termcap, or 1.7 synthesis contracts.
 
 ---
@@ -144,7 +145,9 @@ the planner through direct and routed `infocmp --plan-use` plus all six archive
 RIDs; RP07 adds generated-state, independent-oracle, boundary, corpus, culture,
 and repeated-process hardening. RP08 freezes the complete additive Inspection
 API, package and distribution topology, samples, release verifiers, and 1.8
-release audit at `1.8.0-Alpha-8` without adding another feature tranche.
+release audit at `1.8.0-Alpha-8` without adding another feature tranche. The
+stable 1.8.0 release promotes that validated Alpha-8 surface without semantic or
+public-API changes.
 
 The sequence is cumulative but intentionally modular. Applications which only need runtime terminfo SHALL continue to depend on `Icod.TermInfo` alone.
 

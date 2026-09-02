@@ -3,11 +3,11 @@
 `toe` is the managed conventional terminfo database-listing command in the
 `Icod.TermInfo` tool suite.
 
-## 1.7 status
+## 1.8 status
 
-Version `1.7.0` carries the frozen `toe` database-listing and source-dependency
-contracts forward unchanged. Relative-source synthesis is isolated in
-Inspection and `infocmp -u`; `toe` acquires no new semantics or dependencies.
+Version `1.8.0` carries the frozen `toe` database-listing and source-dependency
+contracts forward unchanged. Relative-source planning is isolated in Inspection
+and `infocmp --plan-use`; `toe` acquires no new semantics or dependencies.
 
 ## 1.6.x history
 
