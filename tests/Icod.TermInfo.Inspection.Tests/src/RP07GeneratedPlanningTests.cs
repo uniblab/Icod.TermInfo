@@ -93,12 +93,12 @@ public sealed class RP07GeneratedPlanningTests {
 
 		switch ( decidingComponent ) {
 			case 0:
-				preferred = CreateScore( 0, 1, 1, 10, 0 );
-				other = CreateScore( 1, 0, 1, 1, 0 );
+				preferred = CreateScore( 1, 1, 1, 10, 0 );
+				other = CreateScore( 2, 0, 1, 1, 0 );
 				break;
 			case 1:
-				preferred = CreateScore( 0, 0, 1, 10, 0 );
-				other = CreateScore( 0, 1, 1, 1, 0 );
+				preferred = CreateScore( 1, 0, 1, 10, 0 );
+				other = CreateScore( 1, 1, 1, 1, 0 );
 				break;
 			case 2:
 				preferred = CreateScore( 0, 0, 0, 10 );
@@ -134,6 +134,7 @@ public sealed class RP07GeneratedPlanningTests {
 			new TerminalDescriptionBuilder( "rp07-equivalent" )
 				.AddAlias( "rp07-equivalent-a" )
 				.AddAlias( "rp07-equivalent-b" )
+				.SetDescription( "RP07 equivalent description" )
 				.SetBoolean( BooleanCapability.AutoRightMargin )
 				.Build();
 		TerminalDescriptionSourceSynthesisParent[] candidates = [
