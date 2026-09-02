@@ -42,18 +42,14 @@ public sealed class MI01JsonContractTests {
 
 		Assert.Equal( 8_192, options.MaximumOutputByteCount );
 		Assert.True( options.WriteIndented );
-		Assert.Empty(
-			typeof( TermInfoJsonRendererOptions )
-				.GetProperties()
-				.Where( property => property.SetMethod is not null )
+		Assert.DoesNotContain(
+			typeof( TermInfoJsonRendererOptions ).GetProperties(),
+			property => property.SetMethod is not null
 		);
-		Assert.Empty(
-			typeof( TermInfoJsonRendererOptions )
-				.GetProperties()
-				.Where(
-					property =>
-						typeof( Delegate ).IsAssignableFrom( property.PropertyType )
-				)
+		Assert.DoesNotContain(
+			typeof( TermInfoJsonRendererOptions ).GetProperties(),
+			property =>
+				typeof( Delegate ).IsAssignableFrom( property.PropertyType )
 		);
 	}
 
@@ -322,10 +318,9 @@ public sealed class MI01JsonContractTests {
 				StringComparison.OrdinalIgnoreCase
 			)
 		);
-		Assert.Empty(
-			project
-				.Descendants()
-				.Where( element => element.Name.LocalName == "PackageReference" )
+		Assert.DoesNotContain(
+			project.Descendants(),
+			element => element.Name.LocalName == "PackageReference"
 		);
 	}
 

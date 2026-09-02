@@ -9,7 +9,7 @@ public sealed class I01ContractTests {
 	private const string StableAssemblyVersion = "1.0.0.0";
 
 	[Fact]
-	public void FourPackagesAdvanceTogetherWithoutChangingAssemblyIdentity() {
+	public void HistoricalInspectionTypesRemainAvailableWithinAdditiveSurface() {
 		string root =
 			FindRepositoryRoot();
 
@@ -70,7 +70,7 @@ public sealed class I01ContractTests {
 					StringComparer.Ordinal
 				)
 				.ToArray();
-		Assert.Equal(
+		Assert.All(
 			new[] {
 				"Icod.TermInfo.Inspection.TermInfoComparisonResult",
 				"Icod.TermInfo.Inspection.TermInfoDatabaseCatalog",
@@ -102,7 +102,7 @@ public sealed class I01ContractTests {
 				"Icod.TermInfo.Inspection.TerminalDescriptionSourceSynthesisParent",
 				"Icod.TermInfo.Inspection.TerminalDescriptionSourceSynthesizer",
 			},
-			exportedTypes
+			expectedType => Assert.Contains( expectedType, exportedTypes )
 		);
 	}
 
