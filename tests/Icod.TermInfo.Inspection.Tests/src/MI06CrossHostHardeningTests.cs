@@ -8,7 +8,7 @@ using Xunit;
 namespace Icod.TermInfo.Inspection.Tests;
 
 public sealed class MI06CrossHostHardeningTests {
-	private const string DevelopmentVersion = "1.9.0-Alpha-7";
+	private const string DevelopmentVersion = "1.9.0-Alpha-6";
 
 	[Fact]
 	public void LargePathologicalJsonIsCultureInvariantAndExactlyBounded() {
