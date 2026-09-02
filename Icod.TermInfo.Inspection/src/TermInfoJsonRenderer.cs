@@ -4,7 +4,7 @@ namespace Icod.TermInfo.Inspection;
 /// Renders immutable Inspection values through the versioned deterministic JSON
 /// contract.
 /// </summary>
-public static class TermInfoJsonRenderer {
+public static partial class TermInfoJsonRenderer {
 	/// <summary>
 	/// The exact schema identifier emitted by the version-1 JSON envelope.
 	/// </summary>
@@ -25,8 +25,9 @@ public static class TermInfoJsonRenderer {
 	/// <exception cref="ArgumentNullException">
 	/// <paramref name="description"/> is <see langword="null"/>.
 	/// </exception>
-	/// <exception cref="NotSupportedException">
-	/// Effective-description JSON rendering begins in MI02.
+	/// <exception cref="InvalidOperationException">
+	/// The effective description contains text which JSON cannot represent, or the
+	/// rendered UTF-8 document exceeds the configured output bound.
 	/// </exception>
 	public static string Render(
 		TerminalDescription description
@@ -54,8 +55,9 @@ public static class TermInfoJsonRenderer {
 	/// <exception cref="OperationCanceledException">
 	/// <paramref name="cancellationToken"/> is canceled.
 	/// </exception>
-	/// <exception cref="NotSupportedException">
-	/// Effective-description JSON rendering begins in MI02.
+	/// <exception cref="InvalidOperationException">
+	/// The effective description contains text which JSON cannot represent, or the
+	/// rendered UTF-8 document exceeds the configured output bound.
 	/// </exception>
 	public static string Render(
 		TerminalDescription description,
@@ -66,8 +68,10 @@ public static class TermInfoJsonRenderer {
 		ArgumentNullException.ThrowIfNull( options );
 		cancellationToken.ThrowIfCancellationRequested();
 
-		throw new NotSupportedException(
-			"Effective terminal-description JSON rendering begins in MI02."
+		return RenderTerminalDescription(
+			description,
+			options,
+			cancellationToken
 		);
 	}
 

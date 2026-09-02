@@ -193,7 +193,7 @@ public sealed class MI01JsonContractTests {
 	}
 
 	[Fact]
-	public void JsonRendererIdentifiesOwningOperationalTranches() {
+	public void RemainingJsonRendererMethodsIdentifyOwningOperationalTranches() {
 		TerminalDescription description =
 			CreateDescription();
 		TermInfoComparisonResult comparison =
@@ -207,10 +207,8 @@ public sealed class MI01JsonContractTests {
 			CreateMissingCatalog();
 
 		Assert.Contains(
-			"MI02",
-			Assert.Throws<NotSupportedException>(
-				() => TermInfoJsonRenderer.Render( description )
-			).Message,
+			"terminalDescription",
+			TermInfoJsonRenderer.Render( description ),
 			StringComparison.Ordinal
 		);
 		Assert.Contains(

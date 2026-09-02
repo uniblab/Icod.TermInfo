@@ -398,10 +398,11 @@ the result reports whether the configured search space was exhausted.
 ## 1.9 development line
 
 Version 1.9 develops deterministic machine-readable Inspection output and
-explicit planning automation. MI01 introduces the immutable bounded JSON policy
-and strongly typed renderer foundation:
+explicit planning automation. MI02 makes effective-description JSON operational
+through the immutable bounded policy and strongly typed renderer foundation:
 
 ```csharp
+using Icod.TermInfo;
 using Icod.TermInfo.Inspection;
 
 TermInfoJsonRendererOptions jsonOptions =
@@ -409,13 +410,20 @@ TermInfoJsonRendererOptions jsonOptions =
 		TermInfoJsonRendererOptions.DefaultMaximumOutputByteCount,
 		writeIndented: true
 	);
+
+string json =
+	TermInfoJsonRenderer.Render(
+		TerminalDatabase.BuiltIn.Load( "xterm-256color" ),
+		jsonOptions
+	);
 ```
 
 The version-1 schema identifier is
-`urn:icod:terminfo:inspection:json:1`. Effective-description rendering begins in
-MI02, comparison and planning evidence in MI03, and explicit database manifests
-in MI04. MI01 deliberately throws `NotSupportedException` from renderer
-operations rather than publish incomplete machine-readable payloads.
+`urn:icod:terminfo:inspection:json:1`. MI02 emits identity plus typed standard
+and extended Boolean, numeric, and string capability arrays in deterministic
+order. Missing descriptions are JSON null, aliases retain their immutable order,
+and the reusable result has no trailing line terminator. Comparison and planning
+evidence remain deferred to MI03, and explicit database manifests to MI04.
 
 Later 1.9 tranches compose the reusable renderer through `infocmp` and `toe` and
 add all-candidates planning only for an explicit caller-selected database
@@ -423,8 +431,8 @@ directory. The frozen 1.7 synthesis and 1.8 planning contracts remain unchanged.
 
 See
 `Icod.TermInfo-1.9.0-Machine-Readable-Inspection-and-Planning-Automation-Roadmap.md`
-and `docs/1.9.0-MI01-JSON-CONTRACT-AND-RENDERER-FOUNDATION.md` for the complete
-development contract.
+and `docs/1.9.0-MI02-EFFECTIVE-DESCRIPTION-JSON.md` for the current operational
+contract.
 
 ## Getting started
 

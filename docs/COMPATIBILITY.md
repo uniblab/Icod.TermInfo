@@ -172,10 +172,19 @@ MI01 freezes:
 - typed renderer entry points and operation-local cancellation;
 - absence of caller-supplied converters, naming policies, encoders, or delegates.
 
-MI01 does not emit a partial payload. Operational rendering begins in MI02
-through MI04, and MI04 publishes the complete version-1 JSON Schema. Once a
-payload field is published under version 1, its meaning and value kind shall not
-be repurposed. A breaking schema change requires a new schema version and
+MI02 makes the `terminalDescription` payload operational. It freezes exact
+identity, immutable alias order, explicit JSON null for a missing description,
+typed capability objects, compiled database order for standard capabilities,
+and value-kind plus exact ordinal-name order for extended capabilities. Absent
+capabilities receive no defaults, and effective JSON contains neither source
+ancestry nor cancellation tombstones. Compact output has no trailing whitespace;
+the optional indented form uses LF and two spaces. Both forms enforce the exact
+final UTF-8 byte count and the default safe JSON escaping policy.
+
+Comparison and plan rendering remain deferred to MI03, catalog rendering to
+MI04, and MI04 publishes the complete version-1 JSON Schema. Once a payload
+field is published under version 1, its meaning and value kind shall not be
+repurposed. A breaking schema change requires a new schema version and
 identifier.
 
 Existing human-readable commands and the frozen 1.7 synthesis and 1.8 planning

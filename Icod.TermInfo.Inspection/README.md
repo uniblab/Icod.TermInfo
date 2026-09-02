@@ -22,6 +22,35 @@ bounded search, cancellation evidence, and explicit catalog semantics are
 recorded in `docs/1.8.0-RELEASE-AUDIT.md`. Stable 1.8.0 promotes the validated
 Alpha-8 surface without changing planning or synthesis semantics.
 
+## 1.9 MI02 effective-description JSON
+
+`1.9.0-Alpha-2` makes `TermInfoJsonRenderer.Render(TerminalDescription)`
+operational. The version-1 payload preserves the exact terminal name, immutable
+alias order, and nullable description, followed by typed standard and extended
+capability arrays.
+
+```csharp
+TerminalDescription terminal =
+	TerminalDatabase.BuiltIn.Load( "xterm-256color" );
+string json =
+	TermInfoJsonRenderer.Render(
+		terminal,
+		new TermInfoJsonRendererOptions(
+			maximumOutputByteCount: 65_536,
+			writeIndented: true
+		)
+	);
+```
+
+Standard capabilities use canonical terminfo short names and compiled database
+order. Extended capabilities are grouped by Boolean, number, and string kind,
+then ordered by exact ordinal name. Compact output is canonical; indented output
+uses LF, two spaces, and no trailing line terminator. The bound is applied to the
+exact final UTF-8 byte count, and control characters use the default safe JSON
+escaping policy. Comparison and planning payloads remain owned by MI03; catalog
+payloads remain owned by MI04. See
+`docs/1.9.0-MI02-EFFECTIVE-DESCRIPTION-JSON.md`.
+
 ## 1.9 MI01 machine-readable renderer foundation
 
 `1.9.0-Alpha-1` adds `TermInfoJsonRendererOptions` and
@@ -42,10 +71,10 @@ schema version `1`. The renderer has typed entry points for
 `TerminalDescription`, `TermInfoComparisonResult`,
 `TerminalDescriptionSourcePlan`, and `TermInfoDatabaseCatalog`.
 
-MI01 validates arguments, bounds, and pre-cancellation, then deliberately throws
-`NotSupportedException`: description rendering begins in MI02, comparison and
-plan rendering in MI03, and catalog rendering in MI04. This prevents an empty or
-partial payload from appearing to satisfy the version-1 schema. See
+MI01 validated arguments, bounds, and pre-cancellation, then deliberately threw
+`NotSupportedException` for all payloads. MI02 has since activated description
+rendering; comparison and plan rendering remain deferred to MI03, and catalog
+rendering to MI04. See
 `docs/1.9.0-MI01-JSON-CONTRACT-AND-RENDERER-FOUNDATION.md`.
 
 ## 1.8 RP07 generated-state oracle and hardening

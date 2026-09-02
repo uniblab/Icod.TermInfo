@@ -271,6 +271,14 @@ immutable historical evidence while cross-framework API equality and explicit
 MI01 contract/package-smoke tests guard the additive prerelease surface. MI07
 will freeze the exact stable 1.9 Inspection baseline.
 
+MI02 advances the coordinated development version to `1.9.0-Alpha-2` without
+adding public API. It makes only the existing `TerminalDescription` renderer
+overloads operational, freezing the effective-description payload, deterministic
+ordering and escaping, compact and LF/two-space indented forms, exact UTF-8
+bounds, and deterministic cancellation boundaries. Comparison and planning
+rendering remain deferred to MI03, and catalog rendering remains deferred to
+MI04. Historical MI01 records retain their Alpha-1 version.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:

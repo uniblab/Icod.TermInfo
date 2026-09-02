@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Text.Json;
 using Icod.TermInfo;
 using Icod.TermInfo.Inspection;
 using Icod.TermInfo.Source;
@@ -255,23 +256,43 @@ Require(
 		&& !jsonOptions.WriteIndented,
 	"The MI01 JSON renderer contract did not retain its reviewed identity and bounds."
 );
-try {
-	_ = TermInfoJsonRenderer.Render(
+string terminalJson =
+	TermInfoJsonRenderer.Render(
 		terminal,
 		jsonOptions
 	);
-	throw new InvalidOperationException(
-		"The MI01 JSON renderer became operational before MI02."
-	);
-} catch ( NotSupportedException exception ) {
-	Require(
-		exception.Message.Contains(
-			"MI02",
-			StringComparison.Ordinal
-		),
-		"The MI01 JSON renderer did not identify its owning operational tranche."
-	);
-}
+using JsonDocument terminalJsonDocument =
+	JsonDocument.Parse( terminalJson );
+JsonElement terminalJsonRoot = terminalJsonDocument.RootElement;
+JsonElement terminalJsonData = terminalJsonRoot.GetProperty( "data" );
+JsonElement terminalJsonCapabilities =
+	terminalJsonData.GetProperty( "capabilities" );
+JsonElement terminalJsonBoolean =
+	terminalJsonCapabilities
+		.GetProperty( "booleans" )
+		.EnumerateArray()
+		.Single();
+JsonElement terminalJsonNumber =
+	terminalJsonCapabilities
+		.GetProperty( "numbers" )
+		.EnumerateArray()
+		.Single();
+Require(
+	terminalJsonRoot.GetProperty( "schema" ).GetString()
+		== TermInfoJsonRenderer.SchemaIdentifier
+		&& terminalJsonRoot.GetProperty( "schemaVersion" ).GetInt32() == 1
+		&& terminalJsonRoot.GetProperty( "documentKind" ).GetString()
+			== "terminalDescription"
+		&& terminalJsonData
+			.GetProperty( "identity" )
+			.GetProperty( "name" )
+			.GetString() == "inspection-smoke"
+		&& terminalJsonBoolean.GetProperty( "name" ).GetString() == "am"
+		&& terminalJsonBoolean.GetProperty( "value" ).GetBoolean()
+		&& terminalJsonNumber.GetProperty( "name" ).GetString() == "cols"
+		&& terminalJsonNumber.GetProperty( "value" ).GetInt32() == 80,
+	"The MI02 package renderer did not emit the reviewed effective-description JSON."
+);
 TerminalDescriptionSourcePlanningScore planningScore =
 	new(
 		1,
@@ -616,5 +637,5 @@ Require(
 );
 
 Console.WriteLine(
-	"Icod.TermInfo.Inspection 1.9.0-Alpha-1 package smoke test passed."
+	"Icod.TermInfo.Inspection 1.9.0-Alpha-2 package smoke test passed."
 );
