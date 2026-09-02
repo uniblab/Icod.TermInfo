@@ -1,0 +1,118 @@
+name: pull-request
+
+on:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_VERSIONS: |
+    8.0.x
+    9.0.x
+    10.0.x
+  CONFIGURATION: Staging
+  SOLUTION_PATH: Icod.TermInfo.sln
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            name: Windows
+            package_host: false
+          - os: ubuntu-latest
+            name: Linux
+            package_host: true
+          - os: macos-latest
+            name: macOS
+            package_host: false
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSIONS }}
+      - name: Restore
+        run: dotnet restore ${{ env.SOLUTION_PATH }}
+      - name: Build
+        run: dotnet build ${{ env.SOLUTION_PATH }} -c ${{ env.CONFIGURATION }} --no-restore -p:ContinuousIntegrationBuild=true
+      - name: Test
+        run: dotnet test ${{ env.SOLUTION_PATH }} -c ${{ env.CONFIGURATION }} --no-build --no-restore --logger trx
+      - name: Pack coordinated Staging packages
+        if: matrix.package_host
+        shell: pwsh
+        run: ./packaging/PackPackages.ps1 -Configuration '${{ env.CONFIGURATION }}' -OutputDirectory artifacts
+      - name: Verify exact Staging package artifacts
+        if: matrix.package_host
+        shell: pwsh
+        run: ./packaging/VerifyPackageArtifact.ps1 -ArtifactDirectory artifacts -Configuration '${{ env.CONFIGURATION }}'
+      - name: Build and verify Staging tool archives
+        if: matrix.package_host
+        shell: pwsh
+        run: ./packaging/BuildToolArchives.ps1 -Configuration '${{ env.CONFIGURATION }}' -OutputDirectory artifacts/tools
+      - name: Upload validated Staging packages
+        if: matrix.package_host
+        uses: actions/upload-artifact@v4
+        with:
+          name: terminfo-pr-packages
+          path: |
+            artifacts/*.nupkg
+            artifacts/*.snupkg
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload validated Staging tool archives
+        if: matrix.package_host
+        uses: actions/upload-artifact@v4
+        with:
+          name: terminfo-pr-tools
+          path: artifacts/tools/*
+          if-no-files-found: error
+          retention-days: 7
+
+  smoke-tool-package:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - uses: actions/download-artifact@v4
+        with:
+          name: terminfo-pr-packages
+          path: artifacts
+      - name: Smoke installable Icod.TermInfo.Tools package
+        shell: pwsh
+        run: ./.github/scripts/smoke-tool-package.ps1 artifacts
+
+  smoke-tool-archives:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - uses: actions/download-artifact@v4
+        with:
+          name: terminfo-pr-tools
+          path: artifacts/tools
+      - name: Smoke matching tool-suite archive
+        shell: pwsh
+        run: ./.github/scripts/smoke-tool-archive.ps1 artifacts/tools
