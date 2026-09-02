@@ -22,6 +22,37 @@ bounded search, cancellation evidence, and explicit catalog semantics are
 recorded in `docs/1.8.0-RELEASE-AUDIT.md`. Stable 1.8.0 promotes the validated
 Alpha-8 surface without changing planning or synthesis semantics.
 
+## 1.9 MI04 database-catalog manifests and JSON Schema
+
+`1.9.0-Alpha-4` makes the existing `TermInfoDatabaseCatalog` renderer overload
+operational without adding public API. The `databaseCatalog` payload preserves
+the normalized root, explicit catalog kind, derived `isComplete` evidence,
+ordered entries and issues, and ordered `duplicateCanonicalNames` evidence.
+
+```csharp
+TermInfoDatabaseCatalog catalog =
+	TermInfoDatabaseInspector.InspectDirectory( explicitDatabaseRoot );
+string catalogJson =
+	TermInfoJsonRenderer.Render(
+		catalog,
+		new TermInfoJsonRendererOptions(
+			maximumOutputByteCount: 65_536,
+			writeIndented: true
+		)
+	);
+```
+
+Completeness is true only for a conventional directory with no inspection
+issues. Duplicate canonical names remain explicit ambiguity evidence and do not
+erase otherwise complete inspection evidence. Missing, unsupported, unavailable,
+malformed, permission-failed, and partial states never claim completeness.
+
+The complete draft 2020-12 version-1 schema is published as
+`docs/Icod.TermInfo.Inspection.schema.json`, included in the NuGet package, and
+covered by checked-in compact and indented fixtures for all four document kinds.
+Command JSON remains owned by MI05. See
+`docs/1.9.0-MI04-DATABASE-CATALOG-MANIFESTS-AND-JSON-SCHEMA.md`.
+
 ## 1.9 MI03 comparison and planning evidence JSON
 
 `1.9.0-Alpha-3` makes the existing comparison and source-plan renderer
@@ -51,7 +82,8 @@ Plan documents retain selected parent count and ordered `UseName` values,
 generated LF source, all score components, selected candidate indices,
 evaluated-plan count, `isExhaustive`, and accepted candidate count. Rendering
 reports the supplied immutable result and does not recompute a comparison or
-rerun planning. Catalog payloads remain owned by MI04. See
+rerun planning. MI04 has since activated catalog payloads and published the
+complete schema. See
 `docs/1.9.0-MI03-COMPARISON-AND-PLANNING-EVIDENCE-JSON.md`.
 
 ## 1.9 MI02 effective-description JSON
@@ -79,8 +111,8 @@ order. Extended capabilities are grouped by Boolean, number, and string kind,
 then ordered by exact ordinal name. Compact output is canonical; indented output
 uses LF, two spaces, and no trailing line terminator. The bound is applied to the
 exact final UTF-8 byte count, and control characters use the default safe JSON
-escaping policy. MI03 has since activated comparison and planning payloads;
-catalog payloads remain owned by MI04. See
+escaping policy. MI03 has since activated comparison and planning payloads, and
+MI04 has activated catalog payloads. See
 `docs/1.9.0-MI02-EFFECTIVE-DESCRIPTION-JSON.md`.
 
 ## 1.9 MI01 machine-readable renderer foundation
@@ -105,8 +137,8 @@ schema version `1`. The renderer has typed entry points for
 
 MI01 validated arguments, bounds, and pre-cancellation, then deliberately threw
 `NotSupportedException` for all payloads. MI02 activated description rendering,
-MI03 activated comparison and plan rendering, and catalog rendering remains
-deferred to MI04. See
+MI03 activated comparison and plan rendering, and MI04 activated catalog
+rendering and published the complete version-1 schema. See
 `docs/1.9.0-MI01-JSON-CONTRACT-AND-RENDERER-FOUNDATION.md`.
 
 ## 1.8 RP07 generated-state oracle and hardening

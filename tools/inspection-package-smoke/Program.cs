@@ -119,6 +119,35 @@ Require(
 		&& !missingCatalog.HasIssues,
 	"The T03 database catalog did not report a deterministic missing-root snapshot."
 );
+string catalogJson =
+	TermInfoJsonRenderer.Render(
+		missingCatalog,
+		new TermInfoJsonRendererOptions(
+			65_536,
+			writeIndented: true
+		)
+	);
+using JsonDocument catalogJsonDocument =
+	JsonDocument.Parse( catalogJson );
+JsonElement catalogJsonRoot = catalogJsonDocument.RootElement;
+JsonElement catalogJsonData = catalogJsonRoot.GetProperty( "data" );
+Require(
+	catalogJsonRoot.GetProperty( "schema" ).GetString()
+		== TermInfoJsonRenderer.SchemaIdentifier
+		&& catalogJsonRoot.GetProperty( "schemaVersion" ).GetInt32() == 1
+		&& catalogJsonRoot.GetProperty( "documentKind" ).GetString()
+			== "databaseCatalog"
+		&& catalogJsonData.GetProperty( "root" ).GetString()
+			== missingCatalog.Root
+		&& catalogJsonData.GetProperty( "kind" ).GetString() == "missing"
+		&& !catalogJsonData.GetProperty( "isComplete" ).GetBoolean()
+		&& catalogJsonData.GetProperty( "entries" ).GetArrayLength() == 0
+		&& catalogJsonData.GetProperty( "issues" ).GetArrayLength() == 0
+		&& catalogJsonData
+			.GetProperty( "duplicateCanonicalNames" )
+			.GetArrayLength() == 0,
+	"The MI04 package renderer did not emit the reviewed database-catalog manifest."
+);
 
 const string source =
 	"inspection-smoke|Inspection package smoke,am,cols#80,";
@@ -709,5 +738,5 @@ Require(
 );
 
 Console.WriteLine(
-	"Icod.TermInfo.Inspection 1.9.0-Alpha-3 package smoke test passed."
+	"Icod.TermInfo.Inspection 1.9.0-Alpha-4 package smoke test passed."
 );

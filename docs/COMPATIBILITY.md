@@ -190,10 +190,16 @@ generated LF source, every frozen score component, selected candidate indices,
 evaluated-plan count, `isExhaustive`, and accepted candidate count. Rendering is
 a direct projection and does not recompute comparison or planning semantics.
 
-Catalog rendering remains deferred to MI04, when the complete version-1 JSON
-Schema is published. Once a payload field is published under version 1, its
-meaning and value kind shall not be repurposed. A breaking schema change requires
-a new schema version and identifier.
+MI04 makes `databaseCatalog` operational. Catalog JSON retains the normalized
+root, explicit catalog kind, derived completeness, ordered entry path and
+identity summaries, ordered issue evidence, and ordered duplicate canonical
+names. Completeness is true only for a conventional directory with no issues;
+duplicate names remain visible ambiguity evidence. The complete draft 2020-12
+version-1 JSON Schema is published at
+`docs/Icod.TermInfo.Inspection.schema.json` and is packaged with Inspection.
+Once a payload field is published under version 1, its meaning and value kind
+shall not be repurposed. A breaking schema change requires a new schema version
+and identifier.
 
 Existing human-readable commands and the frozen 1.7 synthesis and 1.8 planning
 semantics remain unchanged. Later 1.9 command JSON modes must produce exactly one

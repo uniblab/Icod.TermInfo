@@ -1,0 +1,32 @@
+{
+  "schema": "urn:icod:terminfo:inspection:json:1",
+  "schemaVersion": 1,
+  "documentKind": "databaseCatalog",
+  "data": {
+    "root": "//mi04/catalog",
+    "kind": "conventionalDirectory",
+    "isComplete": true,
+    "entries": [
+      {
+        "path": "//mi04/catalog/6d/mi04-main",
+        "name": "mi04-main",
+        "aliases": [
+          "mi04-alias"
+        ],
+        "description": "MI04 \u0022complete\u0022 catalog"
+      },
+      {
+        "path": "//mi04/catalog/6d/mi04-alias",
+        "name": "mi04-main",
+        "aliases": [
+          "mi04-alias"
+        ],
+        "description": "MI04 \u0022complete\u0022 catalog"
+      }
+    ],
+    "issues": [],
+    "duplicateCanonicalNames": [
+      "mi04-main"
+    ]
+  }
+}

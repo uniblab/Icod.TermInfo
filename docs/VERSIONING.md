@@ -288,6 +288,14 @@ exact UTF-8 bounds, and cancellation. Catalog rendering remains deferred to
 MI04. Historical MI01 and MI02 records retain their original development
 versions.
 
+MI04 advances the coordinated development version to `1.9.0-Alpha-4` without
+adding public API. It makes the existing database-catalog renderer overloads
+operational, freezing normalized-root, kind, completeness, ordered-entry,
+ordered-issue, and duplicate-name evidence. It also publishes and packages the
+complete draft 2020-12 version-1 JSON Schema with checked-in compact and indented
+fixtures for all four document kinds. Historical MI01 through MI03 records
+retain their original development versions. Command JSON remains owned by MI05.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:

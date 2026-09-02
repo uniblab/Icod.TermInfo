@@ -29,7 +29,7 @@
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-		<PackageReleaseNotes>1.9.0-Alpha-3 preserves the coordinated five-command router and six-archive distribution while comparison and source-plan JSON become operational in Inspection; no command or dispatch semantics change in MI03.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.9.0-Alpha-4 preserves the coordinated five-command router and six-archive distribution while database-catalog JSON and the complete version-1 schema become operational in Inspection; no command or dispatch semantics change in MI04.</PackageReleaseNotes>
 		<PackageTags>terminfo;termcap;libtinfo;tic;infocmp;toe;captoinfo;infotocap;terminal;tool;dotnet;csharp;icod</PackageTags>
 	</PropertyGroup>
 

@@ -1,0 +1,26 @@
+{
+  "schema": "urn:icod:terminfo:inspection:json:1",
+  "schemaVersion": 1,
+  "documentKind": "databaseCatalog",
+  "data": {
+    "root": "//mi04/incomplete",
+    "kind": "conventionalDirectory",
+    "isComplete": false,
+    "entries": [
+      {
+        "path": "//mi04/incomplete/76/valid-mi04",
+        "name": "valid-mi04",
+        "aliases": [],
+        "description": null
+      }
+    ],
+    "issues": [
+      {
+        "kind": "malformedEntry",
+        "path": "//mi04/incomplete/62/broken",
+        "message": "The compiled entry is malformed."
+      }
+    ],
+    "duplicateCanonicalNames": []
+  }
+}

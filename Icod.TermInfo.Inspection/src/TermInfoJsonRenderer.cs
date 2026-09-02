@@ -202,8 +202,9 @@ public static partial class TermInfoJsonRenderer {
 	/// <exception cref="ArgumentNullException">
 	/// <paramref name="catalog"/> is <see langword="null"/>.
 	/// </exception>
-	/// <exception cref="NotSupportedException">
-	/// Database-catalog JSON rendering begins in MI04.
+	/// <exception cref="InvalidOperationException">
+	/// The catalog contains text which JSON cannot represent, or the rendered
+	/// UTF-8 document exceeds the configured output bound.
 	/// </exception>
 	public static string Render(
 		TermInfoDatabaseCatalog catalog
@@ -231,8 +232,9 @@ public static partial class TermInfoJsonRenderer {
 	/// <exception cref="OperationCanceledException">
 	/// <paramref name="cancellationToken"/> is canceled.
 	/// </exception>
-	/// <exception cref="NotSupportedException">
-	/// Database-catalog JSON rendering begins in MI04.
+	/// <exception cref="InvalidOperationException">
+	/// The catalog contains text which JSON cannot represent, or the rendered
+	/// UTF-8 document exceeds the configured output bound.
 	/// </exception>
 	public static string Render(
 		TermInfoDatabaseCatalog catalog,
@@ -243,8 +245,10 @@ public static partial class TermInfoJsonRenderer {
 		ArgumentNullException.ThrowIfNull( options );
 		cancellationToken.ThrowIfCancellationRequested();
 
-		throw new NotSupportedException(
-			"Database-catalog JSON rendering begins in MI04."
+		return RenderDatabaseCatalog(
+			catalog,
+			options,
+			cancellationToken
 		);
 	}
 }

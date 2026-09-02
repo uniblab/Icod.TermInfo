@@ -222,10 +222,8 @@ public sealed class MI01JsonContractTests {
 			StringComparison.Ordinal
 		);
 		Assert.Contains(
-			"MI04",
-			Assert.Throws<NotSupportedException>(
-				() => TermInfoJsonRenderer.Render( catalog )
-			).Message,
+			"databaseCatalog",
+			TermInfoJsonRenderer.Render( catalog ),
 			StringComparison.Ordinal
 		);
 	}

@@ -1,0 +1,863 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:icod:terminfo:inspection:json:1",
+  "title": "Icod.TermInfo.Inspection JSON version 1",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/terminalDescriptionDocument"
+    },
+    {
+      "$ref": "#/$defs/comparisonDocument"
+    },
+    {
+      "$ref": "#/$defs/sourcePlanDocument"
+    },
+    {
+      "$ref": "#/$defs/databaseCatalogDocument"
+    }
+  ],
+  "$defs": {
+    "terminalDescriptionDocument": {
+      "type": "object",
+      "required": [
+        "schema",
+        "schemaVersion",
+        "documentKind",
+        "data"
+      ],
+      "properties": {
+        "schema": {
+          "const": "urn:icod:terminfo:inspection:json:1"
+        },
+        "schemaVersion": {
+          "const": 1
+        },
+        "documentKind": {
+          "const": "terminalDescription"
+        },
+        "data": {
+          "$ref": "#/$defs/terminalDescriptionData"
+        }
+      },
+      "additionalProperties": true
+    },
+    "comparisonDocument": {
+      "type": "object",
+      "required": [
+        "schema",
+        "schemaVersion",
+        "documentKind",
+        "data"
+      ],
+      "properties": {
+        "schema": {
+          "const": "urn:icod:terminfo:inspection:json:1"
+        },
+        "schemaVersion": {
+          "const": 1
+        },
+        "documentKind": {
+          "const": "comparison"
+        },
+        "data": {
+          "$ref": "#/$defs/comparisonData"
+        }
+      },
+      "additionalProperties": true
+    },
+    "sourcePlanDocument": {
+      "type": "object",
+      "required": [
+        "schema",
+        "schemaVersion",
+        "documentKind",
+        "data"
+      ],
+      "properties": {
+        "schema": {
+          "const": "urn:icod:terminfo:inspection:json:1"
+        },
+        "schemaVersion": {
+          "const": 1
+        },
+        "documentKind": {
+          "const": "sourcePlan"
+        },
+        "data": {
+          "$ref": "#/$defs/sourcePlanData"
+        }
+      },
+      "additionalProperties": true
+    },
+    "databaseCatalogDocument": {
+      "type": "object",
+      "required": [
+        "schema",
+        "schemaVersion",
+        "documentKind",
+        "data"
+      ],
+      "properties": {
+        "schema": {
+          "const": "urn:icod:terminfo:inspection:json:1"
+        },
+        "schemaVersion": {
+          "const": 1
+        },
+        "documentKind": {
+          "const": "databaseCatalog"
+        },
+        "data": {
+          "$ref": "#/$defs/databaseCatalogData"
+        }
+      },
+      "additionalProperties": true
+    },
+    "terminalDescriptionData": {
+      "type": "object",
+      "required": [
+        "identity",
+        "capabilities"
+      ],
+      "properties": {
+        "identity": {
+          "$ref": "#/$defs/terminalIdentity"
+        },
+        "capabilities": {
+          "$ref": "#/$defs/terminalCapabilities"
+        }
+      },
+      "additionalProperties": false
+    },
+    "terminalIdentity": {
+      "type": "object",
+      "required": [
+        "name",
+        "aliases",
+        "description"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "aliases": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "description": {
+          "$ref": "#/$defs/nullableString"
+        }
+      },
+      "additionalProperties": false
+    },
+    "terminalCapabilities": {
+      "type": "object",
+      "required": [
+        "booleans",
+        "numbers",
+        "strings",
+        "extended"
+      ],
+      "properties": {
+        "booleans": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/booleanCapability"
+          }
+        },
+        "numbers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/numberCapability"
+          }
+        },
+        "strings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/stringCapability"
+          }
+        },
+        "extended": {
+          "$ref": "#/$defs/extendedCapabilities"
+        }
+      },
+      "additionalProperties": false
+    },
+    "extendedCapabilities": {
+      "type": "object",
+      "required": [
+        "booleans",
+        "numbers",
+        "strings"
+      ],
+      "properties": {
+        "booleans": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/booleanCapability"
+          }
+        },
+        "numbers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/numberCapability"
+          }
+        },
+        "strings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/stringCapability"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "booleanCapability": {
+      "type": "object",
+      "required": [
+        "name",
+        "value"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "value": {
+          "const": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "numberCapability": {
+      "type": "object",
+      "required": [
+        "name",
+        "value"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "value": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false
+    },
+    "stringCapability": {
+      "type": "object",
+      "required": [
+        "name",
+        "value"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "comparisonData": {
+      "type": "object",
+      "required": [
+        "areEqual",
+        "differences"
+      ],
+      "properties": {
+        "areEqual": {
+          "type": "boolean"
+        },
+        "differences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/difference"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "difference": {
+      "type": "object",
+      "required": [
+        "kind",
+        "capabilityName",
+        "isExtendedCapability",
+        "left",
+        "right"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "identityName",
+            "identityAliases",
+            "identityDescription",
+            "onlyInLeft",
+            "onlyInRight",
+            "differentValue",
+            "differentValueKind",
+            "sourceEntryOnlyInLeft",
+            "sourceEntryOnlyInRight",
+            "sourceFieldOnlyInLeft",
+            "sourceFieldOnlyInRight",
+            "sourceFieldKind",
+            "sourceFieldCapability",
+            "sourceFieldValue",
+            "sourceUseReference"
+          ]
+        },
+        "capabilityName": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "isExtendedCapability": {
+          "$ref": "#/$defs/nullableBoolean"
+        },
+        "left": {
+          "$ref": "#/$defs/differenceSide"
+        },
+        "right": {
+          "$ref": "#/$defs/differenceSide"
+        }
+      },
+      "additionalProperties": false
+    },
+    "differenceSide": {
+      "type": "object",
+      "required": [
+        "text",
+        "aliases",
+        "capabilityValue",
+        "sourceEntry",
+        "sourceEntryIndex",
+        "sourceField",
+        "sourceFieldIndex",
+        "sourceSpan"
+      ],
+      "properties": {
+        "text": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "aliases": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/stringArray"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "capabilityValue": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/capabilityValue"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sourceEntry": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/sourceEntry"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sourceEntryIndex": {
+          "$ref": "#/$defs/nullableNonNegativeInteger"
+        },
+        "sourceField": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/sourceField"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sourceFieldIndex": {
+          "$ref": "#/$defs/nullableNonNegativeInteger"
+        },
+        "sourceSpan": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/sourceSpan"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "capabilityValue": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "value"
+          ],
+          "properties": {
+            "kind": {
+              "const": "boolean"
+            },
+            "value": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "value"
+          ],
+          "properties": {
+            "kind": {
+              "const": "number"
+            },
+            "value": {
+              "type": "integer"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "value"
+          ],
+          "properties": {
+            "kind": {
+              "const": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "sourceEntry": {
+      "type": "object",
+      "required": [
+        "canonicalName",
+        "aliases",
+        "description",
+        "fieldCount",
+        "span"
+      ],
+      "properties": {
+        "canonicalName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "aliases": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "description": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "fieldCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "span": {
+          "$ref": "#/$defs/sourceSpan"
+        }
+      },
+      "additionalProperties": false
+    },
+    "sourceField": {
+      "type": "object",
+      "required": [
+        "kind",
+        "capabilityName",
+        "capabilityClassification",
+        "canonicalCapabilityName",
+        "standardValueKind",
+        "referenceName",
+        "numericValue",
+        "stringValue",
+        "text",
+        "span"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "booleanCapability",
+            "numericCapability",
+            "stringCapability",
+            "cancelledCapability",
+            "useReference",
+            "disabledCapability"
+          ]
+        },
+        "capabilityName": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "capabilityClassification": {
+          "oneOf": [
+            {
+              "enum": [
+                "standard",
+                "knownExtended",
+                "unknownExtended",
+                "invalid"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "canonicalCapabilityName": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "standardValueKind": {
+          "oneOf": [
+            {
+              "enum": [
+                "boolean",
+                "number",
+                "string"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "referenceName": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "numericValue": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "stringValue": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "text": {
+          "type": "string"
+        },
+        "span": {
+          "$ref": "#/$defs/sourceSpan"
+        }
+      },
+      "additionalProperties": false
+    },
+    "sourceSpan": {
+      "type": "object",
+      "required": [
+        "sourceName",
+        "offset",
+        "line",
+        "column",
+        "length",
+        "endOffset"
+      ],
+      "properties": {
+        "sourceName": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "column": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "length": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "endOffset": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "sourcePlanData": {
+      "type": "object",
+      "required": [
+        "selectedParentCount",
+        "selectedParentUseNames",
+        "source",
+        "score",
+        "evaluatedPlanCount",
+        "isExhaustive",
+        "candidateCount"
+      ],
+      "properties": {
+        "selectedParentCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "selectedParentUseNames": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "score": {
+          "$ref": "#/$defs/planningScore"
+        },
+        "evaluatedPlanCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "isExhaustive": {
+          "type": "boolean"
+        },
+        "candidateCount": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "planningScore": {
+      "type": "object",
+      "required": [
+        "localDirectiveCount",
+        "cancellationCount",
+        "parentCount",
+        "renderedUtf8ByteCount",
+        "selectedCandidateIndices"
+      ],
+      "properties": {
+        "localDirectiveCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "cancellationCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "parentCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "renderedUtf8ByteCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "selectedCandidateIndices": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "databaseCatalogData": {
+      "type": "object",
+      "required": [
+        "root",
+        "kind",
+        "isComplete",
+        "entries",
+        "issues",
+        "duplicateCanonicalNames"
+      ],
+      "properties": {
+        "root": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "missing",
+            "conventionalDirectory",
+            "unsupportedStore",
+            "unavailable"
+          ]
+        },
+        "isComplete": {
+          "type": "boolean"
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/databaseCatalogEntry"
+          }
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/databaseCatalogIssue"
+          }
+        },
+        "duplicateCanonicalNames": {
+          "$ref": "#/$defs/stringArray"
+        }
+      },
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "properties": {
+            "kind": {
+              "const": "conventionalDirectory"
+            },
+            "isComplete": {
+              "const": true
+            },
+            "issues": {
+              "maxItems": 0
+            }
+          }
+        },
+        {
+          "properties": {
+            "isComplete": {
+              "const": false
+            }
+          },
+          "anyOf": [
+            {
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "missing",
+                    "unsupportedStore",
+                    "unavailable"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "issues": {
+                  "minItems": 1
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "databaseCatalogEntry": {
+      "type": "object",
+      "required": [
+        "path",
+        "name",
+        "aliases",
+        "description"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "aliases": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "description": {
+          "$ref": "#/$defs/nullableString"
+        }
+      },
+      "additionalProperties": false
+    },
+    "databaseCatalogIssue": {
+      "type": "object",
+      "required": [
+        "kind",
+        "path",
+        "message"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "malformedEntry",
+            "invalidPlacement",
+            "permissionFailure",
+            "ioFailure",
+            "linkSkipped"
+          ]
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "stringArray": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "nullableString": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "nullableBoolean": {
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "nullableNonNegativeInteger": {
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 0
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  }
+}

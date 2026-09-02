@@ -1,6 +1,7 @@
 using System.IO.Compression;
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
@@ -110,7 +111,7 @@ internal static class Program {
 			);
 
 			Console.WriteLine(
-				$"Verified {PackageId} multi-target package structure, exact Runtime/Source dependency boundary, assembly identity, symbols, and Source Link for {packageVersion}."
+				$"Verified {PackageId} multi-target package structure, JSON Schema, exact Runtime/Source dependency boundary, assembly identity, symbols, and Source Link for {packageVersion}."
 			);
 			return 0;
 		}
@@ -118,6 +119,7 @@ internal static class Program {
 			exception is IOException
 			or UnauthorizedAccessException
 			or InvalidDataException
+			or JsonException
 			or InvalidOperationException
 		) {
 			Console.Error.WriteLine(
@@ -149,6 +151,7 @@ internal static class Program {
 
 		List<string> required = [
 			"README.md",
+			"docs/Icod.TermInfo.Inspection.schema.json",
 			"icon.png",
 		];
 		foreach ( string targetFramework in TargetFrameworks ) {
@@ -224,6 +227,7 @@ internal static class Program {
 			),
 			"Inspection package unexpectedly contains a runtimes/ payload."
 		);
+		VerifyJsonSchema( package );
 
 		foreach ( string targetFramework in TargetFrameworks ) {
 			VerifyAssemblyIdentity(
@@ -413,6 +417,58 @@ internal static class Program {
 			$"Repository metadata has an invalid commit id: '{commit}'."
 		);
 		return commit;
+	}
+
+	private static void VerifyJsonSchema(
+		ZipArchive package
+	) {
+		ArgumentNullException.ThrowIfNull( package );
+
+		ZipArchiveEntry schemaEntry =
+			package.GetEntry(
+				"docs/Icod.TermInfo.Inspection.schema.json"
+			) ?? throw new InvalidOperationException(
+				"Inspection package does not contain the published JSON Schema."
+			);
+		using Stream stream = schemaEntry.Open();
+		using JsonDocument document = JsonDocument.Parse( stream );
+		JsonElement root = document.RootElement;
+
+		Require(
+			root.GetProperty( "$schema" ).GetString()
+				== "https://json-schema.org/draft/2020-12/schema",
+			"Inspection package JSON Schema does not identify draft 2020-12."
+		);
+		Require(
+			root.GetProperty( "$id" ).GetString()
+				== "urn:icod:terminfo:inspection:json:1",
+			"Inspection package JSON Schema does not identify schema version 1."
+		);
+		Require(
+			root.GetProperty( "oneOf" ).GetArrayLength() == 4,
+			"Inspection package JSON Schema does not define all four document kinds."
+		);
+		string[] documentReferences =
+			root
+				.GetProperty( "oneOf" )
+				.EnumerateArray()
+				.Select(
+					branch => branch.GetProperty( "$ref" ).GetString()
+				)
+				.Cast<string>()
+				.ToArray();
+		Require(
+			documentReferences.SequenceEqual(
+				new[] {
+					"#/$defs/terminalDescriptionDocument",
+					"#/$defs/comparisonDocument",
+					"#/$defs/sourcePlanDocument",
+					"#/$defs/databaseCatalogDocument",
+				},
+				StringComparer.Ordinal
+			),
+			"Inspection package JSON Schema does not define the reviewed four document kinds."
+		);
 	}
 
 	private static void VerifyAssemblyIdentity(

@@ -404,7 +404,7 @@ public sealed class MI03ComparisonAndPlanJsonTests {
 	}
 
 	[Fact]
-	public void Mi03KeepsCatalogDeferredAndPublicSurfaceStable() {
+	public void Mi04ActivatesCatalogWithoutChangingTheMi03PublicSurface() {
 		TermInfoDatabaseCatalog catalog =
 			TermInfoDatabaseInspector.InspectDirectory(
 				Path.Combine(
@@ -414,10 +414,8 @@ public sealed class MI03ComparisonAndPlanJsonTests {
 			);
 
 		Assert.Contains(
-			"MI04",
-			Assert.Throws<NotSupportedException>(
-				() => TermInfoJsonRenderer.Render( catalog )
-			).Message,
+			"databaseCatalog",
+			TermInfoJsonRenderer.Render( catalog ),
 			StringComparison.Ordinal
 		);
 		Assert.Equal(
@@ -461,7 +459,8 @@ public sealed class MI03ComparisonAndPlanJsonTests {
 		) {
 			Assert.Contains( marker, implementation, StringComparison.Ordinal );
 		}
-		Assert.Contains( "**Status:** MI03 complete", roadmap, StringComparison.Ordinal );
+		Assert.Contains( "## MI03 - Comparison and Planning Evidence JSON", roadmap, StringComparison.Ordinal );
+		Assert.Contains( "**Development version:** `1.9.0-Alpha-3`", roadmap, StringComparison.Ordinal );
 	}
 
 	private static TermInfoComparisonResult CreateFixtureComparison() {

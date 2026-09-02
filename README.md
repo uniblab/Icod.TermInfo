@@ -398,8 +398,9 @@ the result reports whether the configured search space was exhausted.
 ## 1.9 development line
 
 Version 1.9 develops deterministic machine-readable Inspection output and
-explicit planning automation. MI03 makes comparison and relative-source plan
-evidence operational alongside the MI02 effective-description payload:
+explicit planning automation. MI04 completes the reusable renderer with
+database-catalog manifests and publishes the complete version-1 schema alongside
+the MI02 effective-description and MI03 comparison and plan payloads:
 
 ```csharp
 using Icod.TermInfo;
@@ -423,6 +424,11 @@ TermInfoComparisonResult comparison =
 	TerminalDescriptionComparer.Compare( terminal, terminal );
 string comparisonJson =
 	TermInfoJsonRenderer.Render( comparison, jsonOptions );
+
+TermInfoDatabaseCatalog catalog =
+	TermInfoDatabaseInspector.InspectDirectory( explicitDatabaseRoot );
+string catalogJson =
+	TermInfoJsonRenderer.Render( catalog, jsonOptions );
 ```
 
 The version-1 schema identifier is
@@ -430,8 +436,12 @@ The version-1 schema identifier is
 source-aware differences, typed left/right values, retained source entry, field,
 index, and span evidence, and explicit nulls. Plan JSON preserves selected
 parent names, generated LF source, every score component, selected candidate
-indices, evaluation count, exhaustive status, and candidate count. Explicit
-database manifests remain deferred to MI04.
+indices, evaluation count, exhaustive status, and candidate count. Catalog JSON
+preserves the normalized root, explicit catalog kind and completeness, ordered
+entries and issues, and duplicate canonical-name evidence. The published
+`docs/Icod.TermInfo.Inspection.schema.json` describes all four version-1 document
+kinds and is included in the Inspection package. Command composition remains
+owned by MI05.
 
 Later 1.9 tranches compose the reusable renderer through `infocmp` and `toe` and
 add all-candidates planning only for an explicit caller-selected database
@@ -439,8 +449,8 @@ directory. The frozen 1.7 synthesis and 1.8 planning contracts remain unchanged.
 
 See
 `Icod.TermInfo-1.9.0-Machine-Readable-Inspection-and-Planning-Automation-Roadmap.md`
-and `docs/1.9.0-MI03-COMPARISON-AND-PLANNING-EVIDENCE-JSON.md` for the current
-operational contract.
+and `docs/1.9.0-MI04-DATABASE-CATALOG-MANIFESTS-AND-JSON-SCHEMA.md` for the
+current operational contract.
 
 ## Getting started
 
