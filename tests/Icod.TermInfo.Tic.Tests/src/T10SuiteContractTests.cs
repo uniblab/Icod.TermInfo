@@ -167,6 +167,13 @@ public sealed class T10SuiteContractTests {
 				"release.yaml"
 			)
 		);
+		string archiveOrchestrator = File.ReadAllText(
+			System.IO.Path.Combine(
+				root,
+				"packaging",
+				"BuildToolArchives.ps1"
+			)
+		);
 
 		Assert.Contains(
 			"release-tool-archives",
@@ -174,8 +181,13 @@ public sealed class T10SuiteContractTests {
 			StringComparison.Ordinal
 		);
 		Assert.Contains(
-			"build-tool-archives.sh Release",
+			"./packaging/BuildToolArchives.ps1",
 			workflow,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"build-tool-archives.sh",
+			archiveOrchestrator,
 			StringComparison.Ordinal
 		);
 		Assert.Contains(

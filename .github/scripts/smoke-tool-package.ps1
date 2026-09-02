@@ -164,6 +164,102 @@ release-smoke|Icod.TermInfo release smoke terminal,
 		throw 'Routed infocmp did not acquire the entry published by routed tic.'
 	}
 
+	$planningSourcePath = Join-Path $workRoot 'release-planning.ti'
+	[System.IO.File]::WriteAllText(
+		$planningSourcePath,
+		@"
+release-plan-decoy|Icod.TermInfo release planning decoy,
+	lines#12,
+
+release-plan-useful|release-plan-parent|Icod.TermInfo release planning parent,
+	am,
+	cols#80,
+	lines#24,
+
+release-plan-target|Icod.TermInfo release planning target,
+	am,
+	cols#80,
+	lines#24,
+	clear=\E[H\E[2J,
+"@,
+		[System.Text.UTF8Encoding]::new( $false )
+	)
+
+	[void] (
+		Invoke-Router -Arguments @(
+			'tic',
+			'-o',
+			$databaseRoot,
+			$planningSourcePath
+		)
+	)
+
+	$planningOutput = Invoke-Router -Arguments @(
+		'infocmp',
+		'-A',
+		$databaseRoot,
+		'-B',
+		$databaseRoot,
+		'--max-parents',
+		'1',
+		'--require-exhaustive',
+		'--plan-use',
+		'release-plan-target',
+		'release-plan-decoy',
+		'release-plan-parent'
+	)
+	if ( -not $planningOutput.Contains( 'use=release-plan-parent' ) ) {
+		throw 'Routed infocmp planning did not select the useful alias candidate.'
+	}
+	if ( $planningOutput.Contains( 'use=release-plan-decoy' ) ) {
+		throw 'Routed infocmp planning selected the decoy candidate.'
+	}
+	$plannedSourcePath = Join-Path $workRoot 'release-planned-output.ti'
+	$planningValidationSource = $planningOutput + @"
+
+release-plan-useful|release-plan-parent|Icod.TermInfo release planning parent,
+	am,
+	cols#80,
+	lines#24,
+"@
+	[System.IO.File]::WriteAllText(
+		$plannedSourcePath,
+		$planningValidationSource,
+		[System.Text.UTF8Encoding]::new( $false )
+	)
+	[void] (
+		Invoke-Router -Arguments @(
+			'tic',
+			'-c',
+			$plannedSourcePath
+		)
+	)
+	$plannedDatabaseRoot = Join-Path $workRoot 'planned-terminfo'
+	[System.IO.Directory]::CreateDirectory( $plannedDatabaseRoot ) | Out-Null
+	[void] (
+		Invoke-Router -Arguments @(
+			'tic',
+			'-o',
+			$plannedDatabaseRoot,
+			$plannedSourcePath
+		)
+	)
+	$originalTarget = Invoke-Router -Arguments @(
+		'infocmp',
+		'-A',
+		$databaseRoot,
+		'release-plan-target'
+	)
+	$plannedTarget = Invoke-Router -Arguments @(
+		'infocmp',
+		'-A',
+		$plannedDatabaseRoot,
+		'release-plan-target'
+	)
+	if ( $originalTarget -cne $plannedTarget ) {
+		throw 'Routed infocmp planning output did not reproduce the target semantics.'
+	}
+
 	$toeOutput = Invoke-Router -Arguments @(
 		'toe',
 		'-s',

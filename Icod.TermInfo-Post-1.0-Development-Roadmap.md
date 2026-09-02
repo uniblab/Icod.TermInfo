@@ -10,13 +10,13 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
-**Current coordinated version:** `1.7.0`
+**Current coordinated version:** `1.8.0-Alpha-8`
 **Final 1.6 prerelease:** `1.6.0-Alpha-8`
 **Final 1.7 prerelease:** `1.7.0-Alpha-8`
-**Next development line:** post-1.7 demand-driven work
-**Status:** 1.7.0 stable release contract frozen
-**Current tranche:** Release closure — exact-main validation and publication
-**Primary objective:** Synthesize deterministic relative terminfo source in Inspection and expose it through `infocmp -u` without destabilizing the frozen Runtime, Source, Compiler, or Termcap contracts.
+**Next development line:** `1.8.0` - Relative Source Planning and Parent Selection
+**Status:** 1.8.0 stable-intended release contract complete
+**Current tranche:** RP08 - API freeze, packaging, and release closure
+**Primary objective:** Select deterministic, bounded, semantically valid ordered parents in Inspection without changing the frozen Runtime, Source, Compiler, Termcap, or 1.7 synthesis contracts.
 
 ---
 
@@ -86,6 +86,7 @@ in a new version-specific roadmap, not in the retired inventory.
 | **1.6.0** | Termcap interoperability | Parse, resolve, and convert termcap and terminfo |
 | **1.6.1** | Release-verifier hotfix | Restore caller NuGet-cache state before repository sample/toolchain validation; no public API or command-semantic changes |
 | **1.7.0** | Relative terminfo source synthesis | Synthesize deterministic relative `.ti` source in Inspection and expose it through `infocmp -u` |
+| **1.8.0** | Relative source planning | Select deterministic bounded ordered parents for the frozen 1.7 relative-source synthesizer |
 | **later** | Exotic storage/formats | Berkeley DB provider and historical Unix dialects as justified |
 
 The completed 1.5 release contract is recorded in
@@ -125,6 +126,25 @@ validation. RS08 freezes the additive Inspection API, package and distribution
 topology, release-verifier gates, documentation, and release audit. The
 stable 1.7.0 release promotes that validated Alpha-8 surface without semantic or
 public-API changes.
+
+Version 1.8.0 is governed by
+[`Icod.TermInfo-1.8.0-Relative-Source-Planning-and-Parent-Selection-Roadmap.md`](Icod.TermInfo-1.8.0-Relative-Source-Planning-and-Parent-Selection-Roadmap.md).
+RP01 adds the immutable planning options, lexicographic score, result evidence,
+and planner API foundation to Inspection. Candidate inputs reuse the frozen 1.7
+synthesis-parent type, are snapshotted once, retain distinct input positions, and
+are bounded independently from deterministic search. RP02 implements exhaustive
+zero- and single-parent evaluation, obtains frozen score evidence directly from
+the synthesis renderer, rejects unrepresentable plans without approximation, and
+selects the deterministic best result against an independent Source-based oracle.
+
+RP03 adds exhaustive ordered multi-parent permutations; RP04 freezes bounded
+search, cancellation, and result evidence; RP05 adds explicit complete catalog
+and conventional-directory orchestration without host discovery; RP06 composes
+the planner through direct and routed `infocmp --plan-use` plus all six archive
+RIDs; RP07 adds generated-state, independent-oracle, boundary, corpus, culture,
+and repeated-process hardening. RP08 freezes the complete additive Inspection
+API, package and distribution topology, samples, release verifiers, and 1.8
+release audit at `1.8.0-Alpha-8` without adding another feature tranche.
 
 The sequence is cumulative but intentionally modular. Applications which only need runtime terminfo SHALL continue to depend on `Icod.TermInfo` alone.
 

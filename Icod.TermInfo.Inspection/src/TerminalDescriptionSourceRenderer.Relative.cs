@@ -4,7 +4,7 @@ using Icod.TermInfo;
 namespace Icod.TermInfo.Inspection;
 
 public static partial class TerminalDescriptionSourceRenderer {
-	internal static string RenderRelative(
+	internal static TerminalDescriptionSourceSynthesisResult RenderRelative(
 		TerminalDescriptionSourceSynthesisPlan plan
 	) {
 		ArgumentNullException.ThrowIfNull( plan );
@@ -18,6 +18,8 @@ public static partial class TerminalDescriptionSourceRenderer {
 			);
 		StringBuilder builder =
 			new();
+		int localDirectiveCount = 0;
+		int cancellationCount = 0;
 		AppendConfiguredHeader(
 			builder,
 			plan.Target,
@@ -54,7 +56,9 @@ public static partial class TerminalDescriptionSourceRenderer {
 					metadata.ShortName,
 					options
 				);
+				cancellationCount = checked( cancellationCount + 1 );
 			}
+			localDirectiveCount = checked( localDirectiveCount + 1 );
 		}
 
 		foreach (
@@ -91,7 +95,9 @@ public static partial class TerminalDescriptionSourceRenderer {
 					metadata.ShortName,
 					options
 				);
+				cancellationCount = checked( cancellationCount + 1 );
 			}
+			localDirectiveCount = checked( localDirectiveCount + 1 );
 		}
 
 		foreach (
@@ -134,16 +140,23 @@ public static partial class TerminalDescriptionSourceRenderer {
 					metadata.ShortName,
 					options
 				);
+				cancellationCount = checked( cancellationCount + 1 );
 			}
+			localDirectiveCount = checked( localDirectiveCount + 1 );
 		}
 
-		AppendRelativeExtendedCapabilities(
-			builder,
-			plan.Target,
-			inherited.ExtendedCapabilities,
-			options,
-			plan.Options.IncludeExtendedCapabilities
-		);
+		(int extendedLocalDirectiveCount, int extendedCancellationCount) =
+			AppendRelativeExtendedCapabilities(
+				builder,
+				plan.Target,
+				inherited.ExtendedCapabilities,
+				options,
+				plan.Options.IncludeExtendedCapabilities
+			);
+		localDirectiveCount =
+			checked( localDirectiveCount + extendedLocalDirectiveCount );
+		cancellationCount =
+			checked( cancellationCount + extendedCancellationCount );
 
 		// RS04: emit the materialized caller order exactly; do not canonicalize,
 		// deduplicate, prune, or reorder parent references.
@@ -162,7 +175,11 @@ public static partial class TerminalDescriptionSourceRenderer {
 			builder.Append( '\n' );
 		}
 
-		return builder.ToString();
+		return new TerminalDescriptionSourceSynthesisResult(
+			builder.ToString(),
+			localDirectiveCount,
+			cancellationCount
+		);
 	}
 
 	private static ParentAggregate CreateParentAggregate(
@@ -215,7 +232,8 @@ public static partial class TerminalDescriptionSourceRenderer {
 		return aggregate;
 	}
 
-	private static void AppendRelativeExtendedCapabilities(
+	private static (int LocalDirectiveCount, int CancellationCount)
+		AppendRelativeExtendedCapabilities(
 		StringBuilder builder,
 		TerminalDescription target,
 		IReadOnlyDictionary<string, TermInfoCapabilityValue> inherited,
@@ -233,7 +251,7 @@ public static partial class TerminalDescriptionSourceRenderer {
 				inherited
 			);
 		if ( directives.Count == 0 ) {
-			return;
+			return ( 0, 0 );
 		}
 		if ( !includeExtendedCapabilities ) {
 			throw new InvalidOperationException(
@@ -242,6 +260,7 @@ public static partial class TerminalDescriptionSourceRenderer {
 			);
 		}
 
+		int cancellationCount = 0;
 		foreach (
 			ExtendedRelativeDirective directive
 			in directives
@@ -264,8 +283,11 @@ public static partial class TerminalDescriptionSourceRenderer {
 					directive.Name,
 					options
 				);
+				cancellationCount = checked( cancellationCount + 1 );
 			}
 		}
+
+		return ( directives.Count, cancellationCount );
 	}
 
 	private static List<ExtendedRelativeDirective>

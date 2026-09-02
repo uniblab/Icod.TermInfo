@@ -22,6 +22,10 @@ internal sealed class InfoCmpOptions {
 		TerminalDescriptionSourceCapabilityOrder capabilityOrder,
 		bool includeExtendedCapabilities,
 		bool relativeSynthesis,
+		bool planning,
+		int maximumSelectedParentCount,
+		int maximumEvaluatedPlanCount,
+		bool allowNonExhaustiveResult,
 		InfoCmpComparisonMode? comparisonMode,
 		bool shortComparison
 	) {
@@ -53,27 +57,46 @@ internal sealed class InfoCmpOptions {
 				nameof( comparisonMode )
 			);
 		}
+		if ( maximumSelectedParentCount < 0
+			|| maximumSelectedParentCount
+				> TerminalDescriptionSourcePlanningOptions.DefaultMaximumCandidateCount ) {
+			throw new ArgumentOutOfRangeException(
+				nameof( maximumSelectedParentCount )
+			);
+		}
+		if ( maximumEvaluatedPlanCount < 1
+			|| maximumEvaluatedPlanCount
+				> TerminalDescriptionSourcePlanningOptions.MaximumSupportedEvaluatedPlanCount ) {
+			throw new ArgumentOutOfRangeException(
+				nameof( maximumEvaluatedPlanCount )
+			);
+		}
+		if ( relativeSynthesis && planning ) {
+			throw new ArgumentException(
+				"Relative synthesis and planning are mutually exclusive."
+			);
+		}
 
 		string[] names = terminalNames.ToArray();
 		foreach ( string name in names ) {
 			ArgumentException.ThrowIfNullOrWhiteSpace( name );
 		}
-		if ( relativeSynthesis ) {
+		if ( relativeSynthesis || planning ) {
 			if ( names.Length < 2 ) {
 				throw new ArgumentException(
-					"Relative synthesis requires a target and at least one parent terminal.",
+					"Relative synthesis or planning requires a target and at least one candidate terminal.",
 					nameof( terminalNames )
 				);
 			}
 			if ( comparisonMode.HasValue ) {
 				throw new ArgumentException(
-					"Relative synthesis cannot retain a comparison mode.",
+					"Relative synthesis or planning cannot retain a comparison mode.",
 					nameof( comparisonMode )
 				);
 			}
 			if ( shortComparison ) {
 				throw new ArgumentException(
-					"Relative synthesis cannot use short comparison presentation.",
+					"Relative synthesis or planning cannot use short comparison presentation.",
 					nameof( shortComparison )
 				);
 			}
@@ -101,6 +124,10 @@ internal sealed class InfoCmpOptions {
 		CapabilityOrder = capabilityOrder;
 		IncludeExtendedCapabilities = includeExtendedCapabilities;
 		RelativeSynthesis = relativeSynthesis;
+		Planning = planning;
+		MaximumSelectedParentCount = maximumSelectedParentCount;
+		MaximumEvaluatedPlanCount = maximumEvaluatedPlanCount;
+		AllowNonExhaustiveResult = allowNonExhaustiveResult;
 		ComparisonMode = comparisonMode;
 		ShortComparison = shortComparison;
 	}
@@ -124,8 +151,12 @@ internal sealed class InfoCmpOptions {
 	internal bool IsSynthesis =>
 		RelativeSynthesis;
 
+	internal bool IsPlanning =>
+		Planning;
+
 	internal bool IsComparison =>
 		!RelativeSynthesis
+			&& !Planning
 			&& _terminalNames.Count >= 2;
 
 	internal TerminalDescriptionSourceLayout Layout {
@@ -149,6 +180,22 @@ internal sealed class InfoCmpOptions {
 	}
 
 	internal bool RelativeSynthesis {
+		get;
+	}
+
+	internal bool Planning {
+		get;
+	}
+
+	internal int MaximumSelectedParentCount {
+		get;
+	}
+
+	internal int MaximumEvaluatedPlanCount {
+		get;
+	}
+
+	internal bool AllowNonExhaustiveResult {
 		get;
 	}
 
@@ -226,6 +273,15 @@ internal static class InfoCmpOptionsParser {
 		bool capabilityOrderSpecified = false;
 		bool includeExtendedCapabilities = false;
 		bool relativeSynthesis = false;
+		bool planning = false;
+		int maximumSelectedParentCount =
+			TerminalDescriptionSourcePlanningOptions.DefaultMaximumSelectedParentCount;
+		bool maximumSelectedParentCountSpecified = false;
+		int maximumEvaluatedPlanCount =
+			TerminalDescriptionSourcePlanningOptions.DefaultMaximumEvaluatedPlanCount;
+		bool maximumEvaluatedPlanCountSpecified = false;
+		bool allowNonExhaustiveResult = false;
+		bool exhaustivePolicySpecified = false;
 		InfoCmpComparisonMode? comparisonMode = null;
 		bool shortComparison = false;
 		bool optionsEnded = false;
@@ -411,6 +467,103 @@ internal static class InfoCmpOptionsParser {
 						relativeSynthesis = true;
 						break;
 
+					case "--plan-use":
+						planning = true;
+						break;
+
+					case "--max-parents":
+						if ( maximumSelectedParentCountSpecified ) {
+							return InfoCmpOptionsParseResult.Failure(
+								"option '--max-parents' may be specified only once"
+							);
+						}
+						if ( !TryReadValue(
+								args,
+								ref index,
+								"--max-parents",
+								out string? parentCountText,
+								out string? parentCountError
+							) ) {
+							return InfoCmpOptionsParseResult.Failure(
+								parentCountError!
+							);
+						}
+						if ( !int.TryParse(
+								parentCountText,
+								NumberStyles.None,
+								CultureInfo.InvariantCulture,
+								out maximumSelectedParentCount
+							)
+							|| maximumSelectedParentCount < 0
+							|| maximumSelectedParentCount
+								> TerminalDescriptionSourcePlanningOptions.DefaultMaximumCandidateCount ) {
+							return InfoCmpOptionsParseResult.Failure(
+								$"option '--max-parents' requires a decimal count between 0 and "
+									+ TerminalDescriptionSourcePlanningOptions.DefaultMaximumCandidateCount
+							);
+						}
+						maximumSelectedParentCountSpecified = true;
+						break;
+
+					case "--max-plans":
+						if ( maximumEvaluatedPlanCountSpecified ) {
+							return InfoCmpOptionsParseResult.Failure(
+								"option '--max-plans' may be specified only once"
+							);
+						}
+						if ( !TryReadValue(
+								args,
+								ref index,
+								"--max-plans",
+								out string? planCountText,
+								out string? planCountError
+							) ) {
+							return InfoCmpOptionsParseResult.Failure(
+								planCountError!
+							);
+						}
+						if ( !int.TryParse(
+								planCountText,
+								NumberStyles.None,
+								CultureInfo.InvariantCulture,
+								out maximumEvaluatedPlanCount
+							)
+							|| maximumEvaluatedPlanCount < 1
+							|| maximumEvaluatedPlanCount
+								> TerminalDescriptionSourcePlanningOptions.MaximumSupportedEvaluatedPlanCount ) {
+							return InfoCmpOptionsParseResult.Failure(
+								$"option '--max-plans' requires a decimal count between 1 and "
+									+ TerminalDescriptionSourcePlanningOptions.MaximumSupportedEvaluatedPlanCount
+							);
+						}
+						maximumEvaluatedPlanCountSpecified = true;
+						break;
+
+					case "--require-exhaustive":
+						if ( exhaustivePolicySpecified && allowNonExhaustiveResult ) {
+							return InfoCmpOptionsParseResult.Failure(
+								"options '--require-exhaustive' and '--allow-bounded' are mutually exclusive"
+							);
+						}
+						exhaustivePolicySpecified = true;
+						allowNonExhaustiveResult = false;
+						break;
+
+					case "--allow-bounded":
+						if ( exhaustivePolicySpecified && !allowNonExhaustiveResult ) {
+							return InfoCmpOptionsParseResult.Failure(
+								"options '--require-exhaustive' and '--allow-bounded' are mutually exclusive"
+							);
+						}
+						exhaustivePolicySpecified = true;
+						allowNonExhaustiveResult = true;
+						break;
+
+					case "-D":
+						return InfoCmpOptionsParseResult.Failure(
+							"option '-D' cannot be combined with other arguments"
+						);
+
 					case "-x":
 						includeExtendedCapabilities = true;
 						break;
@@ -438,7 +591,53 @@ internal static class InfoCmpOptionsParser {
 			);
 		}
 
-		if ( relativeSynthesis ) {
+		if ( relativeSynthesis && planning ) {
+			return InfoCmpOptionsParseResult.Failure(
+				"options '-u' and '--plan-use' are mutually exclusive"
+			);
+		}
+		if ( !planning
+			&& ( maximumSelectedParentCountSpecified
+				|| maximumEvaluatedPlanCountSpecified
+				|| exhaustivePolicySpecified ) ) {
+			return InfoCmpOptionsParseResult.Failure(
+				"planning-bound options require '--plan-use'"
+			);
+		}
+
+		if ( planning ) {
+			if ( terminalNames.Count < 2 ) {
+				return InfoCmpOptionsParseResult.Failure(
+					"option '--plan-use' requires a target and at least one candidate terminal operand"
+				);
+			}
+			if ( terminalNames.Count - 1
+				> TerminalDescriptionSourcePlanningOptions.DefaultMaximumCandidateCount ) {
+				return InfoCmpOptionsParseResult.Failure(
+					$"option '--plan-use' accepts at most "
+						+ $"{TerminalDescriptionSourcePlanningOptions.DefaultMaximumCandidateCount} candidate operands"
+				);
+			}
+			if ( comparisonMode.HasValue ) {
+				return InfoCmpOptionsParseResult.Failure(
+					"options '-d', '-c', and '-n' cannot be combined with '--plan-use'"
+				);
+			}
+			if ( shortComparison ) {
+				return InfoCmpOptionsParseResult.Failure(
+					"option '-q' cannot be combined with '--plan-use'"
+				);
+			}
+
+			HashSet<string> candidateReferences = new( StringComparer.Ordinal );
+			for ( int index = 1; index < terminalNames.Count; index++ ) {
+				if ( !candidateReferences.Add( terminalNames[ index ] ) ) {
+					return InfoCmpOptionsParseResult.Failure(
+						$"planning candidate reference '{terminalNames[ index ]}' is duplicated"
+					);
+				}
+			}
+		} else if ( relativeSynthesis ) {
 			if ( terminalNames.Count < 2 ) {
 				return InfoCmpOptionsParseResult.Failure(
 					"option '-u' requires a target and at least one parent terminal operand"
@@ -512,6 +711,10 @@ internal static class InfoCmpOptionsParser {
 				capabilityOrder,
 				includeExtendedCapabilities,
 				relativeSynthesis,
+				planning,
+				maximumSelectedParentCount,
+				maximumEvaluatedPlanCount,
+				allowNonExhaustiveResult,
 				comparisonMode,
 				shortComparison
 			)

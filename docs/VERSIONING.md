@@ -190,6 +190,74 @@ sample, version reporting, dependency direction, and cross-platform release
 pipeline. Stable 1.7.0 promotes this validated surface without semantic or API
 changes.
 
+RP01 advances the coordinated development version to `1.8.0-Alpha-1` and adds
+relative-source planning contract types only to `Icod.TermInfo.Inspection`.
+Runtime, Source, Compiler, and Termcap retain their frozen public API baselines;
+the frozen 1.7 Inspection baseline remains immutable historical evidence;
+Inspection continues to depend only on Runtime and Source in production; and all
+five reusable assemblies retain `1.0.0.0`. During 1.8 development the release
+verifier enforces cross-framework Inspection API equality and package-smoke
+coverage for the additive surface. RP08 freezes the exact stable 1.8 Inspection
+API baseline.
+
+RP02 advances the coordinated development version to `1.8.0-Alpha-2` and makes
+the planner operational for the zero-parent baseline plus every legal single
+candidate position. The public API surface is unchanged from RP01. Inspection
+adds only internal synthesis evidence so the frozen score can be computed during
+rendering without reparsing generated source; the frozen 1.7 public synthesizer
+contract and Runtime-and-Source-only production dependency boundary remain
+unchanged. The other coordinated packages and commands advance their package and
+reported versions without public API or command-semantic changes.
+
+RP03 advances the coordinated development version to `1.8.0-Alpha-3` and makes
+ordered multi-parent planning operational through the configured selected-parent
+bound. Candidate positions cannot repeat within one plan, distinct equal
+positions remain eligible, fixed-depth enumeration is lexicographic, and exact
+selected order is passed unchanged to the frozen leftmost-precedence synthesizer.
+The public API and production dependency graph remain unchanged.
+
+RP04 advances the coordinated development version to `1.8.0-Alpha-4` and
+freezes bounded-search arithmetic, deterministic partial-search evidence, and
+stable cancellation boundaries. Hostile candidate and plan spaces terminate
+within validated candidate, parent, evaluation, and generated-source limits.
+Cancellation and operational failure publish no partial plan. The public API
+and production dependency graph remain unchanged.
+
+RP05 advances the coordinated development version to `1.8.0-Alpha-5` and adds
+explicit catalog and conventional-directory orchestration to the Inspection
+planner. Catalog candidates use ordinal canonical-name order, equivalent
+physical publications collapse deterministically, conflicting duplicates and
+issue-bearing catalogs are rejected, and parser limits, planning bounds, and
+cancellation remain authoritative. The frozen 1.4 catalog types, frozen 1.7
+synthesizer, production dependency graph, and reusable assembly identities are
+unchanged.
+
+RP06 advances the coordinated development version to `1.8.0-Alpha-6` and
+exposes explicit-candidate planning through `infocmp --plan-use`. Existing
+`-A`/`-B` acquisition and source-presentation controls map into the reusable
+planner; reviewed parent, evaluation, and exhaustive-versus-bounded controls
+remain enforced by Inspection. Direct and routed command behavior is identical,
+tool-package and archive smoke execute a controlled planning path, and matching
+CI runners exercise all six standalone archive RIDs. No reusable public API,
+production dependency direction, frozen 1.7 synthesis behavior, or reusable
+assembly identity changes.
+
+RP07 advances the coordinated development version to `1.8.0-Alpha-7` and adds
+generated-state, independent-oracle, bounded-prefix, score-tie, permutation,
+equivalent-description, capability-kind, cancellation, maximum-boundary,
+one-past-boundary, culture, insertion-order, repeated-call, and repeated-process
+validation. It reuses the pinned 1.7 differential corpus and extends the
+Toolchain sample through plan, synthesize, compile, publish, reacquire, and
+compare. No public API, production semantic, package dependency, target-
+framework, or assembly-identity change is introduced.
+
+RP08 advances the coordinated development version to `1.8.0-Alpha-8` without
+adding another feature tranche. It freezes the complete additive planning API,
+score, bounds, candidate order, completeness evidence, explicit catalog
+orchestration, package-consumer surface, command and archive composition,
+deterministic samples, release verifiers, and release audit. A green Alpha-8 to
+stable `1.8.0` transition is version-only.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:
@@ -268,6 +336,14 @@ Inspection member and adds only `TerminalDescriptionSourceSynthesisParent`,
 `TerminalDescriptionSourceSynthesizer`. The historical 1.3 and 1.4 Inspection
 baselines remain immutable. Release verification requires exact net8/net9/net10
 API equivalence and an exact match with the 1.7 baseline.
+
+`docs/1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt` is the frozen complete
+Inspection surface for the 1.8 line. It retains the entire 1.7 surface and adds
+only `TerminalDescriptionSourcePlan`, `TerminalDescriptionSourcePlanner`,
+`TerminalDescriptionSourcePlanningOptions`, and
+`TerminalDescriptionSourcePlanningScore`. Release verification requires exact
+net8/net9/net10 equivalence and an exact match with the 1.8 manifest. The 1.7
+manifest remains immutable historical evidence and must not be regenerated.
 
 The baselines record exported types, public/protected members, enum numeric
 values, parameter names/order/defaults, ref/out/in/params shape, generic

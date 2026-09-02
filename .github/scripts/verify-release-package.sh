@@ -122,14 +122,15 @@ dotnet run \
   Icod.TermInfo.Inspection/bin/${configuration}/net8.0/Icod.TermInfo.Inspection.dll \
   Icod.TermInfo.Inspection/bin/${configuration}/net10.0/Icod.TermInfo.Inspection.dll
 
-# The frozen 1.4 Inspection baseline remains immutable historical evidence.
-# RS08 freezes the complete additive 1.7 Inspection surface independently.
+# The frozen 1.7 Inspection baseline remains immutable historical evidence:
+# docs/1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt
+# RP08 freezes the complete additive 1.8 planning surface independently.
 dotnet run \
   --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj \
   -c "${configuration}" \
   --no-build \
   -- --check \
-  docs/1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt \
+  docs/1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt \
   Icod.TermInfo.Inspection/bin/${configuration}/net10.0/Icod.TermInfo.Inspection.dll
 
 # Structural package, Source Link, dependency, and architecture verification.
@@ -477,10 +478,27 @@ dotnet run \
   --no-build \
   -- --describe-only --profile ms-terminal-direct
 
-# The deterministic library-toolchain sample must compose Source, Compiler,
-# Runtime acquisition, and Inspection without depending on host terminfo state.
+# The deterministic library-toolchain sample must compose planning, synthesis,
+# compilation, publication, Runtime acquisition, and Inspection comparison
+# without depending on host terminfo state. Separate process executions must
+# produce byte-identical planned source.
+toolchain_first="${inspection_smoke_root}/rp07-toolchain-first.ti"
+toolchain_second="${inspection_smoke_root}/rp07-toolchain-second.ti"
 dotnet run \
   --project samples/Icod.TermInfo.Toolchain.Sample/Icod.TermInfo.Toolchain.Sample.csproj \
   -c "${configuration}" \
   -f net10.0 \
-  --no-build
+  --no-build \
+  > "${toolchain_first}"
+dotnet run \
+  --project samples/Icod.TermInfo.Toolchain.Sample/Icod.TermInfo.Toolchain.Sample.csproj \
+  -c "${configuration}" \
+  -f net10.0 \
+  --no-build \
+  > "${toolchain_second}"
+if ! cmp -s "${toolchain_first}" "${toolchain_second}"; then
+  diff -u "${toolchain_first}" "${toolchain_second}" >&2 || true
+  echo "Toolchain planning output changed across separate process executions." >&2
+  exit 1
+fi
+cat "${toolchain_first}"

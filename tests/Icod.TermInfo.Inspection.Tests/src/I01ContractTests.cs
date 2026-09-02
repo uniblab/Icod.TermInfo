@@ -92,6 +92,10 @@ public sealed class I01ContractTests {
 				"Icod.TermInfo.Inspection.TerminalDescriptionComparer",
 				"Icod.TermInfo.Inspection.TerminalDescriptionSourceCapabilityOrder",
 				"Icod.TermInfo.Inspection.TerminalDescriptionSourceLayout",
+				"Icod.TermInfo.Inspection.TerminalDescriptionSourcePlan",
+				"Icod.TermInfo.Inspection.TerminalDescriptionSourcePlanner",
+				"Icod.TermInfo.Inspection.TerminalDescriptionSourcePlanningOptions",
+				"Icod.TermInfo.Inspection.TerminalDescriptionSourcePlanningScore",
 				"Icod.TermInfo.Inspection.TerminalDescriptionSourceRenderer",
 				"Icod.TermInfo.Inspection.TerminalDescriptionSourceRendererOptions",
 				"Icod.TermInfo.Inspection.TerminalDescriptionSourceSynthesisOptions",
@@ -352,6 +356,41 @@ public sealed class I01ContractTests {
 					"Icod.TermInfo.sln"
 				)
 			);
+		string packageOrchestrator =
+			File.ReadAllText(
+				Path.Combine(
+					root,
+					"packaging",
+					"PackPackages.ps1"
+				)
+			);
+		string pullRequest =
+			File.ReadAllText(
+				Path.Combine(
+					root,
+					".github",
+					"workflows",
+					"pull-request.yaml"
+				)
+			);
+		string main =
+			File.ReadAllText(
+				Path.Combine(
+					root,
+					".github",
+					"workflows",
+					"main.yaml"
+				)
+			);
+		string release =
+			File.ReadAllText(
+				Path.Combine(
+					root,
+					".github",
+					"workflows",
+					"release.yaml"
+				)
+			);
 
 		Assert.Contains(
 			"Icod.TermInfo.Inspection",
@@ -365,27 +404,14 @@ public sealed class I01ContractTests {
 			"Icod.TermInfo.Inspection.PackageVerifier",
 			solution
 		);
+		Assert.Contains(
+			"Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj",
+			packageOrchestrator
+		);
 
-		foreach (
-			string relativePath
-			in new[] {
-				".github/workflows/pr-build-and-test.yaml",
-				".github/workflows/push-main.yaml",
-				".github/workflows/release.yaml",
-			}
-		) {
-			string workflow =
-				File.ReadAllText(
-					Path.Combine(
-						root,
-						relativePath.Replace(
-							'/',
-							Path.DirectorySeparatorChar
-						)
-					)
-				);
+		foreach ( string workflow in new[] { pullRequest, main, release } ) {
 			Assert.Contains(
-				"Icod.TermInfo.Inspection",
+				"./packaging/PackPackages.ps1",
 				workflow
 			);
 		}
@@ -421,15 +447,6 @@ public sealed class I01ContractTests {
 			);
 		}
 
-		string release =
-			File.ReadAllText(
-				Path.Combine(
-					root,
-					".github",
-					"workflows",
-					"release.yaml"
-				)
-			);
 		Assert.Contains(
 			"if (17 -ne $files.Count)",
 			release
@@ -439,11 +456,11 @@ public sealed class I01ContractTests {
 			release
 		);
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo.Inspection --version {0}",
+			"smoke-tool-package.ps1",
 			release
 		);
 		Assert.Contains(
-			"dotnet tool install --global Icod.TermInfo.Tools --version {0}",
+			"release-packages",
 			release
 		);
 	}

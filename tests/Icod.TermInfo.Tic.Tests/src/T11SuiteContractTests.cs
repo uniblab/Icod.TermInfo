@@ -135,6 +135,10 @@ public sealed class T11SuiteContractTests {
 			root,
 			".github/scripts/verify-tool-archives.sh"
 		);
+		string archiveBuilder = ReadRepositoryFile(
+			root,
+			"packaging/BuildToolArchives.ps1"
+		);
 
 		foreach (
 			string marker
@@ -160,16 +164,21 @@ public sealed class T11SuiteContractTests {
 			);
 		}
 
+		Assert.Contains(
+			"verify-tool-archives.sh",
+			archiveBuilder,
+			StringComparison.Ordinal
+		);
 		foreach (
 			string relativePath
 			in new[] {
-				".github/workflows/pr-build-and-test.yaml",
-				".github/workflows/push-main.yaml",
+				".github/workflows/pull-request.yaml",
+				".github/workflows/main.yaml",
 				".github/workflows/release.yaml",
 			}
 		) {
 			Assert.Contains(
-				"verify-tool-archives.sh",
+				"BuildToolArchives.ps1",
 				ReadRepositoryFile(
 					root,
 					relativePath

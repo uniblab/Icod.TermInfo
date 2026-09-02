@@ -1,4 +1,4 @@
-# Icod.TermInfo 1.7 Tool-Suite Sample
+# Icod.TermInfo 1.8 Tool-Suite Sample
 
 This sample exercises the coordinated `tic`, `infocmp`, `toe`, `captoinfo`, and
 `infotocap` command suite against controlled terminfo and termcap source. It uses
@@ -12,12 +12,16 @@ from this directory, or adjust the paths as appropriate.
 
 ## Terminfo source
 
-`example.ti` defines two entries:
+`example.ti` defines three entries:
 
 - `icod-demo-base` (`idb`) supplies basic screen geometry and cursor/screen
   capabilities;
 - `icod-demo-child` (`idc`) inherits the base through `use=`, overrides `cols`,
   and adds the deliberately unknown extended string capability `IcodDemo`.
+- `icod-demo-decoy` (`idd`) is an intentionally inferior planning candidate.
+
+`planning-parent.ti` repeats only the base entry so redirected planning output
+can be combined with its selected parent and validated independently.
 
 The unknown extended capability makes `-x` meaningful in the validation,
 publication, and rendering examples. It is intentionally not conventional
@@ -41,7 +45,7 @@ tic -x -o ./terminfo example.ti
 ```
 
 The resulting `./terminfo` directory is a conventional compiled terminfo
-database containing both entries and their aliases. To repeat publication over
+database containing all three entries and their aliases. To repeat publication over
 existing destinations, opt into replacement explicitly:
 
 ```text
@@ -77,6 +81,38 @@ Capabilities already supplied by `icod-demo-base` are omitted from the local
 delta. The emitted source can therefore be combined with source for the base and
 resolved back to the same effective child description. Omitting `-x` fails
 rather than silently discarding the child-local extended capability.
+
+## Plan the child from explicit candidates
+
+Version 1.8 adds bounded deterministic parent selection through
+`infocmp --plan-use`. Supply the decoy first to demonstrate that candidate order
+is a final tie-break rather than a first-match rule:
+
+RP08 freezes this direct and routed walkthrough as release evidence for the
+stable-intended Alpha-8 command and distribution contract.
+
+```text
+infocmp -A ./terminfo -B ./terminfo -1 -x --max-parents 1 --require-exhaustive --plan-use icod-demo-child icod-demo-decoy icod-demo-base > planned-child.ti
+```
+
+The selected source contains `use=icod-demo-base` and does not contain
+`use=icod-demo-decoy`. Standard output contains only that source. The same
+operation through the installable router is:
+
+```text
+icod-terminfo infocmp -A ./terminfo -B ./terminfo -1 -x --max-parents 1 --require-exhaustive --plan-use icod-demo-child icod-demo-decoy icod-demo-base > planned-child-routed.ti
+```
+
+The two output files are byte-for-byte equal. Combine either output with the
+checked-in selected-parent source and validate the generated state:
+
+```text
+cat planned-child.ti planning-parent.ti > planned-validation.ti
+tic -c -x planned-validation.ti
+```
+
+This planning form uses only the explicit operands and the explicit `-A` and
+`-B` roots. It does not enumerate the catalog or discover additional candidates.
 
 ## Compare the base and child
 
@@ -155,7 +191,7 @@ Remove the explicit local database and redirected conversion outputs when the
 walkthrough is complete:
 
 ```text
-rm -rf ./terminfo converted-from-termcap.ti roundtrip.termcap
+rm -rf ./terminfo converted-from-termcap.ti roundtrip.termcap planned-child.ti planned-child-routed.ti planned-validation.ti
 ```
 
 On shells without `rm`, remove the same paths with the host's normal file tools.

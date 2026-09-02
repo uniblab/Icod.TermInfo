@@ -6,9 +6,10 @@ namespace Icod.TermInfo.Inspection.Tests;
 
 public sealed class RS08ContractTests {
 	private const string ReleaseVersion = "1.7.0";
+	private const string DevelopmentVersion = "1.8.0-Alpha-8";
 
 	[Fact]
-	public void CoordinatedVersionAndReleaseRecordsIdentifyRs08() {
+	public void OneEightDevelopmentRetainsRs08ReleaseRecords() {
 		string root = FindRepositoryRoot();
 		XDocument buildProperties = XDocument.Load(
 			Path.Combine( root, "Directory.Build.props" ),
@@ -35,7 +36,7 @@ public sealed class RS08ContractTests {
 			)
 		);
 
-		Assert.Equal( ReleaseVersion, version );
+		Assert.Equal( DevelopmentVersion, version );
 		Assert.Contains( "RS08", roadmap, StringComparison.Ordinal );
 		Assert.Contains( ReleaseVersion, audit, StringComparison.Ordinal );
 		Assert.Contains(
@@ -51,12 +52,12 @@ public sealed class RS08ContractTests {
 	}
 
 	[Fact]
-	public void InspectionPublicSurfaceIsFrozenAtTwentyFiveTypes() {
+	public void FrozenOneSevenTypesRemainAvailableWithinAdditiveSurface() {
 		Type[] exportedTypes = typeof( TerminalDescriptionComparer )
 			.Assembly
 			.GetExportedTypes();
 
-		Assert.Equal( 25, exportedTypes.Length );
+		Assert.True( exportedTypes.Length >= 25 );
 		Assert.Contains(
 			exportedTypes,
 			type => type == typeof( TerminalDescriptionSourceSynthesisParent )
@@ -260,6 +261,16 @@ public sealed class RS08ContractTests {
 		);
 		Assert.Contains(
 			"includeExtendedCapabilities: true",
+			sample,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"TerminalDescriptionSourcePlanner.Plan",
+			sample,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"planningCandidates",
 			sample,
 			StringComparison.Ordinal
 		);

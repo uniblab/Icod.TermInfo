@@ -10,6 +10,9 @@ const string source =
 		am,
 		lines#24,
 
+	icod-toolchain-decoy|Toolchain sample planning decoy,
+		cols#80,
+
 	icod-toolchain-child|Toolchain sample child,
 		cols#120,
 		clear=\E[H\E[2J,
@@ -55,11 +58,28 @@ if (
 	);
 }
 
+TermInfoSourceResolveResult resolvedDecoy =
+	TermInfoSourceResolver.Resolve(
+		parsed.Document,
+		"icod-toolchain-decoy"
+	);
+if (
+	resolvedDecoy.HasErrors
+	|| resolvedDecoy.Entry is null
+) {
+	throw new InvalidOperationException(
+		"The sample planning decoy did not resolve cleanly."
+	);
+}
+
 TerminalDescription parent =
 	resolvedParent.Entry.ToTerminalDescription();
+TerminalDescription decoy =
+	resolvedDecoy.Entry.ToTerminalDescription();
 TerminalDescription expected =
 	resolved.Entry.ToTerminalDescription();
-TerminalDescriptionSourceSynthesisParent[] synthesisParents = [
+TerminalDescriptionSourceSynthesisParent[] planningCandidates = [
+	new( decoy.Name, decoy ),
 	new( parent.Name, parent ),
 ];
 TerminalDescriptionSourceSynthesisOptions synthesisOptions =
@@ -70,12 +90,29 @@ TerminalDescriptionSourceSynthesisOptions synthesisOptions =
 		TerminalDescriptionSourceSynthesisOptions.DefaultMaximumParentCount,
 		includeExtendedCapabilities: true
 	);
-string relativeSource =
-	TerminalDescriptionSourceSynthesizer.Synthesize(
-		expected,
-		synthesisParents,
-		synthesisOptions
+TerminalDescriptionSourcePlanningOptions planningOptions =
+	new(
+		synthesisOptions,
+		maximumCandidateCount: planningCandidates.Length,
+		maximumSelectedParentCount: 1,
+		maximumEvaluatedPlanCount: 3
 	);
+TerminalDescriptionSourcePlan plan =
+	TerminalDescriptionSourcePlanner.Plan(
+		expected,
+		planningCandidates,
+		planningOptions
+	);
+if ( !plan.IsExhaustive
+	|| plan.EvaluatedPlanCount != 3
+	|| plan.CandidateCount != 2
+	|| plan.SelectedParents.Count != 1
+	|| !ReferenceEquals( plan.SelectedParents[ 0 ], planningCandidates[ 1 ] ) ) {
+	throw new InvalidOperationException(
+		"The sample planner did not select the useful base with complete evidence."
+	);
+}
+string relativeSource = plan.Source;
 if ( relativeSource.Contains( '\r' )
 	|| !relativeSource.EndsWith( '\n' ) ) {
 	throw new InvalidOperationException(
@@ -96,7 +133,14 @@ if ( !string.Equals( relativeSource, expectedRelativeSource, StringComparison.Or
 
 string combinedSource =
 	relativeSource
-		+ TerminalDescriptionSourceRenderer.Render( parent );
+		+ string.Concat(
+			plan.SelectedParents.Select(
+				selected =>
+					TerminalDescriptionSourceRenderer.Render(
+						selected.Description
+					)
+			)
+		);
 TermInfoSourceParseResult synthesizedParsed =
 	TermInfoSourceParser.Parse(
 		combinedSource,

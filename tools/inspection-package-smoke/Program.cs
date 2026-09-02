@@ -31,7 +31,7 @@ Require(
 Type[] exportedTypes =
 	inspectionAssembly.GetExportedTypes();
 Require(
-	exportedTypes.Length == 25
+	exportedTypes.Length == 29
 		&& exportedTypes.Contains( typeof( TermInfoComparisonResult ) )
 		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalog ) )
 		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalogEntry ) )
@@ -52,12 +52,16 @@ Require(
 		&& exportedTypes.Contains( typeof( TerminalDescriptionComparer ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceCapabilityOrder ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceLayout ) )
+		&& exportedTypes.Contains( typeof( TerminalDescriptionSourcePlan ) )
+		&& exportedTypes.Contains( typeof( TerminalDescriptionSourcePlanner ) )
+		&& exportedTypes.Contains( typeof( TerminalDescriptionSourcePlanningOptions ) )
+		&& exportedTypes.Contains( typeof( TerminalDescriptionSourcePlanningScore ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceRenderer ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceRendererOptions ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesisOptions ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesisParent ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesizer ) ),
-	"The Inspection package did not expose exactly the frozen 1.7 public surface."
+	"The Inspection package did not expose exactly the frozen 1.8 public surface."
 );
 
 Require(
@@ -150,6 +154,44 @@ Require(
 			+ "    cols#80,\n",
 	"The I02 renderer did not produce the canonical smoke representation."
 );
+string emptyCatalogRoot =
+	System.IO.Path.Combine(
+		System.IO.Path.GetTempPath(),
+		$"icod-terminfo-package-smoke-catalog-{Guid.NewGuid():N}"
+	);
+Directory.CreateDirectory( emptyCatalogRoot );
+try {
+	TermInfoDatabaseCatalog emptyCatalog =
+		TermInfoDatabaseInspector.InspectDirectory(
+			emptyCatalogRoot
+		);
+	TerminalDescriptionSourcePlan catalogPlan =
+		TerminalDescriptionSourcePlanner.PlanFromCatalog(
+			terminal,
+			emptyCatalog
+		);
+	TerminalDescriptionSourcePlan directoryPlan =
+		TerminalDescriptionSourcePlanner.PlanFromDirectory(
+			terminal,
+			emptyCatalogRoot
+		);
+	Require(
+		catalogPlan.Source == rendered
+			&& catalogPlan.CandidateCount == 0
+			&& catalogPlan.EvaluatedPlanCount == 1
+			&& catalogPlan.IsExhaustive
+			&& directoryPlan.Source == catalogPlan.Source
+			&& directoryPlan.CandidateCount == 0
+			&& directoryPlan.EvaluatedPlanCount == 1
+			&& directoryPlan.IsExhaustive,
+		"The RP05 package planner did not preserve complete explicit empty-catalog planning."
+	);
+} finally {
+	Directory.Delete(
+		emptyCatalogRoot,
+		recursive: true
+	);
+}
 Require(
 	TerminalDescriptionSourceRenderer.Render(
 		terminal,
@@ -189,6 +231,44 @@ Require(
 		&& TerminalDescriptionSourceSynthesisOptions.MaximumSupportedParentCount == 256
 		&& synthesisOptions.IncludeExtendedCapabilities,
 	"The frozen 1.7 synthesis options surface did not retain its reviewed contract."
+);
+TerminalDescriptionSourcePlanningOptions planningOptions =
+	new();
+Require(
+	planningOptions.MaximumCandidateCount == 64
+		&& planningOptions.MaximumSelectedParentCount == 2
+		&& planningOptions.MaximumEvaluatedPlanCount == 4_097
+		&& planningOptions.MaximumGeneratedSourceLength
+			== TermInfoSourceLexerOptions.DefaultMaximumSourceLength
+		&& !planningOptions.AllowNonExhaustiveResult,
+	"The RP04 package planning options did not retain the reviewed bounded defaults."
+);
+TerminalDescriptionSourcePlanningScore planningScore =
+	new(
+		1,
+		0,
+		1,
+		128,
+		new[] {
+			0,
+		}
+	);
+Require(
+	planningScore.LocalDirectiveCount == 1
+		&& planningScore.CancellationCount == 0
+		&& planningScore.ParentCount == 1
+		&& planningScore.RenderedUtf8ByteCount == 128
+		&& planningScore.SelectedCandidateIndices.SequenceEqual( new[] { 0 } )
+		&& planningScore.CompareTo(
+			new TerminalDescriptionSourcePlanningScore(
+				2,
+				0,
+				0,
+				1,
+				Array.Empty<int>()
+			)
+		) < 0,
+	"The RP04 package planning score did not retain its reviewed component order."
 );
 string synthesizedWithoutParents =
 	TerminalDescriptionSourceSynthesizer.Synthesize(
@@ -255,6 +335,120 @@ Require(
 			+ "    use=inspection-smoke-parent-alias,\n",
 	"The RS04 package synthesizer did not preserve repeated canonical/alias "
 		+ "parent references in caller order."
+);
+TerminalDescriptionSourcePlan planned =
+	TerminalDescriptionSourcePlanner.Plan(
+		terminal,
+		new[] {
+			synthesisAliasParent,
+		}
+	);
+Require(
+	planned.SelectedParents.Count == 1
+		&& ReferenceEquals( planned.SelectedParents[ 0 ], synthesisAliasParent )
+		&& planned.Source
+			== "inspection-smoke|Inspection package smoke,\n"
+				+ "    use=inspection-smoke-parent-alias,\n"
+		&& planned.Score.LocalDirectiveCount == 0
+		&& planned.Score.CancellationCount == 0
+		&& planned.Score.ParentCount == 1
+		&& planned.Score.SelectedCandidateIndices.SequenceEqual( new[] { 0 } )
+		&& planned.EvaluatedPlanCount == 2
+		&& planned.IsExhaustive
+		&& planned.CandidateCount == 1,
+	"The RP02 package planner did not select the exact single-parent reference with complete evidence."
+);
+TerminalDescription smokeBooleanParentDescription =
+	new TerminalDescriptionBuilder( "inspection-smoke-boolean-parent" )
+		.SetBoolean( BooleanCapability.AutoRightMargin )
+		.Build();
+TerminalDescription smokeNumberParentDescription =
+	new TerminalDescriptionBuilder( "inspection-smoke-number-parent" )
+		.SetNumber( NumericCapability.Columns, 80 )
+		.Build();
+TerminalDescriptionSourceSynthesisParent smokeBooleanParent =
+	new(
+		smokeBooleanParentDescription.Name,
+		smokeBooleanParentDescription
+	);
+TerminalDescriptionSourceSynthesisParent smokeNumberParent =
+	new(
+		smokeNumberParentDescription.Name,
+		smokeNumberParentDescription
+	);
+TerminalDescriptionSourcePlan multiParentPlan =
+	TerminalDescriptionSourcePlanner.Plan(
+		terminal,
+		new[] {
+			smokeBooleanParent,
+			smokeNumberParent,
+		},
+		new TerminalDescriptionSourcePlanningOptions(
+			new TerminalDescriptionSourceSynthesisOptions(
+				80,
+				maximumParentCount: 2
+			),
+			maximumCandidateCount: 2,
+			maximumSelectedParentCount: 2
+		)
+	);
+Require(
+	multiParentPlan.SelectedParents.Count == 2
+		&& ReferenceEquals(
+			multiParentPlan.SelectedParents[ 0 ],
+			smokeBooleanParent
+		)
+		&& ReferenceEquals(
+			multiParentPlan.SelectedParents[ 1 ],
+			smokeNumberParent
+		)
+		&& multiParentPlan.Source
+			== "inspection-smoke|Inspection package smoke,\n"
+				+ "    use=inspection-smoke-boolean-parent,\n"
+				+ "    use=inspection-smoke-number-parent,\n"
+		&& multiParentPlan.Score.LocalDirectiveCount == 0
+		&& multiParentPlan.Score.CancellationCount == 0
+		&& multiParentPlan.Score.ParentCount == 2
+		&& multiParentPlan.Score.SelectedCandidateIndices.SequenceEqual(
+			new[] { 0, 1 }
+		)
+		&& multiParentPlan.EvaluatedPlanCount == 5
+		&& multiParentPlan.IsExhaustive
+		&& multiParentPlan.CandidateCount == 2,
+	"The RP03 package planner did not preserve the exact selected two-parent order and evidence."
+);
+TerminalDescriptionSourcePlan boundedPlan =
+	TerminalDescriptionSourcePlanner.Plan(
+		terminal,
+		new[] {
+			smokeBooleanParent,
+			smokeNumberParent,
+			synthesisAliasParent,
+		},
+		new TerminalDescriptionSourcePlanningOptions(
+			new TerminalDescriptionSourceSynthesisOptions(
+				80,
+				maximumParentCount: 2
+			),
+			maximumCandidateCount: 3,
+			maximumSelectedParentCount: 2,
+			maximumEvaluatedPlanCount: 2,
+			allowNonExhaustiveResult: true
+		)
+	);
+Require(
+	boundedPlan.SelectedParents.Count == 1
+		&& ReferenceEquals(
+			boundedPlan.SelectedParents[ 0 ],
+			smokeBooleanParent
+		)
+		&& boundedPlan.Score.SelectedCandidateIndices.SequenceEqual(
+			new[] { 0 }
+		)
+		&& boundedPlan.EvaluatedPlanCount == 2
+		&& !boundedPlan.IsExhaustive
+		&& boundedPlan.CandidateCount == 3,
+	"The RP04 package planner did not preserve deterministic bounded-search evidence."
 );
 TerminalDescription extendedSmokeParent =
 	new TerminalDescriptionBuilder( "inspection-smoke-extended-parent" )

@@ -11,6 +11,231 @@ frozen relative-source synthesis API while preserving all earlier Inspection
 contracts. `captoinfo` consumes Inspection only at the executable-composition
 layer.
 
+## 1.8 RP08 API, packaging, and release closure
+
+`1.8.0-Alpha-8` adds no new feature behavior. It freezes the complete additive
+planning public API in
+`docs/1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt`, retains the immutable 1.7
+synthesis baseline, and makes exact API, package-consumer, deterministic sample,
+direct command, router package, and six-archive validation part of the release
+gate. The stable score, bounds, candidate order, exhaustive and explicitly
+bounded search, cancellation evidence, and explicit catalog semantics are
+recorded in `docs/1.8.0-RELEASE-AUDIT.md`.
+
+The transition from Alpha-8 to stable 1.8.0 is version-only after the exact
+release commit passes every Windows, Linux, and macOS gate.
+
+## 1.8 RP07 generated-state oracle and hardening
+
+`1.8.0-Alpha-7` leaves the planner and public Inspection API unchanged while
+adding seeded generated target/candidate universes, an independent brute-force
+oracle, exhaustive and budget-prefix comparison, score-tie and permutation
+coverage, exact-boundary tests, culture and insertion-order determinism, and
+repeated-process output comparison. Every selected generated source is resolved
+and compared with its original target.
+
+RP07 also reuses the pinned `ncurses 6.5.20250216` effective-state corpus and
+extends the managed Toolchain sample through explicit candidate planning,
+compilation, publication, Runtime reacquisition, and semantic comparison. See
+`docs/1.8.0-RP07-GENERATED-STATE-ORACLE-AND-HARDENING.md` for the complete
+evidence contract.
+
+## 1.8 RP06 command and distribution composition
+
+`1.8.0-Alpha-6` exposes the existing bounded planner through
+`infocmp --plan-use`, the `icod-terminfo infocmp` route, the installable tool
+package, and all six standalone archive RIDs. RP06 adds no Inspection API and
+changes no RP01 through RP05 semantics. The command maps explicit acquisition,
+presentation, and bounds into the reusable immutable planning options.
+
+See `docs/1.8.0-RP06-INFOCMP-PLANNING-COMMAND-AND-DISTRIBUTION.md` for the
+reviewed command and distribution contract.
+
+## 1.8 RP05 explicit database catalog planning
+
+`1.8.0-Alpha-5` composes the bounded planner with an explicit
+`TermInfoDatabaseCatalog` or one explicit conventional database directory. It
+does not consult environment discovery or platform default database locations.
+
+```csharp
+TerminalDescriptionSourcePlan plan =
+	TerminalDescriptionSourcePlanner.PlanFromDirectory(
+		target,
+		explicitDatabaseRoot,
+		planningOptions,
+		parserOptions,
+		cancellationToken
+	);
+```
+
+Use `PlanFromCatalog` when the caller already owns an immutable catalog
+snapshot. Catalog planning requires a conventional, issue-free catalog. Missing,
+unsupported, unavailable, malformed, misplaced, inaccessible, or link-skipping
+catalogs are rejected before plan evaluation so partial candidates never produce
+false exhaustive evidence.
+
+Candidates use canonical names only and retain the catalog's ordinal canonical-
+name order. Alias publications and equivalent physical copies collapse to one
+candidate; conflicting copies of the same canonical name are rejected. Any
+catalog entry whose canonical name or aliases intersects the target name or
+aliases is excluded as an obvious self-reference.
+
+Parser limits, planning bounds, cancellation, the frozen score, and exhaustive
+versus bounded result semantics remain unchanged. See
+`docs/1.8.0-RP05-EXPLICIT-DATABASE-CATALOG-PLANNING.md` for the complete policy.
+
+## 1.8 RP04 bounded search, cancellation, and evidence
+
+`1.8.0-Alpha-4` freezes the planner's hostile-input behavior without changing
+the RP01 public API. Candidate count, selected-parent depth, evaluated-plan
+count, and generated-source length are enforced independently. Plan-space
+arithmetic is checked and budget-aware, so even the supported 256-candidate and
+256-parent maxima cannot wrap an integer or materialize a factorial plan list.
+
+Exhaustive planning rejects a request before source evaluation when its complete
+legal space exceeds `MaximumEvaluatedPlanCount`. A caller that explicitly sets
+`AllowNonExhaustiveResult` receives the best plan from the deterministic
+increasing-depth lexicographic prefix ending at that budget. Such a result always
+reports `IsExhaustive` as `false`.
+
+```csharp
+TerminalDescriptionSourcePlanningOptions options =
+	new(
+		new TerminalDescriptionSourceSynthesisOptions(
+			80,
+			maximumParentCount: 3
+		),
+		maximumCandidateCount: 64,
+		maximumSelectedParentCount: 3,
+		maximumEvaluatedPlanCount: 10_000,
+		allowNonExhaustiveResult: true
+	);
+
+TerminalDescriptionSourcePlan plan =
+	TerminalDescriptionSourcePlanner.Plan(
+		target,
+		candidates,
+		options,
+		cancellationToken
+	);
+```
+
+Cancellation is observed while candidates are snapshotted, throughout ordered
+enumeration, and immediately before and after each synchronous synthesis call.
+A cancellation or bounds failure returns no partial plan. The immutable
+`EvaluatedPlanCount`, `IsExhaustive`, and `CandidateCount` properties explain
+the completed search without exposing mutable internal state.
+
+## 1.8 RP03 ordered multi-parent planning
+
+`1.8.0-Alpha-3` evaluates the zero-parent baseline and every ordered
+permutation of distinct candidate positions through the configured parent
+depth. Different parent orders are distinct plans because the frozen 1.7
+synthesizer resolves collisions using leftmost precedence.
+
+```csharp
+TerminalDescriptionSourcePlan plan =
+	TerminalDescriptionSourcePlanner.Plan(
+		target,
+		new[] {
+			new TerminalDescriptionSourceSynthesisParent(
+				"preferred-base",
+				preferredBase
+			),
+			new TerminalDescriptionSourceSynthesisParent(
+				"supplemental-base",
+				supplementalBase
+			),
+		},
+		new TerminalDescriptionSourcePlanningOptions(
+			new TerminalDescriptionSourceSynthesisOptions(
+				80,
+				maximumParentCount: 2
+			),
+			maximumCandidateCount: 2,
+			maximumSelectedParentCount: 2
+		)
+	);
+```
+
+Enumeration starts with the baseline, then proceeds by increasing depth and
+lexicographic candidate-index sequence. One position cannot repeat within a
+plan, but equal descriptions and aliases at different caller positions remain
+distinct candidates. The winning `SelectedParents`, score indices, and emitted
+`use=` directives all retain the exact selected order.
+
+The default limit of 4,097 evaluations exactly covers the baseline, 64 single-
+parent plans, and 4,032 ordered two-parent plans. A larger admitted space is
+rejected before evaluation unless `AllowNonExhaustiveResult` is enabled; an
+opted-in prefix result reports `IsExhaustive` as `false`.
+
+## 1.8 RP02 zero- and single-parent planning
+
+`1.8.0-Alpha-2` makes the RP01 planner operational for the zero-parent baseline
+and every legal single candidate position. Planning snapshots candidates once,
+delegates every source candidate to the frozen 1.7 synthesizer, scores semantic
+emission evidence without parsing generated text, and returns the deterministic
+best valid plan.
+
+```csharp
+using Icod.TermInfo;
+using Icod.TermInfo.Inspection;
+
+TerminalDescription target =
+	TerminalDatabase.BuiltIn.Load( "xterm-256color" );
+TerminalDescription parent =
+	TerminalDatabase.BuiltIn.Load( "xterm" );
+
+TerminalDescriptionSourcePlan plan =
+	TerminalDescriptionSourcePlanner.Plan(
+		target,
+		new[] {
+			new TerminalDescriptionSourceSynthesisParent(
+				"xterm",
+				parent
+			),
+		},
+		new TerminalDescriptionSourcePlanningOptions(
+			new TerminalDescriptionSourceSynthesisOptions(),
+			maximumSelectedParentCount: 1
+		)
+	);
+```
+
+`SelectedParents` retains the exact winning `UseName` spelling. `Score`,
+`EvaluatedPlanCount`, `IsExhaustive`, and `CandidateCount` provide immutable
+selection evidence. A candidate is rejected if synthesis cannot reproduce the
+target under the active policy or its source exceeds the configured length; the
+planner never substitutes an approximate result.
+
+RP02's complete search depth was zero and one. A selected-parent limit of zero
+still restricts planning to the baseline, and an explicit limit of one retains
+the RP02 search domain. RP03 implements the larger ordered multi-parent legal
+space. `IsExhaustive` retains its RP01 meaning across all plans admitted by the
+active limits.
+
+## 1.8 RP01 relative-source planning contract
+
+`1.8.0-Alpha-1` begins additive relative-source planning in Inspection. RP01
+introduces `TerminalDescriptionSourcePlanningOptions`,
+`TerminalDescriptionSourcePlanningScore`, `TerminalDescriptionSourcePlan`, and
+`TerminalDescriptionSourcePlanner`. Candidate inputs and selected outputs reuse
+the frozen `TerminalDescriptionSourceSynthesisParent` type.
+
+The canonical immutable policy accepts 64 candidate positions, considers up to
+two selected ordered parents, and budgets 4,097 evaluations. That budget exactly
+covers the zero-parent plan, all 64 single-parent plans, and all `64 * 63`
+ordered two-parent plans. The score prefers fewer local directives, fewer
+cancellations, fewer parents, fewer rendered UTF-8 bytes, and then earlier
+candidate-index sequences.
+
+RP01 validates and snapshots candidate input once, preserves equivalent positions,
+excludes ordinal target-name and target-alias self-references, and freezes
+exhaustive versus budget-limited result evidence. RP02 supplies operational zero-
+and single-parent planning; RP03 extends it to ordered multi-parent plans. The
+frozen 1.7 synthesizer public contract is
+unchanged, and Inspection retains only Runtime and Source production dependencies.
+
 ## 1.7 synthesis contract
 
 Version 1.7.0 freezes the additive relative-source synthesis surface in

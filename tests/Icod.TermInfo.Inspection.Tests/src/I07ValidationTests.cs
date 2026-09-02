@@ -475,36 +475,37 @@ public sealed class I07ValidationTests {
 		string pullRequest =
 			ReadRepositoryFile(
 				root,
-				".github/workflows/pr-build-and-test.yaml"
+				".github/workflows/pull-request.yaml"
 			);
-		string pushMain =
+		string main =
 			ReadRepositoryFile(
 				root,
-				".github/workflows/push-main.yaml"
+				".github/workflows/main.yaml"
 			);
 		string release =
 			ReadRepositoryFile(
 				root,
 				".github/workflows/release.yaml"
 			);
+		string packageOrchestrator =
+			ReadRepositoryFile(
+				root,
+				"packaging/PackPackages.ps1"
+			);
 
 		Assert.DoesNotContain( "dotnet nuget push", pullRequest );
-		Assert.DoesNotContain( "dotnet nuget push", pushMain );
+		Assert.DoesNotContain( "dotnet nuget push", main );
 		Assert.Contains( "dotnet nuget push", release );
 		Assert.Contains( "if (17 -ne $files.Count)", release );
 		Assert.Contains( "if (18 -ne $assets.Count)", release );
-		foreach (
-			string packageId
-			in new[] {
-				"Icod.TermInfo",
-				"Icod.TermInfo.Source",
-				"Icod.TermInfo.Compiler",
-				"Icod.TermInfo.Inspection",
-				"Icod.TermInfo.Tools",
-			}
-		) {
-			Assert.Contains( packageId, release );
-		}
+		Assert.Contains(
+			"Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj",
+			packageOrchestrator
+		);
+		Assert.Contains( "./packaging/PackPackages.ps1", pullRequest );
+		Assert.Contains( "./packaging/PackPackages.ps1", main );
+		Assert.Contains( "./packaging/PackPackages.ps1", release );
+		Assert.Contains( "smoke-tool-package.ps1", release );
 
 		Assert.True(
 			File.Exists(

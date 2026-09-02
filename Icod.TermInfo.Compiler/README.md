@@ -11,6 +11,14 @@ controlled publication into an explicit conventional terminfo directory root.
 C07 closes the implementation program with round-trip, determinism, and pinned
 ncurses/`tic` differential validation.
 
+## 1.8 release-candidate status
+
+`1.8.0-Alpha-8` carries Compiler unchanged into the complete stable-intended
+1.8 contract. Its frozen 1.2 API, Runtime-and-Source dependency graph, three
+target frameworks, and assembly identity remain unchanged. Compiler remains
+test and sample infrastructure for planned-source round trips; Inspection does
+not gain a production Compiler dependency.
+
 ## 1.7 release status
 
 Version 1.7.0 carries Compiler unchanged into the stable 1.7 release. The

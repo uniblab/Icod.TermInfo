@@ -2,8 +2,8 @@
 
 ![Icod TUI Toolchain](https://raw.githubusercontent.com/uniblab/Icod.TermInfo/v1.4.1/icod_tui_toolchain.jpg)
 
-[![PR build and test](https://github.com/uniblab/Icod.TermInfo/actions/workflows/pr-build-and-test.yaml/badge.svg)](https://github.com/uniblab/Icod.TermInfo/actions/workflows/pr-build-and-test.yaml)
-[![Main build and test](https://github.com/uniblab/Icod.TermInfo/actions/workflows/push-main.yaml/badge.svg?branch=main)](https://github.com/uniblab/Icod.TermInfo/actions/workflows/push-main.yaml)
+[![PR Staging build](https://github.com/uniblab/Icod.TermInfo/actions/workflows/pull-request.yaml/badge.svg)](https://github.com/uniblab/Icod.TermInfo/actions/workflows/pull-request.yaml)
+[![Main Release validation](https://github.com/uniblab/Icod.TermInfo/actions/workflows/main.yaml/badge.svg?branch=main)](https://github.com/uniblab/Icod.TermInfo/actions/workflows/main.yaml)
 
 `Icod.TermInfo` is a managed, dependency-free .NET implementation of the low-level terminal-capability model traditionally supplied by `libtinfo`.
 
@@ -15,6 +15,15 @@ directions, and all established command semantics.
 The 1.7.0 library package family targets `net8.0`, `net9.0`, and `net10.0`; the
 packages use C# 13, contain no native ncurses/terminfo payload, and are intended
 to run on Windows, Linux, and macOS.
+
+The `1.8.0` development line adds deterministic, bounded ordered-parent
+planning in `Icod.TermInfo.Inspection` for the frozen 1.7 relative-source
+synthesizer. `1.8.0-Alpha-8` is the complete stable-intended release candidate:
+its additive planning API, score, bounds, exhaustive and explicitly bounded
+search, explicit catalog orchestration, `infocmp --plan-use` composition,
+package consumers, samples, and distribution gates are frozen in
+`docs/1.8.0-RELEASE-AUDIT.md`. The install commands below continue to name the
+current published stable release until the repository owner publishes 1.8.0.
 
 ## Install
 
@@ -881,8 +890,11 @@ See `samples/Icod.TermInfo.Toolchain.Sample/README.md` for the complete flow.
 `captoinfo`, and `infotocap`. It uses controlled terminfo and termcap source files
 and an explicit local database root so validation, publication, rendering,
 comparison, relative synthesis through `infocmp -u`, enumeration,
-forward/reverse `use=` dependency reporting, and bidirectional conversion do not
-depend on host-installed terminfo or termcap databases.
+explicit-candidate planning through `infocmp --plan-use`, forward/reverse `use=`
+dependency reporting, and bidirectional conversion do not depend on
+host-installed terminfo or termcap databases. The planning walkthrough includes
+an inferior decoy, direct and routed forms, and `tic -c` validation of the
+selected source.
 
 See `samples/README.md`, `samples/ToolSuite/README.md`,
 `samples/Icod.TermInfo.Acquisition.Sample/README.md`,
@@ -898,7 +910,7 @@ The intended family boundary is now explicit:
 - **`Icod.TermInfo`** — descriptions, compiled-database acquisition, capability semantics, parameter expansion, and output transformation;
 - **`Icod.TermInfo.Source`** — `.ti` lexical analysis, source diagnostics, unresolved entries, cancellation, `use=` inheritance, and materialization into `TerminalDescription`;
 - **`Icod.TermInfo.Compiler`** — deterministic compiled-entry writing, source compilation, and explicit conventional database-layout publication;
-- **`Icod.TermInfo.Inspection`** — canonical effective/source rendering, relative-source synthesis, structured semantic comparison, and provider-aware inspection;
+- **`Icod.TermInfo.Inspection`** — canonical effective/source rendering, relative-source synthesis and parent planning, structured semantic comparison, and provider-aware inspection;
 - **`Icod.TermInfo.Termcap`** — bounded termcap parsing, classification, `tc=` resolution, Runtime conversion, reverse rendering, and explicit termcap acquisition;
 - **`tic`, `infocmp`, `toe`, `captoinfo`, and `infotocap`** — managed command applications which compose the reusable libraries and own command-line policy;
 - **`Icod.TermInfo.Tools` / `icod-terminfo`** — distribution-only .NET tool router which dispatches to the five command applications;

@@ -11,7 +11,7 @@ Icod.TermInfo.Source
         |
         v
 Icod.TermInfo.Inspection
-    synthesize child relative to base
+    plan and synthesize child relative to candidates
         |
         v
 Icod.TermInfo.Source
@@ -30,16 +30,20 @@ Icod.TermInfo.Inspection
     compare acquired state with the original target
 ```
 
-The source contains a base entry and a child using `use=` inheritance. The
-sample resolves both entries, synthesizes deterministic child source relative to
-the base through the frozen 1.7 Inspection API, reparses and resolves that source,
-compiles the synthesized form, publishes it into a unique temporary database,
-reloads the child through `DirectoryTerminalDescriptionProvider`, and requires
-each stage to remain semantically equal to the original resolved child.
+The source contains a useful base, a decoy candidate, and a child using `use=`
+inheritance. The sample resolves all three entries, asks the 1.8 planner to
+select zero or one parent, requires the useful base to win an exhaustive search,
+and consumes the planner's exact source. It then reparses and resolves that
+source, compiles the planned form, publishes it into a unique temporary
+database, reloads the child through `DirectoryTerminalDescriptionProvider`, and
+requires each stage to remain semantically equal to the original resolved
+child.
 
-Version 1.7.0 also exercises the explicit five-argument
+The sample retains the explicit five-argument
 `TerminalDescriptionSourceSynthesisOptions` constructor which is part of the
-frozen `1.7.0` Inspection API baseline.
+frozen `1.7.0` Inspection API baseline, then composes it through
+`TerminalDescriptionSourcePlanningOptions` and
+`TerminalDescriptionSourcePlanner.Plan`.
 
 Run it with:
 
@@ -49,13 +53,18 @@ dotnet run --project samples/Icod.TermInfo.Toolchain.Sample/Icod.TermInfo.Toolch
 
 The project also targets `net8.0` and `net9.0`.
 
+RP08 freezes this sample as release evidence for the final 1.8 public planning
+surface. The release verifier executes it in two separate processes and rejects
+any byte difference in their output.
+
 The sample is deterministic:
 
 - it does not inspect `TERMINFO`, `TERMINFO_DIRS`, or the host system database;
 - it does not invoke native ncurses tools;
 - it writes only beneath a unique temporary directory;
 - it deletes that directory before exit;
+- it produces identical output across repeated process executions;
 - release validation executes the `net10.0` path on Windows, Linux, and macOS.
 
-The rendered child entry is written to standard output only after the complete
-source -> compile -> acquire -> compare path succeeds.
+The planned child entry is written to standard output only after the complete
+plan -> synthesize -> compile -> publish -> reacquire -> compare path succeeds.

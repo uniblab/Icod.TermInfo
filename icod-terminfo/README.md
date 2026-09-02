@@ -5,6 +5,25 @@
 
 The tool targets `net10.0` and therefore requires a .NET 10 runtime.
 
+## 1.8 development status
+
+Version 1.8 adds routed relative-source planning without adding router-owned
+semantics:
+
+```text
+icod-terminfo infocmp -A ./target-db -B ./candidate-db --max-parents 2 --require-exhaustive --plan-use target decoy useful
+```
+
+The router forwards the exact `--plan-use` arguments, streams, cancellation
+token, diagnostics, and exit status to `Icod.TermInfo.InfoCmp.Command`. Direct
+`infocmp` and routed `icod-terminfo infocmp` planning are therefore required to
+produce byte-for-byte identical source. The installable package smoke and every
+matching standalone archive smoke execute the same controlled planning case.
+
+RP08 freezes that command and distribution surface at `1.8.0-Alpha-8`. The
+stable transition adds no router option or dispatch behavior after every direct,
+routed, package-installed, and matching-archive planning gate is green.
+
 ## 1.7 release status
 
 Version 1.7.0 adds `infocmp -u` relative-source synthesis to the coordinated
@@ -53,6 +72,7 @@ icod-terminfo toe -V
 icod-terminfo captoinfo -V
 icod-terminfo infotocap -V
 icod-terminfo infocmp -u target parent
+icod-terminfo infocmp --plan-use target candidate
 ```
 
 The router owns no terminfo semantics and does not reparse command-specific

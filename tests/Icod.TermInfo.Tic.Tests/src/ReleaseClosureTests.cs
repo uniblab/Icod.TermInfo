@@ -5,16 +5,17 @@ namespace Icod.TermInfo.Tic.Tests;
 
 public sealed class ReleaseClosureTests {
 	private const string StableReleaseVersion = "1.7.0";
+	private const string DevelopmentVersion = "1.8.0-Alpha-8";
 	private const string VersionReference = "$(IcodTermInfoSuiteVersion)";
 	private const string StableAssemblyVersion = "1.0.0.0";
 
 	[Fact]
-	public void CoordinatedProjectsConsumeCentralStableVersion() {
+	public void CoordinatedProjectsConsumeCentralDevelopmentVersion() {
 		string root = FindRepositoryRoot();
 		XDocument buildProperties =
 			LoadProject( root, "Directory.Build.props" );
 		Assert.Equal(
-			StableReleaseVersion,
+			DevelopmentVersion,
 			ReadRequiredProperty(
 				buildProperties,
 				"IcodTermInfoSuiteVersion"
@@ -142,7 +143,7 @@ public sealed class ReleaseClosureTests {
 		foreach (
 			string workflow
 			in new string[] {
-				".github/workflows/push-main.yaml",
+				".github/workflows/main.yaml",
 				".github/workflows/release.yaml",
 			}
 		) {
@@ -165,7 +166,12 @@ public sealed class ReleaseClosureTests {
 			".github/workflows/release.yaml"
 		);
 		Assert.Contains(
-			"needs: [metadata, validate, tool-archives, smoke-tool-archives, smoke-tool-package]",
+			"needs: [metadata, package, smoke-tool-package, smoke-tool-archives]",
+			release,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"needs: [metadata, package, tool-archives, publish-nuget, publish-github-packages]",
 			release,
 			StringComparison.Ordinal
 		);
