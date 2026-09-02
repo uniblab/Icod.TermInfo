@@ -75,15 +75,17 @@ See `Icod.TermInfo.Toolchain.Sample/README.md`.
 
 ## ToolSuite
 
-`ToolSuite` is a data-and-command walkthrough for the managed 1.7 command suite.
+`ToolSuite` is a data-and-command walkthrough for the managed 1.8 command suite.
 It uses controlled terminfo and termcap source files plus an explicit local
 database root, so the example does not depend on the host's installed terminfo or
 termcap databases.
 
 The walkthrough covers validation, publication, effective rendering, relative
-synthesis through `infocmp -u`, semantic comparison, conventional database
-enumeration, forward/reverse `use=` dependency reports, termcap-to-terminfo
-conversion, and terminfo-to-termcap round trips.
+synthesis through `infocmp -u`, explicit-candidate parent planning through
+`infocmp --plan-use`, direct and routed planning equivalence, generated-source
+validation, semantic comparison, conventional database enumeration,
+forward/reverse `use=` dependency reports, termcap-to-terminfo conversion, and
+terminfo-to-termcap round trips.
 
 See `ToolSuite/README.md`.
 

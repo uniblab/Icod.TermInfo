@@ -232,6 +232,16 @@ cancellation remain authoritative. The frozen 1.4 catalog types, frozen 1.7
 synthesizer, production dependency graph, and reusable assembly identities are
 unchanged.
 
+RP06 advances the coordinated development version to `1.8.0-Alpha-6` and
+exposes explicit-candidate planning through `infocmp --plan-use`. Existing
+`-A`/`-B` acquisition and source-presentation controls map into the reusable
+planner; reviewed parent, evaluation, and exhaustive-versus-bounded controls
+remain enforced by Inspection. Direct and routed command behavior is identical,
+tool-package and archive smoke execute a controlled planning path, and matching
+CI runners exercise all six standalone archive RIDs. No reusable public API,
+production dependency direction, frozen 1.7 synthesis behavior, or reusable
+assembly identity changes.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:

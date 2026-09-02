@@ -70,11 +70,17 @@ infotocap
 
 `verify-tool-archives.sh` performs structural verification without executing foreign-architecture binaries.
 
-`smoke-tool-archive.ps1` selects the matching archive for the current operating system/architecture and executes the command/version and controlled database smoke path.
+`smoke-tool-archive.ps1` selects the matching archive for the current operating
+system/architecture and executes the command/version, controlled database,
+relative-synthesis, and explicit-candidate planning paths. PR, main, and release
+CI run it on matching hosts for all six RIDs.
 
 ## Installable tool package
 
-`smoke-tool-package.ps1` installs the freshly produced local `Icod.TermInfo.Tools` package into an isolated tool path and package cache, then validates the `icod-terminfo` router and its routed commands.
+`smoke-tool-package.ps1` installs the freshly produced local
+`Icod.TermInfo.Tools` package into an isolated tool path and package cache, then
+validates the `icod-terminfo` router, its routed commands, and a controlled
+`infocmp --plan-use` operation whose emitted source is checked by routed `tic`.
 
 The package smoke and standalone archive smoke remain intentionally separate because they validate different distribution surfaces.
 

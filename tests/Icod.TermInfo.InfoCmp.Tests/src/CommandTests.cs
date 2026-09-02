@@ -40,7 +40,7 @@ public sealed class CommandTests {
 		);
 
 		Assert.Equal( CommandExitCodes.Success, status );
-		Assert.Contains( "1.8.0-Alpha-5", ReadText( stdout ) );
+		Assert.Contains( "1.8.0-Alpha-6", ReadText( stdout ) );
 		Assert.Empty( ReadText( stderr ) );
 	}
 

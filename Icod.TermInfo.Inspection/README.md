@@ -11,6 +11,17 @@ frozen relative-source synthesis API while preserving all earlier Inspection
 contracts. `captoinfo` consumes Inspection only at the executable-composition
 layer.
 
+## 1.8 RP06 command and distribution composition
+
+`1.8.0-Alpha-6` exposes the existing bounded planner through
+`infocmp --plan-use`, the `icod-terminfo infocmp` route, the installable tool
+package, and all six standalone archive RIDs. RP06 adds no Inspection API and
+changes no RP01 through RP05 semantics. The command maps explicit acquisition,
+presentation, and bounds into the reusable immutable planning options.
+
+See `docs/1.8.0-RP06-INFOCMP-PLANNING-COMMAND-AND-DISTRIBUTION.md` for the
+reviewed command and distribution contract.
+
 ## 1.8 RP05 explicit database catalog planning
 
 `1.8.0-Alpha-5` composes the bounded planner with an explicit

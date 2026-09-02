@@ -881,8 +881,11 @@ See `samples/Icod.TermInfo.Toolchain.Sample/README.md` for the complete flow.
 `captoinfo`, and `infotocap`. It uses controlled terminfo and termcap source files
 and an explicit local database root so validation, publication, rendering,
 comparison, relative synthesis through `infocmp -u`, enumeration,
-forward/reverse `use=` dependency reporting, and bidirectional conversion do not
-depend on host-installed terminfo or termcap databases.
+explicit-candidate planning through `infocmp --plan-use`, forward/reverse `use=`
+dependency reporting, and bidirectional conversion do not depend on
+host-installed terminfo or termcap databases. The planning walkthrough includes
+an inferior decoy, direct and routed forms, and `tic -c` validation of the
+selected source.
 
 See `samples/README.md`, `samples/ToolSuite/README.md`,
 `samples/Icod.TermInfo.Acquisition.Sample/README.md`,
@@ -898,7 +901,7 @@ The intended family boundary is now explicit:
 - **`Icod.TermInfo`** — descriptions, compiled-database acquisition, capability semantics, parameter expansion, and output transformation;
 - **`Icod.TermInfo.Source`** — `.ti` lexical analysis, source diagnostics, unresolved entries, cancellation, `use=` inheritance, and materialization into `TerminalDescription`;
 - **`Icod.TermInfo.Compiler`** — deterministic compiled-entry writing, source compilation, and explicit conventional database-layout publication;
-- **`Icod.TermInfo.Inspection`** — canonical effective/source rendering, relative-source synthesis, structured semantic comparison, and provider-aware inspection;
+- **`Icod.TermInfo.Inspection`** — canonical effective/source rendering, relative-source synthesis and parent planning, structured semantic comparison, and provider-aware inspection;
 - **`Icod.TermInfo.Termcap`** — bounded termcap parsing, classification, `tc=` resolution, Runtime conversion, reverse rendering, and explicit termcap acquisition;
 - **`tic`, `infocmp`, `toe`, `captoinfo`, and `infotocap`** — managed command applications which compose the reusable libraries and own command-line policy;
 - **`Icod.TermInfo.Tools` / `icod-terminfo`** — distribution-only .NET tool router which dispatches to the five command applications;

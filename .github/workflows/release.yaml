@@ -127,7 +127,20 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
+        include:
+          - os: windows-latest
+            name: Windows x64
+          - os: windows-11-arm
+            name: Windows ARM64
+          - os: ubuntu-24.04
+            name: Linux x64
+          - os: ubuntu-24.04-arm
+            name: Linux ARM64
+          - os: macos-15-intel
+            name: macOS x64
+          - os: macos-15
+            name: macOS ARM64
+    name: Archive ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4

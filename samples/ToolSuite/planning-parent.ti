@@ -1,0 +1,6 @@
+icod-demo-base|idb|Icod.TermInfo 1.6 tool-suite sample base,
+	am,
+	cols#80,
+	lines#24,
+	clear=\E[H\E[2J,
+	cup=\E[%i%p1%d;%p2%dH,

@@ -1,5 +1,33 @@
 # infocmp
 
+## 1.8 relative-source planning
+
+Version 1.8 adds deterministic bounded parent selection without changing the
+frozen 1.7 `-u` synthesis contract:
+
+```text
+infocmp --plan-use [options] target candidate [candidate ...]
+```
+
+The first operand is acquired through `-A`; every explicit candidate is acquired
+through `-B`. Candidate operand spelling becomes the possible emitted `use=`
+name, and candidate order is the final planning tie-break. The command does not
+discover additional candidates or enumerate a catalog.
+
+Existing `-0`, `-1`, `-w`, `-s`, and `-x` source controls apply. Planning bounds
+are:
+
+```text
+--max-parents count   selected-parent limit, default 2, range 0..64
+--max-plans count     evaluated-plan limit, default 4097, range 1..1000000
+--require-exhaustive  reject a plan space larger than the budget; default
+--allow-bounded       return the best deterministic evaluated prefix
+```
+
+`-u`, `-d`, `-c`, `-n`, `-q`, and `-D` cannot be combined with `--plan-use`.
+Planning-bound controls require planning mode. Successful planning writes only
+the selected source to stdout and leaves stderr empty.
+
 ## 1.7 relative synthesis
 
 Version 1.7.0 adds the frozen RS06 `infocmp -u` command contract. The RS07
@@ -75,6 +103,7 @@ Supported as either `infocmp ...` from a release archive or
 ```text
 infocmp [options] [terminal ...]
 infocmp -u [options] target parent [parent ...]
+infocmp --plan-use [options] target candidate [candidate ...]
 infocmp -D
 infocmp -V
 infocmp --version
@@ -88,11 +117,12 @@ Operand behavior is:
 1 terminal              render that effective description
 2+ terminals            compare first with each later terminal
 -u target parent [...]  synthesize target relative to ordered parents
+--plan-use target candidate [...]  select parents from explicit candidates
 ```
 
-With two or more terminals and no explicit comparison selector or `-u`,
-difference mode (`-d`) is the default. Semantic differences are command output,
-not a failure, and therefore return status `0`.
+With two or more terminals and no explicit comparison selector, `-u`, or
+`--plan-use`, difference mode (`-d`) is the default. Semantic differences are
+command output, not a failure, and therefore return status `0`.
 
 Database selection is:
 
@@ -146,6 +176,7 @@ available for `net8.0`, `net9.0`, and `net10.0`.
 ```text
 infocmp [options] [terminal ...]
 infocmp -u [options] target parent [parent ...]
+infocmp --plan-use [options] target candidate [candidate ...]
 infocmp -D
 infocmp -V
 infocmp --version
@@ -162,6 +193,14 @@ infocmp --help
 -w width        canonical wrapping width
 -s d|i|l|c      capability ordering key
 -u              synthesize first terminal relative to ordered parents
+--plan-use      select ordered use= parents from explicit candidates
+--max-parents count
+                limit selected parents; default 2, range 0..64
+--max-plans count
+                limit evaluated plans; default 4097, range 1..1000000
+--require-exhaustive
+                reject a budget smaller than the complete plan space; default
+--allow-bounded return the best deterministic evaluated prefix
 -d              semantic differences
 -c              common effective capabilities; with -u, synonym for -u
 -n              standard capabilities absent from all operands
@@ -176,6 +215,8 @@ infocmp --help
 Unambiguous short options may be clustered. `-A`, `-B`, `-w`, and `-s` accept
 separated or attached values. Repeating the same comparison selector is
 idempotent; conflicting `-d`, `-c`, and `-n` selectors remain a usage error.
+`--require-exhaustive` is mutually exclusive with `--allow-bounded`. Planning-
+bound controls are rejected outside `--plan-use` mode.
 
 ## Operands
 
@@ -184,6 +225,10 @@ rendered. Two or more operands compare the first terminal against each later
 terminal unless `-u` selects relative synthesis. In synthesis mode, the first
 operand is the target and every later operand is an ordered parent. Use `--`
 before a terminal name beginning with `-`.
+
+In planning mode, the first operand is the target and every later operand is one
+ordered candidate position. Exact operand spelling is preserved when that
+candidate is selected. Duplicate candidate spellings are usage errors.
 
 ## Environment
 
@@ -195,8 +240,8 @@ Runtime system discovery is used.
 ## Exit statuses
 
 ```text
-0    successful rendering/comparison/synthesis, including semantic differences
-1    acquisition/database/operational synthesis failure
+0    successful rendering/comparison/synthesis/planning, including differences
+1    acquisition/database/operational synthesis or planning failure
 2    usage error
 130  cancellation
 ```
@@ -210,19 +255,21 @@ infocmp -w120 xterm
 infocmp -u xterm-256color xterm
 infocmp -1 -x -u child base
 infocmp -A./target-db -B./parent-db -u child base1 base2
+infocmp -A./target-db -B./candidate-db --max-parents 2 --plan-use child decoy base
 ```
 
 ## Compatibility
 
 Icod uses `TerminalDescriptionComparer`, `TerminalDescriptionSourceRenderer`,
-and `TerminalDescriptionSourceSynthesizer` as the authoritative semantic
-engines. Current ncurses behavior is followed for `-c -u`, while the existing
+`TerminalDescriptionSourceSynthesizer`, and `TerminalDescriptionSourcePlanner`
+as the authoritative semantic engines. Current ncurses behavior is followed for
+`-c -u`, while the existing
 Icod Source resolver remains authoritative for parent precedence. Exact ncurses
 comments, whitespace, provenance, or original source reconstruction are not
 claimed. Unsupported switches are reported as usage errors rather than ignored.
 
 ## Non-goals
 
-RS06 does not add C initializer generation, initialization-string analysis,
-vendor subsets, padding-insensitive comparison, Compiler-backed `-Q` output, or
-parent discovery/reordering/minimization.
+RP06 does not add C initializer generation, initialization-string analysis,
+vendor subsets, padding-insensitive comparison, Compiler-backed `-Q` output,
+implicit system candidate discovery, or command-level catalog-wide planning.

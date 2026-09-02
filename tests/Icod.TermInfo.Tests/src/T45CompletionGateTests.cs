@@ -30,7 +30,7 @@ public sealed class T45CompletionGateTests {
 					2 )[ 0 ];
 
 		Assert.Equal(
-			"1.8.0-Alpha-5",
+			"1.8.0-Alpha-6",
 			semanticVersion );
 	}
 
@@ -52,7 +52,7 @@ public sealed class T45CompletionGateTests {
 				LoadOptions.None );
 
 		Assert.Equal(
-			"1.8.0-Alpha-5",
+			"1.8.0-Alpha-6",
 			ReadRequiredProperty(
 				buildProperties,
 				"IcodTermInfoSuiteVersion" ) );
