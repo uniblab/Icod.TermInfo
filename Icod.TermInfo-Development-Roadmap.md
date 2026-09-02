@@ -21,13 +21,16 @@ version contracts live in version-specific roadmap files.
   API-regret audit, dual-target robustness/compatibility, documentation/package
   freeze, and final completion gate; complete and frozen.
 - `Icod.TermInfo-Post-1.0-Development-Roadmap.md` — authoritative post-1.0
-  program; 1.1.0 through 1.7.0 are complete and 1.8.0 is active.
+  program; 1.1.0 through 1.8.0 are complete and 1.9.0 is active.
 - `Icod.TermInfo 1.7.0 — Relative Terminfo Source Synthesis Roadmap.md` — frozen
   1.7 contract for reusable Inspection synthesis and `infocmp -u` command
   integration.
 - `Icod.TermInfo-1.8.0-Relative-Source-Planning-and-Parent-Selection-Roadmap.md`
-  - active 1.8 contract for deterministic bounded parent selection over the
+  - frozen 1.8 contract for deterministic bounded parent selection over the
   frozen 1.7 synthesizer.
+- `Icod.TermInfo-1.9.0-Machine-Readable-Inspection-and-Planning-Automation-Roadmap.md`
+  - active 1.9 contract for versioned deterministic JSON representations and
+  explicit Inspection command automation.
 
 ## Roadmap sequence
 
@@ -46,6 +49,7 @@ version contracts live in version-specific roadmap files.
   -> 1.6.1  release-verifier isolation hotfix
   -> 1.7.0  relative terminfo source synthesis
   -> 1.8.0  relative source planning and parent selection
+  -> 1.9.0  machine-readable inspection and planning automation
 ```
 
 The coordinated package family now consists of Runtime, Source, Compiler,
@@ -57,9 +61,11 @@ curses/virtual screens, graphics protocols, and terminal emulation remain siblin
 system concerns. Current post-1.0 planning is governed by
 `Icod.TermInfo-Post-1.0-Development-Roadmap.md`; the completed 1.7 contract is
 recorded by
-`Icod.TermInfo 1.7.0 — Relative Terminfo Source Synthesis Roadmap.md`, and active
-1.8 work is governed by
-`Icod.TermInfo-1.8.0-Relative-Source-Planning-and-Parent-Selection-Roadmap.md`.
+`Icod.TermInfo 1.7.0 — Relative Terminfo Source Synthesis Roadmap.md`; the frozen
+1.8 planning contract is recorded by
+`Icod.TermInfo-1.8.0-Relative-Source-Planning-and-Parent-Selection-Roadmap.md`;
+and active 1.9 work is governed by
+`Icod.TermInfo-1.9.0-Machine-Readable-Inspection-and-Planning-Automation-Roadmap.md`.
 
 The remainder of this file preserves the original 0.6.0 planning document.
 

@@ -282,7 +282,8 @@ Among other checks, the coordinated verifier retains:
 - Source public API baseline and cross-framework equality;
 - Termcap public API baseline, reflection fingerprint, and structural verifier;
 - Compiler public API baseline and cross-framework equality;
-- Inspection historical/current public API gates and cross-framework equality;
+- immutable 1.7 and 1.8 Inspection API records, plus cross-framework equality
+  throughout additive 1.9 development; MI07 adds the exact 1.9 gate;
 - package dependency and metadata validation;
 - XML documentation, portable symbols, and Source Link validation;
 - isolated package-reference consumers for Runtime, Source, Termcap, Compiler,

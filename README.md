@@ -395,6 +395,37 @@ The planner does not infer ancestry or rewrite synthesis semantics. Every
 evaluated plan delegates source generation to the frozen 1.7 synthesizer, and
 the result reports whether the configured search space was exhausted.
 
+## 1.9 development line
+
+Version 1.9 develops deterministic machine-readable Inspection output and
+explicit planning automation. MI01 introduces the immutable bounded JSON policy
+and strongly typed renderer foundation:
+
+```csharp
+using Icod.TermInfo.Inspection;
+
+TermInfoJsonRendererOptions jsonOptions =
+	new(
+		TermInfoJsonRendererOptions.DefaultMaximumOutputByteCount,
+		writeIndented: true
+	);
+```
+
+The version-1 schema identifier is
+`urn:icod:terminfo:inspection:json:1`. Effective-description rendering begins in
+MI02, comparison and planning evidence in MI03, and explicit database manifests
+in MI04. MI01 deliberately throws `NotSupportedException` from renderer
+operations rather than publish incomplete machine-readable payloads.
+
+Later 1.9 tranches compose the reusable renderer through `infocmp` and `toe` and
+add all-candidates planning only for an explicit caller-selected database
+directory. The frozen 1.7 synthesis and 1.8 planning contracts remain unchanged.
+
+See
+`Icod.TermInfo-1.9.0-Machine-Readable-Inspection-and-Planning-Automation-Roadmap.md`
+and `docs/1.9.0-MI01-JSON-CONTRACT-AND-RENDERER-FOUNDATION.md` for the complete
+development contract.
+
 ## Getting started
 
 Terminal resolution remains explicit and conservative. A normal application can

@@ -260,6 +260,17 @@ stable `1.8.0` transition changes release metadata and documentation only. The
 stable release promotes the validated Alpha-8 surface without semantic or API
 changes.
 
+MI01 advances the coordinated development version to `1.9.0-Alpha-1` and adds
+only `TermInfoJsonRendererOptions` and `TermInfoJsonRenderer` to Inspection. It
+freezes the schema identifier/version, typed value kinds, deterministic text
+policy, immutable UTF-8 output bounds, cancellation boundary, and future
+operational tranche ownership. Runtime, Source, Compiler, Termcap, 1.7 synthesis,
+and 1.8 planning APIs and semantics remain frozen. Inspection retains only
+Runtime and Source production dependencies. The 1.8 Inspection baseline remains
+immutable historical evidence while cross-framework API equality and explicit
+MI01 contract/package-smoke tests guard the additive prerelease surface. MI07
+will freeze the exact stable 1.9 Inspection baseline.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:
@@ -346,6 +357,14 @@ only `TerminalDescriptionSourcePlan`, `TerminalDescriptionSourcePlanner`,
 `TerminalDescriptionSourcePlanningScore`. Release verification requires exact
 net8/net9/net10 equivalence and an exact match with the 1.8 manifest. The 1.7
 manifest remains immutable historical evidence and must not be regenerated.
+
+During MI01 through MI06, the 1.8 Inspection manifest remains immutable
+historical evidence rather than an exact manifest for the developing 1.9
+assembly. Validation requires exact Inspection API equality across net8.0,
+net9.0, and net10.0 plus reviewed tranche-specific API and package-smoke tests.
+MI07 creates `docs/1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt` from the reviewed
+stable-intended surface. Alpha-7 and stable 1.9 validation must then match that
+manifest exactly.
 
 The baselines record exported types, public/protected members, enum numeric
 values, parameter names/order/defaults, ref/out/in/params shape, generic

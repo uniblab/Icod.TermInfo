@@ -22,6 +22,32 @@ bounded search, cancellation evidence, and explicit catalog semantics are
 recorded in `docs/1.8.0-RELEASE-AUDIT.md`. Stable 1.8.0 promotes the validated
 Alpha-8 surface without changing planning or synthesis semantics.
 
+## 1.9 MI01 machine-readable renderer foundation
+
+`1.9.0-Alpha-1` adds `TermInfoJsonRendererOptions` and
+`TermInfoJsonRenderer`. The immutable default policy permits up to 4,194,304
+UTF-8 output bytes, uses compact presentation, and exposes no mutable
+`JsonSerializerOptions`, converter, naming policy, encoder, or callback.
+
+```csharp
+TermInfoJsonRendererOptions options =
+	new(
+		maximumOutputByteCount: 8_192,
+		writeIndented: true
+	);
+```
+
+The exact schema identifier is `urn:icod:terminfo:inspection:json:1`, with
+schema version `1`. The renderer has typed entry points for
+`TerminalDescription`, `TermInfoComparisonResult`,
+`TerminalDescriptionSourcePlan`, and `TermInfoDatabaseCatalog`.
+
+MI01 validates arguments, bounds, and pre-cancellation, then deliberately throws
+`NotSupportedException`: description rendering begins in MI02, comparison and
+plan rendering in MI03, and catalog rendering in MI04. This prevents an empty or
+partial payload from appearing to satisfy the version-1 schema. See
+`docs/1.9.0-MI01-JSON-CONTRACT-AND-RENDERER-FOUNDATION.md`.
+
 ## 1.8 RP07 generated-state oracle and hardening
 
 `1.8.0-Alpha-7` leaves the planner and public Inspection API unchanged while

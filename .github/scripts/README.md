@@ -32,7 +32,9 @@ validation. RP07 runs the planning Toolchain sample in two separate processes
 and requires byte-identical output before accepting its plan, synthesize,
 compile, publish, reacquire, and compare path. RP08 additionally requires the
 exact `docs/1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt` manifest while retaining
-the immutable 1.7 Inspection manifest as historical evidence.
+the immutable 1.7 Inspection manifest as historical evidence. During additive
+1.9 development, both manifests remain historical evidence and cross-framework
+Inspection API equality remains active; MI07 freezes the complete 1.9 surface.
 
 Package production is centralized in:
 

@@ -22,7 +22,7 @@
 		<Title>Icod.TermInfo.Inspection</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed inspection and semantic-comparison foundation for Icod.TermInfo. The 1.3 line provides canonical terminfo rendering and reusable infocmp-style comparison engines without enlarging the frozen Runtime, Source, or Compiler public contracts.</Description>
-		<PackageReleaseNotes>1.8.0 adds the frozen relative-source planning API, deterministic score, bounded and exhaustive search, explicit catalog orchestration, and infocmp --plan-use foundation while preserving 1.7 synthesis, one-way Runtime-and-Source dependencies, net8/net9/net10 support, and assembly version 1.0.0.0.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.9.0-Alpha-1 establishes the bounded machine-readable JSON options and typed renderer foundation while preserving the frozen 1.7 synthesis and 1.8 planning contracts, Runtime-and-Source-only dependencies, net8/net9/net10 support, and assembly version 1.0.0.0.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>

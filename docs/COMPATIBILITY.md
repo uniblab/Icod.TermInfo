@@ -153,6 +153,37 @@ The 1.8 planner does not change 1.7 synthesis semantics, create intermediate
 parents, infer author intent, or introduce a production Compiler or Termcap
 dependency.
 
+## 1.9 machine-readable Inspection compatibility
+
+Inspection 1.9 adds a versioned deterministic JSON representation of existing
+immutable descriptions, comparison results, planning results, and explicit
+database catalogs. JSON is an output representation and does not become a
+second semantic model.
+
+MI01 freezes:
+
+- schema identifier `urn:icod:terminfo:inspection:json:1`;
+- schema version `1`;
+- top-level `schema`, `schemaVersion`, `documentKind`, and `data` property order;
+- `terminalDescription`, `comparison`, `sourcePlan`, and `databaseCatalog`
+  document-kind strings;
+- compact output by default and one reviewed indented form;
+- bounded UTF-8 output size;
+- typed renderer entry points and operation-local cancellation;
+- absence of caller-supplied converters, naming policies, encoders, or delegates.
+
+MI01 does not emit a partial payload. Operational rendering begins in MI02
+through MI04, and MI04 publishes the complete version-1 JSON Schema. Once a
+payload field is published under version 1, its meaning and value kind shall not
+be repurposed. A breaking schema change requires a new schema version and
+identifier.
+
+Existing human-readable commands and the frozen 1.7 synthesis and 1.8 planning
+semantics remain unchanged. Later 1.9 command JSON modes must produce exactly one
+JSON document on successful stdout; diagnostics remain on stderr. Explicit
+all-candidates planning shall require a caller-selected database directory and
+shall never introduce implicit host-wide discovery.
+
 ## Runtime terminfo semantic compatibility
 
 The stable runtime responsibility includes:

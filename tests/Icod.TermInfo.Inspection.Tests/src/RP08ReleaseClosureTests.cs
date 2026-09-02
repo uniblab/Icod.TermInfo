@@ -6,7 +6,7 @@ using Xunit;
 namespace Icod.TermInfo.Inspection.Tests;
 
 public sealed class RP08ReleaseClosureTests {
-	private const string StableReleaseVersion = "1.8.0";
+	private const string DevelopmentVersion = "1.9.0-Alpha-1";
 	private const string HistoricalDevelopmentVersion = "1.8.0-Alpha-8";
 	private const string Rp07Head =
 		"a88237d0d2f0ecdf74a7d96f6ff1cb9a2e8e647d";
@@ -14,13 +14,13 @@ public sealed class RP08ReleaseClosureTests {
 		"ba87cb17abe4d2c2a89851b3f9205f95bfd1116022e8b46d2883941c378f5811";
 
 	[Fact]
-	public void FrozenInspectionSurfaceContainsExactlyReviewedPlanningTypes() {
+	public void FrozenOneEightPlanningTypesRemainAvailableWithinAdditiveSurface() {
 		Type[] exportedTypes =
 			typeof( TerminalDescriptionSourcePlanner )
 				.Assembly
 				.GetExportedTypes();
 
-		Assert.Equal( 29, exportedTypes.Length );
+		Assert.True( exportedTypes.Length >= 29 );
 		Assert.Contains(
 			typeof( TerminalDescriptionSourcePlan ),
 			exportedTypes );
@@ -88,7 +88,7 @@ public sealed class RP08ReleaseClosureTests {
 	}
 
 	[Fact]
-	public void ReleaseVerifiersRequireTheExactOneEightInspectionBaseline() {
+	public void ReleaseVerifiersRetainHistoricalOneEightEvidenceDuringDevelopment() {
 		string root = FindRepositoryRoot();
 		foreach (
 			string relativePath
@@ -118,7 +118,11 @@ public sealed class RP08ReleaseClosureTests {
 				verifier,
 				StringComparison.OrdinalIgnoreCase );
 			Assert.Contains(
-				"--check",
+				"MI07",
+				verifier,
+				StringComparison.Ordinal );
+			Assert.Contains(
+				"--compare",
 				verifier,
 				StringComparison.Ordinal );
 			Assert.Contains(
@@ -188,7 +192,7 @@ public sealed class RP08ReleaseClosureTests {
 	}
 
 	[Fact]
-	public void CoordinatedMetadataAndRoadmapsIdentifyStableClosure() {
+	public void CoordinatedMetadataPreservesStableClosureAndIdentifiesMi01() {
 		string root = FindRepositoryRoot();
 		string buildProperties =
 			File.ReadAllText(
@@ -207,7 +211,7 @@ public sealed class RP08ReleaseClosureTests {
 					"Icod.TermInfo-Post-1.0-Development-Roadmap.md" ) );
 
 		Assert.Contains(
-			StableReleaseVersion,
+			DevelopmentVersion,
 			buildProperties,
 			StringComparison.Ordinal );
 		Assert.Contains(
@@ -215,7 +219,7 @@ public sealed class RP08ReleaseClosureTests {
 			roadmap,
 			StringComparison.Ordinal );
 		Assert.Contains(
-			"Release closure - exact-main validation and publication",
+			"MI01",
 			activeRoadmap,
 			StringComparison.Ordinal );
 	}

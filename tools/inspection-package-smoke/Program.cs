@@ -31,7 +31,7 @@ Require(
 Type[] exportedTypes =
 	inspectionAssembly.GetExportedTypes();
 Require(
-	exportedTypes.Length == 29
+	exportedTypes.Length == 31
 		&& exportedTypes.Contains( typeof( TermInfoComparisonResult ) )
 		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalog ) )
 		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalogEntry ) )
@@ -47,6 +47,8 @@ Require(
 		&& exportedTypes.Contains( typeof( TermInfoInspectionEngine ) )
 		&& exportedTypes.Contains( typeof( TermInfoInspectionResult ) )
 		&& exportedTypes.Contains( typeof( TermInfoInspectionTarget ) )
+		&& exportedTypes.Contains( typeof( TermInfoJsonRenderer ) )
+		&& exportedTypes.Contains( typeof( TermInfoJsonRendererOptions ) )
 		&& exportedTypes.Contains( typeof( TermInfoSourceComparer ) )
 		&& exportedTypes.Contains( typeof( TermInfoSourceRenderer ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionComparer ) )
@@ -61,7 +63,7 @@ Require(
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesisOptions ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesisParent ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesizer ) ),
-	"The Inspection package did not expose exactly the frozen 1.8 public surface."
+	"The Inspection package did not expose exactly the reviewed MI01 public surface."
 );
 
 Require(
@@ -243,6 +245,33 @@ Require(
 		&& !planningOptions.AllowNonExhaustiveResult,
 	"The RP04 package planning options did not retain the reviewed bounded defaults."
 );
+TermInfoJsonRendererOptions jsonOptions =
+	new();
+Require(
+	TermInfoJsonRenderer.SchemaIdentifier
+		== "urn:icod:terminfo:inspection:json:1"
+		&& TermInfoJsonRenderer.SchemaVersion == 1
+		&& jsonOptions.MaximumOutputByteCount == 4_194_304
+		&& !jsonOptions.WriteIndented,
+	"The MI01 JSON renderer contract did not retain its reviewed identity and bounds."
+);
+try {
+	_ = TermInfoJsonRenderer.Render(
+		terminal,
+		jsonOptions
+	);
+	throw new InvalidOperationException(
+		"The MI01 JSON renderer became operational before MI02."
+	);
+} catch ( NotSupportedException exception ) {
+	Require(
+		exception.Message.Contains(
+			"MI02",
+			StringComparison.Ordinal
+		),
+		"The MI01 JSON renderer did not identify its owning operational tranche."
+	);
+}
 TerminalDescriptionSourcePlanningScore planningScore =
 	new(
 		1,
@@ -587,5 +616,5 @@ Require(
 );
 
 Console.WriteLine(
-	"Icod.TermInfo.Inspection package smoke test passed."
+	"Icod.TermInfo.Inspection 1.9.0-Alpha-1 package smoke test passed."
 );
