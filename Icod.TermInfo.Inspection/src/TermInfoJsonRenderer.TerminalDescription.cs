@@ -449,11 +449,31 @@ public static partial class TermInfoJsonRenderer {
 			);
 		}
 
+		internal void WriteNull(
+			string propertyName
+		) {
+			WritePropertyPrefix( propertyName );
+			_output.WriteAscii( "null" );
+		}
+
+		internal void WriteNumberValue(
+			int value
+		) {
+			WriteArrayValuePrefix();
+			WriteNumberSyntax( value );
+		}
+
 		internal void WriteNumber(
 			string propertyName,
 			int value
 		) {
 			WritePropertyPrefix( propertyName );
+			WriteNumberSyntax( value );
+		}
+
+		private void WriteNumberSyntax(
+			int value
+		) {
 			Span<byte> buffer =
 				stackalloc byte[ 11 ];
 			if (

@@ -181,11 +181,19 @@ ancestry nor cancellation tombstones. Compact output has no trailing whitespace;
 the optional indented form uses LF and two spaces. Both forms enforce the exact
 final UTF-8 byte count and the default safe JSON escaping policy.
 
-Comparison and plan rendering remain deferred to MI03, catalog rendering to
-MI04, and MI04 publishes the complete version-1 JSON Schema. Once a payload
-field is published under version 1, its meaning and value kind shall not be
-repurposed. A breaking schema change requires a new schema version and
-identifier.
+MI03 makes `comparison` and `sourcePlan` payloads operational. Comparison JSON
+retains the existing difference order, exact difference kind, capability
+identity, typed values, and source-aware entry, field, index, and span evidence.
+Each left/right side uses a stable shape with explicit null for evidence which
+is absent by semantic design. Plan JSON retains ordered selected parent names,
+generated LF source, every frozen score component, selected candidate indices,
+evaluated-plan count, `isExhaustive`, and accepted candidate count. Rendering is
+a direct projection and does not recompute comparison or planning semantics.
+
+Catalog rendering remains deferred to MI04, when the complete version-1 JSON
+Schema is published. Once a payload field is published under version 1, its
+meaning and value kind shall not be repurposed. A breaking schema change requires
+a new schema version and identifier.
 
 Existing human-readable commands and the frozen 1.7 synthesis and 1.8 planning
 semantics remain unchanged. Later 1.9 command JSON modes must produce exactly one

@@ -22,6 +22,38 @@ bounded search, cancellation evidence, and explicit catalog semantics are
 recorded in `docs/1.8.0-RELEASE-AUDIT.md`. Stable 1.8.0 promotes the validated
 Alpha-8 surface without changing planning or synthesis semantics.
 
+## 1.9 MI03 comparison and planning evidence JSON
+
+`1.9.0-Alpha-3` makes the existing comparison and source-plan renderer
+overloads operational without adding public API. Comparison documents preserve
+the existing deterministic difference order and expose exact kind strings,
+capability identity, typed side values, and retained source entry, field, index,
+and span evidence.
+
+```csharp
+TermInfoComparisonResult comparison =
+	TerminalDescriptionComparer.Compare( left, right );
+string comparisonJson =
+	TermInfoJsonRenderer.Render( comparison );
+
+TerminalDescriptionSourcePlan plan =
+	TerminalDescriptionSourcePlanner.Plan( target, candidates );
+string planJson =
+	TermInfoJsonRenderer.Render( plan );
+```
+
+Each comparison side has one stable shape. Inapplicable text, aliases,
+capability values, source entries, indices, fields, and spans are explicit JSON
+null. Source-field summaries retain classification, canonical identity, decoded
+value, lexical text, and span without recursively embedding unrelated fields.
+
+Plan documents retain selected parent count and ordered `UseName` values,
+generated LF source, all score components, selected candidate indices,
+evaluated-plan count, `isExhaustive`, and accepted candidate count. Rendering
+reports the supplied immutable result and does not recompute a comparison or
+rerun planning. Catalog payloads remain owned by MI04. See
+`docs/1.9.0-MI03-COMPARISON-AND-PLANNING-EVIDENCE-JSON.md`.
+
 ## 1.9 MI02 effective-description JSON
 
 `1.9.0-Alpha-2` makes `TermInfoJsonRenderer.Render(TerminalDescription)`
@@ -47,8 +79,8 @@ order. Extended capabilities are grouped by Boolean, number, and string kind,
 then ordered by exact ordinal name. Compact output is canonical; indented output
 uses LF, two spaces, and no trailing line terminator. The bound is applied to the
 exact final UTF-8 byte count, and control characters use the default safe JSON
-escaping policy. Comparison and planning payloads remain owned by MI03; catalog
-payloads remain owned by MI04. See
+escaping policy. MI03 has since activated comparison and planning payloads;
+catalog payloads remain owned by MI04. See
 `docs/1.9.0-MI02-EFFECTIVE-DESCRIPTION-JSON.md`.
 
 ## 1.9 MI01 machine-readable renderer foundation
@@ -72,9 +104,9 @@ schema version `1`. The renderer has typed entry points for
 `TerminalDescriptionSourcePlan`, and `TermInfoDatabaseCatalog`.
 
 MI01 validated arguments, bounds, and pre-cancellation, then deliberately threw
-`NotSupportedException` for all payloads. MI02 has since activated description
-rendering; comparison and plan rendering remain deferred to MI03, and catalog
-rendering to MI04. See
+`NotSupportedException` for all payloads. MI02 activated description rendering,
+MI03 activated comparison and plan rendering, and catalog rendering remains
+deferred to MI04. See
 `docs/1.9.0-MI01-JSON-CONTRACT-AND-RENDERER-FOUNDATION.md`.
 
 ## 1.8 RP07 generated-state oracle and hardening

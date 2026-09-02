@@ -303,7 +303,7 @@ public sealed class MI02TerminalDescriptionJsonTests {
 	}
 
 	[Fact]
-	public void Mi02KeepsLaterPayloadsDeferredAndPublicSurfaceStable() {
+	public void Mi02SurfaceRemainsStableAsLaterPayloadsBecomeOperational() {
 		TerminalDescription description =
 			CreateFixtureDescription();
 		TermInfoComparisonResult comparison =
@@ -325,17 +325,13 @@ public sealed class MI02TerminalDescriptionJsonTests {
 			);
 
 		Assert.Contains(
-			"MI03",
-			Assert.Throws<NotSupportedException>(
-				() => TermInfoJsonRenderer.Render( comparison )
-			).Message,
+			"comparison",
+			TermInfoJsonRenderer.Render( comparison ),
 			StringComparison.Ordinal
 		);
 		Assert.Contains(
-			"MI03",
-			Assert.Throws<NotSupportedException>(
-				() => TermInfoJsonRenderer.Render( plan )
-			).Message,
+			"sourcePlan",
+			TermInfoJsonRenderer.Render( plan ),
 			StringComparison.Ordinal
 		);
 		Assert.Contains(

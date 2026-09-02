@@ -84,8 +84,9 @@ public static partial class TermInfoJsonRenderer {
 	/// <exception cref="ArgumentNullException">
 	/// <paramref name="comparison"/> is <see langword="null"/>.
 	/// </exception>
-	/// <exception cref="NotSupportedException">
-	/// Comparison JSON rendering begins in MI03.
+	/// <exception cref="InvalidOperationException">
+	/// The comparison contains text which JSON cannot represent, or the rendered
+	/// UTF-8 document exceeds the configured output bound.
 	/// </exception>
 	public static string Render(
 		TermInfoComparisonResult comparison
@@ -113,8 +114,9 @@ public static partial class TermInfoJsonRenderer {
 	/// <exception cref="OperationCanceledException">
 	/// <paramref name="cancellationToken"/> is canceled.
 	/// </exception>
-	/// <exception cref="NotSupportedException">
-	/// Comparison JSON rendering begins in MI03.
+	/// <exception cref="InvalidOperationException">
+	/// The comparison contains text which JSON cannot represent, or the rendered
+	/// UTF-8 document exceeds the configured output bound.
 	/// </exception>
 	public static string Render(
 		TermInfoComparisonResult comparison,
@@ -125,8 +127,10 @@ public static partial class TermInfoJsonRenderer {
 		ArgumentNullException.ThrowIfNull( options );
 		cancellationToken.ThrowIfCancellationRequested();
 
-		throw new NotSupportedException(
-			"Structured comparison JSON rendering begins in MI03."
+		return RenderComparison(
+			comparison,
+			options,
+			cancellationToken
 		);
 	}
 
@@ -139,8 +143,9 @@ public static partial class TermInfoJsonRenderer {
 	/// <exception cref="ArgumentNullException">
 	/// <paramref name="plan"/> is <see langword="null"/>.
 	/// </exception>
-	/// <exception cref="NotSupportedException">
-	/// Planning-result JSON rendering begins in MI03.
+	/// <exception cref="InvalidOperationException">
+	/// The plan contains text which JSON cannot represent, or the rendered UTF-8
+	/// document exceeds the configured output bound.
 	/// </exception>
 	public static string Render(
 		TerminalDescriptionSourcePlan plan
@@ -168,8 +173,9 @@ public static partial class TermInfoJsonRenderer {
 	/// <exception cref="OperationCanceledException">
 	/// <paramref name="cancellationToken"/> is canceled.
 	/// </exception>
-	/// <exception cref="NotSupportedException">
-	/// Planning-result JSON rendering begins in MI03.
+	/// <exception cref="InvalidOperationException">
+	/// The plan contains text which JSON cannot represent, or the rendered UTF-8
+	/// document exceeds the configured output bound.
 	/// </exception>
 	public static string Render(
 		TerminalDescriptionSourcePlan plan,
@@ -180,8 +186,10 @@ public static partial class TermInfoJsonRenderer {
 		ArgumentNullException.ThrowIfNull( options );
 		cancellationToken.ThrowIfCancellationRequested();
 
-		throw new NotSupportedException(
-			"Relative-source planning-result JSON rendering begins in MI03."
+		return RenderSourcePlan(
+			plan,
+			options,
+			cancellationToken
 		);
 	}
 

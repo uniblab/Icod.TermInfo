@@ -596,6 +596,78 @@ Require(
 		&& sourceComparison.Differences[ 0 ].RightSourceField is not null,
 	"The I05 source-aware comparer did not report the local numeric difference."
 );
+string comparisonJson =
+	TermInfoJsonRenderer.Render(
+		sourceComparison,
+		jsonOptions
+	);
+using JsonDocument comparisonJsonDocument =
+	JsonDocument.Parse( comparisonJson );
+JsonElement comparisonJsonRoot = comparisonJsonDocument.RootElement;
+JsonElement comparisonJsonData = comparisonJsonRoot.GetProperty( "data" );
+JsonElement comparisonJsonDifference =
+	comparisonJsonData
+		.GetProperty( "differences" )
+		.EnumerateArray()
+		.Single();
+Require(
+	comparisonJsonRoot.GetProperty( "documentKind" ).GetString()
+		== "comparison"
+		&& !comparisonJsonData.GetProperty( "areEqual" ).GetBoolean()
+		&& comparisonJsonDifference.GetProperty( "kind" ).GetString()
+			== "sourceFieldValue"
+		&& comparisonJsonDifference
+			.GetProperty( "left" )
+			.GetProperty( "sourceField" )
+			.GetProperty( "numericValue" )
+			.GetInt32() == 80
+		&& comparisonJsonDifference
+			.GetProperty( "right" )
+			.GetProperty( "sourceField" )
+			.GetProperty( "numericValue" )
+			.GetInt32() == 132,
+	"The MI03 package renderer did not preserve source-aware comparison evidence."
+);
+string planJson =
+	TermInfoJsonRenderer.Render(
+		planned,
+		jsonOptions
+	);
+using JsonDocument planJsonDocument =
+	JsonDocument.Parse( planJson );
+JsonElement planJsonRoot = planJsonDocument.RootElement;
+JsonElement planJsonData = planJsonRoot.GetProperty( "data" );
+JsonElement planJsonScore = planJsonData.GetProperty( "score" );
+Require(
+	planJsonRoot.GetProperty( "documentKind" ).GetString() == "sourcePlan"
+		&& planJsonData.GetProperty( "selectedParentCount" ).GetInt32() == 1
+		&& planJsonData
+			.GetProperty( "selectedParentUseNames" )
+			.EnumerateArray()
+			.Single()
+			.GetString() == synthesisAliasParent.UseName
+		&& planJsonData.GetProperty( "source" ).GetString() == planned.Source
+		&& planJsonScore.GetProperty( "localDirectiveCount" ).GetInt32()
+			== planned.Score.LocalDirectiveCount
+		&& planJsonScore.GetProperty( "cancellationCount" ).GetInt32()
+			== planned.Score.CancellationCount
+		&& planJsonScore.GetProperty( "parentCount" ).GetInt32()
+			== planned.Score.ParentCount
+		&& planJsonScore.GetProperty( "renderedUtf8ByteCount" ).GetInt32()
+			== planned.Score.RenderedUtf8ByteCount
+		&& planJsonScore
+			.GetProperty( "selectedCandidateIndices" )
+			.EnumerateArray()
+			.Single()
+			.GetInt32() == 0
+		&& planJsonData.GetProperty( "evaluatedPlanCount" ).GetInt32()
+			== planned.EvaluatedPlanCount
+		&& planJsonData.GetProperty( "isExhaustive" ).GetBoolean()
+			== planned.IsExhaustive
+		&& planJsonData.GetProperty( "candidateCount" ).GetInt32()
+			== planned.CandidateCount,
+	"The MI03 package renderer did not preserve source-plan selection and search evidence."
+);
 
 InMemoryTerminalDescriptionProvider provider =
 	new(
@@ -637,5 +709,5 @@ Require(
 );
 
 Console.WriteLine(
-	"Icod.TermInfo.Inspection 1.9.0-Alpha-2 package smoke test passed."
+	"Icod.TermInfo.Inspection 1.9.0-Alpha-3 package smoke test passed."
 );

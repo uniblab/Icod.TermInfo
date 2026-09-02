@@ -279,6 +279,15 @@ bounds, and deterministic cancellation boundaries. Comparison and planning
 rendering remain deferred to MI03, and catalog rendering remains deferred to
 MI04. Historical MI01 records retain their Alpha-1 version.
 
+MI03 advances the coordinated development version to `1.9.0-Alpha-3` without
+adding public API. It makes the existing comparison and source-plan renderer
+overloads operational, freezing typed side values, source-aware evidence,
+ordered parent names, generated source, planning-score components, candidate
+indices, evaluation counts, completeness evidence, deterministic formatting,
+exact UTF-8 bounds, and cancellation. Catalog rendering remains deferred to
+MI04. Historical MI01 and MI02 records retain their original development
+versions.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:

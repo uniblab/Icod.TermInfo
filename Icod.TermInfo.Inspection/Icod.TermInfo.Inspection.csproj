@@ -22,7 +22,7 @@
 		<Title>Icod.TermInfo.Inspection</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed inspection and semantic-comparison foundation for Icod.TermInfo. The 1.3 line provides canonical terminfo rendering and reusable infocmp-style comparison engines without enlarging the frozen Runtime, Source, or Compiler public contracts.</Description>
-		<PackageReleaseNotes>1.9.0-Alpha-2 makes deterministic bounded effective-description JSON operational with exact identity, typed capabilities, frozen ordering and escaping, compact and LF-indented forms, exact UTF-8 limits, and cancellation while preserving the reviewed public surface and lower-layer contracts.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.9.0-Alpha-3 makes deterministic bounded comparison and source-plan JSON operational with ordered semantic differences, typed side values, source entry/field/span evidence, selected parents, generated source, score components, and search evidence while preserving the reviewed public surface and lower-layer contracts.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>

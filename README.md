@@ -398,8 +398,8 @@ the result reports whether the configured search space was exhausted.
 ## 1.9 development line
 
 Version 1.9 develops deterministic machine-readable Inspection output and
-explicit planning automation. MI02 makes effective-description JSON operational
-through the immutable bounded policy and strongly typed renderer foundation:
+explicit planning automation. MI03 makes comparison and relative-source plan
+evidence operational alongside the MI02 effective-description payload:
 
 ```csharp
 using Icod.TermInfo;
@@ -411,19 +411,27 @@ TermInfoJsonRendererOptions jsonOptions =
 		writeIndented: true
 	);
 
-string json =
+TerminalDescription terminal =
+	TerminalDatabase.BuiltIn.Load( "xterm-256color" );
+string descriptionJson =
 	TermInfoJsonRenderer.Render(
-		TerminalDatabase.BuiltIn.Load( "xterm-256color" ),
+		terminal,
 		jsonOptions
 	);
+
+TermInfoComparisonResult comparison =
+	TerminalDescriptionComparer.Compare( terminal, terminal );
+string comparisonJson =
+	TermInfoJsonRenderer.Render( comparison, jsonOptions );
 ```
 
 The version-1 schema identifier is
-`urn:icod:terminfo:inspection:json:1`. MI02 emits identity plus typed standard
-and extended Boolean, numeric, and string capability arrays in deterministic
-order. Missing descriptions are JSON null, aliases retain their immutable order,
-and the reusable result has no trailing line terminator. Comparison and planning
-evidence remain deferred to MI03, and explicit database manifests to MI04.
+`urn:icod:terminfo:inspection:json:1`. MI03 preserves ordered effective and
+source-aware differences, typed left/right values, retained source entry, field,
+index, and span evidence, and explicit nulls. Plan JSON preserves selected
+parent names, generated LF source, every score component, selected candidate
+indices, evaluation count, exhaustive status, and candidate count. Explicit
+database manifests remain deferred to MI04.
 
 Later 1.9 tranches compose the reusable renderer through `infocmp` and `toe` and
 add all-candidates planning only for an explicit caller-selected database
@@ -431,8 +439,8 @@ directory. The frozen 1.7 synthesis and 1.8 planning contracts remain unchanged.
 
 See
 `Icod.TermInfo-1.9.0-Machine-Readable-Inspection-and-Planning-Automation-Roadmap.md`
-and `docs/1.9.0-MI02-EFFECTIVE-DESCRIPTION-JSON.md` for the current operational
-contract.
+and `docs/1.9.0-MI03-COMPARISON-AND-PLANNING-EVIDENCE-JSON.md` for the current
+operational contract.
 
 ## Getting started
 
