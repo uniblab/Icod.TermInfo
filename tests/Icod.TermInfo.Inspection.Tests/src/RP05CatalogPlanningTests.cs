@@ -166,10 +166,12 @@ public sealed class RP05CatalogPlanningTests {
 		string root = CreateTemporaryDirectory();
 		TerminalDescription first =
 			new TerminalDescriptionBuilder( "rp05-conflict" )
+				.SetDescription( "RP05 conflicting Boolean entry" )
 				.SetBoolean( BooleanCapability.AutoRightMargin )
 				.Build();
 		TerminalDescription second =
 			new TerminalDescriptionBuilder( "rp05-conflict" )
+				.SetDescription( "RP05 conflicting numeric entry" )
 				.SetNumber( NumericCapability.Columns, 80 )
 				.Build();
 
