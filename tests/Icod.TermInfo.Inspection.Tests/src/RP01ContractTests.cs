@@ -2,6 +2,7 @@ using Icod.TermInfo;
 using Icod.TermInfo.Inspection;
 using Icod.TermInfo.Source;
 using System.Security.Cryptography;
+using System.Text;
 using Xunit;
 
 namespace Icod.TermInfo.Inspection.Tests;
@@ -391,9 +392,25 @@ public sealed class RP01ContractTests {
 					"1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt"
 				)
 			);
+		string normalizedBaseline =
+			Encoding.UTF8
+				.GetString( baseline )
+				.Replace(
+					"\r\n",
+					"\n",
+					StringComparison.Ordinal
+				)
+				.Replace(
+					'\r',
+					'\n'
+				);
 		Assert.Equal(
 			"ba87cb17abe4d2c2a89851b3f9205f95bfd1116022e8b46d2883941c378f5811",
-			Convert.ToHexString( SHA256.HashData( baseline ) ).ToLowerInvariant()
+			Convert.ToHexString(
+				SHA256.HashData(
+					Encoding.UTF8.GetBytes( normalizedBaseline )
+				)
+			).ToLowerInvariant()
 		);
 	}
 
