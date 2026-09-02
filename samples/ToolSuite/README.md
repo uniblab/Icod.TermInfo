@@ -10,6 +10,9 @@ The commands below use the standalone release-archive launchers. When
 with `icod-terminfo`, for example `icod-terminfo tic -c -x example.ti`. Run them
 from this directory, or adjust the paths as appropriate.
 
+MI07 adds no command form. It freezes the controlled direct and routed examples
+for all four version-1 JSON document kinds as stable 1.9 release evidence.
+
 ## Terminfo source
 
 `example.ti` defines three entries:

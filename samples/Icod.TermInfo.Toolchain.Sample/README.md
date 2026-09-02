@@ -3,6 +3,10 @@
 This sample demonstrates the reusable managed toolchain without invoking
 `tic`, `infocmp`, `toe`, or the `icod-terminfo` router.
 
+MI07 freezes this sample's exact `sourcePlan` fixture and the release verifier's
+two-process byte-equality check. The Alpha-7 to stable 1.9 transition changes no
+sample step or JSON byte.
+
 It composes:
 
 ```text

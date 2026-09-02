@@ -9,9 +9,9 @@ values continue to reference `Icod.TermInfo` alone.
 
 ## 1.9 development status
 
-Version `1.9.0-Alpha-6` preserves the frozen Source 1.1 API, semantics,
-Runtime-only dependency, and assembly identity. MI06 consumes Source only in
-the Toolchain JSON sample; Source adds no Inspection or JSON dependency.
+Version `1.9.0-Alpha-7` preserves the frozen Source 1.1 API, semantics,
+Runtime-only dependency, and assembly identity. MI07 freezes the complete 1.9
+release contract; Source adds no Inspection or JSON dependency.
 
 ## 1.8 release status
 

@@ -398,8 +398,10 @@ the result reports whether the configured search space was exhausted.
 ## 1.9 development line
 
 Version 1.9 develops deterministic machine-readable Inspection output and
-explicit planning automation. MI06 hardens the complete reusable and command
-surface after MI04 completed the renderer and MI05 composed commands. The
+explicit planning automation. `1.9.0-Alpha-7` is the complete stable-intended
+release candidate: MI07 freezes the exact API, schema, command, package, sample,
+fixture, router, and archive contract after MI06 hardened the reusable and
+command surface. The
 reusable renderer includes database-catalog manifests, and the package publishes
 the complete version-1 schema alongside the MI02 effective-description and MI03
 comparison and plan payloads:
@@ -453,10 +455,17 @@ plus six-archive smoke. Culture, separate-process, large/pathological-input,
 exact UTF-8 boundary, and Windows/Linux/macOS evidence remain release gates. The
 frozen 1.7 synthesis and 1.8 planning contracts remain unchanged.
 
+MI07 adds no feature behavior. The complete 31-type Inspection surface is
+frozen in `docs/1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt`; the version-1 schema,
+package graph, direct and routed commands, six-archive topology, samples,
+fixtures, and release verification are frozen in
+`docs/1.9.0-RELEASE-AUDIT.md`. After the exact Alpha-7 commit passes every
+Windows, Linux, and macOS gate, the transition to stable 1.9.0 is version-only.
+
 See
-`Icod.TermInfo-1.9.0-Machine-Readable-Inspection-and-Planning-Automation-Roadmap.md`
-and `docs/1.9.0-MI06-SAMPLES-PACKAGE-CONSUMERS-AND-CROSS-HOST-HARDENING.md` for the
-current operational contract.
+`Icod.TermInfo-1.9.0-Machine-Readable-Inspection-and-Planning-Automation-Roadmap.md`,
+`docs/1.9.0-MI07-API-SCHEMA-PACKAGING-AND-RELEASE-CLOSURE.md`, and
+`docs/1.9.0-RELEASE-AUDIT.md` for the current release contract.
 
 ## Getting started
 

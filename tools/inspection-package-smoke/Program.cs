@@ -66,7 +66,7 @@ Require(
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesisOptions ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesisParent ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesizer ) ),
-	"The Inspection package did not expose exactly the reviewed MI01 public surface."
+	"The Inspection package did not expose exactly the frozen 1.9 public surface."
 );
 
 Require(
@@ -795,5 +795,5 @@ Require(
 );
 
 Console.WriteLine(
-	"Icod.TermInfo.Inspection 1.9.0-Alpha-6 package smoke test passed."
+	"Icod.TermInfo.Inspection 1.9.0-Alpha-7 package smoke test passed."
 );

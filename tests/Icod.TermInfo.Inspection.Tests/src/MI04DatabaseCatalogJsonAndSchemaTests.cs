@@ -435,7 +435,7 @@ public sealed class MI04DatabaseCatalogJsonAndSchemaTests {
 		) {
 			Assert.Contains( marker, implementation, StringComparison.Ordinal );
 		}
-		Assert.Contains( "**Status:** MI06 complete", roadmap, StringComparison.Ordinal );
+		Assert.Contains( "**Status:** MI07 complete", roadmap, StringComparison.Ordinal );
 		Assert.Contains(
 			"## MI04 - Database Catalog Manifests and JSON Schema",
 			roadmap,

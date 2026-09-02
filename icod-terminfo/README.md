@@ -7,7 +7,7 @@ The tool targets `net10.0` and therefore requires a .NET 10 runtime.
 
 ## 1.9 JSON automation
 
-Version `1.9.0-Alpha-6` routes the same machine-readable command contracts as
+Version `1.9.0-Alpha-7` freezes the same machine-readable command contracts as
 the standalone commands:
 
 ```text
@@ -22,9 +22,9 @@ The router adds no JSON or planning semantics. It forwards arguments, streams,
 cancellation, diagnostics, and exit status, so routed and direct output is
 byte-for-byte identical.
 
-MI06 retains that dispatch contract and exercises it through a fresh installed
-tool package plus every matching standalone archive on Windows, Linux, and
-macOS.
+MI07 adds no router behavior. It freezes that dispatch contract, fresh installed
+tool-package evidence, and every matching standalone archive on Windows, Linux,
+and macOS as part of the complete 1.9 release gate.
 
 ## 1.8 release status
 

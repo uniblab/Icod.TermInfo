@@ -5,43 +5,39 @@ using Xunit;
 
 namespace Icod.TermInfo.Inspection.Tests;
 
-public sealed class RP08ReleaseClosureTests {
+public sealed class MI07ReleaseClosureTests {
 	private const string DevelopmentVersion = "1.9.0-Alpha-7";
-	private const string HistoricalDevelopmentVersion = "1.8.0-Alpha-8";
-	private const string Rp07Head =
-		"a88237d0d2f0ecdf74a7d96f6ff1cb9a2e8e647d";
+	private const string Mi06Head =
+		"1f6560dedc45495132fbf50ef333e3ec5ac2b384";
+	private const string Mi06Run = "33685454683";
 	private const string HistoricalOneSevenBaselineSha256 =
 		"ba87cb17abe4d2c2a89851b3f9205f95bfd1116022e8b46d2883941c378f5811";
+	private const string HistoricalOneEightBaselineSha256 =
+		"12e31674f63ed9483a7261fc7f7214c390df9c6025a78dc8ae83aa3b01ea2bcc";
+	private const string VersionOneSchemaSha256 =
+		"76578f421b254802d24453af6868edaf8c23c4b78a87c7e8ef86b233ff0e8500";
+	private const string OneNineBaselineSha256 =
+		"759e0e256d04c0da53774a80ce178fa3048853bf1c1da778daee547d7883881e";
 
 	[Fact]
-	public void FrozenOneEightPlanningTypesRemainAvailableWithinAdditiveSurface() {
+	public void FrozenOneNineInspectionSurfaceContainsExactlyReviewedTypes() {
 		Type[] exportedTypes =
-			typeof( TerminalDescriptionSourcePlanner )
+			typeof( TermInfoJsonRenderer )
 				.Assembly
 				.GetExportedTypes();
 
-		Assert.True( exportedTypes.Length >= 29 );
-		Assert.Contains(
-			typeof( TerminalDescriptionSourcePlan ),
-			exportedTypes );
-		Assert.Contains(
-			typeof( TerminalDescriptionSourcePlanner ),
-			exportedTypes );
-		Assert.Contains(
-			typeof( TerminalDescriptionSourcePlanningOptions ),
-			exportedTypes );
-		Assert.Contains(
-			typeof( TerminalDescriptionSourcePlanningScore ),
-			exportedTypes );
+		Assert.Equal( 31, exportedTypes.Length );
+		Assert.Contains( typeof( TermInfoJsonRenderer ), exportedTypes );
+		Assert.Contains( typeof( TermInfoJsonRendererOptions ), exportedTypes );
 
 		string baseline =
 			File.ReadAllText(
 				Path.Combine(
 					FindRepositoryRoot(),
 					"docs",
-					"1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt" ) );
+					"1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt" ) );
 		Assert.Equal(
-			29,
+			31,
 			baseline
 				.Split( '\n' )
 				.Count(
@@ -49,46 +45,55 @@ public sealed class RP08ReleaseClosureTests {
 						"TYPE ",
 						StringComparison.Ordinal ) ) );
 		Assert.Contains(
-			"TerminalDescriptionSourcePlanner [static]",
+			"TYPE class Icod.TermInfo.Inspection.TermInfoJsonRenderer [static]",
 			baseline,
 			StringComparison.Ordinal );
 		Assert.Contains(
-			"DefaultMaximumEvaluatedPlanCount",
+			"SchemaIdentifier",
 			baseline,
 			StringComparison.Ordinal );
 		Assert.Contains(
-			"PlanFromDirectory",
+			"MaximumSupportedOutputByteCount",
 			baseline,
 			StringComparison.Ordinal );
 		Assert.Contains(
 			"# AssemblyVersion: 1.0.0.0",
 			baseline,
 			StringComparison.Ordinal );
+		Assert.Equal(
+			OneNineBaselineSha256,
+			ComputeSha256( baseline ) );
 	}
 
-	[Fact]
-	public void OneSevenInspectionBaselineRemainsImmutableHistoricalEvidence() {
-		string baseline =
+	[Theory]
+	[InlineData(
+		"1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt",
+		HistoricalOneSevenBaselineSha256 )]
+	[InlineData(
+		"1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt",
+		HistoricalOneEightBaselineSha256 )]
+	[InlineData(
+		"Icod.TermInfo.Inspection.schema.json",
+		VersionOneSchemaSha256 )]
+	public void FrozenHistoricalManifestsAndVersionOneSchemaRemainExact(
+		string fileName,
+		string expectedSha256
+	) {
+		string contents =
 			File.ReadAllText(
 				Path.Combine(
 					FindRepositoryRoot(),
 					"docs",
-					"1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt" ) )
+					fileName ) )
 				.Replace( "\r\n", "\n", StringComparison.Ordinal )
 				.Replace( '\r', '\n' );
-		string sha256 =
-			Convert.ToHexString(
-				SHA256.HashData(
-					Encoding.UTF8.GetBytes( baseline ) )
-			).ToLowerInvariant();
+		string sha256 = ComputeSha256( contents );
 
-		Assert.Equal(
-			HistoricalOneSevenBaselineSha256,
-			sha256 );
+		Assert.Equal( expectedSha256, sha256 );
 	}
 
 	[Fact]
-	public void ReleaseVerifiersRetainHistoricalOneEightEvidenceDuringDevelopment() {
+	public void ReleaseVerifiersRequireExactOneNineInspectionBaseline() {
 		string root = FindRepositoryRoot();
 		foreach (
 			string relativePath
@@ -110,19 +115,11 @@ public sealed class RP08ReleaseClosureTests {
 						relativePath ) );
 
 			Assert.Contains(
-				"1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt",
+				"1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt",
 				verifier,
 				StringComparison.OrdinalIgnoreCase );
 			Assert.Contains(
-				"1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt",
-				verifier,
-				StringComparison.OrdinalIgnoreCase );
-			Assert.Contains(
-				"MI07",
-				verifier,
-				StringComparison.Ordinal );
-			Assert.Contains(
-				"--compare",
+				"--check",
 				verifier,
 				StringComparison.Ordinal );
 			Assert.Contains(
@@ -133,43 +130,32 @@ public sealed class RP08ReleaseClosureTests {
 	}
 
 	[Fact]
-	public void ImplementationRecordFreezesScoreBoundsCompletenessAndPublicationAuthority() {
+	public void ClosureRecordsFreezeSchemaCommandsPackagesArchivesAndAuthority() {
+		string root = FindRepositoryRoot();
 		string record =
 			File.ReadAllText(
 				Path.Combine(
-					FindRepositoryRoot(),
+					root,
 					"docs",
-					"1.8.0-RP08-API-PACKAGING-AND-RELEASE-CLOSURE.md" ) );
-
-		Assert.Contains(
-			HistoricalDevelopmentVersion,
-			record,
-			StringComparison.Ordinal );
-		Assert.Contains( Rp07Head, record, StringComparison.Ordinal );
-		Assert.Contains( "LocalDirectiveCount", record, StringComparison.Ordinal );
-		Assert.Contains( "SelectedCandidateIndices", record, StringComparison.Ordinal );
-		Assert.Contains( "4,097", record, StringComparison.Ordinal );
-		Assert.Contains( "1,000,000", record, StringComparison.Ordinal );
-		Assert.Contains( "IsExhaustive == false", record, StringComparison.Ordinal );
-		Assert.Contains( "version-only", record, StringComparison.Ordinal );
-		Assert.Contains( "repository owner", record, StringComparison.OrdinalIgnoreCase );
-	}
-
-	[Fact]
-	public void ReleaseAuditClosesApiPackagesCommandsArchivesAndSamples() {
+					"1.9.0-MI07-API-SCHEMA-PACKAGING-AND-RELEASE-CLOSURE.md" ) );
 		string audit =
 			File.ReadAllText(
 				Path.Combine(
-					FindRepositoryRoot(),
+					root,
 					"docs",
-					"1.8.0-RELEASE-AUDIT.md" ) );
+					"1.9.0-RELEASE-AUDIT.md" ) );
 
 		foreach (
 			string marker
 			in new[] {
-				"1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt",
-				"AssemblyVersion 1.0.0.0",
-				"infocmp --plan-use",
+				DevelopmentVersion,
+				Mi06Head,
+				Mi06Run,
+				"31 exported types",
+				"urn:icod:terminfo:inspection:json:1",
+				VersionOneSchemaSha256,
+				"infocmp --json",
+				"toe --json",
 				"Icod.TermInfo.Tools",
 				"win-x64",
 				"win-arm64",
@@ -177,11 +163,26 @@ public sealed class RP08ReleaseClosureTests {
 				"linux-arm64",
 				"osx-x64",
 				"osx-arm64",
+				"version-only",
+				"repository owner",
+			}
+		) {
+			Assert.Contains(
+				marker,
+				record,
+				StringComparison.OrdinalIgnoreCase );
+		}
+
+		foreach (
+			string marker
+			in new[] {
+				"1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt",
+				"assembly version `1.0.0.0`",
+				"sourcePlan",
+				"databaseCatalog",
 				"Toolchain",
-				"v1.8.0",
+				"v1.9.0",
 				"pending owner publication",
-				"fc75edf470eefc1b3f367d268dd0618f5f03e38e",
-				"33603732871",
 			}
 		) {
 			Assert.Contains(
@@ -192,7 +193,7 @@ public sealed class RP08ReleaseClosureTests {
 	}
 
 	[Fact]
-	public void CoordinatedMetadataPreservesStableClosureAndIdentifiesMi01() {
+	public void CoordinatedMetadataIdentifiesFinalPrereleaseAndCompletedTranche() {
 		string root = FindRepositoryRoot();
 		string buildProperties =
 			File.ReadAllText(
@@ -203,7 +204,7 @@ public sealed class RP08ReleaseClosureTests {
 			File.ReadAllText(
 				Path.Combine(
 					root,
-					"Icod.TermInfo-1.8.0-Relative-Source-Planning-and-Parent-Selection-Roadmap.md" ) );
+					"Icod.TermInfo-1.9.0-Machine-Readable-Inspection-and-Planning-Automation-Roadmap.md" ) );
 		string activeRoadmap =
 			File.ReadAllText(
 				Path.Combine(
@@ -215,13 +216,13 @@ public sealed class RP08ReleaseClosureTests {
 			buildProperties,
 			StringComparison.Ordinal );
 		Assert.Contains(
-			"Stable 1.8.0 release contract frozen",
+			"MI07 complete",
 			roadmap,
 			StringComparison.Ordinal );
 		Assert.Contains(
-			"MI01",
+			"stable-intended release contract complete",
 			activeRoadmap,
-			StringComparison.Ordinal );
+			StringComparison.OrdinalIgnoreCase );
 	}
 
 	private static string FindRepositoryRoot() {
@@ -244,4 +245,15 @@ public sealed class RP08ReleaseClosureTests {
 		throw new InvalidOperationException(
 			"Repository root not found." );
 	}
+
+	private static string ComputeSha256(
+		string contents
+	) =>
+		Convert.ToHexString(
+			SHA256.HashData(
+				Encoding.UTF8.GetBytes(
+					contents
+						.Replace( "\r\n", "\n", StringComparison.Ordinal )
+						.Replace( '\r', '\n' ) ) )
+		).ToLowerInvariant();
 }

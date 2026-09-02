@@ -10,9 +10,10 @@ the TC07 conversion-command composition.
 
 ## 1.9 development status
 
-Version `1.9.0-Alpha-6` preserves the frozen Termcap 1.6 API, semantics,
-Runtime-only dependency, and assembly identity. Machine-readable Inspection and
-planning remain outside the Termcap package.
+Version `1.9.0-Alpha-7` preserves the frozen Termcap 1.6 API, semantics,
+Runtime-only dependency, and assembly identity. MI07 freezes the complete 1.9
+release contract; machine-readable Inspection and planning remain outside the
+Termcap package.
 
 ## 1.8 release status
 

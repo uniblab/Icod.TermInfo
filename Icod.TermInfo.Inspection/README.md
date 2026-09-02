@@ -3,6 +3,21 @@
 `Icod.TermInfo.Inspection` is the optional managed inspection and semantic-
 comparison layer for the `Icod.TermInfo` package family.
 
+## 1.9 MI07 API, schema, packaging, and release closure
+
+`1.9.0-Alpha-7` adds no feature behavior. It freezes the complete 31-type
+Inspection surface in `docs/1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt`, freezes
+the complete version-1 JSON Schema and its packaged copy, and makes the command,
+package-consumer, sample, fixture, router, and six-archive evidence part of the
+stable 1.9 release gate.
+
+The only public types added after 1.8 are `TermInfoJsonRenderer` and
+`TermInfoJsonRendererOptions`. The four document kinds, schema identifier,
+deterministic compact and indented representations, exact UTF-8 bounds, and
+cancellation behavior are stable-intended. After the exact Alpha-7 commit
+passes every Windows, Linux, and macOS gate, the transition to 1.9.0 is
+version-only. See `docs/1.9.0-RELEASE-AUDIT.md`.
+
 ## 1.9 MI06 consumer and cross-host hardening
 
 `1.9.0-Alpha-6` leaves the MI04 public API, version-1 JSON Schema, and MI05

@@ -217,6 +217,12 @@ inputs, exact UTF-8 boundaries, and tool-package/archive smoke require the same
 JSON bytes and meanings across `net8.0`, `net9.0`, `net10.0`, Windows, Linux,
 macOS, and representative non-default cultures.
 
+MI07 adds no feature behavior. It freezes the exact 31-type Inspection public
+surface, the version-1 JSON Schema fingerprint, existing command semantics,
+package dependency graph, sample and fixture evidence, and router/archive
+topology. The transition from a green `1.9.0-Alpha-7` gate to stable `1.9.0` is
+version-only.
+
 ## Runtime terminfo semantic compatibility
 
 The stable runtime responsibility includes:

@@ -22,7 +22,7 @@
 		<Title>Icod.TermInfo.Inspection</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed inspection and semantic-comparison foundation for Icod.TermInfo. The 1.3 line provides canonical terminfo rendering and reusable infocmp-style comparison engines without enlarging the frozen Runtime, Source, or Compiler public contracts.</Description>
-		<PackageReleaseNotes>1.9.0-Alpha-6 hardens the unchanged deterministic JSON API and schema through package-reference-only consumers, JSON-producing samples, exact fixtures, culture/process/host repetition, pathological input, and UTF-8 boundary validation while preserving all lower-layer contracts.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.9.0-Alpha-7 freezes the exact 31-type Inspection API, version-1 JSON Schema, command semantics, package graph, samples, fixtures, router/archive topology, and release evidence while preserving all lower-layer contracts.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>

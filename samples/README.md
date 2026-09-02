@@ -10,6 +10,10 @@ compile, publish, reacquire, compare, and JSON-render path as cross-host release
 evidence. ToolSuite demonstrates the coordinated five-command suite: `tic`,
 `infocmp`, `toe`, `captoinfo`, and `infotocap`.
 
+MI07 adds no sample behavior. It freezes the Toolchain fixture, repeated-process
+JSON equality, and direct/routed ToolSuite commands as stable 1.9 release
+evidence.
+
 All three executable API sample projects target `net8.0`, `net9.0`, and
 `net10.0`. Every
 `dotnet run` example therefore specifies a framework; substitute `-f net8.0` or

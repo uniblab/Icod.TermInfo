@@ -4,7 +4,7 @@ using Xunit;
 namespace Icod.TermInfo.Termcap.Tests;
 
 public sealed class TC08ContractTests {
-	private const string CurrentDevelopmentVersion = "1.9.0-Alpha-6";
+	private const string CurrentDevelopmentVersion = "1.9.0-Alpha-7";
 	private const string HistoricalTc08Version = "1.6.0-Alpha-8";
 	private const string HistoricalTc07Version = "1.6.0-Alpha-7";
 	private const string TermcapApiSnapshotSha256 =

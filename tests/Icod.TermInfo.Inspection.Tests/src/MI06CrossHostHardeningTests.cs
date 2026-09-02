@@ -8,7 +8,7 @@ using Xunit;
 namespace Icod.TermInfo.Inspection.Tests;
 
 public sealed class MI06CrossHostHardeningTests {
-	private const string DevelopmentVersion = "1.9.0-Alpha-6";
+	private const string DevelopmentVersion = "1.9.0-Alpha-7";
 
 	[Fact]
 	public void LargePathologicalJsonIsCultureInvariantAndExactlyBounded() {
@@ -168,7 +168,7 @@ public sealed class MI06CrossHostHardeningTests {
 		} ) {
 			Assert.Contains( marker, implementation, StringComparison.OrdinalIgnoreCase );
 		}
-		Assert.Contains( "**Status:** MI06 complete", roadmap, StringComparison.Ordinal );
+		Assert.Contains( "**Status:** MI07 complete", roadmap, StringComparison.Ordinal );
 	}
 
 	private static string ReadNormalized(

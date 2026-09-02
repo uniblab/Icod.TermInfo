@@ -13,10 +13,9 @@ ncurses/`tic` differential validation.
 
 ## 1.9 development status
 
-Version `1.9.0-Alpha-6` preserves the frozen Compiler 1.2 API, semantics,
-Runtime-and-Source dependency graph, and assembly identity. MI06 consumes
-Compiler only to prove the Toolchain JSON sample after an exact compiled-state
-round trip; Compiler adds no Inspection or JSON dependency.
+Version `1.9.0-Alpha-7` preserves the frozen Compiler 1.2 API, semantics,
+Runtime-and-Source dependency graph, and assembly identity. MI07 freezes the
+complete 1.9 release contract; Compiler adds no Inspection or JSON dependency.
 
 ## 1.8 release status
 

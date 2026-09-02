@@ -29,7 +29,7 @@
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-		<PackageReleaseNotes>1.9.0-Alpha-6 hardens the unchanged routed JSON automation through installable-package and six-archive smoke, cross-host execution, and exact direct/router evidence while preserving five-command dispatch.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.9.0-Alpha-7 freezes the routed JSON automation, five-command dispatch, installable-package behavior, and six-archive topology as part of the complete 1.9 release contract.</PackageReleaseNotes>
 		<PackageTags>terminfo;termcap;libtinfo;tic;infocmp;toe;captoinfo;infotocap;terminal;tool;dotnet;csharp;icod</PackageTags>
 	</PropertyGroup>
 

@@ -122,11 +122,17 @@ dotnet run \
   Icod.TermInfo.Inspection/bin/${configuration}/net8.0/Icod.TermInfo.Inspection.dll \
   Icod.TermInfo.Inspection/bin/${configuration}/net10.0/Icod.TermInfo.Inspection.dll
 
-# The frozen 1.7 and 1.8 Inspection baselines remain immutable historical evidence:
+# The frozen 1.7 and 1.8 Inspection baselines remain immutable historical
+# evidence. MI07 freezes the complete additive 1.9 JSON surface independently.
 # docs/1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt
 # docs/1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt
-# MI01 begins additive 1.9 development. Cross-framework equality above remains
-# active throughout MI01-MI06; MI07 freezes the complete 1.9 surface.
+dotnet run \
+  --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj \
+  -c "${configuration}" \
+  --no-build \
+  -- --check \
+  docs/1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt \
+  Icod.TermInfo.Inspection/bin/${configuration}/net10.0/Icod.TermInfo.Inspection.dll
 
 # Structural package, Source Link, dependency, and architecture verification.
 dotnet run \

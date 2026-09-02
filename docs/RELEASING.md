@@ -161,8 +161,8 @@ The Bash and CMD entry points perform equivalent validation. They:
 6. require exact Compiler public API equivalence across `net8.0`, `net9.0`, and
    `net10.0` and require `docs/1.2.0-COMPILER-PUBLIC-API-BASELINE.txt` to match;
 7. require exact Inspection public API equivalence across `net8.0`, `net9.0`, and
-   `net10.0` and require `docs/1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt` to match,
-   while retaining the immutable 1.7 manifest as historical evidence;
+   `net10.0` and require `docs/1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt` to match,
+   while retaining the immutable 1.7 and 1.8 manifests as historical evidence;
 8. run the Runtime, Compiler, and Inspection package verifiers for package
    structure, dependency closure, metadata, XML documentation, Source Link, and
    portable symbols;
@@ -203,9 +203,10 @@ frameworks. The Inspection smoke consumer proves the fourth package restores
 with matching Runtime and Source dependencies and exercises the reviewed 1.4
 Inspection public surface, including T02 system database-location inspection and
 T03 conventional database catalog enumeration, without a production Compiler
-dependency. Beginning with 1.8 it also requires the exact 29-type Inspection
-surface and executes direct, explicit catalog, and explicit conventional-root
-planning from packed dependencies.
+dependency. Beginning with 1.9 it requires the exact 31-type Inspection surface,
+renders and parses all four version-1 JSON document kinds, and preserves direct,
+explicit catalog, and explicit conventional-root planning from packed
+dependencies. The package verifier also requires the published JSON Schema.
 
 No checked-in runtime fixture is copied into the smoke project, so those checks
 prove the public package surface rather than repository-only outputs.

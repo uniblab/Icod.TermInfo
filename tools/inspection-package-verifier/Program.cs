@@ -1,5 +1,6 @@
 using System.IO.Compression;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -14,6 +15,8 @@ internal static class Program {
 	private const string CompilerPackageId = "Icod.TermInfo.Compiler";
 	private const string RepositoryUrl = "https://github.com/uniblab/Icod.TermInfo";
 	private const string ExpectedAssemblyVersion = "1.0.0.0";
+	private const string ExpectedJsonSchemaSha256 =
+		"76578f421b254802d24453af6868edaf8c23c4b78a87c7e8ef86b233ff0e8500";
 	private static readonly string[] TargetFrameworks = [
 		"net8.0",
 		"net9.0",
@@ -430,8 +433,26 @@ internal static class Program {
 			) ?? throw new InvalidOperationException(
 				"Inspection package does not contain the published JSON Schema."
 			);
-		using Stream stream = schemaEntry.Open();
-		using JsonDocument document = JsonDocument.Parse( stream );
+		string schema;
+		using ( Stream stream = schemaEntry.Open() )
+		using ( StreamReader reader = new( stream, Encoding.UTF8 ) ) {
+			schema =
+				reader
+					.ReadToEnd()
+					.Replace( "\r\n", "\n", StringComparison.Ordinal )
+					.Replace( '\r', '\n' );
+		}
+		string schemaSha256 =
+			Convert.ToHexString(
+				SHA256.HashData(
+					Encoding.UTF8.GetBytes( schema )
+				)
+			).ToLowerInvariant();
+		Require(
+			schemaSha256 == ExpectedJsonSchemaSha256,
+			$"Inspection package JSON Schema fingerprint '{schemaSha256}' does not match the frozen version-1 fingerprint."
+		);
+		using JsonDocument document = JsonDocument.Parse( schema );
 		JsonElement root = document.RootElement;
 
 		Require(

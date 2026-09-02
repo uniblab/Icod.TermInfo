@@ -313,6 +313,13 @@ hardening. Historical MI01 through MI05 records retain their original
 development versions. MI07 owns final API, schema, packaging, and release
 closure.
 
+MI07 advances the coordinated development version to `1.9.0-Alpha-7` without
+adding feature behavior. It freezes the exact 31-type Inspection API, complete
+version-1 JSON Schema, command semantics, package graph, samples, fixtures,
+router and archive topology, release verifiers, and release audit. Historical
+MI01 through MI06 records retain their original development versions. A green
+Alpha-7 to stable `1.9.0` transition is version-only.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:
@@ -400,13 +407,12 @@ only `TerminalDescriptionSourcePlan`, `TerminalDescriptionSourcePlanner`,
 net8/net9/net10 equivalence and an exact match with the 1.8 manifest. The 1.7
 manifest remains immutable historical evidence and must not be regenerated.
 
-During MI01 through MI06, the 1.8 Inspection manifest remains immutable
-historical evidence rather than an exact manifest for the developing 1.9
-assembly. Validation requires exact Inspection API equality across net8.0,
-net9.0, and net10.0 plus reviewed tranche-specific API and package-smoke tests.
-MI07 creates `docs/1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt` from the reviewed
-stable-intended surface. Alpha-7 and stable 1.9 validation must then match that
-manifest exactly.
+`docs/1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt` is the frozen complete
+Inspection surface for the 1.9 line. It retains the entire 1.8 surface and adds
+only `TermInfoJsonRenderer` and `TermInfoJsonRendererOptions`. Alpha-7 and
+stable 1.9 validation require exact net8/net9/net10 equivalence and an exact
+match with the 1.9 manifest. The 1.7 and 1.8 manifests remain immutable
+historical evidence and must not be regenerated.
 
 The baselines record exported types, public/protected members, enum numeric
 values, parameter names/order/defaults, ref/out/in/params shape, generic
