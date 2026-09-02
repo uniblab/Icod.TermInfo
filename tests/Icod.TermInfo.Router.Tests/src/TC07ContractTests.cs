@@ -150,24 +150,44 @@ public sealed class TC07ContractTests {
 				root,
 				".github/workflows/release.yaml"
 			);
+		string packageOrchestrator =
+			ReadRepositoryFile(
+				root,
+				"packaging/PackPackages.ps1"
+			);
+		string archiveOrchestrator =
+			ReadRepositoryFile(
+				root,
+				"packaging/BuildToolArchives.ps1"
+			);
 
 		Assert.Contains(
 			"Icod.TermInfo.Termcap/Icod.TermInfo.Termcap.csproj",
+			packageOrchestrator,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"build-tool-archives.sh",
+			archiveOrchestrator,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"./packaging/PackPackages.ps1",
 			release,
 			StringComparison.Ordinal
 		);
 		Assert.Contains(
-			"captoinfo/Icod.TermInfo.CapToInfo.csproj",
+			"./packaging/BuildToolArchives.ps1",
 			release,
 			StringComparison.Ordinal
 		);
 		Assert.Contains(
-			"infotocap/Icod.TermInfo.InfoToCap.csproj",
+			"release-packages",
 			release,
 			StringComparison.Ordinal
 		);
 		Assert.Contains(
-			"Icod.TermInfo.Termcap.$version.nupkg",
+			"release-tool-archives",
 			release,
 			StringComparison.Ordinal
 		);
@@ -323,7 +343,6 @@ public sealed class TC07ContractTests {
 						current.FullName,
 						"Icod.TermInfo.sln"
 					)
-				)
 			) {
 				return current.FullName;
 			}
