@@ -216,6 +216,13 @@ positions remain eligible, fixed-depth enumeration is lexicographic, and exact
 selected order is passed unchanged to the frozen leftmost-precedence synthesizer.
 The public API and production dependency graph remain unchanged.
 
+RP04 advances the coordinated development version to `1.8.0-Alpha-4` and
+freezes bounded-search arithmetic, deterministic partial-search evidence, and
+stable cancellation boundaries. Hostile candidate and plan spaces terminate
+within validated candidate, parent, evaluation, and generated-source limits.
+Cancellation and operational failure publish no partial plan. The public API
+and production dependency graph remain unchanged.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:

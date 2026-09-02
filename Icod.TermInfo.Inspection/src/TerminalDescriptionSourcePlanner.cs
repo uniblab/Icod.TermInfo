@@ -9,7 +9,8 @@ namespace Icod.TermInfo.Inspection;
 /// RP01 freezes planning inputs, score ordering, result evidence, and candidate
 /// snapshot semantics. RP02 evaluates the zero-parent baseline and every legal
 /// single-parent candidate position. RP03 evaluates every legal ordered parent
-/// permutation up to the active selected-parent bound.
+/// permutation up to the active selected-parent bound. RP04 freezes bounded-
+/// search arithmetic, cancellation boundaries, and search evidence.
 /// </remarks>
 public static class TerminalDescriptionSourcePlanner {
 	/// <summary>
@@ -236,8 +237,8 @@ public static class TerminalDescriptionSourcePlanner {
 				return false;
 			}
 
-			permutations *= factor;
-			total += permutations;
+			permutations = checked( permutations * factor );
+			total = checked( total + permutations );
 		}
 
 		planCount = total;
@@ -341,6 +342,7 @@ public static class TerminalDescriptionSourcePlanner {
 			parents[ index ] = parent;
 			candidateIndices[ index ] = candidateIndex;
 		}
+		cancellationToken.ThrowIfCancellationRequested();
 		TerminalDescriptionSourceSynthesisResult result;
 		try {
 			result =
@@ -352,6 +354,7 @@ public static class TerminalDescriptionSourcePlanner {
 		} catch ( InvalidOperationException ) {
 			return;
 		}
+		cancellationToken.ThrowIfCancellationRequested();
 
 		if ( result.Source.Length
 			> request.Options.MaximumGeneratedSourceLength ) {

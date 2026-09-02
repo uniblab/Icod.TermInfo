@@ -22,7 +22,7 @@
 		<Title>Icod.TermInfo.Source</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed terminfo source-language support for Icod.TermInfo. The 1.1 line parses and resolves .ti source into the stable TerminalDescription model without enlarging the runtime Icod.TermInfo package.</Description>
-		<PackageReleaseNotes>1.8.0-Alpha-3 coordinates Source with ordered multi-parent relative-source planning while preserving the frozen 1.1 Source public API, bounded parser/resolver and use= precedence semantics, one-way Runtime dependency, net8/net9/net10 support, and 1.0.0.0 assembly identity; no Source semantics change.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.8.0-Alpha-4 coordinates Source with bounded, cancellation-aware relative-source planning while preserving the frozen 1.1 Source public API, bounded parser/resolver and use= precedence semantics, one-way Runtime dependency, net8/net9/net10 support, and 1.0.0.0 assembly identity; no Source semantics change.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>

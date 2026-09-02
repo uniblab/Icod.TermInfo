@@ -61,7 +61,7 @@ Require(
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesisOptions ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesisParent ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesizer ) ),
-	"The Inspection package did not expose exactly the reviewed 1.8 Alpha-3 surface."
+	"The Inspection package did not expose exactly the reviewed 1.8 Alpha-4 surface."
 );
 
 Require(
@@ -203,7 +203,7 @@ Require(
 		&& planningOptions.MaximumGeneratedSourceLength
 			== TermInfoSourceLexerOptions.DefaultMaximumSourceLength
 		&& !planningOptions.AllowNonExhaustiveResult,
-	"The RP03 package planning options did not retain the reviewed bounded defaults."
+	"The RP04 package planning options did not retain the reviewed bounded defaults."
 );
 TerminalDescriptionSourcePlanningScore planningScore =
 	new(
@@ -230,7 +230,7 @@ Require(
 				Array.Empty<int>()
 			)
 		) < 0,
-	"The RP03 package planning score did not retain its reviewed component order."
+	"The RP04 package planning score did not retain its reviewed component order."
 );
 string synthesizedWithoutParents =
 	TerminalDescriptionSourceSynthesizer.Synthesize(
@@ -378,6 +378,39 @@ Require(
 		&& multiParentPlan.IsExhaustive
 		&& multiParentPlan.CandidateCount == 2,
 	"The RP03 package planner did not preserve the exact selected two-parent order and evidence."
+);
+TerminalDescriptionSourcePlan boundedPlan =
+	TerminalDescriptionSourcePlanner.Plan(
+		terminal,
+		new[] {
+			smokeBooleanParent,
+			smokeNumberParent,
+			synthesisAliasParent,
+		},
+		new TerminalDescriptionSourcePlanningOptions(
+			new TerminalDescriptionSourceSynthesisOptions(
+				80,
+				maximumParentCount: 2
+			),
+			maximumCandidateCount: 3,
+			maximumSelectedParentCount: 2,
+			maximumEvaluatedPlanCount: 2,
+			allowNonExhaustiveResult: true
+		)
+	);
+Require(
+	boundedPlan.SelectedParents.Count == 1
+		&& ReferenceEquals(
+			boundedPlan.SelectedParents[ 0 ],
+			smokeBooleanParent
+		)
+		&& boundedPlan.Score.SelectedCandidateIndices.SequenceEqual(
+			new[] { 0 }
+		)
+		&& boundedPlan.EvaluatedPlanCount == 2
+		&& !boundedPlan.IsExhaustive
+		&& boundedPlan.CandidateCount == 3,
+	"The RP04 package planner did not preserve deterministic bounded-search evidence."
 );
 TerminalDescription extendedSmokeParent =
 	new TerminalDescriptionBuilder( "inspection-smoke-extended-parent" )

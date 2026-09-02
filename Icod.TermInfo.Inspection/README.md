@@ -11,6 +11,48 @@ frozen relative-source synthesis API while preserving all earlier Inspection
 contracts. `captoinfo` consumes Inspection only at the executable-composition
 layer.
 
+## 1.8 RP04 bounded search, cancellation, and evidence
+
+`1.8.0-Alpha-4` freezes the planner's hostile-input behavior without changing
+the RP01 public API. Candidate count, selected-parent depth, evaluated-plan
+count, and generated-source length are enforced independently. Plan-space
+arithmetic is checked and budget-aware, so even the supported 256-candidate and
+256-parent maxima cannot wrap an integer or materialize a factorial plan list.
+
+Exhaustive planning rejects a request before source evaluation when its complete
+legal space exceeds `MaximumEvaluatedPlanCount`. A caller that explicitly sets
+`AllowNonExhaustiveResult` receives the best plan from the deterministic
+increasing-depth lexicographic prefix ending at that budget. Such a result always
+reports `IsExhaustive` as `false`.
+
+```csharp
+TerminalDescriptionSourcePlanningOptions options =
+	new(
+		new TerminalDescriptionSourceSynthesisOptions(
+			80,
+			maximumParentCount: 3
+		),
+		maximumCandidateCount: 64,
+		maximumSelectedParentCount: 3,
+		maximumEvaluatedPlanCount: 10_000,
+		allowNonExhaustiveResult: true
+	);
+
+TerminalDescriptionSourcePlan plan =
+	TerminalDescriptionSourcePlanner.Plan(
+		target,
+		candidates,
+		options,
+		cancellationToken
+	);
+```
+
+Cancellation is observed while candidates are snapshotted, throughout ordered
+enumeration, and immediately before and after each synchronous synthesis call.
+A cancellation or bounds failure returns no partial plan. The immutable
+`EvaluatedPlanCount`, `IsExhaustive`, and `CandidateCount` properties explain
+the completed search without exposing mutable internal state.
+
 ## 1.8 RP03 ordered multi-parent planning
 
 `1.8.0-Alpha-3` evaluates the zero-parent baseline and every ordered
