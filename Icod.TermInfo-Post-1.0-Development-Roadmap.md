@@ -10,12 +10,12 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
-**Current coordinated version:** `1.8.0-Alpha-7`
+**Current coordinated version:** `1.8.0-Alpha-8`
 **Final 1.6 prerelease:** `1.6.0-Alpha-8`
 **Final 1.7 prerelease:** `1.7.0-Alpha-8`
 **Next development line:** `1.8.0` - Relative Source Planning and Parent Selection
-**Status:** 1.8.0 implementation in progress
-**Current tranche:** RP07 - generated-state validation, oracle comparison, and hardening
+**Status:** 1.8.0 stable-intended release contract complete
+**Current tranche:** RP08 - API freeze, packaging, and release closure
 **Primary objective:** Select deterministic, bounded, semantically valid ordered parents in Inspection without changing the frozen Runtime, Source, Compiler, Termcap, or 1.7 synthesis contracts.
 
 ---
@@ -136,6 +136,15 @@ are bounded independently from deterministic search. RP02 implements exhaustive
 zero- and single-parent evaluation, obtains frozen score evidence directly from
 the synthesis renderer, rejects unrepresentable plans without approximation, and
 selects the deterministic best result against an independent Source-based oracle.
+
+RP03 adds exhaustive ordered multi-parent permutations; RP04 freezes bounded
+search, cancellation, and result evidence; RP05 adds explicit complete catalog
+and conventional-directory orchestration without host discovery; RP06 composes
+the planner through direct and routed `infocmp --plan-use` plus all six archive
+RIDs; RP07 adds generated-state, independent-oracle, boundary, corpus, culture,
+and repeated-process hardening. RP08 freezes the complete additive Inspection
+API, package and distribution topology, samples, release verifiers, and 1.8
+release audit at `1.8.0-Alpha-8` without adding another feature tranche.
 
 The sequence is cumulative but intentionally modular. Applications which only need runtime terminfo SHALL continue to depend on `Icod.TermInfo` alone.
 

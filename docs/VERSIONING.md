@@ -251,6 +251,13 @@ Toolchain sample through plan, synthesize, compile, publish, reacquire, and
 compare. No public API, production semantic, package dependency, target-
 framework, or assembly-identity change is introduced.
 
+RP08 advances the coordinated development version to `1.8.0-Alpha-8` without
+adding another feature tranche. It freezes the complete additive planning API,
+score, bounds, candidate order, completeness evidence, explicit catalog
+orchestration, package-consumer surface, command and archive composition,
+deterministic samples, release verifiers, and release audit. A green Alpha-8 to
+stable `1.8.0` transition is version-only.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:
@@ -329,6 +336,14 @@ Inspection member and adds only `TerminalDescriptionSourceSynthesisParent`,
 `TerminalDescriptionSourceSynthesizer`. The historical 1.3 and 1.4 Inspection
 baselines remain immutable. Release verification requires exact net8/net9/net10
 API equivalence and an exact match with the 1.7 baseline.
+
+`docs/1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt` is the frozen complete
+Inspection surface for the 1.8 line. It retains the entire 1.7 surface and adds
+only `TerminalDescriptionSourcePlan`, `TerminalDescriptionSourcePlanner`,
+`TerminalDescriptionSourcePlanningOptions`, and
+`TerminalDescriptionSourcePlanningScore`. Release verification requires exact
+net8/net9/net10 equivalence and an exact match with the 1.8 manifest. The 1.7
+manifest remains immutable historical evidence and must not be regenerated.
 
 The baselines record exported types, public/protected members, enum numeric
 values, parameter names/order/defaults, ref/out/in/params shape, generic

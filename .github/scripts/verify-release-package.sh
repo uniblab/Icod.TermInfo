@@ -124,8 +124,14 @@ dotnet run \
 
 # The frozen 1.7 Inspection baseline remains immutable historical evidence:
 # docs/1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt
-# RP01 begins additive 1.8 Inspection API development. Cross-framework equality
-# remains enforced above; RP08 freezes the exact stable 1.8 Inspection baseline.
+# RP08 freezes the complete additive 1.8 planning surface independently.
+dotnet run \
+  --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj \
+  -c "${configuration}" \
+  --no-build \
+  -- --check \
+  docs/1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt \
+  Icod.TermInfo.Inspection/bin/${configuration}/net10.0/Icod.TermInfo.Inspection.dll
 
 # Structural package, Source Link, dependency, and architecture verification.
 dotnet run \

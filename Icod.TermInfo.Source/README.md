@@ -7,6 +7,13 @@ The package is intentionally separate from the stable runtime package. Ordinary
 applications that only load compiled terminfo or use `TerminalDescription`
 values continue to reference `Icod.TermInfo` alone.
 
+## 1.8 release-candidate status
+
+`1.8.0-Alpha-8` carries Source unchanged into the complete stable-intended 1.8
+contract. Its frozen 1.1 API, parser/resolver semantics, Runtime-only dependency,
+three target frameworks, and assembly identity remain unchanged while
+Inspection consumes Source to validate planned relative representations.
+
 ## 1.7 release status
 
 Version 1.7.0 carries Source unchanged into the stable 1.7 release. The

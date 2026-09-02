@@ -61,7 +61,7 @@ Require(
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesisOptions ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesisParent ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesizer ) ),
-	"The Inspection package did not expose exactly the reviewed 1.8 Alpha-5 surface."
+	"The Inspection package did not expose exactly the frozen 1.8 public surface."
 );
 
 Require(

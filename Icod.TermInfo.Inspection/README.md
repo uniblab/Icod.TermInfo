@@ -11,6 +11,20 @@ frozen relative-source synthesis API while preserving all earlier Inspection
 contracts. `captoinfo` consumes Inspection only at the executable-composition
 layer.
 
+## 1.8 RP08 API, packaging, and release closure
+
+`1.8.0-Alpha-8` adds no new feature behavior. It freezes the complete additive
+planning public API in
+`docs/1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt`, retains the immutable 1.7
+synthesis baseline, and makes exact API, package-consumer, deterministic sample,
+direct command, router package, and six-archive validation part of the release
+gate. The stable score, bounds, candidate order, exhaustive and explicitly
+bounded search, cancellation evidence, and explicit catalog semantics are
+recorded in `docs/1.8.0-RELEASE-AUDIT.md`.
+
+The transition from Alpha-8 to stable 1.8.0 is version-only after the exact
+release commit passes every Windows, Linux, and macOS gate.
+
 ## 1.8 RP07 generated-state oracle and hardening
 
 `1.8.0-Alpha-7` leaves the planner and public Inspection API unchanged while

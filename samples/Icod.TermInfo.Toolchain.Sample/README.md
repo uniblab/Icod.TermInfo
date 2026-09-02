@@ -53,6 +53,10 @@ dotnet run --project samples/Icod.TermInfo.Toolchain.Sample/Icod.TermInfo.Toolch
 
 The project also targets `net8.0` and `net9.0`.
 
+RP08 freezes this sample as release evidence for the final 1.8 public planning
+surface. The release verifier executes it in two separate processes and rejects
+any byte difference in their output.
+
 The sample is deterministic:
 
 - it does not inspect `TERMINFO`, `TERMINFO_DIRS`, or the host system database;

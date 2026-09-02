@@ -16,6 +16,15 @@ The 1.7.0 library package family targets `net8.0`, `net9.0`, and `net10.0`; the
 packages use C# 13, contain no native ncurses/terminfo payload, and are intended
 to run on Windows, Linux, and macOS.
 
+The `1.8.0` development line adds deterministic, bounded ordered-parent
+planning in `Icod.TermInfo.Inspection` for the frozen 1.7 relative-source
+synthesizer. `1.8.0-Alpha-8` is the complete stable-intended release candidate:
+its additive planning API, score, bounds, exhaustive and explicitly bounded
+search, explicit catalog orchestration, `infocmp --plan-use` composition,
+package consumers, samples, and distribution gates are frozen in
+`docs/1.8.0-RELEASE-AUDIT.md`. The install commands below continue to name the
+current published stable release until the repository owner publishes 1.8.0.
+
 ## Install
 
 Runtime-only consumers use:

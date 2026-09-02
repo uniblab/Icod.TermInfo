@@ -20,6 +20,10 @@ token, diagnostics, and exit status to `Icod.TermInfo.InfoCmp.Command`. Direct
 produce byte-for-byte identical source. The installable package smoke and every
 matching standalone archive smoke execute the same controlled planning case.
 
+RP08 freezes that command and distribution surface at `1.8.0-Alpha-8`. The
+stable transition adds no router option or dispatch behavior after every direct,
+routed, package-installed, and matching-archive planning gate is green.
+
 ## 1.7 release status
 
 Version 1.7.0 adds `infocmp -u` relative-source synthesis to the coordinated

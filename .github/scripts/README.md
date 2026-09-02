@@ -30,7 +30,9 @@ net8.0/net9.0/net10.0 equivalence where applicable, structural package checks,
 isolated package-reference consumers, deterministic samples, and router/package
 validation. RP07 runs the planning Toolchain sample in two separate processes
 and requires byte-identical output before accepting its plan, synthesize,
-compile, publish, reacquire, and compare path.
+compile, publish, reacquire, and compare path. RP08 additionally requires the
+exact `docs/1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt` manifest while retaining
+the immutable 1.7 Inspection manifest as historical evidence.
 
 Package production is centralized in:
 

@@ -30,7 +30,7 @@ public sealed class T45CompletionGateTests {
 					2 )[ 0 ];
 
 		Assert.Equal(
-			"1.8.0-Alpha-7",
+			"1.8.0-Alpha-8",
 			semanticVersion );
 	}
 
@@ -52,7 +52,7 @@ public sealed class T45CompletionGateTests {
 				LoadOptions.None );
 
 		Assert.Equal(
-			"1.8.0-Alpha-7",
+			"1.8.0-Alpha-8",
 			ReadRequiredProperty(
 				buildProperties,
 				"IcodTermInfoSuiteVersion" ) );
@@ -184,6 +184,9 @@ public sealed class T45CompletionGateTests {
 				verifier );
 			Assert.Contains(
 				"1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt",
+				verifier );
+			Assert.Contains(
+				"1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt",
 				verifier );
 			Assert.True(
 				verifier.Contains(

@@ -85,6 +85,13 @@ only `TerminalDescriptionSourceSynthesisParent`,
 `TerminalDescriptionSourceSynthesizer` to the already-frozen 1.4 Inspection
 surface. The 1.3 and 1.4 baselines remain immutable historical records.
 
+RP08 freezes the additive 1.8 Inspection public API in
+`docs/1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt`. Planning adds only
+`TerminalDescriptionSourcePlan`, `TerminalDescriptionSourcePlanner`,
+`TerminalDescriptionSourcePlanningOptions`, and
+`TerminalDescriptionSourcePlanningScore` to the frozen 1.7 Inspection surface.
+The 1.7 synthesis types and every earlier Inspection baseline remain unchanged.
+
 TC08 freezes the 1.6 Termcap public API in
 `docs/1.6.0-TERMCAP-PUBLIC-API-BASELINE.txt`. Release verification requires the
 full `PublicApiSnapshot/v1` reflection-manifest SHA-256
