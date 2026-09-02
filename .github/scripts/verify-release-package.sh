@@ -472,10 +472,27 @@ dotnet run \
   --no-build \
   -- --describe-only --profile ms-terminal-direct
 
-# The deterministic library-toolchain sample must compose Source, Compiler,
-# Runtime acquisition, and Inspection without depending on host terminfo state.
+# The deterministic library-toolchain sample must compose planning, synthesis,
+# compilation, publication, Runtime acquisition, and Inspection comparison
+# without depending on host terminfo state. Separate process executions must
+# produce byte-identical planned source.
+toolchain_first="${inspection_smoke_root}/rp07-toolchain-first.ti"
+toolchain_second="${inspection_smoke_root}/rp07-toolchain-second.ti"
 dotnet run \
   --project samples/Icod.TermInfo.Toolchain.Sample/Icod.TermInfo.Toolchain.Sample.csproj \
   -c "${configuration}" \
   -f net10.0 \
-  --no-build
+  --no-build \
+  > "${toolchain_first}"
+dotnet run \
+  --project samples/Icod.TermInfo.Toolchain.Sample/Icod.TermInfo.Toolchain.Sample.csproj \
+  -c "${configuration}" \
+  -f net10.0 \
+  --no-build \
+  > "${toolchain_second}"
+if ! cmp -s "${toolchain_first}" "${toolchain_second}"; then
+  diff -u "${toolchain_first}" "${toolchain_second}" >&2 || true
+  echo "Toolchain planning output changed across separate process executions." >&2
+  exit 1
+fi
+cat "${toolchain_first}"

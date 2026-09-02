@@ -91,6 +91,69 @@ public sealed class RS07NcursesDifferentialTests {
 		Assert.Contains( cases, item => item.Parents.Count > 1 );
 	}
 
+	[Fact]
+	public void Rp07PlannerReusesPinnedNcursesTargetAndParentStates() {
+		string fixtureRoot = GetFixtureRoot();
+		string effectivePath = Path.Combine( fixtureRoot, "effective.ti" );
+		TermInfoSourceParseResult effective = TermInfoSourceParser.Parse(
+			File.ReadAllText( effectivePath ),
+			effectivePath
+		);
+		Assert.False(
+			effective.HasErrors,
+			FormatDiagnostics( effective.Diagnostics )
+		);
+
+		foreach (
+			NcursesDifferentialCase testCase
+			in ReadCases( Path.Combine( fixtureRoot, "cases.tsv" ) )
+		) {
+			TerminalDescription target = ResolveDescription(
+				effective.Document,
+				testCase.Target,
+				$"{testCase.Id}: RP07 target"
+			);
+			TerminalDescriptionSourceSynthesisParent[] candidates =
+				testCase.Parents
+					.Select(
+						name => new TerminalDescriptionSourceSynthesisParent(
+							name,
+							ResolveDescription(
+								effective.Document,
+								name,
+								$"{testCase.Id}: RP07 candidate {name}"
+							)
+						)
+					)
+					.ToArray();
+			int maximumDepth = candidates.Length;
+			int exhaustivePlanCount = maximumDepth == 1 ? 2 : 5;
+			TerminalDescriptionSourcePlan plan =
+				TerminalDescriptionSourcePlanner.Plan(
+					target,
+					candidates,
+					new TerminalDescriptionSourcePlanningOptions(
+						new TerminalDescriptionSourceSynthesisOptions(
+							80,
+							maximumParentCount: maximumDepth
+						),
+						maximumCandidateCount: candidates.Length,
+						maximumSelectedParentCount: maximumDepth,
+						maximumEvaluatedPlanCount: exhaustivePlanCount
+					)
+				);
+
+			Assert.True( plan.IsExhaustive );
+			Assert.Equal( exhaustivePlanCount, plan.EvaluatedPlanCount );
+			AssertRelativeResolvesToTarget(
+				target,
+				plan.SelectedParents,
+				plan.Source,
+				$"{testCase.Id}: RP07 planner"
+			);
+		}
+	}
+
 	private static IReadOnlyList<NcursesDifferentialCase> ReadCases(
 		string path
 	) {

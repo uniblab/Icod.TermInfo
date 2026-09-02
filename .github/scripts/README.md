@@ -24,7 +24,13 @@ The legacy `verify-release-package.*` names remain internal compatibility engine
 
 ## Coordinated package validation
 
-The deep verifier covers the coordinated Runtime, Source, Termcap, Compiler, Inspection, and `Icod.TermInfo.Tools` artifacts. It retains API-baseline checks, net8.0/net9.0/net10.0 equivalence where applicable, structural package checks, isolated package-reference consumers, deterministic samples, and router/package validation.
+The deep verifier covers the coordinated Runtime, Source, Termcap, Compiler,
+Inspection, and `Icod.TermInfo.Tools` artifacts. It retains API-baseline checks,
+net8.0/net9.0/net10.0 equivalence where applicable, structural package checks,
+isolated package-reference consumers, deterministic samples, and router/package
+validation. RP07 runs the planning Toolchain sample in two separate processes
+and requires byte-identical output before accepting its plan, synthesize,
+compile, publish, reacquire, and compare path.
 
 Package production is centralized in:
 

@@ -6,7 +6,7 @@ namespace Icod.TermInfo.Inspection.Tests;
 
 public sealed class RS08ContractTests {
 	private const string ReleaseVersion = "1.7.0";
-	private const string DevelopmentVersion = "1.8.0-Alpha-6";
+	private const string DevelopmentVersion = "1.8.0-Alpha-7";
 
 	[Fact]
 	public void OneEightDevelopmentRetainsRs08ReleaseRecords() {
@@ -261,6 +261,16 @@ public sealed class RS08ContractTests {
 		);
 		Assert.Contains(
 			"includeExtendedCapabilities: true",
+			sample,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"TerminalDescriptionSourcePlanner.Plan",
+			sample,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"planningCandidates",
 			sample,
 			StringComparison.Ordinal
 		);

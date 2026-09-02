@@ -349,9 +349,21 @@ dotnet run --project samples\Icod.TermInfo.Sample\Icod.TermInfo.Sample.csproj -c
 if errorlevel 1 goto fail
 
 echo.
-echo === Deterministic Source/Compiler/Inspection toolchain sample ===
-dotnet run --project samples\Icod.TermInfo.Toolchain.Sample\Icod.TermInfo.Toolchain.Sample.csproj -c %CONFIGURATION% -f net10.0 --no-build
+echo === Deterministic planning/Source/Compiler/Inspection toolchain sample ===
+set "TOOLCHAIN_FIRST=%INSPECTION_SMOKE_ROOT%\rp07-toolchain-first.ti"
+set "TOOLCHAIN_SECOND=%INSPECTION_SMOKE_ROOT%\rp07-toolchain-second.ti"
+dotnet run --project samples\Icod.TermInfo.Toolchain.Sample\Icod.TermInfo.Toolchain.Sample.csproj -c %CONFIGURATION% -f net10.0 --no-build > "%TOOLCHAIN_FIRST%"
 if errorlevel 1 goto fail
+dotnet run --project samples\Icod.TermInfo.Toolchain.Sample\Icod.TermInfo.Toolchain.Sample.csproj -c %CONFIGURATION% -f net10.0 --no-build > "%TOOLCHAIN_SECOND%"
+if errorlevel 1 goto fail
+fc /b "%TOOLCHAIN_FIRST%" "%TOOLCHAIN_SECOND%" >nul
+if errorlevel 1 (
+    type "%TOOLCHAIN_FIRST%"
+    type "%TOOLCHAIN_SECOND%"
+    echo Toolchain planning output changed across separate process executions. 1>&2
+    goto fail
+)
+type "%TOOLCHAIN_FIRST%"
 
 goto cleanup
 

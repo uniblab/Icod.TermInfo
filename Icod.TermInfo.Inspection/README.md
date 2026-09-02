@@ -11,6 +11,21 @@ frozen relative-source synthesis API while preserving all earlier Inspection
 contracts. `captoinfo` consumes Inspection only at the executable-composition
 layer.
 
+## 1.8 RP07 generated-state oracle and hardening
+
+`1.8.0-Alpha-7` leaves the planner and public Inspection API unchanged while
+adding seeded generated target/candidate universes, an independent brute-force
+oracle, exhaustive and budget-prefix comparison, score-tie and permutation
+coverage, exact-boundary tests, culture and insertion-order determinism, and
+repeated-process output comparison. Every selected generated source is resolved
+and compared with its original target.
+
+RP07 also reuses the pinned `ncurses 6.5.20250216` effective-state corpus and
+extends the managed Toolchain sample through explicit candidate planning,
+compilation, publication, Runtime reacquisition, and semantic comparison. See
+`docs/1.8.0-RP07-GENERATED-STATE-ORACLE-AND-HARDENING.md` for the complete
+evidence contract.
+
 ## 1.8 RP06 command and distribution composition
 
 `1.8.0-Alpha-6` exposes the existing bounded planner through

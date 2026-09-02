@@ -10,12 +10,12 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
-**Current coordinated version:** `1.8.0-Alpha-6`
+**Current coordinated version:** `1.8.0-Alpha-7`
 **Final 1.6 prerelease:** `1.6.0-Alpha-8`
 **Final 1.7 prerelease:** `1.7.0-Alpha-8`
 **Next development line:** `1.8.0` - Relative Source Planning and Parent Selection
 **Status:** 1.8.0 implementation in progress
-**Current tranche:** RP06 - infocmp planning command and distribution composition
+**Current tranche:** RP07 - generated-state validation, oracle comparison, and hardening
 **Primary objective:** Select deterministic, bounded, semantically valid ordered parents in Inspection without changing the frozen Runtime, Source, Compiler, Termcap, or 1.7 synthesis contracts.
 
 ---

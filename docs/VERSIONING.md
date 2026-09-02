@@ -242,6 +242,15 @@ CI runners exercise all six standalone archive RIDs. No reusable public API,
 production dependency direction, frozen 1.7 synthesis behavior, or reusable
 assembly identity changes.
 
+RP07 advances the coordinated development version to `1.8.0-Alpha-7` and adds
+generated-state, independent-oracle, bounded-prefix, score-tie, permutation,
+equivalent-description, capability-kind, cancellation, maximum-boundary,
+one-past-boundary, culture, insertion-order, repeated-call, and repeated-process
+validation. It reuses the pinned 1.7 differential corpus and extends the
+Toolchain sample through plan, synthesize, compile, publish, reacquire, and
+compare. No public API, production semantic, package dependency, target-
+framework, or assembly-identity change is introduced.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:
