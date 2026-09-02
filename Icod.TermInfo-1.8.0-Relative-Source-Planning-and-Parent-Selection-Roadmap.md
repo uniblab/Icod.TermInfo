@@ -10,7 +10,7 @@
 **Target frameworks:** reusable libraries `net8.0`; `net9.0`; `net10.0`; commands `net10.0`
 **Reusable assembly identity:** retain `1.0.0.0`
 **Planned development sequence:** `1.8.0-Alpha-1` through `1.8.0-Alpha-8`, then stable `1.8.0`
-**Status:** RP04 implementation in progress
+**Status:** RP05 implementation in progress
 **Primary objective:** select a deterministic, bounded, semantically valid ordered parent plan from caller-supplied candidates, then delegate source production unchanged to the frozen 1.7 relative-source synthesizer.
 
 ---

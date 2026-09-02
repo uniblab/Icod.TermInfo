@@ -223,6 +223,15 @@ within validated candidate, parent, evaluation, and generated-source limits.
 Cancellation and operational failure publish no partial plan. The public API
 and production dependency graph remain unchanged.
 
+RP05 advances the coordinated development version to `1.8.0-Alpha-5` and adds
+explicit catalog and conventional-directory orchestration to the Inspection
+planner. Catalog candidates use ordinal canonical-name order, equivalent
+physical publications collapse deterministically, conflicting duplicates and
+issue-bearing catalogs are rejected, and parser limits, planning bounds, and
+cancellation remain authoritative. The frozen 1.4 catalog types, frozen 1.7
+synthesizer, production dependency graph, and reusable assembly identities are
+unchanged.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:

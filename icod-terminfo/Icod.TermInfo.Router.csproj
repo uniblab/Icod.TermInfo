@@ -29,7 +29,7 @@
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-		<PackageReleaseNotes>1.8.0-Alpha-4 coordinates the distribution-only router with bounded, cancellation-aware relative-source planning. RP04 adds no command semantics; five-command dispatch, package topology, and six standalone archive targets remain unchanged.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.8.0-Alpha-5 coordinates the distribution-only router with explicit database catalog planning. RP05 adds no command semantics; five-command dispatch, package topology, and six standalone archive targets remain unchanged.</PackageReleaseNotes>
 		<PackageTags>terminfo;termcap;libtinfo;tic;infocmp;toe;captoinfo;infotocap;terminal;tool;dotnet;csharp;icod</PackageTags>
 	</PropertyGroup>
 

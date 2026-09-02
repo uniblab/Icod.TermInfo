@@ -61,7 +61,7 @@ Require(
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesisOptions ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesisParent ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesizer ) ),
-	"The Inspection package did not expose exactly the reviewed 1.8 Alpha-4 surface."
+	"The Inspection package did not expose exactly the reviewed 1.8 Alpha-5 surface."
 );
 
 Require(
@@ -154,6 +154,44 @@ Require(
 			+ "    cols#80,\n",
 	"The I02 renderer did not produce the canonical smoke representation."
 );
+string emptyCatalogRoot =
+	System.IO.Path.Combine(
+		System.IO.Path.GetTempPath(),
+		$"icod-terminfo-package-smoke-catalog-{Guid.NewGuid():N}"
+	);
+Directory.CreateDirectory( emptyCatalogRoot );
+try {
+	TermInfoDatabaseCatalog emptyCatalog =
+		TermInfoDatabaseInspector.InspectDirectory(
+			emptyCatalogRoot
+		);
+	TerminalDescriptionSourcePlan catalogPlan =
+		TerminalDescriptionSourcePlanner.PlanFromCatalog(
+			terminal,
+			emptyCatalog
+		);
+	TerminalDescriptionSourcePlan directoryPlan =
+		TerminalDescriptionSourcePlanner.PlanFromDirectory(
+			terminal,
+			emptyCatalogRoot
+		);
+	Require(
+		catalogPlan.Source == rendered
+			&& catalogPlan.CandidateCount == 0
+			&& catalogPlan.EvaluatedPlanCount == 1
+			&& catalogPlan.IsExhaustive
+			&& directoryPlan.Source == catalogPlan.Source
+			&& directoryPlan.CandidateCount == 0
+			&& directoryPlan.EvaluatedPlanCount == 1
+			&& directoryPlan.IsExhaustive,
+		"The RP05 package planner did not preserve complete explicit empty-catalog planning."
+	);
+} finally {
+	Directory.Delete(
+		emptyCatalogRoot,
+		recursive: true
+	);
+}
 Require(
 	TerminalDescriptionSourceRenderer.Render(
 		terminal,

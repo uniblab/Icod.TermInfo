@@ -10,9 +10,11 @@ namespace Icod.TermInfo.Inspection;
 /// snapshot semantics. RP02 evaluates the zero-parent baseline and every legal
 /// single-parent candidate position. RP03 evaluates every legal ordered parent
 /// permutation up to the active selected-parent bound. RP04 freezes bounded-
-/// search arithmetic, cancellation boundaries, and search evidence.
+/// search arithmetic, cancellation boundaries, and search evidence. RP05 adds
+/// explicit, completeness-preserving catalog and conventional-directory
+/// orchestration without host discovery.
 /// </remarks>
-public static class TerminalDescriptionSourcePlanner {
+public static partial class TerminalDescriptionSourcePlanner {
 	/// <summary>
 	/// Plans relative source using the canonical bounded planning policy.
 	/// </summary>

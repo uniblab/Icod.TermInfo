@@ -11,6 +11,39 @@ frozen relative-source synthesis API while preserving all earlier Inspection
 contracts. `captoinfo` consumes Inspection only at the executable-composition
 layer.
 
+## 1.8 RP05 explicit database catalog planning
+
+`1.8.0-Alpha-5` composes the bounded planner with an explicit
+`TermInfoDatabaseCatalog` or one explicit conventional database directory. It
+does not consult environment discovery or platform default database locations.
+
+```csharp
+TerminalDescriptionSourcePlan plan =
+	TerminalDescriptionSourcePlanner.PlanFromDirectory(
+		target,
+		explicitDatabaseRoot,
+		planningOptions,
+		parserOptions,
+		cancellationToken
+	);
+```
+
+Use `PlanFromCatalog` when the caller already owns an immutable catalog
+snapshot. Catalog planning requires a conventional, issue-free catalog. Missing,
+unsupported, unavailable, malformed, misplaced, inaccessible, or link-skipping
+catalogs are rejected before plan evaluation so partial candidates never produce
+false exhaustive evidence.
+
+Candidates use canonical names only and retain the catalog's ordinal canonical-
+name order. Alias publications and equivalent physical copies collapse to one
+candidate; conflicting copies of the same canonical name are rejected. Any
+catalog entry whose canonical name or aliases intersects the target name or
+aliases is excluded as an obvious self-reference.
+
+Parser limits, planning bounds, cancellation, the frozen score, and exhaustive
+versus bounded result semantics remain unchanged. See
+`docs/1.8.0-RP05-EXPLICIT-DATABASE-CATALOG-PLANNING.md` for the complete policy.
+
 ## 1.8 RP04 bounded search, cancellation, and evidence
 
 `1.8.0-Alpha-4` freezes the planner's hostile-input behavior without changing
