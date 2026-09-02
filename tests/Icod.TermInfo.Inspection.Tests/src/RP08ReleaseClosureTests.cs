@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using System.Text;
 using Icod.TermInfo.Inspection;
 using Xunit;
 
@@ -66,15 +67,18 @@ public sealed class RP08ReleaseClosureTests {
 
 	[Fact]
 	public void OneSevenInspectionBaselineRemainsImmutableHistoricalEvidence() {
-		byte[] baseline =
-			File.ReadAllBytes(
+		string baseline =
+			File.ReadAllText(
 				Path.Combine(
 					FindRepositoryRoot(),
 					"docs",
-					"1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt" ) );
+					"1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt" ) )
+				.Replace( "\r\n", "\n", StringComparison.Ordinal )
+				.Replace( '\r', '\n' );
 		string sha256 =
 			Convert.ToHexString(
-				SHA256.HashData( baseline )
+				SHA256.HashData(
+					Encoding.UTF8.GetBytes( baseline ) )
 			).ToLowerInvariant();
 
 		Assert.Equal(
