@@ -192,13 +192,25 @@ public sealed class C01ContractTests {
 		Assert.Contains( "Icod.TermInfo.Compiler", solution );
 		Assert.Contains( "Icod.TermInfo.Compiler.Tests", solution );
 
+		string packPackages =
+			File.ReadAllText(
+				Path.Combine(
+					root,
+					"packaging",
+					"PackPackages.ps1"
+				)
+			);
+		Assert.Contains(
+			"Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj",
+			packPackages
+		);
+
 		foreach (
 			string relativePath
 			in new[] {
-				".github/workflows/pr-build-and-test.yaml",
-				".github/workflows/push-main.yaml",
-				".github/scripts/verify-release-package.cmd",
-				".github/scripts/verify-release-package.sh",
+				".github/workflows/pull-request.yaml",
+				".github/workflows/main.yaml",
+				".github/workflows/release.yaml",
 			}
 		) {
 			string text =
@@ -211,7 +223,7 @@ public sealed class C01ContractTests {
 						)
 					)
 				);
-			Assert.Contains( "Icod.TermInfo.Compiler", text );
+			Assert.Contains( "PackPackages.ps1", text );
 		}
 
 		foreach (

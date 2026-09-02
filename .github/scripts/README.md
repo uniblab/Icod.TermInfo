@@ -1,126 +1,88 @@
-# Release Validation Scripts
+# Icod.TermInfo CI/CD support scripts
 
-## Package validation
+The repository now follows the canonical Icod C#/.NET build-cycle structure. Normal build and distribution orchestration lives under `/packaging`; this directory retains TermInfo-specific structural and execution gates used by that orchestration.
 
-`verify-release-package.sh` and `verify-release-package.cmd` are equivalent host
-wrappers for the same repository package-validation contract.
+## Preferred entry points
 
-Both wrappers require:
-
-```text
-<artifact-directory> <Debug|Staging|Release>
-```
-
-For local Debug validation:
+Exact coordinated package validation:
 
 ```text
-.github\scripts\verify-release-package.cmd artifacts Debug
-bash .github/scripts/verify-release-package.sh artifacts Debug
+.github\scripts\verify-package-artifact.cmd artifacts Debug
+./.github/scripts/verify-package-artifact.sh artifacts Debug
+pwsh .github/scripts/verify-package-artifact.ps1 artifacts Debug
 ```
 
-For pull-request/development validation:
+The wrappers delegate to:
 
 ```text
-.github\scripts\verify-release-package.cmd artifacts Staging
-bash .github/scripts/verify-release-package.sh artifacts Staging
+packaging/VerifyPackageArtifact.ps1
 ```
 
-For final main-branch release validation:
+which in turn preserves the existing deep TermInfo package-validation contract implemented by `verify-release-package.cmd` and `verify-release-package.sh`.
+
+The legacy `verify-release-package.*` names remain internal compatibility engines; new workflows and local build tooling should use `verify-package-artifact.*` or `/packaging` entry points.
+
+## Coordinated package validation
+
+The deep verifier covers the coordinated Runtime, Source, Termcap, Compiler, Inspection, and `Icod.TermInfo.Tools` artifacts. It retains API-baseline checks, net8.0/net9.0/net10.0 equivalence where applicable, structural package checks, isolated package-reference consumers, deterministic samples, and router/package validation.
+
+Package production is centralized in:
 
 ```text
-.github\scripts\verify-release-package.cmd artifacts Release
-bash .github/scripts/verify-release-package.sh artifacts Release
+packaging/PackPackages.ps1
 ```
-
-The scripts reject any configuration other than `Debug`, `Staging`, or
-`Release`. The selected configuration controls maintenance tools, API-snapshot
-build-output paths, the Runtime, Compiler, and Inspection package verifiers, the
-`Icod.TermInfo.Tools` structural package verifier, the four reusable-library
-artifacts, all four fresh-library-package consumers, and the deterministic
-repository samples. The installable `Icod.TermInfo.Tools` package also has a
-separate execution smoke described below.
-
-The 1.1 source-language line keeps the frozen `Icod.TermInfo` package checks and
-adds `Icod.TermInfo.Source` net8.0/net9.0/net10.0 API-equivalence, reviewed
-public-API baseline, coordinated-version, artifact-presence, and
-package-reference-only consumer gates. C01 adds equivalent Compiler API-baseline,
-three-target API-equivalence, package-structure, coordinated-version, artifact,
-and package-reference-only consumer gates. I01 adds the independent Inspection
-API baseline, three-target API equivalence, exact Runtime+Source dependency
-verification, structural package validation, coordinated-version/artifact gates,
-and the fourth package-reference-only consumer.
-
-Fresh-package consumers use isolated NuGet package caches.
-`package-smoke.NuGet.Config` maps every `Icod.TermInfo*` package exclusively to
-the validated artifact directory while allowing `Microsoft.*` framework and
-runtime reference packs to restore from NuGet.org when they are not installed
-locally. This keeps the smoke test tied to the local package artifacts without
-blocking SDK reference-pack acquisition.
-
-- Use `verify-release-package.sh` on Bash-capable hosts and in Ubuntu GitHub
-  Actions package-validation jobs.
-- Use `verify-release-package.cmd` from Windows Command Prompt; Bash and Python
-  are not required.
 
 ## Tool-suite archives
 
-`build-tool-archives.sh` publishes `tic`, `infocmp`, and `toe` for the six
-supported release RIDs and creates the coordinated framework-dependent tool-suite
-archives. The archive version comes from
-`Directory.Build.props:IcodTermInfoSuiteVersion`, and the builder verifies the
-effective versions of all four libraries, all three commands, and the router
-before publication.
+The deterministic archive implementation remains:
 
 ```text
-bash .github/scripts/build-tool-archives.sh Release artifacts/tools
+build-tool-archives.sh
+verify-tool-archives.sh
 ```
 
-The six output archives cover `win-x64`, `win-arm64`, `linux-x64`,
-`linux-arm64`, `osx-x64`, and `osx-arm64`. Archive construction normalizes
-ordering and metadata used by the release workflow.
-
-`verify-tool-archives.sh` is the structural gate. It requires exactly the six
-archives for the coordinated version and validates their paths, launchers, and
-release payload without executing a foreign-architecture binary.
+The preferred orchestration entry point is:
 
 ```text
-bash .github/scripts/verify-tool-archives.sh artifacts/tools
+pwsh packaging/BuildToolArchives.ps1 -Configuration Release -OutputDirectory artifacts/tools
 ```
 
-`smoke-tool-archive.ps1` is the matching-host execution gate. It selects the
-archive for the current operating system and architecture, unpacks it, verifies
-all three `--version` results, publishes a controlled entry with `tic`, acquires
-it with `infocmp`, and enumerates it with `toe`.
+The six archives cover:
 
 ```text
-pwsh -File .github/scripts/smoke-tool-archive.ps1 artifacts/tools
+win-x64
+win-arm64
+linux-x64
+linux-arm64
+osx-x64
+osx-arm64
 ```
 
-The release workflow runs structural validation for all six archives and the
-execution smoke on matching Windows, Linux, and macOS runners before package
-publication.
+and contain the five traditional command launchers:
+
+```text
+tic
+infocmp
+toe
+captoinfo
+infotocap
+```
+
+`verify-tool-archives.sh` performs structural verification without executing foreign-architecture binaries.
+
+`smoke-tool-archive.ps1` selects the matching archive for the current operating system/architecture and executes the command/version and controlled database smoke path.
 
 ## Installable tool package
 
-`tools/tool-package-verifier` structurally validates the fifth registry package,
-`Icod.TermInfo.Tools`. It requires the single `icod-terminfo` .NET tool command,
-the coordinated package metadata and managed router/command payload, and rejects
-host-specific `tic`, `infocmp`, or `toe` apphosts from the
-`tools/net10.0/any/` package directory. The six standalone archives remain the
-only distribution which intentionally carries RID-specific apphosts.
+`smoke-tool-package.ps1` installs the freshly produced local `Icod.TermInfo.Tools` package into an isolated tool path and package cache, then validates the `icod-terminfo` router and its routed commands.
 
-`smoke-tool-package.ps1` then validates execution. It reads the centralized
-suite version, installs the freshly packed `.nupkg` into an isolated tool path
-and package cache, verifies
-`icod-terminfo --version`, routes all three command `-V` forms, and exercises the
-same controlled `tic` -> `infocmp` -> `toe` database path used by the archive
-smoke.
+The package smoke and standalone archive smoke remain intentionally separate because they validate different distribution surfaces.
 
-```text
-pwsh -File .github/scripts/smoke-tool-package.ps1 artifacts
-```
+## Lifecycle
 
-PR, main, and release workflows run this installation smoke on Windows, Linux,
-and macOS. The standalone archive smoke remains separate because it validates
-the traditional `tic`, `infocmp`, and `toe` executable names rather than the
-NuGet router.
+- local `build.cmd` / `build.sh`: Debug;
+- pull requests: Staging;
+- `main`: Release;
+- pushed release tags contained in `main`: Release publication.
+
+See `packaging/README.md` for the dependency graph and repository-level build/distribution contract.

@@ -1,0 +1,127 @@
+name: main
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_VERSIONS: |
+    8.0.x
+    9.0.x
+    10.0.x
+  CONFIGURATION: Release
+  SOLUTION_PATH: Icod.TermInfo.sln
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            name: Windows x64
+            distribution_host: false
+          - os: windows-11-arm
+            name: Windows ARM64
+            distribution_host: false
+          - os: ubuntu-24.04
+            name: Linux x64
+            distribution_host: true
+          - os: ubuntu-24.04-arm
+            name: Linux ARM64
+            distribution_host: false
+          - os: macos-15-intel
+            name: macOS x64
+            distribution_host: false
+          - os: macos-15
+            name: macOS ARM64
+            distribution_host: false
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSIONS }}
+      - name: Restore
+        run: dotnet restore ${{ env.SOLUTION_PATH }}
+      - name: Build
+        run: dotnet build ${{ env.SOLUTION_PATH }} -c ${{ env.CONFIGURATION }} --no-restore -p:ContinuousIntegrationBuild=true
+      - name: Test
+        run: dotnet test ${{ env.SOLUTION_PATH }} -c ${{ env.CONFIGURATION }} --no-build --no-restore --logger trx
+      - name: Pack coordinated Release packages
+        if: matrix.distribution_host
+        shell: pwsh
+        run: ./packaging/PackPackages.ps1 -Configuration '${{ env.CONFIGURATION }}' -OutputDirectory artifacts
+      - name: Verify exact Release package artifacts
+        if: matrix.distribution_host
+        shell: pwsh
+        run: ./packaging/VerifyPackageArtifact.ps1 -ArtifactDirectory artifacts -Configuration '${{ env.CONFIGURATION }}'
+      - name: Build and verify Release tool archives
+        if: matrix.distribution_host
+        shell: pwsh
+        run: ./packaging/BuildToolArchives.ps1 -Configuration '${{ env.CONFIGURATION }}' -OutputDirectory artifacts/tools
+      - name: Upload validated Release packages
+        if: matrix.distribution_host
+        uses: actions/upload-artifact@v4
+        with:
+          name: terminfo-main-packages
+          path: |
+            artifacts/*.nupkg
+            artifacts/*.snupkg
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload validated Release tool archives
+        if: matrix.distribution_host
+        uses: actions/upload-artifact@v4
+        with:
+          name: terminfo-main-tools
+          path: artifacts/tools/*
+          if-no-files-found: error
+          retention-days: 7
+
+  smoke-tool-package:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - uses: actions/download-artifact@v4
+        with:
+          name: terminfo-main-packages
+          path: artifacts
+      - shell: pwsh
+        run: ./.github/scripts/smoke-tool-package.ps1 artifacts
+
+  smoke-tool-archives:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - uses: actions/download-artifact@v4
+        with:
+          name: terminfo-main-tools
+          path: artifacts/tools
+      - shell: pwsh
+        run: ./.github/scripts/smoke-tool-archive.ps1 artifacts/tools

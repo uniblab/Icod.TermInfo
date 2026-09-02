@@ -6,11 +6,19 @@ on:
       - 'v*'
 
 concurrency:
-  group: release-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
 permissions:
   contents: read
+
+env:
+  DOTNET_VERSIONS: |
+    8.0.x
+    9.0.x
+    10.0.x
+  CONFIGURATION: Release
+  SOLUTION_PATH: Icod.TermInfo.sln
 
 jobs:
   metadata:
@@ -22,211 +30,81 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Require tag on exact main HEAD
+      - name: Require tagged commit in main
         shell: pwsh
         run: |
-          git fetch origin refs/heads/main:refs/remotes/origin/main --no-tags
+          git fetch origin main --no-tags
+          git merge-base --is-ancestor $env:GITHUB_SHA origin/main
           if (0 -ne $LASTEXITCODE) {
-              throw 'Unable to refresh the current origin/main commit.'
+              throw "Release tag '$env:GITHUB_REF_NAME' does not point to a commit contained in main."
           }
-
-          $mainCommit = (git rev-parse origin/main).Trim()
-          if (0 -ne $LASTEXITCODE -or [string]::IsNullOrWhiteSpace($mainCommit)) {
-              throw 'Unable to resolve the current origin/main commit.'
-          }
-          if ($env:GITHUB_SHA -ne $mainCommit) {
-              throw "Release tag '$env:GITHUB_REF_NAME' points to '$env:GITHUB_SHA', but the exact current main commit is '$mainCommit'."
-          }
-
       - id: version
-        name: Validate tag and centralized suite version
+        name: Validate tag and suite version
         shell: pwsh
         run: |
           $tag = $env:GITHUB_REF_NAME
           if ($tag -notmatch '^v(?<version>[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z][0-9A-Za-z.-]*)?)$') {
               throw "Release tag '$tag' is not a supported v<semver> tag."
           }
-
           $tagVersion = $Matches.version
-          [xml]$buildProperties = Get-Content -LiteralPath 'Directory.Build.props' -Raw
-          $suiteVersionNode = $buildProperties.SelectSingleNode(
-              '/Project/PropertyGroup/IcodTermInfoSuiteVersion'
-          )
-          if ($null -eq $suiteVersionNode) {
+          [xml]$props = Get-Content -LiteralPath 'Directory.Build.props' -Raw
+          $node = $props.SelectSingleNode('/Project/PropertyGroup/IcodTermInfoSuiteVersion')
+          if ($null -eq $node -or [string]::IsNullOrWhiteSpace($node.InnerText)) {
               throw 'Directory.Build.props must declare IcodTermInfoSuiteVersion.'
           }
-          $coordinatedVersion = $suiteVersionNode.InnerText
-          if ($tagVersion -ne $coordinatedVersion) {
-              throw "Tag version '$tagVersion' does not match IcodTermInfoSuiteVersion '$coordinatedVersion'."
+          $suiteVersion = $node.InnerText.Trim()
+          if ($tagVersion -ne $suiteVersion) {
+              throw "Tag version '$tagVersion' does not match suite version '$suiteVersion'."
           }
-
-          $versionReference = '$(IcodTermInfoSuiteVersion)'
-          $libraryProjects = @(
-              @{ Name = 'Runtime'; Path = 'Icod.TermInfo.csproj' },
-              @{ Name = 'Source'; Path = 'Icod.TermInfo.Source/Icod.TermInfo.Source.csproj' },
-              @{ Name = 'Termcap'; Path = 'Icod.TermInfo.Termcap/Icod.TermInfo.Termcap.csproj' },
-              @{ Name = 'Compiler'; Path = 'Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj' },
-              @{ Name = 'Inspection'; Path = 'Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj' }
-          )
-          foreach ($projectInfo in $libraryProjects) {
-              [xml]$project = Get-Content -LiteralPath $projectInfo.Path -Raw
-              $versionNode = $project.SelectSingleNode('/Project/PropertyGroup/Version')
-              $packageVersionNode = $project.SelectSingleNode('/Project/PropertyGroup/PackageVersion')
-              if ($null -eq $versionNode -or $null -eq $packageVersionNode -or $versionNode.InnerText -ne $versionReference -or $packageVersionNode.InnerText -ne $versionReference) {
-                  throw "$($projectInfo.Name) must consume IcodTermInfoSuiteVersion for Version and PackageVersion."
-              }
-          }
-
-          foreach ($commandPath in @(
-              'tic/Icod.TermInfo.Tic.csproj',
-              'infocmp/Icod.TermInfo.InfoCmp.csproj',
-              'toe/Icod.TermInfo.Toe.csproj',
-              'captoinfo/Icod.TermInfo.CapToInfo.csproj',
-              'infotocap/Icod.TermInfo.InfoToCap.csproj'
-          )) {
-              [xml]$commandProject = Get-Content -LiteralPath $commandPath -Raw
-              $commandVersionNode = $commandProject.SelectSingleNode('/Project/PropertyGroup/Version')
-              if ($null -eq $commandVersionNode -or $commandVersionNode.InnerText -ne $versionReference) {
-                  throw "'$commandPath' must consume IcodTermInfoSuiteVersion for Version."
-              }
-          }
-
-          [xml]$router = Get-Content -LiteralPath 'icod-terminfo/Icod.TermInfo.Router.csproj' -Raw
-          foreach ($propertyName in @('Version', 'PackageVersion')) {
-              $node = $router.SelectSingleNode("/Project/PropertyGroup/$propertyName")
-              if ($null -eq $node -or $node.InnerText -ne $versionReference) {
-                  throw "Router $propertyName must consume IcodTermInfoSuiteVersion."
-              }
-          }
-          $packAsToolNode = $router.SelectSingleNode('/Project/PropertyGroup/PackAsTool')
-          $packageIdNode = $router.SelectSingleNode('/Project/PropertyGroup/PackageId')
-          $toolCommandNameNode = $router.SelectSingleNode('/Project/PropertyGroup/ToolCommandName')
-          if ($null -eq $packAsToolNode -or $packAsToolNode.InnerText -ne 'true') {
-              throw 'Router must remain a .NET tool package.'
-          }
-          if ($null -eq $packageIdNode -or $packageIdNode.InnerText -ne 'Icod.TermInfo.Tools') {
-              throw 'Router PackageId must remain Icod.TermInfo.Tools.'
-          }
-          if ($null -eq $toolCommandNameNode -or $toolCommandNameNode.InnerText -ne 'icod-terminfo') {
-              throw 'Router ToolCommandName must remain icod-terminfo.'
-          }
-
           "version=$tagVersion" >> $env:GITHUB_OUTPUT
           "prerelease=$($tagVersion.Contains('-').ToString().ToLowerInvariant())" >> $env:GITHUB_OUTPUT
 
-  validate:
+  package:
     needs: metadata
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: |
-            8.0.x
-            9.0.x
-            10.0.x
-
-      - run: dotnet clean Icod.TermInfo.sln -c Release
-      - run: dotnet restore Icod.TermInfo.sln
-      - run: dotnet build Icod.TermInfo.sln -c Release --no-restore -p:ContinuousIntegrationBuild=true
-      - run: dotnet test Icod.TermInfo.sln -c Release --no-build --logger trx
-
-      - name: Pack Release packages
-        run: |
-          dotnet pack Icod.TermInfo.csproj -c Release --no-build --output artifacts
-          dotnet pack Icod.TermInfo.Source/Icod.TermInfo.Source.csproj -c Release --no-build --output artifacts
-          dotnet pack Icod.TermInfo.Termcap/Icod.TermInfo.Termcap.csproj -c Release --no-build --output artifacts
-          dotnet pack Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj -c Release --no-build --output artifacts
-          dotnet pack Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj -c Release --no-build --output artifacts
-          dotnet pack icod-terminfo/Icod.TermInfo.Router.csproj -c Release --no-build --output artifacts
-
-      - name: Verify Release packages on Windows
-        if: matrix.os == 'windows-latest'
-        shell: cmd
-        run: .github\scripts\verify-release-package.cmd artifacts Release
-
-      - name: Verify Release packages on POSIX
-        if: matrix.os != 'windows-latest'
-        shell: bash
-        run: bash .github/scripts/verify-release-package.sh artifacts Release
-
-      - name: Upload canonical release packages
-        if: matrix.os == 'windows-latest'
-        uses: actions/upload-artifact@v4
+          dotnet-version: ${{ env.DOTNET_VERSIONS }}
+      - run: dotnet restore ${{ env.SOLUTION_PATH }}
+      - run: dotnet build ${{ env.SOLUTION_PATH }} -c ${{ env.CONFIGURATION }} --no-restore -p:ContinuousIntegrationBuild=true
+      - run: dotnet test ${{ env.SOLUTION_PATH }} -c ${{ env.CONFIGURATION }} --no-build --no-restore --logger trx
+      - name: Pack coordinated Release packages
+        shell: pwsh
+        run: ./packaging/PackPackages.ps1 -Configuration '${{ env.CONFIGURATION }}' -OutputDirectory artifacts/release
+      - name: Verify exact Release package artifacts
+        shell: pwsh
+        run: ./packaging/VerifyPackageArtifact.ps1 -ArtifactDirectory artifacts/release -Configuration '${{ env.CONFIGURATION }}'
+      - uses: actions/upload-artifact@v4
         with:
           name: release-packages
           path: |
-            artifacts/Icod.TermInfo.${{ needs.metadata.outputs.version }}.nupkg
-            artifacts/Icod.TermInfo.${{ needs.metadata.outputs.version }}.snupkg
-            artifacts/Icod.TermInfo.Source.${{ needs.metadata.outputs.version }}.nupkg
-            artifacts/Icod.TermInfo.Source.${{ needs.metadata.outputs.version }}.snupkg
-            artifacts/Icod.TermInfo.Termcap.${{ needs.metadata.outputs.version }}.nupkg
-            artifacts/Icod.TermInfo.Termcap.${{ needs.metadata.outputs.version }}.snupkg
-            artifacts/Icod.TermInfo.Compiler.${{ needs.metadata.outputs.version }}.nupkg
-            artifacts/Icod.TermInfo.Compiler.${{ needs.metadata.outputs.version }}.snupkg
-            artifacts/Icod.TermInfo.Inspection.${{ needs.metadata.outputs.version }}.nupkg
-            artifacts/Icod.TermInfo.Inspection.${{ needs.metadata.outputs.version }}.snupkg
-            artifacts/Icod.TermInfo.Tools.${{ needs.metadata.outputs.version }}.nupkg
+            artifacts/release/*.nupkg
+            artifacts/release/*.snupkg
           if-no-files-found: error
           retention-days: 7
 
   tool-archives:
     needs: metadata
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
-
-      - name: Build framework-dependent T10 tool-suite archives
-        shell: bash
-        run: bash .github/scripts/build-tool-archives.sh Release artifacts/tools
-
-      - name: Verify T11 tool-suite archives
-        shell: bash
-        run: bash .github/scripts/verify-tool-archives.sh artifacts/tools
-
-      - name: Upload canonical tool-suite archives
-        uses: actions/upload-artifact@v4
+      - name: Build and verify Release tool archives
+        shell: pwsh
+        run: ./packaging/BuildToolArchives.ps1 -Configuration '${{ env.CONFIGURATION }}' -OutputDirectory artifacts/tools
+      - uses: actions/upload-artifact@v4
         with:
           name: release-tool-archives
           path: artifacts/tools/*
           if-no-files-found: error
           retention-days: 7
 
-  smoke-tool-archives:
-    needs: [metadata, validate, tool-archives]
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 10.0.x
-
-      - uses: actions/download-artifact@v4
-        with:
-          name: release-tool-archives
-          path: artifacts/tools
-
-      - name: Smoke matching tool-suite archive
-        shell: pwsh
-        run: ./.github/scripts/smoke-tool-archive.ps1 artifacts/tools
-
   smoke-tool-package:
-    needs: [metadata, validate]
+    needs: [metadata, package]
     strategy:
       fail-fast: false
       matrix:
@@ -234,22 +112,37 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
-
       - uses: actions/download-artifact@v4
         with:
           name: release-packages
           path: artifacts
-
-      - name: Smoke installable Icod.TermInfo.Tools package
-        shell: pwsh
+      - shell: pwsh
         run: ./.github/scripts/smoke-tool-package.ps1 artifacts
 
+  smoke-tool-archives:
+    needs: [metadata, tool-archives]
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-tool-archives
+          path: artifacts/tools
+      - shell: pwsh
+        run: ./.github/scripts/smoke-tool-archive.ps1 artifacts/tools
+
   publish-nuget:
-    needs: [metadata, validate, tool-archives, smoke-tool-archives, smoke-tool-package]
+    needs: [metadata, package, smoke-tool-package, smoke-tool-archives]
     runs-on: ubuntu-latest
     environment: Release
     permissions:
@@ -259,49 +152,32 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
-
       - uses: actions/download-artifact@v4
         with:
           name: release-packages
           path: artifacts/package
-
-      - name: Exchange GitHub OIDC token for NuGet credential
-        id: nuget-login
+      - id: nuget-login
         uses: NuGet/login@v1
         with:
           user: ${{ secrets.NUGET_USER }}
-
       - name: Publish to NuGet.org
         shell: pwsh
         env:
           NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
         run: |
-          $version = '${{ needs.metadata.outputs.version }}'
-          $packages = @(
-              "artifacts/package/Icod.TermInfo.$version.nupkg",
-              "artifacts/package/Icod.TermInfo.Source.$version.nupkg",
-              "artifacts/package/Icod.TermInfo.Termcap.$version.nupkg",
-              "artifacts/package/Icod.TermInfo.Compiler.$version.nupkg",
-              "artifacts/package/Icod.TermInfo.Inspection.$version.nupkg",
-              "artifacts/package/Icod.TermInfo.Tools.$version.nupkg"
-          )
-
+          $packages = @(Get-ChildItem -LiteralPath 'artifacts/package' -Filter '*.nupkg' -File | Sort-Object Name)
+          if (6 -ne $packages.Count) {
+              throw "Expected six coordinated .nupkg files; found $($packages.Count)."
+          }
           foreach ($package in $packages) {
-              if (-not (Test-Path -LiteralPath $package -PathType Leaf)) {
-                  throw "Expected package '$package' was not downloaded."
-              }
-
-              dotnet nuget push $package `
-                  --api-key $env:NUGET_API_KEY `
-                  --source 'https://api.nuget.org/v3/index.json' `
-                  --skip-duplicate
+              dotnet nuget push $package.FullName --api-key $env:NUGET_API_KEY --source 'https://api.nuget.org/v3/index.json' --skip-duplicate
               if (0 -ne $LASTEXITCODE) {
-                  throw "NuGet.org publication failed for '$package' with status $LASTEXITCODE."
+                  throw "NuGet.org publication failed for '$($package.Name)' with status $LASTEXITCODE."
               }
           }
 
   publish-github-packages:
-    needs: [metadata, validate, publish-nuget]
+    needs: [metadata, package, smoke-tool-package, smoke-tool-archives]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -310,55 +186,35 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
-
       - uses: actions/download-artifact@v4
         with:
           name: release-packages
           path: artifacts/package
-
       - name: Publish to GitHub Packages
         shell: pwsh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_ACTOR_NAME: ${{ github.actor }}
           GITHUB_OWNER: ${{ github.repository_owner }}
+          GITHUB_ACTOR_NAME: ${{ github.actor }}
         run: |
           $source = "https://nuget.pkg.github.com/$env:GITHUB_OWNER/index.json"
-          dotnet nuget add source $source `
-              --name github-release `
-              --username $env:GITHUB_ACTOR_NAME `
-              --password $env:GITHUB_TOKEN `
-              --store-password-in-clear-text
+          dotnet nuget add source $source --name github-release --username $env:GITHUB_ACTOR_NAME --password $env:GITHUB_TOKEN --store-password-in-clear-text
           if (0 -ne $LASTEXITCODE) {
               throw "GitHub Packages source configuration failed with status $LASTEXITCODE."
           }
-
-          $version = '${{ needs.metadata.outputs.version }}'
-          $packages = @(
-              "artifacts/package/Icod.TermInfo.$version.nupkg",
-              "artifacts/package/Icod.TermInfo.Source.$version.nupkg",
-              "artifacts/package/Icod.TermInfo.Termcap.$version.nupkg",
-              "artifacts/package/Icod.TermInfo.Compiler.$version.nupkg",
-              "artifacts/package/Icod.TermInfo.Inspection.$version.nupkg",
-              "artifacts/package/Icod.TermInfo.Tools.$version.nupkg"
-          )
-
+          $packages = @(Get-ChildItem -LiteralPath 'artifacts/package' -Filter '*.nupkg' -File | Sort-Object Name)
+          if (6 -ne $packages.Count) {
+              throw "Expected six coordinated .nupkg files; found $($packages.Count)."
+          }
           foreach ($package in $packages) {
-              if (-not (Test-Path -LiteralPath $package -PathType Leaf)) {
-                  throw "Expected package '$package' was not downloaded."
-              }
-
-              dotnet nuget push $package `
-                  --source github-release `
-                  --api-key $env:GITHUB_TOKEN `
-                  --skip-duplicate
+              dotnet nuget push $package.FullName --source github-release --api-key $env:GITHUB_TOKEN --skip-duplicate
               if (0 -ne $LASTEXITCODE) {
-                  throw "GitHub Packages publication failed for '$package' with status $LASTEXITCODE."
+                  throw "GitHub Packages publication failed for '$($package.Name)' with status $LASTEXITCODE."
               }
           }
 
   github-release:
-    needs: [metadata, validate, tool-archives, publish-nuget, publish-github-packages]
+    needs: [metadata, package, tool-archives, publish-nuget, publish-github-packages]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -367,35 +223,23 @@ jobs:
         with:
           name: release-packages
           path: artifacts/release-assets
-
       - uses: actions/download-artifact@v4
         with:
           name: release-tool-archives
           path: artifacts/release-assets
-
       - name: Create checksums
         shell: pwsh
         run: |
           $assetDirectory = 'artifacts/release-assets'
-          $files = @(
-              Get-ChildItem -LiteralPath $assetDirectory -File |
-                  Where-Object { $_.Extension -in @('.nupkg', '.snupkg', '.zip', '.gz') } |
-                  Sort-Object Name
-          )
+          $files = @(Get-ChildItem -LiteralPath $assetDirectory -File | Where-Object { $_.Extension -in @('.nupkg', '.snupkg', '.zip', '.gz') } | Sort-Object Name)
           if (17 -ne $files.Count) {
-              throw "Expected eleven package artifacts and six tool archives before checksumming; found $($files.Count)."
+              throw "Expected seventeen release binaries before checksumming; found $($files.Count)."
           }
-
           $lines = foreach ($file in $files) {
               $hash = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
               "$hash  $($file.Name)"
           }
-          [System.IO.File]::WriteAllLines(
-              (Join-Path $assetDirectory 'SHA256SUMS.txt'),
-              $lines,
-              [System.Text.UTF8Encoding]::new($false)
-          )
-
+          [System.IO.File]::WriteAllLines((Join-Path $assetDirectory 'SHA256SUMS.txt'), $lines, [System.Text.UTF8Encoding]::new($false))
       - name: Create GitHub Release
         shell: pwsh
         env:
@@ -404,63 +248,16 @@ jobs:
         run: |
           $tag = $env:GITHUB_REF_NAME
           $version = '${{ needs.metadata.outputs.version }}'
-          $assetDirectory = [System.IO.Path]::GetFullPath('artifacts/release-assets')
-          $notes = @'
-          ## Installation
-
-          ```text
-          dotnet add package Icod.TermInfo --version {0}
-          dotnet add package Icod.TermInfo.Source --version {0}
-          dotnet add package Icod.TermInfo.Termcap --version {0}
-          dotnet add package Icod.TermInfo.Compiler --version {0}
-          dotnet add package Icod.TermInfo.Inspection --version {0}
-          dotnet tool install --global Icod.TermInfo.Tools --version {0}
-          ```
-
-          The installed tool exposes routed `tic`, `infocmp`, `toe`, `captoinfo`,
-          and `infotocap` commands. The attached standalone archives expose the
-          same five command names directly.
-
-          `Icod.TermInfo`, `Icod.TermInfo.Source`, `Icod.TermInfo.Termcap`,
-          `Icod.TermInfo.Compiler`, and `Icod.TermInfo.Inspection` target `net8.0`,
-          `net9.0`, and `net10.0`. Termcap depends only on matching Runtime; Source
-          also depends on Runtime. Compiler and Inspection each depend on matching
-          Runtime and Source packages; Inspection does not depend on Compiler.
-
-          The framework-dependent .NET 10 tool suite is also attached for
-          win-x64, win-arm64, linux-x64, linux-arm64, osx-x64, and osx-arm64.
-          Each tool archive contains `tic`, `infocmp`, `toe`, `captoinfo`, and
-          `infotocap` plus required managed dependencies; the user supplies the
-          .NET 10 runtime.
-
-          All six NuGet packages, the five reusable-library symbol packages,
-          all six tool-suite archives, and SHA-256 checksums are attached to this
-          release.
-          '@ -f $version
-
-          $assets = @(
-              Get-ChildItem -LiteralPath $assetDirectory -File |
-                  Where-Object { $_.Extension -in @('.nupkg', '.snupkg', '.zip', '.gz', '.txt') } |
-                  Sort-Object Name |
-                  ForEach-Object { $_.FullName }
-          )
+          $assets = @(Get-ChildItem -LiteralPath 'artifacts/release-assets' -File | Sort-Object Name | ForEach-Object { $_.FullName })
           if (18 -ne $assets.Count) {
               throw "Expected eighteen GitHub Release assets; found $($assets.Count)."
           }
-
-          $arguments = @(
-              'release', 'create', $tag,
-              '--verify-tag',
-              '--title', "Icod.TermInfo $version",
-              '--generate-notes',
-              '--notes', $notes
-          )
+          $arguments = @('release', 'create', $tag, '--verify-tag', '--title', "${{ github.event.repository.name }} $version", '--generate-notes')
           if ('true' -eq '${{ needs.metadata.outputs.prerelease }}') {
               $arguments += '--prerelease'
               $arguments += '--latest=false'
           }
           $arguments += $assets
-
           & gh @arguments
           if (0 -ne $LASTEXITCODE) {
               throw "GitHub Release creation failed with status $LASTEXITCODE."

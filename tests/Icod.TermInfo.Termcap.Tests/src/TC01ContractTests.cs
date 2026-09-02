@@ -72,16 +72,16 @@ public sealed class TC01ContractTests
 					root,
 					".github",
 					"workflows",
-					"pr-build-and-test.yaml"
+					"pull-request.yaml"
 				)
 			);
-		string pushMain =
+		string main =
 			File.ReadAllText(
 				Path.Combine(
 					root,
 					".github",
 					"workflows",
-					"push-main.yaml"
+					"main.yaml"
 				)
 			);
 		string release =
@@ -93,17 +93,41 @@ public sealed class TC01ContractTests
 					"release.yaml"
 				)
 			);
+		string packPackages =
+			File.ReadAllText(
+				Path.Combine(
+					root,
+					"packaging",
+					"PackPackages.ps1"
+				)
+			);
 
 		Assert.Contains(
-			"dotnet pack Icod.TermInfo.Termcap/Icod.TermInfo.Termcap.csproj -c Staging",
+			"Icod.TermInfo.Termcap/Icod.TermInfo.Termcap.csproj",
+			packPackages
+		);
+		Assert.Contains(
+			"CONFIGURATION: Staging",
 			pullRequest
 		);
 		Assert.Contains(
-			"dotnet pack Icod.TermInfo.Termcap/Icod.TermInfo.Termcap.csproj -c Release",
-			pushMain
+			"./packaging/PackPackages.ps1",
+			pullRequest
 		);
 		Assert.Contains(
-			"dotnet pack Icod.TermInfo.Termcap/Icod.TermInfo.Termcap.csproj -c Release",
+			"CONFIGURATION: Release",
+			main
+		);
+		Assert.Contains(
+			"./packaging/PackPackages.ps1",
+			main
+		);
+		Assert.Contains(
+			"CONFIGURATION: Release",
+			release
+		);
+		Assert.Contains(
+			"./packaging/PackPackages.ps1",
 			release
 		);
 	}

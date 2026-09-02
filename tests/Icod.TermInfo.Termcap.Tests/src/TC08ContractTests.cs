@@ -122,9 +122,21 @@ public sealed class TC08ContractTests {
 					"release.yaml"
 				)
 			);
+		string packPackages =
+			File.ReadAllText(
+				Path.Combine(
+					root,
+					"packaging",
+					"PackPackages.ps1"
+				)
+			);
+
 		Assert.Contains( "if (17 -ne $files.Count)", release );
 		Assert.Contains( "if (18 -ne $assets.Count)", release );
-		Assert.Contains( "Icod.TermInfo.Termcap.$version.nupkg", release );
+		Assert.Contains( "Icod.TermInfo.Termcap/Icod.TermInfo.Termcap.csproj", packPackages );
+		Assert.Contains( "NuGet/login@v1", release );
+		Assert.Contains( "environment: Release", release );
+		Assert.Contains( "packages: write", release );
 
 		string implementation =
 			File.ReadAllText(

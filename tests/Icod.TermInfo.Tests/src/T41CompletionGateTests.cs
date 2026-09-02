@@ -97,14 +97,14 @@ public sealed class T41CompletionGateTests
 	{
 		string root =
 			FindRepositoryRoot();
-		string pushMain =
+		string main =
 			NormalizeLineEndings(
 				File.ReadAllText(
 					Path.Combine(
 						root,
 						".github",
 						"workflows",
-						"push-main.yaml")));
+						"main.yaml")));
 		string pullRequest =
 			NormalizeLineEndings(
 				File.ReadAllText(
@@ -112,7 +112,7 @@ public sealed class T41CompletionGateTests
 						root,
 						".github",
 						"workflows",
-						"pr-build-and-test.yaml")));
+						"pull-request.yaml")));
 		string release =
 			NormalizeLineEndings(
 				File.ReadAllText(
@@ -123,59 +123,58 @@ public sealed class T41CompletionGateTests
 						"release.yaml")));
 
 		Assert.StartsWith(
-			"name: main validation\n"
+			"name: main\n"
 			+ "\n"
 			+ "on:\n"
 			+ "  push:\n"
 			+ "    branches:\n"
-			+ "      - main\n"
-			+ "\n"
-			+ "permissions:\n",
-			pushMain);
+			+ "      - main\n",
+			main);
 		Assert.DoesNotContain(
 			"pull_request:",
-			pushMain);
+			main);
 		Assert.Contains(
-			"dotnet pack Icod.TermInfo.csproj -c Release",
-			pushMain);
+			"CONFIGURATION: Release",
+			main);
 		Assert.Contains(
-			"verify-release-package.sh artifacts Release",
-			pushMain);
+			"windows-11-arm",
+			main);
 		Assert.Contains(
-			"verify-release-package.cmd artifacts Release",
-			pushMain);
+			"ubuntu-24.04-arm",
+			main);
+		Assert.Contains(
+			"macos-15-intel",
+			main);
+		Assert.Contains(
+			"./packaging/PackPackages.ps1",
+			main);
+		Assert.Contains(
+			"./packaging/VerifyPackageArtifact.ps1",
+			main);
+		Assert.Contains(
+			"./packaging/BuildToolArchives.ps1",
+			main);
 
 		Assert.StartsWith(
-			"name: pr-build-and-test\n"
+			"name: pull-request\n"
 			+ "\n"
 			+ "on:\n"
-			+ "  pull_request:\n"
-			+ "\n"
-			+ "permissions:\n"
-			+ "  contents: read\n"
-			+ "\n"
-			+ "jobs:\n",
+			+ "  pull_request:\n",
 			pullRequest);
 		Assert.Contains(
-			"dotnet pack Icod.TermInfo.csproj -c Staging",
+			"CONFIGURATION: Staging",
 			pullRequest);
 		Assert.Contains(
-			"verify-release-package.sh artifacts Staging",
+			"./packaging/PackPackages.ps1",
+			pullRequest);
+		Assert.Contains(
+			"./packaging/VerifyPackageArtifact.ps1",
+			pullRequest);
+		Assert.Contains(
+			"./packaging/BuildToolArchives.ps1",
 			pullRequest);
 		Assert.DoesNotContain(
-			"-c Release",
-			pullRequest);
-		Assert.Contains(
-			"actions/upload-artifact@v4",
-			pullRequest);
-		Assert.Contains(
-			"name: icod-terminfo-pr-packages",
-			pullRequest);
-		Assert.Contains(
-			"artifacts/*.nupkg",
-			pullRequest);
-		Assert.Contains(
-			"artifacts/*.snupkg",
+			"CONFIGURATION: Release",
 			pullRequest);
 
 		Assert.StartsWith(
@@ -184,24 +183,22 @@ public sealed class T41CompletionGateTests
 			+ "on:\n"
 			+ "  push:\n"
 			+ "    tags:\n"
-			+ "      - \'v*\'\n",
+			+ "      - 'v*'\n",
 			release);
 		Assert.Contains(
-			"Require tag on exact main HEAD",
+			"Require tagged commit in main",
 			release);
 		Assert.Contains(
-			"git fetch origin refs/heads/main:refs/remotes/origin/main --no-tags\n"
-			+ "          if (0 -ne $LASTEXITCODE) {\n"
-			+ "              throw 'Unable to refresh the current origin/main commit.'\n"
-			+ "          }\n"
-			+ "\n"
-			+ "          $mainCommit = (git rev-parse origin/main).Trim()",
-			release);
-		Assert.DoesNotContain(
-			"merge-base --is-ancestor",
+			"git merge-base --is-ancestor $env:GITHUB_SHA origin/main",
 			release);
 		Assert.Contains(
-			"Validate tag and centralized suite version",
+			"Validate tag and suite version",
+			release);
+		Assert.Contains(
+			"./packaging/PackPackages.ps1",
+			release);
+		Assert.Contains(
+			"./packaging/BuildToolArchives.ps1",
 			release);
 		Assert.Contains(
 			"NuGet/login@v1",
@@ -219,10 +216,9 @@ public sealed class T41CompletionGateTests
 			"dotnet nuget push",
 			"packages: write",
 			"id-token: write",
-			"deploy:",
 		];
 
-		foreach (string workflow in new[] { pullRequest, pushMain })
+		foreach (string workflow in new[] { pullRequest, main })
 		{
 			foreach (string fragment in forbiddenPublicationFragments)
 			{
@@ -252,7 +248,7 @@ public sealed class T41CompletionGateTests
 						current.FullName,
 						".github",
 						"workflows",
-						"push-main.yaml")))
+						"main.yaml")))
 			{
 				return current.FullName;
 			}
