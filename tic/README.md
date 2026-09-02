@@ -2,11 +2,12 @@
 
 `tic` is part of the `Icod.TermInfo` managed terminfo tool suite.
 
-## 1.7 status
+## 1.8 status
 
-Version `1.7.0` carries the frozen `tic` compiler, source-language, database,
-and command contracts forward unchanged. Relative-source synthesis is isolated
-in Inspection and `infocmp -u`; `tic` acquires no new semantics or dependencies.
+Version `1.8.0` carries the frozen `tic` compiler, source-language, database,
+and command contracts forward unchanged. Relative-source planning is isolated
+in Inspection and `infocmp --plan-use`; `tic` acquires no new semantics or
+dependencies.
 
 ## 1.6.x history
 

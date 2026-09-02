@@ -2,7 +2,7 @@
 
 ## 1.8 relative-source planning
 
-Version 1.8 adds deterministic bounded parent selection without changing the
+Version 1.8.0 adds deterministic bounded parent selection without changing the
 frozen 1.7 `-u` synthesis contract:
 
 ```text
@@ -27,6 +27,10 @@ are:
 `-u`, `-d`, `-c`, `-n`, `-q`, and `-D` cannot be combined with `--plan-use`.
 Planning-bound controls require planning mode. Successful planning writes only
 the selected source to stdout and leaves stderr empty.
+
+The stable 1.8 contract is frozen by the exact Inspection API baseline,
+generated-state oracle, package consumers, direct and routed command tests, and
+all six matching archive smokes.
 
 ## 1.7 relative synthesis
 

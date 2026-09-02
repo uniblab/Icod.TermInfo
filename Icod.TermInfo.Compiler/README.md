@@ -11,13 +11,13 @@ controlled publication into an explicit conventional terminfo directory root.
 C07 closes the implementation program with round-trip, determinism, and pinned
 ncurses/`tic` differential validation.
 
-## 1.8 release-candidate status
+## 1.8 release status
 
-`1.8.0-Alpha-8` carries Compiler unchanged into the complete stable-intended
-1.8 contract. Its frozen 1.2 API, Runtime-and-Source dependency graph, three
-target frameworks, and assembly identity remain unchanged. Compiler remains
-test and sample infrastructure for planned-source round trips; Inspection does
-not gain a production Compiler dependency.
+Version 1.8.0 carries Compiler unchanged into the stable 1.8 contract. Its
+frozen 1.2 API, Runtime-and-Source dependency graph, three target frameworks,
+and assembly identity remain unchanged. Compiler remains test and sample
+infrastructure for planned-source round trips; Inspection does not gain a
+production Compiler dependency.
 
 ## 1.7 release status
 
@@ -28,14 +28,14 @@ not acquire a production Compiler dependency.
 
 ## Install
 
-For the 1.7.0 release:
+For the 1.8.0 release:
 
 ```text
-dotnet add package Icod.TermInfo.Compiler --version 1.7.0
+dotnet add package Icod.TermInfo.Compiler --version 1.8.0
 ```
 
 The package targets `net8.0`, `net9.0`, and `net10.0` and depends on the matching
-`Icod.TermInfo` and `Icod.TermInfo.Source` packages. Version 1.7.0 preserves the
+`Icod.TermInfo` and `Icod.TermInfo.Source` packages. Version 1.8.0 preserves the
 frozen 1.2 Compiler public API and semantics. The dependency remains one-way;
 neither Source nor Runtime depends on Compiler, and Compiler does not acquire an
 Inspection or Termcap dependency.

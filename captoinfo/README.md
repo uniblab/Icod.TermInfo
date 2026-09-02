@@ -10,9 +10,9 @@ resolver, semantic conversion uses TC04, and the resulting immutable
 `Icod.TermInfo.Inspection`. TC08 freezes that composition for the stable 1.6.0
 release.
 
-Version `1.7.0` carries that frozen conversion behavior unchanged. Relative
-terminfo source synthesis is isolated in Inspection and `infocmp -u`; it does
-not alter `captoinfo` command semantics or dependencies.
+Version `1.8.0` carries that frozen conversion behavior unchanged. Relative
+terminfo source planning is isolated in Inspection and `infocmp --plan-use`; it
+does not alter `captoinfo` command semantics or dependencies.
 
 ```text
 Usage: captoinfo [OPTION]... [FILE]...

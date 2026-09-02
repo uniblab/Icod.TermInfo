@@ -89,7 +89,7 @@ Version 1.8 adds bounded deterministic parent selection through
 is a final tie-break rather than a first-match rule:
 
 RP08 freezes this direct and routed walkthrough as release evidence for the
-stable-intended Alpha-8 command and distribution contract.
+stable 1.8 command and distribution contract.
 
 ```text
 infocmp -A ./terminfo -B ./terminfo -1 -x --max-parents 1 --require-exhaustive --plan-use icod-demo-child icod-demo-decoy icod-demo-base > planned-child.ti

@@ -18,7 +18,7 @@ public sealed class ContractTests {
 				"Directory.Build.props"
 			);
 		Assert.Equal(
-			"1.8.0-Alpha-8",
+			"1.8.0",
 			ReadRequiredProperty(
 				buildProperties,
 				"IcodTermInfoSuiteVersion"

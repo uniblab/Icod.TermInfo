@@ -7,57 +7,53 @@
 
 `Icod.TermInfo` is a managed, dependency-free .NET implementation of the low-level terminal-capability model traditionally supplied by `libtinfo`.
 
-Version 1.7.0 is the current coordinated release. It adds the frozen Inspection
-relative-source synthesis API and `infocmp -u` while preserving the Runtime,
-Source, Compiler, and Termcap public surfaces, all existing package dependency
-directions, and all established command semantics.
+Version 1.8.0 is the current coordinated release. It adds deterministic,
+bounded ordered-parent planning in `Icod.TermInfo.Inspection` and exposes it
+through `infocmp --plan-use` while preserving the Runtime, Source, Compiler,
+Termcap, and frozen 1.7 synthesis contracts.
 
-The 1.7.0 library package family targets `net8.0`, `net9.0`, and `net10.0`; the
+The 1.8.0 library package family targets `net8.0`, `net9.0`, and `net10.0`; the
 packages use C# 13, contain no native ncurses/terminfo payload, and are intended
 to run on Windows, Linux, and macOS.
 
-The `1.8.0` development line adds deterministic, bounded ordered-parent
-planning in `Icod.TermInfo.Inspection` for the frozen 1.7 relative-source
-synthesizer. `1.8.0-Alpha-8` is the complete stable-intended release candidate:
-its additive planning API, score, bounds, exhaustive and explicitly bounded
-search, explicit catalog orchestration, `infocmp --plan-use` composition,
+The additive planning API, lexicographic score, bounds, exhaustive and
+explicitly bounded search, explicit catalog orchestration, command composition,
 package consumers, samples, and distribution gates are frozen in
-`docs/1.8.0-RELEASE-AUDIT.md`. The install commands below continue to name the
-current published stable release until the repository owner publishes 1.8.0.
+`docs/1.8.0-RELEASE-AUDIT.md`.
 
 ## Install
 
 Runtime-only consumers use:
 
 ```text
-dotnet add package Icod.TermInfo --version 1.7.0
+dotnet add package Icod.TermInfo --version 1.8.0
 ```
 
 Applications which need terminfo source-language support use:
 
 ```text
-dotnet add package Icod.TermInfo.Source --version 1.7.0
+dotnet add package Icod.TermInfo.Source --version 1.8.0
 ```
 
 Applications which need opt-in termcap parsing, conversion, rendering, or
 explicit historical termcap acquisition use:
 
 ```text
-dotnet add package Icod.TermInfo.Termcap --version 1.7.0
+dotnet add package Icod.TermInfo.Termcap --version 1.8.0
 ```
 
 Applications which compile terminfo source or write conventional compiled
 terminfo databases use:
 
 ```text
-dotnet add package Icod.TermInfo.Compiler --version 1.7.0
+dotnet add package Icod.TermInfo.Compiler --version 1.8.0
 ```
 
 Applications which need canonical rendering, semantic comparison, or
 provider-aware inspection use:
 
 ```text
-dotnet add package Icod.TermInfo.Inspection --version 1.7.0
+dotnet add package Icod.TermInfo.Inspection --version 1.8.0
 ```
 
 `Icod.TermInfo.Source` and `Icod.TermInfo.Termcap` each depend on the matching
@@ -69,8 +65,8 @@ on Termcap. Applications which only load compiled terminfo or consume
 
 The same validated package artifacts are published to NuGet.org and GitHub
 Packages. Historical release contracts remain recorded in the versioned release
-audits; the 1.7 publication gate is recorded in
-`docs/1.7.0-RELEASE-AUDIT.md`.
+audits; the 1.8 publication gate is recorded in
+`docs/1.8.0-RELEASE-AUDIT.md`.
 
 ## Tool Suite
 
@@ -97,7 +93,7 @@ distribution-only router package.
 Install the coordinated router as a .NET tool with:
 
 ```text
-dotnet tool install --global Icod.TermInfo.Tools --version 1.7.0
+dotnet tool install --global Icod.TermInfo.Tools --version 1.8.0
 
 icod-terminfo tic -V
 icod-terminfo infocmp -V
@@ -122,7 +118,7 @@ Icod.TermInfo.Tools.<version>.osx-x64.tar.gz
 Icod.TermInfo.Tools.<version>.osx-arm64.tar.gz
 ```
 
-Each 1.7.0 archive contains the traditional `tic`, `infocmp`, `toe`,
+Each 1.8.0 archive contains the traditional `tic`, `infocmp`, `toe`,
 `captoinfo`, and `infotocap` command names and their required managed
 dependencies. The user supplies the .NET 10 runtime and controls where the
 archive is unpacked and whether that location is placed on `PATH`. The archive
@@ -352,6 +348,52 @@ string relativeSource = TerminalDescriptionSourceSynthesizer.Synthesize(
 Parent order is semantic and is never optimized, reordered, or pruned. The
 generated source resolves to the target when combined with source representations
 of the supplied effective parents.
+
+## What 1.8 adds
+
+Version 1.8.0 adds deterministic parent planning above the unchanged 1.7
+relative-source synthesizer:
+
+- `TerminalDescriptionSourcePlanner` evaluates zero-, one-, and ordered
+  multi-parent plans from an explicit caller-supplied candidate sequence;
+- `TerminalDescriptionSourcePlanningOptions` applies independent candidate,
+  selected-parent, evaluated-plan, and generated-source bounds;
+- `TerminalDescriptionSourcePlanningScore` ranks plans lexicographically by
+  local directives, cancellations, parent count, rendered UTF-8 bytes, and
+  candidate-index sequence;
+- `TerminalDescriptionSourcePlan` returns selected parents, generated source,
+  score, evaluated-plan count, and exhaustive-versus-bounded evidence;
+- explicit catalog and directory helpers load only caller-selected data and do
+  not consult environment or platform-default discovery; and
+- `infocmp --plan-use` exposes the same planner through the standalone command,
+  `icod-terminfo` router, tool package, and six release archives.
+
+Applications can plan directly from effective descriptions:
+
+```csharp
+using Icod.TermInfo;
+using Icod.TermInfo.Inspection;
+
+TerminalDescription target =
+	TerminalDatabase.BuiltIn.Load( "xterm-256color" );
+TerminalDescription candidate =
+	TerminalDatabase.BuiltIn.Load( "xterm" );
+
+TerminalDescriptionSourcePlan plan =
+	TerminalDescriptionSourcePlanner.Plan(
+		target,
+		new[] {
+			new TerminalDescriptionSourceSynthesisParent(
+				"xterm",
+				candidate
+			),
+		}
+	);
+```
+
+The planner does not infer ancestry or rewrite synthesis semantics. Every
+evaluated plan delegates source generation to the frozen 1.7 synthesizer, and
+the result reports whether the configured search space was exhausted.
 
 ## Getting started
 
@@ -1021,9 +1063,10 @@ pre-release closure evidence, `docs/1.6.0-RELEASE-AUDIT.md` for the published
 1.6.0 contract and post-publication record, and `docs/1.6.1-RELEASE-AUDIT.md`
 for the release-verifier isolation hotfix and 1.6.1 publication gate. The 1.7
 release contract is defined by
-`Icod.TermInfo 1.7.0 - Relative Terminfo Source Synthesis Roadmap.md` and its
-publication gate is recorded in
-`docs/1.7.0-RELEASE-AUDIT.md`.
+`Icod.TermInfo 1.7.0 - Relative Terminfo Source Synthesis Roadmap.md`. The 1.8
+planning contract is defined by
+`Icod.TermInfo-1.8.0-Relative-Source-Planning-and-Parent-Selection-Roadmap.md`,
+and its publication gate is recorded in `docs/1.8.0-RELEASE-AUDIT.md`.
 
 ## Scope
 
@@ -1036,10 +1079,12 @@ post-1.0 package-family sequence, `Icod.TermInfo-1.3.0-Inspection-and-Comparison
 for the 1.3 Inspection contract,
 `Icod.TermInfo-1.4.0-Tool-Suite-Roadmap.md` for the frozen 1.4 command contract,
 `docs/1.6.0-RELEASE-AUDIT.md` for the frozen 1.6.0 release contract,
-`docs/1.6.1-RELEASE-AUDIT.md` for the published patch-release contract, and
+`docs/1.6.1-RELEASE-AUDIT.md` for the published patch-release contract,
 `Icod.TermInfo 1.7.0 - Relative Terminfo Source Synthesis Roadmap.md` and
-`docs/1.7.0-RELEASE-AUDIT.md` for the current 1.7 synthesis and release
-contracts, and `docs/VERSIONING.md` and `docs/COMPATIBILITY.md` for the 1.x
+`docs/1.7.0-RELEASE-AUDIT.md` for the frozen 1.7 synthesis contract, and
+`Icod.TermInfo-1.8.0-Relative-Source-Planning-and-Parent-Selection-Roadmap.md`
+and `docs/1.8.0-RELEASE-AUDIT.md` for the current 1.8 planning and release
+contracts. See `docs/VERSIONING.md` and `docs/COMPATIBILITY.md` for the 1.x
 promises.
 The 0.6.0 through 1.0.0 roadmaps remain historical frozen contracts.
 
