@@ -1,0 +1,26 @@
+name: da08-permanent-gates
+
+on:
+  push:
+    branches: [1.10.0]
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 1.10.0
+      - name: Install permanent DA08 release gates
+        run: python3 .github/scripts/da08-permanent-gates.py
+      - name: Commit permanent DA08 gates
+        run: |
+          git diff --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .github/scripts/verify-release-package.sh .github/scripts/verify-release-package.cmd tools/inspection-package-verifier/Program.cs
+          git commit -m 'Enforce DA08 API and schema freeze'
+          git push origin HEAD:1.10.0
