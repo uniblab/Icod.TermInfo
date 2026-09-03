@@ -6,6 +6,7 @@ on:
       - 1.10.0
     paths:
       - .github/workflows/da01-apply.yml
+      - .github/scripts/da01-apply.py
 
 permissions:
   contents: write
