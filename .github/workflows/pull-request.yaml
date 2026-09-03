@@ -96,6 +96,9 @@ jobs:
       - name: Smoke installable Icod.TermInfo.Tools package
         shell: pwsh
         run: ./.github/scripts/smoke-tool-package.ps1 artifacts
+      - name: Smoke DA07 installed-tool database automation
+        shell: pwsh
+        run: ./.github/scripts/smoke-da07-automation.ps1 package artifacts
 
   smoke-tool-archives:
     needs: build
@@ -129,3 +132,6 @@ jobs:
       - name: Smoke matching tool-suite archive
         shell: pwsh
         run: ./.github/scripts/smoke-tool-archive.ps1 artifacts/tools
+      - name: Smoke DA07 archive database automation
+        shell: pwsh
+        run: ./.github/scripts/smoke-da07-automation.ps1 archive artifacts/tools
