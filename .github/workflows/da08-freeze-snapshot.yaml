@@ -2,15 +2,13 @@ name: da08-freeze-snapshot
 
 on:
   push:
-    branches:
-      - 1.10.0
+    branches: [1.10.0]
 
 permissions:
   contents: write
 
 jobs:
   snapshot:
-    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,65 +20,25 @@ jobs:
             8.0.x
             9.0.x
             10.0.x
-      - name: Restore and build Inspection snapshot inputs
+      - name: Build
         run: |
           dotnet restore Icod.TermInfo.sln
           dotnet build Icod.TermInfo.sln -c Staging --no-restore -p:ContinuousIntegrationBuild=true
-      - name: Freeze exact 1.10 Inspection API and schema fingerprints
-        shell: pwsh
+      - name: Snapshot
         run: |
-          $baseline = 'docs/1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt'
-          & dotnet run `
-            --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj `
-            -c Staging `
-            --no-build `
-            -- --write `
-            $baseline `
-            Icod.TermInfo.Inspection/bin/Staging/net10.0/Icod.TermInfo.Inspection.dll
-          if (0 -ne $LASTEXITCODE) {
-            throw 'Could not write the DA08 Inspection API baseline.'
-          }
-          & dotnet run `
-            --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj `
-            -c Staging `
-            --no-build `
-            -- --check `
-            $baseline `
-            Icod.TermInfo.Inspection/bin/Staging/net8.0/Icod.TermInfo.Inspection.dll
-          if (0 -ne $LASTEXITCODE) {
-            throw 'net8.0 does not match the DA08 Inspection API baseline.'
-          }
-          & dotnet run `
-            --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj `
-            -c Staging `
-            --no-build `
-            -- --check `
-            $baseline `
-            Icod.TermInfo.Inspection/bin/Staging/net9.0/Icod.TermInfo.Inspection.dll
-          if (0 -ne $LASTEXITCODE) {
-            throw 'net9.0 does not match the DA08 Inspection API baseline.'
-          }
-          $apiHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $baseline).Hash.ToLowerInvariant()
-          $schemaV1Hash = (Get-FileHash -Algorithm SHA256 -LiteralPath 'docs/Icod.TermInfo.Inspection.schema.json').Hash.ToLowerInvariant()
-          $schemaV2Hash = (Get-FileHash -Algorithm SHA256 -LiteralPath 'docs/Icod.TermInfo.Inspection.schema.v2.json').Hash.ToLowerInvariant()
-          $fingerprints = @"
-Icod.TermInfo 1.10.0 DA08 freeze fingerprints
-Inspection API SHA-256: $apiHash
-JSON v1 schema SHA-256: $schemaV1Hash
-JSON v2 schema SHA-256: $schemaV2Hash
-"@
-          [System.IO.File]::WriteAllText(
-            'docs/1.10.0-DA08-FREEZE-FINGERPRINTS.txt',
-            $fingerprints,
-            [System.Text.UTF8Encoding]::new($false)
-          )
+          dotnet run --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj -c Staging --no-build -- --write docs/1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt Icod.TermInfo.Inspection/bin/Staging/net10.0/Icod.TermInfo.Inspection.dll
+          dotnet run --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj -c Staging --no-build -- --check docs/1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt Icod.TermInfo.Inspection/bin/Staging/net8.0/Icod.TermInfo.Inspection.dll
+          dotnet run --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj -c Staging --no-build -- --check docs/1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt Icod.TermInfo.Inspection/bin/Staging/net9.0/Icod.TermInfo.Inspection.dll
+          api_hash="$(sha256sum docs/1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt | awk '{print $1}')"
+          v1_hash="$(sha256sum docs/Icod.TermInfo.Inspection.schema.json | awk '{print $1}')"
+          v2_hash="$(sha256sum docs/Icod.TermInfo.Inspection.schema.v2.json | awk '{print $1}')"
+          printf 'Icod.TermInfo 1.10.0 DA08 freeze fingerprints\nInspection API SHA-256: %s\nJSON v1 schema SHA-256: %s\nJSON v2 schema SHA-256: %s\n' "$api_hash" "$v1_hash" "$v2_hash" > docs/1.10.0-DA08-FREEZE-FINGERPRINTS.txt
           git diff --check
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -- $baseline docs/1.10.0-DA08-FREEZE-FINGERPRINTS.txt
-          if (git diff --cached --quiet) {
-            Write-Host 'DA08 freeze artifacts are already current.'
+          git add docs/1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt docs/1.10.0-DA08-FREEZE-FINGERPRINTS.txt
+          if git diff --cached --quiet; then
             exit 0
-          }
+          fi
           git commit -m 'Freeze DA08 Inspection API and schema fingerprints'
           git push origin HEAD:1.10.0
