@@ -1,0 +1,45 @@
+name: Apply DA04 database-set comparison
+
+on:
+  push:
+    branches:
+      - 1.10.0
+    paths:
+      - .github/workflows/da04-apply.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 1.10.0
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+            10.0.x
+
+      - name: Apply DA04 coordinated updates
+        run: python3 .github/scripts/da04-apply.py
+
+      - name: Build DA04
+        run: dotnet build Icod.TermInfo.sln -c Debug
+
+      - name: Test DA04
+        run: dotnet test Icod.TermInfo.sln -c Debug --no-build
+
+      - name: Commit DA04
+        run: |
+          rm .github/scripts/da04-apply.py
+          rm .github/workflows/da04-apply.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Implement DA04 database-set comparison"
+          git push origin HEAD:1.10.0
