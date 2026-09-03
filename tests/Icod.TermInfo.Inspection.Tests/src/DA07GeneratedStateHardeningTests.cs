@@ -36,7 +36,7 @@ public sealed class DA07GeneratedStateHardeningTests {
 		Assert.Equal( 2, set.Entries.Count );
 		Assert.Contains(
 			analysis.RepeatedIdentities,
-			identity => identity.Name == "shared"
+			identity => identity.Identity.Name == "shared"
 				&& identity.Relationship
 					== TermInfoDatabaseSetSemanticRelationship.SemanticallyDifferent
 		);
@@ -132,8 +132,8 @@ public sealed class DA07GeneratedStateHardeningTests {
 		Assert.Equal( first.Candidates.Count, second.Candidates.Count );
 		Assert.Equal( first.Plan.Source, second.Plan.Source );
 		Assert.Equal(
-			first.Candidates.Select( candidate => candidate.Name ).ToArray(),
-			second.Candidates.Select( candidate => candidate.Name ).ToArray()
+			first.Candidates.Select( candidate => candidate.CanonicalName ).ToArray(),
+			second.Candidates.Select( candidate => candidate.CanonicalName ).ToArray()
 		);
 		Assert.InRange( first.Candidates.Count, 1, 32 );
 
