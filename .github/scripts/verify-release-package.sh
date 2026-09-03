@@ -475,6 +475,18 @@ else
   unset NUGET_PACKAGES
 fi
 
+# The 1.10 database-set sample is executable documentation for the frozen public
+# API and all three version-2 database automation document kinds.
+for database_set_sample_framework in net8.0 net9.0 net10.0; do
+  dotnet run \
+    --project samples/Icod.TermInfo.DatabaseSet.Sample/Icod.TermInfo.DatabaseSet.Sample.csproj \
+    -c "${configuration}" \
+    -f "${database_set_sample_framework}" \
+    --no-build \
+    -- --verify-fixtures samples/Icod.TermInfo.DatabaseSet.Sample/expected \
+    > /dev/null
+done
+
 # The repository sample must retain a non-interactive path suitable for CI.
 dotnet run \
   --project samples/Icod.TermInfo.Sample/Icod.TermInfo.Sample.csproj \

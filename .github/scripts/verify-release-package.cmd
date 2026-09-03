@@ -351,6 +351,13 @@ if defined OLD_NUGET_PACKAGES (
 )
 
 echo.
+echo === Icod.TermInfo 1.10 database-set sample fixtures ===
+for %%F in (net8.0 net9.0 net10.0) do (
+    dotnet run --project samples\Icod.TermInfo.DatabaseSet.Sample\Icod.TermInfo.DatabaseSet.Sample.csproj -c %CONFIGURATION% -f %%F --no-build -- --verify-fixtures samples\Icod.TermInfo.DatabaseSet.Sample\expected >nul
+    if errorlevel 1 goto fail
+)
+
+echo.
 echo === Non-interactive repository sample ===
 dotnet run --project samples\Icod.TermInfo.Sample\Icod.TermInfo.Sample.csproj -c %CONFIGURATION% -f net10.0 --no-build -- --describe-only --profile ms-terminal-direct
 if errorlevel 1 goto fail
