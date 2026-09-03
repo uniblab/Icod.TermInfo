@@ -53,7 +53,7 @@ replace_once(
 replace_once(
     'Icod.TermInfo-1.10.0-Deterministic-Multi-Database-Inspection-Comparison-and-Planning-Automation-Roadmap.md',
     '**Status:** DA06 complete and frozen; DA07 not yet started  ',
-    '**Status:** DA08 release contract frozen at `1.10.0-Alpha-8`; stable promotion pending exact-head validation  ',
+    '**Status:** DA08 release contract frozen at `1.10.0-Alpha-8`; stable promotion pending exact-head validation',
 )
 
 root_section = '''## 1.10 development status — DA08 release freeze
