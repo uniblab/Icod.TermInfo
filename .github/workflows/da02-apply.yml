@@ -25,6 +25,9 @@ jobs:
             9.0.x
             10.0.x
 
+      - name: Correct historical-version guard
+        run: sed -i '/MI07ReleaseClosureTests.cs/d' .github/scripts/da02-apply.py
+
       - name: Apply DA02 coordinated updates
         run: python3 .github/scripts/da02-apply.py
 
