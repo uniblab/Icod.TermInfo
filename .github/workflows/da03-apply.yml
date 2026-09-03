@@ -28,6 +28,20 @@ jobs:
       - name: Correct unit-test cancellation tokens
         run: sed -i 's/TestContext.Current.CancellationToken/CancellationToken.None/g' .github/scripts/da03-apply.py
 
+      - name: Refine incomplete alias visibility
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('.github/scripts/da03-apply.py')
+          text = path.read_text(encoding='utf-8')
+          old = '''\t\t\tif ( pair.Value.Count < 2\n\t\t\t\t&& matchingCanonicalIdentity is null ) {\n\t\t\t\tcontinue;\n\t\t\t}'''
+          new = '''\t\t\tif ( pair.Value.Count < 2\n\t\t\t\t&& matchingCanonicalIdentity is null\n\t\t\t\t&& IsComplete ) {\n\t\t\t\tcontinue;\n\t\t\t}'''
+          if text.count(old) != 1:
+              raise SystemExit('DA03 alias visibility guard mismatch')
+          path.write_text(text.replace(old, new, 1), encoding='utf-8', newline='\n')
+          PY
+
       - name: Apply DA03 coordinated updates
         run: python3 .github/scripts/da03-apply.py
 
