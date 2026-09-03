@@ -32,7 +32,7 @@ internal static class DA07PackageSmoke {
 		TermInfoDatabaseSetSemanticAnalysis analysis = set.AnalyzeSemantics();
 		Require(
 			analysis.RepeatedIdentities.Any(
-				identity => identity.Name == "shared"
+				identity => identity.Identity.Name == "shared"
 					&& identity.Relationship
 						== TermInfoDatabaseSetSemanticRelationship.SemanticallyDifferent
 			),
