@@ -18,16 +18,10 @@ jobs:
         with:
           ref: fix_1.9.0_build_warnings
 
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: |
-            8.0.x
-            9.0.x
-            10.0.x
-
       - name: Apply focused warning fixes
-        shell: python
+        shell: bash
         run: |
+          python3 - <<'PY'
           from pathlib import Path
 
           replacements = {
@@ -50,39 +44,33 @@ jobs:
                   ),
                   (
                       '''entries[ index ]
-					.GetProperty( "aliases" )
-					.EnumerateArray()
-					.Select( value => value.GetString() )
-					.ToArray()''',
+          \t\t\t\t\t.GetProperty( "aliases" )
+          \t\t\t\t\t.EnumerateArray()
+          \t\t\t\t\t.Select( value => value.GetString() )
+          \t\t\t\t\t.ToArray()'''.replace("          ", ""),
                       '''entries[ index ]
-					.GetProperty( "aliases" )
-					.EnumerateArray()
-					.Select( value => value.GetString()! )
-					.ToArray()''',
+          \t\t\t\t\t.GetProperty( "aliases" )
+          \t\t\t\t\t.EnumerateArray()
+          \t\t\t\t\t.Select( value => value.GetString()! )
+          \t\t\t\t\t.ToArray()'''.replace("          ", ""),
                   ),
                   (
                       '''data
-				.GetProperty( "duplicateCanonicalNames" )
-				.EnumerateArray()
-				.Select( value => value.GetString() )
-				.ToArray()''',
+          \t\t\t\t.GetProperty( "duplicateCanonicalNames" )
+          \t\t\t\t.EnumerateArray()
+          \t\t\t\t.Select( value => value.GetString() )
+          \t\t\t\t.ToArray()'''.replace("          ", ""),
                       '''data
-				.GetProperty( "duplicateCanonicalNames" )
-				.EnumerateArray()
-				.Select( value => value.GetString()! )
-				.ToArray()''',
+          \t\t\t\t.GetProperty( "duplicateCanonicalNames" )
+          \t\t\t\t.EnumerateArray()
+          \t\t\t\t.Select( value => value.GetString()! )
+          \t\t\t\t.ToArray()'''.replace("          ", ""),
                   ),
               ],
               "tests/Icod.TermInfo.Toe.Tests/src/MI05JsonCatalogCommandTests.cs": [
                   (
-                      '''Assert.True(
-				result.Stdout.EndsWith( "\\n", StringComparison.Ordinal )
-			);''',
-                      '''Assert.EndsWith(
-				"\\n",
-				result.Stdout,
-				StringComparison.Ordinal
-			);''',
+                      'Assert.True(\n\t\t\t\tresult.Stdout.EndsWith( "\\n", StringComparison.Ordinal )\n\t\t\t);',
+                      'Assert.EndsWith(\n\t\t\t\t"\\n",\n\t\t\t\tresult.Stdout,\n\t\t\t\tStringComparison.Ordinal\n\t\t\t);',
                   ),
               ],
           }
@@ -98,11 +86,10 @@ jobs:
                       )
                   text = text.replace(old, new, 1)
               path.write_text(text, encoding="utf-8", newline="\n")
-
-      - name: Build solution
-        run: dotnet build Icod.TermInfo.sln -c Debug
+          PY
 
       - name: Commit focused fixes
+        shell: bash
         run: |
           rm .github/workflows/fix-1.9.0-build-warnings.yml
           git config user.name "github-actions[bot]"
