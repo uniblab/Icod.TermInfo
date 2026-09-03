@@ -123,13 +123,20 @@ try {
 			[string[]] $Arguments
 		)
 
-		$launcherName = if ( $IsWindows ) { "$Name.exe" } else { $Name }
+		if ( 'package' -ceq $Kind ) {
+			$launcherName = if ( $IsWindows ) { 'icod-terminfo.exe' } else { 'icod-terminfo' }
+			$launcherArguments = @( $Name ) + $Arguments
+		}
+		else {
+			$launcherName = if ( $IsWindows ) { "$Name.exe" } else { $Name }
+			$launcherArguments = $Arguments
+		}
 		$launcher = Join-Path $toolRoot $launcherName
 		if ( -not ( Test-Path -LiteralPath $launcher -PathType Leaf ) ) {
 			throw "DA07 $Kind smoke is missing '$launcherName'."
 		}
 		$output = @(
-			& $launcher @Arguments 2>&1
+			& $launcher @launcherArguments 2>&1
 		)
 		if ( 0 -ne $LASTEXITCODE ) {
 			throw "'$Name $($Arguments -join ' ')' failed with status $LASTEXITCODE.`n$($output -join [Environment]::NewLine)"
@@ -139,18 +146,21 @@ try {
 
 	$firstRoot = Join-Path $workRoot 'first-db'
 	$secondRoot = Join-Path $workRoot 'second-db'
+	$planningFirstRoot = Join-Path $workRoot 'planning-first-db'
+	$planningSecondRoot = Join-Path $workRoot 'planning-second-db'
 	New-Item -ItemType Directory -Path $firstRoot -Force | Out-Null
 	New-Item -ItemType Directory -Path $secondRoot -Force | Out-Null
+	New-Item -ItemType Directory -Path $planningFirstRoot -Force | Out-Null
+	New-Item -ItemType Directory -Path $planningSecondRoot -Force | Out-Null
 	$firstSource = Join-Path $workRoot 'first.ti'
 	$secondSource = Join-Path $workRoot 'second.ti'
+	$planningFirstSource = Join-Path $workRoot 'planning-first.ti'
+	$planningSecondSource = Join-Path $workRoot 'planning-second.ti'
 	[System.IO.File]::WriteAllText(
 		$firstSource,
 		@"
 da07-shared|DA07 first shared,
 	cols#80,
-
-da07-parent-a|DA07 first parent,
-	am,
 
 da07-target|DA07 planning target,
 	am,
@@ -163,7 +173,20 @@ da07-target|DA07 planning target,
 		@"
 da07-shared|DA07 second shared,
 	cols#132,
-
+"@,
+		[System.Text.UTF8Encoding]::new( $false )
+	)
+	[System.IO.File]::WriteAllText(
+		$planningFirstSource,
+		@"
+da07-parent-a|DA07 first parent,
+	am,
+"@,
+		[System.Text.UTF8Encoding]::new( $false )
+	)
+	[System.IO.File]::WriteAllText(
+		$planningSecondSource,
+		@"
 da07-parent-b|DA07 second parent,
 	cols#80,
 "@,
@@ -171,6 +194,8 @@ da07-parent-b|DA07 second parent,
 	)
 	[void] ( Invoke-TermInfoTool -Name 'tic' -Arguments @( '-o', $firstRoot, $firstSource ) )
 	[void] ( Invoke-TermInfoTool -Name 'tic' -Arguments @( '-o', $secondRoot, $secondSource ) )
+	[void] ( Invoke-TermInfoTool -Name 'tic' -Arguments @( '-o', $planningFirstRoot, $planningFirstSource ) )
+	[void] ( Invoke-TermInfoTool -Name 'tic' -Arguments @( '-o', $planningSecondRoot, $planningSecondSource ) )
 
 	$setText = Invoke-TermInfoTool -Name 'toe' -Arguments @(
 		'--json',
@@ -201,9 +226,9 @@ da07-parent-b|DA07 second parent,
 		'-A',
 		$firstRoot,
 		'--candidate-root',
-		$firstRoot,
+		$planningFirstRoot,
 		'--candidate-root',
-		$secondRoot,
+		$planningSecondRoot,
 		'da07-target'
 	)
 	$planDocument = $planText | ConvertFrom-Json -Depth 100
