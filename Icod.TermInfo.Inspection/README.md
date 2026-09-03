@@ -3,6 +3,19 @@
 `Icod.TermInfo.Inspection` is the optional managed inspection and semantic-
 comparison layer for the `Icod.TermInfo` package family.
 
+## 1.10 DA05 multi-database candidate planning
+
+`1.10.0-Alpha-5` composes the frozen 1.8 planner over canonical candidates
+discovered from a complete explicit ordered database set. Candidate order follows
+physical database/catalog order; target identities are excluded by the frozen
+RP05 rule; semantically equal duplicate publications collapse behind the first
+representative; conflicting duplicates and incomplete sets are rejected before
+planning. The composed result maps frozen planner candidate indices and selected
+parents back to exact database, catalog-entry, canonical-name, `use=`, and
+`TerminalDescription` evidence.
+
+See `docs/1.10.0-DA05-MULTI-DATABASE-CANDIDATE-PLANNING.md`.
+
 ## 1.10 DA04 database-set semantic and structural comparison
 
 `1.10.0-Alpha-4` adds deterministic comparison of two ordered database sets as

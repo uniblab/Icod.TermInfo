@@ -221,7 +221,7 @@ public sealed class MI07ReleaseClosureTests {
 			roadmap,
 			StringComparison.Ordinal );
 		Assert.Contains(
-			"DA04 - Database-set semantic comparison",
+			"DA05 - Multi-database candidate planning",
 			activeRoadmap,
 			StringComparison.OrdinalIgnoreCase );
 	}

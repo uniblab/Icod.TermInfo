@@ -64,10 +64,9 @@ public sealed class DA04DatabaseSetComparisonTests {
 		);
 		TermInfoDatabaseSetDifference provenance =
 			Assert.Single(
-				result.Differences.Where(
-					difference => difference.Kind
-						== TermInfoDatabaseSetDifferenceKind.EffectiveProvenance
-				)
+				result.Differences,
+				difference => difference.Kind
+					== TermInfoDatabaseSetDifferenceKind.EffectiveProvenance
 			);
 		Assert.Equal( "alpha", provenance.Name );
 		Assert.NotNull( provenance.SemanticComparison );
@@ -161,10 +160,9 @@ public sealed class DA04DatabaseSetComparisonTests {
 			TermInfoDatabaseSetComparer.Compare( left, right );
 		TermInfoDatabaseSetDifference aliasDifference =
 			Assert.Single(
-				result.Differences.Where(
-					difference => difference.Kind
-						== TermInfoDatabaseSetDifferenceKind.AliasOwnership
-				)
+				result.Differences,
+				difference => difference.Kind
+					== TermInfoDatabaseSetDifferenceKind.AliasOwnership
 			);
 
 		Assert.Equal( "shared", aliasDifference.Name );
@@ -192,10 +190,9 @@ public sealed class DA04DatabaseSetComparisonTests {
 			TermInfoDatabaseSetComparer.Compare( left, right );
 		TermInfoDatabaseSetDifference shadow =
 			Assert.Single(
-				result.Differences.Where(
-					difference => difference.Kind
-						== TermInfoDatabaseSetDifferenceKind.ShadowSet
-				)
+				result.Differences,
+				difference => difference.Kind
+					== TermInfoDatabaseSetDifferenceKind.ShadowSet
 			);
 
 		Assert.True( result.AreEffectivelyEquivalent );

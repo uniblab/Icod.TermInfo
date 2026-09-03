@@ -10,14 +10,14 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
-**Current coordinated version:** `1.10.0-Alpha-4`
+**Current coordinated version:** `1.10.0-Alpha-5`
 **Final 1.6 prerelease:** `1.6.0-Alpha-8`
 **Final 1.7 prerelease:** `1.7.0-Alpha-8`
 **Final 1.8 prerelease:** `1.8.0-Alpha-8`
 **Final 1.9 prerelease:** `1.9.0-Alpha-7`
 **Next development line:** `1.10.0` - Deterministic Multi-Database Inspection, Comparison, and Planning Automation
 **Status:** 1.10.0 implementation in progress
-**Current tranche:** DA04 - Database-set semantic comparison
+**Current tranche:** DA05 - Multi-database candidate planning
 **Primary objective:** Render effective descriptions, comparisons, plans, and explicit catalogs as deterministic bounded versioned JSON, then compose that reusable representation through `infocmp` and `toe` without changing frozen lower-layer semantics.
 
 ---
