@@ -29,7 +29,7 @@
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-		<PackageReleaseNotes>1.10.0-Alpha-8 freezes the additive multi-database toe/infocmp automation, routed package behavior, and DA07 installed-tool plus six-RID archive hardening while preserving the complete 1.9 routed command contract.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.10.0 promotes the frozen and validated multi-database toe/infocmp automation, routed package behavior, installed-tool validation, and six-RID archive contract while preserving the complete 1.9 routed command contract.</PackageReleaseNotes>
 		<PackageTags>terminfo;termcap;libtinfo;tic;infocmp;toe;captoinfo;infotocap;terminal;tool;dotnet;csharp;icod</PackageTags>
 	</PropertyGroup>
 

@@ -8,7 +8,7 @@
 **Command composition:** `toe`, `infocmp`, `icod-terminfo`  
 **Frozen lower layers:** `Icod.TermInfo`, `Icod.TermInfo.Source`, `Icod.TermInfo.Compiler`, `Icod.TermInfo.Termcap` except for unavoidable defect corrections  
 **Baseline:** stable `1.9.0`  
-**Status:** DA08 and consumer documentation/sample closure complete and validated at `1.10.0-Alpha-8`; stable promotion pending
+**Status:** DA08 and consumer documentation/sample closure complete and validated; stable `1.10.0` promotion applied; publication pending
 
 ---
 

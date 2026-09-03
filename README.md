@@ -21,10 +21,10 @@ The exact 31-type Inspection API, version-1 JSON Schema, deterministic UTF-8
 rendering, command semantics, package consumers, samples, fixtures, router, and
 six-archive distribution gates are frozen in `docs/1.9.0-RELEASE-AUDIT.md`.
 
-## 1.10 development status — DA08 release freeze
+## 1.10 release status
 
-The `1.10.0` development branch is frozen at `1.10.0-Alpha-8` for release
-validation. Version 1.10 extends the 1.9 automation layer to caller-ordered sets
+Version `1.10.0` promotes the frozen and fully validated Alpha-8 contract without
+semantic changes. Version 1.10 extends the 1.9 automation layer to caller-ordered sets
 of explicit conventional terminfo databases: deterministic precedence and
 shadow evidence, semantic duplicate and alias-collision analysis, set
 comparison, bounded multi-database parent planning, and the additive version-2
@@ -37,16 +37,16 @@ and command forms remain unchanged; the additive version-2 schema is frozen in
 generated databases, isolated package consumers on `net8.0`/`net9.0`/`net10.0`,
 installed tools on all three hosts, and all six standalone archive RIDs.
 
-The exact Alpha-8 product gate is green. Before the stable version bump, the
-consumer-facing closure adds executable documentation only: the consolidated
+The exact Alpha-8 product gate and final consumer-closure gate are green. The
+stable release includes the executable documentation closure: the consolidated
 `docs/1.10.0-MULTI-DATABASE-GUIDE.md`, the reusable-API
 `samples/Icod.TermInfo.DatabaseSet.Sample`, and the 1.10 extensions in
 `samples/ToolSuite`. The new sample's normalized v2 fixtures are now part of the
 permanent release verifier on `net8.0`, `net9.0`, and `net10.0`.
 
 The final post-documentation Staging gate is green (`33736812176`, head
-`b312c946e2e003f2d00761dff3d49957dbfbbeaf`). Stable `1.10.0` now remains a
-promotion-only version/documentation/package-metadata transition. See
+`b312c946e2e003f2d00761dff3d49957dbfbbeaf`). The coordinated branch version is
+now stable `1.10.0`; publication remains gated by the normal main/tag release workflow. See
 `docs/1.10.0-RELEASE-AUDIT.md`.
 
 ## Install
