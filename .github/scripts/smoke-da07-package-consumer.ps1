@@ -49,6 +49,18 @@ try {
 		Join-Path $repositoryRoot 'tools/inspection-package-smoke/DA07PackageSmoke.cs'
 	) -Destination $workRoot
 
+	$projectPath = Join-Path $workRoot 'Icod.TermInfo.Inspection.PackageSmoke.csproj'
+	$projectText = [System.IO.File]::ReadAllText( $projectPath )
+	$projectText = $projectText.Replace(
+		"`t</ItemGroup>",
+		"`t`t<PackageReference Include=`"Icod.TermInfo.Compiler`" Version=`"`$(IcodTermInfoInspectionPackageVersion)`" />`n`t</ItemGroup>"
+	)
+	[System.IO.File]::WriteAllText(
+		$projectPath,
+		$projectText,
+		[System.Text.UTF8Encoding]::new( $false )
+	)
+
 	$configPath = Join-Path $workRoot 'NuGet.Config'
 	$escapedArtifactRoot = [System.Security.SecurityElement]::Escape( $artifactRoot )
 	$config = @"
@@ -78,7 +90,6 @@ try {
 		[System.Text.UTF8Encoding]::new( $false )
 	)
 	$env:NUGET_PACKAGES = Join-Path $workRoot 'packages'
-	$projectPath = Join-Path $workRoot 'Icod.TermInfo.Inspection.PackageSmoke.csproj'
 
 	& dotnet restore $projectPath `
 		--configfile $configPath `
