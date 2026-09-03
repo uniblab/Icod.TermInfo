@@ -5,19 +5,27 @@ using Icod.TermInfo.Compiler;
 using Icod.TermInfo.Inspection;
 using Path = global::System.IO.Path;
 
+bool verifyFixtures =
+	args.Length == 2
+	&& string.Equals(
+		args[ 0 ],
+		"--verify-fixtures",
+		StringComparison.Ordinal
+	);
+bool writeFixtures =
+	args.Length == 2
+	&& string.Equals(
+		args[ 0 ],
+		"--write-fixtures",
+		StringComparison.Ordinal
+	);
 if (
 	args.Length != 0
-	&& (
-		args.Length != 2
-		|| !string.Equals(
-			args[ 0 ],
-			"--verify-fixtures",
-			StringComparison.Ordinal
-		)
-	)
+	&& !verifyFixtures
+	&& !writeFixtures
 ) {
 	throw new ArgumentException(
-		"Usage: Icod.TermInfo.DatabaseSet.Sample [--verify-fixtures directory]"
+		"Usage: Icod.TermInfo.DatabaseSet.Sample [--verify-fixtures directory|--write-fixtures directory]"
 	);
 }
 
@@ -141,7 +149,7 @@ try {
 		root
 	);
 
-	if ( args.Length == 2 ) {
+	if ( verifyFixtures ) {
 		VerifyFixture(
 			Path.Combine( args[ 1 ], "database-set.json" ),
 			setJson
@@ -151,6 +159,20 @@ try {
 			comparisonJson
 		);
 		VerifyFixture(
+			Path.Combine( args[ 1 ], "database-set-plan.json" ),
+			planJson
+		);
+	} else if ( writeFixtures ) {
+		Directory.CreateDirectory( args[ 1 ] );
+		WriteFixture(
+			Path.Combine( args[ 1 ], "database-set.json" ),
+			setJson
+		);
+		WriteFixture(
+			Path.Combine( args[ 1 ], "database-set-comparison.json" ),
+			comparisonJson
+		);
+		WriteFixture(
 			Path.Combine( args[ 1 ], "database-set-plan.json" ),
 			planJson
 		);
@@ -232,7 +254,7 @@ static void NormalizeNode(
 		foreach ( string key in objectNode.Select( pair => pair.Key ).ToArray() ) {
 			JsonNode? child = objectNode[ key ];
 			if ( child is JsonValue value
-				&& value.TryGetValue( out string? text )
+				&& value.TryGetValue<string>( out string? text )
 				&& text is not null
 				&& text.StartsWith( root, StringComparison.Ordinal ) ) {
 				objectNode[ key ] =
@@ -249,7 +271,7 @@ static void NormalizeNode(
 		for ( int index = 0; index < arrayNode.Count; ++index ) {
 			JsonNode? child = arrayNode[ index ];
 			if ( child is JsonValue value
-				&& value.TryGetValue( out string? text )
+				&& value.TryGetValue<string>( out string? text )
 				&& text is not null
 				&& text.StartsWith( root, StringComparison.Ordinal ) ) {
 				arrayNode[ index ] =
@@ -278,4 +300,18 @@ static void VerifyFixture(
 			$"The rendered database-set document did not match '{path}'."
 		);
 	}
+}
+
+static void WriteFixture(
+	string path,
+	string value
+) {
+	ArgumentException.ThrowIfNullOrWhiteSpace( path );
+	ArgumentNullException.ThrowIfNull( value );
+
+	File.WriteAllText(
+		path,
+		value + "\n",
+		new System.Text.UTF8Encoding( encoderShouldEmitUTF8Identifier: false )
+	);
 }
