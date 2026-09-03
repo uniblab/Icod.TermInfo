@@ -43,14 +43,15 @@ try {
 	CompiledTermInfoDatabaseWriter.Write(
 		firstRoot,
 		[
-			CreateTerminal( "sample-shared", 80, "sample-collision" ),
+			CreateTerminal( "sample-shared", 80 ),
+			CreateTerminal( "sample-alias-owner-a", 90, "sample-collision" ),
 		]
 	);
 	CompiledTermInfoDatabaseWriter.Write(
 		secondRoot,
 		[
 			CreateTerminal( "sample-shared", 132 ),
-			CreateTerminal( "sample-other-owner", 100, "sample-collision" ),
+			CreateTerminal( "sample-alias-owner-b", 100, "sample-collision" ),
 		]
 	);
 	CompiledTermInfoDatabaseWriter.Write(
