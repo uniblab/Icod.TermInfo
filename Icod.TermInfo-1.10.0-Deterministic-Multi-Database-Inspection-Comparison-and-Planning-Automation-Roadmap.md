@@ -8,7 +8,7 @@
 **Command composition:** `toe`, `infocmp`, `icod-terminfo`  
 **Frozen lower layers:** `Icod.TermInfo`, `Icod.TermInfo.Source`, `Icod.TermInfo.Compiler`, `Icod.TermInfo.Termcap` except for unavoidable defect corrections  
 **Baseline:** stable `1.9.0`  
-**Status:** Roadmap approved; DA01 not yet started  
+**Status:** DA01 implementation complete; Staging validation pending  
 
 ---
 

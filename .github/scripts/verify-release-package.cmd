@@ -101,9 +101,11 @@ rem evidence. MI07 freezes the complete additive 1.9 JSON surface independently.
 rem docs\1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt
 rem docs\1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt
 echo.
-echo === Verify approved Icod.TermInfo.Inspection 1.9 public API baseline (%CONFIGURATION%) ===
-dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c %CONFIGURATION% --no-build -- --check docs\1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt Icod.TermInfo.Inspection\bin\%CONFIGURATION%\net10.0\Icod.TermInfo.Inspection.dll
-if errorlevel 1 goto fail
+rem MI07 froze the exact 1.9 Inspection surface. The frozen 1.7, 1.8, and 1.9 baselines remain immutable historical evidence.
+rem docs\1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt
+rem docs\1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt
+rem docs\1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt
+rem DA01 begins additive 1.10 development. Cross-framework equality remains active through DA07; DA08 freezes 1.10.
 
 echo.
 echo === Verify package structure and symbols (%CONFIGURATION%) ===

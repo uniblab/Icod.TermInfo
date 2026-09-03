@@ -10,14 +10,14 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
-**Current coordinated version:** `1.9.0`
+**Current coordinated version:** `1.10.0-Alpha-1`
 **Final 1.6 prerelease:** `1.6.0-Alpha-8`
 **Final 1.7 prerelease:** `1.7.0-Alpha-8`
 **Final 1.8 prerelease:** `1.8.0-Alpha-8`
 **Final 1.9 prerelease:** `1.9.0-Alpha-7`
-**Next development line:** not yet selected
-**Status:** 1.9.0 stable release contract frozen
-**Current tranche:** Release closure - exact-main validation and publication
+**Next development line:** `1.10.0` - Deterministic Multi-Database Inspection, Comparison, and Planning Automation
+**Status:** 1.10.0 implementation in progress
+**Current tranche:** DA01 - Database-set model and contract foundation
 **Primary objective:** Render effective descriptions, comparisons, plans, and explicit catalogs as deterministic bounded versioned JSON, then compose that reusable representation through `infocmp` and `toe` without changing frozen lower-layer semantics.
 
 ---
@@ -90,6 +90,7 @@ in a new version-specific roadmap, not in the retired inventory.
 | **1.7.0** | Relative terminfo source synthesis | Synthesize deterministic relative `.ti` source in Inspection and expose it through `infocmp -u` |
 | **1.8.0** | Relative source planning | Select deterministic bounded ordered parents for the frozen 1.7 relative-source synthesizer |
 | **1.9.0** | Machine-readable inspection and planning automation | Render versioned deterministic JSON for Inspection values and expose explicit command automation without parsing human output |
+| **1.10.0** | Deterministic multi-database inspection, comparison, and planning automation | Aggregate ordered explicit catalogs with stable evidence, then add precedence, conflict analysis, set comparison, multi-catalog planning, and versioned automation |
 | **later** | Exotic storage/formats | Berkeley DB provider and historical Unix dialects as justified |
 
 The completed 1.5 release contract is recorded in
