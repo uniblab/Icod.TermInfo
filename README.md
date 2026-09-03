@@ -21,6 +21,25 @@ The exact 31-type Inspection API, version-1 JSON Schema, deterministic UTF-8
 rendering, command semantics, package consumers, samples, fixtures, router, and
 six-archive distribution gates are frozen in `docs/1.9.0-RELEASE-AUDIT.md`.
 
+## 1.10 development status — DA08 release freeze
+
+The `1.10.0` development branch is frozen at `1.10.0-Alpha-8` for release
+validation. Version 1.10 extends the 1.9 automation layer to caller-ordered sets
+of explicit conventional terminfo databases: deterministic precedence and
+shadow evidence, semantic duplicate and alias-collision analysis, set
+comparison, bounded multi-database parent planning, and the additive version-2
+JSON documents `databaseSet`, `databaseSetComparison`, and `databaseSetPlan`.
+
+The complete 1.10 Inspection public surface is frozen in
+`docs/1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt`. The 1.9 version-1 JSON schema
+and command forms remain unchanged; the additive version-2 schema is frozen in
+`docs/Icod.TermInfo.Inspection.schema.v2.json`. DA07 hardening exercises real
+generated databases, isolated package consumers on `net8.0`/`net9.0`/`net10.0`,
+installed tools on all three hosts, and all six standalone archive RIDs.
+
+Stable `1.10.0` is promotion-only after the exact Alpha-8 release gate is green.
+See `docs/1.10.0-RELEASE-AUDIT.md`.
+
 ## Install
 
 Runtime-only consumers use:

@@ -3,6 +3,16 @@
 The `Icod.TermInfo` package family follows Semantic Versioning for its public
 package contracts.
 
+## 1.10 release line
+
+The DA01-DA08 development sequence is `1.10.0-Alpha-1` through
+`1.10.0-Alpha-8`. DA08 freezes the exact complete 1.10 Inspection API and the
+additive version-2 JSON schema while preserving the frozen 1.9 version-1 schema.
+After the exact Alpha-8 head passes the full package and six-RID distribution
+gate, stable `1.10.0` is a promotion-only version transition: no new feature
+semantics, public API, schema fields, dependencies, target frameworks, command
+behavior, or archive RIDs may be introduced.
+
 ## Package versions
 
 The NuGet packages use:

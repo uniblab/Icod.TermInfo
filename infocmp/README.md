@@ -1,5 +1,25 @@
 # infocmp
 
+## 1.10 multi-database planning automation
+
+Version `1.10.0-Alpha-8` freezes repeatable explicit candidate roots:
+
+```text
+infocmp --json --plan-use --all-candidates \
+    --candidate-root root [--candidate-root root ...] target
+```
+
+The command composes the frozen 1.8 planner over the complete ordered database
+set and emits a version-2 `databaseSetPlan`. Physical database/catalog candidate
+order is retained, the target identity is excluded, semantically equal duplicate
+publications collapse behind the first representative, and conflicting or
+incomplete candidate sets are rejected. The legacy single-directory
+`--all-candidates -B directory` route remains the frozen version-1 `sourcePlan`
+path from 1.9.
+
+DA07 package and six-RID archive smoke exercise this path against real compiled
+databases outside the source tree.
+
 ## 1.9 JSON automation
 
 Version `1.9.0` publishes the frozen direct machine-readable projections of the

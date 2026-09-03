@@ -3,6 +3,29 @@
 `Icod.TermInfo.Inspection` is the optional managed inspection and semantic-
 comparison layer for the `Icod.TermInfo` package family.
 
+## 1.10 DA08 release freeze
+
+`1.10.0-Alpha-8` freezes the complete 51-type additive 1.10 Inspection surface,
+the exact version-2 database automation schema, package verification, command
+composition, and DA07 distribution evidence. The exact API baseline is
+`docs/1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt`; both JSON schema fingerprints
+are recorded in `docs/1.10.0-DA08-FREEZE-FINGERPRINTS.txt` and enforced by the
+package verifier. Version-1 JSON remains byte-compatible with the frozen 1.9
+contract.
+
+See `docs/1.10.0-DA08-API-SCHEMA-COMMAND-PACKAGE-AND-DOCUMENTATION-FREEZE.md`
+and `docs/1.10.0-RELEASE-AUDIT.md`.
+
+## 1.10 DA07 generated-state and distribution hardening
+
+`1.10.0-Alpha-7` adds no feature API. It hardens DA01-DA06 with generated
+compiled databases, culture changes, incomplete and repeated roots, large
+candidate sets, isolated package-only consumption, installed-tool automation,
+and all six matching standalone archive RIDs.
+
+See
+`docs/1.10.0-DA07-GENERATED-STATE-CROSS-HOST-PACKAGE-AND-PATHOLOGICAL-HARDENING.md`.
+
 ## 1.10 DA06 command and machine-readable automation composition
 
 `1.10.0-Alpha-6` adds a separate version-2 database automation contract with

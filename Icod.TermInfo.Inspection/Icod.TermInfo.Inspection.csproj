@@ -22,7 +22,7 @@
 		<Title>Icod.TermInfo.Inspection</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed inspection and semantic-comparison foundation for Icod.TermInfo. The 1.3 line provides canonical terminfo rendering and reusable infocmp-style comparison engines without enlarging the frozen Runtime, Source, or Compiler public contracts.</Description>
-		<PackageReleaseNotes>1.10.0-Alpha-6 adds the separate version-2 database automation JSON contract for databaseSet, databaseSetComparison, and databaseSetPlan documents plus thin toe/infocmp/router command composition, while preserving byte-compatible version-1 JSON invocations and all frozen DA01-DA05 engines.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.10.0-Alpha-8 freezes the complete 1.10 Inspection API, the additive version-2 database automation schema, package verification, command composition, and DA07 cross-host/package/archive hardening while preserving the frozen version-1 JSON and all lower-layer contracts.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>
