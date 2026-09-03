@@ -44,8 +44,9 @@ consumer-facing closure adds executable documentation only: the consolidated
 `samples/ToolSuite`. The new sample's normalized v2 fixtures are now part of the
 permanent release verifier on `net8.0`, `net9.0`, and `net10.0`.
 
-Stable `1.10.0` remains a promotion-only version/documentation transition after
-the final post-documentation Staging gate is green. See
+The final post-documentation Staging gate is green (`33736812176`, head
+`b312c946e2e003f2d00761dff3d49957dbfbbeaf`). Stable `1.10.0` now remains a
+promotion-only version/documentation/package-metadata transition. See
 `docs/1.10.0-RELEASE-AUDIT.md`.
 
 ## Install
