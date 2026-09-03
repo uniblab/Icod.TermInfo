@@ -74,8 +74,10 @@ public sealed class DA07GeneratedStateHardeningTests {
 
 		Assert.False( set.IsComplete );
 		Assert.Equal( TermInfoDatabaseSetLookupStatus.Indeterminate, lookup.Status );
-		Assert.NotNull( lookup.Winner );
-		Assert.Equal( 1, lookup.Winner!.DatabaseIndex );
+		Assert.Null( lookup.Winner );
+		TermInfoDatabaseSetOccurrence occurrence = Assert.Single( lookup.Occurrences );
+		Assert.Equal( 1, occurrence.DatabaseIndex );
+		Assert.Equal( new[] { 0 }, lookup.BlockingDatabaseIndices );
 	}
 
 	[Fact]
