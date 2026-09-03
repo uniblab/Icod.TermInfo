@@ -49,6 +49,70 @@ replace_exact(
     '''Assert.Contains(\n\t\t\tStableReleaseVersion,\n\t\t\tbuildProperties,\n\t\t\tStringComparison.Ordinal );''',
     '''Assert.Contains(\n\t\t\t"IcodTermInfoSuiteVersion",\n\t\t\tbuildProperties,\n\t\t\tStringComparison.Ordinal );''',
 )
+replace_exact(
+    "tests/Icod.TermInfo.Inspection.Tests/src/MI07ReleaseClosureTests.cs",
+    '''Assert.Contains(\n\t\t\t"Release closure - exact-main validation and publication",\n\t\t\tactiveRoadmap,\n\t\t\tStringComparison.OrdinalIgnoreCase );''',
+    '''Assert.Contains(\n\t\t\t"DA01 - Database-set model and contract foundation",\n\t\t\tactiveRoadmap,\n\t\t\tStringComparison.OrdinalIgnoreCase );''',
+)
+
+replace_exact(
+    "tests/Icod.TermInfo.Termcap.Tests/src/TC08ContractTests.cs",
+    'private const string CurrentDevelopmentVersion = "1.9.0";',
+    'private const string CurrentDevelopmentVersion = "1.10.0-Alpha-1";',
+)
+replace_exact(
+    "tests/Icod.TermInfo.Inspection.Tests/src/RS08ContractTests.cs",
+    'private const string CurrentDevelopmentVersion = "1.9.0";',
+    'private const string CurrentDevelopmentVersion = "1.10.0-Alpha-1";',
+)
+replace_exact(
+    "tests/Icod.TermInfo.Inspection.Tests/src/RP08ReleaseClosureTests.cs",
+    'private const string DevelopmentVersion = "1.9.0";',
+    'private const string DevelopmentVersion = "1.10.0-Alpha-1";',
+)
+replace_exact(
+    "tests/Icod.TermInfo.Inspection.Tests/src/RP08ReleaseClosureTests.cs",
+    '''Assert.Contains(\n\t\t\t"MI01",\n\t\t\tactiveRoadmap,\n\t\t\tStringComparison.Ordinal );''',
+    '''Assert.Contains(\n\t\t\t"DA01",\n\t\t\tactiveRoadmap,\n\t\t\tStringComparison.Ordinal );''',
+)
+
+replace_exact(
+    "tests/Icod.TermInfo.Tic.Tests/src/ReleaseClosureTests.cs",
+    'private const string DevelopmentVersion = "1.9.0";',
+    'private const string DevelopmentVersion = "1.10.0-Alpha-1";',
+)
+replace_exact(
+    "tests/Icod.TermInfo.Tests/src/T45CompletionGateTests.cs",
+    '''Assert.Equal(\n\t\t\t"1.9.0",\n\t\t\tsemanticVersion );''',
+    '''Assert.Equal(\n\t\t\t"1.10.0-Alpha-1",\n\t\t\tsemanticVersion );''',
+)
+replace_exact(
+    "tests/Icod.TermInfo.Tests/src/T45CompletionGateTests.cs",
+    '''Assert.Equal(\n\t\t\t"1.9.0",\n\t\t\tReadRequiredProperty(\n\t\t\t\tbuildProperties,\n\t\t\t\t"IcodTermInfoSuiteVersion" ) );''',
+    '''Assert.Equal(\n\t\t\t"1.10.0-Alpha-1",\n\t\t\tReadRequiredProperty(\n\t\t\t\tbuildProperties,\n\t\t\t\t"IcodTermInfoSuiteVersion" ) );''',
+)
+
+for path_name in [
+    "tests/Icod.TermInfo.Tic.Tests/src/CommandTests.cs",
+    "tests/Icod.TermInfo.Toe.Tests/src/CommandTests.cs",
+    "tests/Icod.TermInfo.InfoCmp.Tests/src/CommandTests.cs",
+]:
+    replace_exact(
+        path_name,
+        'Assert.Contains( "1.9.0", ReadText( stdout ) );',
+        'Assert.Contains( "1.10.0-Alpha-1", ReadText( stdout ) );',
+    )
+replace_exact(
+    "tests/Icod.TermInfo.Router.Tests/src/CommandTests.cs",
+    'Assert.Contains( "1.9.0", ReadText( stdout ) );',
+    'Assert.Contains( "1.10.0-Alpha-1", ReadText( stdout ) );',
+    count=2,
+)
+replace_exact(
+    "tests/Icod.TermInfo.Router.Tests/src/ContractTests.cs",
+    '''Assert.Equal(\n\t\t\t"1.9.0",\n\t\t\tReadRequiredProperty(\n\t\t\t\tbuildProperties,\n\t\t\t\t"IcodTermInfoSuiteVersion"\n\t\t\t)\n\t\t);''',
+    '''Assert.Equal(\n\t\t\t"1.10.0-Alpha-1",\n\t\t\tReadRequiredProperty(\n\t\t\t\tbuildProperties,\n\t\t\t\t"IcodTermInfoSuiteVersion"\n\t\t\t)\n\t\t);''',
+)
 
 replace_exact(
     "tools/inspection-package-smoke/Program.cs",
@@ -66,7 +130,7 @@ sh = sh_path.read_text(encoding="utf-8")
 pattern = re.compile(
     r'''# The frozen 1\.7 and 1\.8 Inspection baselines remain immutable historical\n# evidence\. MI07 freezes the complete additive 1\.9 JSON surface independently\.\n# docs/1\.7\.0-INSPECTION-PUBLIC-API-BASELINE\.txt\n# docs/1\.8\.0-INSPECTION-PUBLIC-API-BASELINE\.txt\ndotnet run \\\n  --project tools/public-api-snapshot/Icod\.TermInfo\.PublicApiSnapshot\.csproj \\\n  -c "\$\{configuration\}" \\\n  --no-build \\\n  -- --check \\\n  docs/1\.9\.0-INSPECTION-PUBLIC-API-BASELINE\.txt \\\n  Icod\.TermInfo\.Inspection/bin/\$\{configuration\}/net10\.0/Icod\.TermInfo\.Inspection\.dll\n'''
 )
-replacement = '''# The frozen 1.7, 1.8, and 1.9 Inspection baselines remain immutable historical\n# evidence during additive 1.10 development. Cross-framework equality above\n# remains active throughout DA01-DA07; DA08 freezes the complete 1.10 surface.\n# docs/1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt\n# docs/1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt\n# docs/1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt\n'''
+replacement = '''# MI07 froze the exact 1.9 Inspection surface. The frozen 1.7, 1.8, and 1.9\n# Inspection baselines remain immutable historical evidence during additive 1.10\n# development. Cross-framework equality above remains active throughout\n# DA01-DA07; DA08 freezes the complete 1.10 surface.\n# docs/1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt\n# docs/1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt\n# docs/1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt\n'''
 sh, n = pattern.subn(replacement, sh)
 if n != 1:
     raise RuntimeError(f"verify-release-package.sh baseline block matches: {n}")
@@ -85,7 +149,7 @@ if end < 0:
 end = cmd.find("\n", end) + 1
 cmd = (
     cmd[:line_start]
-    + "rem The frozen 1.7, 1.8, and 1.9 Inspection baselines remain immutable historical evidence.\n"
+    + "rem MI07 froze the exact 1.9 Inspection surface. The frozen 1.7, 1.8, and 1.9 baselines remain immutable historical evidence.\n"
     + "rem docs\\1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt\n"
     + "rem docs\\1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt\n"
     + "rem docs\\1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt\n"
