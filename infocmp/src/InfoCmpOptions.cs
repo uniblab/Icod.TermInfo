@@ -11,6 +11,7 @@ internal enum InfoCmpComparisonMode {
 
 internal sealed class InfoCmpOptions {
 	private readonly IReadOnlyList<string> _terminalNames;
+	private readonly IReadOnlyList<string> _candidateRoots;
 
 	internal InfoCmpOptions(
 		string? databaseDirectory,
@@ -25,6 +26,7 @@ internal sealed class InfoCmpOptions {
 		bool planning,
 		bool json,
 		bool allCandidates,
+		IEnumerable<string> candidateRoots,
 		int maximumSelectedParentCount,
 		int maximumEvaluatedPlanCount,
 		bool allowNonExhaustiveResult,
@@ -32,6 +34,7 @@ internal sealed class InfoCmpOptions {
 		bool shortComparison
 	) {
 		ArgumentNullException.ThrowIfNull( terminalNames );
+		ArgumentNullException.ThrowIfNull( candidateRoots );
 		if ( lineWidth <= 0 ) {
 			throw new ArgumentOutOfRangeException(
 				nameof( lineWidth )
@@ -85,6 +88,17 @@ internal sealed class InfoCmpOptions {
 			);
 		}
 
+		string[] candidateRootArray = candidateRoots.ToArray();
+		foreach ( string root in candidateRootArray ) {
+			ArgumentException.ThrowIfNullOrWhiteSpace( root );
+		}
+		if ( candidateRootArray.Length != 0 && ( !planning || !allCandidates ) ) {
+			throw new ArgumentException(
+				"Candidate roots require all-candidates relative-source planning.",
+				nameof( candidateRoots )
+			);
+		}
+
 		string[] names = terminalNames.ToArray();
 		foreach ( string name in names ) {
 			ArgumentException.ThrowIfNullOrWhiteSpace( name );
@@ -135,6 +149,7 @@ internal sealed class InfoCmpOptions {
 		DatabaseDirectory = databaseDirectory;
 		ComparisonDatabaseDirectory = comparisonDatabaseDirectory;
 		_terminalNames = Array.AsReadOnly( names );
+		_candidateRoots = Array.AsReadOnly( candidateRootArray );
 		Layout = layout;
 		LineWidth = lineWidth;
 		LineWidthSpecified = lineWidthSpecified;
@@ -161,6 +176,9 @@ internal sealed class InfoCmpOptions {
 
 	internal IReadOnlyList<string> TerminalNames =>
 		_terminalNames;
+
+	internal IReadOnlyList<string> CandidateRoots =>
+		_candidateRoots;
 
 	internal string? TerminalName =>
 		_terminalNames.Count == 1
@@ -290,6 +308,7 @@ internal static class InfoCmpOptionsParser {
 		string? databaseDirectory = null;
 		string? comparisonDatabaseDirectory = null;
 		List<string> terminalNames = [];
+		List<string> candidateRoots = [];
 		TerminalDescriptionSourceLayout layout =
 			TerminalDescriptionSourceLayout.Canonical;
 		int lineWidth =
@@ -522,6 +541,21 @@ internal static class InfoCmpOptionsParser {
 						allCandidatesSpecified = true;
 						break;
 
+					case "--candidate-root":
+						if ( !TryReadValue(
+							args,
+							ref index,
+							argument,
+							out string? candidateRoot,
+							out string? candidateRootError
+						) ) {
+							return InfoCmpOptionsParseResult.Failure(
+								candidateRootError!
+							);
+						}
+						candidateRoots.Add( candidateRoot! );
+						break;
+
 					case "--max-parents":
 						if ( maximumSelectedParentCountSpecified ) {
 							return InfoCmpOptionsParseResult.Failure(
@@ -652,6 +686,11 @@ internal static class InfoCmpOptionsParser {
 				"option '--all-candidates' requires '--plan-use'"
 			);
 		}
+		if ( candidateRoots.Count != 0 && ( !planning || !allCandidates ) ) {
+			return InfoCmpOptionsParseResult.Failure(
+				"option '--candidate-root' requires '--plan-use --all-candidates'"
+			);
+		}
 		if ( !planning
 			&& ( maximumSelectedParentCountSpecified
 				|| maximumEvaluatedPlanCountSpecified
@@ -696,14 +735,21 @@ internal static class InfoCmpOptionsParser {
 
 		if ( planning ) {
 			if ( allCandidates ) {
-				if ( comparisonDatabaseDirectory is null ) {
+				if ( comparisonDatabaseDirectory is not null
+					&& candidateRoots.Count != 0 ) {
 					return InfoCmpOptionsParseResult.Failure(
-						"option '--all-candidates' requires one explicit '-B directory'"
+						"options '-B' and '--candidate-root' are mutually exclusive for all-candidates planning"
+					);
+				}
+				if ( comparisonDatabaseDirectory is null
+					&& candidateRoots.Count == 0 ) {
+					return InfoCmpOptionsParseResult.Failure(
+						"option '--all-candidates' requires one explicit '-B' directory or at least one '--candidate-root' directory"
 					);
 				}
 				if ( terminalNames.Count != 1 ) {
 					return InfoCmpOptionsParseResult.Failure(
-						"option '--all-candidates' accepts exactly one target terminal operand"
+						"option '--all-candidates' requires exactly one target terminal"
 					);
 				}
 			} else if ( terminalNames.Count < 2 ) {
@@ -817,6 +863,7 @@ internal static class InfoCmpOptionsParser {
 				planning,
 				json,
 				allCandidates,
+				candidateRoots,
 				maximumSelectedParentCount,
 				maximumEvaluatedPlanCount,
 				allowNonExhaustiveResult,

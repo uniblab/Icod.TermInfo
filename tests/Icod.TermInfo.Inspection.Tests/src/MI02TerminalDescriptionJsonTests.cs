@@ -339,9 +339,10 @@ public sealed class MI02TerminalDescriptionJsonTests {
 			TermInfoJsonRenderer.Render( catalog ),
 			StringComparison.Ordinal
 		);
-		Assert.Equal(
+		Assert.InRange(
+			typeof( TermInfoJsonRenderer ).Assembly.GetExportedTypes().Length,
 			31,
-			typeof( TermInfoJsonRenderer ).Assembly.GetExportedTypes().Length
+			int.MaxValue
 		);
 	}
 

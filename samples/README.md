@@ -1,23 +1,26 @@
 # Icod.TermInfo Samples
 
-The repository contains three executable API samples and one command-suite
-walkthrough. The API samples remain separate so acquisition examples stay easy
-to copy without mixing them with interactive terminal-control output. The
-Toolchain sample demonstrates the reusable Source -> Compiler -> Runtime ->
-Inspection flow, including 1.8 parent planning, 1.7 relative-source synthesis,
-and 1.9 source-plan JSON. MI06 freezes that deterministic plan, synthesize,
-compile, publish, reacquire, compare, and JSON-render path as cross-host release
-evidence. ToolSuite demonstrates the coordinated five-command suite: `tic`,
-`infocmp`, `toe`, `captoinfo`, and `infotocap`.
+The repository contains four executable API samples and one command-suite
+walkthrough. The API samples remain separate so acquisition, terminal-control,
+toolchain, and multi-database examples stay easy to copy without mixing unrelated
+concerns.
 
-MI07 adds no sample behavior. It freezes the Toolchain fixture, repeated-process
-JSON equality, and direct/routed ToolSuite commands as stable 1.9 release
-evidence.
+The 1.10 addition is `Icod.TermInfo.DatabaseSet.Sample`, an executable public-API
+walkthrough for ordered explicit database sets, precedence, semantic shadow and
+alias evidence, set comparison, multi-database planning, and all three version-2
+JSON document kinds. Its normalized JSON fixtures are checked in and verified on
+`net8.0`, `net9.0`, and `net10.0` by the permanent release gate.
 
-All three executable API sample projects target `net8.0`, `net9.0`, and
-`net10.0`. Every
-`dotnet run` example therefore specifies a framework; substitute `-f net8.0` or
-`-f net9.0` when exercising those consumer targets.
+The existing Toolchain sample demonstrates the reusable Source -> Compiler ->
+Runtime -> Inspection flow, including 1.8 parent planning, 1.7 relative-source
+synthesis, and the frozen 1.9 source-plan JSON contract. ToolSuite demonstrates
+the coordinated five-command suite: `tic`, `infocmp`, `toe`, `captoinfo`, and
+`infotocap`, including both the frozen 1.9 version-1 JSON forms and the additive
+1.10 database-set automation forms.
+
+All four executable API sample projects target `net8.0`, `net9.0`, and
+`net10.0`. Every `dotnet run` example therefore specifies a framework; substitute
+`-f net8.0` or `-f net9.0` when exercising those consumer targets.
 
 ## Icod.TermInfo.Sample
 
@@ -37,7 +40,7 @@ See `Icod.TermInfo.Sample/README.md`.
 ## Icod.TermInfo.Acquisition.Sample
 
 `Icod.TermInfo.Acquisition.Sample` is the focused compiled-database acquisition
-demonstration introduced in 0.9 and retained for 1.0. It never emits
+demonstration introduced in 0.9 and retained through 1.10. It never emits
 terminal-control strings.
 
 Commands:
@@ -65,14 +68,13 @@ See `Icod.TermInfo.Acquisition.Sample/README.md`.
 ## Icod.TermInfo.Toolchain.Sample
 
 `Icod.TermInfo.Toolchain.Sample` is the deterministic reusable-library toolchain
-demonstration introduced for 1.5 and extended by RP07. It parses and resolves
+demonstration introduced for 1.5 and extended through 1.9. It parses and resolves
 controlled `.ti` source, selects a useful parent from an explicit candidate set,
 compiles and publishes the planned source into a temporary conventional
 database, reloads the child entry through the Runtime provider, verifies the
 acquired description through Inspection, and renders the immutable plan as a
-version-1 JSON document. It does not depend on the host `TERM` value or
-installed terminfo database. MI06 requires fixture equality and identical JSON
-from two separate release-verifier process executions.
+version-1 JSON document. It does not depend on the host `TERM` value or installed
+terminfo database.
 
 Run it with:
 
@@ -82,20 +84,46 @@ dotnet run --project samples/Icod.TermInfo.Toolchain.Sample/Icod.TermInfo.Toolch
 
 See `Icod.TermInfo.Toolchain.Sample/README.md`.
 
+## Icod.TermInfo.DatabaseSet.Sample
+
+`Icod.TermInfo.DatabaseSet.Sample` is the focused 1.10 reusable-library example.
+It creates controlled compiled databases through the public Compiler API and
+then exercises the public Inspection API without command parsing or ambient
+database discovery.
+
+The sample demonstrates:
+
+- ordered `InspectSet(...)` construction;
+- canonical lookup and first-root precedence;
+- conflicting shadow classification;
+- alias-collision evidence;
+- structural/effective set comparison;
+- conflict-free multi-database parent planning;
+- `databaseSet`, `databaseSetComparison`, and `databaseSetPlan` JSON.
+
+Run it with:
+
+```text
+dotnet run --project samples/Icod.TermInfo.DatabaseSet.Sample/Icod.TermInfo.DatabaseSet.Sample.csproj -f net10.0
+```
+
+See `Icod.TermInfo.DatabaseSet.Sample/README.md` and
+`../docs/1.10.0-MULTI-DATABASE-GUIDE.md`.
+
 ## ToolSuite
 
-`ToolSuite` is a data-and-command walkthrough for the managed 1.9 command suite.
-It uses controlled terminfo and termcap source files plus an explicit local
-database root, so the example does not depend on the host's installed terminfo or
-termcap databases.
+`ToolSuite` is a data-and-command walkthrough for the managed command suite. It
+uses controlled terminfo and termcap source files plus explicit local database
+roots, so the example does not depend on the host's installed terminfo or termcap
+databases.
 
 The walkthrough covers validation, publication, effective rendering, relative
 synthesis through `infocmp -u`, explicit-candidate parent planning through
 `infocmp --plan-use`, direct and routed planning equivalence, generated-source
 validation, semantic comparison, conventional database enumeration,
-forward/reverse `use=` dependency reports, termcap-to-terminfo conversion, and
-terminfo-to-termcap round trips. MI06 adds all four version-1 JSON document
-kinds and direct/router automation equality.
+forward/reverse `use=` dependency reports, termcap-to-terminfo conversion,
+terminfo-to-termcap round trips, all four frozen version-1 JSON document kinds,
+and the three additive 1.10 database-set JSON document kinds.
 
 See `ToolSuite/README.md`.
 

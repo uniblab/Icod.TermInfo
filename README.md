@@ -21,6 +21,34 @@ The exact 31-type Inspection API, version-1 JSON Schema, deterministic UTF-8
 rendering, command semantics, package consumers, samples, fixtures, router, and
 six-archive distribution gates are frozen in `docs/1.9.0-RELEASE-AUDIT.md`.
 
+## 1.10 release status
+
+Version `1.10.0` promotes the frozen and fully validated Alpha-8 contract without
+semantic changes. Version 1.10 extends the 1.9 automation layer to caller-ordered sets
+of explicit conventional terminfo databases: deterministic precedence and
+shadow evidence, semantic duplicate and alias-collision analysis, set
+comparison, bounded multi-database parent planning, and the additive version-2
+JSON documents `databaseSet`, `databaseSetComparison`, and `databaseSetPlan`.
+
+The complete 1.10 Inspection public surface is frozen in
+`docs/1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt`. The 1.9 version-1 JSON schema
+and command forms remain unchanged; the additive version-2 schema is frozen in
+`docs/Icod.TermInfo.Inspection.schema.v2.json`. DA07 hardening exercises real
+generated databases, isolated package consumers on `net8.0`/`net9.0`/`net10.0`,
+installed tools on all three hosts, and all six standalone archive RIDs.
+
+The exact Alpha-8 product gate and final consumer-closure gate are green. The
+stable release includes the executable documentation closure: the consolidated
+`docs/1.10.0-MULTI-DATABASE-GUIDE.md`, the reusable-API
+`samples/Icod.TermInfo.DatabaseSet.Sample`, and the 1.10 extensions in
+`samples/ToolSuite`. The new sample's normalized v2 fixtures are now part of the
+permanent release verifier on `net8.0`, `net9.0`, and `net10.0`.
+
+The final post-documentation Staging gate is green (`33736812176`, head
+`b312c946e2e003f2d00761dff3d49957dbfbbeaf`). The coordinated branch version is
+now stable `1.10.0`; publication remains gated by the normal main/tag release workflow. See
+`docs/1.10.0-RELEASE-AUDIT.md`.
+
 ## Install
 
 Runtime-only consumers use:
@@ -902,7 +930,7 @@ The first provider which resolves the requested name wins.
 
 ## Sample applications
 
-The repository contains three executable API samples plus one command-suite
+The repository contains four executable API samples plus one command-suite
 walkthrough with deliberately different purposes.
 
 ### General terminal API sample
@@ -997,6 +1025,26 @@ against its exact JSON fixture. Use `-f net8.0` or `-f net9.0` when exercising
 those reusable-library target frameworks.
 
 See `samples/Icod.TermInfo.Toolchain.Sample/README.md` for the complete flow.
+
+### Multi-database Inspection sample
+
+`samples/Icod.TermInfo.DatabaseSet.Sample` is the focused 1.10 reusable-API
+example. It creates controlled conventional databases through the public
+Compiler API and exercises ordered `InspectSet(...)` construction, conclusive
+lookup precedence, semantic shadow and alias-collision analysis, set comparison,
+conflict-free multi-database parent planning, and all three version-2 JSON
+document kinds.
+
+Run it with:
+
+```text
+dotnet run --project samples/Icod.TermInfo.DatabaseSet.Sample/Icod.TermInfo.DatabaseSet.Sample.csproj -f net10.0
+```
+
+The permanent release verifier checks the sample's normalized JSON fixtures on
+`net8.0`, `net9.0`, and `net10.0`. See
+`samples/Icod.TermInfo.DatabaseSet.Sample/README.md` and
+`docs/1.10.0-MULTI-DATABASE-GUIDE.md`.
 
 ### Managed tool-suite walkthrough
 

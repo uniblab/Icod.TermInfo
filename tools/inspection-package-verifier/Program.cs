@@ -15,8 +15,10 @@ internal static class Program {
 	private const string CompilerPackageId = "Icod.TermInfo.Compiler";
 	private const string RepositoryUrl = "https://github.com/uniblab/Icod.TermInfo";
 	private const string ExpectedAssemblyVersion = "1.0.0.0";
-	private const string ExpectedJsonSchemaSha256 =
+	private const string ExpectedJsonSchemaV1Sha256 =
 		"76578f421b254802d24453af6868edaf8c23c4b78a87c7e8ef86b233ff0e8500";
+	private const string ExpectedJsonSchemaV2Sha256 =
+		"ae4d53608881344e902f02303c71e2d432500969e60cfb005d70feea607499d0";
 	private static readonly string[] TargetFrameworks = [
 		"net8.0",
 		"net9.0",
@@ -114,7 +116,7 @@ internal static class Program {
 			);
 
 			Console.WriteLine(
-				$"Verified {PackageId} multi-target package structure, JSON Schema, exact Runtime/Source dependency boundary, assembly identity, symbols, and Source Link for {packageVersion}."
+				$"Verified {PackageId} multi-target package structure, JSON Schemas, exact Runtime/Source dependency boundary, assembly identity, symbols, and Source Link for {packageVersion}."
 			);
 			return 0;
 		}
@@ -155,6 +157,7 @@ internal static class Program {
 		List<string> required = [
 			"README.md",
 			"docs/Icod.TermInfo.Inspection.schema.json",
+			"docs/Icod.TermInfo.Inspection.schema.v2.json",
 			"icon.png",
 		];
 		foreach ( string targetFramework in TargetFrameworks ) {
@@ -449,7 +452,7 @@ internal static class Program {
 				)
 			).ToLowerInvariant();
 		Require(
-			schemaSha256 == ExpectedJsonSchemaSha256,
+			schemaSha256 == ExpectedJsonSchemaV1Sha256,
 			$"Inspection package JSON Schema fingerprint '{schemaSha256}' does not match the frozen version-1 fingerprint."
 		);
 		using JsonDocument document = JsonDocument.Parse( schema );
@@ -490,6 +493,69 @@ internal static class Program {
 			),
 			"Inspection package JSON Schema does not define the reviewed four document kinds."
 		);
+
+		ZipArchiveEntry schemaV2Entry =
+			package.GetEntry(
+				"docs/Icod.TermInfo.Inspection.schema.v2.json"
+			) ?? throw new InvalidOperationException(
+				"Inspection package does not contain the database automation JSON Schema."
+			);
+		string schemaV2;
+		using ( Stream stream = schemaV2Entry.Open() )
+		using ( StreamReader reader = new( stream, Encoding.UTF8 ) ) {
+			schemaV2 =
+				reader
+					.ReadToEnd()
+					.Replace( "\r\n", "\n", StringComparison.Ordinal )
+					.Replace( '\r', '\n' );
+		}
+		string schemaV2Sha256 =
+			Convert.ToHexString(
+				SHA256.HashData(
+					Encoding.UTF8.GetBytes( schemaV2 )
+				)
+			).ToLowerInvariant();
+		Require(
+			schemaV2Sha256 == ExpectedJsonSchemaV2Sha256,
+			$"Inspection package database automation JSON Schema fingerprint '{schemaV2Sha256}' does not match the frozen version-2 fingerprint."
+		);
+		using JsonDocument documentV2 = JsonDocument.Parse( schemaV2 );
+		JsonElement rootV2 = documentV2.RootElement;
+		Require(
+			rootV2.GetProperty( "$schema" ).GetString()
+				== "https://json-schema.org/draft/2020-12/schema",
+			"Inspection package database automation JSON Schema does not identify draft 2020-12."
+		);
+		Require(
+			rootV2.GetProperty( "$id" ).GetString()
+				== "urn:icod:terminfo:inspection:json:2",
+			"Inspection package database automation JSON Schema does not identify schema version 2."
+		);
+		Require(
+			rootV2.GetProperty( "oneOf" ).GetArrayLength() == 3,
+			"Inspection package database automation JSON Schema does not define all three document kinds."
+		);
+		string[] documentReferencesV2 =
+			rootV2
+				.GetProperty( "oneOf" )
+				.EnumerateArray()
+				.Select(
+					branch => branch.GetProperty( "$ref" ).GetString()
+				)
+				.Cast<string>()
+				.ToArray();
+		Require(
+			documentReferencesV2.SequenceEqual(
+				new[] {
+					"#/$defs/databaseSetDocument",
+					"#/$defs/databaseSetComparisonDocument",
+					"#/$defs/databaseSetPlanDocument",
+				},
+				StringComparer.Ordinal
+			),
+			"Inspection package database automation JSON Schema does not define the frozen three document kinds."
+		);
+
 	}
 
 	private static void VerifyAssemblyIdentity(

@@ -6,6 +6,20 @@ This document defines the supported 1.x compatibility boundary for
 `Icod.TermInfo.Inspection` package, and beginning with 1.6 the optional
 `Icod.TermInfo.Termcap` package.
 
+## 1.10 compatibility freeze
+
+Version 1.10 is additive above the stable 1.9 boundary. DA08 freezes the complete
+1.10 Inspection surface in `docs/1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt` and
+requires exact equality across `net8.0`, `net9.0`, and `net10.0`. Runtime, Source,
+Compiler, and Termcap retain their previously frozen APIs and assembly identity
+`1.0.0.0`.
+
+The version-1 JSON identifier, schema, four document kinds, ordering, UTF-8
+bounds, and historical `toe`/`infocmp` JSON command forms remain immutable. The
+version-2 schema is additive and contains only `databaseSet`,
+`databaseSetComparison`, and `databaseSetPlan`. Stable 1.10 promotion may not
+change either frozen schema or command semantics.
+
 ## Supported target frameworks
 
 The frozen 1.0 and 1.1 package lines support:

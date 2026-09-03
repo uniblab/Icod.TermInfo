@@ -3,6 +3,104 @@
 `Icod.TermInfo.Inspection` is the optional managed inspection and semantic-
 comparison layer for the `Icod.TermInfo` package family.
 
+## 1.10 DA08 release freeze
+
+`1.10.0-Alpha-8` freezes the complete 51-type additive 1.10 Inspection surface,
+the exact version-2 database automation schema, package verification, command
+composition, and DA07 distribution evidence. The exact API baseline is
+`docs/1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt`; both JSON schema fingerprints
+are recorded in `docs/1.10.0-DA08-FREEZE-FINGERPRINTS.txt` and enforced by the
+package verifier. Version-1 JSON remains byte-compatible with the frozen 1.9
+contract.
+
+For consumer-facing use of the frozen 1.10 surface, see
+`docs/1.10.0-MULTI-DATABASE-GUIDE.md` and
+`samples/Icod.TermInfo.DatabaseSet.Sample/README.md`. Release-contract evidence
+remains in
+`docs/1.10.0-DA08-API-SCHEMA-COMMAND-PACKAGE-AND-DOCUMENTATION-FREEZE.md` and
+`docs/1.10.0-RELEASE-AUDIT.md`.
+
+## 1.10 DA07 generated-state and distribution hardening
+
+`1.10.0-Alpha-7` adds no feature API. It hardens DA01-DA06 with generated
+compiled databases, culture changes, incomplete and repeated roots, large
+candidate sets, isolated package-only consumption, installed-tool automation,
+and all six matching standalone archive RIDs.
+
+See
+`docs/1.10.0-DA07-GENERATED-STATE-CROSS-HOST-PACKAGE-AND-PATHOLOGICAL-HARDENING.md`.
+
+## 1.10 DA06 command and machine-readable automation composition
+
+`1.10.0-Alpha-6` adds a separate version-2 database automation contract with
+`databaseSet`, `databaseSetComparison`, and `databaseSetPlan` document kinds. The
+frozen version-1 identifier, schema file, four document kinds, renderer output,
+and legacy `toe`/`infocmp` JSON invocations remain unchanged. `toe --json` emits
+v1 for one directory and v2 for multiple explicit directories; explicit set
+comparison is available through `--compare-set` with repeated left/right roots.
+`infocmp --candidate-root` composes DA05 multi-database planning, while legacy
+`--all-candidates -B directory` remains the version-1 path.
+
+See `docs/1.10.0-DA06-COMMAND-AND-MACHINE-READABLE-AUTOMATION-COMPOSITION.md`.
+
+## 1.10 DA05 multi-database candidate planning
+
+`1.10.0-Alpha-5` composes the frozen 1.8 planner over canonical candidates
+discovered from a complete explicit ordered database set. Candidate order follows
+physical database/catalog order; target identities are excluded by the frozen
+RP05 rule; semantically equal duplicate publications collapse behind the first
+representative; conflicting duplicates and incomplete sets are rejected before
+planning. The composed result maps frozen planner candidate indices and selected
+parents back to exact database, catalog-entry, canonical-name, `use=`, and
+`TerminalDescription` evidence.
+
+See `docs/1.10.0-DA05-MULTI-DATABASE-CANDIDATE-PLANNING.md`.
+
+## 1.10 DA04 database-set semantic and structural comparison
+
+`1.10.0-Alpha-4` adds deterministic comparison of two ordered database sets as
+both effective precedence views and physical/provenance collections. The result
+separates effective winner/membership/alias changes from root topology, winner
+provenance, shadow-set, completeness, and issue differences, while incomplete
+inputs remain explicitly indeterminate. Cross-set terminal semantics continue to
+use `TerminalDescriptionComparer`; alias scanning reuses the DA03 bound.
+
+See
+`docs/1.10.0-DA04-DATABASE-SET-SEMANTIC-AND-STRUCTURAL-COMPARISON.md`.
+
+## 1.10 DA03 semantic duplicate, alias, and shadow analysis
+
+`1.10.0-Alpha-3` adds bounded winner-versus-shadow semantic classification for
+repeated canonical identities and deterministic alias collision analysis.
+Observed conflicts retain the frozen `TermInfoComparisonResult`; alias ownership
+collisions distinguish multiple canonical owners and alias-to-canonical-name
+collisions, while incomplete input remains explicitly indeterminate. No all-pairs
+comparison, compiled-byte equality, command output, or new JSON document kind is
+introduced.
+
+See
+`docs/1.10.0-DA03-SEMANTIC-DUPLICATE-CONFLICT-ALIAS-AND-SHADOW-ANALYSIS.md`.
+
+## 1.10 DA02 deterministic database-set precedence
+
+`1.10.0-Alpha-2` makes the DA01 ordered database-set model operational for exact
+canonical-name precedence. `LookupCanonicalName` returns structured
+`NotObserved`, `WinnerKnown`, or `Indeterminate` evidence, retains every observed
+occurrence, exposes later observed shadows only when a winner is conclusive, and
+records incomplete databases which prevent a reliable winner or clean absence.
+Aliases remain occurrence evidence rather than canonical lookup keys; semantic
+equal/conflicting shadow classification remains assigned to DA03.
+
+See `docs/1.10.0-DA02-DETERMINISTIC-MULTI-CATALOG-PRECEDENCE.md`.
+
+## 1.10 DA01 database-set foundation
+
+`1.10.0-Alpha-1` introduced immutable caller-ordered explicit catalog sets,
+canonical occurrence indexing, constituent issue/completeness evidence, bounds,
+and explicit-root or already-inspected-catalog construction.
+
+See `docs/1.10.0-DA01-DATABASE-SET-MODEL-AND-CONTRACT-FOUNDATION.md`.
+
 ## 1.9 release status
 
 Version `1.9.0` publishes the complete 31-type Inspection surface frozen in

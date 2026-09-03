@@ -122,17 +122,21 @@ dotnet run \
   Icod.TermInfo.Inspection/bin/${configuration}/net8.0/Icod.TermInfo.Inspection.dll \
   Icod.TermInfo.Inspection/bin/${configuration}/net10.0/Icod.TermInfo.Inspection.dll
 
-# The frozen 1.7 and 1.8 Inspection baselines remain immutable historical
-# evidence. MI07 freezes the complete additive 1.9 JSON surface independently.
+# MI07 and earlier frozen Inspection baselines remain immutable historical evidence:
 # docs/1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt
 # docs/1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt
-dotnet run \
-  --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj \
-  -c "${configuration}" \
-  --no-build \
-  -- --check \
-  docs/1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt \
-  Icod.TermInfo.Inspection/bin/${configuration}/net10.0/Icod.TermInfo.Inspection.dll
+# docs/1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt
+# DA08 freezes the exact complete 1.10 Inspection public surface independently
+# on all three shipped target frameworks. Earlier baselines remain historical.
+for inspection_framework in net8.0 net9.0 net10.0; do
+  dotnet run \
+    --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj \
+    -c "${configuration}" \
+    --no-build \
+    -- --check \
+    docs/1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt \
+    Icod.TermInfo.Inspection/bin/${configuration}/${inspection_framework}/Icod.TermInfo.Inspection.dll
+done
 
 # Structural package, Source Link, dependency, and architecture verification.
 dotnet run \
@@ -470,6 +474,18 @@ if [[ "${original_nuget_packages_was_set}" == "true" ]]; then
 else
   unset NUGET_PACKAGES
 fi
+
+# The 1.10 database-set sample is executable documentation for the frozen public
+# API and all three version-2 database automation document kinds.
+for database_set_sample_framework in net8.0 net9.0 net10.0; do
+  dotnet run \
+    --project samples/Icod.TermInfo.DatabaseSet.Sample/Icod.TermInfo.DatabaseSet.Sample.csproj \
+    -c "${configuration}" \
+    -f "${database_set_sample_framework}" \
+    --no-build \
+    -- --verify-fixtures samples/Icod.TermInfo.DatabaseSet.Sample/expected \
+    > /dev/null
+done
 
 # The repository sample must retain a non-interactive path suitable for CI.
 dotnet run \

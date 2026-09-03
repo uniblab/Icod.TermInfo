@@ -3,6 +3,27 @@
 `toe` is the managed conventional terminfo database-listing command in the
 `Icod.TermInfo` tool suite.
 
+## 1.10 multi-database JSON automation
+
+Version `1.10.0-Alpha-8` freezes the additive explicit database-set forms:
+
+```text
+toe --json root-a root-b [root ...]
+toe --json --compare-set --left-root root [--left-root root ...] \
+    --right-root root [--right-root root ...]
+```
+
+Two or more ordinary explicit roots emit a version-2 `databaseSet` document in
+caller order. `--compare-set` emits a version-2 `databaseSetComparison` and
+keeps left and right root order independently. The historical one-root
+`toe --json directory` form remains the exact version-1 `databaseCatalog`
+contract from 1.9.
+
+DA07 distribution smoke creates real databases with the shipped `tic`, executes
+multi-root `toe --json` through the installed router and every supported archive,
+and verifies conflicting canonical evidence without relying on source-tree
+project references.
+
 ## 1.9 JSON automation
 
 Version `1.9.0` publishes one frozen machine-readable form:

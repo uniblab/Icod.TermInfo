@@ -229,6 +229,7 @@ public static class Command {
 				+ $"       {CommandName} --json -d left right{Environment.NewLine}"
 				+ $"       {CommandName} --json --plan-use target candidate [candidate ...]{Environment.NewLine}"
 				+ $"       {CommandName} --json --plan-use --all-candidates -B directory target{Environment.NewLine}"
+				+ $"       {CommandName} --json --plan-use --all-candidates --candidate-root directory [--candidate-root directory ...] target{Environment.NewLine}"
 			+ $"       {CommandName} -D{Environment.NewLine}"
 			+ $"       {CommandName} -V | --version{Environment.NewLine}"
 			+ Environment.NewLine
@@ -254,7 +255,8 @@ public static class Command {
 			+ Environment.NewLine
 			+ $"Relative-source planning:{Environment.NewLine}"
 				+ $"      --plan-use           select ordered use= parents from explicit candidates{Environment.NewLine}"
-				+ $"      --all-candidates     use every canonical entry from the one explicit -B directory{Environment.NewLine}"
+				+ $"      --all-candidates     use canonical entries from explicit candidate database roots{Environment.NewLine}"
+				+ $"      --candidate-root dir   add one explicit ordered candidate database root; repeatable{Environment.NewLine}"
 			+ $"      --max-parents count  limit selected ordered parents; default 2{Environment.NewLine}"
 			+ $"      --max-plans count    limit evaluated plans; default 4097{Environment.NewLine}"
 			+ $"      --require-exhaustive reject a plan space larger than the budget; default{Environment.NewLine}"
@@ -284,8 +286,9 @@ public static class Command {
 			+ $"-B applies to every parent or planning candidate.{Environment.NewLine}"
 				+ "Planning writes only the selected source to stdout. Comparison selectors, "
 				+ $"-u, -q, and -D cannot be combined with --plan-use.{Environment.NewLine}"
-				+ "All-candidates planning requires --plan-use, exactly one target, and one explicit "
-				+ $"-B conventional directory; it never performs host discovery.{Environment.NewLine}"
+				+ "All-candidates planning requires --plan-use, exactly one target, and either one legacy "
+				+ $"-B directory or one or more --candidate-root directories; it never performs host discovery.{Environment.NewLine}"
+				+ $"Legacy -B all-candidates JSON remains version 1; --candidate-root JSON emits the version-2 databaseSetPlan contract.{Environment.NewLine}"
 				+ $"Successful JSON output is one document followed by exactly one LF.{Environment.NewLine}";
 	}
 

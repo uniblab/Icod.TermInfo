@@ -1,8 +1,8 @@
-# Icod.TermInfo 1.9 Tool-Suite Sample
+# Icod.TermInfo 1.10 Tool-Suite Sample
 
 This sample exercises the coordinated `tic`, `infocmp`, `toe`, `captoinfo`, and
 `infotocap` command suite against controlled terminfo and termcap source. It uses
-an explicit local terminfo database root and checked-in source files so results do
+explicit local terminfo database roots and checked-in source files so results do
 not depend on host-installed terminfo or termcap databases.
 
 The commands below use the standalone release-archive launchers. When
@@ -10,8 +10,119 @@ The commands below use the standalone release-archive launchers. When
 with `icod-terminfo`, for example `icod-terminfo tic -c -x example.ti`. Run them
 from this directory, or adjust the paths as appropriate.
 
-MI07 adds no command form. It freezes the controlled direct and routed examples
-for all four version-1 JSON document kinds as stable 1.9 release evidence.
+The existing 1.9 examples remain the frozen version-1 JSON compatibility path.
+Version 1.10 adds a second controlled walkthrough for ordered database-set
+inspection, set comparison, and multi-database planning without changing those
+1.9 forms.
+
+## 1.10 controlled database-set sources
+
+Four small source files isolate the new multi-database examples:
+
+```text
+database-set-first.ti
+database-set-second.ti
+database-set-plan-a.ti
+database-set-plan-b.ti
+```
+
+`database-set-first.ti` publishes `icod-set-shared` with `cols#80` and also
+publishes the planning target `icod-set-target`. `database-set-second.ti`
+publishes the same canonical `icod-set-shared` with `cols#132`, creating a
+controlled semantic shadow conflict.
+
+The two planning files are deliberately conflict-free. One supplies `am`; the
+other supplies `cols#80`. The target contains both capabilities, so the frozen
+planner can select the two complementary parents without hiding ambiguous
+candidate publications.
+
+Compile the four explicit roots:
+
+```text
+tic -o ./terminfo-set-a database-set-first.ti
+tic -o ./terminfo-set-b database-set-second.ti
+tic -o ./terminfo-plan-a database-set-plan-a.ti
+tic -o ./terminfo-plan-b database-set-plan-b.ti
+```
+
+### Inspect an ordered database set
+
+```text
+toe --json ./terminfo-set-a ./terminfo-set-b > database-set.json
+```
+
+The result is a version-2 `databaseSet` document. Root order is retained, the
+first physical `icod-set-shared` definition is the precedence winner, and the
+second is classified as a semantically different shadow.
+
+The routed form is byte-equivalent:
+
+```text
+icod-terminfo toe --json ./terminfo-set-a ./terminfo-set-b > database-set-routed.json
+```
+
+### Compare database sets
+
+Compare the two-root set with the one-root set:
+
+```text
+toe --json --compare-set \
+  --left-root ./terminfo-set-a \
+  --left-root ./terminfo-set-b \
+  --right-root ./terminfo-set-a \
+  > database-set-comparison.json
+```
+
+This emits a version-2 `databaseSetComparison` document with the ordered
+structural/effective differences. The command does not collapse the result to a
+single equality flag.
+
+The routed form is:
+
+```text
+icod-terminfo toe --json --compare-set \
+  --left-root ./terminfo-set-a \
+  --left-root ./terminfo-set-b \
+  --right-root ./terminfo-set-a \
+  > database-set-comparison-routed.json
+```
+
+### Plan from multiple candidate databases
+
+Use the target from `terminfo-set-a` and the two clean candidate roots:
+
+```text
+infocmp --json --plan-use --all-candidates --max-parents 2 \
+  -A ./terminfo-set-a \
+  --candidate-root ./terminfo-plan-a \
+  --candidate-root ./terminfo-plan-b \
+  icod-set-target \
+  > database-set-plan.json
+```
+
+The result is a version-2 `databaseSetPlan`. Candidate database order and
+selected provenance are retained. The selected source uses both
+`icod-set-parent-a` and `icod-set-parent-b`.
+
+The routed form is:
+
+```text
+icod-terminfo infocmp --json --plan-use --all-candidates --max-parents 2 \
+  -A ./terminfo-set-a \
+  --candidate-root ./terminfo-plan-a \
+  --candidate-root ./terminfo-plan-b \
+  icod-set-target \
+  > database-set-plan-routed.json
+```
+
+The conflicting inspection roots are intentionally **not** used as the planning
+candidate universe. If multiple physical publications use the same canonical
+candidate name with different semantics, planning rejects that ambiguous
+candidate set rather than silently selecting the precedence winner.
+
+For the reusable API version of these examples, see
+`../Icod.TermInfo.DatabaseSet.Sample/README.md`. For the complete 1.10 consumer
+contract, see `../../docs/1.10.0-MULTI-DATABASE-GUIDE.md`.
 
 ## Terminfo source
 
@@ -48,8 +159,8 @@ tic -x -o ./terminfo example.ti
 ```
 
 The resulting `./terminfo` directory is a conventional compiled terminfo
-database containing all three entries and their aliases. To repeat publication over
-existing destinations, opt into replacement explicitly:
+database containing all three entries and their aliases. To repeat publication
+over existing destinations, opt into replacement explicitly:
 
 ```text
 tic --force -x -o ./terminfo example.ti
@@ -91,9 +202,6 @@ Version 1.8 adds bounded deterministic parent selection through
 `infocmp --plan-use`. Supply the decoy first to demonstrate that candidate order
 is a final tie-break rather than a first-match rule:
 
-RP08 freezes this direct and routed walkthrough as release evidence for the
-stable 1.8 command and distribution contract.
-
 ```text
 infocmp -A ./terminfo -B ./terminfo -1 -x --max-parents 1 --require-exhaustive --plan-use icod-demo-child icod-demo-decoy icod-demo-base > planned-child.ti
 ```
@@ -127,10 +235,10 @@ This reports semantic differences between the two compiled descriptions. A
 semantic difference is normal command output and does not by itself make the
 comparison fail.
 
-## Produce machine-readable inspection and planning documents
+## Produce frozen version-1 machine-readable documents
 
-Version 1.9 projects the same immutable Inspection values through one versioned
-JSON envelope. Effective-description and comparison documents are:
+Version 1.9 projects the same immutable Inspection values through the frozen
+version-1 JSON envelope. Effective-description and comparison documents are:
 
 ```text
 infocmp --json -A ./terminfo icod-demo-child > description.json
@@ -163,7 +271,8 @@ toe -hs ./terminfo
 `toe` reads canonical identities and descriptions from the compiled entries
 rather than inferring identities from filenames.
 
-The exact explicit catalog is available as a `databaseCatalog` document:
+The exact explicit catalog is available as the frozen version-1
+`databaseCatalog` document:
 
 ```text
 toe --json ./terminfo > catalog.json
@@ -224,14 +333,19 @@ approximated.
 
 ## Cleanup
 
-Remove the explicit local database and redirected conversion outputs when the
-walkthrough is complete:
+Remove the explicit local databases and redirected outputs when the walkthrough
+is complete:
 
 ```text
-rm -rf ./terminfo converted-from-termcap.ti roundtrip.termcap \
+rm -rf ./terminfo ./terminfo-set-a ./terminfo-set-b \
+  ./terminfo-plan-a ./terminfo-plan-b \
+  converted-from-termcap.ti roundtrip.termcap \
   planned-child.ti planned-child-routed.ti planned-validation.ti \
   description.json description-routed.json comparison.json plan.json \
-  all-candidates-plan.json catalog.json catalog-routed.json
+  all-candidates-plan.json catalog.json catalog-routed.json \
+  database-set.json database-set-routed.json \
+  database-set-comparison.json database-set-comparison-routed.json \
+  database-set-plan.json database-set-plan-routed.json
 ```
 
 On shells without `rm`, remove the same paths with the host's normal file tools.

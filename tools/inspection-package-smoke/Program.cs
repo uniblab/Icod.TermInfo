@@ -34,10 +34,30 @@ Require(
 Type[] exportedTypes =
 	inspectionAssembly.GetExportedTypes();
 Require(
-	exportedTypes.Length == 31
+	exportedTypes.Length >= 51
 		&& exportedTypes.Contains( typeof( TermInfoComparisonResult ) )
 		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalog ) )
 		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalogEntry ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseSet ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseSetEntry ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseSetIdentity ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseSetOccurrence ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseSetIssue ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseSetOptions ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseSetLookupResult ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseSetLookupStatus ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseSetSemanticRelationship ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseSetSemanticAnalysisOptions ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseSetSemanticAnalysis ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseSetIdentityAnalysis ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseSetShadowAnalysis ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseSetAliasAnalysis ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseSetDifferenceKind ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseSetDifference ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseSetComparisonResult ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseSetComparer ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseSetPlanningCandidate ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseSetSourcePlanningResult ) )
 		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalogIssue ) )
 		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalogIssueKind ) )
 		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalogKind ) )
@@ -209,6 +229,11 @@ try {
 			terminal,
 			emptyCatalogRoot
 		);
+	TermInfoDatabaseSetSourcePlanningResult databaseSetPlan =
+		TerminalDescriptionSourcePlanner.PlanFromDatabaseSet(
+			terminal,
+			TermInfoDatabaseInspector.CreateSet([ emptyCatalog ])
+		);
 	Require(
 		catalogPlan.Source == rendered
 			&& catalogPlan.CandidateCount == 0
@@ -217,7 +242,13 @@ try {
 			&& directoryPlan.Source == catalogPlan.Source
 			&& directoryPlan.CandidateCount == 0
 			&& directoryPlan.EvaluatedPlanCount == 1
-			&& directoryPlan.IsExhaustive,
+			&& directoryPlan.IsExhaustive
+			&& databaseSetPlan.Plan.Source == catalogPlan.Source
+			&& databaseSetPlan.Candidates.Count == 0
+			&& databaseSetPlan.SelectedCandidates.Count == 0
+			&& databaseSetPlan.Plan.CandidateCount == 0
+			&& databaseSetPlan.Plan.EvaluatedPlanCount == 1
+			&& databaseSetPlan.Plan.IsExhaustive,
 		"The RP05 package planner did not preserve complete explicit empty-catalog planning."
 	);
 } finally {
@@ -286,6 +317,23 @@ Require(
 		&& jsonOptions.MaximumOutputByteCount == 4_194_304
 		&& !jsonOptions.WriteIndented,
 	"The MI01 JSON renderer contract did not retain its reviewed identity and bounds."
+);
+Require(
+	TermInfoJsonRenderer.DatabaseAutomationSchemaIdentifier
+		== "urn:icod:terminfo:inspection:json:2"
+		&& TermInfoJsonRenderer.DatabaseAutomationSchemaVersion == 2,
+	"The DA06 additive database automation JSON identity is unavailable."
+);
+TermInfoDatabaseSet emptyDatabaseSet =
+	TermInfoDatabaseInspector.CreateSet( Array.Empty<TermInfoDatabaseCatalog>() );
+using JsonDocument databaseSetJsonDocument = JsonDocument.Parse(
+	TermInfoJsonRenderer.Render( emptyDatabaseSet )
+);
+Require(
+	databaseSetJsonDocument.RootElement.GetProperty( "schemaVersion" ).GetInt32() == 2
+		&& databaseSetJsonDocument.RootElement.GetProperty( "documentKind" ).GetString()
+			== "databaseSet",
+	"The DA06 package renderer did not emit the additive databaseSet document."
 );
 string terminalJson =
 	TermInfoJsonRenderer.Render(
