@@ -70,7 +70,9 @@ try {
 		lookup.Status != TermInfoDatabaseSetLookupStatus.WinnerKnown
 		|| lookup.Winner is null
 		|| lookup.Winner.DatabaseIndex != 0
-		|| lookup.Shadows.Count != 1
+		|| lookup.Occurrences.Count != 2
+		|| lookup.ShadowedOccurrences.Count != 1
+		|| lookup.ShadowedOccurrences[ 0 ].DatabaseIndex != 1
 	) {
 		throw new InvalidOperationException(
 			"The sample database-set precedence result was not the expected first-root winner."
