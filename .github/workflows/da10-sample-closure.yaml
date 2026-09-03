@@ -1,0 +1,44 @@
+name: da10-sample-closure
+
+on:
+  push:
+    branches: [1.10.0]
+
+permissions:
+  contents: write
+
+jobs:
+  close:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 1.10.0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+            10.0.x
+      - name: Add sample to solution
+        run: dotnet sln Icod.TermInfo.sln add samples/Icod.TermInfo.DatabaseSet.Sample/Icod.TermInfo.DatabaseSet.Sample.csproj --solution-folder samples
+      - name: Build database-set sample
+        run: |
+          dotnet restore samples/Icod.TermInfo.DatabaseSet.Sample/Icod.TermInfo.DatabaseSet.Sample.csproj
+          dotnet build samples/Icod.TermInfo.DatabaseSet.Sample/Icod.TermInfo.DatabaseSet.Sample.csproj -c Staging --no-restore
+      - name: Generate normalized 1.10 fixtures
+        run: |
+          dotnet run --project samples/Icod.TermInfo.DatabaseSet.Sample/Icod.TermInfo.DatabaseSet.Sample.csproj -c Staging -f net10.0 --no-build -- --write-fixtures samples/Icod.TermInfo.DatabaseSet.Sample/expected > /dev/null
+          dotnet run --project samples/Icod.TermInfo.DatabaseSet.Sample/Icod.TermInfo.DatabaseSet.Sample.csproj -c Staging -f net8.0 --no-build -- --verify-fixtures samples/Icod.TermInfo.DatabaseSet.Sample/expected > /dev/null
+          dotnet run --project samples/Icod.TermInfo.DatabaseSet.Sample/Icod.TermInfo.DatabaseSet.Sample.csproj -c Staging -f net9.0 --no-build -- --verify-fixtures samples/Icod.TermInfo.DatabaseSet.Sample/expected > /dev/null
+      - name: Wire sample into permanent release verifiers
+        run: python3 .github/scripts/da10-sample-closure.py
+      - name: Commit generated sample closure
+        run: |
+          git diff --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add Icod.TermInfo.sln samples/Icod.TermInfo.DatabaseSet.Sample/expected .github/scripts/verify-release-package.sh .github/scripts/verify-release-package.cmd
+          git commit -m 'Freeze 1.10 database-set sample fixtures'
+          git push origin HEAD:1.10.0
