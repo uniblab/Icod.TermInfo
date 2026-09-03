@@ -25,6 +25,19 @@ jobs:
             9.0.x
             10.0.x
 
+      - name: Prepare exact DA06 parser guard
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('infocmp/src/InfoCmpOptions.cs')
+          text = path.read_text(encoding='utf-8')
+          old = '\t\tList<string> terminalNames = [];'
+          new = '\t\tvar terminalNames = new List<string>();'
+          if text.count(old) != 1:
+              raise SystemExit(f'expected one parser declaration, found {text.count(old)}')
+          path.write_text(text.replace(old, new, 1), encoding='utf-8', newline='\n')
+          PY
+
       - name: Apply DA06 coordinated updates
         run: python3 .github/scripts/da06-apply.py
 
