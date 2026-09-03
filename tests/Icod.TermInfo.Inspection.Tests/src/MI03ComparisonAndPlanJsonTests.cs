@@ -523,7 +523,7 @@ public sealed class MI03ComparisonAndPlanJsonTests {
 				.Replace( "\r\n", "\n", StringComparison.Ordinal )
 				.Replace( '\r', '\n' );
 
-		Assert.True( fixture.EndsWith( "\n", StringComparison.Ordinal ) );
+		Assert.EndsWith( "\n", fixture, StringComparison.Ordinal );
 		Assert.False( fixture.EndsWith( "\n\n", StringComparison.Ordinal ) );
 		return fixture[ ..^1 ];
 	}
