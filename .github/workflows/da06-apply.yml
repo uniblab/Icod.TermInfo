@@ -25,17 +25,26 @@ jobs:
             9.0.x
             10.0.x
 
-      - name: Prepare exact DA06 parser guard
+      - name: Prepare exact DA06 parser guards
         run: |
           python3 - <<'PY'
           from pathlib import Path
           path = Path('infocmp/src/InfoCmpOptions.cs')
           text = path.read_text(encoding='utf-8')
-          old = '\t\tList<string> terminalNames = [];'
-          new = '\t\tvar terminalNames = new List<string>();'
-          if text.count(old) != 1:
-              raise SystemExit(f'expected one parser declaration, found {text.count(old)}')
-          path.write_text(text.replace(old, new, 1), encoding='utf-8', newline='\n')
+
+          old_decl = '\t\tList<string> terminalNames = [];'
+          new_decl = '\t\tvar terminalNames = new List<string>();'
+          if text.count(old_decl) != 1:
+              raise SystemExit(f'expected one parser declaration, found {text.count(old_decl)}')
+          text = text.replace(old_decl, new_decl, 1)
+
+          old_block = '''\t\t\tif ( allCandidates ) {\n\t\t\t\tif ( comparisonDatabaseDirectory is null ) {\n\t\t\t\t\treturn InfoCmpOptionsParseResult.Failure(\n\t\t\t\t\t\t"option '--all-candidates' requires one explicit '-B directory'"\n\t\t\t\t\t);\n\t\t\t\t}\n\t\t\t\tif ( terminalNames.Count != 1 ) {\n\t\t\t\t\treturn InfoCmpOptionsParseResult.Failure(\n\t\t\t\t\t\t"option '--all-candidates' accepts exactly one target terminal operand"\n\t\t\t\t\t);\n\t\t\t\t}\n\t\t\t}'''
+          new_block = '''\t\tif ( allCandidates ) {\n\t\t\tif ( !planning ) {\n\t\t\t\treturn InfoCmpOptionsParseResult.Failure(\n\t\t\t\t\t"option '--all-candidates' requires '--plan-use'"\n\t\t\t\t);\n\t\t\t}\n\t\t\tif ( comparisonDatabaseDirectory is null ) {\n\t\t\t\treturn InfoCmpOptionsParseResult.Failure(\n\t\t\t\t\t"option '--all-candidates' requires one explicit '-B' directory"\n\t\t\t\t);\n\t\t\t}\n\t\t\tif ( terminalNames.Count != 1 ) {\n\t\t\t\treturn InfoCmpOptionsParseResult.Failure(\n\t\t\t\t\t"option '--all-candidates' requires exactly one target terminal"\n\t\t\t\t);\n\t\t\t}\n\t\t}'''
+          if text.count(old_block) != 1:
+              raise SystemExit(f'expected one all-candidates planning block, found {text.count(old_block)}')
+          text = text.replace(old_block, new_block, 1)
+
+          path.write_text(text, encoding='utf-8', newline='\n')
           PY
 
       - name: Apply DA06 coordinated updates
