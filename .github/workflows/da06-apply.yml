@@ -50,6 +50,9 @@ jobs:
       - name: Apply DA06 coordinated updates
         run: python3 .github/scripts/da06-apply.py
 
+      - name: Apply DA06 contract corrections
+        run: python3 .github/scripts/da06-correct.py
+
       - name: Build DA06 with zero warnings
         run: |
           set -o pipefail
@@ -63,6 +66,7 @@ jobs:
       - name: Commit DA06
         run: |
           rm .github/scripts/da06-apply.py
+          rm .github/scripts/da06-correct.py
           rm .github/workflows/da06-apply.yml
           rm -f da06-build.log
           git config user.name "github-actions[bot]"
