@@ -1,0 +1,490 @@
+# Icod.TermInfo.Inspection public API baseline
+# Format: Icod.TermInfo.PublicApiSnapshot/v1
+# AssemblyVersion: 1.0.0.0
+
+TYPE class Icod.TermInfo.Inspection.TermInfoComparisonResult [sealed]
+  PROPERTY System.Boolean AreEqual { public get; } null=not-null/unknown
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Inspection.TermInfoDifference> Differences { public get; } null=not-null/unknown<not-null/not-null>
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseCatalog [sealed]
+  PROPERTY Icod.TermInfo.Inspection.TermInfoDatabaseCatalogKind Kind { public get; } null=not-null/unknown
+  PROPERTY System.Boolean HasIssues { public get; } null=not-null/unknown
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Inspection.TermInfoDatabaseCatalogEntry> Entries { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Inspection.TermInfoDatabaseCatalogIssue> Issues { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.Collections.Generic.IReadOnlyList<System.String> DuplicateCanonicalNames { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.String Root { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseCatalogEntry [sealed]
+  PROPERTY Icod.TermInfo.TerminalDescription Terminal { public get; } null=not-null/unknown
+  PROPERTY System.Collections.Generic.IReadOnlyList<System.String> Aliases { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.String Description { public get; } null=nullable/unknown
+  PROPERTY System.String Name { public get; } null=not-null/unknown
+  PROPERTY System.String Path { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseCatalogIssue [sealed]
+  PROPERTY Icod.TermInfo.Inspection.TermInfoDatabaseCatalogIssueKind Kind { public get; } null=not-null/unknown
+  PROPERTY System.String Message { public get; } null=not-null/unknown
+  PROPERTY System.String Path { public get; } null=not-null/unknown
+END
+
+TYPE enum Icod.TermInfo.Inspection.TermInfoDatabaseCatalogIssueKind [sealed]
+  INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  UNDERLYING System.Int32
+  ENUM InvalidPlacement = 1
+  ENUM IoFailure = 3
+  ENUM LinkSkipped = 4
+  ENUM MalformedEntry = 0
+  ENUM PermissionFailure = 2
+END
+
+TYPE enum Icod.TermInfo.Inspection.TermInfoDatabaseCatalogKind [sealed]
+  INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  UNDERLYING System.Int32
+  ENUM ConventionalDirectory = 1
+  ENUM Missing = 0
+  ENUM Unavailable = 3
+  ENUM UnsupportedStore = 2
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseInspector [static]
+  METHOD public static Icod.TermInfo.Inspection.TermInfoDatabaseCatalog InspectDirectory(System.String root null=not-null/not-null, Icod.TermInfo.CompiledTermInfoParserOptions parserOptions null=nullable/nullable default=null) return-null=not-null/not-null
+  METHOD public static Icod.TermInfo.Inspection.TermInfoDatabaseCatalog InspectDirectory(System.String root null=not-null/not-null, Icod.TermInfo.CompiledTermInfoParserOptions parserOptions null=nullable/nullable, System.Threading.CancellationToken cancellationToken null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static Icod.TermInfo.Inspection.TermInfoDatabaseSet CreateSet(System.Collections.Generic.IEnumerable<Icod.TermInfo.Inspection.TermInfoDatabaseCatalog> catalogs null=not-null/not-null<not-null/not-null>, Icod.TermInfo.Inspection.TermInfoDatabaseSetOptions options null=nullable/nullable default=null, System.Threading.CancellationToken cancellationToken null=not-null/not-null default=null) return-null=not-null/not-null
+  METHOD public static Icod.TermInfo.Inspection.TermInfoDatabaseSet InspectSet(System.Collections.Generic.IEnumerable<System.String> roots null=not-null/not-null<not-null/not-null>, Icod.TermInfo.Inspection.TermInfoDatabaseSetOptions options null=nullable/nullable default=null, Icod.TermInfo.CompiledTermInfoParserOptions parserOptions null=nullable/nullable default=null, System.Threading.CancellationToken cancellationToken null=not-null/not-null default=null) return-null=not-null/not-null
+  METHOD public static System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Inspection.TermInfoDatabaseLocation> GetSystemLocations(Icod.TermInfo.SystemTerminalDescriptionProviderOptions options null=nullable/nullable default=null) return-null=not-null/not-null<not-null/not-null>
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseLocation [sealed]
+  PROPERTY Icod.TermInfo.Inspection.TermInfoDatabaseLocationKind Kind { public get; } null=not-null/unknown
+  PROPERTY System.String Path { public get; } null=nullable/unknown
+END
+
+TYPE enum Icod.TermInfo.Inspection.TermInfoDatabaseLocationKind [sealed]
+  INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  UNDERLYING System.Int32
+  ENUM EncodedTermInfo = 0
+  ENUM PlatformDefaultDirectory = 4
+  ENUM TermInfoDirectory = 1
+  ENUM TermInfoDirsDirectory = 3
+  ENUM UserDatabase = 2
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseSet [sealed]
+  PROPERTY System.Boolean IsComplete { public get; } null=not-null/unknown
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Inspection.TermInfoDatabaseSetEntry> Entries { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Inspection.TermInfoDatabaseSetIdentity> Identities { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Inspection.TermInfoDatabaseSetIssue> Issues { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.Int32 TotalEntryCount { public get; } null=not-null/unknown
+  METHOD public Icod.TermInfo.Inspection.TermInfoDatabaseSetLookupResult LookupCanonicalName(System.String name null=not-null/not-null) return-null=not-null/not-null
+  METHOD public Icod.TermInfo.Inspection.TermInfoDatabaseSetSemanticAnalysis AnalyzeSemantics(Icod.TermInfo.Inspection.TermInfoDatabaseSetSemanticAnalysisOptions options null=nullable/nullable default=null, System.Threading.CancellationToken cancellationToken null=not-null/not-null default=null) return-null=not-null/not-null
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseSetAliasAnalysis [sealed]
+  PROPERTY Icod.TermInfo.Inspection.TermInfoDatabaseSetIdentity MatchingCanonicalIdentity { public get; } null=nullable/unknown
+  PROPERTY Icod.TermInfo.Inspection.TermInfoDatabaseSetOccurrence PrecedenceOwner { public get; } null=nullable/unknown
+  PROPERTY Icod.TermInfo.Inspection.TermInfoDatabaseSetSemanticRelationship Relationship { public get; } null=not-null/unknown
+  PROPERTY System.Boolean HasMultipleCanonicalOwners { public get; } null=not-null/unknown
+  PROPERTY System.Boolean IsComplete { public get; } null=not-null/unknown
+  PROPERTY System.Boolean MatchesCanonicalName { public get; } null=not-null/unknown
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Inspection.TermInfoDatabaseSetOccurrence> Occurrences { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.Collections.Generic.IReadOnlyList<System.Int32> BlockingDatabaseIndices { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.Collections.Generic.IReadOnlyList<System.String> CanonicalNames { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.String Alias { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseSetComparer [static]
+  METHOD public static Icod.TermInfo.Inspection.TermInfoDatabaseSetComparisonResult Compare(Icod.TermInfo.Inspection.TermInfoDatabaseSet left null=not-null/not-null, Icod.TermInfo.Inspection.TermInfoDatabaseSet right null=not-null/not-null, Icod.TermInfo.Inspection.TermInfoDatabaseSetSemanticAnalysisOptions semanticAnalysisOptions null=nullable/nullable default=null, System.Threading.CancellationToken cancellationToken null=not-null/not-null default=null) return-null=not-null/not-null
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseSetComparisonResult [sealed]
+  PROPERTY System.Boolean AreEffectivelyEquivalent { public get; } null=not-null/unknown
+  PROPERTY System.Boolean AreEquivalent { public get; } null=not-null/unknown
+  PROPERTY System.Boolean AreStructurallyEquivalent { public get; } null=not-null/unknown
+  PROPERTY System.Boolean IsConclusive { public get; } null=not-null/unknown
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Inspection.TermInfoDatabaseSetDifference> Differences { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.Int32 AliasOccurrenceCount { public get; } null=not-null/unknown
+  PROPERTY System.Int32 SemanticComparisonCount { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseSetDifference [sealed]
+  PROPERTY Icod.TermInfo.Inspection.TermInfoComparisonResult SemanticComparison { public get; } null=nullable/unknown
+  PROPERTY Icod.TermInfo.Inspection.TermInfoDatabaseSetDifferenceKind Kind { public get; } null=not-null/unknown
+  PROPERTY Icod.TermInfo.Inspection.TermInfoDatabaseSetEntry LeftDatabase { public get; } null=nullable/unknown
+  PROPERTY Icod.TermInfo.Inspection.TermInfoDatabaseSetEntry RightDatabase { public get; } null=nullable/unknown
+  PROPERTY Icod.TermInfo.Inspection.TermInfoDatabaseSetIssue LeftIssue { public get; } null=nullable/unknown
+  PROPERTY Icod.TermInfo.Inspection.TermInfoDatabaseSetIssue RightIssue { public get; } null=nullable/unknown
+  PROPERTY Icod.TermInfo.Inspection.TermInfoDatabaseSetLookupResult LeftLookup { public get; } null=nullable/unknown
+  PROPERTY Icod.TermInfo.Inspection.TermInfoDatabaseSetLookupResult RightLookup { public get; } null=nullable/unknown
+  PROPERTY Icod.TermInfo.Inspection.TermInfoDatabaseSetOccurrence LeftOccurrence { public get; } null=nullable/unknown
+  PROPERTY Icod.TermInfo.Inspection.TermInfoDatabaseSetOccurrence RightOccurrence { public get; } null=nullable/unknown
+  PROPERTY System.String Name { public get; } null=nullable/unknown
+END
+
+TYPE enum Icod.TermInfo.Inspection.TermInfoDatabaseSetDifferenceKind [sealed]
+  INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  UNDERLYING System.Int32
+  ENUM AliasOwnership = 7
+  ENUM Completeness = 1
+  ENUM EffectiveProvenance = 6
+  ENUM EffectiveSemantic = 5
+  ENUM Indeterminate = 9
+  ENUM Issue = 2
+  ENUM OnlyInLeft = 3
+  ENUM OnlyInRight = 4
+  ENUM RootTopology = 0
+  ENUM ShadowSet = 8
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseSetEntry [sealed]
+  PROPERTY Icod.TermInfo.Inspection.TermInfoDatabaseCatalog Catalog { public get; } null=not-null/unknown
+  PROPERTY System.Boolean IsComplete { public get; } null=not-null/unknown
+  PROPERTY System.Int32 Index { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseSetIdentity [sealed]
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Inspection.TermInfoDatabaseSetOccurrence> Occurrences { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.String Name { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseSetIdentityAnalysis [sealed]
+  PROPERTY Icod.TermInfo.Inspection.TermInfoDatabaseSetIdentity Identity { public get; } null=not-null/unknown
+  PROPERTY Icod.TermInfo.Inspection.TermInfoDatabaseSetLookupResult Lookup { public get; } null=not-null/unknown
+  PROPERTY Icod.TermInfo.Inspection.TermInfoDatabaseSetSemanticRelationship Relationship { public get; } null=not-null/unknown
+  PROPERTY System.Boolean IsComplete { public get; } null=not-null/unknown
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Inspection.TermInfoDatabaseSetShadowAnalysis> ConflictingShadows { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Inspection.TermInfoDatabaseSetShadowAnalysis> EqualShadows { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Inspection.TermInfoDatabaseSetShadowAnalysis> IndeterminateShadows { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Inspection.TermInfoDatabaseSetShadowAnalysis> Shadows { public get; } null=not-null/unknown<not-null/not-null>
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseSetIssue [sealed]
+  PROPERTY Icod.TermInfo.Inspection.TermInfoDatabaseCatalogIssue Issue { public get; } null=not-null/unknown
+  PROPERTY System.Int32 CatalogIssueIndex { public get; } null=not-null/unknown
+  PROPERTY System.Int32 DatabaseIndex { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseSetLookupResult [sealed]
+  PROPERTY Icod.TermInfo.Inspection.TermInfoDatabaseSetLookupStatus Status { public get; } null=not-null/unknown
+  PROPERTY Icod.TermInfo.Inspection.TermInfoDatabaseSetOccurrence Winner { public get; } null=nullable/unknown
+  PROPERTY System.Boolean HasMultipleOccurrences { public get; } null=not-null/unknown
+  PROPERTY System.Boolean IsObservationComplete { public get; } null=not-null/unknown
+  PROPERTY System.Boolean IsObserved { public get; } null=not-null/unknown
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Inspection.TermInfoDatabaseSetOccurrence> Occurrences { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Inspection.TermInfoDatabaseSetOccurrence> ShadowedOccurrences { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.Collections.Generic.IReadOnlyList<System.Int32> BlockingDatabaseIndices { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.Collections.Generic.IReadOnlyList<System.Int32> IncompleteDatabaseIndices { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.String Name { public get; } null=not-null/unknown
+END
+
+TYPE enum Icod.TermInfo.Inspection.TermInfoDatabaseSetLookupStatus [sealed]
+  INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  UNDERLYING System.Int32
+  ENUM Indeterminate = 2
+  ENUM NotObserved = 0
+  ENUM WinnerKnown = 1
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseSetOccurrence [sealed]
+  PROPERTY Icod.TermInfo.Inspection.TermInfoDatabaseCatalogEntry Entry { public get; } null=not-null/unknown
+  PROPERTY System.Collections.Generic.IReadOnlyList<System.String> Aliases { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.Int32 CatalogEntryIndex { public get; } null=not-null/unknown
+  PROPERTY System.Int32 DatabaseIndex { public get; } null=not-null/unknown
+  PROPERTY System.String Name { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseSetOptions [sealed]
+  FIELD public static const System.Int32 DefaultMaximumDatabaseCount null=not-null/not-null value=64
+  FIELD public static const System.Int32 DefaultMaximumTotalEntryCount null=not-null/not-null value=262144
+  FIELD public static const System.Int32 MaximumSupportedDatabaseCount null=not-null/not-null value=4096
+  FIELD public static const System.Int32 MaximumSupportedTotalEntryCount null=not-null/not-null value=1048576
+  CTOR public TermInfoDatabaseSetOptions()
+  CTOR public TermInfoDatabaseSetOptions(System.Int32 maximumDatabaseCount null=not-null/not-null, System.Int32 maximumTotalEntryCount null=not-null/not-null)
+  PROPERTY System.Int32 MaximumDatabaseCount { public get; } null=not-null/unknown
+  PROPERTY System.Int32 MaximumTotalEntryCount { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseSetPlanningCandidate [sealed]
+  PROPERTY Icod.TermInfo.Inspection.TermInfoDatabaseSetEntry Database { public get; } null=not-null/unknown
+  PROPERTY Icod.TermInfo.Inspection.TermInfoDatabaseSetOccurrence Occurrence { public get; } null=not-null/unknown
+  PROPERTY Icod.TermInfo.Inspection.TerminalDescriptionSourceSynthesisParent Parent { public get; } null=not-null/unknown
+  PROPERTY Icod.TermInfo.TerminalDescription Description { public get; } null=not-null/unknown
+  PROPERTY System.Int32 CandidateIndex { public get; } null=not-null/unknown
+  PROPERTY System.Int32 CatalogEntryIndex { public get; } null=not-null/unknown
+  PROPERTY System.Int32 DatabaseIndex { public get; } null=not-null/unknown
+  PROPERTY System.String CanonicalName { public get; } null=not-null/unknown
+  PROPERTY System.String UseName { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseSetSemanticAnalysis [sealed]
+  PROPERTY System.Boolean HasIndeterminateEvidence { public get; } null=not-null/unknown
+  PROPERTY System.Boolean HasSemanticDifferences { public get; } null=not-null/unknown
+  PROPERTY System.Boolean IsComplete { public get; } null=not-null/unknown
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Inspection.TermInfoDatabaseSetAliasAnalysis> Aliases { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Inspection.TermInfoDatabaseSetIdentityAnalysis> RepeatedIdentities { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.Int32 AliasOccurrenceCount { public get; } null=not-null/unknown
+  PROPERTY System.Int32 SemanticComparisonCount { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseSetSemanticAnalysisOptions [sealed]
+  FIELD public static const System.Int32 DefaultMaximumAliasOccurrenceCount null=not-null/not-null value=1048576
+  FIELD public static const System.Int32 MaximumSupportedAliasOccurrenceCount null=not-null/not-null value=4194304
+  CTOR public TermInfoDatabaseSetSemanticAnalysisOptions()
+  CTOR public TermInfoDatabaseSetSemanticAnalysisOptions(System.Int32 maximumAliasOccurrenceCount null=not-null/not-null)
+  PROPERTY System.Int32 MaximumAliasOccurrenceCount { public get; } null=not-null/unknown
+END
+
+TYPE enum Icod.TermInfo.Inspection.TermInfoDatabaseSetSemanticRelationship [sealed]
+  INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  UNDERLYING System.Int32
+  ENUM Indeterminate = 2
+  ENUM SemanticallyDifferent = 1
+  ENUM SemanticallyEqual = 0
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseSetShadowAnalysis [sealed]
+  PROPERTY Icod.TermInfo.Inspection.TermInfoComparisonResult Comparison { public get; } null=nullable/unknown
+  PROPERTY Icod.TermInfo.Inspection.TermInfoDatabaseSetOccurrence Occurrence { public get; } null=not-null/unknown
+  PROPERTY Icod.TermInfo.Inspection.TermInfoDatabaseSetSemanticRelationship Relationship { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseSetSourcePlanningResult [sealed]
+  PROPERTY Icod.TermInfo.Inspection.TermInfoDatabaseSet DatabaseSet { public get; } null=not-null/unknown
+  PROPERTY Icod.TermInfo.Inspection.TerminalDescriptionSourcePlan Plan { public get; } null=not-null/unknown
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Inspection.TermInfoDatabaseSetPlanningCandidate> Candidates { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Inspection.TermInfoDatabaseSetPlanningCandidate> SelectedCandidates { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.Int32 CandidateSemanticComparisonCount { public get; } null=not-null/unknown
+  PROPERTY System.Int32 CollapsedDuplicateOccurrenceCount { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoDifference [sealed]
+  PROPERTY Icod.TermInfo.Inspection.TermInfoDifferenceKind Kind { public get; } null=not-null/unknown
+  PROPERTY Icod.TermInfo.Source.TermInfoSourceEntry LeftSourceEntry { public get; } null=nullable/unknown
+  PROPERTY Icod.TermInfo.Source.TermInfoSourceEntry RightSourceEntry { public get; } null=nullable/unknown
+  PROPERTY Icod.TermInfo.Source.TermInfoSourceField LeftSourceField { public get; } null=nullable/unknown
+  PROPERTY Icod.TermInfo.Source.TermInfoSourceField RightSourceField { public get; } null=nullable/unknown
+  PROPERTY Icod.TermInfo.Source.TermInfoSourceSpan LeftSourceSpan { public get; } null=nullable/unknown
+  PROPERTY Icod.TermInfo.Source.TermInfoSourceSpan RightSourceSpan { public get; } null=nullable/unknown
+  PROPERTY System.Boolean IsCapabilityDifference { public get; } null=not-null/unknown
+  PROPERTY System.Boolean IsSourceDifference { public get; } null=not-null/unknown
+  PROPERTY System.Collections.Generic.IReadOnlyList<System.String> LeftAliases { public get; } null=nullable/unknown<not-null/not-null>
+  PROPERTY System.Collections.Generic.IReadOnlyList<System.String> RightAliases { public get; } null=nullable/unknown<not-null/not-null>
+  PROPERTY System.Nullable<Icod.TermInfo.TermInfoCapabilityValue> LeftCapabilityValue { public get; } null=nullable/unknown
+  PROPERTY System.Nullable<Icod.TermInfo.TermInfoCapabilityValue> RightCapabilityValue { public get; } null=nullable/unknown
+  PROPERTY System.Nullable<System.Boolean> IsExtendedCapability { public get; } null=nullable/unknown
+  PROPERTY System.Nullable<System.Int32> LeftSourceEntryIndex { public get; } null=nullable/unknown
+  PROPERTY System.Nullable<System.Int32> LeftSourceFieldIndex { public get; } null=nullable/unknown
+  PROPERTY System.Nullable<System.Int32> RightSourceEntryIndex { public get; } null=nullable/unknown
+  PROPERTY System.Nullable<System.Int32> RightSourceFieldIndex { public get; } null=nullable/unknown
+  PROPERTY System.String CapabilityName { public get; } null=nullable/unknown
+  PROPERTY System.String LeftText { public get; } null=nullable/unknown
+  PROPERTY System.String RightText { public get; } null=nullable/unknown
+END
+
+TYPE enum Icod.TermInfo.Inspection.TermInfoDifferenceKind [sealed]
+  INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  UNDERLYING System.Int32
+  ENUM DifferentValue = 5
+  ENUM DifferentValueKind = 6
+  ENUM IdentityAliases = 1
+  ENUM IdentityDescription = 2
+  ENUM IdentityName = 0
+  ENUM OnlyInLeft = 3
+  ENUM OnlyInRight = 4
+  ENUM SourceEntryOnlyInLeft = 7
+  ENUM SourceEntryOnlyInRight = 8
+  ENUM SourceFieldCapability = 12
+  ENUM SourceFieldKind = 11
+  ENUM SourceFieldOnlyInLeft = 9
+  ENUM SourceFieldOnlyInRight = 10
+  ENUM SourceFieldValue = 13
+  ENUM SourceUseReference = 14
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoInspectionComparison [sealed]
+  PROPERTY Icod.TermInfo.Inspection.TermInfoComparisonResult Comparison { public get; } null=not-null/unknown
+  PROPERTY Icod.TermInfo.Inspection.TermInfoInspectionResult Left { public get; } null=not-null/unknown
+  PROPERTY Icod.TermInfo.Inspection.TermInfoInspectionResult Right { public get; } null=not-null/unknown
+  PROPERTY System.Boolean AreEqual { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoInspectionEngine [static]
+  METHOD public static Icod.TermInfo.Inspection.TermInfoInspectionComparison Compare(Icod.TermInfo.Inspection.TermInfoInspectionResult left null=not-null/not-null, Icod.TermInfo.Inspection.TermInfoInspectionResult right null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static Icod.TermInfo.Inspection.TermInfoInspectionComparison Compare(Icod.TermInfo.Inspection.TermInfoInspectionTarget left null=not-null/not-null, Icod.TermInfo.Inspection.TermInfoInspectionTarget right null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static Icod.TermInfo.Inspection.TermInfoInspectionResult Inspect(Icod.TermInfo.Inspection.TermInfoInspectionTarget target null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.Boolean TryInspect(Icod.TermInfo.Inspection.TermInfoInspectionTarget target null=not-null/not-null, out Icod.TermInfo.Inspection.TermInfoInspectionResult result null=nullable/nullable attrs=NotNullWhenAttribute(true)) return-null=not-null/not-null
+  METHOD public static System.String Render(Icod.TermInfo.Inspection.TermInfoInspectionResult result null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.String Render(Icod.TermInfo.Inspection.TermInfoInspectionTarget target null=not-null/not-null) return-null=not-null/not-null
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoInspectionResult [sealed]
+  PROPERTY Icod.TermInfo.Inspection.TermInfoInspectionTarget Target { public get; } null=not-null/unknown
+  PROPERTY Icod.TermInfo.TerminalDescription Terminal { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoInspectionTarget [sealed]
+  CTOR public TermInfoInspectionTarget(Icod.TermInfo.ITerminalDescriptionProvider provider null=not-null/not-null, System.String requestedName null=not-null/not-null, System.String displayLabel null=nullable/nullable default=null)
+  PROPERTY Icod.TermInfo.ITerminalDescriptionProvider Provider { public get; } null=not-null/unknown
+  PROPERTY System.String DisplayLabel { public get; } null=nullable/unknown
+  PROPERTY System.String DisplayName { public get; } null=not-null/unknown
+  PROPERTY System.String RequestedName { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoJsonRenderer [static]
+  FIELD public static const System.Int32 DatabaseAutomationSchemaVersion null=not-null/not-null value=2
+  FIELD public static const System.Int32 SchemaVersion null=not-null/not-null value=1
+  FIELD public static const System.String DatabaseAutomationSchemaIdentifier null=not-null/not-null value="urn:icod:terminfo:inspection:json:2"
+  FIELD public static const System.String SchemaIdentifier null=not-null/not-null value="urn:icod:terminfo:inspection:json:1"
+  METHOD public static System.String Render(Icod.TermInfo.Inspection.TermInfoComparisonResult comparison null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.String Render(Icod.TermInfo.Inspection.TermInfoComparisonResult comparison null=not-null/not-null, Icod.TermInfo.Inspection.TermInfoJsonRendererOptions options null=not-null/not-null, System.Threading.CancellationToken cancellationToken null=not-null/not-null default=null) return-null=not-null/not-null
+  METHOD public static System.String Render(Icod.TermInfo.Inspection.TermInfoDatabaseCatalog catalog null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.String Render(Icod.TermInfo.Inspection.TermInfoDatabaseCatalog catalog null=not-null/not-null, Icod.TermInfo.Inspection.TermInfoJsonRendererOptions options null=not-null/not-null, System.Threading.CancellationToken cancellationToken null=not-null/not-null default=null) return-null=not-null/not-null
+  METHOD public static System.String Render(Icod.TermInfo.Inspection.TermInfoDatabaseSet databaseSet null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.String Render(Icod.TermInfo.Inspection.TermInfoDatabaseSet databaseSet null=not-null/not-null, Icod.TermInfo.Inspection.TermInfoJsonRendererOptions options null=not-null/not-null, System.Threading.CancellationToken cancellationToken null=not-null/not-null default=null) return-null=not-null/not-null
+  METHOD public static System.String Render(Icod.TermInfo.Inspection.TermInfoDatabaseSetComparisonResult comparison null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.String Render(Icod.TermInfo.Inspection.TermInfoDatabaseSetComparisonResult comparison null=not-null/not-null, Icod.TermInfo.Inspection.TermInfoJsonRendererOptions options null=not-null/not-null, System.Threading.CancellationToken cancellationToken null=not-null/not-null default=null) return-null=not-null/not-null
+  METHOD public static System.String Render(Icod.TermInfo.Inspection.TermInfoDatabaseSetSourcePlanningResult planningResult null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.String Render(Icod.TermInfo.Inspection.TermInfoDatabaseSetSourcePlanningResult planningResult null=not-null/not-null, Icod.TermInfo.Inspection.TermInfoJsonRendererOptions options null=not-null/not-null, System.Threading.CancellationToken cancellationToken null=not-null/not-null default=null) return-null=not-null/not-null
+  METHOD public static System.String Render(Icod.TermInfo.Inspection.TermInfoDatabaseSetSourcePlanningResult planningResult null=not-null/not-null, Icod.TermInfo.Inspection.TerminalDescriptionSourcePlanningOptions planningOptions null=not-null/not-null, Icod.TermInfo.Inspection.TermInfoJsonRendererOptions options null=not-null/not-null, System.Threading.CancellationToken cancellationToken null=not-null/not-null default=null) return-null=not-null/not-null
+  METHOD public static System.String Render(Icod.TermInfo.Inspection.TerminalDescriptionSourcePlan plan null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.String Render(Icod.TermInfo.Inspection.TerminalDescriptionSourcePlan plan null=not-null/not-null, Icod.TermInfo.Inspection.TermInfoJsonRendererOptions options null=not-null/not-null, System.Threading.CancellationToken cancellationToken null=not-null/not-null default=null) return-null=not-null/not-null
+  METHOD public static System.String Render(Icod.TermInfo.TerminalDescription description null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.String Render(Icod.TermInfo.TerminalDescription description null=not-null/not-null, Icod.TermInfo.Inspection.TermInfoJsonRendererOptions options null=not-null/not-null, System.Threading.CancellationToken cancellationToken null=not-null/not-null default=null) return-null=not-null/not-null
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoJsonRendererOptions [sealed]
+  FIELD public static const System.Int32 DefaultMaximumOutputByteCount null=not-null/not-null value=4194304
+  FIELD public static const System.Int32 MaximumSupportedOutputByteCount null=not-null/not-null value=67108864
+  CTOR public TermInfoJsonRendererOptions()
+  CTOR public TermInfoJsonRendererOptions(System.Int32 maximumOutputByteCount null=not-null/not-null, System.Boolean writeIndented null=not-null/not-null default=false)
+  PROPERTY System.Boolean WriteIndented { public get; } null=not-null/unknown
+  PROPERTY System.Int32 MaximumOutputByteCount { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoSourceComparer [static]
+  METHOD public static Icod.TermInfo.Inspection.TermInfoComparisonResult Compare(Icod.TermInfo.Source.TermInfoSourceDocument left null=not-null/not-null, Icod.TermInfo.Source.TermInfoSourceDocument right null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static Icod.TermInfo.Inspection.TermInfoComparisonResult Compare(Icod.TermInfo.Source.TermInfoSourceEntry left null=not-null/not-null, Icod.TermInfo.Source.TermInfoSourceEntry right null=not-null/not-null) return-null=not-null/not-null
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoSourceRenderer [static]
+  METHOD public static System.String Render(Icod.TermInfo.Source.TermInfoSourceDocument document null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.String Render(Icod.TermInfo.Source.TermInfoSourceEntry entry null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.Void Write(System.IO.TextWriter writer null=not-null/not-null, Icod.TermInfo.Source.TermInfoSourceDocument document null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.Void Write(System.IO.TextWriter writer null=not-null/not-null, Icod.TermInfo.Source.TermInfoSourceEntry entry null=not-null/not-null) return-null=not-null/not-null
+END
+
+TYPE class Icod.TermInfo.Inspection.TerminalDescriptionComparer [static]
+  METHOD public static Icod.TermInfo.Inspection.TermInfoComparisonResult Compare(Icod.TermInfo.TerminalDescription left null=not-null/not-null, Icod.TermInfo.TerminalDescription right null=not-null/not-null) return-null=not-null/not-null
+END
+
+TYPE enum Icod.TermInfo.Inspection.TerminalDescriptionSourceCapabilityOrder [sealed]
+  INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  UNDERLYING System.Int32
+  ENUM Database = 0
+  ENUM LongName = 2
+  ENUM TermInfoName = 1
+  ENUM TermcapCode = 3
+END
+
+TYPE enum Icod.TermInfo.Inspection.TerminalDescriptionSourceLayout [sealed]
+  INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  UNDERLYING System.Int32
+  ENUM Canonical = 0
+  ENUM OneCapabilityPerLine = 2
+  ENUM SingleLine = 1
+END
+
+TYPE class Icod.TermInfo.Inspection.TerminalDescriptionSourcePlan [sealed]
+  PROPERTY Icod.TermInfo.Inspection.TerminalDescriptionSourcePlanningScore Score { public get; } null=not-null/unknown
+  PROPERTY System.Boolean IsExhaustive { public get; } null=not-null/unknown
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Inspection.TerminalDescriptionSourceSynthesisParent> SelectedParents { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.Int32 CandidateCount { public get; } null=not-null/unknown
+  PROPERTY System.Int32 EvaluatedPlanCount { public get; } null=not-null/unknown
+  PROPERTY System.String Source { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.Inspection.TerminalDescriptionSourcePlanner [static]
+  METHOD public static Icod.TermInfo.Inspection.TermInfoDatabaseSetSourcePlanningResult PlanFromCatalogs(Icod.TermInfo.TerminalDescription target null=not-null/not-null, System.Collections.Generic.IEnumerable<Icod.TermInfo.Inspection.TermInfoDatabaseCatalog> catalogs null=not-null/not-null<not-null/not-null>, Icod.TermInfo.Inspection.TerminalDescriptionSourcePlanningOptions planningOptions null=nullable/nullable default=null, Icod.TermInfo.Inspection.TermInfoDatabaseSetOptions databaseSetOptions null=nullable/nullable default=null, System.Threading.CancellationToken cancellationToken null=not-null/not-null default=null) return-null=not-null/not-null
+  METHOD public static Icod.TermInfo.Inspection.TermInfoDatabaseSetSourcePlanningResult PlanFromDatabaseSet(Icod.TermInfo.TerminalDescription target null=not-null/not-null, Icod.TermInfo.Inspection.TermInfoDatabaseSet databaseSet null=not-null/not-null, Icod.TermInfo.Inspection.TerminalDescriptionSourcePlanningOptions planningOptions null=nullable/nullable default=null, System.Threading.CancellationToken cancellationToken null=not-null/not-null default=null) return-null=not-null/not-null
+  METHOD public static Icod.TermInfo.Inspection.TermInfoDatabaseSetSourcePlanningResult PlanFromDirectories(Icod.TermInfo.TerminalDescription target null=not-null/not-null, System.Collections.Generic.IEnumerable<System.String> roots null=not-null/not-null<not-null/not-null>, Icod.TermInfo.Inspection.TerminalDescriptionSourcePlanningOptions planningOptions null=nullable/nullable default=null, Icod.TermInfo.Inspection.TermInfoDatabaseSetOptions databaseSetOptions null=nullable/nullable default=null, Icod.TermInfo.CompiledTermInfoParserOptions parserOptions null=nullable/nullable default=null, System.Threading.CancellationToken cancellationToken null=not-null/not-null default=null) return-null=not-null/not-null
+  METHOD public static Icod.TermInfo.Inspection.TerminalDescriptionSourcePlan Plan(Icod.TermInfo.TerminalDescription target null=not-null/not-null, System.Collections.Generic.IEnumerable<Icod.TermInfo.Inspection.TerminalDescriptionSourceSynthesisParent> candidates null=not-null/not-null<not-null/not-null>) return-null=not-null/not-null
+  METHOD public static Icod.TermInfo.Inspection.TerminalDescriptionSourcePlan Plan(Icod.TermInfo.TerminalDescription target null=not-null/not-null, System.Collections.Generic.IEnumerable<Icod.TermInfo.Inspection.TerminalDescriptionSourceSynthesisParent> candidates null=not-null/not-null<not-null/not-null>, Icod.TermInfo.Inspection.TerminalDescriptionSourcePlanningOptions options null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static Icod.TermInfo.Inspection.TerminalDescriptionSourcePlan Plan(Icod.TermInfo.TerminalDescription target null=not-null/not-null, System.Collections.Generic.IEnumerable<Icod.TermInfo.Inspection.TerminalDescriptionSourceSynthesisParent> candidates null=not-null/not-null<not-null/not-null>, Icod.TermInfo.Inspection.TerminalDescriptionSourcePlanningOptions options null=not-null/not-null, System.Threading.CancellationToken cancellationToken null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static Icod.TermInfo.Inspection.TerminalDescriptionSourcePlan PlanFromCatalog(Icod.TermInfo.TerminalDescription target null=not-null/not-null, Icod.TermInfo.Inspection.TermInfoDatabaseCatalog catalog null=not-null/not-null, Icod.TermInfo.Inspection.TerminalDescriptionSourcePlanningOptions planningOptions null=nullable/nullable default=null, System.Threading.CancellationToken cancellationToken null=not-null/not-null default=null) return-null=not-null/not-null
+  METHOD public static Icod.TermInfo.Inspection.TerminalDescriptionSourcePlan PlanFromDirectory(Icod.TermInfo.TerminalDescription target null=not-null/not-null, System.String root null=not-null/not-null, Icod.TermInfo.Inspection.TerminalDescriptionSourcePlanningOptions planningOptions null=nullable/nullable default=null, Icod.TermInfo.CompiledTermInfoParserOptions parserOptions null=nullable/nullable default=null, System.Threading.CancellationToken cancellationToken null=not-null/not-null default=null) return-null=not-null/not-null
+END
+
+TYPE class Icod.TermInfo.Inspection.TerminalDescriptionSourcePlanningOptions [sealed]
+  FIELD public static const System.Int32 DefaultMaximumCandidateCount null=not-null/not-null value=64
+  FIELD public static const System.Int32 DefaultMaximumEvaluatedPlanCount null=not-null/not-null value=4097
+  FIELD public static const System.Int32 DefaultMaximumGeneratedSourceLength null=not-null/not-null value=4194304
+  FIELD public static const System.Int32 DefaultMaximumSelectedParentCount null=not-null/not-null value=2
+  FIELD public static const System.Int32 MaximumSupportedCandidateCount null=not-null/not-null value=256
+  FIELD public static const System.Int32 MaximumSupportedEvaluatedPlanCount null=not-null/not-null value=1000000
+  FIELD public static const System.Int32 MaximumSupportedGeneratedSourceLength null=not-null/not-null value=67108864
+  FIELD public static const System.Int32 MaximumSupportedSelectedParentCount null=not-null/not-null value=256
+  CTOR public TerminalDescriptionSourcePlanningOptions()
+  CTOR public TerminalDescriptionSourcePlanningOptions(Icod.TermInfo.Inspection.TerminalDescriptionSourceSynthesisOptions synthesisOptions null=not-null/not-null, System.Int32 maximumCandidateCount null=not-null/not-null default=64, System.Int32 maximumSelectedParentCount null=not-null/not-null default=2, System.Int32 maximumEvaluatedPlanCount null=not-null/not-null default=4097, System.Int32 maximumGeneratedSourceLength null=not-null/not-null default=4194304, System.Boolean allowNonExhaustiveResult null=not-null/not-null default=false)
+  PROPERTY Icod.TermInfo.Inspection.TerminalDescriptionSourceSynthesisOptions SynthesisOptions { public get; } null=not-null/unknown
+  PROPERTY System.Boolean AllowNonExhaustiveResult { public get; } null=not-null/unknown
+  PROPERTY System.Int32 MaximumCandidateCount { public get; } null=not-null/unknown
+  PROPERTY System.Int32 MaximumEvaluatedPlanCount { public get; } null=not-null/unknown
+  PROPERTY System.Int32 MaximumGeneratedSourceLength { public get; } null=not-null/unknown
+  PROPERTY System.Int32 MaximumSelectedParentCount { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.Inspection.TerminalDescriptionSourcePlanningScore [sealed]
+  INTERFACES System.IComparable<Icod.TermInfo.Inspection.TerminalDescriptionSourcePlanningScore>, System.IEquatable<Icod.TermInfo.Inspection.TerminalDescriptionSourcePlanningScore>
+  CTOR public TerminalDescriptionSourcePlanningScore(System.Int32 localDirectiveCount null=not-null/not-null, System.Int32 cancellationCount null=not-null/not-null, System.Int32 parentCount null=not-null/not-null, System.Int32 renderedUtf8ByteCount null=not-null/not-null, System.Collections.Generic.IEnumerable<System.Int32> selectedCandidateIndices null=not-null/not-null<not-null/not-null>)
+  PROPERTY System.Collections.Generic.IReadOnlyList<System.Int32> SelectedCandidateIndices { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.Int32 CancellationCount { public get; } null=not-null/unknown
+  PROPERTY System.Int32 LocalDirectiveCount { public get; } null=not-null/unknown
+  PROPERTY System.Int32 ParentCount { public get; } null=not-null/unknown
+  PROPERTY System.Int32 RenderedUtf8ByteCount { public get; } null=not-null/unknown
+  METHOD public System.Boolean Equals(Icod.TermInfo.Inspection.TerminalDescriptionSourcePlanningScore other null=nullable/nullable) return-null=not-null/not-null
+  METHOD public System.Int32 CompareTo(Icod.TermInfo.Inspection.TerminalDescriptionSourcePlanningScore other null=nullable/nullable) return-null=not-null/not-null
+  METHOD public virtual System.Boolean Equals(System.Object obj null=nullable/nullable) return-null=not-null/not-null
+  METHOD public virtual System.Int32 GetHashCode() return-null=not-null/not-null
+END
+
+TYPE class Icod.TermInfo.Inspection.TerminalDescriptionSourceRenderer [static]
+  METHOD public static System.String Render(Icod.TermInfo.TerminalDescription description null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.String Render(Icod.TermInfo.TerminalDescription description null=not-null/not-null, Icod.TermInfo.Inspection.TerminalDescriptionSourceRendererOptions options null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.Void Write(System.IO.TextWriter writer null=not-null/not-null, Icod.TermInfo.TerminalDescription description null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.Void Write(System.IO.TextWriter writer null=not-null/not-null, Icod.TermInfo.TerminalDescription description null=not-null/not-null, Icod.TermInfo.Inspection.TerminalDescriptionSourceRendererOptions options null=not-null/not-null) return-null=not-null/not-null
+END
+
+TYPE class Icod.TermInfo.Inspection.TerminalDescriptionSourceRendererOptions [sealed]
+  CTOR public TerminalDescriptionSourceRendererOptions()
+  CTOR public TerminalDescriptionSourceRendererOptions(System.Int32 lineWidth null=not-null/not-null, Icod.TermInfo.Inspection.TerminalDescriptionSourceLayout layout null=not-null/not-null default=Canonical, Icod.TermInfo.Inspection.TerminalDescriptionSourceCapabilityOrder capabilityOrder null=not-null/not-null default=Database, System.Boolean includeExtendedCapabilities null=not-null/not-null default=true)
+  PROPERTY Icod.TermInfo.Inspection.TerminalDescriptionSourceCapabilityOrder CapabilityOrder { public get; } null=not-null/unknown
+  PROPERTY Icod.TermInfo.Inspection.TerminalDescriptionSourceLayout Layout { public get; } null=not-null/unknown
+  PROPERTY System.Boolean IncludeExtendedCapabilities { public get; } null=not-null/unknown
+  PROPERTY System.Int32 LineWidth { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.Inspection.TerminalDescriptionSourceSynthesisOptions [sealed]
+  FIELD public static const System.Int32 DefaultMaximumParentCount null=not-null/not-null value=64
+  FIELD public static const System.Int32 MaximumSupportedParentCount null=not-null/not-null value=256
+  CTOR public TerminalDescriptionSourceSynthesisOptions()
+  CTOR public TerminalDescriptionSourceSynthesisOptions(System.Int32 lineWidth null=not-null/not-null, Icod.TermInfo.Inspection.TerminalDescriptionSourceLayout layout null=not-null/not-null default=Canonical, Icod.TermInfo.Inspection.TerminalDescriptionSourceCapabilityOrder capabilityOrder null=not-null/not-null default=Database, System.Int32 maximumParentCount null=not-null/not-null default=64)
+  CTOR public TerminalDescriptionSourceSynthesisOptions(System.Int32 lineWidth null=not-null/not-null, Icod.TermInfo.Inspection.TerminalDescriptionSourceLayout layout null=not-null/not-null, Icod.TermInfo.Inspection.TerminalDescriptionSourceCapabilityOrder capabilityOrder null=not-null/not-null, System.Int32 maximumParentCount null=not-null/not-null, System.Boolean includeExtendedCapabilities null=not-null/not-null)
+  PROPERTY Icod.TermInfo.Inspection.TerminalDescriptionSourceCapabilityOrder CapabilityOrder { public get; } null=not-null/unknown
+  PROPERTY Icod.TermInfo.Inspection.TerminalDescriptionSourceLayout Layout { public get; } null=not-null/unknown
+  PROPERTY System.Boolean IncludeExtendedCapabilities { public get; } null=not-null/unknown
+  PROPERTY System.Int32 LineWidth { public get; } null=not-null/unknown
+  PROPERTY System.Int32 MaximumParentCount { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.Inspection.TerminalDescriptionSourceSynthesisParent [sealed]
+  CTOR public TerminalDescriptionSourceSynthesisParent(System.String useName null=not-null/not-null, Icod.TermInfo.TerminalDescription description null=not-null/not-null)
+  PROPERTY Icod.TermInfo.TerminalDescription Description { public get; } null=not-null/unknown
+  PROPERTY System.String UseName { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.Inspection.TerminalDescriptionSourceSynthesizer [static]
+  METHOD public static System.String Synthesize(Icod.TermInfo.TerminalDescription target null=not-null/not-null, System.Collections.Generic.IEnumerable<Icod.TermInfo.Inspection.TerminalDescriptionSourceSynthesisParent> parents null=not-null/not-null<not-null/not-null>, Icod.TermInfo.Inspection.TerminalDescriptionSourceSynthesisOptions options null=nullable/nullable default=null) return-null=not-null/not-null
+  METHOD public static System.Void Write(System.IO.TextWriter writer null=not-null/not-null, Icod.TermInfo.TerminalDescription target null=not-null/not-null, System.Collections.Generic.IEnumerable<Icod.TermInfo.Inspection.TerminalDescriptionSourceSynthesisParent> parents null=not-null/not-null<not-null/not-null>, Icod.TermInfo.Inspection.TerminalDescriptionSourceSynthesisOptions options null=nullable/nullable default=null) return-null=not-null/not-null
+END
