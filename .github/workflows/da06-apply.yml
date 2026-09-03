@@ -1,0 +1,50 @@
+name: Apply DA06 automation composition
+
+on:
+  push:
+    branches:
+      - 1.10.0
+    paths:
+      - .github/workflows/da06-apply.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 1.10.0
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+            10.0.x
+
+      - name: Apply DA06 coordinated updates
+        run: python3 .github/scripts/da06-apply.py
+
+      - name: Build DA06 with zero warnings
+        run: |
+          set -o pipefail
+          dotnet build Icod.TermInfo.sln -c Debug 2>&1 | tee da06-build.log
+          grep -q "0 Warning(s)" da06-build.log
+          grep -q "0 Error(s)" da06-build.log
+
+      - name: Test DA06
+        run: dotnet test Icod.TermInfo.sln -c Debug --no-build
+
+      - name: Commit DA06
+        run: |
+          rm .github/scripts/da06-apply.py
+          rm .github/workflows/da06-apply.yml
+          rm -f da06-build.log
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Implement DA06 automation composition"
+          git push origin HEAD:1.10.0
