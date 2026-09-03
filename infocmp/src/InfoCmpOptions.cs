@@ -542,19 +542,21 @@ internal static class InfoCmpOptionsParser {
 						break;
 
 					case "--candidate-root":
-					if ( !TryReadValue(
-						args,
-						ref index,
-						argument,
-						out string? candidateRoot,
-						out string? candidateRootError
-					) ) {
-						return InfoCmpOptionsParseResult.Failure( candidateRootError! );
-					}
-					candidateRoots.Add( candidateRoot! );
-					break;
+						if ( !TryReadValue(
+							args,
+							ref index,
+							argument,
+							out string? candidateRoot,
+							out string? candidateRootError
+						) ) {
+							return InfoCmpOptionsParseResult.Failure(
+								candidateRootError!
+							);
+						}
+						candidateRoots.Add( candidateRoot! );
+						break;
 
-				case "--max-parents":
+					case "--max-parents":
 						if ( maximumSelectedParentCountSpecified ) {
 							return InfoCmpOptionsParseResult.Failure(
 								"option '--max-parents' may be specified only once"
