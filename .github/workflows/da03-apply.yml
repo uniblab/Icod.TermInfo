@@ -25,6 +25,9 @@ jobs:
             9.0.x
             10.0.x
 
+      - name: Correct unit-test cancellation tokens
+        run: sed -i 's/TestContext.Current.CancellationToken/CancellationToken.None/g' .github/scripts/da03-apply.py
+
       - name: Apply DA03 coordinated updates
         run: python3 .github/scripts/da03-apply.py
 
