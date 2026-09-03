@@ -14,6 +14,7 @@ internal static class DA07PackageSmoke {
 		);
 		string firstRoot = System.IO.Path.Combine( root, "first" );
 		string secondRoot = System.IO.Path.Combine( root, "second" );
+		string planningRoot = System.IO.Path.Combine( root, "planning" );
 		try {
 			CompiledTermInfoDatabaseWriter.Write(
 				firstRoot,
@@ -29,6 +30,10 @@ internal static class DA07PackageSmoke {
 					CreateTerminal( "other-owner", 100, "collision" ),
 					CreateParent( "parent-b", false, true ),
 				]
+			);
+			CompiledTermInfoDatabaseWriter.Write(
+				planningRoot,
+				CreateParent( "parent-c", false, true )
 			);
 
 			TermInfoDatabaseSet set = TermInfoDatabaseInspector.InspectSet(
@@ -71,8 +76,11 @@ internal static class DA07PackageSmoke {
 				.SetBoolean( BooleanCapability.AutoRightMargin )
 				.SetNumber( NumericCapability.Columns, 80 )
 				.Build();
+			TermInfoDatabaseSet planningSet = TermInfoDatabaseInspector.InspectSet(
+				[ firstRoot, planningRoot ]
+			);
 			TermInfoDatabaseSetSourcePlanningResult plan =
-				TerminalDescriptionSourcePlanner.PlanFromDatabaseSet( target, set );
+				TerminalDescriptionSourcePlanner.PlanFromDatabaseSet( target, planningSet );
 			Require(
 				plan.Candidates.Count >= 2
 					&& plan.Plan.CandidateCount == plan.Candidates.Count,
