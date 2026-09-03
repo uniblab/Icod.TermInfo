@@ -96,6 +96,10 @@ if errorlevel 1 goto fail
 dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c %CONFIGURATION% --no-build -- --compare Icod.TermInfo.Inspection\bin\%CONFIGURATION%\net8.0\Icod.TermInfo.Inspection.dll Icod.TermInfo.Inspection\bin\%CONFIGURATION%\net10.0\Icod.TermInfo.Inspection.dll
 if errorlevel 1 goto fail
 
+rem Frozen Inspection baselines remain immutable historical evidence:
+rem docs\1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt
+rem docs\1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt
+rem docs\1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt
 rem DA08 freezes the exact complete 1.10 Inspection surface on every shipped framework.
 echo.
 echo === Verify approved Icod.TermInfo.Inspection 1.10 public API baseline (%CONFIGURATION%) ===

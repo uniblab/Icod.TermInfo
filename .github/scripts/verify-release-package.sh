@@ -122,6 +122,10 @@ dotnet run \
   Icod.TermInfo.Inspection/bin/${configuration}/net8.0/Icod.TermInfo.Inspection.dll \
   Icod.TermInfo.Inspection/bin/${configuration}/net10.0/Icod.TermInfo.Inspection.dll
 
+# Frozen Inspection baselines remain immutable historical evidence:
+# docs/1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt
+# docs/1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt
+# docs/1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt
 # DA08 freezes the exact complete 1.10 Inspection public surface independently
 # on all three shipped target frameworks. Earlier baselines remain historical.
 for inspection_framework in net8.0 net9.0 net10.0; do
