@@ -107,27 +107,30 @@ public sealed partial class TermInfoDatabaseSet {
 		Dictionary<string, List<TermInfoDatabaseSetOccurrence>> aliasOccurrences =
 			new( StringComparer.Ordinal );
 		int aliasOccurrenceCount = 0;
-		foreach ( TermInfoDatabaseSetIdentity identity in Identities ) {
-			foreach ( TermInfoDatabaseSetOccurrence occurrence in identity.Occurrences ) {
+		IEnumerable<TermInfoDatabaseSetOccurrence> orderedOccurrences =
+			Identities
+				.SelectMany( identity => identity.Occurrences )
+				.OrderBy( occurrence => occurrence.DatabaseIndex )
+				.ThenBy( occurrence => occurrence.CatalogEntryIndex );
+		foreach ( TermInfoDatabaseSetOccurrence occurrence in orderedOccurrences ) {
+			cancellationToken.ThrowIfCancellationRequested();
+			foreach ( string alias in occurrence.Aliases ) {
 				cancellationToken.ThrowIfCancellationRequested();
-				foreach ( string alias in occurrence.Aliases ) {
-					cancellationToken.ThrowIfCancellationRequested();
-					aliasOccurrenceCount = checked( aliasOccurrenceCount + 1 );
-					if ( aliasOccurrenceCount > effectiveOptions.MaximumAliasOccurrenceCount ) {
-						throw new InvalidOperationException(
-							$"Database-set semantic analysis exceeds the configured maximum of {effectiveOptions.MaximumAliasOccurrenceCount} alias occurrences."
-						);
-					}
-
-					if ( !aliasOccurrences.TryGetValue(
-						alias,
-						out List<TermInfoDatabaseSetOccurrence>? occurrences
-					) ) {
-						occurrences = [];
-						aliasOccurrences.Add( alias, occurrences );
-					}
-					occurrences.Add( occurrence );
+				aliasOccurrenceCount = checked( aliasOccurrenceCount + 1 );
+				if ( aliasOccurrenceCount > effectiveOptions.MaximumAliasOccurrenceCount ) {
+					throw new InvalidOperationException(
+						$"Database-set semantic analysis exceeds the configured maximum of {effectiveOptions.MaximumAliasOccurrenceCount} alias occurrences."
+					);
 				}
+
+				if ( !aliasOccurrences.TryGetValue(
+					alias,
+					out List<TermInfoDatabaseSetOccurrence>? occurrences
+				) ) {
+					occurrences = [];
+					aliasOccurrences.Add( alias, occurrences );
+				}
+				occurrences.Add( occurrence );
 			}
 		}
 

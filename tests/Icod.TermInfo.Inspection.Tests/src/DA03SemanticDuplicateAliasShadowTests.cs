@@ -192,12 +192,12 @@ public sealed class DA03SemanticDuplicateAliasShadowTests {
 			TermInfoDatabaseInspector.CreateSet(
 				[
 					CreateCatalog(
-						"owner-a",
-						CreateTerminal( "alpha", 80, "shared" )
+						"owner-first",
+						CreateTerminal( "zeta", 80, "shared" )
 					),
 					CreateCatalog(
-						"owner-b",
-						CreateTerminal( "beta", 80, "shared" )
+						"owner-second",
+						CreateTerminal( "alpha", 80, "shared" )
 					),
 				]
 			);
@@ -208,12 +208,17 @@ public sealed class DA03SemanticDuplicateAliasShadowTests {
 					cancellationToken: CancellationToken.None
 				).Aliases
 			);
+		TermInfoDatabaseSetOccurrence owner =
+			Assert.IsType<TermInfoDatabaseSetOccurrence>( alias.PrecedenceOwner );
 
 		Assert.Equal(
 			TermInfoDatabaseSetSemanticRelationship.SemanticallyDifferent,
 			alias.Relationship
 		);
-		Assert.Equal( new[] { "alpha", "beta" }, alias.CanonicalNames );
+		Assert.Equal( new[] { "alpha", "zeta" }, alias.CanonicalNames );
+		Assert.Equal( new[] { 0, 1 }, alias.Occurrences.Select( occurrence => occurrence.DatabaseIndex ).ToArray() );
+		Assert.Equal( "zeta", owner.Name );
+		Assert.Equal( 0, owner.DatabaseIndex );
 		Assert.True( alias.HasMultipleCanonicalOwners );
 	}
 
