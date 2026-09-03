@@ -53,6 +53,9 @@ jobs:
       - name: Apply DA06 contract corrections
         run: python3 .github/scripts/da06-correct.py
 
+      - name: Update historical-current DA06 assertions
+        run: python3 .github/scripts/da06-history.py
+
       - name: Build DA06 with zero warnings
         run: |
           set -o pipefail
@@ -67,6 +70,7 @@ jobs:
         run: |
           rm .github/scripts/da06-apply.py
           rm .github/scripts/da06-correct.py
+          rm .github/scripts/da06-history.py
           rm .github/workflows/da06-apply.yml
           rm -f da06-build.log
           git config user.name "github-actions[bot]"
