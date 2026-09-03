@@ -13,8 +13,12 @@ are recorded in `docs/1.10.0-DA08-FREEZE-FINGERPRINTS.txt` and enforced by the
 package verifier. Version-1 JSON remains byte-compatible with the frozen 1.9
 contract.
 
-See `docs/1.10.0-DA08-API-SCHEMA-COMMAND-PACKAGE-AND-DOCUMENTATION-FREEZE.md`
-and `docs/1.10.0-RELEASE-AUDIT.md`.
+For consumer-facing use of the frozen 1.10 surface, see
+`docs/1.10.0-MULTI-DATABASE-GUIDE.md` and
+`samples/Icod.TermInfo.DatabaseSet.Sample/README.md`. Release-contract evidence
+remains in
+`docs/1.10.0-DA08-API-SCHEMA-COMMAND-PACKAGE-AND-DOCUMENTATION-FREEZE.md` and
+`docs/1.10.0-RELEASE-AUDIT.md`.
 
 ## 1.10 DA07 generated-state and distribution hardening
 
