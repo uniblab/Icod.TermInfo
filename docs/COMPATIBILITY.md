@@ -220,8 +220,8 @@ macOS, and representative non-default cultures.
 MI07 adds no feature behavior. It freezes the exact 31-type Inspection public
 surface, the version-1 JSON Schema fingerprint, existing command semantics,
 package dependency graph, sample and fixture evidence, and router/archive
-topology. The transition from a green `1.9.0-Alpha-7` gate to stable `1.9.0` is
-version-only.
+topology. Stable `1.9.0` promotes the green `1.9.0-Alpha-7` contract without a
+semantic, public-API, schema, package-graph, or command change.
 
 ## Runtime terminfo semantic compatibility
 

@@ -6,7 +6,8 @@ using Xunit;
 namespace Icod.TermInfo.Inspection.Tests;
 
 public sealed class MI07ReleaseClosureTests {
-	private const string DevelopmentVersion = "1.9.0-Alpha-7";
+	private const string StableReleaseVersion = "1.9.0";
+	private const string HistoricalDevelopmentVersion = "1.9.0-Alpha-7";
 	private const string Mi06Head =
 		"1f6560dedc45495132fbf50ef333e3ec5ac2b384";
 	private const string Mi06Run = "33685454683";
@@ -148,7 +149,7 @@ public sealed class MI07ReleaseClosureTests {
 		foreach (
 			string marker
 			in new[] {
-				DevelopmentVersion,
+				HistoricalDevelopmentVersion,
 				Mi06Head,
 				Mi06Run,
 				"31 exported types",
@@ -193,7 +194,7 @@ public sealed class MI07ReleaseClosureTests {
 	}
 
 	[Fact]
-	public void CoordinatedMetadataIdentifiesFinalPrereleaseAndCompletedTranche() {
+	public void CoordinatedMetadataIdentifiesStableReleaseAndCompletedTranche() {
 		string root = FindRepositoryRoot();
 		string buildProperties =
 			File.ReadAllText(
@@ -212,15 +213,15 @@ public sealed class MI07ReleaseClosureTests {
 					"Icod.TermInfo-Post-1.0-Development-Roadmap.md" ) );
 
 		Assert.Contains(
-			DevelopmentVersion,
+			StableReleaseVersion,
 			buildProperties,
 			StringComparison.Ordinal );
 		Assert.Contains(
-			"MI07 complete",
+			"Stable 1.9.0 release contract frozen",
 			roadmap,
 			StringComparison.Ordinal );
 		Assert.Contains(
-			"stable-intended release contract complete",
+			"Release closure - exact-main validation and publication",
 			activeRoadmap,
 			StringComparison.OrdinalIgnoreCase );
 	}

@@ -10,14 +10,14 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
-**Current coordinated version:** `1.9.0-Alpha-7`
+**Current coordinated version:** `1.9.0`
 **Final 1.6 prerelease:** `1.6.0-Alpha-8`
 **Final 1.7 prerelease:** `1.7.0-Alpha-8`
 **Final 1.8 prerelease:** `1.8.0-Alpha-8`
-**Planned final 1.9 prerelease:** `1.9.0-Alpha-7`
-**Next development line:** `1.9.0` - Machine-Readable Inspection and Planning Automation
-**Status:** 1.9.0 stable-intended release contract complete
-**Current tranche:** MI07 - API, Schema, Packaging, and Release Closure
+**Final 1.9 prerelease:** `1.9.0-Alpha-7`
+**Next development line:** not yet selected
+**Status:** 1.9.0 stable release contract frozen
+**Current tranche:** Release closure - exact-main validation and publication
 **Primary objective:** Render effective descriptions, comparisons, plans, and explicit catalogs as deterministic bounded versioned JSON, then compose that reusable representation through `infocmp` and `toe` without changing frozen lower-layer semantics.
 
 ---
@@ -164,8 +164,8 @@ MI06 hardens samples, package consumers, router/archive execution, bounds, and
 cross-host determinism. MI07 freezes the exact 31-type Inspection API, complete
 version-1 JSON Schema, commands, package graph, samples, fixtures, router and
 archive topology, release verifiers, and release audit at `1.9.0-Alpha-7`
-without adding another feature tranche. Stable 1.9.0 is a version-only
-transition after the complete Alpha-7 gate succeeds.
+without adding another feature tranche. Stable 1.9.0 promotes that validated
+Alpha-7 surface without semantic, public-API, schema, or command changes.
 
 The sequence is cumulative but intentionally modular. Applications which only need runtime terminfo SHALL continue to depend on `Icod.TermInfo` alone.
 

@@ -8,9 +8,10 @@ representability and rendering engine. It does not add another termcap semantic
 model or conversion table. TC08 freezes that composition for the stable 1.6.0
 release.
 
-Version `1.8.0` carries that frozen conversion behavior unchanged. Relative
-terminfo source planning is isolated in Inspection and `infocmp --plan-use`; it
-does not alter `infotocap` command semantics or dependencies.
+Version `1.9.0` carries that frozen conversion behavior unchanged.
+Machine-readable inspection and planning automation are isolated in Inspection,
+`infocmp`, and `toe`; they do not alter `infotocap` command semantics or
+dependencies.
 
 ```text
 Usage: infotocap [OPTION]... FILE...

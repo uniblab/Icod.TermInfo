@@ -168,7 +168,10 @@ public sealed class MI06CrossHostHardeningTests {
 		} ) {
 			Assert.Contains( marker, implementation, StringComparison.OrdinalIgnoreCase );
 		}
-		Assert.Contains( "**Status:** MI07 complete", roadmap, StringComparison.Ordinal );
+		Assert.Contains(
+			"**Status:** Stable 1.9.0 release contract frozen",
+			roadmap,
+			StringComparison.Ordinal );
 	}
 
 	private static string ReadNormalized(

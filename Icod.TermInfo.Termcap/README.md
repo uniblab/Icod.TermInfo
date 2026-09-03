@@ -3,16 +3,16 @@
 `Icod.TermInfo.Termcap` is the optional termcap interoperability layer for the
 Icod.TermInfo package family.
 
-Version 1.8.0 retains the TC01 parser, TC02 capability classifier, TC03
+Version 1.9.0 retains the TC01 parser, TC02 capability classifier, TC03
 inheritance resolver, TC04 semantic converter, TC05 reverse renderer, TC06
 explicit acquisition APIs, and the TC08-frozen public/package contract used by
 the TC07 conversion-command composition.
 
-## 1.9 development status
+## 1.9 release status
 
-Version `1.9.0-Alpha-7` preserves the frozen Termcap 1.6 API, semantics,
-Runtime-only dependency, and assembly identity. MI07 freezes the complete 1.9
-release contract; machine-readable Inspection and planning remain outside the
+Version `1.9.0` preserves the frozen Termcap 1.6 API, semantics, Runtime-only
+dependency, and assembly identity. The stable release promotes the validated
+Alpha-7 contract; machine-readable Inspection and planning remain outside the
 Termcap package.
 
 ## 1.8 release status
@@ -32,7 +32,7 @@ direction.
 ## Install
 
 ```text
-dotnet add package Icod.TermInfo.Termcap --version 1.8.0
+dotnet add package Icod.TermInfo.Termcap --version 1.9.0
 ```
 
 The package targets `net8.0`, `net9.0`, and `net10.0` and depends only on

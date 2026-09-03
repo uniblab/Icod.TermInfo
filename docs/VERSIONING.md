@@ -317,8 +317,9 @@ MI07 advances the coordinated development version to `1.9.0-Alpha-7` without
 adding feature behavior. It freezes the exact 31-type Inspection API, complete
 version-1 JSON Schema, command semantics, package graph, samples, fixtures,
 router and archive topology, release verifiers, and release audit. Historical
-MI01 through MI06 records retain their original development versions. A green
-Alpha-7 to stable `1.9.0` transition is version-only.
+MI01 through MI06 records retain their original development versions. Stable
+`1.9.0` promotes the validated Alpha-7 surface through release metadata and
+documentation changes only, without semantic, public-API, or schema changes.
 
 ## Assembly identity
 

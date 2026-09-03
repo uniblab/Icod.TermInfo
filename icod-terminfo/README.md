@@ -7,7 +7,7 @@ The tool targets `net10.0` and therefore requires a .NET 10 runtime.
 
 ## 1.9 JSON automation
 
-Version `1.9.0-Alpha-7` freezes the same machine-readable command contracts as
+Version `1.9.0` publishes the same frozen machine-readable command contracts as
 the standalone commands:
 
 ```text
@@ -22,9 +22,9 @@ The router adds no JSON or planning semantics. It forwards arguments, streams,
 cancellation, diagnostics, and exit status, so routed and direct output is
 byte-for-byte identical.
 
-MI07 adds no router behavior. It freezes that dispatch contract, fresh installed
-tool-package evidence, and every matching standalone archive on Windows, Linux,
-and macOS as part of the complete 1.9 release gate.
+The stable release adds no router behavior. It publishes the validated dispatch
+contract, installed tool-package evidence, and every matching standalone archive
+on Windows, Linux, and macOS as part of the complete 1.9 release.
 
 ## 1.8 release status
 
@@ -55,13 +55,13 @@ five-command dispatch topology.
 ## Install
 
 ```text
-dotnet tool install --global Icod.TermInfo.Tools --version 1.8.0
+dotnet tool install --global Icod.TermInfo.Tools --version 1.9.0
 ```
 
 Update or remove the global tool with:
 
 ```text
-dotnet tool update --global Icod.TermInfo.Tools --version 1.8.0
+dotnet tool update --global Icod.TermInfo.Tools --version 1.9.0
 dotnet tool uninstall --global Icod.TermInfo.Tools
 ```
 
@@ -69,7 +69,7 @@ For repository-local or application-local use, install through a tool manifest:
 
 ```text
 dotnet new tool-manifest
-dotnet tool install Icod.TermInfo.Tools --version 1.8.0
+dotnet tool install Icod.TermInfo.Tools --version 1.9.0
 dotnet tool run icod-terminfo --version
 ```
 
@@ -83,9 +83,9 @@ It does not install global commands named `tic`, `infocmp`, `toe`, `captoinfo`,
 or `infotocap`. Those traditional command names belong to separately downloaded
 standalone release archives.
 
-Version 1.8.0 retains all five coordinated commands introduced in 1.6.0,
-preserves 1.7 relative synthesis, and adds relative-source planning through the
-existing `infocmp` command:
+Version 1.9.0 retains all five coordinated commands introduced in 1.6.0,
+preserves 1.7 relative synthesis and 1.8 relative-source planning, and adds the
+machine-readable `infocmp` and `toe` forms shown above:
 
 ```text
 icod-terminfo tic -V
@@ -126,7 +126,7 @@ icod-terminfo infotocap --help
 ## Standalone distribution
 
 The router package complements rather than replaces the release archives. Each
-of the six framework-dependent 1.8.0 tool-suite archives contains standalone
+of the six framework-dependent 1.9.0 tool-suite archives contains standalone
 executables named exactly:
 
 ```text

@@ -2,7 +2,7 @@
 
 ## 1.9 JSON automation
 
-Version `1.9.0-Alpha-7` freezes the direct machine-readable projections of the
+Version `1.9.0` publishes the frozen direct machine-readable projections of the
 frozen Inspection values:
 
 ```text
@@ -27,8 +27,8 @@ the same form emits only the selected terminfo source.
 
 MI06 changes no option or document semantics. It adds large escaped-input and
 culture hardening plus real tool-package, archive, and cross-host execution.
-MI07 adds no command behavior and freezes these forms as the stable-intended
-1.9 command contract.
+The stable release adds no command behavior and publishes these validated forms
+as the stable 1.9 command contract.
 
 ## 1.8 relative-source planning
 

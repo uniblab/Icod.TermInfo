@@ -7,11 +7,11 @@ The package is intentionally separate from the stable runtime package. Ordinary
 applications that only load compiled terminfo or use `TerminalDescription`
 values continue to reference `Icod.TermInfo` alone.
 
-## 1.9 development status
+## 1.9 release status
 
-Version `1.9.0-Alpha-7` preserves the frozen Source 1.1 API, semantics,
-Runtime-only dependency, and assembly identity. MI07 freezes the complete 1.9
-release contract; Source adds no Inspection or JSON dependency.
+Version `1.9.0` preserves the frozen Source 1.1 API, semantics, Runtime-only
+dependency, and assembly identity. The stable release promotes the validated
+Alpha-7 contract; Source adds no Inspection or JSON dependency.
 
 ## 1.8 release status
 
@@ -29,16 +29,16 @@ verify synthesized relative source, but it does not depend on Inspection.
 
 ## Install
 
-For the 1.8.0 release:
+For the 1.9.0 release:
 
 ```text
-dotnet add package Icod.TermInfo.Source --version 1.8.0
+dotnet add package Icod.TermInfo.Source --version 1.9.0
 ```
 
 The package depends on the matching `Icod.TermInfo` version and targets
 `net8.0`, `net9.0`, and `net10.0`.
 
-Version 1.8.0 preserves the frozen 1.1 source-language public API and semantics.
+Version 1.9.0 preserves the frozen 1.1 source-language public API and semantics.
 Inspection uses Source to validate relative-source synthesis and planning;
 Source does not acquire an Inspection dependency. The `infotocap` command
 continues to consume Source only at the executable-composition layer, and Source
