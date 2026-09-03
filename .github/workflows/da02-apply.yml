@@ -31,6 +31,11 @@ jobs:
       - name: Apply DA02 coordinated updates
         run: python3 .github/scripts/da02-apply.py
 
+      - name: Advance historical development assertions
+        run: |
+          sed -i 's/"DA01"/"DA02"/' tests/Icod.TermInfo.Inspection.Tests/src/RP08ReleaseClosureTests.cs
+          sed -i 's/DA01 - Database-set model and contract foundation/DA02 - Deterministic multi-catalog inspection and precedence/' tests/Icod.TermInfo.Inspection.Tests/src/MI07ReleaseClosureTests.cs
+
       - name: Build DA02
         run: dotnet build Icod.TermInfo.sln -c Debug
 
