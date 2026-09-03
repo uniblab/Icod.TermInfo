@@ -54,6 +54,10 @@ jobs:
         if: matrix.package_host
         shell: pwsh
         run: ./packaging/VerifyPackageArtifact.ps1 -ArtifactDirectory artifacts -Configuration '${{ env.CONFIGURATION }}'
+      - name: Smoke isolated DA07 package consumer
+        if: matrix.package_host
+        shell: pwsh
+        run: ./.github/scripts/smoke-da07-package-consumer.ps1 artifacts -Configuration '${{ env.CONFIGURATION }}'
       - name: Build and verify Staging tool archives
         if: matrix.package_host
         shell: pwsh
