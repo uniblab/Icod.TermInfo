@@ -221,7 +221,7 @@ public sealed class MI07ReleaseClosureTests {
 			roadmap,
 			StringComparison.Ordinal );
 		Assert.Contains(
-			"DA03 - Semantic duplicate, conflict, alias, and shadow analysis",
+			"DA04 - Database-set semantic comparison",
 			activeRoadmap,
 			StringComparison.OrdinalIgnoreCase );
 	}

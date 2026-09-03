@@ -3,6 +3,18 @@
 `Icod.TermInfo.Inspection` is the optional managed inspection and semantic-
 comparison layer for the `Icod.TermInfo` package family.
 
+## 1.10 DA04 database-set semantic and structural comparison
+
+`1.10.0-Alpha-4` adds deterministic comparison of two ordered database sets as
+both effective precedence views and physical/provenance collections. The result
+separates effective winner/membership/alias changes from root topology, winner
+provenance, shadow-set, completeness, and issue differences, while incomplete
+inputs remain explicitly indeterminate. Cross-set terminal semantics continue to
+use `TerminalDescriptionComparer`; alias scanning reuses the DA03 bound.
+
+See
+`docs/1.10.0-DA04-DATABASE-SET-SEMANTIC-AND-STRUCTURAL-COMPARISON.md`.
+
 ## 1.10 DA03 semantic duplicate, alias, and shadow analysis
 
 `1.10.0-Alpha-3` adds bounded winner-versus-shadow semantic classification for

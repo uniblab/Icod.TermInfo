@@ -34,7 +34,7 @@ Require(
 Type[] exportedTypes =
 	inspectionAssembly.GetExportedTypes();
 Require(
-	exportedTypes.Length >= 45
+	exportedTypes.Length >= 49
 		&& exportedTypes.Contains( typeof( TermInfoComparisonResult ) )
 		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalog ) )
 		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalogEntry ) )
@@ -52,6 +52,10 @@ Require(
 		&& exportedTypes.Contains( typeof( TermInfoDatabaseSetIdentityAnalysis ) )
 		&& exportedTypes.Contains( typeof( TermInfoDatabaseSetShadowAnalysis ) )
 		&& exportedTypes.Contains( typeof( TermInfoDatabaseSetAliasAnalysis ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseSetDifferenceKind ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseSetDifference ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseSetComparisonResult ) )
+		&& exportedTypes.Contains( typeof( TermInfoDatabaseSetComparer ) )
 		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalogIssue ) )
 		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalogIssueKind ) )
 		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalogKind ) )
