@@ -3,6 +3,19 @@
 `Icod.TermInfo.Inspection` is the optional managed inspection and semantic-
 comparison layer for the `Icod.TermInfo` package family.
 
+## 1.10 DA06 command and machine-readable automation composition
+
+`1.10.0-Alpha-6` adds a separate version-2 database automation contract with
+`databaseSet`, `databaseSetComparison`, and `databaseSetPlan` document kinds. The
+frozen version-1 identifier, schema file, four document kinds, renderer output,
+and legacy `toe`/`infocmp` JSON invocations remain unchanged. `toe --json` emits
+v1 for one directory and v2 for multiple explicit directories; explicit set
+comparison is available through `--compare-set` with repeated left/right roots.
+`infocmp --candidate-root` composes DA05 multi-database planning, while legacy
+`--all-candidates -B directory` remains the version-1 path.
+
+See `docs/1.10.0-DA06-COMMAND-AND-MACHINE-READABLE-AUTOMATION-COMPOSITION.md`.
+
 ## 1.10 DA05 multi-database candidate planning
 
 `1.10.0-Alpha-5` composes the frozen 1.8 planner over canonical candidates

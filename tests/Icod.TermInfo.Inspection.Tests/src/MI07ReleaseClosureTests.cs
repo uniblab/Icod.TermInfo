@@ -221,7 +221,7 @@ public sealed class MI07ReleaseClosureTests {
 			roadmap,
 			StringComparison.Ordinal );
 		Assert.Contains(
-			"DA05 - Multi-database candidate planning",
+			"DA06 - Command and machine-readable automation composition",
 			activeRoadmap,
 			StringComparison.OrdinalIgnoreCase );
 	}

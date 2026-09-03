@@ -22,7 +22,7 @@
 		<Title>Icod.TermInfo.Inspection</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed inspection and semantic-comparison foundation for Icod.TermInfo. The 1.3 line provides canonical terminfo rendering and reusable infocmp-style comparison engines without enlarging the frozen Runtime, Source, or Compiler public contracts.</Description>
-		<PackageReleaseNotes>1.10.0-Alpha-5 adds deterministic complete database-set candidate discovery, target-identity exclusion, semantic duplicate validation/collapse, selected-parent provenance mapping, and explicit roots/catalog composition over the unchanged frozen 1.8 planner while preserving DA01-DA04, frozen 1.9 JSON v1, lower-layer, synthesis, planner scoring, and command contracts.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.10.0-Alpha-6 adds the separate version-2 database automation JSON contract for databaseSet, databaseSetComparison, and databaseSetPlan documents plus thin toe/infocmp/router command composition, while preserving byte-compatible version-1 JSON invocations and all frozen DA01-DA05 engines.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>
@@ -78,6 +78,7 @@
 		<Compile Include="src\**\*.cs" />
 		<None Include="README.md" Pack="true" PackagePath="\" />
 		<None Include="..\docs\Icod.TermInfo.Inspection.schema.json" Link="Icod.TermInfo.Inspection.schema.json" Pack="true" PackagePath="docs\" />
+		<None Include="..\docs\Icod.TermInfo.Inspection.schema.v2.json" Link="Icod.TermInfo.Inspection.schema.v2.json" Pack="true" PackagePath="docs\" />
 		<None Include="..\icon.png" Link="icon.png" Pack="true" PackagePath="" />
 		<None Include="..\LICENSE" Link="LICENSE" Pack="true" PackagePath="\" />
 	</ItemGroup>

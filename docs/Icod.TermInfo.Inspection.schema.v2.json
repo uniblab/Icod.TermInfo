@@ -1,0 +1,256 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:icod:terminfo:inspection:json:2",
+  "title": "Icod.TermInfo.Inspection database automation JSON version 2",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/databaseSetDocument"
+    },
+    {
+      "$ref": "#/$defs/databaseSetComparisonDocument"
+    },
+    {
+      "$ref": "#/$defs/databaseSetPlanDocument"
+    }
+  ],
+  "$defs": {
+    "envelopeBase": {
+      "type": "object",
+      "required": [
+        "schema",
+        "schemaVersion",
+        "documentKind",
+        "data"
+      ],
+      "properties": {
+        "schema": {
+          "const": "urn:icod:terminfo:inspection:json:2"
+        },
+        "schemaVersion": {
+          "const": 2
+        }
+      }
+    },
+    "databaseSetDocument": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/envelopeBase"
+        },
+        {
+          "properties": {
+            "documentKind": {
+              "const": "databaseSet"
+            },
+            "data": {
+              "$ref": "#/$defs/databaseSetData"
+            }
+          }
+        }
+      ]
+    },
+    "databaseSetComparisonDocument": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/envelopeBase"
+        },
+        {
+          "properties": {
+            "documentKind": {
+              "const": "databaseSetComparison"
+            },
+            "data": {
+              "$ref": "#/$defs/databaseSetComparisonData"
+            }
+          }
+        }
+      ]
+    },
+    "databaseSetPlanDocument": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/envelopeBase"
+        },
+        {
+          "properties": {
+            "documentKind": {
+              "const": "databaseSetPlan"
+            },
+            "data": {
+              "$ref": "#/$defs/databaseSetPlanData"
+            }
+          }
+        }
+      ]
+    },
+    "databaseSetData": {
+      "type": "object",
+      "required": [
+        "isComplete",
+        "databaseCount",
+        "totalEntryCount",
+        "identityCount",
+        "issueCount",
+        "databases",
+        "identities",
+        "issues",
+        "semanticAnalysis"
+      ],
+      "properties": {
+        "isComplete": {
+          "type": "boolean"
+        },
+        "databaseCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "totalEntryCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "identityCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "issueCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "databases": {
+          "type": "array"
+        },
+        "identities": {
+          "type": "array"
+        },
+        "issues": {
+          "type": "array"
+        },
+        "semanticAnalysis": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false
+    },
+    "databaseSetComparisonData": {
+      "type": "object",
+      "required": [
+        "isConclusive",
+        "areEffectivelyEquivalent",
+        "areStructurallyEquivalent",
+        "areEquivalent",
+        "semanticComparisonCount",
+        "aliasOccurrenceCount",
+        "differences"
+      ],
+      "properties": {
+        "isConclusive": {
+          "type": "boolean"
+        },
+        "areEffectivelyEquivalent": {
+          "type": "boolean"
+        },
+        "areStructurallyEquivalent": {
+          "type": "boolean"
+        },
+        "areEquivalent": {
+          "type": "boolean"
+        },
+        "semanticComparisonCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "aliasOccurrenceCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "differences": {
+          "type": "array"
+        }
+      },
+      "additionalProperties": false
+    },
+    "databaseSetPlanData": {
+      "type": "object",
+      "required": [
+        "databases",
+        "planningBounds",
+        "candidateCount",
+        "collapsedDuplicateOccurrenceCount",
+        "candidateSemanticComparisonCount",
+        "candidates",
+        "selectedParentCount",
+        "selectedCandidateIndices",
+        "selectedCandidates",
+        "source",
+        "score",
+        "evaluatedPlanCount",
+        "isExhaustive"
+      ],
+      "properties": {
+        "databases": {
+          "type": "array"
+        },
+        "planningBounds": {
+          "type": "object",
+          "required": [
+            "maximumCandidateCount",
+            "maximumSelectedParentCount",
+            "maximumEvaluatedPlanCount",
+            "maximumGeneratedSourceLength",
+            "allowNonExhaustiveResult"
+          ],
+          "properties": {
+            "maximumCandidateCount": { "type": "integer", "minimum": 0 },
+            "maximumSelectedParentCount": { "type": "integer", "minimum": 0 },
+            "maximumEvaluatedPlanCount": { "type": "integer", "minimum": 1 },
+            "maximumGeneratedSourceLength": { "type": "integer", "minimum": 1 },
+            "allowNonExhaustiveResult": { "type": "boolean" }
+          },
+          "additionalProperties": false
+        },
+        "candidateCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "collapsedDuplicateOccurrenceCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "candidateSemanticComparisonCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "candidates": {
+          "type": "array"
+        },
+        "selectedParentCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "selectedCandidateIndices": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "selectedCandidates": {
+          "type": "array"
+        },
+        "source": {
+          "type": "string"
+        },
+        "score": {
+          "type": "object"
+        },
+        "evaluatedPlanCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "isExhaustive": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

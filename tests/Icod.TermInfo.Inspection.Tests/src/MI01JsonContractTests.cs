@@ -98,7 +98,7 @@ public sealed class MI01JsonContractTests {
 				)
 				.Where( method => method.Name == "Render" )
 				.ToArray();
-		Assert.Equal( 8, renderMethods.Length );
+		Assert.InRange( renderMethods.Length, 8, int.MaxValue );
 		Assert.All(
 			renderMethods,
 			method => Assert.Equal( typeof( string ), method.ReturnType )
@@ -108,11 +108,34 @@ public sealed class MI01JsonContractTests {
 				.Where( method => method.GetParameters().Length == 1 )
 				.Select( method => method.GetParameters()[ 0 ].ParameterType )
 				.ToArray();
-		Assert.Equal( 4, oneParameterTypes.Length );
 		Assert.Contains( typeof( TerminalDescription ), oneParameterTypes );
 		Assert.Contains( typeof( TermInfoComparisonResult ), oneParameterTypes );
 		Assert.Contains( typeof( TerminalDescriptionSourcePlan ), oneParameterTypes );
 		Assert.Contains( typeof( TermInfoDatabaseCatalog ), oneParameterTypes );
+
+		Type[] frozenVersionOneTypes =
+		[
+			typeof( TerminalDescription ),
+			typeof( TermInfoComparisonResult ),
+			typeof( TerminalDescriptionSourcePlan ),
+			typeof( TermInfoDatabaseCatalog ),
+		];
+		foreach ( Type frozenType in frozenVersionOneTypes ) {
+			Assert.Contains(
+				renderMethods,
+				method => method.GetParameters().Length == 1
+					&& method.GetParameters()[ 0 ].ParameterType == frozenType
+			);
+			Assert.Contains(
+				renderMethods,
+				method => method.GetParameters().Length == 3
+					&& method.GetParameters()[ 0 ].ParameterType == frozenType
+					&& method.GetParameters()[ 1 ].ParameterType
+						== typeof( TermInfoJsonRendererOptions )
+					&& method.GetParameters()[ 2 ].ParameterType
+						== typeof( CancellationToken )
+			);
+		}
 		Assert.DoesNotContain(
 			renderMethods,
 			method => method.GetParameters()[ 0 ].ParameterType == typeof( object )

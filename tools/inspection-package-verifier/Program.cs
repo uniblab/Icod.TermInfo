@@ -155,6 +155,7 @@ internal static class Program {
 		List<string> required = [
 			"README.md",
 			"docs/Icod.TermInfo.Inspection.schema.json",
+			"docs/Icod.TermInfo.Inspection.schema.v2.json",
 			"icon.png",
 		];
 		foreach ( string targetFramework in TargetFrameworks ) {

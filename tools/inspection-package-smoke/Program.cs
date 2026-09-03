@@ -318,6 +318,23 @@ Require(
 		&& !jsonOptions.WriteIndented,
 	"The MI01 JSON renderer contract did not retain its reviewed identity and bounds."
 );
+Require(
+	TermInfoJsonRenderer.DatabaseAutomationSchemaIdentifier
+		== "urn:icod:terminfo:inspection:json:2"
+		&& TermInfoJsonRenderer.DatabaseAutomationSchemaVersion == 2,
+	"The DA06 additive database automation JSON identity is unavailable."
+);
+TermInfoDatabaseSet emptyDatabaseSet =
+	TermInfoDatabaseInspector.CreateSet( Array.Empty<TermInfoDatabaseCatalog>() );
+using JsonDocument databaseSetJsonDocument = JsonDocument.Parse(
+	TermInfoJsonRenderer.Render( emptyDatabaseSet )
+);
+Require(
+	databaseSetJsonDocument.RootElement.GetProperty( "schemaVersion" ).GetInt32() == 2
+		&& databaseSetJsonDocument.RootElement.GetProperty( "documentKind" ).GetString()
+			== "databaseSet",
+	"The DA06 package renderer did not emit the additive databaseSet document."
+);
 string terminalJson =
 	TermInfoJsonRenderer.Render(
 		terminal,

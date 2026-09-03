@@ -80,6 +80,15 @@ public static class Command {
 				;
 			}
 
+			if ( args.Contains( "--compare-set", StringComparer.Ordinal ) ) {
+				return await CompareDatabaseSetsAsync(
+					args,
+					stdout,
+					stderr,
+					cancellationToken
+				).ConfigureAwait( false );
+			}
+
 			ToeCommandLineNormalizationResult normalized =
 				ToeCommandLine.NormalizeListing( args );
 			if ( normalized.Error is string normalizationError ) {
@@ -166,12 +175,19 @@ public static class Command {
 			}
 
 			if ( options.Json ) {
-				return await RenderCatalogAsync(
-					options.Directories[ 0 ],
-					stdout,
-					stderr,
-					cancellationToken
-				).ConfigureAwait( false );
+				return options.Directories.Count == 1
+					? await RenderCatalogAsync(
+						options.Directories[ 0 ],
+						stdout,
+						stderr,
+						cancellationToken
+					).ConfigureAwait( false )
+					: await RenderDatabaseSetAsync(
+						options.Directories,
+						stdout,
+						stderr,
+						cancellationToken
+					).ConfigureAwait( false );
 			}
 
 			ToeListingResult listing = BuildListing(
@@ -252,6 +268,176 @@ public static class Command {
 			cancellationToken
 		).ConfigureAwait( false );
 		return CommandExitCodes.Success;
+	}
+
+	private static async Task<int> RenderDatabaseSetAsync(
+		IReadOnlyList<string> directories,
+		Stream stdout,
+		Stream stderr,
+		CancellationToken cancellationToken
+	) {
+		ArgumentNullException.ThrowIfNull( directories );
+		ArgumentNullException.ThrowIfNull( stdout );
+		ArgumentNullException.ThrowIfNull( stderr );
+		cancellationToken.ThrowIfCancellationRequested();
+
+		string rendered;
+		try {
+			TermInfoDatabaseSet databaseSet =
+				TermInfoDatabaseInspector.InspectSet(
+					directories,
+					parserOptions: null,
+					cancellationToken: cancellationToken
+				);
+			rendered = TermInfoJsonRenderer.Render(
+				databaseSet,
+				new TermInfoJsonRendererOptions(),
+				cancellationToken
+			) + "\n";
+		} catch ( Exception exception ) when ( IsOperationalException( exception ) ) {
+			var diagnostics = new StringBuilder();
+			AppendDiagnostic(
+				diagnostics,
+				"TOE0005",
+				"database set",
+				exception.Message
+			);
+			await WriteAsync( stderr, diagnostics.ToString(), cancellationToken ).ConfigureAwait( false );
+			return CommandExitCodes.Failure;
+		}
+
+		await WriteAsync( stdout, rendered, cancellationToken ).ConfigureAwait( false );
+		return CommandExitCodes.Success;
+	}
+
+	private static async Task<int> CompareDatabaseSetsAsync(
+		IReadOnlyList<string> args,
+		Stream stdout,
+		Stream stderr,
+		CancellationToken cancellationToken
+	) {
+		ArgumentNullException.ThrowIfNull( args );
+		ArgumentNullException.ThrowIfNull( stdout );
+		ArgumentNullException.ThrowIfNull( stderr );
+		cancellationToken.ThrowIfCancellationRequested();
+
+		if ( !TryParseDatabaseSetComparison(
+			args,
+			out IReadOnlyList<string> leftRoots,
+			out IReadOnlyList<string> rightRoots,
+			out string error
+		) ) {
+			await WriteUsageErrorAsync( stderr, error, cancellationToken ).ConfigureAwait( false );
+			return CommandExitCodes.UsageError;
+		}
+
+		try {
+			TermInfoDatabaseSet left = TermInfoDatabaseInspector.InspectSet(
+				leftRoots,
+				parserOptions: null,
+				cancellationToken: cancellationToken
+			);
+			TermInfoDatabaseSet right = TermInfoDatabaseInspector.InspectSet(
+				rightRoots,
+				parserOptions: null,
+				cancellationToken: cancellationToken
+			);
+			TermInfoDatabaseSetComparisonResult comparison =
+				TermInfoDatabaseSetComparer.Compare(
+					left,
+					right,
+					cancellationToken: cancellationToken
+				);
+			string rendered = TermInfoJsonRenderer.Render(
+				comparison,
+				new TermInfoJsonRendererOptions(),
+				cancellationToken
+			) + "\n";
+			await WriteAsync( stdout, rendered, cancellationToken ).ConfigureAwait( false );
+			return CommandExitCodes.Success;
+		} catch ( Exception exception ) when ( IsOperationalException( exception ) ) {
+			var diagnostics = new StringBuilder();
+			AppendDiagnostic(
+				diagnostics,
+				"TOE0005",
+				"database-set comparison",
+				exception.Message
+			);
+			await WriteAsync( stderr, diagnostics.ToString(), cancellationToken ).ConfigureAwait( false );
+			return CommandExitCodes.Failure;
+		}
+	}
+
+	private static bool TryParseDatabaseSetComparison(
+		IReadOnlyList<string> args,
+		out IReadOnlyList<string> leftRoots,
+		out IReadOnlyList<string> rightRoots,
+		out string error
+	) {
+		ArgumentNullException.ThrowIfNull( args );
+		var left = new List<string>();
+		var right = new List<string>();
+		bool json = false;
+		bool compareSet = false;
+		for ( int index = 0; index < args.Count; index++ ) {
+			string argument = args[ index ];
+			switch ( argument ) {
+				case "--json":
+					if ( json ) {
+						leftRoots = Array.Empty<string>();
+						rightRoots = Array.Empty<string>();
+						error = "option '--json' may be specified only once";
+						return false;
+					}
+					json = true;
+					break;
+				case "--compare-set":
+					if ( compareSet ) {
+						leftRoots = Array.Empty<string>();
+						rightRoots = Array.Empty<string>();
+						error = "option '--compare-set' may be specified only once";
+						return false;
+					}
+					compareSet = true;
+					break;
+				case "--left-root":
+				case "--right-root":
+					if ( index + 1 >= args.Count || string.IsNullOrWhiteSpace( args[ index + 1 ] ) ) {
+						leftRoots = Array.Empty<string>();
+						rightRoots = Array.Empty<string>();
+						error = $"option '{argument}' requires a non-empty directory";
+						return false;
+					}
+					string root = args[ ++index ];
+					if ( argument == "--left-root" ) {
+						left.Add( root );
+					} else {
+						right.Add( root );
+					}
+					break;
+				default:
+					leftRoots = Array.Empty<string>();
+					rightRoots = Array.Empty<string>();
+					error = $"unsupported database-set comparison argument '{argument}'";
+					return false;
+			}
+		}
+		if ( !json ) {
+			leftRoots = Array.Empty<string>();
+			rightRoots = Array.Empty<string>();
+			error = "option '--compare-set' requires '--json'";
+			return false;
+		}
+		if ( !compareSet || left.Count == 0 || right.Count == 0 ) {
+			leftRoots = Array.Empty<string>();
+			rightRoots = Array.Empty<string>();
+			error = "database-set comparison requires '--compare-set', at least one '--left-root', and at least one '--right-root'";
+			return false;
+		}
+		leftRoots = Array.AsReadOnly( left.ToArray() );
+		rightRoots = Array.AsReadOnly( right.ToArray() );
+		error = string.Empty;
+		return true;
 	}
 
 	private static ToeListingResult BuildListing(
@@ -601,9 +787,9 @@ public static class Command {
 				error = "options '-a', '-h', and '-s' cannot be combined with '--json'";
 				return false;
 			}
-			if ( directories.Count != 1 ) {
+			if ( directories.Count == 0 ) {
 				options = ToeOptions.Empty;
-				error = "option '--json' requires exactly one explicit directory operand";
+				error = "option '--json' requires at least one explicit directory operand";
 				return false;
 			}
 		}
@@ -685,7 +871,8 @@ public static class Command {
 
 	private static string GetHelpText() {
 		return $"Usage: {CommandName} [options] [directory ...]{Environment.NewLine}"
-			+ $"       {CommandName} --json directory{Environment.NewLine}"
+			+ $"       {CommandName} --json directory [directory ...]{Environment.NewLine}"
+			+ $"       {CommandName} --json --compare-set --left-root directory [--left-root directory ...] --right-root directory [--right-root directory ...]{Environment.NewLine}"
 			+ $"       {CommandName} -u file{Environment.NewLine}"
 			+ $"       {CommandName} -U file{Environment.NewLine}"
 			+ $"       {CommandName} -D{Environment.NewLine}"
@@ -707,7 +894,7 @@ public static class Command {
 			+ Environment.NewLine
 			+ "  -s              sort entries by canonical terminal name; with -a, mark semantic duplicates"
 			+ Environment.NewLine
-			+ "      --json      inspect exactly one explicit directory and emit its databaseCatalog document"
+			+ "      --json      one directory emits frozen v1 databaseCatalog; multiple directories emit v2 databaseSet"
 			+ Environment.NewLine
 			+ "  -u file         list forward use= dependencies in source order"
 			+ Environment.NewLine
@@ -723,6 +910,8 @@ public static class Command {
 			+ "Unambiguous listing options may be clustered; -u/-U accept attached source paths; use -- before a directory or source filename beginning with '-'."
 			+ Environment.NewLine
 			+ "JSON mode rejects listing presentation switches and writes one document followed by exactly one LF."
+			+ Environment.NewLine
+			+ "Use --compare-set with repeated --left-root/--right-root operands for a v2 databaseSetComparison document."
 			+ Environment.NewLine;
 	}
 

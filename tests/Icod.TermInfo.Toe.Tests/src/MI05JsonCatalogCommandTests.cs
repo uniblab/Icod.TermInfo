@@ -64,10 +64,9 @@ public sealed class MI05JsonCatalogCommandTests {
 	}
 
 	[Fact]
-	public async Task JsonRequiresOneUnmodifiedExplicitDirectory() {
+	public async Task JsonRequiresExplicitDirectoriesAndRejectsListingPresentationSwitches() {
 		foreach ( string[] args in new[] {
 			new[] { "--json" },
-			[ "--json", "first", "second" ],
 			[ "--json", "-a", "catalog" ],
 			[ "--json", "-h", "catalog" ],
 			[ "--json", "-s", "catalog" ],

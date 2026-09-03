@@ -121,6 +121,7 @@ internal static class InfoCmpInspector {
 		}
 
 		TerminalDescriptionSourcePlan plan;
+		TermInfoDatabaseSetSourcePlanningResult? databaseSetPlan = null;
 		try {
 			TerminalDescriptionSourceSynthesisOptions synthesisOptions =
 				new(
@@ -143,17 +144,29 @@ internal static class InfoCmpInspector {
 						options.AllowNonExhaustiveResult
 				);
 			if ( options.AllCandidates ) {
-				plan =
-					TerminalDescriptionSourcePlanner.PlanFromDirectory(
-						target.Description,
-						options.ComparisonDatabaseDirectory
-							?? throw new InvalidOperationException(
-								"All-candidates planning requires an explicit candidate directory."
-							),
-						planningOptions,
-						parserOptions: null,
-						cancellationToken: cancellationToken
-					);
+				if ( options.CandidateRoots.Count != 0 ) {
+					databaseSetPlan =
+						TerminalDescriptionSourcePlanner.PlanFromDirectories(
+							target.Description,
+							options.CandidateRoots,
+							planningOptions,
+							parserOptions: null,
+							cancellationToken: cancellationToken
+						);
+					plan = databaseSetPlan.Plan;
+				} else {
+					plan =
+						TerminalDescriptionSourcePlanner.PlanFromDirectory(
+							target.Description,
+							options.ComparisonDatabaseDirectory
+								?? throw new InvalidOperationException(
+									"All-candidates planning requires an explicit candidate directory."
+								),
+							planningOptions,
+							parserOptions: null,
+							cancellationToken: cancellationToken
+						);
+				}
 			} else {
 				List<TerminalDescriptionSourceSynthesisParent> candidates = [];
 				for ( int index = 1; index < options.TerminalNames.Count; index++ ) {
@@ -187,11 +200,18 @@ internal static class InfoCmpInspector {
 			}
 
 			string rendered = options.Json
-				? TermInfoJsonRenderer.Render(
-					plan,
-					new TermInfoJsonRendererOptions(),
-					cancellationToken
-				) + "\n"
+				? ( databaseSetPlan is null
+					? TermInfoJsonRenderer.Render(
+						plan,
+						new TermInfoJsonRendererOptions(),
+						cancellationToken
+					)
+					: TermInfoJsonRenderer.Render(
+						databaseSetPlan,
+						planningOptions,
+						new TermInfoJsonRendererOptions(),
+						cancellationToken
+					) ) + "\n"
 				: plan.Source;
 			await WriteAsync(
 				stdout,
