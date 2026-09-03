@@ -307,8 +307,8 @@ internal static class InfoCmpOptionsParser {
 
 		string? databaseDirectory = null;
 		string? comparisonDatabaseDirectory = null;
-		var terminalNames = new List<string>();
-		var candidateRoots = new List<string>();
+		List<string> terminalNames = [];
+		List<string> candidateRoots = [];
 		TerminalDescriptionSourceLayout layout =
 			TerminalDescriptionSourceLayout.Canonical;
 		int lineWidth =
@@ -732,33 +732,25 @@ internal static class InfoCmpOptionsParser {
 		}
 
 		if ( planning ) {
-		if ( candidateRoots.Count != 0 && ( !planning || !allCandidates ) ) {
-			return InfoCmpOptionsParseResult.Failure(
-				"option '--candidate-root' requires '--plan-use --all-candidates'"
-			);
-		}
-		if ( allCandidates ) {
-			if ( !planning ) {
-				return InfoCmpOptionsParseResult.Failure(
-					"option '--all-candidates' requires '--plan-use'"
-				);
-			}
-			if ( comparisonDatabaseDirectory is not null && candidateRoots.Count != 0 ) {
-				return InfoCmpOptionsParseResult.Failure(
-					"options '-B' and '--candidate-root' are mutually exclusive for all-candidates planning"
-				);
-			}
-			if ( comparisonDatabaseDirectory is null && candidateRoots.Count == 0 ) {
-				return InfoCmpOptionsParseResult.Failure(
-					"option '--all-candidates' requires one explicit '-B' directory or at least one '--candidate-root' directory"
-				);
-			}
-			if ( terminalNames.Count != 1 ) {
-				return InfoCmpOptionsParseResult.Failure(
-					"option '--all-candidates' requires exactly one target terminal"
-				);
-			}
-		} else if ( terminalNames.Count < 2 ) {
+			if ( allCandidates ) {
+				if ( comparisonDatabaseDirectory is not null
+					&& candidateRoots.Count != 0 ) {
+					return InfoCmpOptionsParseResult.Failure(
+						"options '-B' and '--candidate-root' are mutually exclusive for all-candidates planning"
+					);
+				}
+				if ( comparisonDatabaseDirectory is null
+					&& candidateRoots.Count == 0 ) {
+					return InfoCmpOptionsParseResult.Failure(
+						"option '--all-candidates' requires one explicit '-B' directory or at least one '--candidate-root' directory"
+					);
+				}
+				if ( terminalNames.Count != 1 ) {
+					return InfoCmpOptionsParseResult.Failure(
+						"option '--all-candidates' requires exactly one target terminal"
+					);
+				}
+			} else if ( terminalNames.Count < 2 ) {
 				return InfoCmpOptionsParseResult.Failure(
 					"option '--plan-use' requires a target and at least one candidate terminal operand"
 				);
