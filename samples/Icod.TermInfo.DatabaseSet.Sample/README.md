@@ -32,22 +32,26 @@ process executions.
 
 ## Inspection fixture
 
-The first two databases deliberately publish conflicting state:
+The first two databases deliberately publish two independent kinds of conflict:
 
 ```text
 inspection-first
-    sample-shared        cols#80, alias sample-collision
+    sample-shared          cols#80
+    sample-alias-owner-a   cols#90, alias sample-collision
 
 inspection-second
-    sample-shared        cols#132
-    sample-other-owner   cols#100, alias sample-collision
+    sample-shared          cols#132
+    sample-alias-owner-b   cols#100, alias sample-collision
 ```
 
 Because roots are ordered, `sample-shared` from `inspection-first` is the
 conclusive winner and the later `sample-shared` is a shadow. The semantic
-analysis classifies that shadow as `SemanticallyDifferent`. The alias
-`sample-collision` is owned by two different canonical identities and therefore
-retains explicit collision evidence.
+analysis classifies that shadow as `SemanticallyDifferent`.
+
+The alias `sample-collision` is deliberately kept on separate canonical owners.
+That makes the alias-collision example independent from the repeated-canonical
+example and also illustrates that conventional databases may contain physical
+alias publications in addition to canonical publications.
 
 This is different from an incomplete earlier root. If an earlier database is
 incomplete, a later observed entry cannot be promoted to a definitive winner;
