@@ -122,7 +122,7 @@ dotnet run \
   Icod.TermInfo.Inspection/bin/${configuration}/net8.0/Icod.TermInfo.Inspection.dll \
   Icod.TermInfo.Inspection/bin/${configuration}/net10.0/Icod.TermInfo.Inspection.dll
 
-# Frozen Inspection baselines remain immutable historical evidence:
+# MI07 and earlier frozen Inspection baselines remain immutable historical evidence:
 # docs/1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt
 # docs/1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt
 # docs/1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt
