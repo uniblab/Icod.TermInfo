@@ -29,8 +29,10 @@ public sealed class MI05JsonCatalogCommandTests {
 				result.Stdout
 			);
 			Assert.Equal( string.Empty, result.Stderr );
-			Assert.True(
-				result.Stdout.EndsWith( "\n", StringComparison.Ordinal )
+			Assert.EndsWith(
+				"\n",
+				result.Stdout,
+				StringComparison.Ordinal
 			);
 			Assert.False(
 				result.Stdout.EndsWith( "\n\n", StringComparison.Ordinal )
