@@ -8,7 +8,7 @@
 **Command composition:** `toe`, `infocmp`, `icod-terminfo`  
 **Frozen lower layers:** `Icod.TermInfo`, `Icod.TermInfo.Source`, `Icod.TermInfo.Compiler`, `Icod.TermInfo.Termcap` except for unavoidable defect corrections  
 **Baseline:** stable `1.9.0`  
-**Status:** DA05 implementation complete; Staging validation pending  
+**Status:** DA05 complete and frozen; DA06 not yet started  
 
 ---
 
@@ -453,35 +453,46 @@ The command layer SHALL NOT reimplement candidate discovery or planning.
 
 DA06 MAY add a clearly explicit switch that converts the already-frozen Runtime discovery snapshot into an ordered database set. If added:
 
-- the output SHALL record that roots came from discovery;
-- encoded/non-directory `TERMINFO` states SHALL remain visible or explicitly skipped according to the frozen discovery/catalog contracts;
-- the same reusable database-set engine SHALL execute after discovery;
-- explicit-root automation SHALL remain available and preferable for reproducible builds.
-
-Discovery SHALL NOT become implicit in a command form documented as deterministic explicit-root analysis.
+- discovery policy SHALL remain observable;
+- explicit-root mode SHALL remain available;
+- existing Runtime acquisition behavior SHALL NOT change.
 
 ## 9.5 JSON contract
 
-New database-set and database-set-comparison document kinds SHALL use a clearly versioned schema extension. The schema SHALL define:
+Preferred new document kinds are equivalent in responsibility to:
 
-- envelope/version behavior;
-- deterministic property ordering;
-- root and occurrence evidence;
-- completeness state;
-- canonical/alias collision representation;
-- equal/conflicting shadow classification;
-- comparison structure;
-- size bounds;
-- escaping and UTF-8 behavior;
-- exact LF policy for command output.
+```text
+databaseSet
+databaseSetComparison
+```
 
-Frozen 1.9 document kinds SHALL remain byte-compatible.
+and, if needed for planning provenance, an additive database-set plan representation.
 
-## 9.6 Router and archives
+The new contract SHALL define:
 
-Direct commands, the `icod-terminfo` router, and all supported release archives SHALL expose identical semantics.
+- a schema version distinct from immutable 1.9 JSON v1 if fields cannot fit the existing shapes;
+- exact root-order representation;
+- canonical-name ordering;
+- occurrence ordering;
+- conflict/shadow ordering;
+- completeness/issue evidence;
+- bounds metadata where relevant;
+- deterministic path/string treatment;
+- exact newline/framing rules.
 
-**Gate DA06:** users can automate multi-database inspection/comparison/planning through direct and routed commands without scraping human output and without breaking any frozen 1.9 command or JSON form.
+## 9.6 Existing JSON compatibility
+
+The following exact 1.9 invocation classes SHALL remain byte-compatible for equivalent inputs:
+
+```text
+infocmp --json target
+infocmp --json -d left right
+infocmp --json --plan-use target candidate [candidate ...]
+infocmp --json --plan-use --all-candidates -B directory target
+toe --json directory
+```
+
+**Gate DA06:** the reusable 1.10 engines are exposed through documented command and machine-readable contracts without breaking any frozen 1.9 JSON automation.
 
 ---
 
@@ -491,64 +502,55 @@ Direct commands, the `icod-terminfo` router, and all supported release archives 
 
 ## 10.1 Objective
 
-Prove that the database-set contracts remain deterministic, bounded, and portable under realistic and hostile conditions.
+Stress the completed multi-database engine under realistic large databases, generated fixtures, cross-host artifacts, and hostile input.
 
-## 10.2 Generated-state validation
+## 10.2 Required fixture families
 
-Create seeded generated database sets containing combinations of:
+Add committed or reproducibly generated fixtures for at least:
 
-- unique entries;
-- equal duplicates;
-- conflicting duplicates;
-- aliases;
-- alias/canonical collisions;
-- extended capabilities;
-- large strings;
-- many roots;
-- many identities;
-- missing roots;
-- malformed entries;
-- misplaced entries;
-- linked entries where applicable;
-- permission/I/O failures where testable deterministically.
+- multiple small conventional databases with controlled precedence;
+- semantically equal duplicates;
+- semantically different duplicates;
+- alias collisions;
+- missing/unavailable/incomplete roots;
+- mixed short-form and long-form directory layouts;
+- selected variable-capability entries;
+- planner candidate pools spanning multiple roots;
+- set-to-set comparison changes.
 
-Expected results SHALL be derived by an independent oracle where practical.
+## 10.3 Cross-host validation
 
-## 10.3 Cross-host determinism
+Linux, macOS, and Windows SHALL validate:
 
-Windows, Linux, and macOS validation SHALL prove stable semantic ordering and JSON output independent of:
+- deterministic aggregate semantic ordering;
+- stable machine-readable output;
+- package-contained 1.10 APIs/schemas/docs;
+- archive and tool-package smoke behavior;
+- explicit-path behavior appropriate to the host;
+- no ambient-discovery leakage into explicit-root tests.
 
-- path separator;
-- filesystem enumeration order;
-- culture;
-- current UI culture;
-- process locale;
-- case behavior of the host filesystem;
-- repeated process execution.
+## 10.4 Pathological bounds
 
-Where physical path text necessarily differs by host, schema semantics SHALL distinguish host-specific evidence from portable semantic ordering.
+Test near and over configured limits for:
 
-## 10.4 Bounds
+```text
+root count
+entry count
+alias occurrence count
+duplicate-group size
+comparison work
+candidate count
+planner evaluated-plan count
+JSON output size
+```
 
-Pathological tests SHALL cover:
+Failure SHALL be explicit and deterministic.
 
-- maximum root count;
-- maximum aggregate entry count;
-- large duplicate groups;
-- large alias sets;
-- large structured comparison output;
-- JSON UTF-8 byte limits;
-- planner candidate/search bounds;
-- cancellation before and during expensive analysis;
-- no partial JSON stdout on failure.
+## 10.5 Native cross-checks
 
-## 10.5 Package-consumer validation
+Where host terminfo tooling is available, use native utilities as a differential oracle for supported conventional-directory cases. Native tooling is an oracle, not the source of package semantics.
 
-Fresh consumers SHALL validate the new Inspection APIs from packed artifacts rather than repository project references.
-
-Direct commands, routed commands, and release archives SHALL execute representative multi-database JSON and planning workflows.
-
-**Gate DA07:** the 1.10 implementation has deterministic generated-state/oracle coverage, cross-host evidence, package-consumer validation, artifact smoke, and pathological bound tests with no known nondeterministic ordering or unbounded work path.
+**Gate DA07:** the feature set is validated against generated large state, cross-host package/archive paths, and hostile bounded input without nondeterminism or silent truncation.
 
 ---
 
@@ -558,144 +560,111 @@ Direct commands, routed commands, and release archives SHALL execute representat
 
 ## 11.1 Objective
 
-Freeze the complete additive 1.10 contract. DA08 SHALL add no new feature behavior.
+Freeze the final 1.10 additive contract and close release evidence.
 
-## 11.2 API freeze
+## 11.2 Public API baseline
 
-Freeze and review every public Inspection type/member added by DA01–DA07.
+Capture exact post-DA07 public API baselines for every package touched by 1.10.
 
-The review SHALL verify:
+Release verification SHALL reject:
 
-- no accidental mutable collections;
-- no accidental exposure of implementation-specific dictionaries/sets;
-- nullability contracts;
-- argument validation;
-- cancellation semantics;
-- bounds/options defaults;
-- deterministic enumeration guarantees;
-- XML documentation where required;
-- source and binary compatibility with the frozen 1.x package family.
+- accidental Runtime API growth;
+- accidental Source/Compiler/Termcap API growth;
+- divergent Inspection APIs across `net8.0`, `net9.0`, and `net10.0`;
+- missing reviewed 1.10 Inspection additions;
+- unexpected command-layer public helpers.
 
-## 11.3 JSON/schema freeze
+## 11.3 Schema freeze
 
-Freeze the exact schema bytes/fingerprint for any new versioned machine-readable contract.
-
-Permanent tests SHALL verify that existing 1.9 version-1 fixtures and schema behavior remain unchanged.
-
-## 11.4 Command freeze
-
-Freeze exact help, usage, option compatibility, exit-status, stdout/stderr, LF, cancellation, and failure behavior for each new command form.
-
-## 11.5 Distribution freeze
+Freeze all 1.10 additive JSON schemas and committed golden outputs.
 
 Validate:
 
-- all coordinated package versions = `1.10.0-Alpha-8`;
-- package dependency graph remains directional;
-- installable router package;
-- direct project execution;
-- six release archive RIDs where retained by current release infrastructure;
-- package verifier and archive verifier behavior;
-- repository build/test/pack from clean state.
+- exact envelope version;
+- exact document kinds;
+- exact field order where the contract requires it;
+- exact enum spellings;
+- exact number/string/null semantics;
+- one-document/one-LF framing;
+- deterministic output across supported hosts.
 
-## 11.6 Documentation
+## 11.4 Package and archive contents
 
-Update at least:
+Exact package/archive manifests SHALL prove inclusion of required:
 
-- repository `README.md`;
-- `docs/COMPATIBILITY.md`;
-- `Icod.TermInfo-Post-1.0-Development-Roadmap.md`;
-- `toe/README.md`;
-- `infocmp/README.md`;
-- package/readme surfaces for Inspection and Tools as appropriate;
-- a `docs/1.10.0-RELEASE-AUDIT.md` final audit.
+- assemblies;
+- XML docs;
+- schema files;
+- API baselines;
+- command executables;
+- license/notice metadata;
+- release documentation.
 
-## 11.7 Stable promotion
+## 11.5 Repository and package documentation
 
-After Alpha-8 is validated, stable `1.10.0` SHALL be a promotion-only release. No new public API, schema fields, command switches, ordering rules, planner semantics, or package topology may be introduced between Alpha-8 closure and stable publication.
+Update root and package READMEs with:
 
-**Gate DA08:** the complete 1.10 additive API/schema/command/package surface is frozen, documented, validated from packed artifacts, and ready for stable promotion without another feature tranche.
+- ordered database-set inspection examples;
+- duplicate/shadow/conflict interpretation;
+- set comparison examples;
+- multi-database planning examples;
+- JSON automation examples;
+- bounds and incomplete-input behavior;
+- explicit distinction between effective semantics and physical provenance.
 
----
+## 11.6 Stable promotion gate
 
-# 12. Cross-tranche invariants
+Stable `1.10.0` SHALL be promotion-only after DA08. No new feature semantics SHALL enter between Alpha-8 and stable.
 
-Every tranche SHALL preserve all of the following unless this roadmap is explicitly amended before implementation:
-
-1. `Icod.TermInfo` Runtime remains dependency-free.
-2. Existing `TerminalDescription` semantics remain authoritative.
-3. Existing 1.9 JSON version-1 documents remain compatible.
-4. No native `ncurses`, `libtinfo`, Berkeley DB, `tic`, `toe`, or `infocmp` production dependency is introduced.
-5. Explicit-root analysis does not mutate process environment variables.
-6. Input root order remains observable and semantically meaningful.
-7. Filesystem enumeration order never becomes an externally visible semantic order.
-8. Semantic equality comes from managed semantic comparison, not binary-file equality.
-9. Incomplete evidence remains incomplete; later roots do not erase earlier uncertainty.
-10. Planner scoring/search semantics remain frozen from 1.8.
-11. Synthesis semantics remain frozen from 1.7.
-12. Existing 1.4–1.9 command forms remain compatible.
-13. Public APIs snapshot caller collections rather than retaining mutable caller-owned sequences.
-14. External input remains bounded and cancellation-aware.
-15. Tests SHALL not rely on the host having ncurses installed unless explicitly marked as optional differential evidence.
+**Gate DA08:** the final 1.10 API, schema, command, package, archive, documentation, and validation evidence is frozen and stable promotion requires no additional feature work.
 
 ---
 
-# 13. Explicit 1.10 non-goals
-
-The following are deliberately outside the 1.10 release unless required to fix a defect in an existing contract:
-
-- Berkeley DB / hashed terminfo store reading or writing;
-- HP-UX, AIX, OSF/1, or other historical binary dialects;
-- native ncurses dependencies;
-- changing Runtime discovery precedence;
-- writing to multiple database roots as a synchronization/deployment engine;
-- automatically repairing conflicting databases;
-- deleting shadowed entries;
-- modifying system terminfo databases;
-- reconstructing original source comments/whitespace/provenance from compiled entries;
-- changing 1.7 relative-source semantics;
-- changing 1.8 planner score/search semantics;
-- silently extending the frozen 1.9 JSON version-1 schema;
-- NativeAOT or self-contained distribution work except where already required by current release infrastructure;
-- shell completion generation;
-- terminal probing, live input, PTYs, curses, or terminal emulation;
-- package-family work belonging to `Icod.Terminal`, `Icod.Pty`, or `Icod.DCurses`.
-
----
-
-# 14. Release success criteria
+## 12. Release completion criteria
 
 `Icod.TermInfo 1.10.0` is complete when all of the following are true:
 
-- an ordered explicit set of conventional terminfo databases can be represented immutably;
-- aggregate lookup preserves precedence and incomplete evidence;
-- canonical duplicates and alias collisions are classified deterministically;
-- semantic equal/conflicting shadows use the frozen comparison engine;
-- two database sets can be compared structurally and by effective semantics;
-- the frozen planner can consume deterministic candidates from multiple explicit catalogs;
-- direct and routed commands expose machine-readable multi-database workflows;
-- existing 1.9 JSON documents remain compatible;
-- any new JSON contract is versioned, bounded, schema-defined, deterministic, and fixture-frozen;
-- all APIs and command outputs are culture-independent and repeatable;
-- package consumers and release archives execute representative workflows;
-- cross-host validation is green;
-- resource/cancellation/pathological tests are green;
-- the exact public API and schema are frozen at `1.10.0-Alpha-8`;
-- stable `1.10.0` requires only coordinated-version promotion and final release publication.
+- ordered explicit database-set construction is deterministic and immutable;
+- aggregate lookup and precedence are explicit;
+- semantic duplicate/shadow/conflict analysis is complete;
+- alias ownership and collision behavior are explicit;
+- set-to-set semantic and provenance comparison is stable;
+- multi-database planner candidate discovery is deterministic;
+- incomplete roots never masquerade as complete input;
+- 1.8 planner semantics remain frozen;
+- 1.9 JSON version-1 behavior remains byte-compatible;
+- new machine-readable contracts are versioned and schema-backed;
+- cross-host package/archive validation is green;
+- pathological input is bounded;
+- public API baselines are frozen;
+- package/archive manifests contain the required 1.10 evidence;
+- documentation is complete;
+- stable promotion adds no feature semantics.
 
 ---
 
-# 15. Tranche summary
+## 13. Intended 1.10 layering
 
-| Tranche | Version | Theme | Principal outcome |
-|---|---|---|---|
-| **DA01** | `1.10.0-Alpha-1` | Database-set foundation | Immutable explicit ordered database-set model |
-| **DA02** | `1.10.0-Alpha-2` | Aggregate precedence | Winner/shadow/indeterminate lookup semantics |
-| **DA03** | `1.10.0-Alpha-3` | Conflict analysis | Semantic duplicate, alias collision, and shadow classification |
-| **DA04** | `1.10.0-Alpha-4` | Set comparison | Effective semantic plus structural/provenance comparison |
-| **DA05** | `1.10.0-Alpha-5` | Multi-database planning | Deterministic candidate construction over multiple explicit catalogs |
-| **DA06** | `1.10.0-Alpha-6` | CLI/JSON automation | `toe`/`infocmp`/router machine-readable composition |
-| **DA07** | `1.10.0-Alpha-7` | Hardening | Generated-state, cross-host, package, archive, and pathological validation |
-| **DA08** | `1.10.0-Alpha-8` | Release closure | API/schema/command/package/documentation freeze |
+```text
+Icod.TermInfo
+    stable Runtime semantic model + acquisition
+        |
+        v
+Icod.TermInfo.Inspection 1.3-1.9
+    compare + inspect + synthesize + plan + JSON
+        |
+        v
+Icod.TermInfo.Inspection 1.10
+    ordered database-set model
+    + precedence
+    + shadow/conflict/alias analysis
+    + set comparison
+    + multi-database planning composition
+    + new machine-readable representations
+        |
+        v
+toe / infocmp / icod-terminfo
+    thin human + automation adapters
+```
 
-The roadmap intentionally makes DA01–DA05 reusable library work first, DA06 command composition second, and DA07–DA08 proof/freeze work last. This preserves the package-family rule that commands remain thin adapters over reusable managed engines.
+This keeps runtime terminal behavior stable while allowing increasingly powerful deterministic maintenance and deployment automation above it.
