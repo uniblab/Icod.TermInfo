@@ -3,6 +3,26 @@
 `Icod.TermInfo.Inspection` is the optional managed inspection and semantic-
 comparison layer for the `Icod.TermInfo` package family.
 
+## 1.10 DA02 deterministic database-set precedence
+
+`1.10.0-Alpha-2` makes the DA01 ordered database-set model operational for exact
+canonical-name precedence. `LookupCanonicalName` returns structured
+`NotObserved`, `WinnerKnown`, or `Indeterminate` evidence, retains every observed
+occurrence, exposes later observed shadows only when a winner is conclusive, and
+records incomplete databases which prevent a reliable winner or clean absence.
+Aliases remain occurrence evidence rather than canonical lookup keys; semantic
+equal/conflicting shadow classification remains assigned to DA03.
+
+See `docs/1.10.0-DA02-DETERMINISTIC-MULTI-CATALOG-PRECEDENCE.md`.
+
+## 1.10 DA01 database-set foundation
+
+`1.10.0-Alpha-1` introduced immutable caller-ordered explicit catalog sets,
+canonical occurrence indexing, constituent issue/completeness evidence, bounds,
+and explicit-root or already-inspected-catalog construction.
+
+See `docs/1.10.0-DA01-DATABASE-SET-MODEL-AND-CONTRACT-FOUNDATION.md`.
+
 ## 1.9 release status
 
 Version `1.9.0` publishes the complete 31-type Inspection surface frozen in

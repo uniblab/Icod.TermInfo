@@ -84,4 +84,99 @@ public sealed class TermInfoDatabaseSet {
 	public bool IsComplete {
 		get;
 	}
+
+	/// <summary>
+	/// Resolves one exact canonical terminal name against caller-selected database
+	/// precedence without treating aliases as canonical identities.
+	/// </summary>
+	/// <param name="name">The exact canonical terminal name.</param>
+	/// <returns>Structured precedence and incomplete-input evidence.</returns>
+	public TermInfoDatabaseSetLookupResult LookupCanonicalName(
+		string name
+	) {
+		ArgumentException.ThrowIfNullOrWhiteSpace( name );
+
+		int[] incompleteDatabaseIndices =
+			Entries
+				.Where( entry => !entry.IsComplete )
+				.Select( entry => entry.Index )
+				.ToArray();
+		TermInfoDatabaseSetIdentity? identity = FindIdentity( name );
+		if ( identity is null ) {
+			if ( incompleteDatabaseIndices.Length == 0 ) {
+				return new TermInfoDatabaseSetLookupResult(
+					name,
+					TermInfoDatabaseSetLookupStatus.NotObserved,
+					Array.Empty<TermInfoDatabaseSetOccurrence>(),
+					null,
+					Array.Empty<TermInfoDatabaseSetOccurrence>(),
+					Array.Empty<int>(),
+					Array.Empty<int>()
+				);
+			}
+
+			return new TermInfoDatabaseSetLookupResult(
+				name,
+				TermInfoDatabaseSetLookupStatus.Indeterminate,
+				Array.Empty<TermInfoDatabaseSetOccurrence>(),
+				null,
+				Array.Empty<TermInfoDatabaseSetOccurrence>(),
+				incompleteDatabaseIndices,
+				incompleteDatabaseIndices
+			);
+		}
+
+		TermInfoDatabaseSetOccurrence[] occurrences =
+			identity.Occurrences.ToArray();
+		int firstObservedDatabaseIndex = occurrences[ 0 ].DatabaseIndex;
+		int[] blockingDatabaseIndices =
+			incompleteDatabaseIndices
+				.Where( index => index <= firstObservedDatabaseIndex )
+				.ToArray();
+		if ( blockingDatabaseIndices.Length != 0 ) {
+			return new TermInfoDatabaseSetLookupResult(
+				name,
+				TermInfoDatabaseSetLookupStatus.Indeterminate,
+				occurrences,
+				null,
+				Array.Empty<TermInfoDatabaseSetOccurrence>(),
+				incompleteDatabaseIndices,
+				blockingDatabaseIndices
+			);
+		}
+
+		return new TermInfoDatabaseSetLookupResult(
+			name,
+			TermInfoDatabaseSetLookupStatus.WinnerKnown,
+			occurrences,
+			occurrences[ 0 ],
+			occurrences.Skip( 1 ),
+			incompleteDatabaseIndices,
+			Array.Empty<int>()
+		);
+	}
+
+	private TermInfoDatabaseSetIdentity? FindIdentity(
+		string name
+	) {
+		ArgumentException.ThrowIfNullOrWhiteSpace( name );
+
+		int low = 0;
+		int high = Identities.Count - 1;
+		while ( low <= high ) {
+			int middle = low + ( ( high - low ) / 2 );
+			TermInfoDatabaseSetIdentity candidate = Identities[ middle ];
+			int comparison = StringComparer.Ordinal.Compare( candidate.Name, name );
+			if ( comparison == 0 ) {
+				return candidate;
+			}
+			if ( comparison < 0 ) {
+				low = middle + 1;
+			} else {
+				high = middle - 1;
+			}
+		}
+
+		return null;
+	}
 }

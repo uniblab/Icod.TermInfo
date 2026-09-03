@@ -221,7 +221,7 @@ public sealed class MI07ReleaseClosureTests {
 			roadmap,
 			StringComparison.Ordinal );
 		Assert.Contains(
-			"DA01 - Database-set model and contract foundation",
+			"DA02 - Deterministic multi-catalog inspection and precedence",
 			activeRoadmap,
 			StringComparison.OrdinalIgnoreCase );
 	}
