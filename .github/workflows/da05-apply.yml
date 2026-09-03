@@ -28,8 +28,47 @@ jobs:
       - name: Apply DA05 coordinated updates
         run: python3 .github/scripts/da05-apply.py
 
-      - name: Build DA05
-        run: dotnet build Icod.TermInfo.sln -c Debug
+      - name: Correct DA05 verbose fixtures and DA04 analyzer findings
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          da05 = Path("tests/Icod.TermInfo.Inspection.Tests/src/DA05MultiDatabaseCandidatePlanningTests.cs")
+          text = da05.read_text(encoding="utf-8")
+          replacements = {
+              'new TerminalDescriptionBuilder( "da05-target" )\n\t\t\t.AddAlias': 'new TerminalDescriptionBuilder( "da05-target" )\n\t\t\t.SetDescription( "DA05 target" )\n\t\t\t.AddAlias',
+              'new TerminalDescriptionBuilder( "da05-alpha" )\n\t\t\t.AddAlias': 'new TerminalDescriptionBuilder( "da05-alpha" )\n\t\t\t.SetDescription( "DA05 alpha parent" )\n\t\t\t.AddAlias',
+              'new TerminalDescriptionBuilder( "da05-beta" )\n\t\t\t.SetNumber': 'new TerminalDescriptionBuilder( "da05-beta" )\n\t\t\t.SetDescription( "DA05 beta parent" )\n\t\t\t.SetNumber',
+              'new TerminalDescriptionBuilder( "da05-decoy" )\n\t\t\t.SetBoolean': 'new TerminalDescriptionBuilder( "da05-decoy" )\n\t\t\t.SetDescription( "DA05 decoy parent" )\n\t\t\t.SetBoolean',
+              'new TerminalDescriptionBuilder( "da05-self-reference" )\n\t\t\t\t.AddAlias': 'new TerminalDescriptionBuilder( "da05-self-reference" )\n\t\t\t\t.SetDescription( "DA05 self-reference candidate" )\n\t\t\t\t.AddAlias',
+              'new TerminalDescriptionBuilder( "da05-conflict" )\n\t\t\t\t.SetBoolean': 'new TerminalDescriptionBuilder( "da05-conflict" )\n\t\t\t\t.SetDescription( "DA05 conflicting boolean candidate" )\n\t\t\t\t.SetBoolean',
+              'new TerminalDescriptionBuilder( "da05-conflict" )\n\t\t\t\t.SetNumber': 'new TerminalDescriptionBuilder( "da05-conflict" )\n\t\t\t\t.SetDescription( "DA05 conflicting numeric candidate" )\n\t\t\t\t.SetNumber',
+          }
+          for old, new in replacements.items():
+              if text.count(old) != 1:
+                  raise RuntimeError(f"DA05 fixture replacement mismatch: {old!r}")
+              text = text.replace(old, new, 1)
+          da05.write_text(text, encoding="utf-8", newline="\n")
+
+          da04 = Path("tests/Icod.TermInfo.Inspection.Tests/src/DA04DatabaseSetComparisonTests.cs")
+          text = da04.read_text(encoding="utf-8")
+          replacements = {
+              '''Assert.Single(\n\t\t\t\tresult.Differences.Where(\n\t\t\t\t\tdifference => difference.Kind\n\t\t\t\t\t\t== TermInfoDatabaseSetDifferenceKind.EffectiveProvenance\n\t\t\t\t)\n\t\t\t)''': '''Assert.Single(\n\t\t\t\tresult.Differences,\n\t\t\t\tdifference => difference.Kind\n\t\t\t\t\t== TermInfoDatabaseSetDifferenceKind.EffectiveProvenance\n\t\t\t)''',
+              '''Assert.Single(\n\t\t\t\tresult.Differences.Where(\n\t\t\t\t\tdifference => difference.Kind\n\t\t\t\t\t\t== TermInfoDatabaseSetDifferenceKind.AliasOwnership\n\t\t\t\t)\n\t\t\t)''': '''Assert.Single(\n\t\t\t\tresult.Differences,\n\t\t\t\tdifference => difference.Kind\n\t\t\t\t\t== TermInfoDatabaseSetDifferenceKind.AliasOwnership\n\t\t\t)''',
+              '''Assert.Single(\n\t\t\t\tresult.Differences.Where(\n\t\t\t\t\tdifference => difference.Kind\n\t\t\t\t\t\t== TermInfoDatabaseSetDifferenceKind.ShadowSet\n\t\t\t\t)\n\t\t\t)''': '''Assert.Single(\n\t\t\t\tresult.Differences,\n\t\t\t\tdifference => difference.Kind\n\t\t\t\t\t== TermInfoDatabaseSetDifferenceKind.ShadowSet\n\t\t\t)''',
+          }
+          for old, new in replacements.items():
+              if text.count(old) != 1:
+                  raise RuntimeError(f"DA04 analyzer replacement mismatch: {old!r}")
+              text = text.replace(old, new, 1)
+          da04.write_text(text, encoding="utf-8", newline="\n")
+          PY
+
+      - name: Build DA05 with zero warnings
+        run: |
+          dotnet build Icod.TermInfo.sln -c Debug | tee /tmp/da05-build.log
+          grep -F "0 Warning(s)" /tmp/da05-build.log
+          grep -F "0 Error(s)" /tmp/da05-build.log
 
       - name: Test DA05
         run: dotnet test Icod.TermInfo.sln -c Debug --no-build
