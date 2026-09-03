@@ -122,13 +122,17 @@ dotnet run \
   Icod.TermInfo.Inspection/bin/${configuration}/net8.0/Icod.TermInfo.Inspection.dll \
   Icod.TermInfo.Inspection/bin/${configuration}/net10.0/Icod.TermInfo.Inspection.dll
 
-# MI07 froze the exact 1.9 Inspection surface. The frozen 1.7, 1.8, and 1.9
-# Inspection baselines remain immutable historical evidence during additive 1.10
-# development. Cross-framework equality above remains active throughout
-# DA01-DA07; DA08 freezes the complete 1.10 surface.
-# docs/1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt
-# docs/1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt
-# docs/1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt
+# DA08 freezes the exact complete 1.10 Inspection public surface independently
+# on all three shipped target frameworks. Earlier baselines remain historical.
+for inspection_framework in net8.0 net9.0 net10.0; do
+  dotnet run \
+    --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj \
+    -c "${configuration}" \
+    --no-build \
+    -- --check \
+    docs/1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt \
+    Icod.TermInfo.Inspection/bin/${configuration}/${inspection_framework}/Icod.TermInfo.Inspection.dll
+done
 
 # Structural package, Source Link, dependency, and architecture verification.
 dotnet run \

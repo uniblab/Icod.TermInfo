@@ -96,16 +96,13 @@ if errorlevel 1 goto fail
 dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c %CONFIGURATION% --no-build -- --compare Icod.TermInfo.Inspection\bin\%CONFIGURATION%\net8.0\Icod.TermInfo.Inspection.dll Icod.TermInfo.Inspection\bin\%CONFIGURATION%\net10.0\Icod.TermInfo.Inspection.dll
 if errorlevel 1 goto fail
 
-rem The frozen 1.7 and 1.8 Inspection baselines remain immutable historical
-rem evidence. MI07 freezes the complete additive 1.9 JSON surface independently.
-rem docs\1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt
-rem docs\1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt
+rem DA08 freezes the exact complete 1.10 Inspection surface on every shipped framework.
 echo.
-rem MI07 froze the exact 1.9 Inspection surface. The frozen 1.7, 1.8, and 1.9 baselines remain immutable historical evidence.
-rem docs\1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt
-rem docs\1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt
-rem docs\1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt
-rem DA01 begins additive 1.10 development. Cross-framework equality remains active through DA07; DA08 freezes 1.10.
+echo === Verify approved Icod.TermInfo.Inspection 1.10 public API baseline (%CONFIGURATION%) ===
+for %%F in (net8.0 net9.0 net10.0) do (
+    dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c %CONFIGURATION% --no-build -- --check docs\1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt Icod.TermInfo.Inspection\bin\%CONFIGURATION%\%%F\Icod.TermInfo.Inspection.dll
+    if errorlevel 1 goto fail
+)
 
 echo.
 echo === Verify package structure and symbols (%CONFIGURATION%) ===
