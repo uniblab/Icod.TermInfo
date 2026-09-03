@@ -1,0 +1,134 @@
+name: stable-promotion
+
+on:
+  push:
+    branches: [1.10.0]
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 1.10.0
+      - name: Promote current-facing 1.10 metadata
+        shell: python
+        run: |
+          from pathlib import Path
+
+          replacements = {
+              'Icod.TermInfo.csproj': [
+                  ('1.9.0 promotes the frozen and validated 1.9 release contract while preserving the frozen 1.0 Runtime public API, dependency-free package boundary, net8/net9/net10 support, and 1.0.0.0 assembly identity; no Runtime semantics change.',
+                   '1.10.0 promotes the frozen and validated 1.10 release contract while preserving the frozen 1.0 Runtime public API, dependency-free package boundary, net8/net9/net10 support, and 1.0.0.0 assembly identity; no Runtime semantics change.'),
+              ],
+              'Icod.TermInfo.Source/Icod.TermInfo.Source.csproj': [
+                  ('1.9.0 promotes the frozen and validated 1.9 release contract while preserving the frozen 1.1 Source public API, bounded parser/resolver and use= precedence semantics, Runtime-only dependency, net8/net9/net10 support, and 1.0.0.0 assembly identity; no Source semantics change.',
+                   '1.10.0 promotes the frozen and validated 1.10 release contract while preserving the frozen 1.1 Source public API, bounded parser/resolver and use= precedence semantics, Runtime-only dependency, net8/net9/net10 support, and 1.0.0.0 assembly identity; no Source semantics change.'),
+              ],
+              'Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj': [
+                  ('1.9.0 promotes the frozen and validated 1.9 release contract while preserving the frozen 1.2 Compiler public API, deterministic writer/database semantics, Runtime-and-Source dependency graph, net8/net9/net10 support, and 1.0.0.0 assembly identity; no Compiler semantics change.',
+                   '1.10.0 promotes the frozen and validated 1.10 release contract while preserving the frozen 1.2 Compiler public API, deterministic writer/database semantics, Runtime-and-Source dependency graph, net8/net9/net10 support, and 1.0.0.0 assembly identity; no Compiler semantics change.'),
+              ],
+              'Icod.TermInfo.Termcap/Icod.TermInfo.Termcap.csproj': [
+                  ('1.9.0 promotes the frozen and validated 1.9 release contract while preserving the frozen 1.6 Termcap public API, Runtime-only dependency, conversion semantics, net8/net9/net10 support, and 1.0.0.0 assembly identity; no Termcap semantics change.',
+                   '1.10.0 promotes the frozen and validated 1.10 release contract while preserving the frozen 1.6 Termcap public API, Runtime-only dependency, conversion semantics, net8/net9/net10 support, and 1.0.0.0 assembly identity; no Termcap semantics change.'),
+              ],
+              'Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj': [
+                  ('1.10.0-Alpha-8 freezes the complete 1.10 Inspection API, the additive version-2 database automation schema, package verification, command composition, and DA07 cross-host/package/archive hardening while preserving the frozen version-1 JSON and all lower-layer contracts.',
+                   '1.10.0 promotes the frozen and validated 1.10 Inspection API, additive version-2 database automation schema, package verification, command composition, DA07 hardening, and consumer sample/documentation closure while preserving the frozen version-1 JSON and all lower-layer contracts.'),
+              ],
+              'icod-terminfo/Icod.TermInfo.Router.csproj': [
+                  ('1.10.0-Alpha-8 freezes the additive multi-database toe/infocmp automation, routed package behavior, and DA07 installed-tool plus six-RID archive hardening while preserving the complete 1.9 routed command contract.',
+                   '1.10.0 promotes the frozen and validated multi-database toe/infocmp automation, routed package behavior, installed-tool validation, and six-RID archive contract while preserving the complete 1.9 routed command contract.'),
+              ],
+          }
+
+          for path, pairs in replacements.items():
+              file = Path(path)
+              text = file.read_text(encoding='utf-8')
+              for old, new in pairs:
+                  if old not in text:
+                      raise SystemExit(f'Required promotion marker not found in {path}: {old}')
+                  text = text.replace(old, new, 1)
+              file.write_text(text, encoding='utf-8', newline='\n')
+
+          root = Path('README.md')
+          text = root.read_text(encoding='utf-8')
+          old = '''## 1.10 development status — DA08 release freeze\n\nThe `1.10.0` development branch is frozen at `1.10.0-Alpha-8` for release\nvalidation.'''
+          new = '''## 1.10 release status\n\nVersion `1.10.0` promotes the frozen and fully validated Alpha-8 contract without\nsemantic changes.'''
+          if old not in text:
+              raise SystemExit('Root 1.10 status marker not found.')
+          text = text.replace(old, new, 1)
+          old = '''The exact Alpha-8 product gate is green. Before the stable version bump, the\nconsumer-facing closure adds executable documentation only:'''
+          new = '''The exact Alpha-8 product gate and final consumer-closure gate are green. The\nstable release includes the executable documentation closure:'''
+          if old not in text:
+              raise SystemExit('Root consumer-closure marker not found.')
+          text = text.replace(old, new, 1)
+          old = '''The final post-documentation Staging gate is green (`33736812176`, head\n`b312c946e2e003f2d00761dff3d49957dbfbbeaf`). Stable `1.10.0` now remains a\npromotion-only version/documentation/package-metadata transition.'''
+          new = '''The final post-documentation Staging gate is green (`33736812176`, head\n`b312c946e2e003f2d00761dff3d49957dbfbbeaf`). The coordinated branch version is\nnow stable `1.10.0`; publication remains gated by the normal main/tag release workflow.'''
+          if old not in text:
+              raise SystemExit('Root stable-promotion marker not found.')
+          text = text.replace(old, new, 1)
+          root.write_text(text, encoding='utf-8', newline='\n')
+
+          audit = Path('docs/1.10.0-RELEASE-AUDIT.md')
+          text = audit.read_text(encoding='utf-8')
+          text = text.replace(
+              '**Status:** DA08 and consumer documentation/sample closure complete and green; stable promotion pending',
+              '**Status:** DA08 and consumer documentation/sample closure complete and green; promoted to stable `1.10.0`; publication pending',
+              1,
+          )
+          text = text.replace(
+              'Stable promotion is version/documentation-only.',
+              'Stable promotion to `1.10.0` is version/documentation/package-metadata-only and is now applied on the release branch.',
+              1,
+          )
+          audit.write_text(text, encoding='utf-8', newline='\n')
+
+          roadmap = Path('Icod.TermInfo-1.10.0-Deterministic-Multi-Database-Inspection-Comparison-and-Planning-Automation-Roadmap.md')
+          text = roadmap.read_text(encoding='utf-8')
+          old = '**Status:** DA08 and consumer documentation/sample closure complete and validated at `1.10.0-Alpha-8`; stable promotion pending'
+          new = '**Status:** DA08 and consumer documentation/sample closure complete and validated; stable `1.10.0` promotion applied; publication pending'
+          if old not in text:
+              raise SystemExit('Roadmap stable-promotion marker not found.')
+          roadmap.write_text(text.replace(old, new, 1), encoding='utf-8', newline='\n')
+
+      - name: Synchronize current stable-version assertions
+        shell: python
+        run: |
+          from pathlib import Path
+          candidates = [
+              p for p in Path('tests').rglob('*.cs')
+              if p.is_file()
+          ]
+          changed = []
+          for path in candidates:
+              text = path.read_text(encoding='utf-8')
+              # Only current-version assertions are promoted. Historical DA07/DA08 evidence
+              # remains Alpha-7/Alpha-8 in tranche-specific documentation and tests.
+              if '1.10.0-Alpha-8' not in text:
+                  continue
+              if any(token in path.name for token in ['DA07', 'DA08']):
+                  continue
+              new = text.replace('1.10.0-Alpha-8', '1.10.0')
+              if new != text:
+                  path.write_text(new, encoding='utf-8', newline='\n')
+                  changed.append(str(path))
+          print('\n'.join(changed))
+
+      - name: Commit stable promotion metadata
+        run: |
+          git diff --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md docs/1.10.0-RELEASE-AUDIT.md Icod.TermInfo-1.10.0-Deterministic-Multi-Database-Inspection-Comparison-and-Planning-Automation-Roadmap.md Icod.TermInfo.csproj Icod.TermInfo.Source/Icod.TermInfo.Source.csproj Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj Icod.TermInfo.Termcap/Icod.TermInfo.Termcap.csproj Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj icod-terminfo/Icod.TermInfo.Router.csproj tests
+          if git diff --cached --quiet; then
+            echo 'No additional stable-promotion metadata changes were required.'
+            exit 0
+          fi
+          git commit -m 'Prepare stable 1.10.0 release metadata'
+          git push origin HEAD:1.10.0
