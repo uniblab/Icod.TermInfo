@@ -222,9 +222,13 @@ public static class Command {
 	}
 
 	private static string GetHelpText() {
-		return $"Usage: {CommandName} [options] [terminal ...]{Environment.NewLine}"
-			+ $"       {CommandName} -u [options] target parent [parent ...]{Environment.NewLine}"
-			+ $"       {CommandName} --plan-use [options] target candidate [candidate ...]{Environment.NewLine}"
+			return $"Usage: {CommandName} [options] [terminal ...]{Environment.NewLine}"
+				+ $"       {CommandName} -u [options] target parent [parent ...]{Environment.NewLine}"
+				+ $"       {CommandName} --plan-use [options] target candidate [candidate ...]{Environment.NewLine}"
+				+ $"       {CommandName} --json target{Environment.NewLine}"
+				+ $"       {CommandName} --json -d left right{Environment.NewLine}"
+				+ $"       {CommandName} --json --plan-use target candidate [candidate ...]{Environment.NewLine}"
+				+ $"       {CommandName} --json --plan-use --all-candidates -B directory target{Environment.NewLine}"
 			+ $"       {CommandName} -D{Environment.NewLine}"
 			+ $"       {CommandName} -V | --version{Environment.NewLine}"
 			+ Environment.NewLine
@@ -249,7 +253,8 @@ public static class Command {
 			+ $"  -x              allow required local extended declarations/cancellations{Environment.NewLine}"
 			+ Environment.NewLine
 			+ $"Relative-source planning:{Environment.NewLine}"
-			+ $"      --plan-use           select ordered use= parents from explicit candidates{Environment.NewLine}"
+				+ $"      --plan-use           select ordered use= parents from explicit candidates{Environment.NewLine}"
+				+ $"      --all-candidates     use every canonical entry from the one explicit -B directory{Environment.NewLine}"
 			+ $"      --max-parents count  limit selected ordered parents; default 2{Environment.NewLine}"
 			+ $"      --max-plans count    limit evaluated plans; default 4097{Environment.NewLine}"
 			+ $"      --require-exhaustive reject a plan space larger than the budget; default{Environment.NewLine}"
@@ -262,7 +267,8 @@ public static class Command {
 			+ $"  -q              use shorter comparison presentation{Environment.NewLine}"
 			+ Environment.NewLine
 			+ $"Other options:{Environment.NewLine}"
-			+ $"  -x              include effective extended capabilities where defined{Environment.NewLine}"
+				+ $"  -x              include effective extended capabilities where defined{Environment.NewLine}"
+				+ $"      --json      emit one stable machine-readable inspection, comparison, or plan document{Environment.NewLine}"
 			+ $"  -D              print Runtime database discovery locations and exit{Environment.NewLine}"
 			+ $"  -V, --version   print the Icod.TermInfo tool-suite version and exit{Environment.NewLine}"
 			+ $"      --help      display this help and exit{Environment.NewLine}"
@@ -276,8 +282,11 @@ public static class Command {
 			+ $"attached values; use -- before a terminal name beginning with '-'.{Environment.NewLine}"
 			+ "Relative use= references preserve parent operand spelling and order; "
 			+ $"-B applies to every parent or planning candidate.{Environment.NewLine}"
-			+ "Planning writes only the selected source to stdout. Comparison selectors, "
-			+ $"-u, -q, and -D cannot be combined with --plan-use.{Environment.NewLine}";
+				+ "Planning writes only the selected source to stdout. Comparison selectors, "
+				+ $"-u, -q, and -D cannot be combined with --plan-use.{Environment.NewLine}"
+				+ "All-candidates planning requires --plan-use, exactly one target, and one explicit "
+				+ $"-B conventional directory; it never performs host discovery.{Environment.NewLine}"
+				+ $"Successful JSON output is one document followed by exactly one LF.{Environment.NewLine}";
 	}
 
 	private static string GetSemanticVersion() {

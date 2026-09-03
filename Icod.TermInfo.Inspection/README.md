@@ -3,6 +3,33 @@
 `Icod.TermInfo.Inspection` is the optional managed inspection and semantic-
 comparison layer for the `Icod.TermInfo` package family.
 
+## 1.9 release status
+
+Version `1.9.0` publishes the complete 31-type Inspection surface frozen in
+`docs/1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt`, the complete version-1 JSON
+Schema and its packaged copy, and the validated command, package-consumer,
+sample, fixture, router, and six-archive evidence.
+
+The only public types added after 1.8 are `TermInfoJsonRenderer` and
+`TermInfoJsonRendererOptions`. The four document kinds, schema identifier,
+deterministic compact and indented representations, exact UTF-8 bounds, and
+cancellation behavior are stable. The stable release promotes the validated
+Alpha-7 contract without feature, API, schema, or command-semantic changes. See
+`docs/1.9.0-RELEASE-AUDIT.md`.
+
+## 1.9 MI06 consumer and cross-host hardening
+
+`1.9.0-Alpha-6` leaves the MI04 public API, version-1 JSON Schema, and MI05
+command semantics unchanged. The Toolchain sample now renders an exact
+checked-in source-plan fixture after completing its semantic round trip. The
+fresh package-reference-only consumer renders all four document kinds on
+`net8.0`, `net9.0`, and `net10.0`, and hardens large escaped text, culture
+independence, and exact UTF-8 bounds. Tool-package and six-archive smoke continue
+to execute real `infocmp` and `toe` JSON workflows on Windows, Linux, and macOS.
+
+See
+`docs/1.9.0-MI06-SAMPLES-PACKAGE-CONSUMERS-AND-CROSS-HOST-HARDENING.md`.
+
 The 1.3 line established the reusable inspection/comparison engine while
 preserving the already-frozen Runtime 1.0, Source 1.1, and Compiler 1.2 public
 contracts. Version 1.4.0 froze the reviewed additive database-inspection and
@@ -21,6 +48,125 @@ gate. The stable score, bounds, candidate order, exhaustive and explicitly
 bounded search, cancellation evidence, and explicit catalog semantics are
 recorded in `docs/1.8.0-RELEASE-AUDIT.md`. Stable 1.8.0 promotes the validated
 Alpha-8 surface without changing planning or synthesis semantics.
+
+## 1.9 MI04 database-catalog manifests and JSON Schema
+
+`1.9.0-Alpha-4` makes the existing `TermInfoDatabaseCatalog` renderer overload
+operational without adding public API. The `databaseCatalog` payload preserves
+the normalized root, explicit catalog kind, derived `isComplete` evidence,
+ordered entries and issues, and ordered `duplicateCanonicalNames` evidence.
+
+```csharp
+TermInfoDatabaseCatalog catalog =
+	TermInfoDatabaseInspector.InspectDirectory( explicitDatabaseRoot );
+string catalogJson =
+	TermInfoJsonRenderer.Render(
+		catalog,
+		new TermInfoJsonRendererOptions(
+			maximumOutputByteCount: 65_536,
+			writeIndented: true
+		)
+	);
+```
+
+Completeness is true only for a conventional directory with no inspection
+issues. Duplicate canonical names remain explicit ambiguity evidence and do not
+erase otherwise complete inspection evidence. Missing, unsupported, unavailable,
+malformed, permission-failed, and partial states never claim completeness.
+
+The complete draft 2020-12 version-1 schema is published as
+`docs/Icod.TermInfo.Inspection.schema.json`, included in the NuGet package, and
+covered by checked-in compact and indented fixtures for all four document kinds.
+Command JSON was deliberately deferred to, and is now implemented by, MI05. See
+`docs/1.9.0-MI04-DATABASE-CATALOG-MANIFESTS-AND-JSON-SCHEMA.md`.
+
+## 1.9 MI03 comparison and planning evidence JSON
+
+`1.9.0-Alpha-3` makes the existing comparison and source-plan renderer
+overloads operational without adding public API. Comparison documents preserve
+the existing deterministic difference order and expose exact kind strings,
+capability identity, typed side values, and retained source entry, field, index,
+and span evidence.
+
+```csharp
+TermInfoComparisonResult comparison =
+	TerminalDescriptionComparer.Compare( left, right );
+string comparisonJson =
+	TermInfoJsonRenderer.Render( comparison );
+
+TerminalDescriptionSourcePlan plan =
+	TerminalDescriptionSourcePlanner.Plan( target, candidates );
+string planJson =
+	TermInfoJsonRenderer.Render( plan );
+```
+
+Each comparison side has one stable shape. Inapplicable text, aliases,
+capability values, source entries, indices, fields, and spans are explicit JSON
+null. Source-field summaries retain classification, canonical identity, decoded
+value, lexical text, and span without recursively embedding unrelated fields.
+
+Plan documents retain selected parent count and ordered `UseName` values,
+generated LF source, all score components, selected candidate indices,
+evaluated-plan count, `isExhaustive`, and accepted candidate count. Rendering
+reports the supplied immutable result and does not recompute a comparison or
+rerun planning. MI04 has since activated catalog payloads and published the
+complete schema. See
+`docs/1.9.0-MI03-COMPARISON-AND-PLANNING-EVIDENCE-JSON.md`.
+
+## 1.9 MI02 effective-description JSON
+
+`1.9.0-Alpha-2` makes `TermInfoJsonRenderer.Render(TerminalDescription)`
+operational. The version-1 payload preserves the exact terminal name, immutable
+alias order, and nullable description, followed by typed standard and extended
+capability arrays.
+
+```csharp
+TerminalDescription terminal =
+	TerminalDatabase.BuiltIn.Load( "xterm-256color" );
+string json =
+	TermInfoJsonRenderer.Render(
+		terminal,
+		new TermInfoJsonRendererOptions(
+			maximumOutputByteCount: 65_536,
+			writeIndented: true
+		)
+	);
+```
+
+Standard capabilities use canonical terminfo short names and compiled database
+order. Extended capabilities are grouped by Boolean, number, and string kind,
+then ordered by exact ordinal name. Compact output is canonical; indented output
+uses LF, two spaces, and no trailing line terminator. The bound is applied to the
+exact final UTF-8 byte count, and control characters use the default safe JSON
+escaping policy. MI03 has since activated comparison and planning payloads, and
+MI04 has activated catalog payloads. See
+`docs/1.9.0-MI02-EFFECTIVE-DESCRIPTION-JSON.md`.
+
+## 1.9 MI01 machine-readable renderer foundation
+
+`1.9.0-Alpha-1` adds `TermInfoJsonRendererOptions` and
+`TermInfoJsonRenderer`. The immutable default policy permits up to 4,194,304
+UTF-8 output bytes, uses compact presentation, and exposes no mutable
+`JsonSerializerOptions`, converter, naming policy, encoder, or callback.
+
+```csharp
+TermInfoJsonRendererOptions options =
+	new(
+		maximumOutputByteCount: 8_192,
+		writeIndented: true
+	);
+```
+
+The exact schema identifier is `urn:icod:terminfo:inspection:json:1`, with
+schema version `1`. The renderer has typed entry points for
+`TerminalDescription`, `TermInfoComparisonResult`,
+`TerminalDescriptionSourcePlan`, and `TermInfoDatabaseCatalog`.
+
+MI01 validated arguments, bounds, and pre-cancellation, then deliberately threw
+`NotSupportedException` for all payloads. MI02 activated description rendering,
+MI03 activated comparison and plan rendering, and MI04 activated catalog
+rendering and published the complete version-1 schema. See
+`docs/1.9.0-MI01-JSON-CONTRACT-AND-RENDERER-FOUNDATION.md`.
 
 ## 1.8 RP07 generated-state oracle and hardening
 
@@ -250,7 +396,7 @@ and Source packages.
 ## Install
 
 ```text
-dotnet add package Icod.TermInfo.Inspection --version 1.8.0
+dotnet add package Icod.TermInfo.Inspection --version 1.9.0
 ```
 
 The package targets `net8.0`, `net9.0`, and `net10.0`, depends on matching

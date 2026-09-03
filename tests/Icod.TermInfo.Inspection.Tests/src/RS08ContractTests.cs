@@ -6,10 +6,10 @@ namespace Icod.TermInfo.Inspection.Tests;
 
 public sealed class RS08ContractTests {
 	private const string ReleaseVersion = "1.7.0";
-	private const string CurrentReleaseVersion = "1.8.0";
+	private const string CurrentDevelopmentVersion = "1.9.0";
 
 	[Fact]
-	public void OneEightReleaseRetainsRs08ReleaseRecords() {
+	public void CurrentDevelopmentRetainsRs08ReleaseRecords() {
 		string root = FindRepositoryRoot();
 		XDocument buildProperties = XDocument.Load(
 			Path.Combine( root, "Directory.Build.props" ),
@@ -36,7 +36,7 @@ public sealed class RS08ContractTests {
 			)
 		);
 
-		Assert.Equal( CurrentReleaseVersion, version );
+		Assert.Equal( CurrentDevelopmentVersion, version );
 		Assert.Contains( "RS08", roadmap, StringComparison.Ordinal );
 		Assert.Contains( ReleaseVersion, audit, StringComparison.Ordinal );
 		Assert.Contains(

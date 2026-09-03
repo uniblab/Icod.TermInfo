@@ -1,4 +1,7 @@
+using System.Globalization;
 using System.Reflection;
+using System.Text;
+using System.Text.Json;
 using Icod.TermInfo;
 using Icod.TermInfo.Inspection;
 using Icod.TermInfo.Source;
@@ -31,7 +34,7 @@ Require(
 Type[] exportedTypes =
 	inspectionAssembly.GetExportedTypes();
 Require(
-	exportedTypes.Length == 29
+	exportedTypes.Length == 31
 		&& exportedTypes.Contains( typeof( TermInfoComparisonResult ) )
 		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalog ) )
 		&& exportedTypes.Contains( typeof( TermInfoDatabaseCatalogEntry ) )
@@ -47,6 +50,8 @@ Require(
 		&& exportedTypes.Contains( typeof( TermInfoInspectionEngine ) )
 		&& exportedTypes.Contains( typeof( TermInfoInspectionResult ) )
 		&& exportedTypes.Contains( typeof( TermInfoInspectionTarget ) )
+		&& exportedTypes.Contains( typeof( TermInfoJsonRenderer ) )
+		&& exportedTypes.Contains( typeof( TermInfoJsonRendererOptions ) )
 		&& exportedTypes.Contains( typeof( TermInfoSourceComparer ) )
 		&& exportedTypes.Contains( typeof( TermInfoSourceRenderer ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionComparer ) )
@@ -61,7 +66,7 @@ Require(
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesisOptions ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesisParent ) )
 		&& exportedTypes.Contains( typeof( TerminalDescriptionSourceSynthesizer ) ),
-	"The Inspection package did not expose exactly the frozen 1.8 public surface."
+	"The Inspection package did not expose exactly the frozen 1.9 public surface."
 );
 
 Require(
@@ -115,6 +120,35 @@ Require(
 		&& missingCatalog.DuplicateCanonicalNames.Count == 0
 		&& !missingCatalog.HasIssues,
 	"The T03 database catalog did not report a deterministic missing-root snapshot."
+);
+string catalogJson =
+	TermInfoJsonRenderer.Render(
+		missingCatalog,
+		new TermInfoJsonRendererOptions(
+			65_536,
+			writeIndented: true
+		)
+	);
+using JsonDocument catalogJsonDocument =
+	JsonDocument.Parse( catalogJson );
+JsonElement catalogJsonRoot = catalogJsonDocument.RootElement;
+JsonElement catalogJsonData = catalogJsonRoot.GetProperty( "data" );
+Require(
+	catalogJsonRoot.GetProperty( "schema" ).GetString()
+		== TermInfoJsonRenderer.SchemaIdentifier
+		&& catalogJsonRoot.GetProperty( "schemaVersion" ).GetInt32() == 1
+		&& catalogJsonRoot.GetProperty( "documentKind" ).GetString()
+			== "databaseCatalog"
+		&& catalogJsonData.GetProperty( "root" ).GetString()
+			== missingCatalog.Root
+		&& catalogJsonData.GetProperty( "kind" ).GetString() == "missing"
+		&& !catalogJsonData.GetProperty( "isComplete" ).GetBoolean()
+		&& catalogJsonData.GetProperty( "entries" ).GetArrayLength() == 0
+		&& catalogJsonData.GetProperty( "issues" ).GetArrayLength() == 0
+		&& catalogJsonData
+			.GetProperty( "duplicateCanonicalNames" )
+			.GetArrayLength() == 0,
+	"The MI04 package renderer did not emit the reviewed database-catalog manifest."
 );
 
 const string source =
@@ -242,6 +276,108 @@ Require(
 			== TermInfoSourceLexerOptions.DefaultMaximumSourceLength
 		&& !planningOptions.AllowNonExhaustiveResult,
 	"The RP04 package planning options did not retain the reviewed bounded defaults."
+);
+TermInfoJsonRendererOptions jsonOptions =
+	new();
+Require(
+	TermInfoJsonRenderer.SchemaIdentifier
+		== "urn:icod:terminfo:inspection:json:1"
+		&& TermInfoJsonRenderer.SchemaVersion == 1
+		&& jsonOptions.MaximumOutputByteCount == 4_194_304
+		&& !jsonOptions.WriteIndented,
+	"The MI01 JSON renderer contract did not retain its reviewed identity and bounds."
+);
+string terminalJson =
+	TermInfoJsonRenderer.Render(
+		terminal,
+		jsonOptions
+	);
+using JsonDocument terminalJsonDocument =
+	JsonDocument.Parse( terminalJson );
+JsonElement terminalJsonRoot = terminalJsonDocument.RootElement;
+JsonElement terminalJsonData = terminalJsonRoot.GetProperty( "data" );
+JsonElement terminalJsonCapabilities =
+	terminalJsonData.GetProperty( "capabilities" );
+JsonElement terminalJsonBoolean =
+	terminalJsonCapabilities
+		.GetProperty( "booleans" )
+		.EnumerateArray()
+		.Single();
+JsonElement terminalJsonNumber =
+	terminalJsonCapabilities
+		.GetProperty( "numbers" )
+		.EnumerateArray()
+		.Single();
+Require(
+	terminalJsonRoot.GetProperty( "schema" ).GetString()
+		== TermInfoJsonRenderer.SchemaIdentifier
+		&& terminalJsonRoot.GetProperty( "schemaVersion" ).GetInt32() == 1
+		&& terminalJsonRoot.GetProperty( "documentKind" ).GetString()
+			== "terminalDescription"
+		&& terminalJsonData
+			.GetProperty( "identity" )
+			.GetProperty( "name" )
+			.GetString() == "inspection-smoke"
+		&& terminalJsonBoolean.GetProperty( "name" ).GetString() == "am"
+		&& terminalJsonBoolean.GetProperty( "value" ).GetBoolean()
+		&& terminalJsonNumber.GetProperty( "name" ).GetString() == "cols"
+		&& terminalJsonNumber.GetProperty( "value" ).GetInt32() == 80,
+	"The MI02 package renderer did not emit the reviewed effective-description JSON."
+);
+TerminalDescription pathologicalTerminal =
+	new TerminalDescriptionBuilder( "mi06-package-large" )
+		.SetDescription( "MI06 package-only culture and bound smoke" )
+		.SetExtendedString(
+			"XMI06",
+			string.Concat(
+				Enumerable.Repeat(
+					"I\u0130\u001b\n",
+					8_192
+				)
+			)
+		)
+		.Build();
+string invariantPathologicalJson =
+	TermInfoJsonRenderer.Render( pathologicalTerminal );
+CultureInfo originalCulture = CultureInfo.CurrentCulture;
+CultureInfo originalUiCulture = CultureInfo.CurrentUICulture;
+try {
+	foreach ( string cultureName in new[] { "ar-SA", "tr-TR" } ) {
+		CultureInfo.CurrentCulture =
+			CultureInfo.GetCultureInfo( cultureName );
+		CultureInfo.CurrentUICulture =
+			CultureInfo.GetCultureInfo( cultureName );
+		Require(
+			TermInfoJsonRenderer.Render( pathologicalTerminal )
+				== invariantPathologicalJson,
+			"The MI06 package-only renderer changed across cultures."
+		);
+	}
+} finally {
+	CultureInfo.CurrentCulture = originalCulture;
+	CultureInfo.CurrentUICulture = originalUiCulture;
+}
+int pathologicalByteCount =
+	Encoding.UTF8.GetByteCount( invariantPathologicalJson );
+Require(
+	TermInfoJsonRenderer.Render(
+		pathologicalTerminal,
+		new TermInfoJsonRendererOptions( pathologicalByteCount )
+	) == invariantPathologicalJson,
+	"The MI06 package-only renderer rejected its exact UTF-8 boundary."
+);
+bool rejectedBelowExactBoundary = false;
+try {
+	TermInfoJsonRenderer.Render(
+		pathologicalTerminal,
+		new TermInfoJsonRendererOptions( pathologicalByteCount - 1 )
+	);
+} catch ( InvalidOperationException ) {
+	rejectedBelowExactBoundary = true;
+}
+Require(
+	rejectedBelowExactBoundary,
+	"The MI06 package-only renderer accepted output beyond its UTF-8 boundary."
 );
 TerminalDescriptionSourcePlanningScore planningScore =
 	new(
@@ -546,6 +682,78 @@ Require(
 		&& sourceComparison.Differences[ 0 ].RightSourceField is not null,
 	"The I05 source-aware comparer did not report the local numeric difference."
 );
+string comparisonJson =
+	TermInfoJsonRenderer.Render(
+		sourceComparison,
+		jsonOptions
+	);
+using JsonDocument comparisonJsonDocument =
+	JsonDocument.Parse( comparisonJson );
+JsonElement comparisonJsonRoot = comparisonJsonDocument.RootElement;
+JsonElement comparisonJsonData = comparisonJsonRoot.GetProperty( "data" );
+JsonElement comparisonJsonDifference =
+	comparisonJsonData
+		.GetProperty( "differences" )
+		.EnumerateArray()
+		.Single();
+Require(
+	comparisonJsonRoot.GetProperty( "documentKind" ).GetString()
+		== "comparison"
+		&& !comparisonJsonData.GetProperty( "areEqual" ).GetBoolean()
+		&& comparisonJsonDifference.GetProperty( "kind" ).GetString()
+			== "sourceFieldValue"
+		&& comparisonJsonDifference
+			.GetProperty( "left" )
+			.GetProperty( "sourceField" )
+			.GetProperty( "numericValue" )
+			.GetInt32() == 80
+		&& comparisonJsonDifference
+			.GetProperty( "right" )
+			.GetProperty( "sourceField" )
+			.GetProperty( "numericValue" )
+			.GetInt32() == 132,
+	"The MI03 package renderer did not preserve source-aware comparison evidence."
+);
+string planJson =
+	TermInfoJsonRenderer.Render(
+		planned,
+		jsonOptions
+	);
+using JsonDocument planJsonDocument =
+	JsonDocument.Parse( planJson );
+JsonElement planJsonRoot = planJsonDocument.RootElement;
+JsonElement planJsonData = planJsonRoot.GetProperty( "data" );
+JsonElement planJsonScore = planJsonData.GetProperty( "score" );
+Require(
+	planJsonRoot.GetProperty( "documentKind" ).GetString() == "sourcePlan"
+		&& planJsonData.GetProperty( "selectedParentCount" ).GetInt32() == 1
+		&& planJsonData
+			.GetProperty( "selectedParentUseNames" )
+			.EnumerateArray()
+			.Single()
+			.GetString() == synthesisAliasParent.UseName
+		&& planJsonData.GetProperty( "source" ).GetString() == planned.Source
+		&& planJsonScore.GetProperty( "localDirectiveCount" ).GetInt32()
+			== planned.Score.LocalDirectiveCount
+		&& planJsonScore.GetProperty( "cancellationCount" ).GetInt32()
+			== planned.Score.CancellationCount
+		&& planJsonScore.GetProperty( "parentCount" ).GetInt32()
+			== planned.Score.ParentCount
+		&& planJsonScore.GetProperty( "renderedUtf8ByteCount" ).GetInt32()
+			== planned.Score.RenderedUtf8ByteCount
+		&& planJsonScore
+			.GetProperty( "selectedCandidateIndices" )
+			.EnumerateArray()
+			.Single()
+			.GetInt32() == 0
+		&& planJsonData.GetProperty( "evaluatedPlanCount" ).GetInt32()
+			== planned.EvaluatedPlanCount
+		&& planJsonData.GetProperty( "isExhaustive" ).GetBoolean()
+			== planned.IsExhaustive
+		&& planJsonData.GetProperty( "candidateCount" ).GetInt32()
+			== planned.CandidateCount,
+	"The MI03 package renderer did not preserve source-plan selection and search evidence."
+);
 
 InMemoryTerminalDescriptionProvider provider =
 	new(
@@ -587,5 +795,5 @@ Require(
 );
 
 Console.WriteLine(
-	"Icod.TermInfo.Inspection package smoke test passed."
+	"Icod.TermInfo.Inspection 1.9.0 package smoke test passed."
 );

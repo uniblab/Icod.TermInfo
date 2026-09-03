@@ -1,4 +1,4 @@
-# Icod.TermInfo 1.8 Tool-Suite Sample
+# Icod.TermInfo 1.9 Tool-Suite Sample
 
 This sample exercises the coordinated `tic`, `infocmp`, `toe`, `captoinfo`, and
 `infotocap` command suite against controlled terminfo and termcap source. It uses
@@ -9,6 +9,9 @@ The commands below use the standalone release-archive launchers. When
 `Icod.TermInfo.Tools` is installed as a .NET tool, prefix the same command lines
 with `icod-terminfo`, for example `icod-terminfo tic -c -x example.ti`. Run them
 from this directory, or adjust the paths as appropriate.
+
+MI07 adds no command form. It freezes the controlled direct and routed examples
+for all four version-1 JSON document kinds as stable 1.9 release evidence.
 
 ## Terminfo source
 
@@ -124,6 +127,33 @@ This reports semantic differences between the two compiled descriptions. A
 semantic difference is normal command output and does not by itself make the
 comparison fail.
 
+## Produce machine-readable inspection and planning documents
+
+Version 1.9 projects the same immutable Inspection values through one versioned
+JSON envelope. Effective-description and comparison documents are:
+
+```text
+infocmp --json -A ./terminfo icod-demo-child > description.json
+infocmp --json -d -A ./terminfo -B ./terminfo icod-demo-base icod-demo-child > comparison.json
+```
+
+Explicit-candidate and explicit-directory all-candidates planning are:
+
+```text
+infocmp --json --plan-use -A ./terminfo -B ./terminfo icod-demo-child icod-demo-decoy icod-demo-base > plan.json
+infocmp --json --plan-use --all-candidates --max-parents 1 \
+  -A ./terminfo -B ./terminfo icod-demo-child \
+  > all-candidates-plan.json
+```
+
+The all-candidates form inspects only `./terminfo`, uses canonical catalog order,
+and excludes the target. Each successful command writes exactly one compact JSON
+document followed by one LF. The routed forms are byte-identical, for example:
+
+```text
+icod-terminfo infocmp --json -A ./terminfo icod-demo-child > description-routed.json
+```
+
 ## Enumerate the database
 
 ```text
@@ -132,6 +162,13 @@ toe -hs ./terminfo
 
 `toe` reads canonical identities and descriptions from the compiled entries
 rather than inferring identities from filenames.
+
+The exact explicit catalog is available as a `databaseCatalog` document:
+
+```text
+toe --json ./terminfo > catalog.json
+icod-terminfo toe --json ./terminfo > catalog-routed.json
+```
 
 ## Inspect source dependencies
 
@@ -191,7 +228,10 @@ Remove the explicit local database and redirected conversion outputs when the
 walkthrough is complete:
 
 ```text
-rm -rf ./terminfo converted-from-termcap.ti roundtrip.termcap planned-child.ti planned-child-routed.ti planned-validation.ti
+rm -rf ./terminfo converted-from-termcap.ti roundtrip.termcap \
+  planned-child.ti planned-child-routed.ti planned-validation.ti \
+  description.json description-routed.json comparison.json plan.json \
+  all-candidates-plan.json catalog.json catalog-routed.json
 ```
 
 On shells without `rm`, remove the same paths with the host's normal file tools.

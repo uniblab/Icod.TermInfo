@@ -1,0 +1,41 @@
+{
+  "schema": "urn:icod:terminfo:inspection:json:1",
+  "schemaVersion": 1,
+  "documentKind": "comparison",
+  "data": {
+    "areEqual": false,
+    "differences": [
+      {
+        "kind": "differentValue",
+        "capabilityName": "cols",
+        "isExtendedCapability": false,
+        "left": {
+          "text": null,
+          "aliases": null,
+          "capabilityValue": {
+            "kind": "number",
+            "value": 80
+          },
+          "sourceEntry": null,
+          "sourceEntryIndex": null,
+          "sourceField": null,
+          "sourceFieldIndex": null,
+          "sourceSpan": null
+        },
+        "right": {
+          "text": null,
+          "aliases": null,
+          "capabilityValue": {
+            "kind": "number",
+            "value": 132
+          },
+          "sourceEntry": null,
+          "sourceEntryIndex": null,
+          "sourceField": null,
+          "sourceFieldIndex": null,
+          "sourceSpan": null
+        }
+      }
+    ]
+  }
+}

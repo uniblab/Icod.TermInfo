@@ -1,0 +1,87 @@
+{
+  "schema": "urn:icod:terminfo:inspection:json:1",
+  "schemaVersion": 1,
+  "documentKind": "terminalDescription",
+  "data": {
+    "identity": {
+      "name": "mi02-terminal",
+      "aliases": [
+        "mi02-z-alias",
+        "mi02-a-alias"
+      ],
+      "description": "MI02 \u0022safe\u0022 caf\u00E9"
+    },
+    "capabilities": {
+      "booleans": [
+        {
+          "name": "bw",
+          "value": true
+        },
+        {
+          "name": "am",
+          "value": true
+        }
+      ],
+      "numbers": [
+        {
+          "name": "cols",
+          "value": 80
+        },
+        {
+          "name": "lines",
+          "value": 24
+        },
+        {
+          "name": "colors",
+          "value": 256
+        }
+      ],
+      "strings": [
+        {
+          "name": "bel",
+          "value": "\u0007"
+        },
+        {
+          "name": "clear",
+          "value": "\u001B[H\u001B[2J"
+        },
+        {
+          "name": "cup",
+          "value": "\u001B[%i%p1%d;%p2%dH"
+        }
+      ],
+      "extended": {
+        "booleans": [
+          {
+            "name": "aB",
+            "value": true
+          },
+          {
+            "name": "zB",
+            "value": true
+          }
+        ],
+        "numbers": [
+          {
+            "name": "aN",
+            "value": 42
+          },
+          {
+            "name": "zN",
+            "value": -7
+          }
+        ],
+        "strings": [
+          {
+            "name": "aS",
+            "value": "quote \u0022 slash \\"
+          },
+          {
+            "name": "zS",
+            "value": "zeta"
+          }
+        ]
+      }
+    }
+  }
+}

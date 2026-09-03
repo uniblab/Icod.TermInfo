@@ -7,53 +7,53 @@
 
 `Icod.TermInfo` is a managed, dependency-free .NET implementation of the low-level terminal-capability model traditionally supplied by `libtinfo`.
 
-Version 1.8.0 is the current coordinated release. It adds deterministic,
-bounded ordered-parent planning in `Icod.TermInfo.Inspection` and exposes it
-through `infocmp --plan-use` while preserving the Runtime, Source, Compiler,
-Termcap, and frozen 1.7 synthesis contracts.
+Version 1.9.0 is the current coordinated release. It adds deterministic,
+bounded, versioned JSON for effective descriptions, comparisons, source plans,
+and explicit database catalogs, then exposes those documents through
+`infocmp --json` and `toe --json`. Runtime, Source, Compiler, Termcap, frozen
+1.7 synthesis, and frozen 1.8 planning contracts remain unchanged.
 
-The 1.8.0 library package family targets `net8.0`, `net9.0`, and `net10.0`; the
+The 1.9.0 library package family targets `net8.0`, `net9.0`, and `net10.0`; the
 packages use C# 13, contain no native ncurses/terminfo payload, and are intended
 to run on Windows, Linux, and macOS.
 
-The additive planning API, lexicographic score, bounds, exhaustive and
-explicitly bounded search, explicit catalog orchestration, command composition,
-package consumers, samples, and distribution gates are frozen in
-`docs/1.8.0-RELEASE-AUDIT.md`.
+The exact 31-type Inspection API, version-1 JSON Schema, deterministic UTF-8
+rendering, command semantics, package consumers, samples, fixtures, router, and
+six-archive distribution gates are frozen in `docs/1.9.0-RELEASE-AUDIT.md`.
 
 ## Install
 
 Runtime-only consumers use:
 
 ```text
-dotnet add package Icod.TermInfo --version 1.8.0
+dotnet add package Icod.TermInfo --version 1.9.0
 ```
 
 Applications which need terminfo source-language support use:
 
 ```text
-dotnet add package Icod.TermInfo.Source --version 1.8.0
+dotnet add package Icod.TermInfo.Source --version 1.9.0
 ```
 
 Applications which need opt-in termcap parsing, conversion, rendering, or
 explicit historical termcap acquisition use:
 
 ```text
-dotnet add package Icod.TermInfo.Termcap --version 1.8.0
+dotnet add package Icod.TermInfo.Termcap --version 1.9.0
 ```
 
 Applications which compile terminfo source or write conventional compiled
 terminfo databases use:
 
 ```text
-dotnet add package Icod.TermInfo.Compiler --version 1.8.0
+dotnet add package Icod.TermInfo.Compiler --version 1.9.0
 ```
 
 Applications which need canonical rendering, semantic comparison, or
 provider-aware inspection use:
 
 ```text
-dotnet add package Icod.TermInfo.Inspection --version 1.8.0
+dotnet add package Icod.TermInfo.Inspection --version 1.9.0
 ```
 
 `Icod.TermInfo.Source` and `Icod.TermInfo.Termcap` each depend on the matching
@@ -65,8 +65,8 @@ on Termcap. Applications which only load compiled terminfo or consume
 
 The same validated package artifacts are published to NuGet.org and GitHub
 Packages. Historical release contracts remain recorded in the versioned release
-audits; the 1.8 publication gate is recorded in
-`docs/1.8.0-RELEASE-AUDIT.md`.
+audits; the 1.9 publication gate is recorded in
+`docs/1.9.0-RELEASE-AUDIT.md`.
 
 ## Tool Suite
 
@@ -93,7 +93,7 @@ distribution-only router package.
 Install the coordinated router as a .NET tool with:
 
 ```text
-dotnet tool install --global Icod.TermInfo.Tools --version 1.8.0
+dotnet tool install --global Icod.TermInfo.Tools --version 1.9.0
 
 icod-terminfo tic -V
 icod-terminfo infocmp -V
@@ -118,7 +118,7 @@ Icod.TermInfo.Tools.<version>.osx-x64.tar.gz
 Icod.TermInfo.Tools.<version>.osx-arm64.tar.gz
 ```
 
-Each 1.8.0 archive contains the traditional `tic`, `infocmp`, `toe`,
+Each 1.9.0 archive contains the traditional `tic`, `infocmp`, `toe`,
 `captoinfo`, and `infotocap` command names and their required managed
 dependencies. The user supplies the .NET 10 runtime and controls where the
 archive is unpacked and whether that location is placed on `PATH`. The archive
@@ -394,6 +394,76 @@ TerminalDescriptionSourcePlan plan =
 The planner does not infer ancestry or rewrite synthesis semantics. Every
 evaluated plan delegates source generation to the frozen 1.7 synthesizer, and
 the result reports whether the configured search space was exhausted.
+
+## What 1.9 adds
+
+Version 1.9.0 adds deterministic machine-readable Inspection output and
+explicit planning automation. MI07 freezes the exact API, schema, command,
+package, sample, fixture, router, and archive contract after MI06 hardened the
+reusable and command surface. The reusable renderer includes database-catalog
+manifests, and the package publishes the complete version-1 schema alongside
+the MI02 effective-description and MI03 comparison and plan payloads:
+
+```csharp
+using Icod.TermInfo;
+using Icod.TermInfo.Inspection;
+
+TermInfoJsonRendererOptions jsonOptions =
+	new(
+		TermInfoJsonRendererOptions.DefaultMaximumOutputByteCount,
+		writeIndented: true
+	);
+
+TerminalDescription terminal =
+	TerminalDatabase.BuiltIn.Load( "xterm-256color" );
+string descriptionJson =
+	TermInfoJsonRenderer.Render(
+		terminal,
+		jsonOptions
+	);
+
+TermInfoComparisonResult comparison =
+	TerminalDescriptionComparer.Compare( terminal, terminal );
+string comparisonJson =
+	TermInfoJsonRenderer.Render( comparison, jsonOptions );
+
+TermInfoDatabaseCatalog catalog =
+	TermInfoDatabaseInspector.InspectDirectory( explicitDatabaseRoot );
+string catalogJson =
+	TermInfoJsonRenderer.Render( catalog, jsonOptions );
+```
+
+The version-1 schema identifier is
+`urn:icod:terminfo:inspection:json:1`. MI03 preserves ordered effective and
+source-aware differences, typed left/right values, retained source entry, field,
+index, and span evidence, and explicit nulls. Plan JSON preserves selected
+parent names, generated LF source, every score component, selected candidate
+indices, evaluation count, exhaustive status, and candidate count. Catalog JSON
+preserves the normalized root, explicit catalog kind and completeness, ordered
+entries and issues, and duplicate canonical-name evidence. The published
+`docs/Icod.TermInfo.Inspection.schema.json` describes all four version-1 document
+kinds and is included in the Inspection package. `infocmp --json` emits
+description, comparison, and source-plan documents; `toe --json` emits catalog
+documents. Explicit-directory all-candidates planning is available only through
+one caller-selected database root.
+
+MI06 adds a JSON-producing Toolchain sample, ToolSuite automation examples,
+package-reference-only rendering for all four document kinds, and tool-package
+plus six-archive smoke. Culture, separate-process, large/pathological-input,
+exact UTF-8 boundary, and Windows/Linux/macOS evidence remain release gates. The
+frozen 1.7 synthesis and 1.8 planning contracts remain unchanged.
+
+MI07 adds no feature behavior. The complete 31-type Inspection surface is
+frozen in `docs/1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt`; the version-1 schema,
+package graph, direct and routed commands, six-archive topology, samples,
+fixtures, and release verification are frozen in
+`docs/1.9.0-RELEASE-AUDIT.md`. Stable 1.9.0 promotes the validated Alpha-7
+surface without changing behavior, public API, schema, or package topology.
+
+See
+`Icod.TermInfo-1.9.0-Machine-Readable-Inspection-and-Planning-Automation-Roadmap.md`,
+`docs/1.9.0-MI07-API-SCHEMA-PACKAGING-AND-RELEASE-CLOSURE.md`, and
+`docs/1.9.0-RELEASE-AUDIT.md` for the current release contract.
 
 ## Getting started
 
@@ -912,7 +982,8 @@ library stack without invoking the command layer. It parses and resolves a
 controlled `.ti` source document, synthesizes the child relative to its base,
 reparses and resolves the synthesized source, compiles and publishes it into a
 temporary conventional database, reloads the child through the Runtime provider,
-and verifies semantic equality through Inspection.
+verifies semantic equality through Inspection, and emits the immutable plan as
+one version-1 `sourcePlan` JSON document.
 
 Run it with:
 
@@ -921,8 +992,9 @@ dotnet run --project samples/Icod.TermInfo.Toolchain.Sample/Icod.TermInfo.Toolch
 ```
 
 The sample is deterministic and does not inspect the host terminfo database. It
-is executed by release validation on Windows, Linux, and macOS. Use `-f net8.0`
-or `-f net9.0` when exercising those reusable-library target frameworks.
+is executed twice by release validation on Windows, Linux, and macOS and checked
+against its exact JSON fixture. Use `-f net8.0` or `-f net9.0` when exercising
+those reusable-library target frameworks.
 
 See `samples/Icod.TermInfo.Toolchain.Sample/README.md` for the complete flow.
 
@@ -937,6 +1009,9 @@ dependency reporting, and bidirectional conversion do not depend on
 host-installed terminfo or termcap databases. The planning walkthrough includes
 an inferior decoy, direct and routed forms, and `tic -c` validation of the
 selected source.
+The MI06 walkthrough also covers all four version-1 JSON document kinds,
+explicit-directory all-candidates planning, and byte-identical direct/router
+automation.
 
 See `samples/README.md`, `samples/ToolSuite/README.md`,
 `samples/Icod.TermInfo.Acquisition.Sample/README.md`,
@@ -1066,7 +1141,10 @@ release contract is defined by
 `Icod.TermInfo 1.7.0 - Relative Terminfo Source Synthesis Roadmap.md`. The 1.8
 planning contract is defined by
 `Icod.TermInfo-1.8.0-Relative-Source-Planning-and-Parent-Selection-Roadmap.md`,
-and its publication gate is recorded in `docs/1.8.0-RELEASE-AUDIT.md`.
+and its publication gate is recorded in `docs/1.8.0-RELEASE-AUDIT.md`. The 1.9
+machine-readable Inspection contract is defined by
+`Icod.TermInfo-1.9.0-Machine-Readable-Inspection-and-Planning-Automation-Roadmap.md`,
+and its publication gate is recorded in `docs/1.9.0-RELEASE-AUDIT.md`.
 
 ## Scope
 
@@ -1083,9 +1161,11 @@ for the 1.3 Inspection contract,
 `Icod.TermInfo 1.7.0 - Relative Terminfo Source Synthesis Roadmap.md` and
 `docs/1.7.0-RELEASE-AUDIT.md` for the frozen 1.7 synthesis contract, and
 `Icod.TermInfo-1.8.0-Relative-Source-Planning-and-Parent-Selection-Roadmap.md`
-and `docs/1.8.0-RELEASE-AUDIT.md` for the current 1.8 planning and release
-contracts. See `docs/VERSIONING.md` and `docs/COMPATIBILITY.md` for the 1.x
-promises.
+and `docs/1.8.0-RELEASE-AUDIT.md` for the frozen 1.8 planning contract, and
+`Icod.TermInfo-1.9.0-Machine-Readable-Inspection-and-Planning-Automation-Roadmap.md`
+and `docs/1.9.0-RELEASE-AUDIT.md` for the current 1.9 machine-readable
+Inspection and release contracts. See `docs/VERSIONING.md` and
+`docs/COMPATIBILITY.md` for the 1.x promises.
 The 0.6.0 through 1.0.0 roadmaps remain historical frozen contracts.
 
 ## Authors

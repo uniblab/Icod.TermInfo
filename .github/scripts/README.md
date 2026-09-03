@@ -28,11 +28,15 @@ The deep verifier covers the coordinated Runtime, Source, Termcap, Compiler,
 Inspection, and `Icod.TermInfo.Tools` artifacts. It retains API-baseline checks,
 net8.0/net9.0/net10.0 equivalence where applicable, structural package checks,
 isolated package-reference consumers, deterministic samples, and router/package
-validation. RP07 runs the planning Toolchain sample in two separate processes
-and requires byte-identical output before accepting its plan, synthesize,
-compile, publish, reacquire, and compare path. RP08 additionally requires the
-exact `docs/1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt` manifest while retaining
-the immutable 1.7 Inspection manifest as historical evidence.
+validation. MI06 runs the planning Toolchain sample in two separate processes,
+requires byte-identical source-plan JSON, and checks the exact fixture after its
+plan, synthesize, compile, publish, reacquire, and compare path. The
+package-reference-only Inspection consumer also renders all four document kinds
+under multiple cultures and exact output bounds. MI07 requires the exact
+`docs/1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt` manifest while retaining the
+immutable 1.7 and 1.8 Inspection manifests as historical evidence. It also
+freezes the packaged version-1 JSON Schema, command behavior, sample fixtures,
+package graph, and router/archive topology as release gates.
 
 Package production is centralized in:
 

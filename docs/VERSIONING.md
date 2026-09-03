@@ -260,6 +260,67 @@ stable `1.8.0` transition changes release metadata and documentation only. The
 stable release promotes the validated Alpha-8 surface without semantic or API
 changes.
 
+MI01 advances the coordinated development version to `1.9.0-Alpha-1` and adds
+only `TermInfoJsonRendererOptions` and `TermInfoJsonRenderer` to Inspection. It
+freezes the schema identifier/version, typed value kinds, deterministic text
+policy, immutable UTF-8 output bounds, cancellation boundary, and future
+operational tranche ownership. Runtime, Source, Compiler, Termcap, 1.7 synthesis,
+and 1.8 planning APIs and semantics remain frozen. Inspection retains only
+Runtime and Source production dependencies. The 1.8 Inspection baseline remains
+immutable historical evidence while cross-framework API equality and explicit
+MI01 contract/package-smoke tests guard the additive prerelease surface. MI07
+will freeze the exact stable 1.9 Inspection baseline.
+
+MI02 advances the coordinated development version to `1.9.0-Alpha-2` without
+adding public API. It makes only the existing `TerminalDescription` renderer
+overloads operational, freezing the effective-description payload, deterministic
+ordering and escaping, compact and LF/two-space indented forms, exact UTF-8
+bounds, and deterministic cancellation boundaries. Comparison and planning
+rendering remain deferred to MI03, and catalog rendering remains deferred to
+MI04. Historical MI01 records retain their Alpha-1 version.
+
+MI03 advances the coordinated development version to `1.9.0-Alpha-3` without
+adding public API. It makes the existing comparison and source-plan renderer
+overloads operational, freezing typed side values, source-aware evidence,
+ordered parent names, generated source, planning-score components, candidate
+indices, evaluation counts, completeness evidence, deterministic formatting,
+exact UTF-8 bounds, and cancellation. Catalog rendering remains deferred to
+MI04. Historical MI01 and MI02 records retain their original development
+versions.
+
+MI04 advances the coordinated development version to `1.9.0-Alpha-4` without
+adding public API. It makes the existing database-catalog renderer overloads
+operational, freezing normalized-root, kind, completeness, ordered-entry,
+ordered-issue, and duplicate-name evidence. It also publishes and packages the
+complete draft 2020-12 version-1 JSON Schema with checked-in compact and indented
+fixtures for all four document kinds. Historical MI01 through MI03 records
+retain their original development versions. Command JSON remains owned by MI05.
+
+MI05 advances the coordinated development version to `1.9.0-Alpha-5` without
+adding reusable public API or changing the version-1 JSON Schema. It composes
+the frozen renderer through `infocmp --json` and `toe --json`, and composes the
+frozen explicit-catalog planner through `infocmp --plan-use
+--all-candidates -B directory target`. Historical MI01 through MI04 records
+retain their original development versions. MI06 owns samples, package-only
+consumers, and cross-host hardening.
+
+MI06 advances the coordinated development version to `1.9.0-Alpha-6` without
+adding public API, changing the version-1 JSON Schema, or changing command
+semantics. It adds JSON-producing Toolchain and ToolSuite samples, exact
+package-reference-only rendering evidence, distributed command smoke, and
+culture, process, host, large-input, pathological-input, and UTF-8 boundary
+hardening. Historical MI01 through MI05 records retain their original
+development versions. MI07 owns final API, schema, packaging, and release
+closure.
+
+MI07 advances the coordinated development version to `1.9.0-Alpha-7` without
+adding feature behavior. It freezes the exact 31-type Inspection API, complete
+version-1 JSON Schema, command semantics, package graph, samples, fixtures,
+router and archive topology, release verifiers, and release audit. Historical
+MI01 through MI06 records retain their original development versions. Stable
+`1.9.0` promotes the validated Alpha-7 surface through release metadata and
+documentation changes only, without semantic, public-API, or schema changes.
+
 ## Assembly identity
 
 The 1.x line freezes the managed assembly identities:
@@ -346,6 +407,13 @@ only `TerminalDescriptionSourcePlan`, `TerminalDescriptionSourcePlanner`,
 `TerminalDescriptionSourcePlanningScore`. Release verification requires exact
 net8/net9/net10 equivalence and an exact match with the 1.8 manifest. The 1.7
 manifest remains immutable historical evidence and must not be regenerated.
+
+`docs/1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt` is the frozen complete
+Inspection surface for the 1.9 line. It retains the entire 1.8 surface and adds
+only `TermInfoJsonRenderer` and `TermInfoJsonRendererOptions`. Alpha-7 and
+stable 1.9 validation require exact net8/net9/net10 equivalence and an exact
+match with the 1.9 manifest. The 1.7 and 1.8 manifests remain immutable
+historical evidence and must not be regenerated.
 
 The baselines record exported types, public/protected members, enum numeric
 values, parameter names/order/defaults, ref/out/in/params shape, generic

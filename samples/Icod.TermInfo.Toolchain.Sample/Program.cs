@@ -4,6 +4,22 @@ using Icod.TermInfo.Inspection;
 using Icod.TermInfo.Source;
 using Path = global::System.IO.Path;
 
+if (
+	args.Length != 0
+	&& (
+		args.Length != 2
+		|| !string.Equals(
+			args[ 0 ],
+			"--verify-fixture",
+			StringComparison.Ordinal
+		)
+	)
+) {
+	throw new ArgumentException(
+		"Usage: Icod.TermInfo.Toolchain.Sample [--verify-fixture path]"
+	);
+}
+
 const string source =
 	"""
 	icod-toolchain-base|Toolchain sample base,
@@ -224,7 +240,20 @@ try {
 		);
 	}
 
-	Console.Write( relativeSource );
+	string json = TermInfoJsonRenderer.Render( plan ) + "\n";
+	if ( args.Length == 2 ) {
+		string fixture =
+			File.ReadAllText( args[ 1 ] )
+				.Replace( "\r\n", "\n", StringComparison.Ordinal )
+				.Replace( '\r', '\n' );
+		if ( !string.Equals( json, fixture, StringComparison.Ordinal ) ) {
+			throw new InvalidOperationException(
+				"The rendered source-plan JSON did not match the checked-in fixture."
+			);
+		}
+	}
+
+	Console.Write( json );
 }
 finally {
 	if ( Directory.Exists( databaseRoot ) ) {

@@ -279,12 +279,89 @@ release-plan-useful|release-plan-parent|Icod.TermInfo release planning parent,
 		throw 'infocmp planning output did not reproduce the target semantics.'
 	}
 
+	$descriptionDocument = Invoke-ReleaseTool -Name 'infocmp' -Arguments @(
+		'--json',
+		'-A',
+		$databaseRoot,
+		'release-smoke'
+	) | ConvertFrom-Json -Depth 100
+	if ( 'terminalDescription' -cne $descriptionDocument.documentKind ) {
+		throw 'infocmp JSON did not emit a terminalDescription document.'
+	}
+
+	$comparisonDocument = Invoke-ReleaseTool -Name 'infocmp' -Arguments @(
+		'--json',
+		'-d',
+		'-A',
+		$databaseRoot,
+		'-B',
+		$databaseRoot,
+		'release-smoke',
+		'release-plan-target'
+	) | ConvertFrom-Json -Depth 100
+	if ( 'comparison' -cne $comparisonDocument.documentKind ) {
+		throw 'infocmp JSON did not emit a comparison document.'
+	}
+
+	$automationSourcePath = Join-Path $workRoot 'release-json-planning.ti'
+	$automationDatabaseRoot = Join-Path $workRoot 'json-terminfo'
+	[System.IO.Directory]::CreateDirectory( $automationDatabaseRoot ) | Out-Null
+	[System.IO.File]::WriteAllText(
+		$automationSourcePath,
+		@"
+release-json-parent|Icod.TermInfo release JSON planning parent,
+	cols#80,
+
+release-json-target|Icod.TermInfo release JSON planning target,
+	am,
+	cols#80,
+"@,
+		[System.Text.UTF8Encoding]::new( $false )
+	)
+	[void] (
+		Invoke-ReleaseTool -Name 'tic' -Arguments @(
+			'-o',
+			$automationDatabaseRoot,
+			$automationSourcePath
+		)
+	)
+
+	$planDocument = Invoke-ReleaseTool -Name 'infocmp' -Arguments @(
+		'--json',
+		'--plan-use',
+		'--all-candidates',
+		'--max-parents',
+		'1',
+		'-A',
+		$automationDatabaseRoot,
+		'-B',
+		$automationDatabaseRoot,
+		'release-json-target'
+	) | ConvertFrom-Json -Depth 100
+	if ( 'sourcePlan' -cne $planDocument.documentKind ) {
+		throw 'infocmp all-candidates JSON did not emit a sourcePlan document.'
+	}
+	if ( $planDocument.data.source.Contains( 'use=release-json-target' ) ) {
+		throw 'infocmp all-candidates planning failed to exclude the target.'
+	}
+
 	$toeOutput = Invoke-ReleaseTool -Name 'toe' -Arguments @(
 		'-s',
 		$databaseRoot
 	)
 	if ( -not $toeOutput.Contains( 'release-smoke' ) ) {
 		throw 'toe did not enumerate the entry published by tic.'
+	}
+
+	$catalogDocument = Invoke-ReleaseTool -Name 'toe' -Arguments @(
+		'--json',
+		$databaseRoot
+	) | ConvertFrom-Json -Depth 100
+	if ( 'databaseCatalog' -cne $catalogDocument.documentKind ) {
+		throw 'toe JSON did not emit a databaseCatalog document.'
+	}
+	if ( 'conventionalDirectory' -cne $catalogDocument.data.kind ) {
+		throw 'toe JSON did not report a conventional directory.'
 	}
 
 	$termcapPath = Join-Path $workRoot 'release-smoke.cap'

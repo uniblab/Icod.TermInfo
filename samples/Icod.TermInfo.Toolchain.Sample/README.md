@@ -3,6 +3,10 @@
 This sample demonstrates the reusable managed toolchain without invoking
 `tic`, `infocmp`, `toe`, or the `icod-terminfo` router.
 
+MI07 freezes this sample's exact `sourcePlan` fixture and the release verifier's
+two-process byte-equality check. The Alpha-7 to stable 1.9 transition changes no
+sample step or JSON byte.
+
 It composes:
 
 ```text
@@ -28,6 +32,9 @@ Icod.TermInfo
         v
 Icod.TermInfo.Inspection
     compare acquired state with the original target
+        |
+        v
+    render the immutable plan as version-1 JSON
 ```
 
 The source contains a useful base, a decoy candidate, and a child using `use=`
@@ -53,9 +60,16 @@ dotnet run --project samples/Icod.TermInfo.Toolchain.Sample/Icod.TermInfo.Toolch
 
 The project also targets `net8.0` and `net9.0`.
 
-RP08 freezes this sample as release evidence for the final 1.8 public planning
-surface. The release verifier executes it in two separate processes and rejects
-any byte difference in their output.
+MI06 extends the RP08 sample by writing the exact compact `sourcePlan` JSON
+document after the full semantic path succeeds. To verify the checked-in
+cross-host fixture while running the sample:
+
+```text
+dotnet run --project samples/Icod.TermInfo.Toolchain.Sample/Icod.TermInfo.Toolchain.Sample.csproj -f net10.0 -- --verify-fixture samples/Icod.TermInfo.Toolchain.Sample/expected-source-plan.json
+```
+
+The release verifier executes this form in two separate processes and rejects
+any byte difference between the outputs or against the fixture.
 
 The sample is deterministic:
 
@@ -63,8 +77,9 @@ The sample is deterministic:
 - it does not invoke native ncurses tools;
 - it writes only beneath a unique temporary directory;
 - it deletes that directory before exit;
-- it produces identical output across repeated process executions;
+- it produces identical source-plan JSON across repeated process executions;
 - release validation executes the `net10.0` path on Windows, Linux, and macOS.
 
-The planned child entry is written to standard output only after the complete
-plan -> synthesize -> compile -> publish -> reacquire -> compare path succeeds.
+One version-1 `sourcePlan` document followed by one LF is written to standard
+output only after the complete plan -> synthesize -> compile -> publish ->
+reacquire -> compare path succeeds.

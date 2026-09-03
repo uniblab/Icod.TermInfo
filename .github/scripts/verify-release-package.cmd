@@ -96,12 +96,13 @@ if errorlevel 1 goto fail
 dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c %CONFIGURATION% --no-build -- --compare Icod.TermInfo.Inspection\bin\%CONFIGURATION%\net8.0\Icod.TermInfo.Inspection.dll Icod.TermInfo.Inspection\bin\%CONFIGURATION%\net10.0\Icod.TermInfo.Inspection.dll
 if errorlevel 1 goto fail
 
-rem The frozen 1.7 Inspection baseline remains immutable historical evidence:
+rem The frozen 1.7 and 1.8 Inspection baselines remain immutable historical
+rem evidence. MI07 freezes the complete additive 1.9 JSON surface independently.
 rem docs\1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt
-rem RP08 freezes the complete additive 1.8 planning surface independently.
+rem docs\1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt
 echo.
-echo === Verify approved Icod.TermInfo.Inspection 1.8 public API baseline (%CONFIGURATION%) ===
-dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c %CONFIGURATION% --no-build -- --check docs\1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt Icod.TermInfo.Inspection\bin\%CONFIGURATION%\net10.0\Icod.TermInfo.Inspection.dll
+echo === Verify approved Icod.TermInfo.Inspection 1.9 public API baseline (%CONFIGURATION%) ===
+dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c %CONFIGURATION% --no-build -- --check docs\1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt Icod.TermInfo.Inspection\bin\%CONFIGURATION%\net10.0\Icod.TermInfo.Inspection.dll
 if errorlevel 1 goto fail
 
 echo.
@@ -352,18 +353,19 @@ dotnet run --project samples\Icod.TermInfo.Sample\Icod.TermInfo.Sample.csproj -c
 if errorlevel 1 goto fail
 
 echo.
-echo === Deterministic planning/Source/Compiler/Inspection toolchain sample ===
-set "TOOLCHAIN_FIRST=%INSPECTION_SMOKE_ROOT%\rp07-toolchain-first.ti"
-set "TOOLCHAIN_SECOND=%INSPECTION_SMOKE_ROOT%\rp07-toolchain-second.ti"
-dotnet run --project samples\Icod.TermInfo.Toolchain.Sample\Icod.TermInfo.Toolchain.Sample.csproj -c %CONFIGURATION% -f net10.0 --no-build > "%TOOLCHAIN_FIRST%"
+echo === Deterministic planning/Source/Compiler/Inspection JSON toolchain sample ===
+set "TOOLCHAIN_FIXTURE=samples\Icod.TermInfo.Toolchain.Sample\expected-source-plan.json"
+set "TOOLCHAIN_FIRST=%INSPECTION_SMOKE_ROOT%\mi06-toolchain-first.json"
+set "TOOLCHAIN_SECOND=%INSPECTION_SMOKE_ROOT%\mi06-toolchain-second.json"
+dotnet run --project samples\Icod.TermInfo.Toolchain.Sample\Icod.TermInfo.Toolchain.Sample.csproj -c %CONFIGURATION% -f net10.0 --no-build -- --verify-fixture "%TOOLCHAIN_FIXTURE%" > "%TOOLCHAIN_FIRST%"
 if errorlevel 1 goto fail
-dotnet run --project samples\Icod.TermInfo.Toolchain.Sample\Icod.TermInfo.Toolchain.Sample.csproj -c %CONFIGURATION% -f net10.0 --no-build > "%TOOLCHAIN_SECOND%"
+dotnet run --project samples\Icod.TermInfo.Toolchain.Sample\Icod.TermInfo.Toolchain.Sample.csproj -c %CONFIGURATION% -f net10.0 --no-build -- --verify-fixture "%TOOLCHAIN_FIXTURE%" > "%TOOLCHAIN_SECOND%"
 if errorlevel 1 goto fail
 fc /b "%TOOLCHAIN_FIRST%" "%TOOLCHAIN_SECOND%" >nul
 if errorlevel 1 (
     type "%TOOLCHAIN_FIRST%"
     type "%TOOLCHAIN_SECOND%"
-    echo Toolchain planning output changed across separate process executions. 1>&2
+    echo Toolchain JSON output changed across separate process executions. 1>&2
     goto fail
 )
 type "%TOOLCHAIN_FIRST%"

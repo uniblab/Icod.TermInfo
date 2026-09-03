@@ -23,6 +23,8 @@ internal sealed class InfoCmpOptions {
 		bool includeExtendedCapabilities,
 		bool relativeSynthesis,
 		bool planning,
+		bool json,
+		bool allCandidates,
 		int maximumSelectedParentCount,
 		int maximumEvaluatedPlanCount,
 		bool allowNonExhaustiveResult,
@@ -76,15 +78,30 @@ internal sealed class InfoCmpOptions {
 				"Relative synthesis and planning are mutually exclusive."
 			);
 		}
+		if ( allCandidates && !planning ) {
+			throw new ArgumentException(
+				"All-candidates mode requires relative-source planning.",
+				nameof( allCandidates )
+			);
+		}
 
 		string[] names = terminalNames.ToArray();
 		foreach ( string name in names ) {
 			ArgumentException.ThrowIfNullOrWhiteSpace( name );
 		}
 		if ( relativeSynthesis || planning ) {
-			if ( names.Length < 2 ) {
+			if ( relativeSynthesis && names.Length < 2 ) {
 				throw new ArgumentException(
-					"Relative synthesis or planning requires a target and at least one candidate terminal.",
+					"Relative synthesis requires a target and at least one parent terminal.",
+					nameof( terminalNames )
+				);
+			}
+			if ( planning
+				&& ( allCandidates ? names.Length != 1 : names.Length < 2 ) ) {
+				throw new ArgumentException(
+					allCandidates
+						? "All-candidates planning requires exactly one target terminal."
+						: "Relative-source planning requires a target and at least one candidate terminal.",
 					nameof( terminalNames )
 				);
 			}
@@ -125,6 +142,8 @@ internal sealed class InfoCmpOptions {
 		IncludeExtendedCapabilities = includeExtendedCapabilities;
 		RelativeSynthesis = relativeSynthesis;
 		Planning = planning;
+		Json = json;
+		AllCandidates = allCandidates;
 		MaximumSelectedParentCount = maximumSelectedParentCount;
 		MaximumEvaluatedPlanCount = maximumEvaluatedPlanCount;
 		AllowNonExhaustiveResult = allowNonExhaustiveResult;
@@ -184,6 +203,14 @@ internal sealed class InfoCmpOptions {
 	}
 
 	internal bool Planning {
+		get;
+	}
+
+	internal bool Json {
+		get;
+	}
+
+	internal bool AllCandidates {
 		get;
 	}
 
@@ -274,6 +301,10 @@ internal static class InfoCmpOptionsParser {
 		bool includeExtendedCapabilities = false;
 		bool relativeSynthesis = false;
 		bool planning = false;
+		bool json = false;
+		bool jsonSpecified = false;
+		bool allCandidates = false;
+		bool allCandidatesSpecified = false;
 		int maximumSelectedParentCount =
 			TerminalDescriptionSourcePlanningOptions.DefaultMaximumSelectedParentCount;
 		bool maximumSelectedParentCountSpecified = false;
@@ -471,6 +502,26 @@ internal static class InfoCmpOptionsParser {
 						planning = true;
 						break;
 
+					case "--json":
+						if ( jsonSpecified ) {
+							return InfoCmpOptionsParseResult.Failure(
+								"option '--json' may be specified only once"
+							);
+						}
+						json = true;
+						jsonSpecified = true;
+						break;
+
+					case "--all-candidates":
+						if ( allCandidatesSpecified ) {
+							return InfoCmpOptionsParseResult.Failure(
+								"option '--all-candidates' may be specified only once"
+							);
+						}
+						allCandidates = true;
+						allCandidatesSpecified = true;
+						break;
+
 					case "--max-parents":
 						if ( maximumSelectedParentCountSpecified ) {
 							return InfoCmpOptionsParseResult.Failure(
@@ -596,6 +647,11 @@ internal static class InfoCmpOptionsParser {
 				"options '-u' and '--plan-use' are mutually exclusive"
 			);
 		}
+		if ( allCandidates && !planning ) {
+			return InfoCmpOptionsParseResult.Failure(
+				"option '--all-candidates' requires '--plan-use'"
+			);
+		}
 		if ( !planning
 			&& ( maximumSelectedParentCountSpecified
 				|| maximumEvaluatedPlanCountSpecified
@@ -604,14 +660,59 @@ internal static class InfoCmpOptionsParser {
 				"planning-bound options require '--plan-use'"
 			);
 		}
+		if ( json ) {
+			if ( relativeSynthesis ) {
+				return InfoCmpOptionsParseResult.Failure(
+					"option '--json' cannot be combined with '-u'"
+				);
+			}
+			if ( !planning
+				&& ( layout != TerminalDescriptionSourceLayout.Canonical
+					|| lineWidthSpecified
+					|| capabilityOrderSpecified
+					|| includeExtendedCapabilities ) ) {
+				return InfoCmpOptionsParseResult.Failure(
+					"options '-0', '-1', '-w', '-s', and '-x' cannot be combined with '--json' outside planning mode"
+				);
+			}
+			if ( !planning
+				&& comparisonMode.HasValue
+				&& comparisonMode.Value != InfoCmpComparisonMode.Differences ) {
+				return InfoCmpOptionsParseResult.Failure(
+					"options '-c' and '-n' cannot be combined with '--json'"
+				);
+			}
+			if ( !planning && shortComparison ) {
+				return InfoCmpOptionsParseResult.Failure(
+					"option '-q' cannot be combined with '--json'"
+				);
+			}
+			if ( !planning && terminalNames.Count > 2 ) {
+				return InfoCmpOptionsParseResult.Failure(
+					"option '--json' comparison accepts exactly two terminal operands"
+				);
+			}
+		}
 
 		if ( planning ) {
-			if ( terminalNames.Count < 2 ) {
+			if ( allCandidates ) {
+				if ( comparisonDatabaseDirectory is null ) {
+					return InfoCmpOptionsParseResult.Failure(
+						"option '--all-candidates' requires one explicit '-B directory'"
+					);
+				}
+				if ( terminalNames.Count != 1 ) {
+					return InfoCmpOptionsParseResult.Failure(
+						"option '--all-candidates' accepts exactly one target terminal operand"
+					);
+				}
+			} else if ( terminalNames.Count < 2 ) {
 				return InfoCmpOptionsParseResult.Failure(
 					"option '--plan-use' requires a target and at least one candidate terminal operand"
 				);
 			}
-			if ( terminalNames.Count - 1
+			if ( !allCandidates
+				&& terminalNames.Count - 1
 				> TerminalDescriptionSourcePlanningOptions.DefaultMaximumCandidateCount ) {
 				return InfoCmpOptionsParseResult.Failure(
 					$"option '--plan-use' accepts at most "
@@ -629,12 +730,14 @@ internal static class InfoCmpOptionsParser {
 				);
 			}
 
-			HashSet<string> candidateReferences = new( StringComparer.Ordinal );
-			for ( int index = 1; index < terminalNames.Count; index++ ) {
-				if ( !candidateReferences.Add( terminalNames[ index ] ) ) {
-					return InfoCmpOptionsParseResult.Failure(
-						$"planning candidate reference '{terminalNames[ index ]}' is duplicated"
-					);
+			if ( !allCandidates ) {
+				HashSet<string> candidateReferences = new( StringComparer.Ordinal );
+				for ( int index = 1; index < terminalNames.Count; index++ ) {
+					if ( !candidateReferences.Add( terminalNames[ index ] ) ) {
+						return InfoCmpOptionsParseResult.Failure(
+							$"planning candidate reference '{terminalNames[ index ]}' is duplicated"
+						);
+					}
 				}
 			}
 		} else if ( relativeSynthesis ) {
@@ -712,6 +815,8 @@ internal static class InfoCmpOptionsParser {
 				includeExtendedCapabilities,
 				relativeSynthesis,
 				planning,
+				json,
+				allCandidates,
 				maximumSelectedParentCount,
 				maximumEvaluatedPlanCount,
 				allowNonExhaustiveResult,

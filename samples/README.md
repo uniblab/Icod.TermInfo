@@ -4,11 +4,15 @@ The repository contains three executable API samples and one command-suite
 walkthrough. The API samples remain separate so acquisition examples stay easy
 to copy without mixing them with interactive terminal-control output. The
 Toolchain sample demonstrates the reusable Source -> Compiler -> Runtime ->
-Inspection flow, including 1.8 parent planning and 1.7 relative-source
-synthesis. RP08 freezes that deterministic plan, synthesize, compile, publish,
-reacquire, and compare path as release evidence, while ToolSuite demonstrates
-the coordinated five-command 1.8 suite: `tic`, `infocmp`, `toe`,
-`captoinfo`, and `infotocap`.
+Inspection flow, including 1.8 parent planning, 1.7 relative-source synthesis,
+and 1.9 source-plan JSON. MI06 freezes that deterministic plan, synthesize,
+compile, publish, reacquire, compare, and JSON-render path as cross-host release
+evidence. ToolSuite demonstrates the coordinated five-command suite: `tic`,
+`infocmp`, `toe`, `captoinfo`, and `infotocap`.
+
+MI07 adds no sample behavior. It freezes the Toolchain fixture, repeated-process
+JSON equality, and direct/routed ToolSuite commands as stable 1.9 release
+evidence.
 
 All three executable API sample projects target `net8.0`, `net9.0`, and
 `net10.0`. Every
@@ -64,10 +68,11 @@ See `Icod.TermInfo.Acquisition.Sample/README.md`.
 demonstration introduced for 1.5 and extended by RP07. It parses and resolves
 controlled `.ti` source, selects a useful parent from an explicit candidate set,
 compiles and publishes the planned source into a temporary conventional
-database, reloads the child entry through the Runtime provider, and verifies the
-acquired description through Inspection. It does not depend on the host `TERM`
-value or installed terminfo database. RP08 requires identical output from two
-separate release-verifier process executions.
+database, reloads the child entry through the Runtime provider, verifies the
+acquired description through Inspection, and renders the immutable plan as a
+version-1 JSON document. It does not depend on the host `TERM` value or
+installed terminfo database. MI06 requires fixture equality and identical JSON
+from two separate release-verifier process executions.
 
 Run it with:
 
@@ -79,7 +84,7 @@ See `Icod.TermInfo.Toolchain.Sample/README.md`.
 
 ## ToolSuite
 
-`ToolSuite` is a data-and-command walkthrough for the managed 1.8 command suite.
+`ToolSuite` is a data-and-command walkthrough for the managed 1.9 command suite.
 It uses controlled terminfo and termcap source files plus an explicit local
 database root, so the example does not depend on the host's installed terminfo or
 termcap databases.
@@ -89,7 +94,8 @@ synthesis through `infocmp -u`, explicit-candidate parent planning through
 `infocmp --plan-use`, direct and routed planning equivalence, generated-source
 validation, semantic comparison, conventional database enumeration,
 forward/reverse `use=` dependency reports, termcap-to-terminfo conversion, and
-terminfo-to-termcap round trips.
+terminfo-to-termcap round trips. MI06 adds all four version-1 JSON document
+kinds and direct/router automation equality.
 
 See `ToolSuite/README.md`.
 

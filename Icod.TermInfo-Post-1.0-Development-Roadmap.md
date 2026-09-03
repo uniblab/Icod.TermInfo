@@ -10,14 +10,15 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
-**Current coordinated version:** `1.8.0`
+**Current coordinated version:** `1.9.0`
 **Final 1.6 prerelease:** `1.6.0-Alpha-8`
 **Final 1.7 prerelease:** `1.7.0-Alpha-8`
 **Final 1.8 prerelease:** `1.8.0-Alpha-8`
-**Next development line:** post-1.8 demand-driven work
-**Status:** 1.8.0 stable release contract frozen
+**Final 1.9 prerelease:** `1.9.0-Alpha-7`
+**Next development line:** not yet selected
+**Status:** 1.9.0 stable release contract frozen
 **Current tranche:** Release closure - exact-main validation and publication
-**Primary objective:** Select deterministic, bounded, semantically valid ordered parents in Inspection without changing the frozen Runtime, Source, Compiler, Termcap, or 1.7 synthesis contracts.
+**Primary objective:** Render effective descriptions, comparisons, plans, and explicit catalogs as deterministic bounded versioned JSON, then compose that reusable representation through `infocmp` and `toe` without changing frozen lower-layer semantics.
 
 ---
 
@@ -88,6 +89,7 @@ in a new version-specific roadmap, not in the retired inventory.
 | **1.6.1** | Release-verifier hotfix | Restore caller NuGet-cache state before repository sample/toolchain validation; no public API or command-semantic changes |
 | **1.7.0** | Relative terminfo source synthesis | Synthesize deterministic relative `.ti` source in Inspection and expose it through `infocmp -u` |
 | **1.8.0** | Relative source planning | Select deterministic bounded ordered parents for the frozen 1.7 relative-source synthesizer |
+| **1.9.0** | Machine-readable inspection and planning automation | Render versioned deterministic JSON for Inspection values and expose explicit command automation without parsing human output |
 | **later** | Exotic storage/formats | Berkeley DB provider and historical Unix dialects as justified |
 
 The completed 1.5 release contract is recorded in
@@ -148,6 +150,22 @@ API, package and distribution topology, samples, release verifiers, and 1.8
 release audit at `1.8.0-Alpha-8` without adding another feature tranche. The
 stable 1.8.0 release promotes that validated Alpha-8 surface without semantic or
 public-API changes.
+
+Version 1.9.0 is governed by
+[`Icod.TermInfo-1.9.0-Machine-Readable-Inspection-and-Planning-Automation-Roadmap.md`](Icod.TermInfo-1.9.0-Machine-Readable-Inspection-and-Planning-Automation-Roadmap.md).
+MI01 adds the immutable bounded JSON options and typed renderer foundation,
+freezes the version-1 envelope and deterministic text contract, and leaves each
+payload deliberately non-operational until its owning tranche. MI02 renders
+effective descriptions. MI03 renders structured comparisons and complete
+relative-source planning evidence. MI04 renders explicit database-catalog
+manifests and publishes the completed version-1 JSON Schema. MI05 composes JSON
+through `infocmp` and `toe` and adds explicit-directory all-candidates planning.
+MI06 hardens samples, package consumers, router/archive execution, bounds, and
+cross-host determinism. MI07 freezes the exact 31-type Inspection API, complete
+version-1 JSON Schema, commands, package graph, samples, fixtures, router and
+archive topology, release verifiers, and release audit at `1.9.0-Alpha-7`
+without adding another feature tranche. Stable 1.9.0 promotes that validated
+Alpha-7 surface without semantic, public-API, schema, or command changes.
 
 The sequence is cumulative but intentionally modular. Applications which only need runtime terminfo SHALL continue to depend on `Icod.TermInfo` alone.
 

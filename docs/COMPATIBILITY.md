@@ -153,6 +153,76 @@ The 1.8 planner does not change 1.7 synthesis semantics, create intermediate
 parents, infer author intent, or introduce a production Compiler or Termcap
 dependency.
 
+## 1.9 machine-readable Inspection compatibility
+
+Inspection 1.9 adds a versioned deterministic JSON representation of existing
+immutable descriptions, comparison results, planning results, and explicit
+database catalogs. JSON is an output representation and does not become a
+second semantic model.
+
+MI01 freezes:
+
+- schema identifier `urn:icod:terminfo:inspection:json:1`;
+- schema version `1`;
+- top-level `schema`, `schemaVersion`, `documentKind`, and `data` property order;
+- `terminalDescription`, `comparison`, `sourcePlan`, and `databaseCatalog`
+  document-kind strings;
+- compact output by default and one reviewed indented form;
+- bounded UTF-8 output size;
+- typed renderer entry points and operation-local cancellation;
+- absence of caller-supplied converters, naming policies, encoders, or delegates.
+
+MI02 makes the `terminalDescription` payload operational. It freezes exact
+identity, immutable alias order, explicit JSON null for a missing description,
+typed capability objects, compiled database order for standard capabilities,
+and value-kind plus exact ordinal-name order for extended capabilities. Absent
+capabilities receive no defaults, and effective JSON contains neither source
+ancestry nor cancellation tombstones. Compact output has no trailing whitespace;
+the optional indented form uses LF and two spaces. Both forms enforce the exact
+final UTF-8 byte count and the default safe JSON escaping policy.
+
+MI03 makes `comparison` and `sourcePlan` payloads operational. Comparison JSON
+retains the existing difference order, exact difference kind, capability
+identity, typed values, and source-aware entry, field, index, and span evidence.
+Each left/right side uses a stable shape with explicit null for evidence which
+is absent by semantic design. Plan JSON retains ordered selected parent names,
+generated LF source, every frozen score component, selected candidate indices,
+evaluated-plan count, `isExhaustive`, and accepted candidate count. Rendering is
+a direct projection and does not recompute comparison or planning semantics.
+
+MI04 makes `databaseCatalog` operational. Catalog JSON retains the normalized
+root, explicit catalog kind, derived completeness, ordered entry path and
+identity summaries, ordered issue evidence, and ordered duplicate canonical
+names. Completeness is true only for a conventional directory with no issues;
+duplicate names remain visible ambiguity evidence. The complete draft 2020-12
+version-1 JSON Schema is published at
+`docs/Icod.TermInfo.Inspection.schema.json` and is packaged with Inspection.
+Once a payload field is published under version 1, its meaning and value kind
+shall not be repurposed. A breaking schema change requires a new schema version
+and identifier.
+
+Existing human-readable commands and the frozen 1.7 synthesis and 1.8 planning
+semantics remain unchanged. MI05 command JSON modes produce exactly one JSON
+document followed by one LF on successful stdout; diagnostics remain on stderr.
+`infocmp --json` projects the effective description, structured difference, or
+source plan already owned by Inspection. `toe --json directory` projects the
+exact explicit catalog, including incomplete catalog evidence. Explicit
+all-candidates planning requires `--plan-use`, exactly one target, and a
+caller-selected `-B` database directory; it never introduces implicit host-wide
+discovery.
+
+MI06 changes none of those contracts. The package-reference-only consumer,
+checked-in source-plan fixture, repeated-process sample, large and pathological
+inputs, exact UTF-8 boundaries, and tool-package/archive smoke require the same
+JSON bytes and meanings across `net8.0`, `net9.0`, `net10.0`, Windows, Linux,
+macOS, and representative non-default cultures.
+
+MI07 adds no feature behavior. It freezes the exact 31-type Inspection public
+surface, the version-1 JSON Schema fingerprint, existing command semantics,
+package dependency graph, sample and fixture evidence, and router/archive
+topology. Stable `1.9.0` promotes the green `1.9.0-Alpha-7` contract without a
+semantic, public-API, schema, package-graph, or command change.
+
 ## Runtime terminfo semantic compatibility
 
 The stable runtime responsibility includes:

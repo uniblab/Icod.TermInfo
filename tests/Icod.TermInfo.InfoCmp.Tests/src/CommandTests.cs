@@ -27,7 +27,7 @@ public sealed class CommandTests {
 	}
 
 	[Fact]
-	public async Task VersionReportsCoordinatedReleaseVersion() {
+	public async Task VersionReportsCoordinatedDevelopmentVersion() {
 		using var stdin = new MemoryStream();
 		using var stdout = new MemoryStream();
 		using var stderr = new MemoryStream();
@@ -40,7 +40,7 @@ public sealed class CommandTests {
 		);
 
 		Assert.Equal( CommandExitCodes.Success, status );
-		Assert.Contains( "1.8.0", ReadText( stdout ) );
+		Assert.Contains( "1.9.0", ReadText( stdout ) );
 		Assert.Empty( ReadText( stderr ) );
 	}
 

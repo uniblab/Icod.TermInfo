@@ -122,15 +122,16 @@ dotnet run \
   Icod.TermInfo.Inspection/bin/${configuration}/net8.0/Icod.TermInfo.Inspection.dll \
   Icod.TermInfo.Inspection/bin/${configuration}/net10.0/Icod.TermInfo.Inspection.dll
 
-# The frozen 1.7 Inspection baseline remains immutable historical evidence:
+# The frozen 1.7 and 1.8 Inspection baselines remain immutable historical
+# evidence. MI07 freezes the complete additive 1.9 JSON surface independently.
 # docs/1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt
-# RP08 freezes the complete additive 1.8 planning surface independently.
+# docs/1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt
 dotnet run \
   --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj \
   -c "${configuration}" \
   --no-build \
   -- --check \
-  docs/1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt \
+  docs/1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt \
   Icod.TermInfo.Inspection/bin/${configuration}/net10.0/Icod.TermInfo.Inspection.dll
 
 # Structural package, Source Link, dependency, and architecture verification.
@@ -481,24 +482,27 @@ dotnet run \
 # The deterministic library-toolchain sample must compose planning, synthesis,
 # compilation, publication, Runtime acquisition, and Inspection comparison
 # without depending on host terminfo state. Separate process executions must
-# produce byte-identical planned source.
-toolchain_first="${inspection_smoke_root}/rp07-toolchain-first.ti"
-toolchain_second="${inspection_smoke_root}/rp07-toolchain-second.ti"
+# produce byte-identical, fixture-matched source-plan JSON.
+toolchain_fixture="samples/Icod.TermInfo.Toolchain.Sample/expected-source-plan.json"
+toolchain_first="${inspection_smoke_root}/mi06-toolchain-first.json"
+toolchain_second="${inspection_smoke_root}/mi06-toolchain-second.json"
 dotnet run \
   --project samples/Icod.TermInfo.Toolchain.Sample/Icod.TermInfo.Toolchain.Sample.csproj \
   -c "${configuration}" \
   -f net10.0 \
   --no-build \
+  -- --verify-fixture "${toolchain_fixture}" \
   > "${toolchain_first}"
 dotnet run \
   --project samples/Icod.TermInfo.Toolchain.Sample/Icod.TermInfo.Toolchain.Sample.csproj \
   -c "${configuration}" \
   -f net10.0 \
   --no-build \
+  -- --verify-fixture "${toolchain_fixture}" \
   > "${toolchain_second}"
 if ! cmp -s "${toolchain_first}" "${toolchain_second}"; then
   diff -u "${toolchain_first}" "${toolchain_second}" >&2 || true
-  echo "Toolchain planning output changed across separate process executions." >&2
+  echo "Toolchain JSON output changed across separate process executions." >&2
   exit 1
 fi
 cat "${toolchain_first}"

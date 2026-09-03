@@ -260,6 +260,76 @@ release-plan-useful|release-plan-parent|Icod.TermInfo release planning parent,
 		throw 'Routed infocmp planning output did not reproduce the target semantics.'
 	}
 
+	$descriptionDocument = Invoke-Router -Arguments @(
+		'infocmp',
+		'--json',
+		'-A',
+		$databaseRoot,
+		'release-smoke'
+	) | ConvertFrom-Json -Depth 100
+	if ( 'terminalDescription' -cne $descriptionDocument.documentKind ) {
+		throw 'Routed infocmp JSON did not emit a terminalDescription document.'
+	}
+
+	$comparisonDocument = Invoke-Router -Arguments @(
+		'infocmp',
+		'--json',
+		'-d',
+		'-A',
+		$databaseRoot,
+		'-B',
+		$databaseRoot,
+		'release-smoke',
+		'release-plan-target'
+	) | ConvertFrom-Json -Depth 100
+	if ( 'comparison' -cne $comparisonDocument.documentKind ) {
+		throw 'Routed infocmp JSON did not emit a comparison document.'
+	}
+
+	$automationSourcePath = Join-Path $workRoot 'release-json-planning.ti'
+	$automationDatabaseRoot = Join-Path $workRoot 'json-terminfo'
+	[System.IO.Directory]::CreateDirectory( $automationDatabaseRoot ) | Out-Null
+	[System.IO.File]::WriteAllText(
+		$automationSourcePath,
+		@"
+release-json-parent|Icod.TermInfo release JSON planning parent,
+	cols#80,
+
+release-json-target|Icod.TermInfo release JSON planning target,
+	am,
+	cols#80,
+"@,
+		[System.Text.UTF8Encoding]::new( $false )
+	)
+	[void] (
+		Invoke-Router -Arguments @(
+			'tic',
+			'-o',
+			$automationDatabaseRoot,
+			$automationSourcePath
+		)
+	)
+
+	$planDocument = Invoke-Router -Arguments @(
+		'infocmp',
+		'--json',
+		'--plan-use',
+		'--all-candidates',
+		'--max-parents',
+		'1',
+		'-A',
+		$automationDatabaseRoot,
+		'-B',
+		$automationDatabaseRoot,
+		'release-json-target'
+	) | ConvertFrom-Json -Depth 100
+	if ( 'sourcePlan' -cne $planDocument.documentKind ) {
+		throw 'Routed infocmp all-candidates JSON did not emit a sourcePlan document.'
+	}
+	if ( $planDocument.data.source.Contains( 'use=release-json-target' ) ) {
+		throw 'Routed infocmp all-candidates planning failed to exclude the target.'
+	}
+
 	$toeOutput = Invoke-Router -Arguments @(
 		'toe',
 		'-s',
@@ -267,6 +337,18 @@ release-plan-useful|release-plan-parent|Icod.TermInfo release planning parent,
 	)
 	if ( -not $toeOutput.Contains( 'release-smoke' ) ) {
 		throw 'Routed toe did not enumerate the entry published by routed tic.'
+	}
+
+	$catalogDocument = Invoke-Router -Arguments @(
+		'toe',
+		'--json',
+		$databaseRoot
+	) | ConvertFrom-Json -Depth 100
+	if ( 'databaseCatalog' -cne $catalogDocument.documentKind ) {
+		throw 'Routed toe JSON did not emit a databaseCatalog document.'
+	}
+	if ( 'conventionalDirectory' -cne $catalogDocument.data.kind ) {
+		throw 'Routed toe JSON did not report a conventional directory.'
 	}
 
 	$termcapPath = Join-Path $workRoot 'release-smoke.cap'

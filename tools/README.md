@@ -16,8 +16,8 @@ the NuGet package.
   identity, documentation, symbol, and Source Link validation for
   `Icod.TermInfo.Compiler`.
 - `inspection-package-verifier` — structural, dependency, assembly identity,
-  documentation, symbol, and Source Link validation for
-  `Icod.TermInfo.Inspection`.
+  documentation, symbol, Source Link, and frozen version-1 JSON Schema
+  validation for `Icod.TermInfo.Inspection`.
 - `public-api-snapshot` — deterministic exhaustive reflection manifest for the
   frozen Runtime API and explicitly supplied assemblies such as
   `Icod.TermInfo.Source`, `Icod.TermInfo.Compiler`, and
