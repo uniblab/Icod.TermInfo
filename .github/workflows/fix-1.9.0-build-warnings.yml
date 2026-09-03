@@ -1,0 +1,112 @@
+name: Apply 1.9.0 warning fixes
+
+on:
+  push:
+    branches:
+      - fix_1.9.0_build_warnings
+    paths:
+      - .github/workflows/fix-1.9.0-build-warnings.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix_1.9.0_build_warnings
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+            10.0.x
+
+      - name: Apply focused warning fixes
+        shell: python
+        run: |
+          from pathlib import Path
+
+          replacements = {
+              "tests/Icod.TermInfo.Inspection.Tests/src/MI02TerminalDescriptionJsonTests.cs": [
+                  (
+                      'Assert.True( fixture.EndsWith( "\\n", StringComparison.Ordinal ) );',
+                      'Assert.EndsWith( "\\n", fixture, StringComparison.Ordinal );',
+                  ),
+              ],
+              "tests/Icod.TermInfo.Inspection.Tests/src/MI03ComparisonAndPlanJsonTests.cs": [
+                  (
+                      'Assert.True( fixture.EndsWith( "\\n", StringComparison.Ordinal ) );',
+                      'Assert.EndsWith( "\\n", fixture, StringComparison.Ordinal );',
+                  ),
+              ],
+              "tests/Icod.TermInfo.Inspection.Tests/src/MI04DatabaseCatalogJsonAndSchemaTests.cs": [
+                  (
+                      'Assert.True( fixture.EndsWith( "\\n", StringComparison.Ordinal ) );',
+                      'Assert.EndsWith( "\\n", fixture, StringComparison.Ordinal );',
+                  ),
+                  (
+                      '''entries[ index ]
+					.GetProperty( "aliases" )
+					.EnumerateArray()
+					.Select( value => value.GetString() )
+					.ToArray()''',
+                      '''entries[ index ]
+					.GetProperty( "aliases" )
+					.EnumerateArray()
+					.Select( value => value.GetString()! )
+					.ToArray()''',
+                  ),
+                  (
+                      '''data
+				.GetProperty( "duplicateCanonicalNames" )
+				.EnumerateArray()
+				.Select( value => value.GetString() )
+				.ToArray()''',
+                      '''data
+				.GetProperty( "duplicateCanonicalNames" )
+				.EnumerateArray()
+				.Select( value => value.GetString()! )
+				.ToArray()''',
+                  ),
+              ],
+              "tests/Icod.TermInfo.Toe.Tests/src/MI05JsonCatalogCommandTests.cs": [
+                  (
+                      '''Assert.True(
+				result.Stdout.EndsWith( "\\n", StringComparison.Ordinal )
+			);''',
+                      '''Assert.EndsWith(
+				"\\n",
+				result.Stdout,
+				StringComparison.Ordinal
+			);''',
+                  ),
+              ],
+          }
+
+          for filename, file_replacements in replacements.items():
+              path = Path(filename)
+              text = path.read_text(encoding="utf-8")
+              for old, new in file_replacements:
+                  count = text.count(old)
+                  if count != 1:
+                      raise RuntimeError(
+                          f"Expected exactly one occurrence in {filename}, found {count}: {old!r}"
+                      )
+                  text = text.replace(old, new, 1)
+              path.write_text(text, encoding="utf-8", newline="\n")
+
+      - name: Build solution
+        run: dotnet build Icod.TermInfo.sln -c Debug
+
+      - name: Commit focused fixes
+        run: |
+          rm .github/workflows/fix-1.9.0-build-warnings.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Fix 1.9.0 build warnings"
+          git push origin HEAD:fix_1.9.0_build_warnings
