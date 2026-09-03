@@ -90,7 +90,7 @@ public sealed class MI04DatabaseCatalogJsonAndSchemaTests {
 				entries[ index ]
 					.GetProperty( "aliases" )
 					.EnumerateArray()
-					.Select( value => value.GetString() )
+					.Select( value => value.GetString()! )
 					.ToArray()
 			);
 			Assert.Equal(
@@ -104,7 +104,7 @@ public sealed class MI04DatabaseCatalogJsonAndSchemaTests {
 			data
 				.GetProperty( "duplicateCanonicalNames" )
 				.EnumerateArray()
-				.Select( value => value.GetString() )
+				.Select( value => value.GetString()! )
 				.ToArray()
 		);
 	}
@@ -536,7 +536,7 @@ public sealed class MI04DatabaseCatalogJsonAndSchemaTests {
 				.Replace( "\r\n", "\n", StringComparison.Ordinal )
 				.Replace( '\r', '\n' );
 
-		Assert.True( fixture.EndsWith( "\n", StringComparison.Ordinal ) );
+		Assert.EndsWith( "\n", fixture, StringComparison.Ordinal );
 		Assert.False( fixture.EndsWith( "\n\n", StringComparison.Ordinal ) );
 		return fixture[ ..^1 ];
 	}
