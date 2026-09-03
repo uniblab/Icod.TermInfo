@@ -4,7 +4,7 @@ namespace Icod.TermInfo.Inspection;
 /// Represents an immutable deterministic aggregation of caller-ordered explicit
 /// terminfo database catalogs.
 /// </summary>
-public sealed class TermInfoDatabaseSet {
+public sealed partial class TermInfoDatabaseSet {
 	internal TermInfoDatabaseSet(
 		IEnumerable<TermInfoDatabaseSetEntry> entries,
 		IEnumerable<TermInfoDatabaseSetIdentity> identities,

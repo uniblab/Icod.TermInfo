@@ -221,7 +221,7 @@ public sealed class MI07ReleaseClosureTests {
 			roadmap,
 			StringComparison.Ordinal );
 		Assert.Contains(
-			"DA02 - Deterministic multi-catalog inspection and precedence",
+			"DA03 - Semantic duplicate, conflict, alias, and shadow analysis",
 			activeRoadmap,
 			StringComparison.OrdinalIgnoreCase );
 	}

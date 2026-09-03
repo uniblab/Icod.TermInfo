@@ -3,6 +3,19 @@
 `Icod.TermInfo.Inspection` is the optional managed inspection and semantic-
 comparison layer for the `Icod.TermInfo` package family.
 
+## 1.10 DA03 semantic duplicate, alias, and shadow analysis
+
+`1.10.0-Alpha-3` adds bounded winner-versus-shadow semantic classification for
+repeated canonical identities and deterministic alias collision analysis.
+Observed conflicts retain the frozen `TermInfoComparisonResult`; alias ownership
+collisions distinguish multiple canonical owners and alias-to-canonical-name
+collisions, while incomplete input remains explicitly indeterminate. No all-pairs
+comparison, compiled-byte equality, command output, or new JSON document kind is
+introduced.
+
+See
+`docs/1.10.0-DA03-SEMANTIC-DUPLICATE-CONFLICT-ALIAS-AND-SHADOW-ANALYSIS.md`.
+
 ## 1.10 DA02 deterministic database-set precedence
 
 `1.10.0-Alpha-2` makes the DA01 ordered database-set model operational for exact
