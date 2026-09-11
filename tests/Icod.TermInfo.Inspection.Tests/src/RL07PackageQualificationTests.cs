@@ -123,6 +123,85 @@ public sealed class RL07PackageQualificationTests {
 		);
 	}
 
+	[Fact]
+	public void LifecycleSampleUsesOnlyInspectionAndIsWiredIntoArtifactVerification() {
+		string root = FindRepositoryRoot();
+		string sampleDirectory = Path.Combine(
+			root,
+			"samples",
+			"Icod.TermInfo.PersistentRasterLifecycle.Sample"
+		);
+		string projectPath = Path.Combine(
+			sampleDirectory,
+			"Icod.TermInfo.PersistentRasterLifecycle.Sample.csproj"
+		);
+		string sourcePath = Path.Combine(
+			sampleDirectory,
+			"Program.cs"
+		);
+		Assert.True(
+			File.Exists( projectPath ),
+			"RL07 must provide a reusable persistent-raster lifecycle consumer sample."
+		);
+		Assert.True(
+			File.Exists( sourcePath ),
+			"RL07 lifecycle sample must include executable source."
+		);
+
+		XDocument project = XDocument.Load( projectPath );
+		XElement projectReference = Assert.Single(
+			project
+				.Descendants()
+				.Where(
+					element => element.Name.LocalName == "ProjectReference"
+				)
+		);
+		Assert.EndsWith(
+			"Icod.TermInfo.Inspection.csproj",
+			projectReference.Attribute( "Include" )?.Value,
+			StringComparison.Ordinal
+		);
+		Assert.DoesNotContain(
+			project.Descendants(),
+			element => element.Name.LocalName == "PackageReference"
+		);
+
+		string source = File.ReadAllText( sourcePath );
+		Assert.Contains(
+			"PersistentRasterLifecycleInspector.Inspect",
+			source,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"PersistentRasterLifecycleEvidenceKind.Verified",
+			source,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"PersistentRasterLifecyclePlanner.Plan",
+			source,
+			StringComparison.Ordinal
+		);
+		Assert.DoesNotContain(
+			"Icod.Terminal",
+			source,
+			StringComparison.Ordinal
+		);
+
+		string packageVerification = File.ReadAllText(
+			Path.Combine(
+				root,
+				"packaging",
+				"VerifyPackageArtifact.ps1"
+			)
+		);
+		Assert.Contains(
+			"Icod.TermInfo.PersistentRasterLifecycle.Sample",
+			packageVerification,
+			StringComparison.Ordinal
+		);
+	}
+
 	private static string FindRepositoryRoot() {
 		DirectoryInfo? current = new( AppContext.BaseDirectory );
 		while ( current is not null ) {
