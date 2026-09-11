@@ -19,6 +19,8 @@ internal static class Program {
 		"76578f421b254802d24453af6868edaf8c23c4b78a87c7e8ef86b233ff0e8500";
 	private const string ExpectedJsonSchemaV2Sha256 =
 		"ae4d53608881344e902f02303c71e2d432500969e60cfb005d70feea607499d0";
+	private const string ExpectedJsonSchemaV3Sha256 =
+		"33ca95aee120f84d0d160ac189f8ddb4db183361b7bd83885c99c1c8ed355a97";
 	private static readonly string[] TargetFrameworks = [
 		"net8.0",
 		"net9.0",
@@ -158,6 +160,7 @@ internal static class Program {
 			"README.md",
 			"docs/Icod.TermInfo.Inspection.schema.json",
 			"docs/Icod.TermInfo.Inspection.schema.v2.json",
+			"docs/Icod.TermInfo.Inspection.schema.v3.json",
 			"icon.png",
 		];
 		foreach ( string targetFramework in TargetFrameworks ) {
@@ -556,6 +559,66 @@ internal static class Program {
 			"Inspection package database automation JSON Schema does not define the frozen three document kinds."
 		);
 
+		ZipArchiveEntry schemaV3Entry =
+			package.GetEntry(
+				"docs/Icod.TermInfo.Inspection.schema.v3.json"
+			) ?? throw new InvalidOperationException(
+				"Inspection package does not contain the persistent-raster lifecycle JSON Schema."
+			);
+		string schemaV3;
+		using ( Stream stream = schemaV3Entry.Open() )
+		using ( StreamReader reader = new( stream, Encoding.UTF8 ) ) {
+			schemaV3 =
+				reader
+					.ReadToEnd()
+					.Replace( "\r\n", "\n", StringComparison.Ordinal )
+					.Replace( '\r', '\n' );
+		}
+		string schemaV3Sha256 =
+			Convert.ToHexString(
+				SHA256.HashData(
+					Encoding.UTF8.GetBytes( schemaV3 )
+				)
+			).ToLowerInvariant();
+		Require(
+			schemaV3Sha256 == ExpectedJsonSchemaV3Sha256,
+			$"Inspection package persistent-raster lifecycle JSON Schema fingerprint '{schemaV3Sha256}' does not match the frozen version-3 fingerprint."
+		);
+		using JsonDocument documentV3 = JsonDocument.Parse( schemaV3 );
+		JsonElement rootV3 = documentV3.RootElement;
+		Require(
+			rootV3.GetProperty( "$schema" ).GetString()
+				== "https://json-schema.org/draft/2020-12/schema",
+			"Inspection package persistent-raster lifecycle JSON Schema does not identify draft 2020-12."
+		);
+		Require(
+			rootV3.GetProperty( "$id" ).GetString()
+				== "urn:icod:terminfo:inspection:json:3",
+			"Inspection package persistent-raster lifecycle JSON Schema does not identify schema version 3."
+		);
+		Require(
+			rootV3.GetProperty( "oneOf" ).GetArrayLength() == 2,
+			"Inspection package persistent-raster lifecycle JSON Schema does not define both document kinds."
+		);
+		string[] documentReferencesV3 =
+			rootV3
+				.GetProperty( "oneOf" )
+				.EnumerateArray()
+				.Select(
+					branch => branch.GetProperty( "$ref" ).GetString()
+				)
+				.Cast<string>()
+				.ToArray();
+		Require(
+			documentReferencesV3.SequenceEqual(
+				new[] {
+					"#/$defs/persistentRasterLifecycleProfileDocument",
+					"#/$defs/persistentRasterLifecyclePlanDocument",
+				},
+				StringComparer.Ordinal
+			),
+			"Inspection package persistent-raster lifecycle JSON Schema does not define the reviewed two document kinds."
+		);
 	}
 
 	private static void VerifyAssemblyIdentity(
