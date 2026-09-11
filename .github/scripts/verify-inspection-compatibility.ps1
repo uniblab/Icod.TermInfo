@@ -16,6 +16,7 @@ $repositoryRoot = [System.IO.Path]::GetFullPath(
 $baselinePath = Join-Path $repositoryRoot 'docs/1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt'
 $approvedAdditionsPath = Join-Path $repositoryRoot 'docs/1.11.0-INSPECTION-PUBLIC-API-ADDITIONS.txt'
 $approvedMembersPath = Join-Path $repositoryRoot 'docs/1.11.0-INSPECTION-PUBLIC-API-ADDITIVE-MEMBERS.txt'
+$oneElevenApiSha256 = '69c7350d5d44d502ecf1698c8fe1c1336f03d38eb1a36e36219f50ac33585a86'
 $assemblyFullPath = if ([System.IO.Path]::IsPathRooted($AssemblyPath)) {
     [System.IO.Path]::GetFullPath($AssemblyPath)
 } else {
@@ -42,6 +43,19 @@ function Normalize-Text {
     )
 
     return (($Text -replace "`r`n", "`n" -replace "`r", "`n").TrimEnd("`n") + "`n")
+}
+
+function Get-NormalizedSha256 {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Text
+    )
+
+    $normalized = Normalize-Text -Text $Text
+    $bytes = [System.Text.Encoding]::UTF8.GetBytes($normalized)
+    return [Convert]::ToHexString(
+        [System.Security.Cryptography.SHA256]::HashData($bytes)
+    ).ToLowerInvariant()
 }
 
 function Read-ApprovedOneElevenTypes {
@@ -268,6 +282,11 @@ try {
 
         $frozen = Normalize-Text -Text ([System.IO.File]::ReadAllText($baselinePath))
         $current = [System.IO.File]::ReadAllText($temporaryManifest)
+        $currentSha256 = Get-NormalizedSha256 -Text $current
+        if (-not [string]::Equals($oneElevenApiSha256, $currentSha256, [System.StringComparison]::Ordinal)) {
+            throw "Icod.TermInfo.Inspection current 1.11 public API fingerprint changed. Expected $oneElevenApiSha256, actual $currentSha256."
+        }
+
         $approvedMembers = Read-ApprovedOneElevenMembers -Path $approvedMembersPath
         $memberFiltered = Remove-ApprovedOneElevenMembers `
             -Manifest $current `
@@ -281,6 +300,7 @@ try {
             throw 'Icod.TermInfo.Inspection changed the frozen 1.10 public API outside explicitly approved 1.11 additions.'
         }
 
+        Write-Host "Verified exact 1.11 Inspection public API SHA-256 $currentSha256."
         Write-Host (
             "Verified frozen 1.10 Inspection API compatibility after excluding {0} explicitly approved 1.11 public type block(s) and {1} additive member(s)." -f `
                 $filtered.RemovedTypeCount, `
