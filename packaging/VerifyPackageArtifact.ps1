@@ -26,6 +26,14 @@ try {
     if (0 -ne $LASTEXITCODE) {
         throw "Package artifact verification exited with status $LASTEXITCODE."
     }
+
+    & pwsh -NoLogo -NoProfile -File `
+        .github/scripts/smoke-rl07-package-consumer.ps1 `
+        -ArtifactDirectory $ArtifactDirectory `
+        -Configuration $Configuration
+    if (0 -ne $LASTEXITCODE) {
+        throw "RL07 package-only lifecycle consumer exited with status $LASTEXITCODE."
+    }
 } finally {
     Pop-Location
 }
