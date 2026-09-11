@@ -52,7 +52,7 @@ try {
 		Join-Path $repositoryRoot 'tools/inspection-package-smoke/Program.cs'
 	) -Destination $workRoot
 	Copy-Item -LiteralPath (
-		Join-Path $repositoryRoot 'tools/inspection-package-smoke/RL07PersistentRasterLifecyclePackageSmoke.cs'
+		Join-Path $repositoryRoot 'tools/inspection-package-smoke/RL07LifecyclePackageSmoke.cs'
 	) -Destination $workRoot
 
 	$env:ICOD_TERMINFO_ARTIFACT_DIR = $artifactRoot
