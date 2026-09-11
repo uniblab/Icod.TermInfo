@@ -22,7 +22,7 @@
 		<Title>Icod.TermInfo.Inspection</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed inspection and semantic-comparison foundation for Icod.TermInfo. The 1.3 line provides canonical terminfo rendering and reusable infocmp-style comparison engines without enlarging the frozen Runtime, Source, or Compiler public contracts.</Description>
-		<PackageReleaseNotes>1.10.0 promotes the frozen and validated 1.10 Inspection API, additive version-2 database automation schema, package verification, command composition, DA07 hardening, and consumer sample/documentation closure while preserving the frozen version-1 JSON and all lower-layer contracts.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.11.0 adds protocol-neutral persistent-raster lifecycle evidence, classification, deterministic semantic planning, TerminalDescription/database-set composition, and additive version-3 profile/plan JSON automation, with package-only downstream qualification and no dependency on Icod.Terminal.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>
