@@ -34,6 +34,25 @@ try {
     if (0 -ne $LASTEXITCODE) {
         throw "RL07 package-only lifecycle consumer exited with status $LASTEXITCODE."
     }
+
+    $lifecycleSampleProject = Join-Path `
+        $repositoryRoot `
+        'samples/Icod.TermInfo.PersistentRasterLifecycle.Sample/Icod.TermInfo.PersistentRasterLifecycle.Sample.csproj'
+    & dotnet restore $lifecycleSampleProject
+    if (0 -ne $LASTEXITCODE) {
+        throw 'RL07 persistent-raster lifecycle sample restore failed.'
+    }
+
+    foreach ($framework in @('net8.0', 'net9.0', 'net10.0')) {
+        & dotnet run `
+            --project $lifecycleSampleProject `
+            -c $Configuration `
+            -f $framework `
+            --no-restore
+        if (0 -ne $LASTEXITCODE) {
+            throw "RL07 persistent-raster lifecycle sample failed on $framework."
+        }
+    }
 } finally {
     Pop-Location
 }
