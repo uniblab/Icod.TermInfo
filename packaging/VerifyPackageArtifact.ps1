@@ -53,6 +53,21 @@ try {
             throw "RL07 persistent-raster lifecycle sample failed on $framework."
         }
     }
+
+    $inspectionApiManifest = Join-Path `
+        $ArtifactDirectory `
+        'Icod.TermInfo.Inspection.current-public-api.txt'
+    & dotnet run `
+        --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj `
+        -c $Configuration `
+        --no-build `
+        -- `
+        --write `
+        $inspectionApiManifest `
+        "Icod.TermInfo.Inspection/bin/$Configuration/net10.0/Icod.TermInfo.Inspection.dll"
+    if (0 -ne $LASTEXITCODE) {
+        throw 'RL08 Inspection public API manifest generation failed.'
+    }
 } finally {
     Pop-Location
 }
