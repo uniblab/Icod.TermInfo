@@ -1,3 +1,7 @@
 # Icod.TermInfo.Inspection 1.11 approved additive public types
+Icod.TermInfo.Inspection.PersistentRasterLifecycleEvidence
+Icod.TermInfo.Inspection.PersistentRasterLifecycleEvidenceKind
+Icod.TermInfo.Inspection.PersistentRasterLifecycleEvidenceOptions
+Icod.TermInfo.Inspection.PersistentRasterLifecycleEvidenceSubject
 Icod.TermInfo.Inspection.PersistentRasterLifecycleOperation
 Icod.TermInfo.Inspection.PersistentRasterLifecycleSupportStatus
