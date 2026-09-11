@@ -1,9 +1,15 @@
 # Icod.TermInfo Samples
 
-The repository contains four executable API samples and one command-suite
+The repository contains five executable API samples and one command-suite
 walkthrough. The API samples remain separate so acquisition, terminal-control,
-toolchain, and multi-database examples stay easy to copy without mixing unrelated
-concerns.
+toolchain, multi-database, and persistent-raster lifecycle examples stay easy to
+copy without mixing unrelated concerns.
+
+The 1.11 addition is `Icod.TermInfo.PersistentRasterLifecycle.Sample`, an
+executable public-API walkthrough for protocol-neutral persistent-raster
+evidence, classification, planning, consumer-owned runtime verification, and the
+version-3 lifecycle JSON documents. It intentionally performs no terminal I/O
+and has no dependency on `Icod.Terminal`.
 
 The 1.10 addition is `Icod.TermInfo.DatabaseSet.Sample`, an executable public-API
 walkthrough for ordered explicit database sets, precedence, semantic shadow and
@@ -18,7 +24,7 @@ the coordinated five-command suite: `tic`, `infocmp`, `toe`, `captoinfo`, and
 `infotocap`, including both the frozen 1.9 version-1 JSON forms and the additive
 1.10 database-set automation forms.
 
-All four executable API sample projects target `net8.0`, `net9.0`, and
+All five executable API sample projects target `net8.0`, `net9.0`, and
 `net10.0`. Every `dotnet run` example therefore specifies a framework; substitute
 `-f net8.0` or `-f net9.0` when exercising those consumer targets.
 
@@ -109,6 +115,31 @@ dotnet run --project samples/Icod.TermInfo.DatabaseSet.Sample/Icod.TermInfo.Data
 
 See `Icod.TermInfo.DatabaseSet.Sample/README.md` and
 `../docs/1.10.0-MULTI-DATABASE-GUIDE.md`.
+
+## Icod.TermInfo.PersistentRasterLifecycle.Sample
+
+`Icod.TermInfo.PersistentRasterLifecycle.Sample` is the focused 1.11 reusable
+Inspection example. It begins with a controlled Sixel description and proves
+that ordinary raster-display evidence does not imply persistent upload or
+placement support. The initial lifecycle request is therefore indeterminate and
+requires runtime verification.
+
+The sample then adds explicit `Verified` evidence representing a result obtained
+by the consumer's own live/runtime verification layer. Reclassification turns
+that evidence into a successful protocol-neutral upload-plus-placement plan,
+which is rendered using the version-3 lifecycle JSON contract.
+
+The project references only `Icod.TermInfo.Inspection`. It does not perform live
+probing, transmit graphics, own terminal resource or placement identifiers, or
+depend on `Icod.Terminal`.
+
+Run it with:
+
+```text
+dotnet run --project samples/Icod.TermInfo.PersistentRasterLifecycle.Sample/Icod.TermInfo.PersistentRasterLifecycle.Sample.csproj -f net10.0
+```
+
+See `Icod.TermInfo.PersistentRasterLifecycle.Sample/README.md`.
 
 ## ToolSuite
 
