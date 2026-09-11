@@ -17,14 +17,13 @@ public sealed class ContractTests {
 				root,
 				"Directory.Build.props"
 			);
-		Assert.True(
+		Assert.StartsWith(
+			"1.11.0",
 			ReadRequiredProperty(
 				buildProperties,
 				"IcodTermInfoSuiteVersion"
-			).StartsWith(
-				"1.11.0",
-				StringComparison.Ordinal
-			)
+			),
+			StringComparison.Ordinal
 		);
 
 		foreach (
@@ -241,7 +240,6 @@ public sealed class ContractTests {
 						current.FullName,
 						"Icod.TermInfo.sln"
 					)
-				)
 			) {
 				return current.FullName;
 			}
