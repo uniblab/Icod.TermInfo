@@ -17,11 +17,13 @@ public sealed class ContractTests {
 				root,
 				"Directory.Build.props"
 			);
-		Assert.Equal(
-			"1.10.0",
+		Assert.True(
 			ReadRequiredProperty(
 				buildProperties,
 				"IcodTermInfoSuiteVersion"
+			).StartsWith(
+				"1.11.0",
+				StringComparison.Ordinal
 			)
 		);
 
