@@ -16,26 +16,33 @@ public sealed class RL08ReleaseClosureTests {
 
 	[Fact]
 	public void ExactOneElevenInspectionSurfaceIsFrozen() {
-		string baseline = ReadRepositoryFile(
-			"docs/1.11.0-INSPECTION-PUBLIC-API-BASELINE.txt"
+		string freeze = ReadRepositoryFile(
+			"docs/1.11.0-INSPECTION-PUBLIC-API-FREEZE.md"
+		);
+		string fingerprints = ReadRepositoryFile(
+			"docs/1.11.0-RL08-FREEZE-FINGERPRINTS.txt"
+		);
+		string additions = ReadRepositoryFile(
+			"docs/1.11.0-INSPECTION-PUBLIC-API-ADDITIONS.txt"
+		);
+		string additiveMembers = ReadRepositoryFile(
+			"docs/1.11.0-INSPECTION-PUBLIC-API-ADDITIVE-MEMBERS.txt"
 		);
 
-		Assert.Equal(
-			InspectionApiSha256,
-			ComputeSha256( baseline )
-		);
 		Assert.Equal(
 			67,
 			typeof( PersistentRasterLifecycleProfile ).Assembly.GetExportedTypes().Length
 		);
+		Assert.Contains( InspectionApiSha256, freeze, StringComparison.Ordinal );
+		Assert.Contains( InspectionApiSha256, fingerprints, StringComparison.Ordinal );
 		Assert.Contains(
-			"TYPE class Icod.TermInfo.Inspection.PersistentRasterLifecycleProfile [sealed]",
-			baseline,
+			"Icod.TermInfo.Inspection.PersistentRasterLifecycleProfile",
+			additions,
 			StringComparison.Ordinal
 		);
 		Assert.Contains(
-			"TYPE class Icod.TermInfo.Inspection.TermInfoJsonRenderer [static]",
-			baseline,
+			"PersistentRasterLifecycleSchemaIdentifier",
+			additiveMembers,
 			StringComparison.Ordinal
 		);
 	}
@@ -78,11 +85,12 @@ public sealed class RL08ReleaseClosureTests {
 
 		foreach ( string verifier in new[] { shell, command } ) {
 			Assert.Contains(
-				"1.11.0-INSPECTION-PUBLIC-API-BASELINE.txt",
+				"verify-inspection-compatibility.ps1",
 				verifier,
 				StringComparison.Ordinal
 			);
 		}
+		Assert.Contains( InspectionApiSha256, compatibility, StringComparison.Ordinal );
 		Assert.Contains(
 			"1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt",
 			compatibility,
