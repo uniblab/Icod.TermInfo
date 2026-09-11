@@ -113,6 +113,10 @@ public sealed class RL06PersistentRasterLifecycleJsonTests {
 			"docs",
 			"Icod.TermInfo.Inspection.schema.v3.json"
 		);
+		Assert.Equal(
+			"33ca95aee120f84d0d160ac189f8ddb4db183361b7bd83885c99c1c8ed355a97",
+			NormalizedLfSha256( schemaPath )
+		);
 		using JsonDocument schema =
 			JsonDocument.Parse(
 				File.ReadAllText( schemaPath )
@@ -141,6 +145,24 @@ public sealed class RL06PersistentRasterLifecycleJsonTests {
 		Assert.Contains(
 			"Icod.TermInfo.Inspection.schema.v3.json",
 			projectText,
+			StringComparison.Ordinal
+		);
+		string packageVerifier = File.ReadAllText(
+			Path.Combine(
+				root,
+				"tools",
+				"inspection-package-verifier",
+				"Program.cs"
+			)
+		);
+		Assert.Contains(
+			"Icod.TermInfo.Inspection.schema.v3.json",
+			packageVerifier,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"33ca95aee120f84d0d160ac189f8ddb4db183361b7bd83885c99c1c8ed355a97",
+			packageVerifier,
 			StringComparison.Ordinal
 		);
 	}
