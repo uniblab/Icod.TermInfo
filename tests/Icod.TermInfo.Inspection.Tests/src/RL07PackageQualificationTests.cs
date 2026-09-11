@@ -25,12 +25,9 @@ public sealed class RL07PackageQualificationTests {
 			"Icod.TermInfo.Inspection",
 			packageReference.Attribute( "Include" )?.Value
 		);
-		Assert.Empty(
-			project
-				.Descendants()
-				.Where(
-					element => element.Name.LocalName == "ProjectReference"
-				)
+		Assert.DoesNotContain(
+			project.Descendants(),
+			element => element.Name.LocalName == "ProjectReference"
 		);
 	}
 
