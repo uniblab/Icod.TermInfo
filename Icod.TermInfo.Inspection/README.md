@@ -3,6 +3,35 @@
 `Icod.TermInfo.Inspection` is the optional managed inspection and semantic-
 comparison layer for the `Icod.TermInfo` package family.
 
+## 1.11 RL08 release candidate
+
+`1.11.0-Alpha-8` freezes the complete additive persistent-raster lifecycle
+surface introduced by RL01-RL07. The new contract is protocol-neutral:
+Inspection owns immutable evidence, provenance, classification, contradiction,
+uncertainty, deterministic semantic planning, description/database-set
+composition, and version-3 machine-readable profile/plan documents. Live
+terminal verification, protocol execution, resource and placement identities,
+generation invalidation, acknowledgements, and cleanup remain outside TermInfo.
+
+The complete 1.11 Inspection reflection manifest has normalized-LF SHA-256
+`69c7350d5d44d502ecf1698c8fe1c1336f03d38eb1a36e36219f50ac33585a86`.
+Release verification also removes only the exact reviewed 1.11 type/member delta
+and requires the remainder to equal the frozen 1.10 API byte-for-byte. The
+composite freeze is documented in
+`docs/1.11.0-INSPECTION-PUBLIC-API-FREEZE.md`.
+
+Version 1 and version 2 JSON contracts remain immutable. Version 3 is additive
+and contains exactly `persistentRasterLifecycleProfile` and
+`persistentRasterLifecyclePlan`; the three exact schema fingerprints are
+recorded in `docs/1.11.0-RL08-FREEZE-FINGERPRINTS.txt`.
+
+For consumer-facing use, see
+`docs/1.11.0-PERSISTENT-RASTER-LIFECYCLE-GUIDE.md` and
+`samples/Icod.TermInfo.PersistentRasterLifecycle.Sample/README.md`. The
+NuGet-only qualification consumer and the checked-in sample are permanently run
+on `net8.0`, `net9.0`, and `net10.0` by release validation. See
+`docs/1.11.0-RELEASE-AUDIT.md` for release-closure evidence.
+
 ## 1.10 DA08 release freeze
 
 `1.10.0-Alpha-8` freezes the complete 51-type additive 1.10 Inspection surface,
@@ -297,7 +326,6 @@ reviewed command and distribution contract.
 `1.8.0-Alpha-5` composes the bounded planner with an explicit
 `TermInfoDatabaseCatalog` or one explicit conventional database directory. It
 does not consult environment discovery or platform default database locations.
-
 ```csharp
 TerminalDescriptionSourcePlan plan =
 	TerminalDescriptionSourcePlanner.PlanFromDirectory(
@@ -494,7 +522,7 @@ and Source packages.
 ## Install
 
 ```text
-dotnet add package Icod.TermInfo.Inspection --version 1.9.0
+dotnet add package Icod.TermInfo.Inspection --version 1.10.0
 ```
 
 The package targets `net8.0`, `net9.0`, and `net10.0`, depends on matching
@@ -953,7 +981,8 @@ framework guarantees continue through 1.6.0.
 - `Icod.TermInfo.Source` owns `.ti` lexical, parsing, and inheritance semantics.
 - `Icod.TermInfo.Compiler` owns deterministic compiled-entry/database writing.
 - `Icod.TermInfo.Inspection` owns canonical human-readable representation,
-  relative-source synthesis, semantic comparison, inspection orchestration, and
-  read-only database catalog inspection.
+  relative-source synthesis, semantic comparison, inspection orchestration,
+  read-only database catalog inspection, and persistent-raster lifecycle
+  evidence, classification, and semantic planning.
 
 Command-line parsing and `infocmp` executable policy remain outside this package.
