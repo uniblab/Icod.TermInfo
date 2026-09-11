@@ -354,9 +354,11 @@ public sealed class RL03PersistentRasterLifecycleClassificationTests {
 			);
 
 		Assert.Throws<ArgumentOutOfRangeException>(
-			() => profile.GetStatus(
-				(PersistentRasterLifecycleEvidenceSubject)99
-			)
+			() => {
+				_ = profile.GetStatus(
+					(PersistentRasterLifecycleEvidenceSubject)99
+				);
+			}
 		);
 	}
 
