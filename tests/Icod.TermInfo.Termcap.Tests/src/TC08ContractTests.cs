@@ -23,11 +23,10 @@ public sealed class TC08ContractTests {
 			.Single( element => element.Name.LocalName == "IcodTermInfoSuiteVersion" )
 			.Value
 			.Trim();
-		Assert.True(
-			currentVersion.StartsWith(
-				CurrentDevelopmentVersion,
-				StringComparison.Ordinal
-			)
+		Assert.StartsWith(
+			CurrentDevelopmentVersion,
+			currentVersion,
+			StringComparison.Ordinal
 		);
 
 		string tc07 =
