@@ -1,0 +1,7 @@
+# Icod.TermInfo.Inspection 1.11 approved additive members on frozen 1.10 public types
+  FIELD public static const System.Int32 PersistentRasterLifecycleSchemaVersion null=not-null/not-null value=3
+  FIELD public static const System.String PersistentRasterLifecycleSchemaIdentifier null=not-null/not-null value="urn:icod:terminfo:inspection:json:3"
+  METHOD public static System.String Render(Icod.TermInfo.Inspection.PersistentRasterLifecyclePlan plan null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.String Render(Icod.TermInfo.Inspection.PersistentRasterLifecyclePlan plan null=not-null/not-null, Icod.TermInfo.Inspection.TermInfoJsonRendererOptions options null=not-null/not-null, System.Threading.CancellationToken cancellationToken null=not-null/not-null default=null) return-null=not-null/not-null
+  METHOD public static System.String Render(Icod.TermInfo.Inspection.PersistentRasterLifecycleProfile profile null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.String Render(Icod.TermInfo.Inspection.PersistentRasterLifecycleProfile profile null=not-null/not-null, Icod.TermInfo.Inspection.TermInfoJsonRendererOptions options null=not-null/not-null, System.Threading.CancellationToken cancellationToken null=not-null/not-null default=null) return-null=not-null/not-null

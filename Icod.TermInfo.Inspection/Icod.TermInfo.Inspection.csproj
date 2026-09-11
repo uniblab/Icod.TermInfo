@@ -79,6 +79,7 @@
 		<None Include="README.md" Pack="true" PackagePath="\" />
 		<None Include="..\docs\Icod.TermInfo.Inspection.schema.json" Link="Icod.TermInfo.Inspection.schema.json" Pack="true" PackagePath="docs\" />
 		<None Include="..\docs\Icod.TermInfo.Inspection.schema.v2.json" Link="Icod.TermInfo.Inspection.schema.v2.json" Pack="true" PackagePath="docs\" />
+		<None Include="..\docs\Icod.TermInfo.Inspection.schema.v3.json" Link="Icod.TermInfo.Inspection.schema.v3.json" Pack="true" PackagePath="docs\" />
 		<None Include="..\icon.png" Link="icon.png" Pack="true" PackagePath="" />
 		<None Include="..\LICENSE" Link="LICENSE" Pack="true" PackagePath="\" />
 	</ItemGroup>

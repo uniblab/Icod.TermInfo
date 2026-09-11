@@ -15,6 +15,7 @@ $repositoryRoot = [System.IO.Path]::GetFullPath(
 )
 $baselinePath = Join-Path $repositoryRoot 'docs/1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt'
 $approvedAdditionsPath = Join-Path $repositoryRoot 'docs/1.11.0-INSPECTION-PUBLIC-API-ADDITIONS.txt'
+$approvedMembersPath = Join-Path $repositoryRoot 'docs/1.11.0-INSPECTION-PUBLIC-API-ADDITIVE-MEMBERS.txt'
 $assemblyFullPath = if ([System.IO.Path]::IsPathRooted($AssemblyPath)) {
     [System.IO.Path]::GetFullPath($AssemblyPath)
 } else {
@@ -26,6 +27,9 @@ if (-not (Test-Path -LiteralPath $baselinePath -PathType Leaf)) {
 }
 if (-not (Test-Path -LiteralPath $approvedAdditionsPath -PathType Leaf)) {
     throw "Approved 1.11 Inspection API additions file not found: $approvedAdditionsPath"
+}
+if (-not (Test-Path -LiteralPath $approvedMembersPath -PathType Leaf)) {
+    throw "Approved 1.11 Inspection API additive members file not found: $approvedMembersPath"
 }
 if (-not (Test-Path -LiteralPath $assemblyFullPath -PathType Leaf)) {
     throw "Inspection assembly not found: $assemblyFullPath"
@@ -72,6 +76,111 @@ function Read-ApprovedOneElevenTypes {
     }
 
     return $approved
+}
+
+function Read-ApprovedOneElevenMembers {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Path
+    )
+
+    $approved = [System.Collections.Generic.HashSet[string]]::new(
+        [System.StringComparer]::Ordinal
+    )
+    foreach ($line in [System.IO.File]::ReadAllLines($Path)) {
+        $candidate = $line.TrimEnd()
+        $classification = $candidate.Trim()
+        if (
+            $classification.Length -eq 0
+            -or $classification.StartsWith('#', [System.StringComparison]::Ordinal)
+        ) {
+            continue
+        }
+        if (
+            -not $candidate.StartsWith('  FIELD ', [System.StringComparison]::Ordinal)
+            -and -not $candidate.StartsWith('  METHOD ', [System.StringComparison]::Ordinal)
+        ) {
+            throw "Approved 1.11 additive API member is not a public API manifest field or method line: $candidate"
+        }
+        if (
+            -not $candidate.Contains(
+                'PersistentRasterLifecycle',
+                [System.StringComparison]::Ordinal
+            )
+        ) {
+            throw "Approved 1.11 additive API member is outside the persistent-raster lifecycle surface: $candidate"
+        }
+        if (-not $approved.Add($candidate)) {
+            throw "Approved 1.11 additive API members file contains a duplicate member: $candidate"
+        }
+    }
+
+    if ($approved.Count -eq 0) {
+        throw 'Approved 1.11 Inspection API additive members file is empty.'
+    }
+
+    return $approved
+}
+
+function Remove-ApprovedOneElevenMembers {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Manifest,
+
+        [Parameter(Mandatory = $true)]
+        [System.Collections.Generic.HashSet[string]]$ApprovedMembers
+    )
+
+    $rendererTypeHeader = 'TYPE class Icod.TermInfo.Inspection.TermInfoJsonRenderer [static]'
+    $lines = (Normalize-Text -Text $Manifest).Split("`n")
+    $result = [System.Collections.Generic.List[string]]::new()
+    $removedMembers = [System.Collections.Generic.HashSet[string]]::new(
+        [System.StringComparer]::Ordinal
+    )
+    $insideRenderer = $false
+
+    foreach ($line in $lines) {
+        if ($line -eq $rendererTypeHeader) {
+            $insideRenderer = $true
+            $result.Add($line)
+            continue
+        }
+
+        if ($insideRenderer -and $line -eq 'END') {
+            $insideRenderer = $false
+            $result.Add($line)
+            continue
+        }
+
+        if (
+            $insideRenderer
+            -and $line.Contains(
+                'PersistentRasterLifecycle',
+                [System.StringComparison]::Ordinal
+            )
+        ) {
+            if (-not $ApprovedMembers.Contains($line)) {
+                throw "Unapproved 1.11 additive public member on TermInfoJsonRenderer: $line"
+            }
+            if (-not $removedMembers.Add($line)) {
+                throw "Inspection API manifest contains duplicate approved additive member lines: $line"
+            }
+            continue
+        }
+
+        $result.Add($line)
+    }
+
+    foreach ($approvedMember in $ApprovedMembers) {
+        if (-not $removedMembers.Contains($approvedMember)) {
+            throw "Approved 1.11 additive public API member is missing from the current assembly: $approvedMember"
+        }
+    }
+
+    return [PSCustomObject]@{
+        Manifest = Normalize-Text -Text ($result -join "`n")
+        RemovedMemberCount = $removedMembers.Count
+    }
 }
 
 function Remove-ApprovedOneElevenTypes {
@@ -166,16 +275,24 @@ try {
 
         $frozen = Normalize-Text -Text ([System.IO.File]::ReadAllText($baselinePath))
         $current = [System.IO.File]::ReadAllText($temporaryManifest)
+        $approvedMembers = Read-ApprovedOneElevenMembers -Path $approvedMembersPath
+        $memberFiltered = Remove-ApprovedOneElevenMembers `
+            -Manifest $current `
+            -ApprovedMembers $approvedMembers
         $approvedTypes = Read-ApprovedOneElevenTypes -Path $approvedAdditionsPath
         $filtered = Remove-ApprovedOneElevenTypes `
-            -Manifest $current `
+            -Manifest $memberFiltered.Manifest `
             -ApprovedTypes $approvedTypes
 
         if (-not [string]::Equals($frozen, $filtered.Manifest, [System.StringComparison]::Ordinal)) {
             throw 'Icod.TermInfo.Inspection changed the frozen 1.10 public API outside explicitly approved 1.11 additions.'
         }
 
-        Write-Host ("Verified frozen 1.10 Inspection API compatibility after excluding {0} explicitly approved 1.11 public type block(s)." -f $filtered.RemovedTypeCount)
+        Write-Host (
+            "Verified frozen 1.10 Inspection API compatibility after excluding {0} explicitly approved 1.11 public type block(s) and {1} additive member(s)." -f `
+                $filtered.RemovedTypeCount, `
+                $memberFiltered.RemovedMemberCount
+        )
     } finally {
         if (Test-Path -LiteralPath $temporaryManifest) {
             Remove-Item -LiteralPath $temporaryManifest -Force
