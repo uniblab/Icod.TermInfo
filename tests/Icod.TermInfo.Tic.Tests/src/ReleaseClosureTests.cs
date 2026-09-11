@@ -19,11 +19,10 @@ public sealed class ReleaseClosureTests {
 				buildProperties,
 				"IcodTermInfoSuiteVersion"
 			);
-		Assert.True(
-			currentVersion.StartsWith(
-				DevelopmentVersion,
-				StringComparison.Ordinal
-			)
+		Assert.StartsWith(
+			DevelopmentVersion,
+			currentVersion,
+			StringComparison.Ordinal
 		);
 
 		foreach (
@@ -317,7 +316,6 @@ public sealed class ReleaseClosureTests {
 						current.FullName,
 						"Icod.TermInfo.sln"
 					)
-				)
 			) {
 				return current.FullName;
 			}
