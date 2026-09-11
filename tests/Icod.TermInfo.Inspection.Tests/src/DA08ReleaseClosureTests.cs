@@ -86,6 +86,10 @@ public sealed class DA08ReleaseClosureTests {
 			root,
 			".github/scripts/verify-inspection-compatibility.ps1"
 		);
+		string approvedAdditions = ReadRepositoryFile(
+			root,
+			"docs/1.11.0-INSPECTION-PUBLIC-API-ADDITIONS.txt"
+		);
 		string packageVerifier = ReadRepositoryFile(
 			root,
 			"tools/inspection-package-verifier/Program.cs"
@@ -107,8 +111,18 @@ public sealed class DA08ReleaseClosureTests {
 			StringComparison.Ordinal
 		);
 		Assert.Contains(
-			"PersistentRasterLifecycle",
+			"1.11.0-INSPECTION-PUBLIC-API-ADDITIONS.txt",
 			compatibilityVerifier,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"Icod.TermInfo.Inspection.PersistentRasterLifecycleOperation",
+			approvedAdditions,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"Icod.TermInfo.Inspection.PersistentRasterLifecycleSupportStatus",
+			approvedAdditions,
 			StringComparison.Ordinal
 		);
 		Assert.Contains( JsonV1SchemaSha256, packageVerifier, StringComparison.Ordinal );
