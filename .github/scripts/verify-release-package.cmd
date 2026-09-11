@@ -100,13 +100,13 @@ rem MI07 and earlier frozen Inspection baselines remain immutable historical evi
 rem docs\1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt
 rem docs\1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt
 rem docs\1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt
-rem DA08 freezes the exact complete 1.10 Inspection surface on every shipped framework.
+rem DA08 freezes the exact complete 1.10 Inspection public surface. During 1.11
+rem development, only reviewed PersistentRasterLifecycle* public types may be
+rem additive above that surface; every 1.10 type/member remains exact.
 echo.
-echo === Verify approved Icod.TermInfo.Inspection 1.10 public API baseline (%CONFIGURATION%) ===
-for %%F in (net8.0 net9.0 net10.0) do (
-    dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c %CONFIGURATION% --no-build -- --check docs\1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt Icod.TermInfo.Inspection\bin\%CONFIGURATION%\%%F\Icod.TermInfo.Inspection.dll
-    if errorlevel 1 goto fail
-)
+echo === Verify Icod.TermInfo.Inspection 1.10 compatibility plus approved 1.11 additions (%CONFIGURATION%) ===
+pwsh -NoLogo -NoProfile -File .github\scripts\verify-inspection-compatibility.ps1 -Configuration %CONFIGURATION% -AssemblyPath Icod.TermInfo.Inspection\bin\%CONFIGURATION%\net10.0\Icod.TermInfo.Inspection.dll
+if errorlevel 1 goto fail
 
 echo.
 echo === Verify package structure and symbols (%CONFIGURATION%) ===
