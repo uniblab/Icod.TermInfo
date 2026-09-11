@@ -147,8 +147,7 @@ function Remove-ApprovedOneElevenMembers {
         }
 
         if (
-            $insideRenderer
-            -and $line.Contains(
+            $insideRenderer -and $line.Contains(
                 'PersistentRasterLifecycle',
                 [System.StringComparison]::Ordinal
             )
