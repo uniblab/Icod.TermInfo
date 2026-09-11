@@ -52,6 +52,7 @@ public sealed class PersistentRasterLifecyclePlan {
 						"A successful lifecycle plan cannot contain issues.",
 						nameof( issues )
 					);
+				}
 				break;
 			case PersistentRasterLifecyclePlanStatus.Indeterminate:
 				if (
