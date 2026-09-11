@@ -29,11 +29,10 @@ public sealed class T45CompletionGateTests {
 					'+',
 					2 )[ 0 ];
 
-		Assert.True(
-			semanticVersion.StartsWith(
-				"1.11.0",
-				StringComparison.Ordinal
-			)
+		Assert.StartsWith(
+			"1.11.0",
+			semanticVersion,
+			StringComparison.Ordinal
 		);
 	}
 
@@ -54,14 +53,13 @@ public sealed class T45CompletionGateTests {
 					"Directory.Build.props" ),
 				LoadOptions.None );
 
-		Assert.True(
+		Assert.StartsWith(
+			"1.11.0",
 			ReadRequiredProperty(
 				buildProperties,
 				"IcodTermInfoSuiteVersion"
-			).StartsWith(
-				"1.11.0",
-				StringComparison.Ordinal
-			)
+			),
+			StringComparison.Ordinal
 		);
 		Assert.Equal(
 			"$(IcodTermInfoSuiteVersion)",
