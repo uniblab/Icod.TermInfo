@@ -150,11 +150,8 @@ public sealed class RL07PackageQualificationTests {
 
 		XDocument project = XDocument.Load( projectPath );
 		XElement projectReference = Assert.Single(
-			project
-				.Descendants()
-				.Where(
-					element => element.Name.LocalName == "ProjectReference"
-				)
+			project.Descendants(),
+			element => element.Name.LocalName == "ProjectReference"
 		);
 		Assert.EndsWith(
 			"Icod.TermInfo.Inspection.csproj",
