@@ -14,6 +14,7 @@ $repositoryRoot = [System.IO.Path]::GetFullPath(
     (Join-Path (Join-Path $PSScriptRoot '..') '..')
 )
 $baselinePath = Join-Path $repositoryRoot 'docs/1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt'
+$approvedAdditionsPath = Join-Path $repositoryRoot 'docs/1.11.0-INSPECTION-PUBLIC-API-ADDITIONS.txt'
 $assemblyFullPath = if ([System.IO.Path]::IsPathRooted($AssemblyPath)) {
     [System.IO.Path]::GetFullPath($AssemblyPath)
 } else {
@@ -22,6 +23,9 @@ $assemblyFullPath = if ([System.IO.Path]::IsPathRooted($AssemblyPath)) {
 
 if (-not (Test-Path -LiteralPath $baselinePath -PathType Leaf)) {
     throw "Frozen 1.10 Inspection API baseline not found: $baselinePath"
+}
+if (-not (Test-Path -LiteralPath $approvedAdditionsPath -PathType Leaf)) {
+    throw "Approved 1.11 Inspection API additions file not found: $approvedAdditionsPath"
 }
 if (-not (Test-Path -LiteralPath $assemblyFullPath -PathType Leaf)) {
     throw "Inspection assembly not found: $assemblyFullPath"
@@ -36,17 +40,59 @@ function Normalize-Text {
     return (($Text -replace "`r`n", "`n" -replace "`r", "`n").TrimEnd("`n") + "`n")
 }
 
+function Read-ApprovedOneElevenTypes {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Path
+    )
+
+    $approved = [System.Collections.Generic.HashSet[string]]::new(
+        [System.StringComparer]::Ordinal
+    )
+    foreach ($line in [System.IO.File]::ReadAllLines($Path)) {
+        $candidate = $line.Trim()
+        if (
+            $candidate.Length -eq 0
+            -or $candidate.StartsWith('#', [System.StringComparison]::Ordinal)
+        ) {
+            continue
+        }
+        if (
+            -not $candidate.StartsWith(
+                'Icod.TermInfo.Inspection.PersistentRasterLifecycle',
+                [System.StringComparison]::Ordinal
+            )
+        ) {
+            throw "Approved 1.11 Inspection API addition is outside the persistent-raster lifecycle namespace: $candidate"
+        }
+        if (-not $approved.Add($candidate)) {
+            throw "Approved 1.11 Inspection API additions file contains a duplicate type: $candidate"
+        }
+    }
+
+    if ($approved.Count -eq 0) {
+        throw 'Approved 1.11 Inspection API additions file is empty.'
+    }
+
+    return $approved
+}
+
 function Remove-ApprovedOneElevenTypes {
     param(
         [Parameter(Mandatory = $true)]
-        [string]$Manifest
+        [string]$Manifest,
+
+        [Parameter(Mandatory = $true)]
+        [System.Collections.Generic.HashSet[string]]$ApprovedTypes
     )
 
     $lines = (Normalize-Text -Text $Manifest).Split("`n")
     $result = [System.Collections.Generic.List[string]]::new()
+    $removedTypes = [System.Collections.Generic.HashSet[string]]::new(
+        [System.StringComparer]::Ordinal
+    )
     $skipBlock = $false
     $skipTrailingBlank = $false
-    $removedTypeCount = 0
 
     foreach ($line in $lines) {
         if ($skipTrailingBlank) {
@@ -58,10 +104,23 @@ function Remove-ApprovedOneElevenTypes {
         }
 
         if (-not $skipBlock -and $line.StartsWith('TYPE ', [System.StringComparison]::Ordinal)) {
-            $skipBlock = $line -match '^TYPE\s+\S+\s+Icod\.TermInfo\.Inspection\.PersistentRasterLifecycle'
-            if ($skipBlock) {
-                $removedTypeCount++
-                continue
+            if ($line -match '^TYPE\s+\S+\s+(\S+)\s+\[') {
+                $typeName = $Matches[1]
+                if (
+                    $typeName.StartsWith(
+                        'Icod.TermInfo.Inspection.PersistentRasterLifecycle',
+                        [System.StringComparison]::Ordinal
+                    )
+                ) {
+                    if (-not $ApprovedTypes.Contains($typeName)) {
+                        throw "Unapproved 1.11 Inspection public API addition: $typeName"
+                    }
+                    if (-not $removedTypes.Add($typeName)) {
+                        throw "Inspection API manifest contains duplicate public type blocks: $typeName"
+                    }
+                    $skipBlock = $true
+                    continue
+                }
             }
         }
 
@@ -80,9 +139,15 @@ function Remove-ApprovedOneElevenTypes {
         throw 'Inspection API manifest ended inside an approved 1.11 type block.'
     }
 
+    foreach ($approvedType in $ApprovedTypes) {
+        if (-not $removedTypes.Contains($approvedType)) {
+            throw "Approved 1.11 Inspection public API type is missing from the current assembly: $approvedType"
+        }
+    }
+
     return [PSCustomObject]@{
         Manifest = Normalize-Text -Text ($result -join "`n")
-        RemovedTypeCount = $removedTypeCount
+        RemovedTypeCount = $removedTypes.Count
     }
 }
 
@@ -104,13 +169,16 @@ try {
 
         $frozen = Normalize-Text -Text ([System.IO.File]::ReadAllText($baselinePath))
         $current = [System.IO.File]::ReadAllText($temporaryManifest)
-        $filtered = Remove-ApprovedOneElevenTypes -Manifest $current
+        $approvedTypes = Read-ApprovedOneElevenTypes -Path $approvedAdditionsPath
+        $filtered = Remove-ApprovedOneElevenTypes `
+            -Manifest $current `
+            -ApprovedTypes $approvedTypes
 
         if (-not [string]::Equals($frozen, $filtered.Manifest, [System.StringComparison]::Ordinal)) {
-            throw 'Icod.TermInfo.Inspection changed the frozen 1.10 public API outside approved PersistentRasterLifecycle* additions.'
+            throw 'Icod.TermInfo.Inspection changed the frozen 1.10 public API outside explicitly approved 1.11 additions.'
         }
 
-        Write-Host ("Verified frozen 1.10 Inspection API compatibility after excluding {0} approved 1.11 PersistentRasterLifecycle* type block(s)." -f $filtered.RemovedTypeCount)
+        Write-Host ("Verified frozen 1.10 Inspection API compatibility after excluding {0} explicitly approved 1.11 public type block(s)." -f $filtered.RemovedTypeCount)
     } finally {
         if (Test-Path -LiteralPath $temporaryManifest) {
             Remove-Item -LiteralPath $temporaryManifest -Force
