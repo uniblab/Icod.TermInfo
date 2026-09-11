@@ -72,7 +72,7 @@ public sealed class DA08ReleaseClosureTests {
 	}
 
 	[Fact]
-	public void ReleaseVerifiersEnforceOneTenInspectionApiAndBothSchemas() {
+	public void ReleaseVerifiersEnforceOneTenCompatibilityAndBothSchemas() {
 		string root = FindRepositoryRoot();
 		string shell = ReadRepositoryFile(
 			root,
@@ -82,19 +82,33 @@ public sealed class DA08ReleaseClosureTests {
 			root,
 			".github/scripts/verify-release-package.cmd"
 		);
+		string compatibilityVerifier = ReadRepositoryFile(
+			root,
+			".github/scripts/verify-inspection-compatibility.ps1"
+		);
 		string packageVerifier = ReadRepositoryFile(
 			root,
 			"tools/inspection-package-verifier/Program.cs"
 		);
 
 		Assert.Contains(
-			"1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt",
+			"verify-inspection-compatibility.ps1",
 			shell,
 			StringComparison.Ordinal
 		);
 		Assert.Contains(
-			"1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt",
+			"verify-inspection-compatibility.ps1",
 			command,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt",
+			compatibilityVerifier,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"PersistentRasterLifecycle",
+			compatibilityVerifier,
 			StringComparison.Ordinal
 		);
 		Assert.Contains( JsonV1SchemaSha256, packageVerifier, StringComparison.Ordinal );
