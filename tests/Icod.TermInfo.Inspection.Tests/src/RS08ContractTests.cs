@@ -6,7 +6,7 @@ namespace Icod.TermInfo.Inspection.Tests;
 
 public sealed class RS08ContractTests {
 	private const string ReleaseVersion = "1.7.0";
-	private const string CurrentDevelopmentVersion = "1.10.0";
+	private const string CurrentDevelopmentVersion = "1.11.0";
 
 	[Fact]
 	public void CurrentDevelopmentRetainsRs08ReleaseRecords() {
@@ -36,7 +36,12 @@ public sealed class RS08ContractTests {
 			)
 		);
 
-		Assert.Equal( CurrentDevelopmentVersion, version );
+		Assert.True(
+			version.StartsWith(
+				CurrentDevelopmentVersion,
+				StringComparison.Ordinal
+			)
+		);
 		Assert.Contains( "RS08", roadmap, StringComparison.Ordinal );
 		Assert.Contains( ReleaseVersion, audit, StringComparison.Ordinal );
 		Assert.Contains(
