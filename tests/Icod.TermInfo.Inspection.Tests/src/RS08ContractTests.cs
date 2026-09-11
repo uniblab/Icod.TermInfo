@@ -36,11 +36,10 @@ public sealed class RS08ContractTests {
 			)
 		);
 
-		Assert.True(
-			version.StartsWith(
-				CurrentDevelopmentVersion,
-				StringComparison.Ordinal
-			)
+		Assert.StartsWith(
+			CurrentDevelopmentVersion,
+			version,
+			StringComparison.Ordinal
 		);
 		Assert.Contains( "RS08", roadmap, StringComparison.Ordinal );
 		Assert.Contains( ReleaseVersion, audit, StringComparison.Ordinal );
