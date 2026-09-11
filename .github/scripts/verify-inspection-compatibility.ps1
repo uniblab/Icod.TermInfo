@@ -10,8 +10,10 @@ param(
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
-$repositoryRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))
-$baselinePath = Join-Path $repositoryRoot 'docs\1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt'
+$repositoryRoot = [System.IO.Path]::GetFullPath(
+    (Join-Path (Join-Path $PSScriptRoot '..') '..')
+)
+$baselinePath = Join-Path $repositoryRoot 'docs/1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt'
 $assemblyFullPath = if ([System.IO.Path]::IsPathRooted($AssemblyPath)) {
     [System.IO.Path]::GetFullPath($AssemblyPath)
 } else {
