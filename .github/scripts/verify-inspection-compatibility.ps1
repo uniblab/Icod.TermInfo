@@ -90,16 +90,10 @@ function Read-ApprovedOneElevenMembers {
     foreach ($line in [System.IO.File]::ReadAllLines($Path)) {
         $candidate = $line.TrimEnd()
         $classification = $candidate.Trim()
-        if (
-            $classification.Length -eq 0
-            -or $classification.StartsWith('#', [System.StringComparison]::Ordinal)
-        ) {
+        if ($classification.Length -eq 0 -or $classification.StartsWith('#', [System.StringComparison]::Ordinal)) {
             continue
         }
-        if (
-            -not $candidate.StartsWith('  FIELD ', [System.StringComparison]::Ordinal)
-            -and -not $candidate.StartsWith('  METHOD ', [System.StringComparison]::Ordinal)
-        ) {
+        if (-not $candidate.StartsWith('  FIELD ', [System.StringComparison]::Ordinal) -and -not $candidate.StartsWith('  METHOD ', [System.StringComparison]::Ordinal)) {
             throw "Approved 1.11 additive API member is not a public API manifest field or method line: $candidate"
         }
         if (
