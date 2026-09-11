@@ -51,10 +51,7 @@ function Read-ApprovedOneElevenTypes {
     )
     foreach ($line in [System.IO.File]::ReadAllLines($Path)) {
         $candidate = $line.Trim()
-        if (
-            $candidate.Length -eq 0
-            -or $candidate.StartsWith('#', [System.StringComparison]::Ordinal)
-        ) {
+        if ($candidate.Length -eq 0 -or $candidate.StartsWith('#', [System.StringComparison]::Ordinal)) {
             continue
         }
         if (
