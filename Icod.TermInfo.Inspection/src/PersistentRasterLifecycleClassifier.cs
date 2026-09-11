@@ -70,11 +70,13 @@ public static class PersistentRasterLifecycleClassifier {
 				highestPrecedence = precedence;
 				hasPositive = item.IsPositive;
 				hasNegative = !item.IsPositive;
-			} else if ( precedence == highestPrecedence ) {
-				if ( item.IsPositive ) {
-					hasPositive = true;
-				} else {
-					hasNegative = true;
+			} else {
+				if ( precedence == highestPrecedence ) {
+					if ( item.IsPositive ) {
+						hasPositive = true;
+					} else {
+						hasNegative = true;
+					}
 				}
 			}
 		}
