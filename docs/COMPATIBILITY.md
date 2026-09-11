@@ -6,6 +6,32 @@ This document defines the supported 1.x compatibility boundary for
 `Icod.TermInfo.Inspection` package, and beginning with 1.6 the optional
 `Icod.TermInfo.Termcap` package.
 
+## 1.11 compatibility freeze
+
+Version 1.11 is additive above the stable 1.10 boundary. RL08 freezes the
+complete 1.11 Inspection reflection manifest by exact normalized-LF SHA-256
+`69c7350d5d44d502ecf1698c8fe1c1336f03d38eb1a36e36219f50ac33585a86`
+and requires exact public API equality across `net8.0`, `net9.0`, and
+`net10.0`. It also removes only the exact reviewed 1.11 lifecycle type/member
+delta and requires the remainder to equal the frozen 1.10 manifest exactly.
+Runtime, Source, Compiler, and Termcap retain their previously frozen APIs and
+assembly identity `1.0.0.0`.
+
+Version 1.11 adds protocol-neutral persistent-raster lifecycle evidence,
+classification, planning, description/database-set composition, and version-3
+profile/plan JSON only to Inspection. Static absence remains `Unknown`; ordinary
+raster/Sixel evidence does not imply persistence. Live verification, graphics
+protocol transmission, terminal resource/placement identity, acknowledgements,
+generation invalidation, and cleanup remain outside TermInfo. Inspection gains
+no production dependency on `Icod.Terminal` or `Icod.DCurses`.
+
+Version-1 and version-2 JSON identifiers, schemas, document kinds, ordering,
+bounds, and historical command forms remain immutable. Version 3 is additive
+and contains only `persistentRasterLifecycleProfile` and
+`persistentRasterLifecyclePlan`. Stable 1.11 promotion may not change any of the
+three frozen schemas, the exact 1.11 public surface, package dependency direction,
+or command semantics.
+
 ## 1.10 compatibility freeze
 
 Version 1.10 is additive above the stable 1.9 boundary. DA08 freezes the complete
@@ -111,6 +137,15 @@ TC08 freezes the 1.6 Termcap public API in
 full `PublicApiSnapshot/v1` reflection-manifest SHA-256
 `1e24b8a555b506594c58cf58d03bf87b2b60192f6316537cb4200498c6a92ab0`, exact compiled-assembly API equivalence across net8/net9/net10, and the
 packaged XML documentation member-ID inventory recorded by the same baseline.
+
+The 1.9 Inspection public API is frozen by
+`docs/1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt`. The complete 1.10 additive
+surface is frozen by `docs/1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt`.
+Version 1.11 uses the composite exact freeze in
+`docs/1.11.0-INSPECTION-PUBLIC-API-FREEZE.md`, combining the frozen 1.10
+manifest, the exact reviewed 1.11 type/member delta, and the complete 1.11
+manifest SHA-256. Release validation rejects any whole-surface change even when
+it remains source-compatible.
 
 Within 1.x:
 
@@ -488,7 +523,10 @@ Runtime and Source never depend on Compiler.
 Beginning with 1.3, `Icod.TermInfo.Inspection` contains corresponding three-target
 managed/XML and symbol assets and depends directly on the matching Runtime and
 Source packages. Inspection does not depend on Compiler. Runtime, Source, and
-Compiler do not depend on Inspection.
+Compiler do not depend on Inspection. Beginning with 1.11, Inspection also
+explicitly does not depend on `Icod.Terminal` or `Icod.DCurses`; callers may use
+those sibling layers to verify or execute a semantic lifecycle plan without
+creating a reverse package dependency.
 
 Beginning with 1.6, `Icod.TermInfo.Termcap` contains corresponding three-target
 managed/XML and symbol assets and depends only on the matching Runtime package.
@@ -525,6 +563,11 @@ The reusable `Icod.TermInfo` package family does not promise:
 - PTY/ConPTY lifecycle;
 - curses/virtual-screen behavior;
 - terminal emulation or graphics protocols.
+
+Version 1.11 may describe and plan protocol-neutral persistent-raster lifecycle
+semantics, but it does not implement a graphics wire protocol, live terminal
+resource registry, placement registry, or session lifecycle. Those execution
+concerns remain sibling-layer work.
 
 The 1.4 line provides the managed `tic`, `infocmp`, and `toe` command
 applications. Version 1.5 adds the `Icod.TermInfo.Tools` installation router.
