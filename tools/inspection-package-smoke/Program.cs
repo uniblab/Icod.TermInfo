@@ -232,7 +232,7 @@ try {
 	TermInfoDatabaseSetSourcePlanningResult databaseSetPlan =
 		TerminalDescriptionSourcePlanner.PlanFromDatabaseSet(
 			terminal,
-			TermInfoDatabaseInspector.CreateSet([ emptyCatalog ])
+			TermInfoDatabaseInspector.CreateSet( [ emptyCatalog ] )
 		);
 	Require(
 		catalogPlan.Source == rendered
