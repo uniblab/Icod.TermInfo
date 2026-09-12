@@ -99,9 +99,12 @@ public sealed class CodingConventionTests {
 
 		foreach ( string path in EnumerateCSharpFiles( repositoryRoot ) ) {
 			string source = MaskNonCode( File.ReadAllText( path ) );
+			int violationIndex = FindParenthesisSpacingViolation( source );
 
-			if ( ContainsParenthesisSpacingViolation( source ) ) {
-				violations.Add( GetRelativePath( repositoryRoot, path ) );
+			if ( violationIndex >= 0 ) {
+				violations.Add(
+					$"{GetRelativePath( repositoryRoot, path )}:{GetLineNumber( source, violationIndex )}"
+				);
 			}
 		}
 
@@ -160,18 +163,20 @@ public sealed class CodingConventionTests {
 		return false;
 	}
 
-	private static bool ContainsParenthesisSpacingViolation( string source ) {
+	private static int FindParenthesisSpacingViolation( string source ) {
 		ArgumentNullException.ThrowIfNull( source );
 
-		if ( ControlKeywordWithoutSpaceBeforeParenthesisPattern.IsMatch( source ) ) {
-			return true;
+		Match controlKeywordMatch =
+			ControlKeywordWithoutSpaceBeforeParenthesisPattern.Match( source );
+		if ( controlKeywordMatch.Success ) {
+			return controlKeywordMatch.Index;
 		}
 
 		foreach ( Match match in ParenthesizedControlFlowPattern.Matches( source ) ) {
 			int openParenthesis =
 				match.Index + match.Value.LastIndexOf( '(' );
 			if ( !ParenthesisInteriorUsesRepositorySpacing( source, openParenthesis ) ) {
-				return true;
+				return openParenthesis;
 			}
 		}
 
@@ -181,11 +186,11 @@ public sealed class CodingConventionTests {
 			}
 
 			if ( !ParenthesisInteriorUsesRepositorySpacing( source, i ) ) {
-				return true;
+				return i;
 			}
 		}
 
-		return false;
+		return -1;
 	}
 
 	private static bool IsCallLikeOpenParenthesis(
@@ -271,6 +276,23 @@ public sealed class CodingConventionTests {
 		}
 
 		return -1;
+	}
+
+	private static int GetLineNumber(
+		string source,
+		int index
+	) {
+		ArgumentNullException.ThrowIfNull( source );
+		ArgumentOutOfRangeException.ThrowIfNegative( index );
+
+		int lineNumber = 1;
+		int end = Math.Min( index, source.Length );
+		for ( int i = 0; i < end; i++ ) {
+			if ( source[i] == '\n' ) {
+				lineNumber++;
+			}
+		}
+		return lineNumber;
 	}
 
 	private static string MaskNonCode( string source ) {
