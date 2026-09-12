@@ -19,14 +19,16 @@ public static class TermInfoSourceResolver {
 	public static TermInfoSourceResolveResult Resolve(
 		TermInfoSourceDocument document,
 		string name,
-		TermInfoSourceResolverOptions? options = null ) {
+		TermInfoSourceResolverOptions? options = null
+	) {
 		ArgumentNullException.ThrowIfNull( document );
 		ArgumentException.ThrowIfNullOrWhiteSpace( name );
 
 		return Resolve(
 			new DocumentEntryProvider( document ),
 			name,
-			options );
+			options
+		);
 	}
 
 	/// <summary>
@@ -39,19 +41,22 @@ public static class TermInfoSourceResolver {
 	public static TermInfoSourceResolveResult Resolve(
 		ITermInfoSourceEntryProvider provider,
 		string name,
-		TermInfoSourceResolverOptions? options = null ) {
+		TermInfoSourceResolverOptions? options = null
+	) {
 		ArgumentNullException.ThrowIfNull( provider );
 		ArgumentException.ThrowIfNullOrWhiteSpace( name );
 
 		ResolutionContext context =
 			new(
 				provider,
-				options ?? new TermInfoSourceResolverOptions() );
+				options ?? new TermInfoSourceResolverOptions()
+			);
 		ResolvedNode? node =
 			context.ResolveNamed(
 				name,
 				0,
-				null );
+				null
+			);
 		IReadOnlyList<TermInfoSourceDiagnostic> diagnostics =
 			context.GetOrderedDiagnostics();
 
@@ -59,17 +64,22 @@ public static class TermInfoSourceResolver {
 			|| diagnostics.Any(
 				diagnostic =>
 					diagnostic.Severity
-						== TermInfoSourceDiagnosticSeverity.Error ) ) {
+						== TermInfoSourceDiagnosticSeverity.Error
+			)
+		) {
 			return new TermInfoSourceResolveResult(
 				null,
-				diagnostics );
+				diagnostics
+			);
 		}
 
 		return new TermInfoSourceResolveResult(
 			new TermInfoSourceResolvedEntry(
 				node.Entry,
-				node.State ),
-			diagnostics );
+				node.State
+			),
+			diagnostics
+		);
 	}
 
 	private sealed class ResolutionContext {
@@ -83,7 +93,8 @@ public static class TermInfoSourceResolver {
 
 		internal ResolutionContext(
 			ITermInfoSourceEntryProvider provider,
-			TermInfoSourceResolverOptions options ) {
+			TermInfoSourceResolverOptions options
+		) {
 			ArgumentNullException.ThrowIfNull( provider );
 			ArgumentNullException.ThrowIfNull( options );
 
@@ -94,45 +105,52 @@ public static class TermInfoSourceResolver {
 		internal ResolvedNode? ResolveNamed(
 			string requestedName,
 			int depth,
-			TermInfoSourceSpan? referenceSpan ) {
+			TermInfoSourceSpan? referenceSpan
+		) {
 			ArgumentException.ThrowIfNullOrWhiteSpace( requestedName );
 
 			if ( depth > _options.MaximumInheritanceDepth ) {
 				AddDiagnostic(
 					TermInfoSourceDiagnosticCodes.MaximumInheritanceDepthExceeded,
 					$"Maximum inheritance depth {_options.MaximumInheritanceDepth} was exceeded while resolving '{requestedName}'.",
-					referenceSpan );
+					referenceSpan
+				);
 				return null;
 			}
 
 			bool found =
 				_provider.TryLoad(
 					requestedName,
-					out TermInfoSourceEntry? entry );
+					out TermInfoSourceEntry? entry
+				);
 			ValidateProviderResult(
 				found,
 				entry,
-				requestedName );
+				requestedName
+			);
 
 			if ( !found ) {
 				AddDiagnostic(
 					TermInfoSourceDiagnosticCodes.MissingSourceEntry,
 					$"Source entry '{requestedName}' could not be found.",
-					referenceSpan );
+					referenceSpan
+				);
 				return null;
 			}
 
 			TermInfoSourceEntry loadedEntry =
 				entry
 				?? throw new InvalidOperationException(
-					$"The source-entry provider returned no entry for '{requestedName}'." );
+					$"The source-entry provider returned no entry for '{requestedName}'."
+				);
 			string canonicalName =
 				loadedEntry.CanonicalName;
 			if ( _activeNames.Contains( canonicalName ) ) {
 				AddDiagnostic(
 					TermInfoSourceDiagnosticCodes.InheritanceCycle,
 					CreateCycleMessage( canonicalName ),
-					referenceSpan );
+					referenceSpan
+				);
 				return null;
 			}
 
@@ -180,7 +198,8 @@ public static class TermInfoSourceResolver {
 						ResolveNamed(
 							referenceName,
 							checked( depth + 1 ),
-							field.Span );
+							field.Span
+						);
 					if ( parent is null ) {
 						parentFailed = true;
 						continue;
@@ -197,13 +216,15 @@ public static class TermInfoSourceResolver {
 				ResolvedNode resolved =
 					new(
 						loadedEntry,
-						local );
+						local
+					);
 				_cache[ cacheKey ] =
 					resolved.Clone();
 				return resolved;
 			} finally {
 				_activePath.RemoveAt(
-					_activePath.Count - 1 );
+					_activePath.Count - 1
+				);
 				_activeNames.Remove( canonicalName );
 			}
 		}
@@ -215,20 +236,24 @@ public static class TermInfoSourceResolver {
 						new {
 							Diagnostic = diagnostic,
 							Ordinal = ordinal,
-						} )
+						}
+				)
 				.OrderBy(
 					item =>
 						item.Diagnostic.Span?.SourceName
 						?? string.Empty,
-					StringComparer.Ordinal )
+					StringComparer.Ordinal
+				)
 				.ThenBy(
 					item =>
 						item.Diagnostic.Span?.Offset
-						?? int.MaxValue )
+						?? int.MaxValue
+				)
 				.ThenBy(
 					item =>
 						item.Diagnostic.Span?.Length
-						?? int.MaxValue )
+						?? int.MaxValue
+				)
 				.ThenBy( item => item.Ordinal )
 				.Select( item => item.Diagnostic )
 				.ToArray();
@@ -237,7 +262,8 @@ public static class TermInfoSourceResolver {
 		private void AddDiagnostic(
 			string code,
 			string message,
-			TermInfoSourceSpan? span ) {
+			TermInfoSourceSpan? span
+		) {
 			ArgumentException.ThrowIfNullOrWhiteSpace( code );
 			ArgumentException.ThrowIfNullOrWhiteSpace( message );
 
@@ -246,11 +272,14 @@ public static class TermInfoSourceResolver {
 					code,
 					TermInfoSourceDiagnosticSeverity.Error,
 					message,
-					span ) );
+					span
+				)
+			);
 		}
 
 		private string CreateCycleMessage(
-			string canonicalName ) {
+			string canonicalName
+		) {
 			ArgumentException.ThrowIfNullOrWhiteSpace( canonicalName );
 
 			int start =
@@ -259,7 +288,9 @@ public static class TermInfoSourceResolver {
 						string.Equals(
 							name,
 							canonicalName,
-							StringComparison.Ordinal ) );
+							StringComparison.Ordinal
+						)
+				);
 			IEnumerable<string> cycle;
 			if ( start < 0 ) {
 				cycle =
@@ -275,24 +306,28 @@ public static class TermInfoSourceResolver {
 				"Inheritance cycle detected: "
 				+ string.Join(
 					" -> ",
-					cycle )
+					cycle
+				)
 				+ ".";
 		}
 
 		private static void ValidateProviderResult(
 			bool found,
 			TermInfoSourceEntry? entry,
-			string requestedName ) {
+			string requestedName
+		) {
 			ArgumentException.ThrowIfNullOrWhiteSpace( requestedName );
 
 			if ( found && entry is null ) {
 				throw new InvalidOperationException(
-					$"The source-entry provider reported success for '{requestedName}' but returned a null entry." );
+					$"The source-entry provider reported success for '{requestedName}' but returned a null entry."
+				);
 			}
 
 			if ( !found && entry is not null ) {
 				throw new InvalidOperationException(
-					$"The source-entry provider reported a clean miss for '{requestedName}' but returned a non-null entry." );
+					$"The source-entry provider reported a clean miss for '{requestedName}' but returned a non-null entry."
+				);
 			}
 		}
 	}
@@ -301,27 +336,33 @@ public static class TermInfoSourceResolver {
 		private readonly TermInfoSourceDocument _document;
 
 		internal DocumentEntryProvider(
-			TermInfoSourceDocument document ) {
+			TermInfoSourceDocument document
+		) {
 			ArgumentNullException.ThrowIfNull( document );
 			_document = document;
 		}
 
 		public bool TryLoad(
 			string name,
-			[NotNullWhen( true )] out TermInfoSourceEntry? entry ) {
+			[NotNullWhen( true )] out TermInfoSourceEntry? entry
+		) {
 			ArgumentException.ThrowIfNullOrWhiteSpace( name );
 
 			foreach ( TermInfoSourceEntry candidate in _document.Entries ) {
 				if ( string.Equals(
 						candidate.CanonicalName,
 						name,
-						StringComparison.Ordinal )
+						StringComparison.Ordinal
+					)
 					|| candidate.Aliases.Any(
 						alias =>
 							string.Equals(
 								alias,
 								name,
-								StringComparison.Ordinal ) ) ) {
+								StringComparison.Ordinal
+							)
+					)
+				) {
 					entry = candidate;
 					return true;
 				}
@@ -335,7 +376,8 @@ public static class TermInfoSourceResolver {
 	private sealed class ResolvedNode {
 		internal ResolvedNode(
 			TermInfoSourceEntry entry,
-			TermInfoSourceCapabilityState state ) {
+			TermInfoSourceCapabilityState state
+		) {
 			ArgumentNullException.ThrowIfNull( entry );
 			ArgumentNullException.ThrowIfNull( state );
 
@@ -354,11 +396,13 @@ public static class TermInfoSourceResolver {
 		internal ResolvedNode Clone() {
 			return new ResolvedNode(
 				Entry,
-				State.Clone() );
+				State.Clone()
+			);
 		}
 	}
 
 	private readonly record struct ResolutionCacheKey(
 		string CanonicalName,
-		int Depth );
+		int Depth
+	);
 }
