@@ -8,16 +8,13 @@ if (args.Length == 0
     || string.Equals(
         args[0],
         "-h",
-        StringComparison.Ordinal))
-{
+        StringComparison.Ordinal)) {
     PrintUsage();
     return;
 }
 
-try
-{
-    switch (args[0])
-    {
+try {
+    switch (args[0]) {
         case "parse":
             RequireArgumentCount(
                 args,
@@ -87,15 +84,13 @@ try
             Environment.ExitCode = 2;
             break;
     }
-}
-catch (Exception exception)
+} catch (Exception exception)
     when (exception is ArgumentException
         or IOException
         or UnauthorizedAccessException
         or FormatException
         or NotSupportedException
-        or KeyNotFoundException)
-{
+        or KeyNotFoundException) {
     Console.Error.WriteLine(
         $"{exception.GetType().Name}: {exception.Message}");
     Environment.ExitCode = 2;
@@ -104,16 +99,14 @@ catch (Exception exception)
 static void LoadFromProvider(
     string source,
     ITerminalDescriptionProvider provider,
-    string name)
-{
+    string name) {
     ArgumentNullException.ThrowIfNull(source);
     ArgumentNullException.ThrowIfNull(provider);
     ArgumentNullException.ThrowIfNull(name);
 
     if (!provider.TryLoad(
             name,
-            out TerminalDescription? terminal))
-    {
+            out TerminalDescription? terminal)) {
         Console.WriteLine(
             $"Source: {source}");
         Console.WriteLine(
@@ -129,8 +122,7 @@ static void LoadFromProvider(
 
 static void Describe(
     string source,
-    TerminalDescription terminal)
-{
+    TerminalDescription terminal) {
     ArgumentNullException.ThrowIfNull(source);
     ArgumentNullException.ThrowIfNull(terminal);
 
@@ -159,12 +151,10 @@ static void Describe(
 }
 
 static string FormatAliases(
-    IReadOnlyList<string> aliases)
-{
+    IReadOnlyList<string> aliases) {
     ArgumentNullException.ThrowIfNull(aliases);
 
-    if (aliases.Count == 0)
-    {
+    if (aliases.Count == 0) {
         return "(none)";
     }
 
@@ -174,27 +164,23 @@ static string FormatAliases(
 }
 
 static string FormatNumber(
-    int? value)
-{
+    int? value) {
     return value?.ToString()
         ?? "(absent)";
 }
 
 static void RequireArgumentCount(
     string[] arguments,
-    int expected)
-{
+    int expected) {
     ArgumentNullException.ThrowIfNull(arguments);
 
-    if (arguments.Length != expected)
-    {
+    if (arguments.Length != expected) {
         throw new ArgumentException(
             $"Command '{arguments[0]}' expects {expected - 1} argument(s).");
     }
 }
 
-static void PrintUsage()
-{
+static void PrintUsage() {
     Console.WriteLine(
         "Icod.TermInfo compiled-database acquisition sample");
     Console.WriteLine();

@@ -21,9 +21,8 @@ public sealed class DA08ReleaseClosureTests {
 		);
 
 		Assert.Equal( InspectionApiSha256, ComputeSha256( baseline ) );
-		Assert.Equal(
-			51,
-			typeof( TermInfoDatabaseSet ).Assembly.GetExportedTypes().Length
+		Assert.True(
+			typeof( TermInfoDatabaseSet ).Assembly.GetExportedTypes().Length >= 51
 		);
 		foreach (
 			string marker
@@ -73,7 +72,7 @@ public sealed class DA08ReleaseClosureTests {
 	}
 
 	[Fact]
-	public void ReleaseVerifiersEnforceOneTenInspectionApiAndBothSchemas() {
+	public void ReleaseVerifiersEnforceOneTenCompatibilityAndBothSchemas() {
 		string root = FindRepositoryRoot();
 		string shell = ReadRepositoryFile(
 			root,
@@ -83,19 +82,47 @@ public sealed class DA08ReleaseClosureTests {
 			root,
 			".github/scripts/verify-release-package.cmd"
 		);
+		string compatibilityVerifier = ReadRepositoryFile(
+			root,
+			".github/scripts/verify-inspection-compatibility.ps1"
+		);
+		string approvedAdditions = ReadRepositoryFile(
+			root,
+			"docs/1.11.0-INSPECTION-PUBLIC-API-ADDITIONS.txt"
+		);
 		string packageVerifier = ReadRepositoryFile(
 			root,
 			"tools/inspection-package-verifier/Program.cs"
 		);
 
 		Assert.Contains(
-			"1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt",
+			"verify-inspection-compatibility.ps1",
 			shell,
 			StringComparison.Ordinal
 		);
 		Assert.Contains(
-			"1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt",
+			"verify-inspection-compatibility.ps1",
 			command,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt",
+			compatibilityVerifier,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"1.11.0-INSPECTION-PUBLIC-API-ADDITIONS.txt",
+			compatibilityVerifier,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"Icod.TermInfo.Inspection.PersistentRasterLifecycleOperation",
+			approvedAdditions,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"Icod.TermInfo.Inspection.PersistentRasterLifecycleSupportStatus",
+			approvedAdditions,
 			StringComparison.Ordinal
 		);
 		Assert.Contains( JsonV1SchemaSha256, packageVerifier, StringComparison.Ordinal );

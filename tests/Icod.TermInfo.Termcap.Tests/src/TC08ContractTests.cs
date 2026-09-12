@@ -4,7 +4,7 @@ using Xunit;
 namespace Icod.TermInfo.Termcap.Tests;
 
 public sealed class TC08ContractTests {
-	private const string CurrentDevelopmentVersion = "1.10.0";
+	private const string CurrentDevelopmentVersion = "1.11.0";
 	private const string HistoricalTc08Version = "1.6.0-Alpha-8";
 	private const string HistoricalTc07Version = "1.6.0-Alpha-7";
 	private const string TermcapApiSnapshotSha256 =
@@ -18,13 +18,15 @@ public sealed class TC08ContractTests {
 				Path.Combine( root, "Directory.Build.props" ),
 				LoadOptions.None
 			);
-		Assert.Equal(
+		string currentVersion = buildProperties
+			.Descendants()
+			.Single( element => element.Name.LocalName == "IcodTermInfoSuiteVersion" )
+			.Value
+			.Trim();
+		Assert.StartsWith(
 			CurrentDevelopmentVersion,
-			buildProperties
-				.Descendants()
-				.Single( element => element.Name.LocalName == "IcodTermInfoSuiteVersion" )
-				.Value
-				.Trim()
+			currentVersion,
+			StringComparison.Ordinal
 		);
 
 		string tc07 =

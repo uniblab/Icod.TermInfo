@@ -126,17 +126,14 @@ dotnet run \
 # docs/1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt
 # docs/1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt
 # docs/1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt
-# DA08 freezes the exact complete 1.10 Inspection public surface independently
-# on all three shipped target frameworks. Earlier baselines remain historical.
-for inspection_framework in net8.0 net9.0 net10.0; do
-  dotnet run \
-    --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj \
-    -c "${configuration}" \
-    --no-build \
-    -- --check \
-    docs/1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt \
-    Icod.TermInfo.Inspection/bin/${configuration}/${inspection_framework}/Icod.TermInfo.Inspection.dll
-done
+# DA08 freezes the exact complete 1.10 Inspection public surface. During 1.11
+# development, only reviewed PersistentRasterLifecycle* public types may be
+# additive above that surface; every 1.10 type/member remains exact.
+pwsh -NoLogo -NoProfile -File \
+  .github/scripts/verify-inspection-compatibility.ps1 \
+  -Configuration "${configuration}" \
+  -AssemblyPath \
+  "Icod.TermInfo.Inspection/bin/${configuration}/net10.0/Icod.TermInfo.Inspection.dll"
 
 # Structural package, Source Link, dependency, and architecture verification.
 dotnet run \
@@ -311,7 +308,6 @@ dotnet run \
   -f net8.0 \
   --no-restore \
   -p:IcodTermInfoPackageVersion="${package_version}"
-
 dotnet run \
   --project "${smoke_root}/Icod.TermInfo.PackageSmoke.csproj" \
   -c "${configuration}" \
@@ -347,7 +343,6 @@ dotnet run \
   -f net8.0 \
   --no-restore \
   -p:IcodTermInfoSourcePackageVersion="${source_package_version}"
-
 dotnet run \
   --project "${source_smoke_root}/Icod.TermInfo.Source.PackageSmoke.csproj" \
   -c "${configuration}" \

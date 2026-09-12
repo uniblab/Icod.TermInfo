@@ -1,20 +1,16 @@
 namespace Icod.TermInfo.Sample;
 
-internal static class SampleOutput
-{
-    internal static void EmitDemonstration(TerminalDescription terminal)
-    {
+internal static class SampleOutput {
+    internal static void EmitDemonstration(TerminalDescription terminal) {
         ArgumentNullException.ThrowIfNull(terminal);
 
         string? clear =
             terminal.GetString(StringCapability.ClearScreen);
-        if (clear is not null)
-        {
+        if (clear is not null) {
             TermInfoOutput.PutP(clear, Console.Out);
         }
 
-        if (terminal.GetString(StringCapability.CursorAddress) is not null)
-        {
+        if (terminal.GetString(StringCapability.CursorAddress) is not null) {
             string move =
                 terminal.Expand(
                     StringCapability.CursorAddress,
@@ -29,8 +25,7 @@ internal static class SampleOutput
         string? normal =
             terminal.GetString(StringCapability.ExitAttributeMode);
 
-        if (bold is not null)
-        {
+        if (bold is not null) {
             TermInfoOutput.PutP(bold, Console.Out);
         }
 
@@ -38,17 +33,14 @@ internal static class SampleOutput
             TerminalColors.GetColorSupport(terminal);
 
         if (color.Model == TerminalColorModel.DirectRgb
-            && color.HasForegroundSelector)
-        {
+            && color.HasForegroundSelector) {
             TermInfoOutput.PutP(
                 TerminalColors.ExpandForeground(
                     terminal,
                     new TerminalRgbColor(0x80, 0x40, 0xC0)),
                 Console.Out);
-        }
-        else if (color.IndexedColorCount >= 8
-            && color.HasForegroundSelector)
-        {
+        } else if (color.IndexedColorCount >= 8
+            && color.HasForegroundSelector) {
             TermInfoOutput.PutP(
                 TerminalColors.ExpandForeground(terminal, 1),
                 Console.Out);
@@ -57,8 +49,7 @@ internal static class SampleOutput
         Console.Write(
             "Icod.TermInfo terminal-control demonstration");
 
-        if (normal is not null)
-        {
+        if (normal is not null) {
             TermInfoOutput.PutP(normal, Console.Out);
         }
 

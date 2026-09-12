@@ -3,6 +3,28 @@
 The `Icod.TermInfo` package family follows Semantic Versioning for its public
 package contracts.
 
+## 1.11 release line
+
+The RL01-RL08 development sequence is `1.11.0-Alpha-1` through
+`1.11.0-Alpha-8`. Version 1.11 adds compatible public API only to
+`Icod.TermInfo.Inspection`: protocol-neutral persistent-raster lifecycle evidence,
+classification, semantic planning, description/database-set composition, and
+additive version-3 profile/plan JSON automation. Runtime, Source, Compiler, and
+Termcap public APIs remain frozen, and the command/router layer gains no new
+command semantics.
+
+RL08 freezes the complete 1.11 Inspection reflection manifest by exact normalized-
+LF SHA-256 while independently proving that removing only the reviewed 1.11 type
+and renderer-member delta reconstructs the frozen 1.10 manifest exactly. JSON
+schema versions 1 and 2 remain immutable historical contracts; version 3 is the
+additive lifecycle-only schema.
+
+After the exact Alpha-8 head passes the complete Staging package, NuGet-only
+consumer, reusable sample, installed-tool, and six-RID archive gates, stable
+`1.11.0` is a promotion-only transition. Stable promotion may not introduce new
+feature semantics, public API, schema fields, dependencies, target frameworks,
+command behavior, or archive RIDs and requires its own fresh full validation.
+
 ## 1.10 release line
 
 The DA01-DA08 development sequence is `1.10.0-Alpha-1` through
@@ -425,6 +447,20 @@ stable 1.9 validation require exact net8/net9/net10 equivalence and an exact
 match with the 1.9 manifest. The 1.7 and 1.8 manifests remain immutable
 historical evidence and must not be regenerated.
 
+`docs/1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt` is the frozen complete
+Inspection surface for the 1.10 line. It retains the complete 1.9 surface and
+adds the deterministic ordered database-set inspection, analysis, comparison,
+and planning automation surface. The additive version-2 JSON schema is frozen
+separately from the immutable version-1 schema.
+
+Version 1.11 uses the composite exact freeze documented in
+`docs/1.11.0-INSPECTION-PUBLIC-API-FREEZE.md`: the frozen 1.10 manifest, the
+exact reviewed 1.11 type and renderer-member delta, and the normalized complete
+1.11 manifest SHA-256
+`69c7350d5d44d502ecf1698c8fe1c1336f03d38eb1a36e36219f50ac33585a86`.
+Release verification requires both that whole-manifest hash and exact
+reconstruction of the 1.10 baseline after removing only the reviewed delta.
+
 The baselines record exported types, public/protected members, enum numeric
 values, parameter names/order/defaults, ref/out/in/params shape, generic
 constraints, nullability, and relevant attributes.
@@ -460,7 +496,9 @@ Beginning with I01, `Icod.TermInfo.Inspection` depends directly on the matching
 `Icod.TermInfo` and `Icod.TermInfo.Source` packages. Inspection SHALL NOT depend
 on Compiler, and Runtime, Source, and Compiler SHALL NOT acquire a dependency on
 Inspection. Inspection tests may reference Compiler for differential evidence
-without changing the production package graph.
+without changing the production package graph. Version 1.11 additionally freezes
+that Inspection SHALL NOT acquire a production dependency on `Icod.Terminal` or
+`Icod.DCurses`; live terminal verification and execution remain consumer-owned.
 
 Beginning with TC01, `Icod.TermInfo.Termcap` depends directly and exclusively on
 the matching `Icod.TermInfo` package. Runtime, Source, Compiler, and Inspection
