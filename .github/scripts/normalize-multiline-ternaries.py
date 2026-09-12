@@ -8,10 +8,11 @@ def replace_exact(path: str, old: str, new: str) -> None:
     text = target.read_text(encoding="utf-8")
     old_count = text.count(old)
     new_count = text.count(new)
-    if old_count == 1 and new_count == 0:
-        target.write_text(text.replace(old, new, 1), encoding="utf-8", newline="\n")
+    embedded_old_count = new.count(old)
+    if new_count == 1 and old_count == embedded_old_count:
         return
-    if old_count == 0 and new_count == 1:
+    if new_count == 0 and old_count == 1:
+        target.write_text(text.replace(old, new, 1), encoding="utf-8", newline="\n")
         return
     raise SystemExit(
         f"{path}: expected one old target or one normalized target; "
