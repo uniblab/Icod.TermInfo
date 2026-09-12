@@ -8,6 +8,10 @@ public sealed class CodingConventionTests {
 		@"(?m)(?:\)|\b(?:class|struct|interface|enum|record|namespace)\b[^\r\n]*|\b(?:else|catch|try|finally|do))\r?\n[ \t]*\{",
 		RegexOptions.CultureInvariant
 	);
+	private static readonly Regex SpaceIndentationPattern = new(
+		@"(?m)^ +\S",
+		RegexOptions.CultureInvariant
+	);
 
 	[Fact]
 	public void RepositoryCSharpFilesUseOneTrueBraceStyle() {
@@ -18,16 +22,34 @@ public sealed class CodingConventionTests {
 			string source = File.ReadAllText( path );
 
 			if ( AllmanBlockBracePattern.IsMatch( source ) ) {
-				violations.Add(
-					Path.GetRelativePath( repositoryRoot, path )
-						.Replace( Path.DirectorySeparatorChar, '/' )
-				);
+				violations.Add( GetRelativePath( repositoryRoot, path ) );
 			}
 		}
 
 		Assert.True(
 			violations.Count == 0,
 			"C# files using legacy block-brace placement:"
+				+ Environment.NewLine
+				+ string.Join( Environment.NewLine, violations )
+		);
+	}
+
+	[Fact]
+	public void RepositoryCSharpFilesUseTabsForIndentation() {
+		string repositoryRoot = FindRepositoryRoot();
+		List<string> violations = [];
+
+		foreach ( string path in EnumerateCSharpFiles( repositoryRoot ) ) {
+			string source = File.ReadAllText( path );
+
+			if ( SpaceIndentationPattern.IsMatch( source ) ) {
+				violations.Add( GetRelativePath( repositoryRoot, path ) );
+			}
+		}
+
+		Assert.True(
+			violations.Count == 0,
+			"C# files using spaces for indentation:"
 				+ Environment.NewLine
 				+ string.Join( Environment.NewLine, violations )
 		);
@@ -58,6 +80,17 @@ public sealed class CodingConventionTests {
 				path => path,
 				StringComparer.Ordinal
 			);
+	}
+
+	private static string GetRelativePath(
+		string repositoryRoot,
+		string path
+	) {
+		ArgumentException.ThrowIfNullOrWhiteSpace( repositoryRoot );
+		ArgumentException.ThrowIfNullOrWhiteSpace( path );
+
+		return Path.GetRelativePath( repositoryRoot, path )
+			.Replace( Path.DirectorySeparatorChar, '/' );
 	}
 
 	private static string FindRepositoryRoot() {
