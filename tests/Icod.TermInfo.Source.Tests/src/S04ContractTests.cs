@@ -10,7 +10,8 @@ public sealed class S04ContractTests {
 	private const string DevelopmentVersion = "$(IcodTermInfoSuiteVersion)";
 	private const string StableAssemblyVersion = "1.0.0.0";
 
-	[Fact]	public void SourceAndRuntimePackagesAdvanceTogetherWithoutChangingAssemblyIdentity() {
+	[Fact]
+	public void SourceAndRuntimePackagesAdvanceTogetherWithoutChangingAssemblyIdentity() {
 		string root = FindRepositoryRoot();
 
 		foreach (
@@ -19,31 +20,41 @@ public sealed class S04ContractTests {
 			{
 				"Icod.TermInfo.csproj",
 				"Icod.TermInfo.Source/Icod.TermInfo.Source.csproj",
-			} ) {
+			}
+		) {
 			XDocument project =
 				XDocument.Load(
 					Path.Combine(
 						root,
 						relativePath.Replace(
 							'/',
-							Path.DirectorySeparatorChar ) ),
-					LoadOptions.None );
+							Path.DirectorySeparatorChar
+						)
+					),
+					LoadOptions.None
+				);
 
 			Assert.Equal(
 				DevelopmentVersion,
 				ReadRequiredProperty(
 					project,
-					"Version" ) );
+					"Version"
+				)
+			);
 			Assert.Equal(
 				DevelopmentVersion,
 				ReadRequiredProperty(
 					project,
-					"PackageVersion" ) );
+					"PackageVersion"
+				)
+			);
 			Assert.Equal(
 				StableAssemblyVersion,
 				ReadRequiredProperty(
 					project,
-					"AssemblyVersion" ) );
+					"AssemblyVersion"
+				)
+			);
 		}
 	}
 
@@ -103,11 +114,15 @@ public sealed class S04ContractTests {
 					type =>
 						type.GetProperties(
 							BindingFlags.Public
-							| BindingFlags.Instance ) )
+							| BindingFlags.Instance
+						)
+				)
 				.SelectMany(
 					property =>
-						FlattenType( property.PropertyType ) ),
-			type => type == typeof( TerminalDescription ) );
+						FlattenType( property.PropertyType )
+				),
+			type => type == typeof( TerminalDescription )
+		);
 	}
 
 	[Fact]
@@ -118,26 +133,34 @@ public sealed class S04ContractTests {
 				Path.Combine(
 					root,
 					"docs",
-					"1.1.0-SOURCE-PUBLIC-API-BASELINE.txt" ) );
+					"1.1.0-SOURCE-PUBLIC-API-BASELINE.txt"
+				)
+			);
 
 		Assert.Contains(
 			"TYPE class Icod.TermInfo.Source.TermInfoSourceDocument [sealed]",
-			baseline );
+			baseline
+		);
 		Assert.Contains(
 			"TYPE class Icod.TermInfo.Source.TermInfoSourceEntry [sealed]",
-			baseline );
+			baseline
+		);
 		Assert.Contains(
 			"TYPE class Icod.TermInfo.Source.TermInfoSourceField [sealed]",
-			baseline );
+			baseline
+		);
 		Assert.Contains(
 			"TYPE enum Icod.TermInfo.Source.TermInfoSourceFieldKind [sealed]",
-			baseline );
+			baseline
+		);
 		Assert.Contains(
 			"TYPE class Icod.TermInfo.Source.TermInfoSourceParseResult [sealed]",
-			baseline );
+			baseline
+		);
 		Assert.Contains(
 			"TYPE class Icod.TermInfo.Source.TermInfoSourceParser [static]",
-			baseline );
+			baseline
+		);
 	}
 
 	[Fact]
@@ -147,12 +170,15 @@ public sealed class S04ContractTests {
 			Path.Combine(
 				root,
 				"docs",
-				"1.1.0-S04-UNRESOLVED-SOURCE-ENTRY-MODEL.md" );
+				"1.1.0-S04-UNRESOLVED-SOURCE-ENTRY-MODEL.md"
+			);
 		string roadmap =
 			File.ReadAllText(
 				Path.Combine(
 					root,
-					"Icod.TermInfo-Post-1.0-Development-Roadmap.md" ) );
+					"Icod.TermInfo-Post-1.0-Development-Roadmap.md"
+				)
+			);
 
 		Assert.True( File.Exists( recordPath ) );
 		string record =
@@ -164,11 +190,13 @@ public sealed class S04ContractTests {
 		Assert.Contains( "S05", record );
 		Assert.Contains(
 			"1.1.0-S04-UNRESOLVED-SOURCE-ENTRY-MODEL.md",
-			roadmap );
+			roadmap
+		);
 	}
 
 	private static IEnumerable<Type> FlattenType(
-		Type type ) {
+		Type type
+	) {
 		ArgumentNullException.ThrowIfNull( type );
 
 		yield return type;
@@ -183,7 +211,8 @@ public sealed class S04ContractTests {
 
 	private static string ReadRequiredProperty(
 		XDocument project,
-		string propertyName ) {
+		string propertyName
+	) {
 		ArgumentNullException.ThrowIfNull( project );
 		ArgumentNullException.ThrowIfNull( propertyName );
 
@@ -192,7 +221,8 @@ public sealed class S04ContractTests {
 			.First(
 				element =>
 					element.Name.LocalName
-						== propertyName )
+						== propertyName
+			)
 			.Value
 			.Trim();
 	}
@@ -200,13 +230,18 @@ public sealed class S04ContractTests {
 	private static string FindRepositoryRoot() {
 		DirectoryInfo? current =
 			new(
-				AppContext.BaseDirectory );
+				AppContext.BaseDirectory
+			);
 
 		while ( current is not null ) {
-			if ( File.Exists(
+			if (
+				File.Exists(
 					Path.Combine(
 						current.FullName,
-						"Icod.TermInfo.sln" ) ) ) {
+						"Icod.TermInfo.sln"
+					)
+				)
+			) {
 				return current.FullName;
 			}
 
@@ -215,6 +250,7 @@ public sealed class S04ContractTests {
 		}
 
 		throw new InvalidOperationException(
-			"Unable to locate the Icod.TermInfo repository root." );
+			"Unable to locate the Icod.TermInfo repository root."
+		);
 	}
 }
