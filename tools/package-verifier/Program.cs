@@ -457,9 +457,10 @@ internal static class Program {
 			);
 
 		try {
-			using ( Stream source = entry!.Open() )
-			using ( FileStream destination = File.Create( temporaryPath ) ) {
-				source.CopyTo( destination );
+			using ( Stream source = entry!.Open() ) {
+				using ( FileStream destination = File.Create( temporaryPath ) ) {
+					source.CopyTo( destination );
+				}
 			}
 
 			AssemblyName assemblyName = AssemblyName.GetAssemblyName( temporaryPath );
