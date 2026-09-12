@@ -718,9 +718,10 @@ public sealed class I07ValidationTests {
 	private static string FormatNullableInteger(
 		int? value
 	) {
-		return value.HasValue
+		return ( value.HasValue )
 			? value.Value.ToString( CultureInfo.InvariantCulture )
-			: string.Empty;
+			: string.Empty
+		;
 	}
 
 	private static string[] ReadProjectReferences(

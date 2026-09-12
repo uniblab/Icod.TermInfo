@@ -1049,7 +1049,7 @@ internal static class Program {
 				+ character.ToString()
 				+ "'",
 			bool boolean =>
-				boolean
+				( boolean )
 					? "true"
 					: "false",
 			IFormattable formattable =>

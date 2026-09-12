@@ -482,9 +482,10 @@ public static class Command {
 		bool stopAfterFirstConventional = !explicitDirectories
 			&& !options.AllDatabases;
 		Dictionary<string, ToeDuplicateReference>? duplicateReferences =
-			options.AllDatabases && options.SortByName
+			( options.AllDatabases && options.SortByName )
 				? new Dictionary<string, ToeDuplicateReference>( StringComparer.Ordinal )
-				: null;
+				: null
+		;
 
 		foreach ( string root in roots ) {
 			cancellationToken.ThrowIfCancellationRequested();
