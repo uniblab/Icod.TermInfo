@@ -93,7 +93,7 @@ public sealed class CodingConventionTests {
 	}
 
 	[Fact]
-	public void RepositoryCSharpParenthesesUseRepositorySpacing() {
+	public void RepositoryCSharpCallsAndControlsUseRepositoryParenthesisSpacing() {
 		string repositoryRoot = FindRepositoryRoot();
 		List<string> violations = [];
 
@@ -107,7 +107,7 @@ public sealed class CodingConventionTests {
 
 		Assert.True(
 			violations.Count == 0,
-			"C# files using non-repository parenthesis spacing:"
+			"C# files using non-repository call/control parenthesis spacing:"
 				+ Environment.NewLine
 				+ string.Join( Environment.NewLine, violations )
 		);
@@ -167,29 +167,59 @@ public sealed class CodingConventionTests {
 			return true;
 		}
 
+		foreach ( Match match in ParenthesizedControlFlowPattern.Matches( source ) ) {
+			int openParenthesis =
+				match.Index + match.Value.LastIndexOf( '(' );
+			if ( !ParenthesisInteriorUsesRepositorySpacing( source, openParenthesis ) ) {
+				return true;
+			}
+		}
+
 		for ( int i = 0; i < source.Length; i++ ) {
-			if ( source[i] != '(' ) {
+			if ( source[i] != '(' || !IsCallLikeOpenParenthesis( source, i ) ) {
 				continue;
 			}
 
-			int closeParenthesis = FindMatchingParenthesis( source, i );
-			if ( closeParenthesis < 0 ) {
-				continue;
-			}
-
-			if ( closeParenthesis == i + 1 ) {
-				continue;
-			}
-
-			if (
-				!char.IsWhiteSpace( source[i + 1] )
-				|| !char.IsWhiteSpace( source[closeParenthesis - 1] )
-			) {
+			if ( !ParenthesisInteriorUsesRepositorySpacing( source, i ) ) {
 				return true;
 			}
 		}
 
 		return false;
+	}
+
+	private static bool IsCallLikeOpenParenthesis(
+		string source,
+		int openParenthesis
+	) {
+		ArgumentNullException.ThrowIfNull( source );
+
+		if ( openParenthesis <= 0 ) {
+			return false;
+		}
+
+		char previous = source[openParenthesis - 1];
+		return char.IsLetterOrDigit( previous )
+			|| previous == '_'
+			|| previous == '>'
+			|| previous == ']'
+			|| previous == ')'
+			|| previous == '!';
+	}
+
+	private static bool ParenthesisInteriorUsesRepositorySpacing(
+		string source,
+		int openParenthesis
+	) {
+		ArgumentNullException.ThrowIfNull( source );
+
+		int closeParenthesis = FindMatchingParenthesis( source, openParenthesis );
+		if ( closeParenthesis < 0 || closeParenthesis == openParenthesis + 1 ) {
+			return true;
+		}
+
+		return char.IsWhiteSpace( source[openParenthesis + 1] )
+			&& char.IsWhiteSpace( source[closeParenthesis - 1] );
 	}
 
 	private static int FindMatchingParenthesis(
