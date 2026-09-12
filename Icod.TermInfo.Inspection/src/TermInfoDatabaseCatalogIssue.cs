@@ -10,13 +10,13 @@ public sealed class TermInfoDatabaseCatalogIssue {
 		string path,
 		string message
 	) {
-		ArgumentException.ThrowIfNullOrWhiteSpace(path);
-		ArgumentException.ThrowIfNullOrWhiteSpace(message);
+		ArgumentException.ThrowIfNullOrWhiteSpace( path );
+		ArgumentException.ThrowIfNullOrWhiteSpace( message );
 
-		if (!System.IO.Path.IsPathFullyQualified(path)) {
+		if ( !System.IO.Path.IsPathFullyQualified( path ) ) {
 			throw new ArgumentException(
 				"A catalog issue path must be fully qualified.",
-				nameof(path)
+				nameof( path )
 			);
 		}
 
