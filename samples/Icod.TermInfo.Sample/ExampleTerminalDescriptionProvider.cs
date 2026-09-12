@@ -2,12 +2,10 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Icod.TermInfo.Sample;
 
-internal sealed class ExampleTerminalDescriptionProvider : ITerminalDescriptionProvider
-{
+internal sealed class ExampleTerminalDescriptionProvider : ITerminalDescriptionProvider {
     private readonly InMemoryTerminalDescriptionProvider _inner;
 
-    internal ExampleTerminalDescriptionProvider()
-    {
+    internal ExampleTerminalDescriptionProvider() {
         TerminalDescription terminal =
             new TerminalDescriptionBuilder("example-terminal")
                 .SetBoolean(BooleanCapability.AutoRightMargin)
@@ -28,8 +26,7 @@ internal sealed class ExampleTerminalDescriptionProvider : ITerminalDescriptionP
 
     public bool TryLoad(
         string name,
-        [NotNullWhen(true)] out TerminalDescription? terminal)
-    {
+        [NotNullWhen(true)] out TerminalDescription? terminal) {
         ArgumentNullException.ThrowIfNull(name);
 
         return _inner.TryLoad(name, out terminal);
