@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Icod.TermInfo;
 using Xunit;
 
@@ -6,111 +5,109 @@ namespace Icod.TermInfo.Tests;
 
 public sealed class Vt100OutputTests {
 	[Fact]
-	public void Vt100RawCapabilitiesStillContainPaddingAnnotations() {
-		Assert.Equal(
-			"\x1b[H\x1b[J$<50>",
+	public void DefaultOutputRemovesVt100ClearScreenPadding() {
+		using StringWriter writer = new();
+
+		TermInfoOutput.PutP(
 			TerminalProfiles.Vt100.GetRequiredString(
 				StringCapability.ClearScreen
-			)
-		);
-		Assert.Equal(
-			"\x1b[1m$<2>",
-			TerminalProfiles.Vt100.GetRequiredString(
-				StringCapability.EnterBoldMode
-			)
-		);
-		Assert.Equal(
-			"\x1b[C$<2>",
-			TerminalProfiles.Vt100.GetRequiredString(
-				StringCapability.CursorRightOne
-			)
-		);
-	}
-
-	[Fact]
-	public void IgnoreModeEmitsVt100PayloadWithoutLiteralPaddingSyntax() {
-		string raw =
-			TerminalProfiles.Vt100.GetRequiredString(
-				StringCapability.ClearScreen
-			);
-		StringWriter writer = new();
-
-		TermInfoOutput.TPuts(
-			raw,
-			affectedLines: 1,
-			writer,
-			PaddingMode.Ignore
+			),
+			writer
 		);
 
 		Assert.Equal( "\x1b[H\x1b[J", writer.ToString() );
+		Assert.DoesNotContain( "$<", writer.ToString(), StringComparison.Ordinal );
 	}
 
 	[Fact]
-	public void SleepModeSchedulesVt100PaddingAnnotation() {
-		string raw =
-			TerminalProfiles.Vt100.GetRequiredString(
-				StringCapability.CursorRightOne
-			);
-		StringWriter writer = new();
+	public void DelayModeHonorsVt100ClearScreenPadding() {
+		using StringWriter writer = new();
 		RecordingDelayProvider delayProvider = new();
 
-		TermInfoOutput.TPuts(
-			raw,
-			affectedLines: 1,
+		TermInfoOutput.PutP(
+			TerminalProfiles.Vt100.GetRequiredString(
+				StringCapability.ClearScreen
+			),
 			writer,
-			PaddingMode.Sleep,
+			PaddingMode.Delay,
 			delayProvider
 		);
 
-		Assert.Equal( "\x1b[C", writer.ToString() );
-		Assert.Single( delayProvider.Delays );
-		Assert.Equal(
-			TimeSpan.FromMilliseconds( 2 ),
-			delayProvider.Delays[0]
-		);
+		Assert.Equal( "\x1b[H\x1b[J", writer.ToString() );
+
+		TermInfoDelay delay = Assert.Single( delayProvider.Delays );
+		Assert.Equal( TimeSpan.FromMilliseconds( 50 ), delay.Duration );
+		Assert.False( delay.IsMandatory );
 	}
 
 	[Fact]
-	public void DelayModeRemainsObservablySlowerThanIgnoreMode() {
-		const string Value = "A$<20>B";
+	public void ExpandedVt100CursorAddressCanBeEmittedWithPadding() {
+		using StringWriter writer = new();
+		RecordingDelayProvider delayProvider = new();
 
-		Stopwatch ignore = Stopwatch.StartNew();
+		string value =
+			TerminalProfiles.Vt100.Expand(
+				StringCapability.CursorAddress,
+				10,
+				20
+			);
+
 		TermInfoOutput.TPuts(
-			Value,
-			affectedLines: 1,
-			TextWriter.Null,
-			PaddingMode.Ignore
+			value,
+			1,
+			writer,
+			PaddingMode.Delay,
+			delayProvider
 		);
-		ignore.Stop();
 
-		Stopwatch sleep = Stopwatch.StartNew();
+		Assert.Equal( "\x1b[11;21H", writer.ToString() );
+
+		TermInfoDelay delay = Assert.Single( delayProvider.Delays );
+		Assert.Equal( TimeSpan.FromMilliseconds( 5 ), delay.Duration );
+	}
+
+	[Fact]
+	public void ExpandedVt100AttributesCanBeEmittedWithoutPaddingText() {
+		using StringWriter writer = new();
+		RecordingDelayProvider delayProvider = new();
+
+		string value =
+			TerminalProfiles.Vt100.Expand(
+				StringCapability.SetAttributes,
+				0,
+				1,
+				0,
+				1,
+				0,
+				1,
+				0,
+				0,
+				1
+			);
+
 		TermInfoOutput.TPuts(
-			Value,
-			affectedLines: 1,
-			TextWriter.Null,
-			PaddingMode.Sleep
+			value,
+			1,
+			writer,
+			PaddingMode.Delay,
+			delayProvider
 		);
-		sleep.Stop();
 
-		Assert.True(
-			sleep.Elapsed >= TimeSpan.FromMilliseconds( 10 ),
-			$"Expected observable delay; measured {sleep.Elapsed}."
-		);
-		Assert.True(
-			sleep.Elapsed > ignore.Elapsed,
-			$"Sleep mode {sleep.Elapsed} should exceed ignore mode {ignore.Elapsed}."
-		);
+		Assert.DoesNotContain( "$<", writer.ToString(), StringComparison.Ordinal );
+
+		TermInfoDelay delay = Assert.Single( delayProvider.Delays );
+		Assert.Equal( TimeSpan.FromMilliseconds( 2 ), delay.Duration );
 	}
 
 	private sealed class RecordingDelayProvider : ITermInfoDelayProvider {
-		internal List<TimeSpan> Delays { get; } = [];
+		internal List<TermInfoDelay> Delays { get; } = [];
 
-		public void Delay( TimeSpan delay ) {
+		public void Delay( TermInfoDelay delay ) {
 			Delays.Add( delay );
 		}
 
 		public ValueTask DelayAsync(
-			TimeSpan delay,
+			TermInfoDelay delay,
 			CancellationToken cancellationToken = default
 		) {
 			cancellationToken.ThrowIfCancellationRequested();
