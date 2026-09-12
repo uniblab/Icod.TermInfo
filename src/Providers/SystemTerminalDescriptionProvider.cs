@@ -18,8 +18,7 @@ namespace Icod.TermInfo;
 /// <see cref="TerminalDatabase.BuiltIn"/>.
 /// </remarks>
 public sealed class SystemTerminalDescriptionProvider
-	: ITerminalDescriptionProvider
-{
+	: ITerminalDescriptionProvider {
 	private const string HexPrefix = "hex:";
 	private const string Base64Prefix = "b64:";
 
@@ -36,7 +35,7 @@ public sealed class SystemTerminalDescriptionProvider
 	];
 
 	private readonly ConcurrentDictionary<string, Lazy<TerminalDescription?>> _cache =
-		new(StringComparer.Ordinal);
+		new( StringComparer.Ordinal );
 	private readonly SystemTerminalDescriptionProviderOptions _options;
 	private readonly SystemTerminalDiscoverySnapshot _snapshot;
 	private readonly DirectorySource[] _directorySources;
@@ -54,40 +53,38 @@ public sealed class SystemTerminalDescriptionProvider
 	/// terminal state. The provider owns its snapshot and successful-entry cache.
 	/// </remarks>
 	public SystemTerminalDescriptionProvider(
-		SystemTerminalDescriptionProviderOptions? options = null)
-	{
+		SystemTerminalDescriptionProviderOptions? options = null
+	) {
 		_options =
-			SnapshotOptions(
-				options);
+			SnapshotOptions( options );
 		_snapshot =
-			SystemTerminalDiscoverySnapshot.Capture(
-				_options);
+			SystemTerminalDiscoverySnapshot.Capture( _options );
 		_directorySources =
 			BuildDirectorySources(
 				_options,
 				_snapshot,
-				GetDefaultRoots(
-					_snapshot.Platform));
+				GetDefaultRoots( _snapshot.Platform )
+			);
 	}
 
 	internal SystemTerminalDescriptionProvider(
 		SystemTerminalDescriptionProviderOptions options,
 		SystemTerminalDiscoverySnapshot snapshot,
-		IReadOnlyList<string> defaultRoots)
-	{
-		ArgumentNullException.ThrowIfNull(options);
-		ArgumentNullException.ThrowIfNull(snapshot);
-		ArgumentNullException.ThrowIfNull(defaultRoots);
+		IReadOnlyList<string> defaultRoots
+	) {
+		ArgumentNullException.ThrowIfNull( options );
+		ArgumentNullException.ThrowIfNull( snapshot );
+		ArgumentNullException.ThrowIfNull( defaultRoots );
 
 		_options =
-			SnapshotOptions(
-				options);
+			SnapshotOptions( options );
 		_snapshot = snapshot;
 		_directorySources =
 			BuildDirectorySources(
 				_options,
 				_snapshot,
-				defaultRoots);
+				defaultRoots
+			);
 	}
 
 	/// <inheritdoc/>
@@ -98,77 +95,75 @@ public sealed class SystemTerminalDescriptionProvider
 	/// </remarks>
 	public bool TryLoad(
 		string name,
-		[NotNullWhen(true)] out TerminalDescription? terminal)
-	{
-		DirectoryTerminalDescriptionProvider.ValidateTerminalName(
-			name);
+		[NotNullWhen( true )] out TerminalDescription? terminal
+	) {
+		DirectoryTerminalDescriptionProvider.ValidateTerminalName( name );
 
 		Lazy<TerminalDescription?> load =
 			_cache.GetOrAdd(
 				name,
-				CreateLoad);
+				CreateLoad
+			);
 
-		try
-		{
+		try {
 			terminal =
 				load.Value;
-		}
-		catch
-		{
+		} catch {
 			_cache.TryRemove(
 				new KeyValuePair<string, Lazy<TerminalDescription?>>(
 					name,
-					load));
+					load
+				)
+			);
 			throw;
 		}
 
-		if (terminal is null)
-		{
+		if ( terminal is null ) {
 			_cache.TryRemove(
 				new KeyValuePair<string, Lazy<TerminalDescription?>>(
 					name,
-					load));
+					load
+				)
+			);
 			return false;
 		}
 
 		return true;
 	}
 
-	private Lazy<TerminalDescription?> CreateLoad(
-		string name)
-	{
+	private Lazy<TerminalDescription?> CreateLoad( string name ) {
 		return new Lazy<TerminalDescription?>(
-			() => LoadUncached(
-				name),
-			LazyThreadSafetyMode.ExecutionAndPublication);
+			() => LoadUncached( name ),
+			LazyThreadSafetyMode.ExecutionAndPublication
+		);
 	}
 
-	private TerminalDescription? LoadUncached(
-		string name)
-	{
-		if (_options.UseEnvironment
-			&& IsEncodedTermInfo(
-				_snapshot.TermInfo))
-		{
-			if (SystemTerminalDiscoveryInputs.TryLoadEncodedTermInfo(
+	private TerminalDescription? LoadUncached( string name ) {
+		if (
+			_options.UseEnvironment
+			&& IsEncodedTermInfo( _snapshot.TermInfo )
+		) {
+			if (
+				SystemTerminalDiscoveryInputs.TryLoadEncodedTermInfo(
 					_snapshot.TermInfo,
 					name,
 					_options.ParserOptions,
-					out TerminalDescription? encodedTerminal))
-			{
+					out TerminalDescription? encodedTerminal
+				)
+			) {
 				return encodedTerminal;
 			}
 		}
 
-		foreach (DirectorySource source in _directorySources)
-		{
-			ValidateDirectorySource(
-				source);
+		foreach ( DirectorySource source in _directorySources ) {
+			ValidateDirectorySource( source );
 
-			if (source.Provider.TryLoad(
+			if (
+				source.Provider.TryLoad(
 					name,
-					out TerminalDescription? terminal))
-			{
+					out TerminalDescription? terminal
+				)
+			) {
 				return terminal;
 			}
 		}
@@ -177,10 +172,9 @@ public sealed class SystemTerminalDescriptionProvider
 	}
 
 	internal static IReadOnlyList<string> GetDefaultRoots(
-		TerminalHostPlatform platform)
-	{
-		return platform switch
-		{
+		TerminalHostPlatform platform
+	) {
+		return platform switch {
 			TerminalHostPlatform.Linux => LinuxDefaultRoots,
 			TerminalHostPlatform.MacOS => MacOSDefaultRoots,
 			_ => Array.Empty<string>(),
@@ -192,16 +186,15 @@ public sealed class SystemTerminalDescriptionProvider
 		SystemTerminalDiscoverySnapshot snapshot,
 		IReadOnlyList<string> defaultRoots
 	) {
-		ArgumentNullException.ThrowIfNull(options);
-		ArgumentNullException.ThrowIfNull(snapshot);
-		ArgumentNullException.ThrowIfNull(defaultRoots);
+		ArgumentNullException.ThrowIfNull( options );
+		ArgumentNullException.ThrowIfNull( snapshot );
+		ArgumentNullException.ThrowIfNull( defaultRoots );
 
 		List<SystemTerminalDatabaseLocation> locations = [];
 
-		if (options.UseEnvironment
-			&& IsEncodedTermInfo(
-				snapshot.TermInfo
-			)
+		if (
+			options.UseEnvironment
+			&& IsEncodedTermInfo( snapshot.TermInfo )
 		) {
 			locations.Add(
 				new SystemTerminalDatabaseLocation(
@@ -218,7 +211,7 @@ public sealed class SystemTerminalDescriptionProvider
 				defaultRoots
 			);
 
-		foreach (DirectorySource source in directorySources) {
+		foreach ( DirectorySource source in directorySources ) {
 			locations.Add(
 				new SystemTerminalDatabaseLocation(
 					source.Kind,
@@ -241,32 +234,33 @@ public sealed class SystemTerminalDescriptionProvider
 			source.UseEnvironment,
 			source.UseUserDatabase,
 			source.UseSystemDatabases,
-			source.ParserOptions);
+			source.ParserOptions
+		);
 	}
 
 	private static DirectorySource[] BuildDirectorySources(
 		SystemTerminalDescriptionProviderOptions options,
 		SystemTerminalDiscoverySnapshot snapshot,
-		IReadOnlyList<string> defaultRoots)
-	{
-		ArgumentNullException.ThrowIfNull(options);
-		ArgumentNullException.ThrowIfNull(snapshot);
-		ArgumentNullException.ThrowIfNull(defaultRoots);
+		IReadOnlyList<string> defaultRoots
+	) {
+		ArgumentNullException.ThrowIfNull( options );
+		ArgumentNullException.ThrowIfNull( snapshot );
+		ArgumentNullException.ThrowIfNull( defaultRoots );
 
 		StringComparer comparer =
-			(snapshot.Platform == TerminalHostPlatform.Windows)
+			( snapshot.Platform == TerminalHostPlatform.Windows )
 				? StringComparer.OrdinalIgnoreCase
 				: StringComparer.Ordinal
 		;
 		HashSet<string> seen =
-			new(comparer);
+			new( comparer );
 		List<DirectorySource> sources = [];
 
-		if (options.UseEnvironment
+		if (
+			options.UseEnvironment
 			&& snapshot.TermInfo is { Length: > 0 }
-			&& !IsEncodedTermInfo(
-				snapshot.TermInfo))
-		{
+			&& !IsEncodedTermInfo( snapshot.TermInfo )
+		) {
 			AddDirectorySource(
 				snapshot.TermInfo,
 				"TERMINFO",
@@ -274,21 +268,25 @@ public sealed class SystemTerminalDescriptionProvider
 				snapshot.CurrentDirectory,
 				options.ParserOptions,
 				seen,
-				sources);
+				sources
+			);
 		}
 
-		if (options.UseUserDatabase
+		if (
+			options.UseUserDatabase
 			&& snapshot.Platform != TerminalHostPlatform.Windows
-			&& snapshot.HomeDirectory is { Length: > 0 })
-		{
+			&& snapshot.HomeDirectory is { Length: > 0 }
+		) {
 			string homeDirectory =
 				Path.GetFullPath(
 					snapshot.HomeDirectory,
-					snapshot.CurrentDirectory);
+					snapshot.CurrentDirectory
+				);
 			string userRoot =
 				Path.Combine(
 					homeDirectory,
-					".terminfo");
+					".terminfo"
+				);
 
 			AddDirectorySource(
 				userRoot,
@@ -297,25 +295,27 @@ public sealed class SystemTerminalDescriptionProvider
 				snapshot.CurrentDirectory,
 				options.ParserOptions,
 				seen,
-				sources);
+				sources
+			);
 		}
 
 		IReadOnlyList<string> emptyComponentDefaults =
-			options.UseSystemDatabases
+			( options.UseSystemDatabases )
 				? defaultRoots
 				: Array.Empty<string>()
 		;
 
-		if (options.UseEnvironment
-			&& snapshot.TermInfoDirs is not null)
-		{
+		if (
+			options.UseEnvironment
+			&& snapshot.TermInfoDirs is not null
+		) {
 			IReadOnlyList<string> termInfoDirs =
 				SystemTerminalDiscoveryInputs.ResolveTermInfoDirs(
 					snapshot,
-					emptyComponentDefaults);
+					emptyComponentDefaults
+				);
 
-			foreach (string root in termInfoDirs)
-			{
+			foreach ( string root in termInfoDirs ) {
 				AddDirectorySource(
 					root,
 					"TERMINFO_DIRS",
@@ -323,14 +323,13 @@ public sealed class SystemTerminalDescriptionProvider
 					snapshot.CurrentDirectory,
 					options.ParserOptions,
 					seen,
-					sources);
+					sources
+				);
 			}
 		}
 
-		if (options.UseSystemDatabases)
-		{
-			foreach (string root in defaultRoots)
-			{
+		if ( options.UseSystemDatabases ) {
+			foreach ( string root in defaultRoots ) {
 				AddDirectorySource(
 					root,
 					"platform default",
@@ -338,7 +337,8 @@ public sealed class SystemTerminalDescriptionProvider
 					snapshot.CurrentDirectory,
 					options.ParserOptions,
 					seen,
-					sources);
+					sources
+				);
 			}
 		}
 
@@ -352,29 +352,29 @@ public sealed class SystemTerminalDescriptionProvider
 		string currentDirectory,
 		CompiledTermInfoParserOptions parserOptions,
 		ISet<string> seen,
-		ICollection<DirectorySource> sources)
-	{
-		ArgumentNullException.ThrowIfNull(root);
-		ArgumentNullException.ThrowIfNull(sourceName);
-		ArgumentNullException.ThrowIfNull(currentDirectory);
-		ArgumentNullException.ThrowIfNull(parserOptions);
-		ArgumentNullException.ThrowIfNull(seen);
-		ArgumentNullException.ThrowIfNull(sources);
+		ICollection<DirectorySource> sources
+	) {
+		ArgumentNullException.ThrowIfNull( root );
+		ArgumentNullException.ThrowIfNull( sourceName );
+		ArgumentNullException.ThrowIfNull( currentDirectory );
+		ArgumentNullException.ThrowIfNull( parserOptions );
+		ArgumentNullException.ThrowIfNull( seen );
+		ArgumentNullException.ThrowIfNull( sources );
 
-		if (root.Length == 0)
-		{
+		if ( root.Length == 0 ) {
 			throw new ArgumentException(
 				"A terminfo search root cannot be empty.",
-				nameof(root));
+				nameof( root )
+			);
 		}
 
 		string fullPath =
 			Path.GetFullPath(
 				root,
-				currentDirectory);
+				currentDirectory
+			);
 
-		if (!seen.Add(fullPath))
-		{
+		if ( !seen.Add( fullPath ) ) {
 			return;
 		}
 
@@ -384,78 +384,65 @@ public sealed class SystemTerminalDescriptionProvider
 				kind,
 				new DirectoryTerminalDescriptionProvider(
 					fullPath,
-					parserOptions)));
+					parserOptions
+				)
+			)
+		);
 	}
 
-	private static void ValidateDirectorySource(
-		DirectorySource source)
-	{
+	private static void ValidateDirectorySource( DirectorySource source ) {
 		FileAttributes attributes;
 
-		try
-		{
+		try {
 			attributes =
-				File.GetAttributes(
-					source.Provider.Root);
-		}
-		catch (FileNotFoundException)
-		{
+				File.GetAttributes( source.Provider.Root );
+		} catch ( FileNotFoundException ) {
 			return;
-		}
-		catch (DirectoryNotFoundException)
-		{
+		} catch ( DirectoryNotFoundException ) {
 			return;
 		}
 
-		if ((attributes & FileAttributes.Directory) != 0)
-		{
+		if ( ( attributes & FileAttributes.Directory ) != 0 ) {
 			return;
 		}
 
 		throw new NotSupportedException(
-			$"The {source.SourceName} terminfo location '{source.Provider.Root}' is not a directory tree. Hashed terminfo databases are outside the 0.9 contract.");
+			$"The {source.SourceName} terminfo location '{source.Provider.Root}' is not a directory tree. Hashed terminfo databases are outside the 0.9 contract."
+		);
 	}
 
-	private static bool IsEncodedTermInfo(
-		string? termInfo)
-	{
+	private static bool IsEncodedTermInfo( string? termInfo ) {
 		return termInfo is not null
-			&& (termInfo.StartsWith(
+			&& (
+				termInfo.StartsWith(
 					HexPrefix,
-					StringComparison.Ordinal)
+					StringComparison.Ordinal
+				)
 				|| termInfo.StartsWith(
 					Base64Prefix,
-					StringComparison.Ordinal));
+					StringComparison.Ordinal
+				)
+			);
 	}
 
-	private sealed class DirectorySource
-	{
+	private sealed class DirectorySource {
 		internal DirectorySource(
 			string sourceName,
 			SystemTerminalDatabaseLocationKind kind,
-			DirectoryTerminalDescriptionProvider provider)
-		{
-			ArgumentNullException.ThrowIfNull(sourceName);
-			ArgumentNullException.ThrowIfNull(provider);
+			DirectoryTerminalDescriptionProvider provider
+		) {
+			ArgumentNullException.ThrowIfNull( sourceName );
+			ArgumentNullException.ThrowIfNull( provider );
 
 			SourceName = sourceName;
 			Kind = kind;
 			Provider = provider;
 		}
 
-		internal string SourceName
-		{
-			get;
-		}
+		internal string SourceName { get; }
 
-		internal SystemTerminalDatabaseLocationKind Kind
-		{
-			get;
-		}
+		internal SystemTerminalDatabaseLocationKind Kind { get; }
 
-		internal DirectoryTerminalDescriptionProvider Provider
-		{
-			get;
-		}
+		internal DirectoryTerminalDescriptionProvider Provider { get; }
 	}
 }
