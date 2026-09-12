@@ -8,35 +8,34 @@ namespace Icod.TermInfo.Source;
 /// whether a capability name is standard or extended. Capability catalog
 /// classification begins in S05.
 /// </remarks>
-public enum TermInfoSourceFieldKind
-{
-    /// <summary>
-    /// A Boolean capability declaration.
-    /// </summary>
-    BooleanCapability = 0,
+public enum TermInfoSourceFieldKind {
+	/// <summary>
+	/// A Boolean capability declaration.
+	/// </summary>
+	BooleanCapability = 0,
 
-    /// <summary>
-    /// A numeric capability declaration.
-    /// </summary>
-    NumericCapability = 1,
+	/// <summary>
+	/// A numeric capability declaration.
+	/// </summary>
+	NumericCapability = 1,
 
-    /// <summary>
-    /// A string capability declaration.
-    /// </summary>
-    StringCapability = 2,
+	/// <summary>
+	/// A string capability declaration.
+	/// </summary>
+	StringCapability = 2,
 
-    /// <summary>
-    /// A capability cancellation declaration.
-    /// </summary>
-    CancelledCapability = 3,
+	/// <summary>
+	/// A capability cancellation declaration.
+	/// </summary>
+	CancelledCapability = 3,
 
-    /// <summary>
-    /// A <c>use=</c> inheritance reference.
-    /// </summary>
-    UseReference = 4,
+	/// <summary>
+	/// A <c>use=</c> inheritance reference.
+	/// </summary>
+	UseReference = 4,
 
-    /// <summary>
-    /// An ncurses-compatible field disabled by a leading period.
-    /// </summary>
-    DisabledCapability = 5,
+	/// <summary>
+	/// An ncurses-compatible field disabled by a leading period.
+	/// </summary>
+	DisabledCapability = 5,
 }
