@@ -10,13 +10,13 @@ public sealed class TermInfoDatabaseSetOccurrence {
 		int catalogEntryIndex,
 		TermInfoDatabaseCatalogEntry entry
 	) {
-		if (databaseIndex < 0) {
-			throw new ArgumentOutOfRangeException(nameof(databaseIndex));
+		if ( databaseIndex < 0 ) {
+			throw new ArgumentOutOfRangeException( nameof( databaseIndex ) );
 		}
-		if (catalogEntryIndex < 0) {
-			throw new ArgumentOutOfRangeException(nameof(catalogEntryIndex));
+		if ( catalogEntryIndex < 0 ) {
+			throw new ArgumentOutOfRangeException( nameof( catalogEntryIndex ) );
 		}
-		ArgumentNullException.ThrowIfNull(entry);
+		ArgumentNullException.ThrowIfNull( entry );
 
 		DatabaseIndex = databaseIndex;
 		CatalogEntryIndex = catalogEntryIndex;
