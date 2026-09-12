@@ -4,8 +4,7 @@ namespace Icod.TermInfo.Termcap;
 /// Identifies how a parsed termcap capability code relates to the canonical
 /// Runtime standard-capability catalog.
 /// </summary>
-public enum TermcapCapabilityClassification
-{
+public enum TermcapCapabilityClassification {
 	/// <summary>
 	/// The code maps uniquely to a current standard Runtime capability.
 	/// </summary>

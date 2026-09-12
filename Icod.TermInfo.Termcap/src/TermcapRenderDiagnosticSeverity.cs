@@ -3,8 +3,7 @@ namespace Icod.TermInfo.Termcap;
 /// <summary>
 /// Identifies the severity of a termcap reverse-rendering diagnostic.
 /// </summary>
-public enum TermcapRenderDiagnosticSeverity
-{
+public enum TermcapRenderDiagnosticSeverity {
 	/// <summary>The diagnostic records non-lossy rendering information.</summary>
 	Information = 0,
 

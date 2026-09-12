@@ -10,8 +10,7 @@ namespace Icod.TermInfo.Termcap;
 /// Provider failures other than a clean miss propagate to the caller. A reader
 /// returned on success is owned and disposed by the acquisition operation.
 /// </remarks>
-public interface ITermcapFileProvider
-{
+public interface ITermcapFileProvider {
 	/// <summary>
 	/// Attempts to open one termcap database path for bounded parser input.
 	/// </summary>

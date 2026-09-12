@@ -3,8 +3,7 @@ namespace Icod.TermInfo.Termcap;
 /// <summary>
 /// Identifies the unresolved syntactic kind of a termcap capability field.
 /// </summary>
-public enum TermcapSourceFieldKind
-{
+public enum TermcapSourceFieldKind {
 	/// <summary>A present Boolean capability.</summary>
 	BooleanCapability = 0,
 	/// <summary>A numeric capability.</summary>
