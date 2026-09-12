@@ -2,27 +2,33 @@ namespace Icod.TermInfo.Sample;
 
 internal static class SampleAcquisition {
 	internal static TerminalDescription ParseCompiledEntry(
-		ReadOnlySpan<byte> entry) {
+		ReadOnlySpan<byte> entry
+	) {
 		return CompiledTermInfoParser.Parse(
-			entry);
+			entry
+		);
 	}
 
 	internal static TerminalDescription LoadExplicitRoot(
 		string root,
-		string name) {
-		ArgumentNullException.ThrowIfNull(root);
-		ArgumentNullException.ThrowIfNull(name);
+		string name
+	) {
+		ArgumentNullException.ThrowIfNull( root );
+		ArgumentNullException.ThrowIfNull( name );
 
 		DirectoryTerminalDescriptionProvider provider =
 			new(
-				root);
+				root
+			);
 		return new TerminalDatabase(
 			new ITerminalDescriptionProvider[]
 			{
 				provider,
-			})
+			}
+		)
 			.Load(
-				name);
+				name
+			);
 	}
 
 	internal static SystemTerminalDescriptionProvider CreateRestrictedSystemProvider() {
@@ -30,7 +36,9 @@ internal static class SampleAcquisition {
 			new SystemTerminalDescriptionProviderOptions(
 				useEnvironment: false,
 				useUserDatabase: false,
-				useSystemDatabases: false));
+				useSystemDatabases: false
+			)
+		);
 	}
 
 	internal static SystemTerminalDescriptionProvider CreateSystemProvider() {
@@ -38,7 +46,8 @@ internal static class SampleAcquisition {
 	}
 
 	internal static TerminalDatabase CreateSystemWithBuiltInFallback(
-		SystemTerminalDescriptionProvider? systemProvider = null) {
+		SystemTerminalDescriptionProvider? systemProvider = null
+	) {
 		SystemTerminalDescriptionProvider system =
 			systemProvider
 			?? CreateSystemProvider();
@@ -48,6 +57,7 @@ internal static class SampleAcquisition {
 			{
 				system,
 				TerminalDatabase.BuiltIn,
-			});
+			}
+		);
 	}
 }
