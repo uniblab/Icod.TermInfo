@@ -25,7 +25,12 @@ public sealed class CodingConventionTests {
 			}
 		}
 
-		Assert.Empty( violations );
+		Assert.True(
+			violations.Count == 0,
+			"C# files using legacy block-brace placement:"
+				+ Environment.NewLine
+				+ string.Join( Environment.NewLine, violations )
+		);
 	}
 
 	private static IEnumerable<string> EnumerateCSharpFiles(
