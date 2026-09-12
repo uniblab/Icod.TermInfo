@@ -306,18 +306,18 @@ public sealed class I02DatabaseLocationInspectionTests {
 			new(
 				null,
 				null,
-				Path.Combine(root, "home"),
+				Path.Combine( root, "home" ),
 				root,
 				TerminalHostPlatform.Linux
 			);
-		string defaultRoot = Path.Combine(root, "default");
+		string defaultRoot = Path.Combine( root, "default" );
 
 		TermInfoDatabaseLocation location =
 			Assert.Single(
 				TermInfoDatabaseInspector.GetSystemLocations(
 					options,
 					snapshot,
-					[defaultRoot]
+					[ defaultRoot ]
 				)
 			);
 
