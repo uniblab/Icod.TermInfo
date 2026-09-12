@@ -19,15 +19,18 @@ public sealed class T45CompletionGateTests {
 
 		Assert.Equal(
 			new Version( 1, 0, 0, 0 ),
-			assemblyName.Version );
+			assemblyName.Version
+		);
 		Assert.NotNull(
-			informationalVersion );
+			informationalVersion
+		);
 
 		string semanticVersion =
 			informationalVersion!
 				.Split(
 					'+',
-					2 )[ 0 ];
+					2
+				)[ 0 ];
 
 		Assert.StartsWith(
 			"1.11.0",
@@ -44,14 +47,18 @@ public sealed class T45CompletionGateTests {
 			XDocument.Load(
 				Path.Combine(
 					root,
-					"Icod.TermInfo.csproj" ),
-				LoadOptions.None );
+					"Icod.TermInfo.csproj"
+				),
+				LoadOptions.None
+			);
 		XDocument buildProperties =
 			XDocument.Load(
 				Path.Combine(
 					root,
-					"Directory.Build.props" ),
-				LoadOptions.None );
+					"Directory.Build.props"
+				),
+				LoadOptions.None
+			);
 
 		Assert.StartsWith(
 			"1.11.0",
@@ -65,22 +72,30 @@ public sealed class T45CompletionGateTests {
 			"$(IcodTermInfoSuiteVersion)",
 			ReadRequiredProperty(
 				project,
-				"Version" ) );
+				"Version"
+			)
+		);
 		Assert.Equal(
 			"$(IcodTermInfoSuiteVersion)",
 			ReadRequiredProperty(
 				project,
-				"PackageVersion" ) );
+				"PackageVersion"
+			)
+		);
 		Assert.Equal(
 			"1.0.0.0",
 			ReadRequiredProperty(
 				project,
-				"AssemblyVersion" ) );
+				"AssemblyVersion"
+			)
+		);
 		Assert.Equal(
 			"net8.0;net9.0;net10.0",
 			ReadRequiredProperty(
 				project,
-				"TargetFrameworks" ) );
+				"TargetFrameworks"
+			)
+		);
 	}
 
 	[Fact]
@@ -91,47 +106,62 @@ public sealed class T45CompletionGateTests {
 			File.ReadAllText(
 				Path.Combine(
 					root,
-					"README.md" ) );
+					"README.md"
+				)
+			);
 
 		Assert.Contains(
 			"dotnet add package Icod.TermInfo --version 1.11.0",
-			readme );
+			readme
+		);
 		Assert.Contains(
 			"dotnet add package Icod.TermInfo.Source --version 1.11.0",
-			readme );
+			readme
+		);
 		Assert.Contains(
 			"dotnet add package Icod.TermInfo.Termcap --version 1.11.0",
-			readme );
+			readme
+		);
 		Assert.Contains(
 			"dotnet add package Icod.TermInfo.Compiler --version 1.11.0",
-			readme );
+			readme
+		);
 		Assert.Contains(
 			"dotnet add package Icod.TermInfo.Inspection --version 1.11.0",
-			readme );
+			readme
+		);
 		Assert.Contains(
 			"dotnet tool install --global Icod.TermInfo.Tools --version 1.11.0",
-			readme );
+			readme
+		);
 		Assert.DoesNotContain(
 			"1.6.0-Alpha-8 is the current",
-			readme );
+			readme
+		);
 		Assert.Contains(
 			"docs/VERSIONING.md",
-			readme );
+			readme
+		);
 		Assert.Contains(
 			"docs/COMPATIBILITY.md",
-			readme );
+			readme
+		);
 		Assert.Contains(
 			"docs/1.6.0-RELEASE-AUDIT.md",
-			readme );
+			readme
+		);
 		Assert.Contains(
 			"docs/1.9.0-RELEASE-AUDIT.md",
-			readme );
+			readme
+		);
 		Assert.Contains(
 			"docs/1.8.0-RELEASE-AUDIT.md",
-			readme );
+			readme
+		);
 		Assert.Contains(
 			"docs/1.11.0-RELEASE-AUDIT.md",
-			readme );
+			readme
+		);
 	}
 
 	[Fact]
@@ -144,14 +174,18 @@ public sealed class T45CompletionGateTests {
 					root,
 					"tools",
 					"termcap-package-verifier",
-					"Program.cs" ) );
+					"Program.cs"
+				)
+			);
 
 		Assert.Contains(
 			"docs/1.6.0-TERMCAP-PUBLIC-API-BASELINE.txt",
-			termcapPackageVerifier );
+			termcapPackageVerifier
+		);
 		Assert.Contains(
 			"TERMCAP-API-DOC-ID-SNAPSHOT-V1",
-			termcapPackageVerifier );
+			termcapPackageVerifier
+		);
 
 		foreach (
 			string relativePath
@@ -160,73 +194,101 @@ public sealed class T45CompletionGateTests {
 				Path.Combine(
 					".github",
 					"scripts",
-					"verify-release-package.cmd"),
+					"verify-release-package.cmd"
+				),
 				Path.Combine(
 					".github",
 					"scripts",
-					"verify-release-package.sh"),
-			} ) {
+					"verify-release-package.sh"
+				),
+			}
+		) {
 			string verifier =
 				File.ReadAllText(
 					Path.Combine(
 						root,
-						relativePath ) );
+						relativePath
+					)
+				);
 
 			Assert.Contains(
 				"--check",
-				verifier );
+				verifier
+			);
 			Assert.Contains(
 				"--compare",
-				verifier );
+				verifier
+			);
 			Assert.Contains(
 				"net8.0",
-				verifier );
+				verifier
+			);
 			Assert.Contains(
 				"net9.0",
-				verifier );
+				verifier
+			);
 			Assert.Contains(
 				"net10.0",
-				verifier );
+				verifier
+			);
 			Assert.Contains(
 				"1.1.0-SOURCE-PUBLIC-API-BASELINE.txt",
-				verifier );
+				verifier
+			);
 			Assert.Contains(
 				"1.2.0-COMPILER-PUBLIC-API-BASELINE.txt",
-				verifier );
+				verifier
+			);
 			Assert.Contains(
 				"1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt",
-				verifier );
+				verifier
+			);
 			Assert.Contains(
 				"1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt",
-				verifier );
+				verifier
+			);
 			Assert.True(
 				verifier.Contains(
 					"termcap-package-verifier",
-					StringComparison.OrdinalIgnoreCase ) );
+					StringComparison.OrdinalIgnoreCase
+				)
+			);
 			Assert.True(
 				verifier.Contains(
 					"termcap-package-smoke",
-					StringComparison.OrdinalIgnoreCase ) );
+					StringComparison.OrdinalIgnoreCase
+				)
+			);
 			Assert.True(
 				verifier.Contains(
 					"package-smoke",
-					StringComparison.OrdinalIgnoreCase ) );
+					StringComparison.OrdinalIgnoreCase
+				)
+			);
 			Assert.True(
 				verifier.Contains(
 					"source-package-smoke",
-					StringComparison.OrdinalIgnoreCase ) );
+					StringComparison.OrdinalIgnoreCase
+				)
+			);
 			Assert.True(
 				verifier.Contains(
 					"compiler-package-smoke",
-					StringComparison.OrdinalIgnoreCase ) );
+					StringComparison.OrdinalIgnoreCase
+				)
+			);
 			Assert.True(
 				verifier.Contains(
 					"inspection-package-smoke",
-					StringComparison.OrdinalIgnoreCase ) );
+					StringComparison.OrdinalIgnoreCase
+				)
+			);
 			Assert.True(
 				verifier.Contains(
 					"inspection-package-verifier",
-					StringComparison.OrdinalIgnoreCase ) );
+					StringComparison.OrdinalIgnoreCase
+				)
+			);
 
 			string restoreMarker;
 			if (
@@ -273,48 +335,62 @@ public sealed class T45CompletionGateTests {
 				Path.Combine(
 					root,
 					"docs",
-					"1.3.0-RELEASE-AUDIT.md" ) );
+					"1.3.0-RELEASE-AUDIT.md"
+				)
+			);
 
 		Assert.Contains(
 			"Final release candidate",
-			audit );
+			audit
+		);
 		Assert.Contains(
 			"docs/1.0.0-PUBLIC-API-BASELINE.txt",
-			audit );
+			audit
+		);
 		Assert.Contains(
 			"docs/1.1.0-SOURCE-PUBLIC-API-BASELINE.txt",
-			audit );
+			audit
+		);
 		Assert.Contains(
 			"docs/1.2.0-COMPILER-PUBLIC-API-BASELINE.txt",
-			audit );
+			audit
+		);
 		Assert.Contains(
 			"docs/1.3.0-INSPECTION-PUBLIC-API-BASELINE.txt",
-			audit );
+			audit
+		);
 		Assert.Contains(
 			"verify-release-package",
-			audit );
+			audit
+		);
 		Assert.Contains(
 			"release.yaml",
-			audit );
+			audit
+		);
 		Assert.Contains(
 			"v1.3.0",
-			audit );
+			audit
+		);
 	}
 
 	private static string ReadRequiredProperty(
 		XDocument project,
-		string name ) {
+		string name
+	) {
 		ArgumentNullException.ThrowIfNull(
-			project );
+			project
+		);
 		ArgumentNullException.ThrowIfNull(
-			name );
+			name
+		);
 
 		return project
 			.Descendants()
 			.Single(
 				element =>
 					element.Name.LocalName
-						== name )
+						== name
+			)
 			.Value
 			.Trim();
 	}
@@ -322,13 +398,18 @@ public sealed class T45CompletionGateTests {
 	private static string FindRepositoryRoot() {
 		DirectoryInfo? current =
 			new(
-				AppContext.BaseDirectory );
+				AppContext.BaseDirectory
+			);
 
 		while ( current is not null ) {
-			if ( File.Exists(
+			if (
+				File.Exists(
 					Path.Combine(
 						current.FullName,
-						"Icod.TermInfo.csproj" ) ) ) {
+						"Icod.TermInfo.csproj"
+					)
+				)
+			) {
 				return current.FullName;
 			}
 
@@ -337,6 +418,7 @@ public sealed class T45CompletionGateTests {
 		}
 
 		throw new InvalidOperationException(
-			"Unable to locate the Icod.TermInfo repository root." );
+			"Unable to locate the Icod.TermInfo repository root."
+		);
 	}
 }
