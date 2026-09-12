@@ -335,18 +335,6 @@ public sealed class CodingConventionTests {
 				return questionIndex;
 			}
 
-			int conditionLineStart =
-				maskedSource.LastIndexOf( '\n', conditionOpen - 1 ) + 1;
-			int conditionFirst = conditionLineStart;
-			while (
-				conditionFirst < conditionOpen
-				&& char.IsWhiteSpace( maskedSource[conditionFirst] )
-			) {
-				conditionFirst++;
-			}
-			string conditionIndent =
-				maskedSource[ conditionLineStart..conditionFirst ];
-
 			string branchIndent = match.Groups[ "indent" ].Value;
 			int colonIndex = FindTernaryBranchMarker(
 				maskedSource,
@@ -365,13 +353,10 @@ public sealed class CodingConventionTests {
 
 			int semicolonLineStart =
 				maskedSource.LastIndexOf( '\n', semicolonIndex - 1 ) + 1;
-			string semicolonIndent =
-				maskedSource[ semicolonLineStart..semicolonIndex ];
-			if (
-				semicolonIndent != conditionIndent
-				|| semicolonIndent.Any( character => !char.IsWhiteSpace( character ) )
-			) {
-				return semicolonIndex;
+			for ( int i = semicolonLineStart; i < semicolonIndex; i++ ) {
+				if ( !char.IsWhiteSpace( source[i] ) ) {
+					return semicolonIndex;
+				}
 			}
 		}
 
