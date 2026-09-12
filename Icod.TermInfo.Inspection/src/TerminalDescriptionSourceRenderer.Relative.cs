@@ -327,13 +327,14 @@ public static partial class TerminalDescriptionSourceRenderer {
 			}
 
 			TermInfoCapabilityValue orderingValue =
-				targetPresent
+				( targetPresent )
 					? targetValue
-					: inheritedValue;
+					: inheritedValue
+			;
 			directives.Add(
 				new ExtendedRelativeDirective(
 					name,
-					targetPresent
+					( targetPresent )
 						? targetValue
 						: null,
 					GetExtendedKindOrder( orderingValue )

@@ -282,10 +282,10 @@ public static class TerminalDescriptionComparer {
 				null,
 				null,
 				null,
-				leftPresent
+				( leftPresent )
 					? leftValue
 					: null,
-				rightPresent
+				( rightPresent )
 					? rightValue
 					: null
 			)

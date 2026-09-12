@@ -458,7 +458,7 @@ internal static class Program {
 
 			AppendGenericParameters(
 				builder,
-				method.IsGenericMethodDefinition
+				( method.IsGenericMethodDefinition )
 					? method.GetGenericArguments()
 					: Array.Empty<Type>(),
 				"    "

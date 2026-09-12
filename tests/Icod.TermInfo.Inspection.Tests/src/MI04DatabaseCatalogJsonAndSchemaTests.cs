@@ -26,9 +26,10 @@ public sealed class MI04DatabaseCatalogJsonAndSchemaTests {
 		string fixtureName
 	) {
 		TermInfoDatabaseCatalog catalog =
-			complete
+			( complete )
 				? CreateCompleteCatalog()
-				: CreateIncompleteCatalog();
+				: CreateIncompleteCatalog()
+		;
 		string actual =
 			TermInfoJsonRenderer.Render(
 				catalog,

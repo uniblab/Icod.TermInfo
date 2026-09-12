@@ -181,9 +181,10 @@ internal sealed class InfoCmpOptions {
 		_candidateRoots;
 
 	internal string? TerminalName =>
-		_terminalNames.Count == 1
+		( _terminalNames.Count == 1 )
 			? _terminalNames[ 0 ]
-			: null;
+			: null
+	;
 
 	internal bool IsSynthesis =>
 		RelativeSynthesis;

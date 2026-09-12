@@ -254,7 +254,7 @@ internal static class ToeSourceDependencyAnalyzer {
 		var output = new StringBuilder();
 		foreach ( TermInfoSourceDiagnostic diagnostic in diagnostics ) {
 			TermInfoSourceSpan? span = diagnostic.Span;
-			string location = span is null
+			string location = ( span is null )
 				? "source"
 				: string.Concat(
 					span.SourceName ?? "source",
@@ -271,7 +271,7 @@ internal static class ToeSourceDependencyAnalyzer {
 				.Append( diagnostic.Code )
 				.Append( ' ' )
 				.Append(
-					diagnostic.Severity == TermInfoSourceDiagnosticSeverity.Error
+					( diagnostic.Severity == TermInfoSourceDiagnosticSeverity.Error )
 						? "error"
 						: "warning"
 				)

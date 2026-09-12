@@ -513,7 +513,7 @@ public sealed class RS07ContractTests {
 		internal DeterministicRandom(
 			uint seed
 		) {
-			_state = seed == 0
+			_state = ( seed == 0 )
 				? 0xA341316Cu
 				: seed
 			;

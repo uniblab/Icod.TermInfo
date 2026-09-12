@@ -581,7 +581,7 @@ public static partial class TermInfoDatabaseInspector {
 		TermInfoDatabaseCatalogIssueKind kind =
 			ClassifyCatalogIoException( exception );
 		string message =
-			kind == TermInfoDatabaseCatalogIssueKind.PermissionFailure
+			( kind == TermInfoDatabaseCatalogIssueKind.PermissionFailure )
 				? $"Access to the {subject} was denied."
 				: $"The {subject} could not be inspected because of an I/O failure."
 		;

@@ -518,9 +518,10 @@ public sealed class RP02PlanningTests {
 		ArgumentNullException.ThrowIfNull( options );
 
 		TerminalDescriptionSourceSynthesisParent[] parents =
-			parent is null
+			( parent is null )
 				? []
-				: [ parent ];
+				: [ parent ]
+		;
 		string source;
 		try {
 			source =

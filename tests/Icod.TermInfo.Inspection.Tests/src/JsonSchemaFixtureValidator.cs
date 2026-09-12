@@ -313,12 +313,13 @@ internal static class JsonSchemaFixtureValidator {
 		}
 
 		JsonObject? properties =
-			schema.TryGetPropertyValue(
+			( schema.TryGetPropertyValue(
 				"properties",
 				out JsonNode? propertiesNode
-			)
+			) )
 				? propertiesNode!.AsObject()
-				: null;
+				: null
+		;
 		if ( properties is not null ) {
 			foreach (
 				KeyValuePair<string, JsonNode?> propertySchema

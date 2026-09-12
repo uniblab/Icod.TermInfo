@@ -175,7 +175,7 @@ public static class Command {
 			}
 
 			if ( options.Json ) {
-				return options.Directories.Count == 1
+				return ( options.Directories.Count == 1 )
 					? await RenderCatalogAsync(
 						options.Directories[ 0 ],
 						stdout,
@@ -187,7 +187,8 @@ public static class Command {
 						stdout,
 						stderr,
 						cancellationToken
-					).ConfigureAwait( false );
+					).ConfigureAwait( false )
+				;
 			}
 
 			ToeListingResult listing = BuildListing(

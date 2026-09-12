@@ -560,17 +560,17 @@ public sealed class I07ValidationTests {
 	) {
 		TerminalDescriptionBuilder builder =
 			new TerminalDescriptionBuilder(
-				left
+				( left )
 					? "i07-left"
 					: "i07-right"
 			)
 				.SetDescription(
-					left
+					( left )
 						? "I07 left comparison"
 						: "I07 right comparison"
 				)
 				.AddAlias(
-					left
+					( left )
 						? "i07-left-alias"
 						: "i07-right-alias"
 				)

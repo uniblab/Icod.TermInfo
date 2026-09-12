@@ -421,10 +421,10 @@ public sealed class TC06AcquisitionTests {
 		) {
 			ArgumentException.ThrowIfNullOrWhiteSpace( name );
 
-			return _values.TryGetValue(
+			return ( _values.TryGetValue(
 				name,
 				out string? value
-			)
+			) )
 				? value
 				: null
 			;

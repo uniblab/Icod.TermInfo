@@ -506,7 +506,7 @@ public sealed class TC08DifferentialValidationTests {
 		ArgumentNullException.ThrowIfNull( result );
 
 		string fields =
-			result.Entry is null
+			( result.Entry is null )
 				? string.Empty
 				: string.Join(
 					",",

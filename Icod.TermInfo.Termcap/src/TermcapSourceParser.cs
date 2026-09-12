@@ -735,9 +735,10 @@ public static class TermcapSourceParser {
 				char target =
 					spelling[++index];
 				int controlValue =
-					target == '?'
+					( target == '?' )
 						? 0x7f
-						: target & 0x1f;
+						: target & 0x1f
+				;
 				if ( controlValue == 0 ) {
 					diagnostics.Add(
 						CreateStringDiagnostic(

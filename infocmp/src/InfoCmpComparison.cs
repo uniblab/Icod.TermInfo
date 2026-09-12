@@ -523,10 +523,13 @@ internal static class InfoCmpComparisonRenderer {
 	private static string FormatMissingCapabilityValue(
 		TermInfoCapabilityValue? otherValue
 	) {
-		return otherValue.HasValue
+		return (
+			otherValue.HasValue
 			&& otherValue.Value.Kind == TermInfoCapabilityValueKind.Boolean
-				? "F"
-				: "NULL";
+		)
+			? "F"
+			: "NULL"
+		;
 	}
 
 	private static string FormatCapabilityValue(
@@ -535,7 +538,7 @@ internal static class InfoCmpComparisonRenderer {
 	) {
 		string formatted = value.Kind switch {
 			TermInfoCapabilityValueKind.Boolean =>
-				value.BooleanValue
+				( value.BooleanValue )
 					? "T"
 					: "F",
 			TermInfoCapabilityValueKind.Number =>

@@ -328,7 +328,7 @@ public sealed class RP05CatalogPlanningTests {
 		ArgumentNullException.ThrowIfNull( target );
 
 		TerminalDescription[] entries =
-			reverseOrder
+			( reverseOrder )
 				? [
 					CreateDecoyParent(),
 					CreateBetaParent(),
