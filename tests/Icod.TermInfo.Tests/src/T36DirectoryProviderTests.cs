@@ -56,10 +56,8 @@ public sealed class T36DirectoryProviderTests {
 						BindingFlags.Public
 						| BindingFlags.Instance
 						| BindingFlags.DeclaredOnly
-					)
-					.Where(
-						method => !method.IsSpecialName
-					)
+					),
+				method => !method.IsSpecialName
 			);
 		Assert.Equal(
 			nameof( DirectoryTerminalDescriptionProvider.TryLoad ),
