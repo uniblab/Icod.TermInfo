@@ -9,10 +9,10 @@ public sealed class TermInfoDatabaseSetEntry {
 		int index,
 		TermInfoDatabaseCatalog catalog
 	) {
-		if (index < 0) {
-			throw new ArgumentOutOfRangeException(nameof(index));
+		if ( index < 0 ) {
+			throw new ArgumentOutOfRangeException( nameof( index ) );
 		}
-		ArgumentNullException.ThrowIfNull(catalog);
+		ArgumentNullException.ThrowIfNull( catalog );
 
 		Index = index;
 		Catalog = catalog;
