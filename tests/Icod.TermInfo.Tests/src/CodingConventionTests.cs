@@ -507,6 +507,7 @@ public sealed class CodingConventionTests {
 				if ( depth == 0 ) {
 					return i;
 				}
+			}
 		}
 
 		return -1;
