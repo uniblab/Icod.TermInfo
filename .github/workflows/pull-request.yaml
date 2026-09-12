@@ -36,8 +36,8 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add tests/Icod.TermInfo.Tests/src/CodingConventionTests.cs
-          git commit -m "Refine multiline ternary convention gate"
+          git add -u
+          git commit -m "Normalize multiline ternary layout"
           git push origin "HEAD:${{ github.event.pull_request.head.ref }}"
 
   build:
