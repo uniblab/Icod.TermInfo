@@ -4,19 +4,19 @@ using Xunit;
 
 namespace Icod.TermInfo.Tests;
 
-public sealed class T44DocumentationPackageFreezeTests
-{
+public sealed class T44DocumentationPackageFreezeTests {
 	[Fact]
-	public void ReleaseBuildMakesMissingPublicXmlDocumentationFatal()
-	{
+	public void ReleaseBuildMakesMissingPublicXmlDocumentationFatal() {
 		string root =
 			FindRepositoryRoot();
 		XDocument project =
 			XDocument.Load(
 				Path.Combine(
 					root,
-					"Icod.TermInfo.csproj"),
-				LoadOptions.None);
+					"Icod.TermInfo.csproj"
+				),
+				LoadOptions.None
+			);
 
 		XElement release =
 			project
@@ -25,11 +25,13 @@ public sealed class T44DocumentationPackageFreezeTests
 					element =>
 						element.Name.LocalName
 							== "PropertyGroup"
-						&& (element.Attribute("Condition")?.Value
+						&& (element.Attribute( "Condition" )?.Value
 							.Contains(
 								"'$(Configuration)' == 'Release'",
-								StringComparison.Ordinal)
-							?? false));
+								StringComparison.Ordinal
+							)
+							?? false)
+				);
 
 		Assert.Equal(
 			"true",
@@ -38,9 +40,11 @@ public sealed class T44DocumentationPackageFreezeTests
 				.Single(
 					element =>
 						element.Name.LocalName
-							== "TreatWarningsAsErrors")
+							== "TreatWarningsAsErrors"
+				)
 				.Value
-				.Trim());
+				.Trim()
+		);
 
 		Assert.DoesNotContain(
 			release.Elements(),
@@ -49,7 +53,9 @@ public sealed class T44DocumentationPackageFreezeTests
 					== "WarningsNotAsErrors"
 				&& element.Value.Contains(
 					"CS1591",
-					StringComparison.Ordinal));
+					StringComparison.Ordinal
+				)
+		);
 
 		Assert.Equal(
 			"true",
@@ -58,14 +64,15 @@ public sealed class T44DocumentationPackageFreezeTests
 				.Single(
 					element =>
 						element.Name.LocalName
-							== "GenerateDocumentationFile")
+							== "GenerateDocumentationFile"
+				)
 				.Value
-				.Trim());
+				.Trim()
+		);
 	}
 
 	[Fact]
-	public void OneXVersioningAndCompatibilityPoliciesAreCheckedIn()
-	{
+	public void OneXVersioningAndCompatibilityPoliciesAreCheckedIn() {
 		string root =
 			FindRepositoryRoot();
 
@@ -74,107 +81,129 @@ public sealed class T44DocumentationPackageFreezeTests
 				Path.Combine(
 					root,
 					"docs",
-					"VERSIONING.md"));
+					"VERSIONING.md"
+				)
+			);
 		string compatibility =
 			File.ReadAllText(
 				Path.Combine(
 					root,
 					"docs",
-					"COMPATIBILITY.md"));
+					"COMPATIBILITY.md"
+				)
+			);
 
 		Assert.Contains(
 			"Semantic Versioning",
-			versioning);
+			versioning
+		);
 		Assert.Contains(
 			"1.0.0.0",
-			versioning);
+			versioning
+		);
 		Assert.Contains(
 			"unsigned",
-			versioning);
+			versioning
+		);
 
 		Assert.Contains(
 			"net8.0",
-			compatibility);
+			compatibility
+		);
 		Assert.Contains(
 			"net10.0",
-			compatibility);
+			compatibility
+		);
 		Assert.Contains(
 			"Windows",
-			compatibility);
+			compatibility
+		);
 		Assert.Contains(
 			"Linux",
-			compatibility);
+			compatibility
+		);
 		Assert.Contains(
 			"macOS",
-			compatibility);
+			compatibility
+		);
 	}
 
 	[Fact]
-	public void PackageMetadataRetainsFrozenReleaseAssets()
-	{
+	public void PackageMetadataRetainsFrozenReleaseAssets() {
 		string root =
 			FindRepositoryRoot();
 		XDocument project =
 			XDocument.Load(
 				Path.Combine(
 					root,
-					"Icod.TermInfo.csproj"),
-				LoadOptions.None);
+					"Icod.TermInfo.csproj"
+				),
+				LoadOptions.None
+			);
 
 		Assert.Equal(
 			"README.md",
 			ReadRequiredProperty(
 				project,
-				"PackageReadmeFile"));
+				"PackageReadmeFile"
+			)
+		);
 		Assert.Equal(
 			"icon.png",
 			ReadRequiredProperty(
 				project,
-				"PackageIcon"));
+				"PackageIcon"
+			)
+		);
 		Assert.Equal(
 			"LGPL-3.0-or-later",
 			ReadRequiredProperty(
 				project,
-				"PackageLicenseExpression"));
+				"PackageLicenseExpression"
+			)
+		);
 		Assert.Equal(
 			"1.0.0.0",
 			ReadRequiredProperty(
 				project,
-				"AssemblyVersion"));
+				"AssemblyVersion"
+			)
+		);
 	}
 
 	private static string ReadRequiredProperty(
 		XDocument project,
-		string name)
-	{
-		ArgumentNullException.ThrowIfNull(
-			project);
-		ArgumentNullException.ThrowIfNull(
-			name);
+		string name
+	) {
+		ArgumentNullException.ThrowIfNull( project );
+		ArgumentNullException.ThrowIfNull( name );
 
 		return project
 			.Descendants()
 			.Single(
 				element =>
 					element.Name.LocalName
-						== name)
+						== name
+			)
 			.Value
 			.Trim();
 	}
 
-	private static string FindRepositoryRoot()
-	{
+	private static string FindRepositoryRoot() {
 		DirectoryInfo? current =
 			new(
-				AppContext.BaseDirectory);
+				AppContext.BaseDirectory
+			);
 
-		while (current is not null)
-		{
-			if (File.Exists(
+		while ( current is not null ) {
+			if (
+				File.Exists(
 					Path.Combine(
 						current.FullName,
-						"Icod.TermInfo.csproj")))
-			{
+						"Icod.TermInfo.csproj"
+					)
+				)
+			) {
 				return current.FullName;
 			}
 
@@ -183,6 +212,7 @@ public sealed class T44DocumentationPackageFreezeTests
 		}
 
 		throw new InvalidOperationException(
-			"Unable to locate the Icod.TermInfo repository root.");
+			"Unable to locate the Icod.TermInfo repository root."
+		);
 	}
 }
