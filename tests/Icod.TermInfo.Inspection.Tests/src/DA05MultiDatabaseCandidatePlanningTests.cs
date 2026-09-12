@@ -22,7 +22,7 @@ public sealed class DA05MultiDatabaseCandidatePlanningTests {
 				CreateDecoyParent()
 			);
 		TermInfoDatabaseSet set =
-			TermInfoDatabaseInspector.CreateSet([ first, second ]);
+			TermInfoDatabaseInspector.CreateSet( [ first, second ] );
 
 		TermInfoDatabaseSetSourcePlanningResult result =
 			TerminalDescriptionSourcePlanner.PlanFromDatabaseSet(
@@ -139,7 +139,7 @@ public sealed class DA05MultiDatabaseCandidatePlanningTests {
 				[ issue ]
 			);
 		TermInfoDatabaseSet set =
-			TermInfoDatabaseInspector.CreateSet([ incomplete ]);
+			TermInfoDatabaseInspector.CreateSet( [ incomplete ] );
 
 		InvalidOperationException exception =
 			Assert.Throws<InvalidOperationException>(
