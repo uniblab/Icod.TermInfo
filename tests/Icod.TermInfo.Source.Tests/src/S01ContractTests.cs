@@ -15,45 +15,61 @@ public sealed class S01ContractTests {
 				Path.Combine(
 					root,
 					"Icod.TermInfo.Source",
-					"Icod.TermInfo.Source.csproj" ),
-				LoadOptions.None );
+					"Icod.TermInfo.Source.csproj"
+				),
+				LoadOptions.None
+			);
 		XDocument runtimeProject =
 			XDocument.Load(
 				Path.Combine(
 					root,
-					"Icod.TermInfo.csproj" ),
-				LoadOptions.None );
+					"Icod.TermInfo.csproj"
+				),
+				LoadOptions.None
+			);
 
 		Assert.Equal(
 			"net8.0;net9.0;net10.0",
 			ReadRequiredProperty(
 				sourceProject,
-				"TargetFrameworks" ) );
+				"TargetFrameworks"
+			)
+		);
 		Assert.Equal(
 			"13.0",
 			ReadRequiredProperty(
 				sourceProject,
-				"LangVersion" ) );
+				"LangVersion"
+			)
+		);
 		Assert.Equal(
 			DevelopmentVersion,
 			ReadRequiredProperty(
 				sourceProject,
-				"Version" ) );
+				"Version"
+			)
+		);
 		Assert.Equal(
 			DevelopmentVersion,
 			ReadRequiredProperty(
 				sourceProject,
-				"PackageVersion" ) );
+				"PackageVersion"
+			)
+		);
 		Assert.Equal(
 			StableAssemblyVersion,
 			ReadRequiredProperty(
 				sourceProject,
-				"AssemblyVersion" ) );
+				"AssemblyVersion"
+			)
+		);
 		Assert.Equal(
 			"Icod.TermInfo.Source",
 			ReadRequiredProperty(
 				sourceProject,
-				"PackageId" ) );
+				"PackageId"
+			)
+		);
 
 		XElement sourceReference =
 			sourceProject
@@ -61,12 +77,14 @@ public sealed class S01ContractTests {
 				.Single(
 					element =>
 						element.Name.LocalName
-							== "ProjectReference" );
+							== "ProjectReference"
+				);
 		Assert.Equal(
 			@"..\Icod.TermInfo.csproj",
 			sourceReference
 				.Attribute( "Include" )
-				?.Value );
+				?.Value
+		);
 
 		Assert.DoesNotContain(
 			runtimeProject.Descendants(),
@@ -76,8 +94,10 @@ public sealed class S01ContractTests {
 				&& ( element.Attribute( "Include" )?.Value
 					.Contains(
 						"Icod.TermInfo.Source",
-						StringComparison.OrdinalIgnoreCase )
-					?? false ) );
+						StringComparison.OrdinalIgnoreCase
+					)
+					?? false )
+		);
 	}
 
 	[Fact]
@@ -87,24 +107,32 @@ public sealed class S01ContractTests {
 			XDocument.Load(
 				Path.Combine(
 					root,
-					"Icod.TermInfo.csproj" ),
-				LoadOptions.None );
+					"Icod.TermInfo.csproj"
+				),
+				LoadOptions.None
+			);
 
 		Assert.Equal(
 			DevelopmentVersion,
 			ReadRequiredProperty(
 				runtimeProject,
-				"Version" ) );
+				"Version"
+			)
+		);
 		Assert.Equal(
 			DevelopmentVersion,
 			ReadRequiredProperty(
 				runtimeProject,
-				"PackageVersion" ) );
+				"PackageVersion"
+			)
+		);
 		Assert.Equal(
 			StableAssemblyVersion,
 			ReadRequiredProperty(
 				runtimeProject,
-				"AssemblyVersion" ) );
+				"AssemblyVersion"
+			)
+		);
 	}
 
 	[Fact]
@@ -116,13 +144,17 @@ public sealed class S01ContractTests {
 			ReadProjectProperty(
 				root,
 				"tests/Icod.TermInfo.Source.Tests/Icod.TermInfo.Source.Tests.csproj",
-				"TargetFrameworks" ) );
+				"TargetFrameworks"
+			)
+		);
 		Assert.Equal(
 			"net8.0;net9.0;net10.0",
 			ReadProjectProperty(
 				root,
 				"tools/source-package-smoke/Icod.TermInfo.Source.PackageSmoke.csproj",
-				"TargetFrameworks" ) );
+				"TargetFrameworks"
+			)
+		);
 	}
 
 	[Fact]
@@ -132,49 +164,64 @@ public sealed class S01ContractTests {
 			File.ReadAllText(
 				Path.Combine(
 					root,
-					"Icod.TermInfo.sln" ) );
+					"Icod.TermInfo.sln"
+				)
+			);
 		string pullRequest =
 			File.ReadAllText(
 				Path.Combine(
 					root,
 					".github",
 					"workflows",
-					"pull-request.yaml" ) );
+					"pull-request.yaml"
+				)
+			);
 		string main =
 			File.ReadAllText(
 				Path.Combine(
 					root,
 					".github",
 					"workflows",
-					"main.yaml" ) );
+					"main.yaml"
+				)
+			);
 		string packPackages =
 			File.ReadAllText(
 				Path.Combine(
 					root,
 					"packaging",
-					"PackPackages.ps1" ) );
+					"PackPackages.ps1"
+				)
+			);
 
 		Assert.Contains(
 			"Icod.TermInfo.Source",
-			solution );
+			solution
+		);
 		Assert.Contains(
 			"Icod.TermInfo.Source.Tests",
-			solution );
+			solution
+		);
 		Assert.Contains(
 			"Icod.TermInfo.Source/Icod.TermInfo.Source.csproj",
-			packPackages );
+			packPackages
+		);
 		Assert.Contains(
 			"CONFIGURATION: Staging",
-			pullRequest );
+			pullRequest
+		);
 		Assert.Contains(
 			"./packaging/PackPackages.ps1",
-			pullRequest );
+			pullRequest
+		);
 		Assert.Contains(
 			"CONFIGURATION: Release",
-			main );
+			main
+		);
 		Assert.Contains(
 			"./packaging/PackPackages.ps1",
-			main );
+			main
+		);
 	}
 
 	[Fact]
@@ -188,36 +235,47 @@ public sealed class S01ContractTests {
 				Path.Combine(
 					".github",
 					"scripts",
-					"verify-release-package.cmd"),
+					"verify-release-package.cmd"
+				),
 				Path.Combine(
 					".github",
 					"scripts",
-					"verify-release-package.sh"),
-			} ) {
+					"verify-release-package.sh"
+				),
+			}
+		) {
 			string verifier =
 				File.ReadAllText(
 					Path.Combine(
 						root,
-						relativePath ) );
+						relativePath
+					)
+				);
 
 			Assert.Contains(
 				"Icod.TermInfo.Source",
-				verifier );
+				verifier
+			);
 			Assert.Contains(
 				"source-package-smoke",
-				verifier );
+				verifier
+			);
 			Assert.Contains(
 				"--compare",
-				verifier );
+				verifier
+			);
 			Assert.Contains(
 				"net8.0",
-				verifier );
+				verifier
+			);
 			Assert.Contains(
 				"net9.0",
-				verifier );
+				verifier
+			);
 			Assert.Contains(
 				"net10.0",
-				verifier );
+				verifier
+			);
 		}
 	}
 
@@ -229,32 +287,43 @@ public sealed class S01ContractTests {
 				Path.Combine(
 					root,
 					"docs",
-					"1.1.0-S01-SOURCE-PACKAGE-FOUNDATION.md" ) );
+					"1.1.0-S01-SOURCE-PACKAGE-FOUNDATION.md"
+				)
+			);
 
 		Assert.Contains(
 			"TIS",
-			record );
+			record
+		);
 		Assert.True(
 			record.Contains(
 				"severity",
-				StringComparison.OrdinalIgnoreCase ) );
+				StringComparison.OrdinalIgnoreCase
+			)
+		);
 		Assert.True(
 			record.Contains(
 				"source location",
-				StringComparison.OrdinalIgnoreCase ) );
+				StringComparison.OrdinalIgnoreCase
+			)
+		);
 		Assert.True(
 			record.Contains(
 				"deterministic",
-				StringComparison.OrdinalIgnoreCase ) );
+				StringComparison.OrdinalIgnoreCase
+			)
+		);
 		Assert.Contains(
 			"S02",
-			record );
+			record
+		);
 	}
 
 	private static string ReadProjectProperty(
 		string root,
 		string relativePath,
-		string propertyName ) {
+		string propertyName
+	) {
 		ArgumentNullException.ThrowIfNull( root );
 		ArgumentNullException.ThrowIfNull( relativePath );
 		ArgumentNullException.ThrowIfNull( propertyName );
@@ -265,17 +334,22 @@ public sealed class S01ContractTests {
 					root,
 					relativePath.Replace(
 						'/',
-						Path.DirectorySeparatorChar ) ),
-				LoadOptions.None );
+						Path.DirectorySeparatorChar
+					)
+				),
+				LoadOptions.None
+			);
 
 		return ReadRequiredProperty(
 			project,
-			propertyName );
+			propertyName
+		);
 	}
 
 	private static string ReadRequiredProperty(
 		XDocument project,
-		string propertyName ) {
+		string propertyName
+	) {
 		ArgumentNullException.ThrowIfNull( project );
 		ArgumentNullException.ThrowIfNull( propertyName );
 
@@ -284,7 +358,8 @@ public sealed class S01ContractTests {
 			.First(
 				element =>
 					element.Name.LocalName
-						== propertyName )
+						== propertyName
+			)
 			.Value
 			.Trim();
 	}
@@ -292,13 +367,18 @@ public sealed class S01ContractTests {
 	private static string FindRepositoryRoot() {
 		DirectoryInfo? current =
 			new(
-				AppContext.BaseDirectory );
+				AppContext.BaseDirectory
+			);
 
 		while ( current is not null ) {
-			if ( File.Exists(
+			if (
+				File.Exists(
 					Path.Combine(
 						current.FullName,
-						"Icod.TermInfo.sln" ) ) ) {
+						"Icod.TermInfo.sln"
+					)
+				)
+			) {
 				return current.FullName;
 			}
 
@@ -307,6 +387,7 @@ public sealed class S01ContractTests {
 		}
 
 		throw new InvalidOperationException(
-			"Unable to locate the Icod.TermInfo repository root." );
+			"Unable to locate the Icod.TermInfo repository root."
+		);
 	}
 }
