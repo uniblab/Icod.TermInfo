@@ -8,7 +8,7 @@ concurrency:
   cancel-in-progress: true
 
 # Temporary write access supports the branch-scoped convention normalizer.
-# This checkpoint verifies the normalized branch head with an idempotent pass.
+# This checkpoint verifies the final normalized branch head with an idempotent pass.
 permissions:
   contents: write
 
