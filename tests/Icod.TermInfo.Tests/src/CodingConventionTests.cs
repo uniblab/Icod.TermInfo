@@ -98,8 +98,12 @@ public sealed class CodingConventionTests {
 		List<string> violations = [];
 
 		foreach ( string path in EnumerateCSharpFiles( repositoryRoot ) ) {
-			string source = MaskNonCode( File.ReadAllText( path ) );
-			int violationIndex = FindParenthesisSpacingViolation( source );
+			string source = File.ReadAllText( path );
+			string maskedSource = MaskNonCode( source );
+			int violationIndex = FindParenthesisSpacingViolation(
+				maskedSource,
+				source
+			);
 
 			if ( violationIndex >= 0 ) {
 				violations.Add(
@@ -122,8 +126,12 @@ public sealed class CodingConventionTests {
 		List<string> violations = [];
 
 		foreach ( string path in EnumerateCSharpFiles( repositoryRoot ) ) {
-			string source = MaskNonCode( File.ReadAllText( path ) );
-			int violationIndex = FindMultilineClosingParenthesisViolation( source );
+			string source = File.ReadAllText( path );
+			string maskedSource = MaskNonCode( source );
+			int violationIndex = FindMultilineClosingParenthesisViolation(
+				maskedSource,
+				source
+			);
 
 			if ( violationIndex >= 0 ) {
 				violations.Add(
@@ -187,29 +195,48 @@ public sealed class CodingConventionTests {
 		return false;
 	}
 
-	private static int FindParenthesisSpacingViolation( string source ) {
+	private static int FindParenthesisSpacingViolation(
+		string maskedSource,
+		string source
+	) {
+		ArgumentNullException.ThrowIfNull( maskedSource );
 		ArgumentNullException.ThrowIfNull( source );
 
 		Match controlKeywordMatch =
-			ControlKeywordWithoutSpaceBeforeParenthesisPattern.Match( source );
+			ControlKeywordWithoutSpaceBeforeParenthesisPattern.Match( maskedSource );
 		if ( controlKeywordMatch.Success ) {
 			return controlKeywordMatch.Index;
 		}
 
-		foreach ( Match match in ParenthesizedControlFlowPattern.Matches( source ) ) {
+		foreach ( Match match in ParenthesizedControlFlowPattern.Matches( maskedSource ) ) {
 			int openParenthesis =
 				match.Index + match.Value.LastIndexOf( '(' );
-			if ( !ParenthesisInteriorUsesRepositorySpacing( source, openParenthesis ) ) {
+			if (
+				!ParenthesisInteriorUsesRepositorySpacing(
+					maskedSource,
+					source,
+					openParenthesis
+				)
+			) {
 				return openParenthesis;
 			}
 		}
 
-		for ( int i = 0; i < source.Length; i++ ) {
-			if ( source[i] != '(' || !IsCallLikeOpenParenthesis( source, i ) ) {
+		for ( int i = 0; i < maskedSource.Length; i++ ) {
+			if (
+				maskedSource[i] != '('
+				|| !IsCallLikeOpenParenthesis( maskedSource, i )
+			) {
 				continue;
 			}
 
-			if ( !ParenthesisInteriorUsesRepositorySpacing( source, i ) ) {
+			if (
+				!ParenthesisInteriorUsesRepositorySpacing(
+					maskedSource,
+					source,
+					i
+				)
+			) {
 				return i;
 			}
 		}
@@ -217,25 +244,32 @@ public sealed class CodingConventionTests {
 		return -1;
 	}
 
-	private static int FindMultilineClosingParenthesisViolation( string source ) {
+	private static int FindMultilineClosingParenthesisViolation(
+		string maskedSource,
+		string source
+	) {
+		ArgumentNullException.ThrowIfNull( maskedSource );
 		ArgumentNullException.ThrowIfNull( source );
 
-		for ( int i = 0; i < source.Length; i++ ) {
-			if ( source[i] != '(' || !IsCallLikeOpenParenthesis( source, i ) ) {
+		for ( int i = 0; i < maskedSource.Length; i++ ) {
+			if (
+				maskedSource[i] != '('
+				|| !IsCallLikeOpenParenthesis( maskedSource, i )
+			) {
 				continue;
 			}
 
-			int closeParenthesis = FindMatchingParenthesis( source, i );
+			int closeParenthesis = FindMatchingParenthesis( maskedSource, i );
 			if ( closeParenthesis < 0 ) {
 				continue;
 			}
 
-			int firstLineBreak = source.IndexOf( '\n', i + 1 );
+			int firstLineBreak = maskedSource.IndexOf( '\n', i + 1 );
 			if ( firstLineBreak < 0 || firstLineBreak > closeParenthesis ) {
 				continue;
 			}
 
-			int lineStart = source.LastIndexOf( '\n', closeParenthesis - 1 ) + 1;
+			int lineStart = maskedSource.LastIndexOf( '\n', closeParenthesis - 1 ) + 1;
 			for ( int j = lineStart; j < closeParenthesis; j++ ) {
 				if ( !char.IsWhiteSpace( source[j] ) ) {
 					return closeParenthesis;
@@ -290,12 +324,15 @@ public sealed class CodingConventionTests {
 	}
 
 	private static bool ParenthesisInteriorUsesRepositorySpacing(
+		string maskedSource,
 		string source,
 		int openParenthesis
 	) {
+		ArgumentNullException.ThrowIfNull( maskedSource );
 		ArgumentNullException.ThrowIfNull( source );
 
-		int closeParenthesis = FindMatchingParenthesis( source, openParenthesis );
+		int closeParenthesis =
+			FindMatchingParenthesis( maskedSource, openParenthesis );
 		if ( closeParenthesis < 0 || closeParenthesis == openParenthesis + 1 ) {
 			return true;
 		}
@@ -585,7 +622,6 @@ public sealed class CodingConventionTests {
 						directory.FullName,
 						"Icod.TermInfo.sln"
 					)
-				)
 			) {
 				return directory.FullName;
 			}
