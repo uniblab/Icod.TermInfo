@@ -346,6 +346,10 @@ public sealed class CodingConventionTests {
 				return questionIndex;
 			}
 
+			if ( IsNestedInParenthesesOrBrackets( maskedSource, questionIndex ) ) {
+				continue;
+			}
+
 			int semicolonIndex = maskedSource.IndexOf( ';', colonIndex + 1 );
 			if ( semicolonIndex < 0 ) {
 				return colonIndex;
@@ -405,6 +409,30 @@ public sealed class CodingConventionTests {
 		}
 
 		return -1;
+	}
+
+	private static bool IsNestedInParenthesesOrBrackets(
+		string source,
+		int index
+	) {
+		ArgumentNullException.ThrowIfNull( source );
+		ArgumentOutOfRangeException.ThrowIfNegative( index );
+
+		int parenthesisDepth = 0;
+		int bracketDepth = 0;
+		for ( int i = 0; i < index; i++ ) {
+			if ( source[i] == '(' ) {
+				parenthesisDepth++;
+			} else if ( source[i] == ')' ) {
+				parenthesisDepth--;
+			} else if ( source[i] == '[' ) {
+				bracketDepth++;
+			} else if ( source[i] == ']' ) {
+				bracketDepth--;
+			}
+		}
+
+		return parenthesisDepth > 0 || bracketDepth > 0;
 	}
 
 	private static bool IsCallLikeOpenParenthesis(
