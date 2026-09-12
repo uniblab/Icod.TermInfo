@@ -5,8 +5,7 @@ using Xunit;
 
 namespace Icod.TermInfo.Termcap.Tests;
 
-public sealed class TC06AcquisitionTests
-{
+public sealed class TC06AcquisitionTests {
 	[Fact]
 	public void ExplicitInlineSourceAcquiresWithoutFilesystem() {
 		TermcapAcquisitionOptions options =
@@ -407,8 +406,7 @@ public sealed class TC06AcquisitionTests
 		);
 	}
 
-	private sealed class MemoryEnvironmentProvider : ITermcapEnvironmentProvider
-	{
+	private sealed class MemoryEnvironmentProvider : ITermcapEnvironmentProvider {
 		private readonly IReadOnlyDictionary<string, string?> _values;
 
 		internal MemoryEnvironmentProvider(
@@ -433,8 +431,7 @@ public sealed class TC06AcquisitionTests
 		}
 	}
 
-	private sealed class MemoryFileProvider : ITermcapFileProvider
-	{
+	private sealed class MemoryFileProvider : ITermcapFileProvider {
 		private readonly IReadOnlyDictionary<string, string> _sources;
 		private readonly List<string> _openedPaths = [];
 
@@ -470,8 +467,7 @@ public sealed class TC06AcquisitionTests
 		}
 	}
 
-	private sealed class ThrowingFileProvider : ITermcapFileProvider
-	{
+	private sealed class ThrowingFileProvider : ITermcapFileProvider {
 		public bool TryOpenText(
 			string path,
 			[NotNullWhen( true )] out TextReader? reader
