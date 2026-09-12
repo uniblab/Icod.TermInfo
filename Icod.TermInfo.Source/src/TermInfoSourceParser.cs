@@ -13,485 +13,504 @@ namespace Icod.TermInfo.Source;
 /// <c>use=</c> inheritance, or construct <c>TerminalDescription</c> values.
 /// </para>
 /// </remarks>
-public static class TermInfoSourceParser
-{
-    /// <summary>
-    /// Parses terminfo source text into unresolved entries.
-    /// </summary>
-    /// <param name="source">The complete source text.</param>
-    /// <param name="sourceName">An optional source identity for diagnostics.</param>
-    /// <param name="options">Optional lexer/resource-limit settings.</param>
-    /// <returns>The parsed unresolved document and diagnostics.</returns>
-    public static TermInfoSourceParseResult Parse(
-        string source,
-        string? sourceName = null,
-        TermInfoSourceLexerOptions? options = null)
-    {
-        ArgumentNullException.ThrowIfNull(source);
+public static class TermInfoSourceParser {
+	/// <summary>
+	/// Parses terminfo source text into unresolved entries.
+	/// </summary>
+	/// <param name="source">The complete source text.</param>
+	/// <param name="sourceName">An optional source identity for diagnostics.</param>
+	/// <param name="options">Optional lexer/resource-limit settings.</param>
+	/// <returns>The parsed unresolved document and diagnostics.</returns>
+	public static TermInfoSourceParseResult Parse(
+		string source,
+		string? sourceName = null,
+		TermInfoSourceLexerOptions? options = null
+	) {
+		ArgumentNullException.ThrowIfNull( source );
 
-        return ParseLexResult(
-            TermInfoSourceLexer.Tokenize(
-                source,
-                sourceName,
-                options));
-    }
+		return ParseLexResult(
+			TermInfoSourceLexer.Tokenize(
+				source,
+				sourceName,
+				options
+			)
+		);
+	}
 
-    /// <summary>
-    /// Reads and parses terminfo source into unresolved entries.
-    /// </summary>
-    /// <param name="reader">The source reader.</param>
-    /// <param name="sourceName">An optional source identity for diagnostics.</param>
-    /// <param name="options">Optional lexer/resource-limit settings.</param>
-    /// <returns>The parsed unresolved document and diagnostics.</returns>
-    public static TermInfoSourceParseResult Parse(
-        TextReader reader,
-        string? sourceName = null,
-        TermInfoSourceLexerOptions? options = null)
-    {
-        ArgumentNullException.ThrowIfNull(reader);
+	/// <summary>
+	/// Reads and parses terminfo source into unresolved entries.
+	/// </summary>
+	/// <param name="reader">The source reader.</param>
+	/// <param name="sourceName">An optional source identity for diagnostics.</param>
+	/// <param name="options">Optional lexer/resource-limit settings.</param>
+	/// <returns>The parsed unresolved document and diagnostics.</returns>
+	public static TermInfoSourceParseResult Parse(
+		TextReader reader,
+		string? sourceName = null,
+		TermInfoSourceLexerOptions? options = null
+	) {
+		ArgumentNullException.ThrowIfNull( reader );
 
-        return ParseLexResult(
-            TermInfoSourceLexer.Tokenize(
-                reader,
-                sourceName,
-                options));
-    }
+		return ParseLexResult(
+			TermInfoSourceLexer.Tokenize(
+				reader,
+				sourceName,
+				options
+			)
+		);
+	}
 
-    private static TermInfoSourceParseResult ParseLexResult(
-        TermInfoSourceLexResult lexResult)
-    {
-        ArgumentNullException.ThrowIfNull(lexResult);
+	private static TermInfoSourceParseResult ParseLexResult(
+		TermInfoSourceLexResult lexResult
+	) {
+		ArgumentNullException.ThrowIfNull( lexResult );
 
-        List<TermInfoSourceDiagnostic> diagnostics =
-            [.. lexResult.Diagnostics];
-        List<TermInfoSourceEntry> entries = [];
-        HashSet<string> sourceIdentities =
-            new(StringComparer.Ordinal);
-        IReadOnlyList<TermInfoSourceToken> tokens =
-            lexResult.Tokens;
+		List<TermInfoSourceDiagnostic> diagnostics =
+			[.. lexResult.Diagnostics];
+		List<TermInfoSourceEntry> entries = [];
+		HashSet<string> sourceIdentities =
+			new( StringComparer.Ordinal );
+		IReadOnlyList<TermInfoSourceToken> tokens =
+			lexResult.Tokens;
 
-        int index = 0;
-        while (index < tokens.Count)
-        {
-            if (tokens[index].Kind
-                != TermInfoSourceTokenKind.TerminalName)
-            {
-                index++;
-                continue;
-            }
+		int index = 0;
+		while ( index < tokens.Count ) {
+			if (
+				tokens[index].Kind
+					!= TermInfoSourceTokenKind.TerminalName
+			) {
+				index++;
+				continue;
+			}
 
-            TermInfoSourceToken nameToken =
-                tokens[index];
-            string canonicalName =
-                nameToken.Text;
-            RegisterSourceIdentity(
-                sourceIdentities,
-                canonicalName,
-                false,
-                nameToken.Span,
-                diagnostics
-            );
-            List<string> aliases = [];
-            string? description = null;
-            TermInfoSourceToken lastSemanticToken =
-                nameToken;
-            index++;
+			TermInfoSourceToken nameToken =
+				tokens[index];
+			string canonicalName =
+				nameToken.Text;
+			RegisterSourceIdentity(
+				sourceIdentities,
+				canonicalName,
+				false,
+				nameToken.Span,
+				diagnostics
+			);
+			List<string> aliases = [];
+			string? description = null;
+			TermInfoSourceToken lastSemanticToken =
+				nameToken;
+			index++;
 
-            while (index < tokens.Count)
-            {
-                TermInfoSourceToken token =
-                    tokens[index];
-                if (token.Kind == TermInfoSourceTokenKind.Alias)
-                {
-                    aliases.Add(token.Text);
-                    RegisterSourceIdentity(
-                        sourceIdentities,
-                        token.Text,
-                        true,
-                        token.Span,
-                        diagnostics
-                    );
-                    lastSemanticToken = token;
-                    index++;
-                    continue;
-                }
+			while ( index < tokens.Count ) {
+				TermInfoSourceToken token =
+					tokens[index];
+				if ( token.Kind == TermInfoSourceTokenKind.Alias ) {
+					aliases.Add( token.Text );
+					RegisterSourceIdentity(
+						sourceIdentities,
+						token.Text,
+						true,
+						token.Span,
+						diagnostics
+					);
+					lastSemanticToken = token;
+					index++;
+					continue;
+				}
 
-                if (token.Kind == TermInfoSourceTokenKind.Description)
-                {
-                    description = token.Text;
-                    lastSemanticToken = token;
-                    index++;
-                    continue;
-                }
+				if ( token.Kind == TermInfoSourceTokenKind.Description ) {
+					description = token.Text;
+					lastSemanticToken = token;
+					index++;
+					continue;
+				}
 
-                break;
-            }
+				break;
+			}
 
-            List<TermInfoSourceField> fields = [];
-            while (index < tokens.Count
-                && tokens[index].Kind
-                    != TermInfoSourceTokenKind.TerminalName)
-            {
-                TermInfoSourceToken token =
-                    tokens[index];
-                TermInfoSourceField? field =
-                    CreateField(
-                        token,
-                        diagnostics);
-                if (field is not null)
-                {
-                    fields.Add(field);
-                    lastSemanticToken = token;
-                }
+			List<TermInfoSourceField> fields = [];
+			while (
+				( index < tokens.Count )
+				&& (
+					tokens[index].Kind
+						!= TermInfoSourceTokenKind.TerminalName
+				)
+			) {
+				TermInfoSourceToken token =
+					tokens[index];
+				TermInfoSourceField? field =
+					CreateField(
+						token,
+						diagnostics
+					);
+				if ( field is not null ) {
+					fields.Add( field );
+					lastSemanticToken = token;
+				}
 
-                index++;
-            }
+				index++;
+			}
 
-            entries.Add(
-                new TermInfoSourceEntry(
-                    canonicalName,
-                    aliases,
-                    description,
-                    fields,
-                    CreateEntrySpan(
-                        nameToken.Span,
-                        lastSemanticToken.Span)));
-        }
+			entries.Add(
+				new TermInfoSourceEntry(
+					canonicalName,
+					aliases,
+					description,
+					fields,
+					CreateEntrySpan(
+						nameToken.Span,
+						lastSemanticToken.Span
+					)
+				)
+			);
+		}
 
-        TermInfoSourceDiagnostic[] orderedDiagnostics =
-            diagnostics
-                .Select(
-                    (diagnostic, ordinal) =>
-                        new
-                        {
-                            Diagnostic = diagnostic,
-                            Ordinal = ordinal,
-                        })
-                .OrderBy(
-                    item => item.Diagnostic.Span?.Offset
-                        ?? int.MaxValue)
-                .ThenBy(
-                    item => item.Diagnostic.Span?.Length
-                        ?? int.MaxValue)
-                .ThenBy(
-                    item => item.Ordinal)
-                .Select(item => item.Diagnostic)
-                .ToArray();
+		TermInfoSourceDiagnostic[] orderedDiagnostics =
+			diagnostics
+				.Select(
+					(diagnostic, ordinal) =>
+						new {
+							Diagnostic = diagnostic,
+							Ordinal = ordinal,
+						}
+				)
+				.OrderBy(
+					item => item.Diagnostic.Span?.Offset
+						?? int.MaxValue
+				)
+				.ThenBy(
+					item => item.Diagnostic.Span?.Length
+						?? int.MaxValue
+				)
+				.ThenBy(
+					item => item.Ordinal
+				)
+				.Select( item => item.Diagnostic )
+				.ToArray();
 
-        return new TermInfoSourceParseResult(
-            new TermInfoSourceDocument(
-                entries,
-                tokens),
-            orderedDiagnostics);
-    }
+		return new TermInfoSourceParseResult(
+			new TermInfoSourceDocument(
+				entries,
+				tokens
+			),
+			orderedDiagnostics
+		);
+	}
 
-    private static void RegisterSourceIdentity(
-        ISet<string> identities,
-        string name,
-        bool isAlias,
-        TermInfoSourceSpan span,
-        ICollection<TermInfoSourceDiagnostic> diagnostics
-    )
-    {
-        ArgumentNullException.ThrowIfNull(identities);
-        ArgumentNullException.ThrowIfNull(name);
-        ArgumentNullException.ThrowIfNull(span);
-        ArgumentNullException.ThrowIfNull(diagnostics);
+	private static void RegisterSourceIdentity(
+		ISet<string> identities,
+		string name,
+		bool isAlias,
+		TermInfoSourceSpan span,
+		ICollection<TermInfoSourceDiagnostic> diagnostics
+	) {
+		ArgumentNullException.ThrowIfNull( identities );
+		ArgumentNullException.ThrowIfNull( name );
+		ArgumentNullException.ThrowIfNull( span );
+		ArgumentNullException.ThrowIfNull( diagnostics );
 
-        if (string.IsNullOrWhiteSpace(name)
-            || identities.Add(name))
-        {
-            return;
-        }
+		if (
+			string.IsNullOrWhiteSpace( name )
+			|| identities.Add( name )
+		) {
+			return;
+		}
 
-        string code;
-        string message;
-        if (isAlias)
-        {
-            code = TermInfoSourceDiagnosticCodes.DuplicateSourceAlias;
-            message =
-                $"Source alias '{name}' duplicates an earlier source identity.";
-        }
-        else
-        {
-            code = TermInfoSourceDiagnosticCodes.DuplicateSourceEntryName;
-            message =
-                $"Source entry name '{name}' duplicates an earlier source identity.";
-        }
+		string code;
+		string message;
+		if ( isAlias ) {
+			code = TermInfoSourceDiagnosticCodes.DuplicateSourceAlias;
+			message =
+				$"Source alias '{name}' duplicates an earlier source identity.";
+		} else {
+			code = TermInfoSourceDiagnosticCodes.DuplicateSourceEntryName;
+			message =
+				$"Source entry name '{name}' duplicates an earlier source identity.";
+		}
 
-        diagnostics.Add(
-            new TermInfoSourceDiagnostic(
-                code,
-                TermInfoSourceDiagnosticSeverity.Warning,
-                message,
-                span
-            )
-        );
-    }
+		diagnostics.Add(
+			new TermInfoSourceDiagnostic(
+				code,
+				TermInfoSourceDiagnosticSeverity.Warning,
+				message,
+				span
+			)
+		);
+	}
 
-    private static TermInfoSourceField? CreateField(
-        TermInfoSourceToken token,
-        ICollection<TermInfoSourceDiagnostic> diagnostics)
-    {
-        ArgumentNullException.ThrowIfNull(token);
-        ArgumentNullException.ThrowIfNull(diagnostics);
+	private static TermInfoSourceField? CreateField(
+		TermInfoSourceToken token,
+		ICollection<TermInfoSourceDiagnostic> diagnostics
+	) {
+		ArgumentNullException.ThrowIfNull( token );
+		ArgumentNullException.ThrowIfNull( diagnostics );
 
-        switch (token.Kind)
-        {
-            case TermInfoSourceTokenKind.BooleanCapability:
-                return CreateCapabilityField(
-                    TermInfoSourceFieldKind.BooleanCapability,
-                    token,
-                    token.Text.Trim(),
-                    null,
-                    null,
-                    diagnostics);
+		switch ( token.Kind ) {
+			case TermInfoSourceTokenKind.BooleanCapability:
+				return CreateCapabilityField(
+					TermInfoSourceFieldKind.BooleanCapability,
+					token,
+					token.Text.Trim(),
+					null,
+					null,
+					diagnostics
+				);
 
-            case TermInfoSourceTokenKind.NumericCapability:
-            {
-                TermInfoSourceNumericValueResult numeric =
-                    TermInfoSourceValueParser.ParseNumeric(token);
-                AddDiagnostics(
-                    diagnostics,
-                    numeric.Diagnostics);
-                return CreateCapabilityField(
-                    TermInfoSourceFieldKind.NumericCapability,
-                    token,
-                    NormalizeCapabilityName(
-                        TextBeforeOperator(
-                            token.Text,
-                            '#')),
-                    numeric.Value,
-                    null,
-                    diagnostics);
-            }
+			case TermInfoSourceTokenKind.NumericCapability: {
+				TermInfoSourceNumericValueResult numeric =
+					TermInfoSourceValueParser.ParseNumeric( token );
+				AddDiagnostics(
+					diagnostics,
+					numeric.Diagnostics
+				);
+				return CreateCapabilityField(
+					TermInfoSourceFieldKind.NumericCapability,
+					token,
+					NormalizeCapabilityName(
+						TextBeforeOperator(
+							token.Text,
+							'#'
+						)
+					),
+					numeric.Value,
+					null,
+					diagnostics
+				);
+			}
 
-            case TermInfoSourceTokenKind.StringCapability:
-            {
-                TermInfoSourceStringValueResult text =
-                    TermInfoSourceValueParser.ParseString(token);
-                AddDiagnostics(
-                    diagnostics,
-                    text.Diagnostics);
-                return CreateCapabilityField(
-                    TermInfoSourceFieldKind.StringCapability,
-                    token,
-                    NormalizeCapabilityName(
-                        TextBeforeOperator(
-                            token.Text,
-                            '=')),
-                    null,
-                    text.Value,
-                    diagnostics);
-            }
+			case TermInfoSourceTokenKind.StringCapability: {
+				TermInfoSourceStringValueResult text =
+					TermInfoSourceValueParser.ParseString( token );
+				AddDiagnostics(
+					diagnostics,
+					text.Diagnostics
+				);
+				return CreateCapabilityField(
+					TermInfoSourceFieldKind.StringCapability,
+					token,
+					NormalizeCapabilityName(
+						TextBeforeOperator(
+							token.Text,
+							'='
+						)
+					),
+					null,
+					text.Value,
+					diagnostics
+				);
+			}
 
-            case TermInfoSourceTokenKind.CancelledCapability:
-                return CreateCapabilityField(
-                    TermInfoSourceFieldKind.CancelledCapability,
-                    token,
-                    NormalizeCapabilityName(
-                        TextBeforeOperator(
-                            token.Text,
-                            '@')),
-                    null,
-                    null,
-                    diagnostics);
+			case TermInfoSourceTokenKind.CancelledCapability:
+				return CreateCapabilityField(
+					TermInfoSourceFieldKind.CancelledCapability,
+					token,
+					NormalizeCapabilityName(
+						TextBeforeOperator(
+							token.Text,
+							'@'
+						)
+					),
+					null,
+					null,
+					diagnostics
+				);
 
-            case TermInfoSourceTokenKind.UseReference:
-                return new TermInfoSourceField(
-                    TermInfoSourceFieldKind.UseReference,
-                    null,
-                    TextAfterOperator(
-                        token.Text,
-                        '=').Trim(),
-                    null,
-                    null,
-                    token.Text,
-                    token.Span);
+			case TermInfoSourceTokenKind.UseReference:
+				return new TermInfoSourceField(
+					TermInfoSourceFieldKind.UseReference,
+					null,
+					TextAfterOperator(
+						token.Text,
+						'='
+					).Trim(),
+					null,
+					null,
+					token.Text,
+					token.Span
+				);
 
-            case TermInfoSourceTokenKind.DisabledCapability:
-            {
-                string disabled =
-                    token.Text;
-                if (disabled.Length != 0
-                    && disabled[0] == '.')
-                {
-                    disabled =
-                        disabled[1..];
-                }
-                return CreateCapabilityField(
-                    TermInfoSourceFieldKind.DisabledCapability,
-                    token,
-                    NormalizeCapabilityName(
-                        TextBeforeAnyCapabilityOperator(disabled)),
-                    null,
-                    null,
-                    diagnostics);
-            }
+			case TermInfoSourceTokenKind.DisabledCapability: {
+				string disabled =
+					token.Text;
+				if (
+					( disabled.Length != 0 )
+					&& ( disabled[0] == '.' )
+				) {
+					disabled =
+						disabled[1..];
+				}
+				return CreateCapabilityField(
+					TermInfoSourceFieldKind.DisabledCapability,
+					token,
+					NormalizeCapabilityName(
+						TextBeforeAnyCapabilityOperator( disabled )
+					),
+					null,
+					null,
+					diagnostics
+				);
+			}
 
-            default:
-                return null;
-        }
-    }
+			default:
+				return null;
+		}
+	}
 
-    private static TermInfoSourceField CreateCapabilityField(
-        TermInfoSourceFieldKind kind,
-        TermInfoSourceToken token,
-        string capabilityName,
-        int? numericValue,
-        string? stringValue,
-        ICollection<TermInfoSourceDiagnostic> diagnostics)
-    {
-        ArgumentNullException.ThrowIfNull(token);
-        ArgumentException.ThrowIfNullOrWhiteSpace(capabilityName);
-        ArgumentNullException.ThrowIfNull(diagnostics);
+	private static TermInfoSourceField CreateCapabilityField(
+		TermInfoSourceFieldKind kind,
+		TermInfoSourceToken token,
+		string capabilityName,
+		int? numericValue,
+		string? stringValue,
+		ICollection<TermInfoSourceDiagnostic> diagnostics
+	) {
+		ArgumentNullException.ThrowIfNull( token );
+		ArgumentException.ThrowIfNullOrWhiteSpace( capabilityName );
+		ArgumentNullException.ThrowIfNull( diagnostics );
 
-        TermInfoSourceCapabilityIdentity identity =
-            TermInfoSourceCapabilityClassifier.Classify(
-                capabilityName);
+		TermInfoSourceCapabilityIdentity identity =
+			TermInfoSourceCapabilityClassifier.Classify( capabilityName );
 
-        if (identity.Classification
-            == TermInfoSourceCapabilityClassification.Invalid)
-        {
-            diagnostics.Add(
-                new TermInfoSourceDiagnostic(
-                    TermInfoSourceDiagnosticCodes.InvalidCapabilityName,
-                    TermInfoSourceDiagnosticSeverity.Error,
-                    $"'{capabilityName}' is not a valid terminfo capability name.",
-                    token.Span));
-        }
-        else
-        {
-            TermInfoCapabilityValueKind? declaredKind =
-                GetDeclaredValueKind(kind);
-            if (declaredKind is not null
-                && identity.StandardValueKind is not null
-                && declaredKind != identity.StandardValueKind)
-            {
-                diagnostics.Add(
-                    new TermInfoSourceDiagnostic(
-                        TermInfoSourceDiagnosticCodes.StandardCapabilityTypeMismatch,
-                        TermInfoSourceDiagnosticSeverity.Error,
-                        $"Standard capability '{identity.CanonicalName}' is {identity.StandardValueKind} but the source field declares it as {declaredKind}.",
-                        token.Span));
-            }
-        }
+		if (
+			identity.Classification
+				== TermInfoSourceCapabilityClassification.Invalid
+		) {
+			diagnostics.Add(
+				new TermInfoSourceDiagnostic(
+					TermInfoSourceDiagnosticCodes.InvalidCapabilityName,
+					TermInfoSourceDiagnosticSeverity.Error,
+					$"'{capabilityName}' is not a valid terminfo capability name.",
+					token.Span
+				)
+			);
+		} else {
+			TermInfoCapabilityValueKind? declaredKind =
+				GetDeclaredValueKind( kind );
+			if (
+				( declaredKind is not null )
+				&& ( identity.StandardValueKind is not null )
+				&& ( declaredKind != identity.StandardValueKind )
+			) {
+				diagnostics.Add(
+					new TermInfoSourceDiagnostic(
+						TermInfoSourceDiagnosticCodes.StandardCapabilityTypeMismatch,
+						TermInfoSourceDiagnosticSeverity.Error,
+						$"Standard capability '{identity.CanonicalName}' is {identity.StandardValueKind} but the source field declares it as {declaredKind}.",
+						token.Span
+					)
+				);
+			}
+		}
 
-        return new TermInfoSourceField(
-            kind,
-            capabilityName,
-            null,
-            numericValue,
-            stringValue,
-            token.Text,
-            token.Span,
-            identity.Classification,
-            identity.CanonicalName,
-            identity.StandardValueKind,
-            identity.StandardBooleanCapability,
-            identity.StandardNumericCapability,
-            identity.StandardStringCapability);
-    }
+		return new TermInfoSourceField(
+			kind,
+			capabilityName,
+			null,
+			numericValue,
+			stringValue,
+			token.Text,
+			token.Span,
+			identity.Classification,
+			identity.CanonicalName,
+			identity.StandardValueKind,
+			identity.StandardBooleanCapability,
+			identity.StandardNumericCapability,
+			identity.StandardStringCapability
+		);
+	}
 
-    private static TermInfoCapabilityValueKind? GetDeclaredValueKind(
-        TermInfoSourceFieldKind kind)
-    {
-        return kind switch
-        {
-            TermInfoSourceFieldKind.BooleanCapability =>
-                TermInfoCapabilityValueKind.Boolean,
-            TermInfoSourceFieldKind.NumericCapability =>
-                TermInfoCapabilityValueKind.Number,
-            TermInfoSourceFieldKind.StringCapability =>
-                TermInfoCapabilityValueKind.String,
-            _ => null,
-        };
-    }
+	private static TermInfoCapabilityValueKind? GetDeclaredValueKind(
+		TermInfoSourceFieldKind kind
+	) {
+		return kind switch {
+			TermInfoSourceFieldKind.BooleanCapability =>
+				TermInfoCapabilityValueKind.Boolean,
+			TermInfoSourceFieldKind.NumericCapability =>
+				TermInfoCapabilityValueKind.Number,
+			TermInfoSourceFieldKind.StringCapability =>
+				TermInfoCapabilityValueKind.String,
+			_ => null,
+		};
+	}
 
-    private static string NormalizeCapabilityName(
-        string text)
-    {
-        ArgumentNullException.ThrowIfNull(text);
+	private static string NormalizeCapabilityName( string text ) {
+		ArgumentNullException.ThrowIfNull( text );
 
-        return text.Trim();
-    }
+		return text.Trim();
+	}
 
-    private static string TextBeforeOperator(
-        string text,
-        char operatorCharacter)
-    {
-        ArgumentNullException.ThrowIfNull(text);
+	private static string TextBeforeOperator(
+		string text,
+		char operatorCharacter
+	) {
+		ArgumentNullException.ThrowIfNull( text );
 
-        int index =
-            text.IndexOf(operatorCharacter);
-        return (index < 0)
-            ? text
-            : text[..index]
-        ;
-    }
+		int index =
+			text.IndexOf( operatorCharacter );
+		return ( index < 0 )
+			? text
+			: text[..index]
+		;
+	}
 
-    private static string TextAfterOperator(
-        string text,
-        char operatorCharacter)
-    {
-        ArgumentNullException.ThrowIfNull(text);
+	private static string TextAfterOperator(
+		string text,
+		char operatorCharacter
+	) {
+		ArgumentNullException.ThrowIfNull( text );
 
-        int index =
-            text.IndexOf(operatorCharacter);
-        return (index < 0)
-            ? string.Empty
-            : text[(index + 1)..]
-        ;
-    }
+		int index =
+			text.IndexOf( operatorCharacter );
+		return ( index < 0 )
+			? string.Empty
+			: text[( index + 1 )..]
+		;
+	}
 
-    private static string TextBeforeAnyCapabilityOperator(
-        string text)
-    {
-        ArgumentNullException.ThrowIfNull(text);
+	private static string TextBeforeAnyCapabilityOperator( string text ) {
+		ArgumentNullException.ThrowIfNull( text );
 
-        int end =
-            text.Length;
-        foreach (char operatorCharacter in new[] { '#', '=', '@' })
-        {
-            int index =
-                text.IndexOf(operatorCharacter);
-            if (index >= 0)
-            {
-                end =
-                    Math.Min(
-                        end,
-                        index);
-            }
-        }
+		int end =
+			text.Length;
+		foreach ( char operatorCharacter in new[] { '#', '=', '@' } ) {
+			int index =
+				text.IndexOf( operatorCharacter );
+			if ( index >= 0 ) {
+				end =
+					Math.Min(
+						end,
+						index
+					);
+			}
+		}
 
-        return text[..end];
-    }
+		return text[..end];
+	}
 
-    private static void AddDiagnostics(
-        ICollection<TermInfoSourceDiagnostic> destination,
-        IEnumerable<TermInfoSourceDiagnostic> source)
-    {
-        ArgumentNullException.ThrowIfNull(destination);
-        ArgumentNullException.ThrowIfNull(source);
+	private static void AddDiagnostics(
+		ICollection<TermInfoSourceDiagnostic> destination,
+		IEnumerable<TermInfoSourceDiagnostic> source
+	) {
+		ArgumentNullException.ThrowIfNull( destination );
+		ArgumentNullException.ThrowIfNull( source );
 
-        foreach (TermInfoSourceDiagnostic diagnostic in source)
-        {
-            destination.Add(diagnostic);
-        }
-    }
+		foreach ( TermInfoSourceDiagnostic diagnostic in source ) {
+			destination.Add( diagnostic );
+		}
+	}
 
-    private static TermInfoSourceSpan CreateEntrySpan(
-        TermInfoSourceSpan first,
-        TermInfoSourceSpan last)
-    {
-        ArgumentNullException.ThrowIfNull(first);
-        ArgumentNullException.ThrowIfNull(last);
+	private static TermInfoSourceSpan CreateEntrySpan(
+		TermInfoSourceSpan first,
+		TermInfoSourceSpan last
+	) {
+		ArgumentNullException.ThrowIfNull( first );
+		ArgumentNullException.ThrowIfNull( last );
 
-        return new TermInfoSourceSpan(
-            first.SourceName,
-            first.Offset,
-            first.Line,
-            first.Column,
-            checked(last.EndOffset - first.Offset));
-    }
+		return new TermInfoSourceSpan(
+			first.SourceName,
+			first.Offset,
+			first.Line,
+			first.Column,
+			checked( last.EndOffset - first.Offset )
+		);
+	}
 }
