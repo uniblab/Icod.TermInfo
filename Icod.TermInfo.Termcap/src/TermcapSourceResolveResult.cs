@@ -6,8 +6,7 @@ namespace Icod.TermInfo.Termcap;
 /// Contains the result of resolving one termcap source entry and its
 /// <c>tc=</c> inheritance chain.
 /// </summary>
-public sealed class TermcapSourceResolveResult
-{
+public sealed class TermcapSourceResolveResult {
 	internal TermcapSourceResolveResult(
 		TermcapSourceResolvedEntry? entry,
 		IEnumerable<TermcapSourceDiagnostic> diagnostics

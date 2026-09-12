@@ -5,8 +5,7 @@ namespace Icod.TermInfo.Termcap;
 /// <summary>
 /// Contains a parsed termcap source document and its diagnostics.
 /// </summary>
-public sealed class TermcapSourceParseResult
-{
+public sealed class TermcapSourceParseResult {
 	internal TermcapSourceParseResult(
 		TermcapSourceDocument document,
 		IEnumerable<TermcapSourceDiagnostic> diagnostics

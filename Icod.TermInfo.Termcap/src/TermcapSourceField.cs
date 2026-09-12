@@ -3,8 +3,7 @@ namespace Icod.TermInfo.Termcap;
 /// <summary>
 /// Represents one unresolved termcap capability field.
 /// </summary>
-public sealed class TermcapSourceField
-{
+public sealed class TermcapSourceField {
 	internal TermcapSourceField(
 		TermcapSourceFieldKind kind,
 		string capabilityName,

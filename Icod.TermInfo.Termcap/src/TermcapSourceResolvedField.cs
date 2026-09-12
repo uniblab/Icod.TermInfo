@@ -4,8 +4,7 @@ namespace Icod.TermInfo.Termcap;
 /// Represents one effective termcap field after <c>tc=</c> inheritance has been
 /// resolved.
 /// </summary>
-public sealed class TermcapSourceResolvedField
-{
+public sealed class TermcapSourceResolvedField {
 	internal TermcapSourceResolvedField(
 		TermcapSourceEntry sourceEntry,
 		TermcapSourceField sourceField,

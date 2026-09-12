@@ -5,8 +5,7 @@ namespace Icod.TermInfo.Termcap;
 /// <summary>
 /// Represents a parsed collection of unresolved termcap terminal descriptions.
 /// </summary>
-public sealed class TermcapSourceDocument
-{
+public sealed class TermcapSourceDocument {
 	internal TermcapSourceDocument(
 		IEnumerable<TermcapSourceEntry> entries
 	) {
