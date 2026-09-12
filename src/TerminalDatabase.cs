@@ -13,147 +13,139 @@ namespace Icod.TermInfo;
 /// <see cref="BuiltIn"/> fallback. Provider failures are propagated.
 /// </remarks>
 public sealed class TerminalDatabase
-    : ITerminalDescriptionProvider
-{
-    private readonly IReadOnlyList<ITerminalDescriptionProvider> _providers;
+	: ITerminalDescriptionProvider {
+	private readonly IReadOnlyList<ITerminalDescriptionProvider> _providers;
 
-    /// <summary>
-    /// Initializes a database from providers consulted in the supplied order.
-    /// </summary>
-    public TerminalDatabase(
-        IEnumerable<ITerminalDescriptionProvider> providers)
-    {
-        ArgumentNullException.ThrowIfNull(providers);
+	/// <summary>
+	/// Initializes a database from providers consulted in the supplied order.
+	/// </summary>
+	public TerminalDatabase(
+		IEnumerable<ITerminalDescriptionProvider> providers
+	) {
+		ArgumentNullException.ThrowIfNull( providers );
 
-        ITerminalDescriptionProvider[] providerArray = providers.ToArray();
-        for (int i = 0; i < providerArray.Length; i++)
-        {
-            if (providerArray[i] is null)
-            {
-                throw new ArgumentException(
-                    "Terminal providers cannot contain null entries.",
-                    nameof(providers));
-            }
-        }
+		ITerminalDescriptionProvider[] providerArray = providers.ToArray();
+		for ( int i = 0; i < providerArray.Length; i++ ) {
+			if ( providerArray[i] is null ) {
+				throw new ArgumentException(
+					"Terminal providers cannot contain null entries.",
+					nameof( providers )
+				);
+			}
+		}
 
-        _providers = Array.AsReadOnly(providerArray);
-    }
+		_providers = Array.AsReadOnly( providerArray );
+	}
 
-    /// <summary>
-    /// Gets the immutable database of profiles supplied with the package.
-    /// </summary>
-    /// <remarks>
-    /// This database is environment-independent and I/O-free. External
-    /// directory or system acquisition never mutates it.
-    /// </remarks>
-    public static TerminalDatabase BuiltIn { get; } =
-        new(
-            new ITerminalDescriptionProvider[]
-            {
-                new InMemoryTerminalDescriptionProvider(
-                    new[]
-                    {
-                        TerminalProfiles.MsTerminalDirect,
-                        TerminalProfiles.MsTerminal,
-                        TerminalProfiles.XtermDirect256,
-                        TerminalProfiles.XtermDirect16,
-                        TerminalProfiles.XtermDirect,
-                        TerminalProfiles.Xterm256Color,
-                        TerminalProfiles.Xterm88Color,
-                        TerminalProfiles.Xterm16Color,
-                        TerminalProfiles.Xterm,
-                        TerminalProfiles.Vt220,
-                        TerminalProfiles.Vt102,
-                        TerminalProfiles.WinConsole,
-                        TerminalProfiles.Ansi,
-                        TerminalProfiles.Vt100,
-                        TerminalProfiles.Dumb,
-                    }),
-            });
+	/// <summary>
+	/// Gets the immutable database of profiles supplied with the package.
+	/// </summary>
+	/// <remarks>
+	/// This database is environment-independent and I/O-free. External
+	/// directory or system acquisition never mutates it.
+	/// </remarks>
+	public static TerminalDatabase BuiltIn { get; } =
+		new(
+			new ITerminalDescriptionProvider[] {
+				new InMemoryTerminalDescriptionProvider(
+					new[] {
+						TerminalProfiles.MsTerminalDirect,
+						TerminalProfiles.MsTerminal,
+						TerminalProfiles.XtermDirect256,
+						TerminalProfiles.XtermDirect16,
+						TerminalProfiles.XtermDirect,
+						TerminalProfiles.Xterm256Color,
+						TerminalProfiles.Xterm88Color,
+						TerminalProfiles.Xterm16Color,
+						TerminalProfiles.Xterm,
+						TerminalProfiles.Vt220,
+						TerminalProfiles.Vt102,
+						TerminalProfiles.WinConsole,
+						TerminalProfiles.Ansi,
+						TerminalProfiles.Vt100,
+						TerminalProfiles.Dumb,
+					}
+				),
+			}
+		);
 
-    /// <summary>
-    /// Loads a terminal profile by canonical name or alias.
-    /// </summary>
-    /// <exception cref="KeyNotFoundException">
-    /// No configured provider has the requested terminal profile.
-    /// </exception>
-    public TerminalDescription Load(string name)
-    {
-        ValidateTerminalName(name);
+	/// <summary>
+	/// Loads a terminal profile by canonical name or alias.
+	/// </summary>
+	/// <exception cref="KeyNotFoundException">
+	/// No configured provider has the requested terminal profile.
+	/// </exception>
+	public TerminalDescription Load( string name ) {
+		ValidateTerminalName( name );
 
-        if (TryLoad(name, out TerminalDescription? terminal))
-        {
-            return terminal;
-        }
+		if ( TryLoad( name, out TerminalDescription? terminal ) ) {
+			return terminal;
+		}
 
-        throw new KeyNotFoundException(
-            $"Terminal profile '{name}' is not available.");
-    }
+		throw new KeyNotFoundException(
+			$"Terminal profile '{name}' is not available."
+		);
+	}
 
-    /// <summary>
-    /// Attempts to load a terminal profile by canonical name or alias.
-    /// </summary>
-    /// <remarks>
-    /// Providers are consulted in constructor order. The first provider which
-    /// resolves the requested name wins. A clean miss continues to the next
-    /// provider; exceptions from a provider are not hidden as misses.
-    /// </remarks>
-    public bool TryLoad(
-        string name,
-        [NotNullWhen(true)] out TerminalDescription? terminal)
-    {
-        ValidateTerminalName(name);
+	/// <summary>
+	/// Attempts to load a terminal profile by canonical name or alias.
+	/// </summary>
+	/// <remarks>
+	/// Providers are consulted in constructor order. The first provider which
+	/// resolves the requested name wins. A clean miss continues to the next
+	/// provider; exceptions from a provider are not hidden as misses.
+	/// </remarks>
+	public bool TryLoad(
+		string name,
+		[NotNullWhen( true )] out TerminalDescription? terminal
+	) {
+		ValidateTerminalName( name );
 
-        foreach (ITerminalDescriptionProvider provider in _providers)
-        {
-            if (provider.TryLoad(name, out terminal))
-            {
-                if (terminal is null)
-                {
-                    throw new InvalidOperationException(
-                        $"Terminal provider '{provider.GetType().FullName}' returned success without a terminal description.");
-                }
+		foreach ( ITerminalDescriptionProvider provider in _providers ) {
+			if ( provider.TryLoad( name, out terminal ) ) {
+				if ( terminal is null ) {
+					throw new InvalidOperationException(
+						$"Terminal provider '{provider.GetType().FullName}' returned success without a terminal description."
+					);
+				}
 
-                return true;
-            }
-        }
+				return true;
+			}
+		}
 
-        terminal = null;
-        return false;
-    }
+		terminal = null;
+		return false;
+	}
 
-    /// <summary>
-    /// Resolves a requested name and returns an explicit fallback if the name is
-    /// absent or unsupported.
-    /// </summary>
-    public TerminalDescription Resolve(
-        string? requestedName,
-        TerminalDescription fallback)
-    {
-        ArgumentNullException.ThrowIfNull(fallback);
+	/// <summary>
+	/// Resolves a requested name and returns an explicit fallback if the name is
+	/// absent or unsupported.
+	/// </summary>
+	public TerminalDescription Resolve(
+		string? requestedName,
+		TerminalDescription fallback
+	) {
+		ArgumentNullException.ThrowIfNull( fallback );
 
-        if (string.IsNullOrWhiteSpace(requestedName))
-        {
-            return fallback;
-        }
+		if ( string.IsNullOrWhiteSpace( requestedName ) ) {
+			return fallback;
+		}
 
-        if (TryLoad(requestedName, out TerminalDescription? terminal))
-        {
-            return terminal;
-        }
+		if ( TryLoad( requestedName, out TerminalDescription? terminal ) ) {
+			return terminal;
+		}
 
-        return fallback;
-    }
+		return fallback;
+	}
 
-    private static void ValidateTerminalName(string name)
-    {
-        ArgumentNullException.ThrowIfNull(name);
+	private static void ValidateTerminalName( string name ) {
+		ArgumentNullException.ThrowIfNull( name );
 
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            throw new ArgumentException(
-                "The terminal name cannot be empty or whitespace.",
-                nameof(name));
-        }
-    }
+		if ( string.IsNullOrWhiteSpace( name ) ) {
+			throw new ArgumentException(
+				"The terminal name cannot be empty or whitespace.",
+				nameof( name )
+			);
+		}
+	}
 }
