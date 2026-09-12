@@ -937,7 +937,7 @@ internal static class TermcapReverseStringConverter {
 		int Current
 	) {
 		internal string CurrentExpression =>
-			Current == 0
+			( Current == 0 )
 				? First
 				: Second
 		;

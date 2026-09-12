@@ -240,7 +240,7 @@ public sealed class TermcapAcquisitionOptions {
 	private static string? NormalizeEnvironmentValue(
 		string? value
 	) {
-		return string.IsNullOrWhiteSpace( value )
+		return ( string.IsNullOrWhiteSpace( value ) )
 			? null
 			: value
 		;

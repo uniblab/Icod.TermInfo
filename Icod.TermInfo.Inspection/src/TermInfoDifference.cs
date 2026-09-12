@@ -70,17 +70,19 @@ public sealed class TermInfoDifference {
 		LeftText = leftText;
 		RightText = rightText;
 		_leftAliases =
-			leftAliases is null
+			( leftAliases is null )
 				? null
 				: Array.AsReadOnly(
 					leftAliases.ToArray()
-				);
+				)
+		;
 		_rightAliases =
-			rightAliases is null
+			( rightAliases is null )
 				? null
 				: Array.AsReadOnly(
 					rightAliases.ToArray()
-				);
+				)
+		;
 		LeftCapabilityValue = leftCapabilityValue;
 		RightCapabilityValue = rightCapabilityValue;
 		LeftSourceEntry = leftSourceEntry;

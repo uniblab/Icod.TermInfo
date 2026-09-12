@@ -52,9 +52,10 @@ public sealed partial class TermInfoDatabaseSet {
 							shadow.Entry.Terminal
 						);
 					TermInfoDatabaseSetSemanticRelationship shadowRelationship =
-						comparison.AreEqual
+						( comparison.AreEqual )
 							? TermInfoDatabaseSetSemanticRelationship.SemanticallyEqual
-							: TermInfoDatabaseSetSemanticRelationship.SemanticallyDifferent;
+							: TermInfoDatabaseSetSemanticRelationship.SemanticallyDifferent
+					;
 					hasDifference |= !comparison.AreEqual;
 					shadows.Add(
 						new TermInfoDatabaseSetShadowAnalysis(

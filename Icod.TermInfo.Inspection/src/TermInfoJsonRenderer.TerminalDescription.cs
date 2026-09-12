@@ -443,7 +443,7 @@ public static partial class TermInfoJsonRenderer {
 		) {
 			WritePropertyPrefix( propertyName );
 			_output.WriteAscii(
-				value
+				( value )
 					? "true"
 					: "false"
 			);

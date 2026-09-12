@@ -481,7 +481,7 @@ public static partial class TermInfoDatabaseInspector {
 		}
 
 		StringComparison pathComparison =
-			OperatingSystem.IsWindows()
+			( OperatingSystem.IsWindows() )
 				? StringComparison.OrdinalIgnoreCase
 				: StringComparison.Ordinal
 		;

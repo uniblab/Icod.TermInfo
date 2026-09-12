@@ -126,10 +126,10 @@ public static class TermcapAcquirer {
 		) {
 			ArgumentException.ThrowIfNullOrWhiteSpace( name );
 
-			return _sourceByName.TryGetValue(
+			return ( _sourceByName.TryGetValue(
 				name,
 				out TermcapAcquisitionSource? source
-			)
+			) )
 				? source
 				: null
 			;

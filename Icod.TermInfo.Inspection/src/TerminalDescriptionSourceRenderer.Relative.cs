@@ -71,12 +71,13 @@ public static partial class TerminalDescriptionSourceRenderer {
 			int? targetValue =
 				plan.Target.GetNumber( metadata.Capability );
 			int? inheritedValue =
-				inherited.NumericCapabilities.TryGetValue(
+				( inherited.NumericCapabilities.TryGetValue(
 					metadata.Capability,
 					out int inheritedNumber
-				)
+				) )
 					? inheritedNumber
-					: null;
+					: null
+			;
 
 			if ( targetValue == inheritedValue ) {
 				continue;

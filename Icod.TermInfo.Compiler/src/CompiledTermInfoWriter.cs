@@ -529,7 +529,7 @@ public static partial class CompiledTermInfoWriter {
 			RequiresWideNumericRepresentation( description );
 
 		if ( requestedFormat == CompiledTermInfoFormat.Automatic ) {
-			return requiresWide
+			return ( requiresWide )
 				? CompiledTermInfoFormat.Wide
 				: CompiledTermInfoFormat.Legacy
 			;

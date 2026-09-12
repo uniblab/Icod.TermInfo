@@ -47,7 +47,7 @@ public static class TermcapConverter {
 					diagnostic.Severity == TermcapConversionDiagnosticSeverity.Error
 			);
 		TerminalDescription? description =
-			hasErrors
+			( hasErrors )
 				? null
 				: builder.Build()
 		;

@@ -172,7 +172,7 @@ public static class TermcapRenderer {
 			) {
 				AddDiagnostic(
 					diagnostics,
-					parameterized
+					( parameterized )
 						? TermcapRenderDiagnosticCodes.ParameterProgramNotRepresentable
 						: TermcapRenderDiagnosticCodes.StringValueNotRepresentable,
 					error ?? $"Runtime string capability '{mapping.TermInfoShortName}' cannot be represented faithfully as termcap.",

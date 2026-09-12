@@ -454,7 +454,7 @@ public static class TermcapSourceParser {
 			fieldText.Length != 0
 				&& fieldText[0] == '.';
 		int capabilityOffset =
-			disabled
+			( disabled )
 				? 1
 				: 0
 		;

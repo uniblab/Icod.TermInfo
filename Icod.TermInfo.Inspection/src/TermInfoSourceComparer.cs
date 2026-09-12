@@ -302,13 +302,14 @@ public static class TermInfoSourceComparer {
 		}
 
 		if ( left.Kind == TermInfoSourceFieldKind.UseReference ) {
-			return string.Equals(
+			return ( string.Equals(
 				left.ReferenceName,
 				right.ReferenceName,
 				StringComparison.Ordinal
-			)
+			) )
 				? null
-				: TermInfoDifferenceKind.SourceUseReference;
+				: TermInfoDifferenceKind.SourceUseReference
+			;
 		}
 
 		if ( !string.Equals(
@@ -321,11 +322,11 @@ public static class TermInfoSourceComparer {
 
 		return left.Kind switch {
 			TermInfoSourceFieldKind.NumericCapability =>
-				NumericValuesEqual( left, right )
+				( NumericValuesEqual( left, right ) )
 					? null
 					: TermInfoDifferenceKind.SourceFieldValue,
 			TermInfoSourceFieldKind.StringCapability =>
-				StringValuesEqual( left, right )
+				( StringValuesEqual( left, right ) )
 					? null
 					: TermInfoDifferenceKind.SourceFieldValue,
 			_ => null,

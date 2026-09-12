@@ -169,7 +169,7 @@ internal static class TermcapStringConverter {
 			position < source.Length
 			&& source[position] == '*';
 		int paddingEnd =
-			proportional
+			( proportional )
 				? checked( position + 1 )
 				: position
 		;
