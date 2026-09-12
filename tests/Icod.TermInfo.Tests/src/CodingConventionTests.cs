@@ -93,7 +93,7 @@ public sealed class CodingConventionTests {
 
 		foreach ( Match match in ParenthesizedControlFlowPattern.Matches( source ) ) {
 			int openParenthesis =
-				match.Index + match.Value.LastIndexOf( '(', StringComparison.Ordinal );
+				match.Index + match.Value.LastIndexOf( '(' );
 			int closeParenthesis = FindMatchingParenthesis( source, openParenthesis );
 			if ( closeParenthesis < 0 ) {
 				continue;
@@ -324,7 +324,6 @@ public sealed class CodingConventionTests {
 			if ( masked[i] != '\r' && masked[i] != '\n' ) {
 				masked[i] = ' ';
 			}
-		}
 	}
 
 	private static IEnumerable<string> EnumerateCSharpFiles(
