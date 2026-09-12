@@ -21,6 +21,28 @@ def replace_exact(path: str, old: str, new: str) -> None:
     )
 
 
+def replace_exact_count(
+    path: str,
+    old: str,
+    new: str,
+    expected_count: int,
+) -> None:
+    target = Path(path)
+    text = target.read_text(encoding="utf-8")
+    old_count = text.count(old)
+    new_count = text.count(new)
+    embedded_old_count = new.count(old)
+    if new_count == expected_count and old_count == expected_count * embedded_old_count:
+        return
+    if new_count == 0 and old_count == expected_count:
+        target.write_text(text.replace(old, new), encoding="utf-8", newline="\n")
+        return
+    raise SystemExit(
+        f"{path}: expected {expected_count} old targets or {expected_count} normalized targets; "
+        f"found old={old_count}, new={new_count}"
+    )
+
+
 replace_exact(
     "Icod.TermInfo.Termcap/src/TermcapSourceParser.cs",
     """\t\treturn hasErrors\n\t\t\t? null\n\t\t\t: value.ToString()\n\t\t;\n""",
@@ -63,8 +85,15 @@ replace_exact(
     """\t\t\treturn (\n\t\t\t\t(\n\t\t\t\t\tsource.Length != 0\n\t\t\t\t\t&& source[ 0 ] == '\\uFEFF'\n\t\t\t\t)\n\t\t\t\t\t? source[ 1.. ]\n\t\t\t\t\t: source,\n\t\t\t\tnull\n\t\t\t);\n""",
 )
 
-replace_exact(
+replace_exact_count(
     "tools/public-api-snapshot/Program.cs",
     """\t\t\t+ ( string.IsNullOrEmpty( attributes )\n\t\t\t\t? string.Empty\n\t\t\t\t: $\" attrs={attributes}\" );\n""",
     """\t\t\t+ ( ( string.IsNullOrEmpty( attributes ) )\n\t\t\t\t? string.Empty\n\t\t\t\t: $\" attrs={attributes}\" );\n""",
+    2,
+)
+
+replace_exact(
+    "tools/public-api-snapshot/Program.cs",
+    """\t\t\t+ ( string.IsNullOrEmpty( attributes )\n\t\t\t\t? string.Empty\n\t\t\t\t: $\" return-attrs={attributes}\" );\n""",
+    """\t\t\t+ ( ( string.IsNullOrEmpty( attributes ) )\n\t\t\t\t? string.Empty\n\t\t\t\t: $\" return-attrs={attributes}\" );\n""",
 )
