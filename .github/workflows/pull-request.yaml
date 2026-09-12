@@ -8,7 +8,7 @@ concurrency:
   cancel-in-progress: true
 
 # Temporary write access supports the branch-scoped convention normalizer.
-# This checkpoint verifies the final single repository finding.
+# This checkpoint verifies the fully normalized ternary inventory with an idempotent pass.
 permissions:
   contents: write
 
