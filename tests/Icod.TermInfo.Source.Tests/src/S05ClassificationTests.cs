@@ -456,6 +456,7 @@ public sealed class S05ClassificationTests {
 						current.FullName,
 						"Icod.TermInfo.sln"
 					)
+				)
 			) {
 				return current.FullName;
 			}
