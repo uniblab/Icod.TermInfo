@@ -6,8 +6,7 @@ namespace Icod.TermInfo.Termcap;
 /// Resolves termcap <c>tc=</c> inheritance into deterministic effective source
 /// fields without performing terminfo conversion.
 /// </summary>
-public static class TermcapSourceResolver
-{
+public static class TermcapSourceResolver {
 	/// <summary>
 	/// Resolves one named entry from a parsed termcap source document.
 	/// </summary>
@@ -83,8 +82,7 @@ public static class TermcapSourceResolver
 		);
 	}
 
-	private sealed class ResolutionContext
-	{
+	private sealed class ResolutionContext {
 		private readonly ITermcapSourceEntryProvider _provider;
 		private readonly TermcapSourceResolverOptions _options;
 		private readonly HashSet<string> _activeNames =
@@ -372,8 +370,7 @@ public static class TermcapSourceResolver
 		}
 	}
 
-	private sealed class DocumentEntryProvider : ITermcapSourceEntryProvider
-	{
+	private sealed class DocumentEntryProvider : ITermcapSourceEntryProvider {
 		private readonly TermcapSourceDocument _document;
 
 		internal DocumentEntryProvider(
@@ -410,8 +407,7 @@ public static class TermcapSourceResolver
 		}
 	}
 
-	private sealed class ResolvedNode
-	{
+	private sealed class ResolvedNode {
 		internal ResolvedNode(
 			TermcapSourceEntry entry,
 			IEnumerable<TermcapSourceResolvedField> fields
