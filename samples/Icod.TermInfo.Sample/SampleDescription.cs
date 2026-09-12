@@ -2,11 +2,9 @@ using System.Text;
 
 namespace Icod.TermInfo.Sample;
 
-internal static class SampleDescription
-{
+internal static class SampleDescription {
     internal static void DescribeSemanticCompletionApis(
-        TerminalDescription terminal)
-    {
+        TerminalDescription terminal) {
         ArgumentNullException.ThrowIfNull(terminal);
 
         Console.WriteLine(
@@ -25,8 +23,7 @@ internal static class SampleDescription
         Console.WriteLine(
             $"Reusable parameter program sample: 41 -> {reusableProgram.Expand(41)}");
 
-        if (terminal.TryGetExtendedString("XM", out _))
-        {
+        if (terminal.TryGetExtendedString("XM", out _)) {
             string mouseEnable =
                 terminal.ExpandExtendedString("XM", 1);
             Console.WriteLine(
@@ -66,8 +63,7 @@ internal static class SampleDescription
             $"Windows profiles: {winConsole.Name}, {windowsTerminal.Name}, {windowsTerminalDirect.Name} ({TerminalColors.GetColorSupport(windowsTerminalDirect).Model})");
     }
 
-    internal static void DescribeProfile(TerminalDescription terminal)
-    {
+    internal static void DescribeProfile(TerminalDescription terminal) {
         ArgumentNullException.ThrowIfNull(terminal);
 
         TerminalColorSupport color =
@@ -78,17 +74,14 @@ internal static class SampleDescription
 
         if (color.Model == TerminalColorModel.Indexed
             && color.IndexedColorCount > 0
-            && color.HasForegroundSelector)
-        {
+            && color.HasForegroundSelector) {
             int index = Math.Min(1, color.IndexedColorCount - 1);
             string expansion =
                 TerminalColors.ExpandForeground(terminal, index);
             Console.WriteLine(
                 $"Indexed foreground sample: {EscapeForDisplay(expansion)}");
-        }
-        else if (color.Model == TerminalColorModel.DirectRgb
-            && color.HasForegroundSelector)
-        {
+        } else if (color.Model == TerminalColorModel.DirectRgb
+            && color.HasForegroundSelector) {
             string expansion =
                 TerminalColors.ExpandForeground(
                     terminal,
@@ -128,13 +121,11 @@ internal static class SampleDescription
             $"Descriptive metadata: mouse={hasMouse}, focus={hasFocus}, bracketed-paste={hasBracketedPaste}");
     }
 
-    private static string FormatNullable(int? value)
-    {
+    private static string FormatNullable(int? value) {
         return value?.ToString() ?? "absent";
     }
 
-    private static string EscapeForDisplay(string value)
-    {
+    private static string EscapeForDisplay(string value) {
         ArgumentNullException.ThrowIfNull(value);
 
         return value
