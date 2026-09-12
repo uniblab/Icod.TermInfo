@@ -7,8 +7,7 @@ namespace Icod.TermInfo.Termcap;
 /// Contains the result of converting one resolved termcap entry into the Runtime
 /// terminal-description model.
 /// </summary>
-public sealed class TermcapConversionResult
-{
+public sealed class TermcapConversionResult {
 	internal TermcapConversionResult(
 		TerminalDescription? description,
 		IEnumerable<TermcapConversionDiagnostic> diagnostics

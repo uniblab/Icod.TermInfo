@@ -6,8 +6,7 @@ namespace Icod.TermInfo.Termcap;
 /// Describes one mapping from a two-character termcap code to one canonical
 /// Runtime standard capability identity.
 /// </summary>
-public sealed class TermcapStandardCapabilityMapping
-{
+public sealed class TermcapStandardCapabilityMapping {
 	private TermcapStandardCapabilityMapping(
 		string termcapCode,
 		string canonicalTermcapCode,

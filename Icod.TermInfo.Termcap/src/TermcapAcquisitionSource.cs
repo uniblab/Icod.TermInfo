@@ -4,8 +4,7 @@ namespace Icod.TermInfo.Termcap;
 /// Describes the configured source which supplied an acquired root termcap
 /// entry.
 /// </summary>
-public sealed class TermcapAcquisitionSource
-{
+public sealed class TermcapAcquisitionSource {
 	internal TermcapAcquisitionSource(
 		TermcapAcquisitionSourceKind kind,
 		string identifier

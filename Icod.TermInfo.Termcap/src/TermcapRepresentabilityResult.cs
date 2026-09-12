@@ -6,8 +6,7 @@ namespace Icod.TermInfo.Termcap;
 /// Contains the preflight decision for rendering a Runtime terminal description
 /// as conventional termcap source.
 /// </summary>
-public sealed class TermcapRepresentabilityResult
-{
+public sealed class TermcapRepresentabilityResult {
 	internal TermcapRepresentabilityResult(
 		IEnumerable<TermcapRenderDiagnostic> diagnostics
 	) {
