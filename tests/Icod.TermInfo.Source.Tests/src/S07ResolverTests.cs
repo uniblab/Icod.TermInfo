@@ -18,29 +18,36 @@ public sealed class S07ResolverTests {
 				+ "\tuse=base-alias,\n"
 				+ "child|S07 child,\n"
 				+ "\tclear=child,\n"
-				+ "\tuse=grandchild,\n" );
+				+ "\tuse=grandchild,\n"
+			);
 
 		TermInfoSourceResolveResult result =
 			TermInfoSourceResolver.Resolve(
 				document,
-				"child" );
+				"child"
+			);
 
 		TermInfoSourceResolvedEntry entry =
 			AssertResolved( result );
 		Assert.Equal(
 			"child",
-			entry.SourceEntry.CanonicalName );
+			entry.SourceEntry.CanonicalName
+		);
 		Assert.True(
-			entry.GetBoolean( BooleanCapability.AutoRightMargin ) );
+			entry.GetBoolean( BooleanCapability.AutoRightMargin )
+		);
 		Assert.Equal(
 			80,
-			entry.GetNumber( NumericCapability.Columns ) );
+			entry.GetNumber( NumericCapability.Columns )
+		);
 		Assert.Equal(
 			24,
-			entry.GetNumber( NumericCapability.Lines ) );
+			entry.GetNumber( NumericCapability.Lines )
+		);
 		Assert.Equal(
 			"child",
-			entry.GetString( StringCapability.ClearScreen ) );
+			entry.GetString( StringCapability.ClearScreen )
+		);
 	}
 
 	[Fact]
@@ -57,27 +64,35 @@ public sealed class S07ResolverTests {
 				+ "\tVendor=right,\n"
 				+ "child|S07 child,\n"
 				+ "\tuse=left,\n"
-				+ "\tuse=right,\n" );
+				+ "\tuse=right,\n"
+			);
 
 		TermInfoSourceResolvedEntry entry =
 			AssertResolved(
 				TermInfoSourceResolver.Resolve(
 					document,
-					"child" ) );
+					"child"
+				)
+			);
 
 		Assert.Equal(
 			80,
-			entry.GetNumber( NumericCapability.Columns ) );
+			entry.GetNumber( NumericCapability.Columns )
+		);
 		Assert.Equal(
 			"left",
-			entry.GetString( StringCapability.ClearScreen ) );
+			entry.GetString( StringCapability.ClearScreen )
+		);
 		Assert.True(
 			entry.TryGetExtended(
 				"Vendor",
-				out TermInfoCapabilityValue vendor ) );
+				out TermInfoCapabilityValue vendor
+			)
+		);
 		Assert.Equal(
 			"left",
-			vendor.StringValue );
+			vendor.StringValue
+		);
 	}
 
 	[Fact]
@@ -97,28 +112,37 @@ public sealed class S07ResolverTests {
 				+ "\tcols#132,\n"
 				+ "\tclear@,\n"
 				+ "\tVendor@,\n"
-				+ "\tuse=parent,\n" );
+				+ "\tuse=parent,\n"
+			);
 
 		TermInfoSourceResolvedEntry entry =
 			AssertResolved(
 				TermInfoSourceResolver.Resolve(
 					document,
-					"child" ) );
+					"child"
+				)
+			);
 
 		Assert.False(
-			entry.GetBoolean( BooleanCapability.AutoRightMargin ) );
+			entry.GetBoolean( BooleanCapability.AutoRightMargin )
+		);
 		Assert.Equal(
 			132,
-			entry.GetNumber( NumericCapability.Columns ) );
+			entry.GetNumber( NumericCapability.Columns )
+		);
 		Assert.Equal(
 			24,
-			entry.GetNumber( NumericCapability.Lines ) );
+			entry.GetNumber( NumericCapability.Lines )
+		);
 		Assert.Null(
-			entry.GetString( StringCapability.ClearScreen ) );
+			entry.GetString( StringCapability.ClearScreen )
+		);
 		Assert.False(
 			entry.TryGetExtended(
 				"Vendor",
-				out _ ) );
+				out _
+			)
+		);
 	}
 
 	[Fact]
@@ -133,20 +157,26 @@ public sealed class S07ResolverTests {
 				+ "\tVendor=right,\n"
 				+ "child|S07 child,\n"
 				+ "\tuse=left,\n"
-				+ "\tuse=right,\n" );
+				+ "\tuse=right,\n"
+			);
 
 		TermInfoSourceResolvedEntry entry =
 			AssertResolved(
 				TermInfoSourceResolver.Resolve(
 					document,
-					"child" ) );
+					"child"
+				)
+			);
 
 		Assert.Null(
-			entry.GetNumber( NumericCapability.Columns ) );
+			entry.GetNumber( NumericCapability.Columns )
+		);
 		Assert.False(
 			entry.TryGetExtended(
 				"Vendor",
-				out _ ) );
+				out _
+			)
+		);
 	}
 
 	[Fact]
@@ -155,25 +185,29 @@ public sealed class S07ResolverTests {
 			ParseDocument(
 				"child|S07 missing parents,\n"
 				+ "\tuse=missing-left,\n"
-				+ "\tuse=missing-right,\n" );
+				+ "\tuse=missing-right,\n"
+			);
 
 		TermInfoSourceResolveResult rootMiss =
 			TermInfoSourceResolver.Resolve(
 				document,
-				"does-not-exist" );
+				"does-not-exist"
+			);
 		Assert.True( rootMiss.HasErrors );
 		Assert.Null( rootMiss.Entry );
 		TermInfoSourceDiagnostic rootDiagnostic =
 			Assert.Single( rootMiss.Diagnostics );
 		Assert.Equal(
 			TermInfoSourceDiagnosticCodes.MissingSourceEntry,
-			rootDiagnostic.Code );
+			rootDiagnostic.Code
+		);
 		Assert.Null( rootDiagnostic.Span );
 
 		TermInfoSourceResolveResult parentMiss =
 			TermInfoSourceResolver.Resolve(
 				document,
-				"child" );
+				"child"
+			);
 		Assert.True( parentMiss.HasErrors );
 		Assert.Null( parentMiss.Entry );
 		Assert.Equal(
@@ -183,10 +217,13 @@ public sealed class S07ResolverTests {
 				TermInfoSourceDiagnosticCodes.MissingSourceEntry,
 			},
 			parentMiss.Diagnostics.Select(
-				diagnostic => diagnostic.Code ) );
+				diagnostic => diagnostic.Code
+			)
+		);
 		Assert.True(
 			parentMiss.Diagnostics[ 0 ].Span!.Offset
-				< parentMiss.Diagnostics[ 1 ].Span!.Offset );
+				< parentMiss.Diagnostics[ 1 ].Span!.Offset
+		);
 	}
 
 	[Fact]
@@ -194,11 +231,13 @@ public sealed class S07ResolverTests {
 		TermInfoSourceDocument directDocument =
 			ParseDocument(
 				"self|self-alias|S07 direct cycle,\n"
-				+ "\tuse=self-alias,\n" );
+				+ "\tuse=self-alias,\n"
+			);
 		TermInfoSourceResolveResult direct =
 			TermInfoSourceResolver.Resolve(
 				directDocument,
-				"self" );
+				"self"
+			);
 
 		Assert.True( direct.HasErrors );
 		Assert.Null( direct.Entry );
@@ -206,10 +245,12 @@ public sealed class S07ResolverTests {
 			Assert.Single( direct.Diagnostics );
 		Assert.Equal(
 			TermInfoSourceDiagnosticCodes.InheritanceCycle,
-			directDiagnostic.Code );
+			directDiagnostic.Code
+		);
 		Assert.Contains(
 			"self -> self",
-			directDiagnostic.Message );
+			directDiagnostic.Message
+		);
 
 		TermInfoSourceDocument indirectDocument =
 			ParseDocument(
@@ -218,11 +259,13 @@ public sealed class S07ResolverTests {
 				+ "b|S07 cycle b,\n"
 				+ "\tuse=c,\n"
 				+ "c|S07 cycle c,\n"
-				+ "\tuse=a,\n" );
+				+ "\tuse=a,\n"
+			);
 		TermInfoSourceResolveResult indirect =
 			TermInfoSourceResolver.Resolve(
 				indirectDocument,
-				"a" );
+				"a"
+			);
 
 		Assert.True( indirect.HasErrors );
 		Assert.Null( indirect.Entry );
@@ -230,10 +273,12 @@ public sealed class S07ResolverTests {
 			Assert.Single( indirect.Diagnostics );
 		Assert.Equal(
 			TermInfoSourceDiagnosticCodes.InheritanceCycle,
-			indirectDiagnostic.Code );
+			indirectDiagnostic.Code
+		);
 		Assert.Contains(
 			"a -> b -> c -> a",
-			indirectDiagnostic.Message );
+			indirectDiagnostic.Message
+		);
 	}
 
 	[Fact]
@@ -245,30 +290,35 @@ public sealed class S07ResolverTests {
 				+ "middle|S07 depth middle,\n"
 				+ "\tuse=base,\n"
 				+ "root|S07 depth root,\n"
-				+ "\tuse=middle,\n" );
+				+ "\tuse=middle,\n"
+			);
 
 		TermInfoSourceResolveResult allowed =
 			TermInfoSourceResolver.Resolve(
 				document,
 				"root",
-				new TermInfoSourceResolverOptions( 2 ) );
+				new TermInfoSourceResolverOptions( 2 )
+			);
 		AssertResolved( allowed );
 
 		TermInfoSourceResolveResult rejected =
 			TermInfoSourceResolver.Resolve(
 				document,
 				"root",
-				new TermInfoSourceResolverOptions( 1 ) );
+				new TermInfoSourceResolverOptions( 1 )
+			);
 		Assert.True( rejected.HasErrors );
 		Assert.Null( rejected.Entry );
 		TermInfoSourceDiagnostic diagnostic =
 			Assert.Single( rejected.Diagnostics );
 		Assert.Equal(
 			TermInfoSourceDiagnosticCodes.MaximumInheritanceDepthExceeded,
-			diagnostic.Code );
+			diagnostic.Code
+		);
 		Assert.Contains(
 			"base",
-			diagnostic.Message );
+			diagnostic.Message
+		);
 	}
 
 	[Fact]
@@ -278,7 +328,8 @@ public sealed class S07ResolverTests {
 				"base|S07 zero depth base,\n"
 				+ "\tcols#80,\n"
 				+ "child|S07 zero depth child,\n"
-				+ "\tuse=base,\n" );
+				+ "\tuse=base,\n"
+			);
 		TermInfoSourceResolverOptions options =
 			new( 0 );
 
@@ -286,17 +337,21 @@ public sealed class S07ResolverTests {
 			TermInfoSourceResolver.Resolve(
 				document,
 				"base",
-				options ) );
+				options
+			)
+		);
 
 		TermInfoSourceResolveResult child =
 			TermInfoSourceResolver.Resolve(
 				document,
 				"child",
-				options );
+				options
+			);
 		Assert.True( child.HasErrors );
 		Assert.Equal(
 			TermInfoSourceDiagnosticCodes.MaximumInheritanceDepthExceeded,
-			Assert.Single( child.Diagnostics ).Code );
+			Assert.Single( child.Diagnostics ).Code
+		);
 	}
 
 	[Fact]
@@ -311,13 +366,15 @@ public sealed class S07ResolverTests {
 				+ "\tuse=shared,\n"
 				+ "root|S07 cache-depth root,\n"
 				+ "\tuse=branch,\n"
-				+ "\tuse=shared,\n" );
+				+ "\tuse=shared,\n"
+			);
 
 		TermInfoSourceResolveResult result =
 			TermInfoSourceResolver.Resolve(
 				document,
 				"root",
-				new TermInfoSourceResolverOptions( 2 ) );
+				new TermInfoSourceResolverOptions( 2 )
+			);
 
 		Assert.True( result.HasErrors );
 		Assert.Null( result.Entry );
@@ -325,10 +382,12 @@ public sealed class S07ResolverTests {
 			Assert.Single( result.Diagnostics );
 		Assert.Equal(
 			TermInfoSourceDiagnosticCodes.MaximumInheritanceDepthExceeded,
-			diagnostic.Code );
+			diagnostic.Code
+		);
 		Assert.Contains(
 			"leaf",
-			diagnostic.Message );
+			diagnostic.Message
+		);
 	}
 
 	[Fact]
@@ -337,28 +396,36 @@ public sealed class S07ResolverTests {
 			Assert.Single(
 				ParseDocument(
 					"parent|external-parent|S07 external parent,\n"
-					+ "\tcols#80,\n" )
-				.Entries );
+					+ "\tcols#80,\n"
+				)
+				.Entries
+			);
 		TermInfoSourceEntry child =
 			Assert.Single(
 				ParseDocument(
 					"child|S07 external child,\n"
-					+ "\tuse=external-parent,\n" )
-				.Entries );
+					+ "\tuse=external-parent,\n"
+				)
+				.Entries
+			);
 		DictionaryEntryProvider provider =
 			new(
 				child,
-				parent );
+				parent
+			);
 
 		TermInfoSourceResolvedEntry entry =
 			AssertResolved(
 				TermInfoSourceResolver.Resolve(
 					provider,
-					"child" ) );
+					"child"
+				)
+			);
 
 		Assert.Equal(
 			80,
-			entry.GetNumber( NumericCapability.Columns ) );
+			entry.GetNumber( NumericCapability.Columns )
+		);
 	}
 
 	[Fact]
@@ -367,25 +434,33 @@ public sealed class S07ResolverTests {
 			() =>
 				TermInfoSourceResolver.Resolve(
 					new ThrowingProvider(),
-					"terminal" ) );
+					"terminal"
+				)
+		);
 
 		Assert.Throws<InvalidOperationException>(
 			() =>
 				TermInfoSourceResolver.Resolve(
 					new SuccessWithNullProvider(),
-					"terminal" ) );
+					"terminal"
+				)
+		);
 
 		TermInfoSourceEntry entry =
 			Assert.Single(
 				ParseDocument(
 					"terminal|S07 provider contract,\n"
-					+ "\tcols#80,\n" )
-				.Entries );
+					+ "\tcols#80,\n"
+				)
+				.Entries
+			);
 		Assert.Throws<InvalidOperationException>(
 			() =>
 				TermInfoSourceResolver.Resolve(
 					new MissWithEntryProvider( entry ),
-					"terminal" ) );
+					"terminal"
+				)
+		);
 	}
 
 	[Fact]
@@ -397,17 +472,21 @@ public sealed class S07ResolverTests {
 				+ "second|shared|S07 second alias,\n"
 				+ "\tcols#132,\n"
 				+ "child|S07 duplicate alias consumer,\n"
-				+ "\tuse=shared,\n" );
+				+ "\tuse=shared,\n"
+			);
 
 		for ( int iteration = 0; iteration < 5; iteration++ ) {
 			TermInfoSourceResolvedEntry entry =
 				AssertResolved(
 					TermInfoSourceResolver.Resolve(
 						document,
-						"child" ) );
+						"child"
+					)
+				);
 			Assert.Equal(
 				80,
-				entry.GetNumber( NumericCapability.Columns ) );
+				entry.GetNumber( NumericCapability.Columns )
+			);
 		}
 	}
 
@@ -427,7 +506,8 @@ public sealed class S07ResolverTests {
 				+ "child|S07 deterministic child,\n"
 				+ "\tVendor=child,\n"
 				+ "\tuse=left,\n"
-				+ "\tuse=right,\n" );
+				+ "\tuse=right,\n"
+			);
 		TermInfoSourceEntry[] entries =
 			document.Entries.ToArray();
 
@@ -440,44 +520,59 @@ public sealed class S07ResolverTests {
 			AssertResolved(
 				TermInfoSourceResolver.Resolve(
 					forward,
-					"child" ) );
+					"child"
+				)
+			);
 		TermInfoSourceResolvedEntry second =
 			AssertResolved(
 				TermInfoSourceResolver.Resolve(
 					reverse,
-					"child" ) );
+					"child"
+				)
+			);
 
 		Assert.Equal(
 			first.GetBoolean( BooleanCapability.AutoRightMargin ),
-			second.GetBoolean( BooleanCapability.AutoRightMargin ) );
+			second.GetBoolean( BooleanCapability.AutoRightMargin )
+		);
 		Assert.Equal(
 			first.GetNumber( NumericCapability.Columns ),
-			second.GetNumber( NumericCapability.Columns ) );
+			second.GetNumber( NumericCapability.Columns )
+		);
 		Assert.Equal(
 			first.GetNumber( NumericCapability.Lines ),
-			second.GetNumber( NumericCapability.Lines ) );
+			second.GetNumber( NumericCapability.Lines )
+		);
 		Assert.True(
 			first.TryGetExtended(
 				"Vendor",
-				out TermInfoCapabilityValue firstVendor ) );
+				out TermInfoCapabilityValue firstVendor
+			)
+		);
 		Assert.True(
 			second.TryGetExtended(
 				"Vendor",
-				out TermInfoCapabilityValue secondVendor ) );
+				out TermInfoCapabilityValue secondVendor
+			)
+		);
 		Assert.Equal(
 			firstVendor,
-			secondVendor );
+			secondVendor
+		);
 	}
 
 	[Fact]
 	public void ResolverOptionsRejectUnsafeDepthLimits() {
 		Assert.Throws<ArgumentOutOfRangeException>(
-			() => new TermInfoSourceResolverOptions( -1 ) );
+			() => new TermInfoSourceResolverOptions( -1 )
+		);
 		Assert.Throws<ArgumentOutOfRangeException>(
 			() =>
 				new TermInfoSourceResolverOptions(
 					TermInfoSourceResolverOptions.MaximumSupportedInheritanceDepth
-					+ 1 ) );
+					+ 1
+				)
+		);
 	}
 
 	[Fact]
@@ -487,50 +582,64 @@ public sealed class S07ResolverTests {
 				TermInfoSourceResolver.Resolve(
 					ParseDocument(
 						"terminal|S07 query validation,\n"
-						+ "\tcols#80,\n" ),
-					"terminal" ) );
+						+ "\tcols#80,\n"
+					),
+					"terminal"
+				)
+			);
 
 		Assert.Throws<ArgumentOutOfRangeException>(
-			() => entry.GetBoolean( (BooleanCapability)( -1 ) ) );
+			() => entry.GetBoolean( (BooleanCapability)( -1 ) )
+		);
 		Assert.Throws<ArgumentOutOfRangeException>(
-			() => entry.GetNumber( (NumericCapability)( -1 ) ) );
+			() => entry.GetNumber( (NumericCapability)( -1 ) )
+		);
 		Assert.Throws<ArgumentOutOfRangeException>(
-			() => entry.GetString( (StringCapability)( -1 ) ) );
+			() => entry.GetString( (StringCapability)( -1 ) )
+		);
 		Assert.Throws<ArgumentException>(
 			() =>
 				entry.TryGetExtended(
 					" ",
-					out _ ) );
+					out _
+				)
+		);
 	}
 
 	private static TermInfoSourceDocument ParseDocument(
-		string source ) {
+		string source
+	) {
 		ArgumentNullException.ThrowIfNull( source );
 
 		TermInfoSourceParseResult parsed =
 			TermInfoSourceParser.Parse(
 				source,
-				"s07.ti" );
+				"s07.ti"
+			);
 		Assert.False(
 			parsed.HasErrors,
-			FormatDiagnostics( parsed.Diagnostics ) );
+			FormatDiagnostics( parsed.Diagnostics )
+		);
 		return parsed.Document;
 	}
 
 	private static TermInfoSourceResolvedEntry AssertResolved(
-		TermInfoSourceResolveResult result ) {
+		TermInfoSourceResolveResult result
+	) {
 		ArgumentNullException.ThrowIfNull( result );
 
 		Assert.False(
 			result.HasErrors,
-			FormatDiagnostics( result.Diagnostics ) );
+			FormatDiagnostics( result.Diagnostics )
+		);
 		Assert.Empty( result.Diagnostics );
 		Assert.NotNull( result.Entry );
 		return result.Entry!;
 	}
 
 	private static string FormatDiagnostics(
-		IEnumerable<TermInfoSourceDiagnostic> diagnostics ) {
+		IEnumerable<TermInfoSourceDiagnostic> diagnostics
+	) {
 		ArgumentNullException.ThrowIfNull( diagnostics );
 
 		return string.Join(
@@ -539,7 +648,9 @@ public sealed class S07ResolverTests {
 				diagnostic =>
 					diagnostic.Code
 					+ " "
-					+ diagnostic.Message ) );
+					+ diagnostic.Message
+			)
+		);
 	}
 
 	private sealed class DictionaryEntryProvider : ITermInfoSourceEntryProvider {
@@ -547,7 +658,8 @@ public sealed class S07ResolverTests {
 			new( StringComparer.Ordinal );
 
 		internal DictionaryEntryProvider(
-			params TermInfoSourceEntry[] entries ) {
+			params TermInfoSourceEntry[] entries
+		) {
 			ArgumentNullException.ThrowIfNull( entries );
 
 			foreach ( TermInfoSourceEntry entry in entries ) {
@@ -560,18 +672,21 @@ public sealed class S07ResolverTests {
 
 		public bool TryLoad(
 			string name,
-			[NotNullWhen( true )] out TermInfoSourceEntry? entry ) {
+			[NotNullWhen( true )] out TermInfoSourceEntry? entry
+		) {
 			ArgumentException.ThrowIfNullOrWhiteSpace( name );
 			return _entries.TryGetValue(
 				name,
-				out entry );
+				out entry
+			);
 		}
 	}
 
 	private sealed class ThrowingProvider : ITermInfoSourceEntryProvider {
 		public bool TryLoad(
 			string name,
-			[NotNullWhen( true )] out TermInfoSourceEntry? entry ) {
+			[NotNullWhen( true )] out TermInfoSourceEntry? entry
+		) {
 			ArgumentException.ThrowIfNullOrWhiteSpace( name );
 			entry = null;
 			throw new IOException( "Synthetic source-provider failure." );
@@ -590,18 +705,21 @@ public sealed class S07ResolverTests {
 			return true;
 		}
 	}
+
 	private sealed class MissWithEntryProvider : ITermInfoSourceEntryProvider {
 		private readonly TermInfoSourceEntry _entry;
 
 		internal MissWithEntryProvider(
-			TermInfoSourceEntry entry ) {
+			TermInfoSourceEntry entry
+		) {
 			ArgumentNullException.ThrowIfNull( entry );
 			_entry = entry;
 		}
 
 		public bool TryLoad(
 			string name,
-			[NotNullWhen( true )] out TermInfoSourceEntry? entry ) {
+			[NotNullWhen( true )] out TermInfoSourceEntry? entry
+		) {
 			ArgumentException.ThrowIfNullOrWhiteSpace( name );
 			entry = _entry;
 			return false;
