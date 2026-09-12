@@ -9,13 +9,13 @@ public sealed class TermInfoDatabaseSetIssue {
 		int catalogIssueIndex,
 		TermInfoDatabaseCatalogIssue issue
 	) {
-		if (databaseIndex < 0) {
-			throw new ArgumentOutOfRangeException(nameof(databaseIndex));
+		if ( databaseIndex < 0 ) {
+			throw new ArgumentOutOfRangeException( nameof( databaseIndex ) );
 		}
-		if (catalogIssueIndex < 0) {
-			throw new ArgumentOutOfRangeException(nameof(catalogIssueIndex));
+		if ( catalogIssueIndex < 0 ) {
+			throw new ArgumentOutOfRangeException( nameof( catalogIssueIndex ) );
 		}
-		ArgumentNullException.ThrowIfNull(issue);
+		ArgumentNullException.ThrowIfNull( issue );
 
 		DatabaseIndex = databaseIndex;
 		CatalogIssueIndex = catalogIssueIndex;
