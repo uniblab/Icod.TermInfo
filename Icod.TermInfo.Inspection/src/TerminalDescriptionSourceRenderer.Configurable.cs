@@ -170,8 +170,7 @@ public static partial class TerminalDescriptionSourceRenderer {
 			IReadOnlyList<StandardCapabilityMetadata<TCapability>> metadata,
 			TerminalDescriptionSourceCapabilityOrder order
 		)
-		where TCapability : struct, Enum
-	{
+		where TCapability : struct, Enum {
 		ArgumentNullException.ThrowIfNull( metadata );
 
 		return order switch {
