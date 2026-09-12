@@ -375,6 +375,7 @@ public sealed class CodingConventionTests {
 						directory.FullName,
 						"Icod.TermInfo.sln"
 					)
+				)
 			) {
 				return directory.FullName;
 			}
