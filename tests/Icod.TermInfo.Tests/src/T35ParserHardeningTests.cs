@@ -19,7 +19,8 @@ public sealed class T35ParserHardeningTests {
 	[InlineData( "compiled/t29-extended.bin" )]
 	[InlineData( "compiled/t29-extended32.bin" )]
 	public void EveryTruncatedPrefixHasDeterministicParserOutcome(
-		string relativePath ) {
+		string relativePath
+	) {
 		byte[] entry =
 			ReadFixture( relativePath );
 		int conventionalEnd =
@@ -37,17 +38,21 @@ public sealed class T35ParserHardeningTests {
 
 				Assert.False(
 					string.IsNullOrWhiteSpace(
-						terminal.Name ) );
+						terminal.Name
+					)
+				);
 				continue;
 			}
 
 			Exception? exception =
 				Record.Exception(
-					() => CompiledTermInfoParser.Parse( prefix ) );
+					() => CompiledTermInfoParser.Parse( prefix )
+				);
 
 			Assert.NotNull( exception );
 			Assert.IsType<CompiledTermInfoFormatException>(
-				exception );
+				exception
+			);
 		}
 	}
 
@@ -57,51 +62,64 @@ public sealed class T35ParserHardeningTests {
 	[InlineData( 8, "string-offsets" )]
 	public void ImpossibleStandardCountsFailBeforeSectionWalking(
 		int headerFieldOffset,
-		string expectedSection ) {
+		string expectedSection
+	) {
 		byte[] entry =
 			CreateHeaderOnlyEntry(
-				LegacyMagic );
+				LegacyMagic
+			);
 
 		BinaryPrimitives.WriteUInt16LittleEndian(
 			entry.AsSpan(
 				headerFieldOffset,
-				sizeof( ushort ) ),
-			ushort.MaxValue );
+				sizeof( ushort )
+			),
+			ushort.MaxValue
+		);
 
 		CompiledTermInfoFormatException exception =
 			Assert.Throws<CompiledTermInfoFormatException>(
-				() => CompiledTermInfoParser.Parse( entry ) );
+				() => CompiledTermInfoParser.Parse( entry )
+			);
 
 		Assert.Equal(
 			expectedSection,
-			exception.Section );
+			exception.Section
+		);
 		Assert.Equal(
 			headerFieldOffset,
-			exception.Offset );
+			exception.Offset
+		);
 	}
 
 	[Fact]
 	public void MaximumDeclaredNamesSizeFailsBeforeDecodingAbsentBytes() {
 		byte[] entry =
 			CreateHeaderOnlyEntry(
-				LegacyMagic );
+				LegacyMagic
+			);
 
 		BinaryPrimitives.WriteUInt16LittleEndian(
 			entry.AsSpan(
 				2,
-				sizeof( ushort ) ),
-			ushort.MaxValue );
+				sizeof( ushort )
+			),
+			ushort.MaxValue
+		);
 
 		CompiledTermInfoFormatException exception =
 			Assert.Throws<CompiledTermInfoFormatException>(
-				() => CompiledTermInfoParser.Parse( entry ) );
+				() => CompiledTermInfoParser.Parse( entry )
+			);
 
 		Assert.Equal(
 			"names",
-			exception.Section );
+			exception.Section
+		);
 		Assert.Equal(
 			entry.Length,
-			exception.Offset );
+			exception.Offset
+		);
 	}
 
 	[Fact]
@@ -112,19 +130,24 @@ public sealed class T35ParserHardeningTests {
 		BinaryPrimitives.WriteUInt16LittleEndian(
 			entry.AsSpan(
 				10,
-				sizeof( ushort ) ),
-			ushort.MaxValue );
+				sizeof( ushort )
+			),
+			ushort.MaxValue
+		);
 
 		CompiledTermInfoFormatException exception =
 			Assert.Throws<CompiledTermInfoFormatException>(
-				() => CompiledTermInfoParser.Parse( entry ) );
+				() => CompiledTermInfoParser.Parse( entry )
+			);
 
 		Assert.Equal(
 			"string-table",
-			exception.Section );
+			exception.Section
+		);
 		Assert.Equal(
 			entry.Length,
-			exception.Offset );
+			exception.Offset
+		);
 	}
 
 	[Fact]
@@ -136,18 +159,22 @@ public sealed class T35ParserHardeningTests {
 				numericCount: 0,
 				stringCount: 0,
 				stringTableItemCount: 2,
-				stringTableSize: 1 );
+				stringTableSize: 1
+			);
 
 		CompiledTermInfoFormatException exception =
 			Assert.Throws<CompiledTermInfoFormatException>(
-				() => CompiledTermInfoParser.Parse( entry ) );
+				() => CompiledTermInfoParser.Parse( entry )
+			);
 
 		Assert.Equal(
 			"extended-header",
-			exception.Section );
+			exception.Section
+		);
 		Assert.Equal(
 			-1,
-			exception.Offset );
+			exception.Offset
+		);
 	}
 
 	[Fact]
@@ -159,203 +186,252 @@ public sealed class T35ParserHardeningTests {
 				numericCount: ushort.MaxValue,
 				stringCount: ushort.MaxValue,
 				stringTableItemCount: ushort.MaxValue,
-				stringTableSize: ushort.MaxValue );
+				stringTableSize: ushort.MaxValue
+			);
 
 		CompiledTermInfoFormatException exception =
 			Assert.Throws<CompiledTermInfoFormatException>(
-				() => CompiledTermInfoParser.Parse( entry ) );
+				() => CompiledTermInfoParser.Parse( entry )
+			);
 
 		Assert.Equal(
 			"extended-header",
-			exception.Section );
+			exception.Section
+		);
 	}
 
 	[Fact]
 	public void StandardStringOffsetOutsideTableHasStableOffsetDiagnostic() {
 		byte[] entry =
 			ReadFixture(
-				"compiled/t29-legacy-minimal.bin" );
+				"compiled/t29-legacy-minimal.bin"
+			);
 		int offsetTable =
 			GetStringOffsetTableOffset( entry );
 
 		BinaryPrimitives.WriteInt16LittleEndian(
 			entry.AsSpan(
 				offsetTable,
-				sizeof( short ) ),
-			short.MaxValue );
+				sizeof( short )
+			),
+			short.MaxValue
+		);
 
 		CompiledTermInfoFormatException exception =
 			Assert.Throws<CompiledTermInfoFormatException>(
-				() => CompiledTermInfoParser.Parse( entry ) );
+				() => CompiledTermInfoParser.Parse( entry )
+			);
 
 		Assert.Equal(
 			"string-offsets",
-			exception.Section );
+			exception.Section
+		);
 		Assert.Equal(
 			offsetTable,
-			exception.Offset );
+			exception.Offset
+		);
 	}
 
 	[Fact]
 	public void ExtendedStringOffsetOutsideTableHasStableOffsetDiagnostic() {
 		byte[] entry =
 			ReadFixture(
-				"compiled/t29-extended.bin" );
+				"compiled/t29-extended.bin"
+			);
 		ExtendedOffsets offsets =
 			GetExtendedOffsets( entry );
 
 		BinaryPrimitives.WriteInt16LittleEndian(
 			entry.AsSpan(
 				offsets.StringOffsetTable,
-				sizeof( short ) ),
-			short.MaxValue );
+				sizeof( short )
+			),
+			short.MaxValue
+		);
 
 		CompiledTermInfoFormatException exception =
 			Assert.Throws<CompiledTermInfoFormatException>(
-				() => CompiledTermInfoParser.Parse( entry ) );
+				() => CompiledTermInfoParser.Parse( entry )
+			);
 
 		Assert.Equal(
 			"extended-string-offsets",
-			exception.Section );
+			exception.Section
+		);
 		Assert.Equal(
 			offsets.StringOffsetTable,
-			exception.Offset );
+			exception.Offset
+		);
 	}
 
 	[Fact]
 	public void ExtendedNameOffsetOutsideTableHasStableOffsetDiagnostic() {
 		byte[] entry =
 			ReadFixture(
-				"compiled/t29-extended.bin" );
+				"compiled/t29-extended.bin"
+			);
 		ExtendedOffsets offsets =
 			GetExtendedOffsets( entry );
 
 		BinaryPrimitives.WriteInt16LittleEndian(
 			entry.AsSpan(
 				offsets.NameOffsetTable,
-				sizeof( short ) ),
-			short.MaxValue );
+				sizeof( short )
+			),
+			short.MaxValue
+		);
 
 		CompiledTermInfoFormatException exception =
 			Assert.Throws<CompiledTermInfoFormatException>(
-				() => CompiledTermInfoParser.Parse( entry ) );
+				() => CompiledTermInfoParser.Parse( entry )
+			);
 
 		Assert.Equal(
 			"extended-name-offsets",
-			exception.Section );
+			exception.Section
+		);
 		Assert.Equal(
 			offsets.NameOffsetTable,
-			exception.Offset );
+			exception.Offset
+		);
 	}
 
 	[Fact]
 	public void ThirtyTwoBitInvalidNegativeStandardNumericIsRejected() {
 		byte[] entry =
 			ReadFixture(
-				"compiled/t29-extended32.bin" );
+				"compiled/t29-extended32.bin"
+			);
 		int numericOffset =
 			GetNumericOffset( entry );
 
 		BinaryPrimitives.WriteInt32LittleEndian(
 			entry.AsSpan(
 				numericOffset,
-				sizeof( int ) ),
-			int.MinValue );
+				sizeof( int )
+			),
+			int.MinValue
+		);
 
 		CompiledTermInfoFormatException exception =
 			Assert.Throws<CompiledTermInfoFormatException>(
-				() => CompiledTermInfoParser.Parse( entry ) );
+				() => CompiledTermInfoParser.Parse( entry )
+			);
 
 		Assert.Equal(
 			"numerics",
-			exception.Section );
+			exception.Section
+		);
 		Assert.Equal(
 			numericOffset,
-			exception.Offset );
+			exception.Offset
+		);
 	}
 
 	[Fact]
 	public void ThirtyTwoBitInvalidNegativeExtendedNumericIsRejected() {
 		byte[] entry =
 			ReadFixture(
-				"compiled/t29-extended32.bin" );
+				"compiled/t29-extended32.bin"
+			);
 		ExtendedOffsets offsets =
 			GetExtendedOffsets( entry );
 
 		BinaryPrimitives.WriteInt32LittleEndian(
 			entry.AsSpan(
 				offsets.NumericTable,
-				sizeof( int ) ),
-			int.MinValue );
+				sizeof( int )
+			),
+			int.MinValue
+		);
 
 		CompiledTermInfoFormatException exception =
 			Assert.Throws<CompiledTermInfoFormatException>(
-				() => CompiledTermInfoParser.Parse( entry ) );
+				() => CompiledTermInfoParser.Parse( entry )
+			);
 
 		Assert.Equal(
 			"extended-numerics",
-			exception.Section );
+			exception.Section
+		);
 		Assert.Equal(
 			offsets.NumericTable,
-			exception.Offset );
+			exception.Offset
+		);
 	}
 
 	[Fact]
 	public void DiagnosticsAreStableAcrossRepeatedMalformedParses() {
 		byte[] entry =
 			ReadFixture(
-				"malformed/illegal-extended-string-offset.bin" );
+				"malformed/illegal-extended-string-offset.bin"
+			);
 
 		CompiledTermInfoFormatException first =
 			Assert.Throws<CompiledTermInfoFormatException>(
-				() => CompiledTermInfoParser.Parse( entry ) );
+				() => CompiledTermInfoParser.Parse( entry )
+			);
 		CompiledTermInfoFormatException second =
 			Assert.Throws<CompiledTermInfoFormatException>(
-				() => CompiledTermInfoParser.Parse( entry ) );
+				() => CompiledTermInfoParser.Parse( entry )
+			);
 
 		Assert.Equal(
 			first.Section,
-			second.Section );
+			second.Section
+		);
 		Assert.Equal(
 			first.Offset,
-			second.Offset );
+			second.Offset
+		);
 		Assert.Equal(
 			first.Message,
-			second.Message );
+			second.Message
+		);
 	}
 
 	[Fact]
 	public void FailedParseDoesNotMutateInputOrContaminateLaterSuccess() {
 		byte[] malformed =
 			ReadFixture(
-				"malformed/extended-standard-name-collision.bin" );
+				"malformed/extended-standard-name-collision.bin"
+			);
 		byte[] snapshot =
 			(byte[])malformed.Clone();
 
 		Assert.Throws<CompiledTermInfoFormatException>(
-			() => CompiledTermInfoParser.Parse( malformed ) );
+			() => CompiledTermInfoParser.Parse( malformed )
+		);
 		Assert.Equal(
 			snapshot,
-			malformed );
+			malformed
+		);
 
 		TerminalDescription terminal =
 			ParseFixture(
-				"compiled/t29-extended32.bin" );
+				"compiled/t29-extended32.bin"
+			);
 
 		Assert.Equal(
 			"t29-extended32",
-			terminal.Name );
+			terminal.Name
+		);
 		Assert.Equal<int?>(
 			16_777_216,
 			terminal.GetNumber(
-				NumericCapability.Colors ) );
+				NumericCapability.Colors
+			)
+		);
 		Assert.True(
 			terminal.TryGetExtendedNumber(
 				"XNum",
-				out int value ) );
+				out int value
+			)
+		);
 		Assert.Equal(
 			2_147_483_640,
-			value );
+			value
+		);
 	}
 
 	[Fact]
@@ -370,7 +446,8 @@ public sealed class T35ParserHardeningTests {
 				new byte[
 					random.Next(
 						0,
-						1_025 ) ];
+						1_025
+					) ];
 			random.NextBytes( entry );
 
 			if ( entry.Length >= sizeof( ushort )
@@ -383,17 +460,21 @@ public sealed class T35ParserHardeningTests {
 				BinaryPrimitives.WriteUInt16LittleEndian(
 					entry.AsSpan(
 						0,
-						sizeof( ushort ) ),
-					magic );
+						sizeof( ushort )
+					),
+					magic
+				);
 			}
 
 			Exception? exception =
 				Record.Exception(
-					() => CompiledTermInfoParser.Parse( entry ) );
+					() => CompiledTermInfoParser.Parse( entry )
+				);
 
 			if ( exception is not null ) {
 				Assert.IsType<CompiledTermInfoFormatException>(
-					exception );
+					exception
+				);
 			}
 		}
 	}
@@ -405,14 +486,17 @@ public sealed class T35ParserHardeningTests {
 	[InlineData( "compiled/t29-extended.bin" )]
 	[InlineData( "compiled/t29-extended32.bin" )]
 	public void DeterministicMutationsNeverEscapeParserExceptionBoundary(
-		string relativePath ) {
+		string relativePath
+	) {
 		byte[] seed =
 			ReadFixture( relativePath );
 		Random random =
 			new(
 				StringComparer.Ordinal.GetHashCode(
-					relativePath )
-				^ 0x0035_0009 );
+					relativePath
+				)
+				^ 0x0035_0009
+			);
 
 		for ( int iteration = 0;
 			iteration < 128;
@@ -422,29 +506,34 @@ public sealed class T35ParserHardeningTests {
 			int editCount =
 				random.Next(
 					1,
-					5 );
+					5
+				);
 
 			for ( int edit = 0;
 				edit < editCount;
 				edit++ ) {
 				int offset =
 					random.Next(
-						entry.Length );
+						entry.Length
+					);
 				int bit =
 					random.Next(
 						0,
-						8 );
+						8
+					);
 				entry[ offset ] ^=
 					(byte)( 1 << bit );
 			}
 
 			Exception? exception =
 				Record.Exception(
-					() => CompiledTermInfoParser.Parse( entry ) );
+					() => CompiledTermInfoParser.Parse( entry )
+				);
 
 			if ( exception is not null ) {
 				Assert.IsType<CompiledTermInfoFormatException>(
-					exception );
+					exception
+				);
 			}
 		}
 	}
@@ -457,7 +546,8 @@ public sealed class T35ParserHardeningTests {
 					BindingFlags.Public
 					| BindingFlags.NonPublic
 					| BindingFlags.Static
-					| BindingFlags.DeclaredOnly );
+					| BindingFlags.DeclaredOnly
+				);
 
 		Assert.NotEmpty( methods );
 
@@ -465,20 +555,24 @@ public sealed class T35ParserHardeningTests {
 			methods,
 			method => {
 				Assert.Null(
-					method.GetCustomAttribute<DllImportAttribute>() );
+					method.GetCustomAttribute<DllImportAttribute>()
+				);
 				Assert.True(
 					( method.Attributes
 						& MethodAttributes.PinvokeImpl )
 					== 0,
-					$"Parser method '{method.Name}' is marked as a native P/Invoke." );
-			} );
+					$"Parser method '{method.Name}' is marked as a native P/Invoke."
+				);
+			}
+		);
 	}
 
 	[Fact]
 	public void ConfiguredEntryLimitIsCheckedBeforeFormatWalking() {
 		byte[] entry =
 			ReadFixture(
-				"compiled/t29-extended32.bin" );
+				"compiled/t29-extended32.bin"
+			);
 		CompiledTermInfoParserOptions options =
 			new( entry.Length - 1 );
 
@@ -486,24 +580,31 @@ public sealed class T35ParserHardeningTests {
 			Assert.Throws<CompiledTermInfoFormatException>(
 				() => CompiledTermInfoParser.Parse(
 					entry,
-					options ) );
+					options
+				)
+			);
 
 		Assert.Equal(
 			"entry",
-			exception.Section );
+			exception.Section
+		);
 		Assert.Equal(
 			-1,
-			exception.Offset );
+			exception.Offset
+		);
 	}
 
 	private static TerminalDescription ParseFixture(
-		string relativePath ) {
+		string relativePath
+	) {
 		return CompiledTermInfoParser.Parse(
-			ReadFixture( relativePath ) );
+			ReadFixture( relativePath )
+		);
 	}
 
 	private static byte[] ReadFixture(
-		string relativePath ) {
+		string relativePath
+	) {
 		return File.ReadAllBytes(
 			Path.Combine(
 				AppContext.BaseDirectory,
@@ -511,19 +612,25 @@ public sealed class T35ParserHardeningTests {
 				"compiled-terminfo",
 				relativePath.Replace(
 					'/',
-					Path.DirectorySeparatorChar ) ) );
+					Path.DirectorySeparatorChar
+				)
+			)
+		);
 	}
 
 	private static byte[] CreateHeaderOnlyEntry(
-		ushort magic ) {
+		ushort magic
+	) {
 		byte[] entry =
 			new byte[ HeaderSize ];
 
 		BinaryPrimitives.WriteUInt16LittleEndian(
 			entry.AsSpan(
 				0,
-				sizeof( ushort ) ),
-			magic );
+				sizeof( ushort )
+			),
+			magic
+		);
 		return entry;
 	}
 
@@ -534,16 +641,22 @@ public sealed class T35ParserHardeningTests {
 		BinaryPrimitives.WriteUInt16LittleEndian(
 			entry.AsSpan(
 				0,
-				sizeof( ushort ) ),
-			LegacyMagic );
+				sizeof( ushort )
+			),
+			LegacyMagic
+		);
 		BinaryPrimitives.WriteUInt16LittleEndian(
 			entry.AsSpan(
 				2,
-				sizeof( ushort ) ),
-			4 );
+				sizeof( ushort )
+			),
+			4
+		);
 		"n|d\0"u8.CopyTo(
 			entry.AsSpan(
-				HeaderSize ) );
+				HeaderSize
+			)
+		);
 
 		return entry;
 	}
@@ -554,7 +667,8 @@ public sealed class T35ParserHardeningTests {
 		ushort numericCount,
 		ushort stringCount,
 		ushort stringTableItemCount,
-		ushort stringTableSize ) {
+		ushort stringTableSize
+	) {
 		ArgumentNullException.ThrowIfNull( conventional );
 
 		int headerOffset =
@@ -569,57 +683,75 @@ public sealed class T35ParserHardeningTests {
 
 		conventional.CopyTo(
 			entry,
-			0 );
+			0
+		);
 
 		BinaryPrimitives.WriteUInt16LittleEndian(
 			entry.AsSpan(
 				headerOffset,
-				sizeof( ushort ) ),
-			booleanCount );
+				sizeof( ushort )
+			),
+			booleanCount
+		);
 		BinaryPrimitives.WriteUInt16LittleEndian(
 			entry.AsSpan(
 				headerOffset + 2,
-				sizeof( ushort ) ),
-			numericCount );
+				sizeof( ushort )
+			),
+			numericCount
+		);
 		BinaryPrimitives.WriteUInt16LittleEndian(
 			entry.AsSpan(
 				headerOffset + 4,
-				sizeof( ushort ) ),
-			stringCount );
+				sizeof( ushort )
+			),
+			stringCount
+		);
 		BinaryPrimitives.WriteUInt16LittleEndian(
 			entry.AsSpan(
 				headerOffset + 6,
-				sizeof( ushort ) ),
-			stringTableItemCount );
+				sizeof( ushort )
+			),
+			stringTableItemCount
+		);
 		BinaryPrimitives.WriteUInt16LittleEndian(
 			entry.AsSpan(
 				headerOffset + 8,
-				sizeof( ushort ) ),
-			stringTableSize );
+				sizeof( ushort )
+			),
+			stringTableSize
+		);
 
 		return entry;
 	}
 
 	private static int GetConventionalEnd(
-		ReadOnlySpan<byte> entry ) {
+		ReadOnlySpan<byte> entry
+	) {
 		ushort magic =
 			BinaryPrimitives.ReadUInt16LittleEndian(
-				entry[ 0..2 ] );
+				entry[ 0..2 ]
+			);
 		int names =
 			BinaryPrimitives.ReadUInt16LittleEndian(
-				entry[ 2..4 ] );
+				entry[ 2..4 ]
+			);
 		int booleans =
 			BinaryPrimitives.ReadUInt16LittleEndian(
-				entry[ 4..6 ] );
+				entry[ 4..6 ]
+			);
 		int numbers =
 			BinaryPrimitives.ReadUInt16LittleEndian(
-				entry[ 6..8 ] );
+				entry[ 6..8 ]
+			);
 		int strings =
 			BinaryPrimitives.ReadUInt16LittleEndian(
-				entry[ 8..10 ] );
+				entry[ 8..10 ]
+			);
 		int table =
 			BinaryPrimitives.ReadUInt16LittleEndian(
-				entry[ 10..12 ] );
+				entry[ 10..12 ]
+			);
 
 		int numericOffset =
 			HeaderSize
@@ -642,13 +774,16 @@ public sealed class T35ParserHardeningTests {
 	}
 
 	private static int GetNumericOffset(
-		ReadOnlySpan<byte> entry ) {
+		ReadOnlySpan<byte> entry
+	) {
 		int names =
 			BinaryPrimitives.ReadUInt16LittleEndian(
-				entry[ 2..4 ] );
+				entry[ 2..4 ]
+			);
 		int booleans =
 			BinaryPrimitives.ReadUInt16LittleEndian(
-				entry[ 4..6 ] );
+				entry[ 4..6 ]
+			);
 
 		int offset =
 			HeaderSize
@@ -662,13 +797,16 @@ public sealed class T35ParserHardeningTests {
 	}
 
 	private static int GetStringOffsetTableOffset(
-		ReadOnlySpan<byte> entry ) {
+		ReadOnlySpan<byte> entry
+	) {
 		ushort magic =
 			BinaryPrimitives.ReadUInt16LittleEndian(
-				entry[ 0..2 ] );
+				entry[ 0..2 ]
+			);
 		int numbers =
 			BinaryPrimitives.ReadUInt16LittleEndian(
-				entry[ 6..8 ] );
+				entry[ 6..8 ]
+			);
 		int numericWidth =
 			( magic == ExtendedNumberMagic )
 				? sizeof( int )
@@ -680,10 +818,12 @@ public sealed class T35ParserHardeningTests {
 	}
 
 	private static ExtendedOffsets GetExtendedOffsets(
-		ReadOnlySpan<byte> entry ) {
+		ReadOnlySpan<byte> entry
+	) {
 		ushort magic =
 			BinaryPrimitives.ReadUInt16LittleEndian(
-				entry[ 0..2 ] );
+				entry[ 0..2 ]
+			);
 		int numericWidth =
 			( magic == ExtendedNumberMagic )
 				? sizeof( int )
@@ -700,17 +840,23 @@ public sealed class T35ParserHardeningTests {
 			BinaryPrimitives.ReadUInt16LittleEndian(
 				entry.Slice(
 					headerOffset,
-					sizeof( ushort ) ) );
+					sizeof( ushort )
+				)
+			);
 		int numbers =
 			BinaryPrimitives.ReadUInt16LittleEndian(
 				entry.Slice(
 					headerOffset + 2,
-					sizeof( ushort ) ) );
+					sizeof( ushort )
+				)
+			);
 		int strings =
 			BinaryPrimitives.ReadUInt16LittleEndian(
 				entry.Slice(
 					headerOffset + 4,
-					sizeof( ushort ) ) );
+					sizeof( ushort )
+				)
+			);
 
 		int numericOffset =
 			headerOffset
@@ -730,11 +876,13 @@ public sealed class T35ParserHardeningTests {
 		return new ExtendedOffsets(
 			numericOffset,
 			stringOffsetTable,
-			nameOffsetTable );
+			nameOffsetTable
+		);
 	}
 
 	private readonly record struct ExtendedOffsets(
 		int NumericTable,
 		int StringOffsetTable,
-		int NameOffsetTable );
+		int NameOffsetTable
+	);
 }
