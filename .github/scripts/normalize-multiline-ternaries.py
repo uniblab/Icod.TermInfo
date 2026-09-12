@@ -4,10 +4,17 @@ from pathlib import Path
 def replace_exact(path: str, old: str, new: str) -> None:
     target = Path(path)
     text = target.read_text(encoding="utf-8")
-    count = text.count(old)
-    if count != 1:
-        raise SystemExit(f"{path}: expected exactly one replacement target, found {count}")
-    target.write_text(text.replace(old, new, 1), encoding="utf-8", newline="\n")
+    old_count = text.count(old)
+    new_count = text.count(new)
+    if old_count == 1 and new_count == 0:
+        target.write_text(text.replace(old, new, 1), encoding="utf-8", newline="\n")
+        return
+    if old_count == 0 and new_count == 1:
+        return
+    raise SystemExit(
+        f"{path}: expected one old target or one normalized target; "
+        f"found old={old_count}, new={new_count}"
+    )
 
 
 convention_test = "tests/Icod.TermInfo.Tests/src/CodingConventionTests.cs"
