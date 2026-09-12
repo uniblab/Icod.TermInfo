@@ -7,8 +7,7 @@ namespace Icod.TermInfo.Termcap;
 /// Exposes the adopted mapping from two-character termcap codes to the existing
 /// Runtime standard-capability identities.
 /// </summary>
-public static class TermcapCapabilityCatalog
-{
+public static class TermcapCapabilityCatalog {
 	private static readonly ObsoleteAliasDefinition[] ObsoleteAliases =
 	[
 		new( "BO", "mr", "AT&T" ),
@@ -235,8 +234,7 @@ public static class TermcapCapabilityCatalog
 		}
 	}
 
-	private readonly struct ObsoleteAliasDefinition
-	{
+	private readonly struct ObsoleteAliasDefinition {
 		internal ObsoleteAliasDefinition(
 			string aliasCode,
 			string canonicalCode,

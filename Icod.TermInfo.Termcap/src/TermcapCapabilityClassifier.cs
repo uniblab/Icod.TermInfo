@@ -6,8 +6,7 @@ namespace Icod.TermInfo.Termcap;
 /// Classifies unresolved termcap fields against the canonical Runtime standard
 /// capability metadata without performing conversion or inheritance resolution.
 /// </summary>
-public static class TermcapCapabilityClassifier
-{
+public static class TermcapCapabilityClassifier {
 	/// <summary>
 	/// Classifies one unresolved termcap source field.
 	/// </summary>
@@ -69,12 +68,10 @@ public static class TermcapCapabilityClassifier
 		if ( mapping.IsObsoleteAlias ) {
 			classification =
 				TermcapCapabilityClassification.ObsoleteAlias;
-		}
-		else if ( mapping.IsObsoleteStandard ) {
+		} else if ( mapping.IsObsoleteStandard ) {
 			classification =
 				TermcapCapabilityClassification.ObsoleteStandard;
-		}
-		else {
+		} else {
 			classification =
 				TermcapCapabilityClassification.Standard;
 		}
