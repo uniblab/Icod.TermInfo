@@ -94,22 +94,22 @@ public sealed class T45CompletionGateTests {
 					"README.md" ) );
 
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo --version 1.10.0",
+			"dotnet add package Icod.TermInfo --version 1.11.0",
 			readme );
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo.Source --version 1.10.0",
+			"dotnet add package Icod.TermInfo.Source --version 1.11.0",
 			readme );
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo.Termcap --version 1.10.0",
+			"dotnet add package Icod.TermInfo.Termcap --version 1.11.0",
 			readme );
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo.Compiler --version 1.10.0",
+			"dotnet add package Icod.TermInfo.Compiler --version 1.11.0",
 			readme );
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo.Inspection --version 1.10.0",
+			"dotnet add package Icod.TermInfo.Inspection --version 1.11.0",
 			readme );
 		Assert.Contains(
-			"dotnet tool install --global Icod.TermInfo.Tools --version 1.10.0",
+			"dotnet tool install --global Icod.TermInfo.Tools --version 1.11.0",
 			readme );
 		Assert.DoesNotContain(
 			"1.6.0-Alpha-8 is the current",
@@ -128,6 +128,9 @@ public sealed class T45CompletionGateTests {
 			readme );
 		Assert.Contains(
 			"docs/1.8.0-RELEASE-AUDIT.md",
+			readme );
+		Assert.Contains(
+			"docs/1.11.0-RELEASE-AUDIT.md",
 			readme );
 	}
 
