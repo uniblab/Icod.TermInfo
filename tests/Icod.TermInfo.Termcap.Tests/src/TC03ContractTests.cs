@@ -6,8 +6,7 @@ using Xunit;
 
 namespace Icod.TermInfo.Termcap.Tests;
 
-public sealed class TC03ContractTests
-{
+public sealed class TC03ContractTests {
 	private const string Tc03DevelopmentVersion = "1.6.0-Alpha-3";
 
 	[Fact]
@@ -156,7 +155,6 @@ public sealed class TC03ContractTests
 						current.FullName,
 						"Icod.TermInfo.sln"
 					)
-				)
 			) {
 				return current.FullName;
 			}
