@@ -1,8 +1,8 @@
 # Icod.TermInfo Acquisition Sample
 
 This executable is the focused compiled terminfo acquisition sample introduced
-in 0.9 and retained for 1.0. It is intentionally non-interactive and never
-emits terminal-control strings.
+in 0.9 and retained as the low-level acquisition example through 1.11. It is
+intentionally non-interactive and never emits terminal-control strings.
 
 The project targets `net8.0`, `net9.0`, and `net10.0`; the commands below use
 `net10.0`. Substitute `-f net8.0` or `-f net9.0` to exercise those targets.
