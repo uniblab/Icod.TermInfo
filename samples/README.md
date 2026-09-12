@@ -11,6 +11,10 @@ evidence, classification, planning, consumer-owned runtime verification, and the
 version-3 lifecycle JSON documents. It intentionally performs no terminal I/O
 and has no dependency on `Icod.Terminal`.
 
+Version 1.11 deliberately adds no persistent-raster lifecycle command-line form.
+That feature remains a reusable `Icod.TermInfo.Inspection` API and is demonstrated
+by the dedicated lifecycle sample rather than by `ToolSuite`.
+
 The 1.10 addition is `Icod.TermInfo.DatabaseSet.Sample`, an executable public-API
 walkthrough for ordered explicit database sets, precedence, semantic shadow and
 alias evidence, set comparison, multi-database planning, and all three version-2
@@ -46,7 +50,7 @@ See `Icod.TermInfo.Sample/README.md`.
 ## Icod.TermInfo.Acquisition.Sample
 
 `Icod.TermInfo.Acquisition.Sample` is the focused compiled-database acquisition
-demonstration introduced in 0.9 and retained through 1.10. It never emits
+demonstration introduced in 0.9 and retained through 1.11. It never emits
 terminal-control strings.
 
 Commands:
@@ -154,7 +158,9 @@ synthesis through `infocmp -u`, explicit-candidate parent planning through
 validation, semantic comparison, conventional database enumeration,
 forward/reverse `use=` dependency reports, termcap-to-terminfo conversion,
 terminfo-to-termcap round trips, all four frozen version-1 JSON document kinds,
-and the three additive 1.10 database-set JSON document kinds.
+and the three additive 1.10 database-set JSON document kinds. Persistent-raster
+lifecycle planning is intentionally absent here because 1.11 exposes it only
+through the reusable Inspection API.
 
 See `ToolSuite/README.md`.
 
