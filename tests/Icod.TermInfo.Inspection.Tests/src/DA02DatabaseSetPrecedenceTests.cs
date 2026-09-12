@@ -38,7 +38,7 @@ public sealed class DA02DatabaseSetPrecedenceTests {
 		TermInfoDatabaseCatalog catalog =
 			CreateCatalog( "single", CreateTerminal( "target", "target-alias" ) );
 		TermInfoDatabaseSet set =
-			TermInfoDatabaseInspector.CreateSet([ catalog ]);
+			TermInfoDatabaseInspector.CreateSet( [ catalog ] );
 
 		TermInfoDatabaseSetLookupResult result =
 			set.LookupCanonicalName( "target" );
@@ -186,7 +186,7 @@ public sealed class DA02DatabaseSetPrecedenceTests {
 		try {
 			CultureInfo.CurrentCulture = new CultureInfo( "tr-TR" );
 			TermInfoDatabaseSet set =
-				TermInfoDatabaseInspector.CreateSet([ catalog ]);
+				TermInfoDatabaseInspector.CreateSet( [ catalog ] );
 
 			TermInfoDatabaseSetLookupResult latin =
 				set.LookupCanonicalName( "I-terminal" );
