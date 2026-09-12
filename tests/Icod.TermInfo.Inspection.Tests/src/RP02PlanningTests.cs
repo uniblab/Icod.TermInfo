@@ -554,9 +554,10 @@ public sealed class RP02PlanningTests {
 				field => field.Kind == TermInfoSourceFieldKind.CancelledCapability
 			);
 		int[] selectedCandidateIndices =
-			candidateIndex.HasValue
+			( candidateIndex.HasValue )
 				? [ candidateIndex.Value ]
-				: [];
+				: []
+		;
 		TerminalDescriptionSourcePlanningScore score =
 			new(
 				localDirectiveCount,

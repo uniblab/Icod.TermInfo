@@ -212,7 +212,7 @@ public static class Command {
 				).ConfigureAwait( false );
 			}
 
-			return listing.HasOperationalFailure
+			return ( listing.HasOperationalFailure )
 				? CommandExitCodes.Failure
 				: CommandExitCodes.Success
 			;

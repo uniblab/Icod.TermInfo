@@ -679,9 +679,10 @@ public sealed class I07ValidationTests {
 	private static string DescribeAliases(
 		IReadOnlyList<string>? aliases
 	) {
-		return aliases is null
+		return ( aliases is null )
 			? string.Empty
-			: string.Join( ",", aliases );
+			: string.Join( ",", aliases )
+		;
 	}
 
 	private static string DescribeCapabilityValue(

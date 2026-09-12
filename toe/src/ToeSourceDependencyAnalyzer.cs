@@ -337,10 +337,12 @@ internal static class ToeSourceDependencyAnalyzer {
 				).ConfigureAwait( false );
 
 			return (
-				source.Length != 0
+				(
+					source.Length != 0
 					&& source[ 0 ] == '\uFEFF'
-						? source[ 1.. ]
-						: source,
+				)
+					? source[ 1.. ]
+					: source,
 				null
 			);
 		} catch ( DecoderFallbackException ) {

@@ -886,7 +886,7 @@ public static class TermcapSourceParser {
 			value.Append( translated );
 		}
 
-		return hasErrors
+		return ( hasErrors )
 			? null
 			: value.ToString()
 		;

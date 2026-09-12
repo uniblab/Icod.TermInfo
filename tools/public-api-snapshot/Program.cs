@@ -652,7 +652,7 @@ internal static class Program {
 			+ $"{property.Name}{index} "
 			+ $"{{ {string.Join( " ", accessors )} }} "
 			+ $"null={FormatNullability( Nullability.Create( property ) )}"
-			+ ( string.IsNullOrEmpty( attributes )
+			+ ( ( string.IsNullOrEmpty( attributes ) )
 				? string.Empty
 				: $" attrs={attributes}" );
 	}
@@ -694,7 +694,7 @@ internal static class Program {
 			+ $"{eventInfo.Name} "
 			+ $"{{ {string.Join( " ", accessors )} }} "
 			+ $"null={FormatNullability( Nullability.Create( eventInfo ) )}"
-			+ ( string.IsNullOrEmpty( attributes )
+			+ ( ( string.IsNullOrEmpty( attributes ) )
 				? string.Empty
 				: $" attrs={attributes}" );
 	}
@@ -743,7 +743,7 @@ internal static class Program {
 			+ $"{methodName}"
 			+ $"({FormatParameters( method.GetParameters() )}) "
 			+ $"return-null={FormatNullability( Nullability.Create( method.ReturnParameter ) )}"
-			+ ( string.IsNullOrEmpty( attributes )
+			+ ( ( string.IsNullOrEmpty( attributes ) )
 				? string.Empty
 				: $" return-attrs={attributes}" );
 

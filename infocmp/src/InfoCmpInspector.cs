@@ -352,9 +352,10 @@ internal static class InfoCmpInspector {
 			cancellationToken.ThrowIfCancellationRequested();
 			string requestedName = options.TerminalNames[ index ];
 			string? databaseDirectory =
-				index == 0
+				( index == 0 )
 					? options.DatabaseDirectory
-					: options.ComparisonDatabaseDirectory;
+					: options.ComparisonDatabaseDirectory
+			;
 			InfoCmpTerminal? terminal =
 				await AcquireAsync(
 					requestedName,
