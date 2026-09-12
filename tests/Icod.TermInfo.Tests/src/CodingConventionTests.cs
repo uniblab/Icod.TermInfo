@@ -13,7 +13,7 @@ public sealed class CodingConventionTests {
 		RegexOptions.CultureInvariant
 	);
 	private static readonly Regex ParenthesizedControlFlowPattern = new(
-		@"(?m)^[\t ]*(?:\}[\t ]+else[\t ]+)?(?:if|for|foreach|while|using|lock|fixed)[\t ]*\(",
+		@"(?m)^[\t ]*(?:\}[\t ]+else[\t ]+)?(?:(?:await[\t ]+)?(?:foreach|using)|if|for|while|lock|fixed)[\t ]*\(",
 		RegexOptions.CultureInvariant
 	);
 	private static readonly Regex ElseControlFlowPattern = new(
@@ -193,45 +193,48 @@ public sealed class CodingConventionTests {
 		int i = 0;
 		while ( i < source.Length ) {
 			if ( i + 1 < source.Length && source[i] == '/' && source[i + 1] == '/' ) {
-				int end = source.IndexOf( '\n', i + 2 );
-				if ( end < 0 ) {
-					end = source.Length;
+				int commentEnd = source.IndexOf( '\n', i + 2 );
+				if ( commentEnd < 0 ) {
+					commentEnd = source.Length;
 				}
-				MaskRange( masked, i, end );
-				i = end;
+				MaskRange( masked, i, commentEnd );
+				i = commentEnd;
 				continue;
 			}
 
 			if ( i + 1 < source.Length && source[i] == '/' && source[i + 1] == '*' ) {
-				int end = source.IndexOf( "*/", i + 2, StringComparison.Ordinal );
-				end = ( end < 0 ) ? source.Length : end + 2;
-				MaskRange( masked, i, end );
-				i = end;
+				int blockCommentEnd = source.IndexOf( "*/", i + 2, StringComparison.Ordinal );
+				blockCommentEnd = ( blockCommentEnd < 0 )
+					? source.Length
+					: blockCommentEnd + 2
+				;
+				MaskRange( masked, i, blockCommentEnd );
+				i = blockCommentEnd;
 				continue;
 			}
 
 			if ( source[i] == '"' ) {
 				int quoteCount = CountConsecutiveQuotes( source, i );
 				if ( quoteCount >= 3 ) {
-					int end = FindRawStringEnd( source, i + quoteCount, quoteCount );
-					MaskRange( masked, i, end );
-					i = end;
+					int rawStringEnd = FindRawStringEnd( source, i + quoteCount, quoteCount );
+					MaskRange( masked, i, rawStringEnd );
+					i = rawStringEnd;
 					continue;
 				}
 
 				bool verbatim =
 					( i > 0 && source[i - 1] == '@' )
 					|| ( i > 1 && source[i - 1] == '$' && source[i - 2] == '@' );
-				int end = FindQuotedStringEnd( source, i + 1, verbatim );
-				MaskRange( masked, i, end );
-				i = end;
+				int stringEnd = FindQuotedStringEnd( source, i + 1, verbatim );
+				MaskRange( masked, i, stringEnd );
+				i = stringEnd;
 				continue;
 			}
 
 			if ( source[i] == '\'' ) {
-				int end = FindCharacterLiteralEnd( source, i + 1 );
-				MaskRange( masked, i, end );
-				i = end;
+				int characterEnd = FindCharacterLiteralEnd( source, i + 1 );
+				MaskRange( masked, i, characterEnd );
+				i = characterEnd;
 				continue;
 			}
 
