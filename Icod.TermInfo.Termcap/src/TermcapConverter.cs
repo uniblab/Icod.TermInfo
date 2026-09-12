@@ -6,8 +6,7 @@ namespace Icod.TermInfo.Termcap;
 /// Converts resolved termcap source semantics into the canonical immutable
 /// Runtime terminal-description model.
 /// </summary>
-public static class TermcapConverter
-{
+public static class TermcapConverter {
 	/// <summary>
 	/// Converts one TC03-resolved termcap entry into a Runtime description.
 	/// </summary>
