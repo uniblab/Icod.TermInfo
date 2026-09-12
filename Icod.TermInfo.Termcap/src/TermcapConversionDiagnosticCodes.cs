@@ -3,8 +3,7 @@ namespace Icod.TermInfo.Termcap;
 /// <summary>
 /// Defines stable diagnostic codes emitted by termcap semantic conversion.
 /// </summary>
-public static class TermcapConversionDiagnosticCodes
-{
+public static class TermcapConversionDiagnosticCodes {
 	/// <summary>An adopted historical termcap alias was mapped to its canonical Runtime capability.</summary>
 	public const string HistoricalAlias = "TCON0001";
 	/// <summary>An unmapped two-character field was preserved as a Runtime extended capability.</summary>

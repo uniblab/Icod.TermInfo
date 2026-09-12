@@ -3,8 +3,7 @@ namespace Icod.TermInfo.Termcap;
 /// <summary>
 /// Defines stable diagnostic codes emitted by termcap source parsing and resolution.
 /// </summary>
-public static class TermcapSourceDiagnosticCodes
-{
+public static class TermcapSourceDiagnosticCodes {
 	/// <summary>The configured maximum source length was exceeded.</summary>
 	public const string MaximumSourceLengthExceeded = "TCAP0001";
 	/// <summary>A terminal description does not contain the header-terminating colon.</summary>

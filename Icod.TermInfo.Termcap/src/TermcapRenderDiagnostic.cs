@@ -5,8 +5,7 @@ namespace Icod.TermInfo.Termcap;
 /// <summary>
 /// Describes one deterministic termcap representability or rendering decision.
 /// </summary>
-public sealed class TermcapRenderDiagnostic
-{
+public sealed class TermcapRenderDiagnostic {
 	internal TermcapRenderDiagnostic(
 		string code,
 		TermcapRenderDiagnosticSeverity severity,
