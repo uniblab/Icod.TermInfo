@@ -113,7 +113,7 @@ internal sealed class InfoCmpOptions {
 			if ( planning
 				&& ( allCandidates ? names.Length != 1 : names.Length < 2 ) ) {
 				throw new ArgumentException(
-					allCandidates
+					( allCandidates )
 						? "All-candidates planning requires exactly one target terminal."
 						: "Relative-source planning requires a target and at least one candidate terminal.",
 					nameof( terminalNames )

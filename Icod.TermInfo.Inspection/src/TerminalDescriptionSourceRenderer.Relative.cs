@@ -111,12 +111,13 @@ public static partial class TerminalDescriptionSourceRenderer {
 			string? targetValue =
 				plan.Target.GetString( metadata.Capability );
 			string? inheritedValue =
-				inherited.StringCapabilities.TryGetValue(
+				( inherited.StringCapabilities.TryGetValue(
 					metadata.Capability,
 					out string? inheritedString
-				)
+				) )
 					? inheritedString
-					: null;
+					: null
+			;
 
 			if (
 				string.Equals(

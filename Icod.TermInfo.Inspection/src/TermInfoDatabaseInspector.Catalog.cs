@@ -563,7 +563,7 @@ public static partial class TermInfoDatabaseInspector {
 	) {
 		ArgumentNullException.ThrowIfNull( exception );
 
-		return exception is UnauthorizedAccessException
+		return ( exception is UnauthorizedAccessException )
 			? TermInfoDatabaseCatalogIssueKind.PermissionFailure
 			: TermInfoDatabaseCatalogIssueKind.IoFailure
 		;

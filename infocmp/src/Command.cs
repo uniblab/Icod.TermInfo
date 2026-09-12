@@ -117,7 +117,7 @@ public static class Command {
 				).ConfigureAwait( false );
 			}
 
-			return options.IsComparison
+			return ( options.IsComparison )
 				? await InfoCmpInspector.CompareAsync(
 					options,
 					stdout,

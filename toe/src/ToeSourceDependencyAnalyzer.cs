@@ -177,12 +177,13 @@ internal static class ToeSourceDependencyAnalyzer {
 					continue;
 				}
 
-				TermInfoSourceEntry? parent = identities.TryGetValue(
+				TermInfoSourceEntry? parent = ( identities.TryGetValue(
 					referenceName,
 					out TermInfoSourceEntry? resolvedParent
-				)
+				) )
 					? resolvedParent
-					: null;
+					: null
+				;
 				string parentName = parent?.CanonicalName ?? referenceName;
 				if ( !seenParents.Add( parentName ) ) {
 					continue;

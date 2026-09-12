@@ -118,7 +118,7 @@ internal static class TicPublisher {
 
 		try {
 			TicDestinationResolution destination =
-				options.OutputDirectory is string explicitDirectory
+				( options.OutputDirectory is string explicitDirectory )
 					? TicDestinationResolver.ResolveExplicit( explicitDirectory )
 					: TicDestinationResolver.ResolveDefault(
 						TermInfoDatabaseInspector.GetSystemLocations()

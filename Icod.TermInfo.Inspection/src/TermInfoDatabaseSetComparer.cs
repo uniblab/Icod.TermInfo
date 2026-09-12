@@ -587,7 +587,7 @@ public static class TermInfoDatabaseSetComparer {
 			out TermInfoDatabaseSetOccurrence? owner
 		) ) {
 			return new AliasResolution(
-				set.IsComplete
+				( set.IsComplete )
 					? AliasResolutionStatus.NotObserved
 					: AliasResolutionStatus.Indeterminate,
 				null
@@ -599,7 +599,7 @@ public static class TermInfoDatabaseSetComparer {
 				database => !database.IsComplete && database.Index <= owner.DatabaseIndex
 			);
 		return new AliasResolution(
-			blocked
+			( blocked )
 				? AliasResolutionStatus.Indeterminate
 				: AliasResolutionStatus.OwnerKnown,
 			owner

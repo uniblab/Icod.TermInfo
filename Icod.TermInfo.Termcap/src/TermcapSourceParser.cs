@@ -543,7 +543,7 @@ public static class TermcapSourceParser {
 					capabilityName,
 					null,
 					null,
-					referenceName.Length == 0
+					( referenceName.Length == 0 )
 						? null
 						: referenceName,
 					fieldText,

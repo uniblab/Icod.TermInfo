@@ -199,8 +199,8 @@ internal static class InfoCmpInspector {
 					);
 			}
 
-			string rendered = options.Json
-				? ( databaseSetPlan is null
+			string rendered = ( options.Json )
+				? ( ( databaseSetPlan is null )
 					? TermInfoJsonRenderer.Render(
 						plan,
 						new TermInfoJsonRendererOptions(),
@@ -212,7 +212,8 @@ internal static class InfoCmpInspector {
 						new TermInfoJsonRendererOptions(),
 						cancellationToken
 					) ) + "\n"
-				: plan.Source;
+				: plan.Source
+			;
 			await WriteAsync(
 				stdout,
 				rendered,

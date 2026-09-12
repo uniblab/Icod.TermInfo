@@ -34,7 +34,7 @@ internal static class Program {
 		try {
 			string root = FindRepositoryRoot();
 			string artifactDirectory =
-				args.Length == 0
+				( args.Length == 0 )
 					? Path.Combine( root, "artifacts" )
 					: Path.GetFullPath( args[0], root )
 			;

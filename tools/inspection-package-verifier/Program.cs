@@ -43,7 +43,7 @@ internal static class Program {
 			string root =
 				FindRepositoryRoot();
 			string artifactDirectory =
-				args.Length == 0
+				( args.Length == 0 )
 					? Path.Combine(
 						root,
 						"artifacts"
@@ -51,7 +51,8 @@ internal static class Program {
 					: Path.GetFullPath(
 						args[ 0 ],
 						root
-					);
+					)
+			;
 			string packageVersion =
 				ReadPackageVersion(
 					root,

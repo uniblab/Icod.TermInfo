@@ -189,11 +189,11 @@ public static class TerminalDescriptionComparer {
 				metadata.ShortName,
 				isExtendedCapability: false,
 				leftValue is not null,
-				leftValue is not null
+				( leftValue is not null )
 					? new TermInfoCapabilityValue( leftValue )
 					: default,
 				rightValue is not null,
-				rightValue is not null
+				( rightValue is not null )
 					? new TermInfoCapabilityValue( rightValue )
 					: default
 			);

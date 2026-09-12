@@ -975,7 +975,7 @@ internal static class TermcapReverseStringConverter {
 		) {
 			ArgumentNullException.ThrowIfNull( transform );
 
-			return Current == 0
+			return ( Current == 0 )
 				? new ParameterState(
 					transform( First ),
 					Second,

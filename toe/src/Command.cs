@@ -74,7 +74,7 @@ public static class Command {
 					).ConfigureAwait( false );
 				}
 
-				return dependency.HasOperationalFailure
+				return ( dependency.HasOperationalFailure )
 					? CommandExitCodes.Failure
 					: CommandExitCodes.Success
 				;

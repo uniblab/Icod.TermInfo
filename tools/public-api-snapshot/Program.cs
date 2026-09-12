@@ -316,7 +316,7 @@ internal static class Program {
 
 		AppendGenericParameters(
 			builder,
-			type.IsGenericTypeDefinition
+			( type.IsGenericTypeDefinition )
 				? type.GetGenericArguments()
 				: Array.Empty<Type>(),
 			"  "

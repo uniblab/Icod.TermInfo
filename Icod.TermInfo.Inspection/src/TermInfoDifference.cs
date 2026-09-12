@@ -220,19 +220,25 @@ public sealed class TermInfoDifference {
 	/// Gets the most specific retained source span on the left.
 	/// </summary>
 	public TermInfoSourceSpan? LeftSourceSpan =>
-		LeftSourceField is not null
+		(
+			LeftSourceField is not null
 			|| RightSourceField is not null
+		)
 			? LeftSourceField?.Span
-			: LeftSourceEntry?.Span;
+			: LeftSourceEntry?.Span
+	;
 
 	/// <summary>
 	/// Gets the most specific retained source span on the right.
 	/// </summary>
 	public TermInfoSourceSpan? RightSourceSpan =>
-		LeftSourceField is not null
+		(
+			LeftSourceField is not null
 			|| RightSourceField is not null
+		)
 			? RightSourceField?.Span
-			: RightSourceEntry?.Span;
+			: RightSourceEntry?.Span
+	;
 
 	private static void ValidateSourceIndex(
 		int? value,
