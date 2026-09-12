@@ -332,13 +332,14 @@ public sealed class MI03ComparisonAndPlanJsonTests {
 		bool renderComparison
 	) {
 		string expected =
-			renderComparison
+			( renderComparison )
 				? TermInfoJsonRenderer.Render( CreateFixtureComparison() )
-				: TermInfoJsonRenderer.Render( CreateFixturePlan() );
+				: TermInfoJsonRenderer.Render( CreateFixturePlan() )
+		;
 		int byteCount = Encoding.UTF8.GetByteCount( expected );
 
 		string exact =
-			renderComparison
+			( renderComparison )
 				? TermInfoJsonRenderer.Render(
 					CreateFixtureComparison(),
 					new TermInfoJsonRendererOptions( byteCount )
@@ -346,7 +347,8 @@ public sealed class MI03ComparisonAndPlanJsonTests {
 				: TermInfoJsonRenderer.Render(
 					CreateFixturePlan(),
 					new TermInfoJsonRendererOptions( byteCount )
-				);
+				)
+		;
 		Assert.Equal( expected, exact );
 
 		InvalidOperationException exception =

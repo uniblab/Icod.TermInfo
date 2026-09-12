@@ -159,9 +159,10 @@ public static partial class TerminalDescriptionSourcePlanner {
 		}
 
 		int evaluationLimit =
-			completePlanCountKnown
+			( completePlanCountKnown )
 				? requiredPlanCount
-				: request.Options.MaximumEvaluatedPlanCount;
+				: request.Options.MaximumEvaluatedPlanCount
+		;
 		int evaluatedPlanCount = 0;
 		TerminalDescriptionSourcePlanningScore? bestScore = null;
 		string? bestSource = null;

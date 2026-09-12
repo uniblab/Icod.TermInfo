@@ -26,14 +26,14 @@ public static partial class TermInfoDatabaseInspector {
 		SystemTerminalDescriptionProviderOptions? options = null
 	) {
 		SystemTerminalDescriptionProviderOptions effectiveOptions =
-			SystemTerminalDescriptionProvider.SnapshotOptions(options);
+			SystemTerminalDescriptionProvider.SnapshotOptions( options );
 		SystemTerminalDiscoverySnapshot snapshot =
-			SystemTerminalDiscoverySnapshot.Capture(effectiveOptions);
+			SystemTerminalDiscoverySnapshot.Capture( effectiveOptions );
 
 		return GetSystemLocations(
 			effectiveOptions,
 			snapshot,
-			SystemTerminalDescriptionProvider.GetDefaultRoots(snapshot.Platform)
+			SystemTerminalDescriptionProvider.GetDefaultRoots( snapshot.Platform )
 		);
 	}
 
@@ -42,9 +42,9 @@ public static partial class TermInfoDatabaseInspector {
 		SystemTerminalDiscoverySnapshot snapshot,
 		IReadOnlyList<string> defaultRoots
 	) {
-		ArgumentNullException.ThrowIfNull(options);
-		ArgumentNullException.ThrowIfNull(snapshot);
-		ArgumentNullException.ThrowIfNull(defaultRoots);
+		ArgumentNullException.ThrowIfNull( options );
+		ArgumentNullException.ThrowIfNull( snapshot );
+		ArgumentNullException.ThrowIfNull( defaultRoots );
 
 		IReadOnlyList<SystemTerminalDatabaseLocation> runtimeLocations =
 			SystemTerminalDescriptionProvider.GetDatabaseLocations(
@@ -55,16 +55,16 @@ public static partial class TermInfoDatabaseInspector {
 		TermInfoDatabaseLocation[] result =
 			new TermInfoDatabaseLocation[runtimeLocations.Count];
 
-		for (int index = 0; index < runtimeLocations.Count; index++) {
+		for ( int index = 0; index < runtimeLocations.Count; index++ ) {
 			SystemTerminalDatabaseLocation location = runtimeLocations[index];
 			result[index] =
 				new TermInfoDatabaseLocation(
-					MapKind(location.Kind),
+					MapKind( location.Kind ),
 					location.Path
 				);
 		}
 
-		return Array.AsReadOnly(result);
+		return Array.AsReadOnly( result );
 	}
 
 	private static TermInfoDatabaseLocationKind MapKind(
@@ -82,7 +82,7 @@ public static partial class TermInfoDatabaseInspector {
 			SystemTerminalDatabaseLocationKind.PlatformDefaultDirectory
 				=> TermInfoDatabaseLocationKind.PlatformDefaultDirectory,
 			_ => throw new ArgumentOutOfRangeException(
-				nameof(kind),
+				nameof( kind ),
 				kind,
 				"Unknown Runtime terminfo database location kind."
 			),

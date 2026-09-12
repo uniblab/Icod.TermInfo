@@ -5,8 +5,7 @@ namespace Icod.TermInfo.Termcap;
 /// <summary>
 /// Opens explicitly selected termcap database paths from the host filesystem.
 /// </summary>
-public sealed class SystemTermcapFileProvider : ITermcapFileProvider
-{
+public sealed class SystemTermcapFileProvider : ITermcapFileProvider {
 	/// <inheritdoc/>
 	public bool TryOpenText(
 		string path,

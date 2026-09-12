@@ -199,20 +199,26 @@ internal static class InfoCmpInspector {
 					);
 			}
 
-			string rendered = options.Json
-				? ( databaseSetPlan is null
-					? TermInfoJsonRenderer.Render(
-						plan,
-						new TermInfoJsonRendererOptions(),
-						cancellationToken
-					)
-					: TermInfoJsonRenderer.Render(
-						databaseSetPlan,
-						planningOptions,
-						new TermInfoJsonRendererOptions(),
-						cancellationToken
-					) ) + "\n"
-				: plan.Source;
+			string rendered;
+			if ( options.Json ) {
+				string json =
+					( databaseSetPlan is null )
+						? TermInfoJsonRenderer.Render(
+							plan,
+							new TermInfoJsonRendererOptions(),
+							cancellationToken
+						)
+						: TermInfoJsonRenderer.Render(
+							databaseSetPlan,
+							planningOptions,
+							new TermInfoJsonRendererOptions(),
+							cancellationToken
+						)
+				;
+				rendered = json + "\n";
+			} else {
+				rendered = plan.Source;
+			}
 			await WriteAsync(
 				stdout,
 				rendered,
@@ -346,9 +352,10 @@ internal static class InfoCmpInspector {
 			cancellationToken.ThrowIfCancellationRequested();
 			string requestedName = options.TerminalNames[ index ];
 			string? databaseDirectory =
-				index == 0
+				( index == 0 )
 					? options.DatabaseDirectory
-					: options.ComparisonDatabaseDirectory;
+					: options.ComparisonDatabaseDirectory
+			;
 			InfoCmpTerminal? terminal =
 				await AcquireAsync(
 					requestedName,

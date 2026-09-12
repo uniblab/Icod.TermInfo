@@ -5,8 +5,7 @@ namespace Icod.TermInfo.Termcap;
 /// <summary>
 /// Reports the semantic classification of one unresolved termcap source field.
 /// </summary>
-public sealed class TermcapCapabilityClassificationResult
-{
+public sealed class TermcapCapabilityClassificationResult {
 	internal TermcapCapabilityClassificationResult(
 		TermcapSourceField field,
 		TermcapCapabilityClassification classification,

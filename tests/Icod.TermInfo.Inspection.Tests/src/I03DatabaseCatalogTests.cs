@@ -421,7 +421,7 @@ public sealed class I03DatabaseCatalogTests {
 					link,
 					target
 				);
-			} catch (Exception exception) when (
+			} catch ( Exception exception ) when (
 				exception is UnauthorizedAccessException
 				|| exception is IOException
 				|| exception is PlatformNotSupportedException
@@ -514,7 +514,7 @@ public sealed class I03DatabaseCatalogTests {
 	private static void DeleteTemporaryDirectory(
 		string path
 	) {
-		if (!Directory.Exists(path)) {
+		if ( !Directory.Exists( path ) ) {
 			return;
 		}
 
@@ -523,8 +523,8 @@ public sealed class I03DatabaseCatalogTests {
 				path,
 				recursive: true
 			);
-		} catch (IOException) {
-		} catch (UnauthorizedAccessException) {
+		} catch ( IOException ) {
+		} catch ( UnauthorizedAccessException ) {
 		}
 	}
 }

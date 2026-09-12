@@ -4,34 +4,38 @@ using Xunit;
 
 namespace Icod.TermInfo.Tests;
 
-public sealed class T32FoundationTests
-{
-    [Fact]
-    public void BuiltInDatabaseRemainsInMemoryOnly()
-    {
-        FieldInfo? providersField =
-            typeof(TerminalDatabase).GetField(
-                "_providers",
-                BindingFlags.NonPublic
-                | BindingFlags.Instance);
+public sealed class T32FoundationTests {
+	[Fact]
+	public void BuiltInDatabaseRemainsInMemoryOnly() {
+		FieldInfo? providersField =
+			typeof( TerminalDatabase ).GetField(
+				"_providers",
+				BindingFlags.NonPublic
+				| BindingFlags.Instance
+			);
 
-        Assert.NotNull(providersField);
+		Assert.NotNull( providersField );
 
-        object? rawProviders =
-            providersField!.GetValue(TerminalDatabase.BuiltIn);
-        IReadOnlyList<ITerminalDescriptionProvider> providers =
-            Assert.IsAssignableFrom<
-                IReadOnlyList<ITerminalDescriptionProvider>>(
-                    rawProviders);
+		object? rawProviders =
+			providersField!.GetValue( TerminalDatabase.BuiltIn );
+		IReadOnlyList<ITerminalDescriptionProvider> providers =
+			Assert.IsAssignableFrom<
+				IReadOnlyList<ITerminalDescriptionProvider>
+			>(
+				rawProviders
+			);
 
-        Assert.Single(providers);
-        Assert.IsType<InMemoryTerminalDescriptionProvider>(
-            providers[0]);
+		Assert.Single( providers );
+		Assert.IsType<InMemoryTerminalDescriptionProvider>(
+			providers[0]
+		);
 
-        Assert.False(
-            TerminalDatabase.BuiltIn.TryLoad(
-                "linux",
-                out TerminalDescription? terminal));
-        Assert.Null(terminal);
-    }
+		Assert.False(
+			TerminalDatabase.BuiltIn.TryLoad(
+				"linux",
+				out TerminalDescription? terminal
+			)
+		);
+		Assert.Null( terminal );
+	}
 }

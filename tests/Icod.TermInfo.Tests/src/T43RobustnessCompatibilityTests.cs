@@ -6,32 +6,28 @@ using Xunit;
 
 namespace Icod.TermInfo.Tests;
 
-public sealed class T43RobustnessCompatibilityTests
-{
+public sealed class T43RobustnessCompatibilityTests {
 	private const ushort LegacyMagic = 0x011A;
 	private const ushort ExtendedNumberMagic = 0x021E;
 
 	[Fact]
-	public void GeneratedCompiledCorpusIsCultureIndependent()
-	{
+	public void GeneratedCompiledCorpusIsCultureIndependent() {
 		CultureInfo originalCulture =
 			CultureInfo.CurrentCulture;
 		CultureInfo originalUiCulture =
 			CultureInfo.CurrentUICulture;
 
-		try
-		{
+		try {
 			TerminalSnapshot[]? baseline = null;
 
 			foreach (
 				CultureInfo culture
-				in new[]
-				{
+				in new[] {
 					CultureInfo.InvariantCulture,
-					CultureInfo.GetCultureInfo("tr-TR"),
-					CultureInfo.GetCultureInfo("ar-SA"),
-				})
-			{
+					CultureInfo.GetCultureInfo( "tr-TR" ),
+					CultureInfo.GetCultureInfo( "ar-SA" ),
+				}
+			) {
 				CultureInfo.CurrentCulture =
 					culture;
 				CultureInfo.CurrentUICulture =
@@ -41,30 +37,31 @@ public sealed class T43RobustnessCompatibilityTests
 					Enumerable
 						.Range(
 							0,
-							128)
+							128
+						)
 						.Select(
 							index =>
 								Snapshot(
 									CompiledTermInfoParser.Parse(
 										CreateGeneratedEntry(
-											index))))
+											index
+										)
+									)
+								)
+						)
 						.ToArray();
 
-				if (baseline is null)
-				{
+				if ( baseline is null ) {
 					baseline =
 						current;
-				}
-				else
-				{
+				} else {
 					Assert.Equal(
 						baseline,
-						current);
+						current
+					);
 				}
 			}
-		}
-		finally
-		{
+		} finally {
 			CultureInfo.CurrentCulture =
 				originalCulture;
 			CultureInfo.CurrentUICulture =
@@ -73,29 +70,33 @@ public sealed class T43RobustnessCompatibilityTests
 	}
 
 	[Fact]
-	public void ExpandedDeterministicRandomCorpusNeverEscapesParserContract()
-	{
+	public void ExpandedDeterministicRandomCorpusNeverEscapesParserContract() {
 		Random random =
 			new(
-				0x0043_1001);
+				0x0043_1001
+			);
 
 		for (
 			int iteration = 0;
 			iteration < 4_096;
-			iteration++)
-		{
+			iteration++
+		) {
 			byte[] entry =
 				new byte[
 					random.Next(
 						0,
-						4_097)];
+						4_097
+					)
+				];
 
 			random.NextBytes(
-				entry);
+				entry
+			);
 
-			if (entry.Length >= sizeof(ushort)
-				&& iteration % 3 == 0)
-			{
+			if (
+				entry.Length >= sizeof( ushort )
+				&& iteration % 3 == 0
+			) {
 				ushort magic =
 					(iteration % 2 == 0)
 						? LegacyMagic
@@ -105,68 +106,78 @@ public sealed class T43RobustnessCompatibilityTests
 				BinaryPrimitives.WriteUInt16LittleEndian(
 					entry.AsSpan(
 						0,
-						sizeof(ushort)),
-					magic);
+						sizeof( ushort )
+					),
+					magic
+				);
 			}
 
 			Exception? exception =
 				Record.Exception(
 					() =>
 						CompiledTermInfoParser.Parse(
-							entry));
+							entry
+						)
+				);
 
-			if (exception is not null)
-			{
+			if ( exception is not null ) {
 				Assert.IsType<CompiledTermInfoFormatException>(
-					exception);
+					exception
+				);
 			}
 		}
 	}
 
 	[Theory]
-	[InlineData("compiled/t29-legacy-minimal.bin", 0x4301)]
-	[InlineData("compiled/t29-legacy-alignment.bin", 0x4302)]
-	[InlineData("compiled/t29-legacy-edge.bin", 0x4303)]
-	[InlineData("compiled/t29-extended.bin", 0x4304)]
-	[InlineData("compiled/t29-extended32.bin", 0x4305)]
+	[InlineData( "compiled/t29-legacy-minimal.bin", 0x4301 )]
+	[InlineData( "compiled/t29-legacy-alignment.bin", 0x4302 )]
+	[InlineData( "compiled/t29-legacy-edge.bin", 0x4303 )]
+	[InlineData( "compiled/t29-extended.bin", 0x4304 )]
+	[InlineData( "compiled/t29-extended32.bin", 0x4305 )]
 	public void ExpandedDeterministicMutationsNeverEscapeParserContract(
 		string relativePath,
-		int seed)
-	{
+		int seed
+	) {
 		ArgumentNullException.ThrowIfNull(
-			relativePath);
+			relativePath
+		);
 
 		byte[] original =
 			ReadFixture(
-				relativePath);
+				relativePath
+			);
 		Random random =
 			new(
-				seed);
+				seed
+			);
 
 		for (
 			int iteration = 0;
 			iteration < 512;
-			iteration++)
-		{
+			iteration++
+		) {
 			byte[] entry =
 				(byte[])original.Clone();
 			int editCount =
 				random.Next(
 					1,
-					9);
+					9
+				);
 
 			for (
 				int edit = 0;
 				edit < editCount;
-				edit++)
-			{
+				edit++
+			) {
 				int offset =
 					random.Next(
-						entry.Length);
+						entry.Length
+					);
 				int bit =
 					random.Next(
 						0,
-						8);
+						8
+					);
 
 				entry[offset] ^=
 					(byte)(1 << bit);
@@ -176,19 +187,20 @@ public sealed class T43RobustnessCompatibilityTests
 				Record.Exception(
 					() =>
 						CompiledTermInfoParser.Parse(
-							entry));
+							entry
+						)
+				);
 
-			if (exception is not null)
-			{
+			if ( exception is not null ) {
 				Assert.IsType<CompiledTermInfoFormatException>(
-					exception);
+					exception
+				);
 			}
 		}
 	}
 
 	[Fact]
-	public async Task DirectoryProviderSingleFlightSurvivesConcurrentStress()
-	{
+	public async Task DirectoryProviderSingleFlightSurvivesConcurrentStress() {
 		using TemporaryDirectory temporary =
 			new();
 		string name =
@@ -198,38 +210,46 @@ public sealed class T43RobustnessCompatibilityTests
 			temporary.Root,
 			name,
 			ReadFixture(
-				"compiled/t29-legacy-minimal.bin"));
+				"compiled/t29-legacy-minimal.bin"
+			)
+		);
 
 		DirectoryTerminalDescriptionProvider provider =
 			new(
-				temporary.Root);
+				temporary.Root
+			);
 
 		using ManualResetEventSlim gate =
 			new(
-				initialState: false);
+				initialState: false
+			);
 
 		Task<TerminalDescription>[] tasks =
 			Enumerable
 				.Range(
 					0,
-					256)
+					256
+				)
 				.Select(
 					_ =>
 						Task.Run(
-							() =>
-							{
+							() => {
 								gate.Wait();
 								return Load(
 									provider,
-									name);
-							}))
+									name
+								);
+							}
+						)
+				)
 				.ToArray();
 
 		gate.Set();
 
 		TerminalDescription[] terminals =
 			await Task.WhenAll(
-				tasks);
+				tasks
+			);
 
 		TerminalDescription first =
 			terminals[0];
@@ -239,48 +259,56 @@ public sealed class T43RobustnessCompatibilityTests
 			terminal =>
 				Assert.Same(
 					first,
-					terminal));
+					terminal
+				)
+		);
 	}
 
 	[Fact]
-	public void ParserMaximumEntrySizeBoundaryIsExact()
-	{
+	public void ParserMaximumEntrySizeBoundaryIsExact() {
 		byte[] entry =
 			ReadFixture(
-				"compiled/t29-legacy-minimal.bin");
+				"compiled/t29-legacy-minimal.bin"
+			);
 
 		CompiledTermInfoParserOptions exact =
 			new(
-				maximumEntrySize: entry.Length);
+				maximumEntrySize: entry.Length
+			);
 
 		TerminalDescription terminal =
 			CompiledTermInfoParser.Parse(
 				entry,
-				exact);
+				exact
+			);
 
 		Assert.Equal(
 			"t29-legacy-minimal",
-			terminal.Name);
+			terminal.Name
+		);
 
 		CompiledTermInfoParserOptions tooSmall =
 			new(
 				maximumEntrySize:
-					entry.Length - 1);
+					entry.Length - 1
+			);
 
 		Assert.Throws<CompiledTermInfoFormatException>(
 			() =>
 				CompiledTermInfoParser.Parse(
 					entry,
-					tooSmall));
+					tooSmall
+				)
+		);
 	}
 
 	private static byte[] CreateGeneratedEntry(
-		int index)
-	{
-		if (index < 0)
-		{
+		int index
+	) {
+		if ( index < 0 ) {
 			throw new ArgumentOutOfRangeException(
-				nameof(index));
+				nameof( index )
+			);
 		}
 
 		ushort magic =
@@ -294,13 +322,14 @@ public sealed class T43RobustnessCompatibilityTests
 			$"t43-alias-{index:D3}";
 		byte[] names =
 			Encoding.ASCII.GetBytes(
-				$"{name}|{alias}|T43 generated entry {index:D3}\0");
+				$"{name}|{alias}|T43 generated entry {index:D3}\0"
+			);
 		int booleanCount =
 			index % 9;
 		int numericWidth =
 			(magic == ExtendedNumberMagic)
-				? sizeof(int)
-				: sizeof(short)
+				? sizeof( int )
+				: sizeof( short )
 			;
 
 		int numericOffset =
@@ -308,61 +337,75 @@ public sealed class T43RobustnessCompatibilityTests
 			+ names.Length
 			+ booleanCount;
 
-		if ((numericOffset & 1) != 0)
-		{
+		if ( (numericOffset & 1) != 0 ) {
 			numericOffset++;
 		}
 
 		byte[] entry =
 			new byte[
 				numericOffset
-				+ numericWidth];
+				+ numericWidth
+			];
 
 		BinaryPrimitives.WriteUInt16LittleEndian(
 			entry.AsSpan(
 				0,
-				sizeof(ushort)),
-			magic);
+				sizeof( ushort )
+			),
+			magic
+		);
 		BinaryPrimitives.WriteUInt16LittleEndian(
 			entry.AsSpan(
 				2,
-				sizeof(ushort)),
-			checked((ushort)names.Length));
+				sizeof( ushort )
+			),
+			checked( (ushort)names.Length )
+		);
 		BinaryPrimitives.WriteUInt16LittleEndian(
 			entry.AsSpan(
 				4,
-				sizeof(ushort)),
-			checked((ushort)booleanCount));
+				sizeof( ushort )
+			),
+			checked( (ushort)booleanCount )
+		);
 		BinaryPrimitives.WriteUInt16LittleEndian(
 			entry.AsSpan(
 				6,
-				sizeof(ushort)),
-			1);
+				sizeof( ushort )
+			),
+			1
+		);
 		BinaryPrimitives.WriteUInt16LittleEndian(
 			entry.AsSpan(
 				8,
-				sizeof(ushort)),
-			0);
+				sizeof( ushort )
+			),
+			0
+		);
 		BinaryPrimitives.WriteUInt16LittleEndian(
 			entry.AsSpan(
 				10,
-				sizeof(ushort)),
-			0);
+				sizeof( ushort )
+			),
+			0
+		);
 
 		names
 			.AsSpan()
 			.CopyTo(
-				entry.AsSpan(12));
+				entry.AsSpan( 12 )
+			);
 
 		for (
 			int boolean = 0;
 			boolean < booleanCount;
-			boolean++)
-		{
+			boolean++
+		) {
 			entry[
 				12
 				+ names.Length
-				+ boolean] =
+				+ boolean
+			] =
 				(byte)(boolean % 2);
 		}
 
@@ -372,71 +415,82 @@ public sealed class T43RobustnessCompatibilityTests
 				: 80 + index
 			;
 
-		if (magic == ExtendedNumberMagic)
-		{
+		if ( magic == ExtendedNumberMagic ) {
 			BinaryPrimitives.WriteInt32LittleEndian(
 				entry.AsSpan(
 					numericOffset,
-					sizeof(int)),
-				columns);
-		}
-		else
-		{
+					sizeof( int )
+				),
+				columns
+			);
+		} else {
 			BinaryPrimitives.WriteInt16LittleEndian(
 				entry.AsSpan(
 					numericOffset,
-					sizeof(short)),
-				checked((short)columns));
+					sizeof( short )
+				),
+				checked( (short)columns )
+			);
 		}
 
 		return entry;
 	}
 
 	private static TerminalSnapshot Snapshot(
-		TerminalDescription terminal)
-	{
+		TerminalDescription terminal
+	) {
 		ArgumentNullException.ThrowIfNull(
-			terminal);
+			terminal
+		);
 
 		return new TerminalSnapshot(
 			terminal.Name,
 			terminal.Description,
 			string.Join(
 				"\u001F",
-				terminal.Aliases),
+				terminal.Aliases
+			),
 			terminal.GetNumber(
-				NumericCapability.Columns),
+				NumericCapability.Columns
+			),
 			terminal.BooleanCapabilities.Count,
 			terminal.NumericCapabilities.Count,
 			terminal.StringCapabilities.Count,
-			terminal.ExtendedCapabilities.Count);
+			terminal.ExtendedCapabilities.Count
+		);
 	}
 
 	private static TerminalDescription Load(
 		ITerminalDescriptionProvider provider,
-		string name)
-	{
+		string name
+	) {
 		ArgumentNullException.ThrowIfNull(
-			provider);
+			provider
+		);
 		ArgumentNullException.ThrowIfNull(
-			name);
+			name
+		);
 
-		if (!provider.TryLoad(
+		if (
+			!provider.TryLoad(
 				name,
-				out TerminalDescription? terminal))
-		{
+				out TerminalDescription? terminal
+			)
+		) {
 			throw new InvalidOperationException(
-				$"Expected provider to load '{name}'.");
+				$"Expected provider to load '{name}'."
+			);
 		}
 
 		return terminal;
 	}
 
 	private static byte[] ReadFixture(
-		string relativePath)
-	{
+		string relativePath
+	) {
 		ArgumentNullException.ThrowIfNull(
-			relativePath);
+			relativePath
+		);
 
 		return File.ReadAllBytes(
 			Path.Combine(
@@ -445,37 +499,47 @@ public sealed class T43RobustnessCompatibilityTests
 				"compiled-terminfo",
 				relativePath.Replace(
 					'/',
-					Path.DirectorySeparatorChar)));
+					Path.DirectorySeparatorChar
+				)
+			)
+		);
 	}
 
 	private static string WriteLiteralCandidate(
 		string root,
 		string name,
-		byte[] entry)
-	{
+		byte[] entry
+	) {
 		ArgumentNullException.ThrowIfNull(
-			root);
+			root
+		);
 		ArgumentNullException.ThrowIfNull(
-			name);
+			name
+		);
 		ArgumentNullException.ThrowIfNull(
-			entry);
+			entry
+		);
 
 		string directory =
 			Path.Combine(
 				root,
-				name[0].ToString());
+				name[0].ToString()
+			);
 
 		Directory.CreateDirectory(
-			directory);
+			directory
+		);
 
 		string path =
 			Path.Combine(
 				directory,
-				name);
+				name
+			);
 
 		File.WriteAllBytes(
 			path,
-			entry);
+			entry
+		);
 
 		return path;
 	}
@@ -488,35 +552,37 @@ public sealed class T43RobustnessCompatibilityTests
 		int BooleanCount,
 		int NumericCount,
 		int StringCount,
-		int ExtendedCount);
+		int ExtendedCount
+	);
 
-	private sealed class TemporaryDirectory : IDisposable
-	{
-		internal TemporaryDirectory()
-		{
+	private sealed class TemporaryDirectory : IDisposable {
+		internal TemporaryDirectory() {
 			Root =
 				Path.Combine(
 					Path.GetTempPath(),
 					"icod-terminfo-t43-"
-					+ Guid.NewGuid().ToString("N"));
+					+ Guid.NewGuid().ToString( "N" )
+				);
 
 			Directory.CreateDirectory(
-				Root);
+				Root
+			);
 		}
 
-		internal string Root
-		{
+		internal string Root {
 			get;
 		}
 
-		public void Dispose()
-		{
-			if (Directory.Exists(
-					Root))
-			{
+		public void Dispose() {
+			if (
+				Directory.Exists(
+					Root
+				)
+			) {
 				Directory.Delete(
 					Root,
-					recursive: true);
+					recursive: true
+				);
 			}
 		}
 	}

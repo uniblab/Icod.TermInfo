@@ -191,7 +191,7 @@ internal static class TicSourceValidator {
 			cancellationToken
 		).ConfigureAwait( false );
 
-		return diagnostics.Any( diagnostic => diagnostic.IsError )
+		return ( diagnostics.Any( diagnostic => diagnostic.IsError ) )
 			? CommandExitCodes.Failure
 			: CommandExitCodes.Success
 		;

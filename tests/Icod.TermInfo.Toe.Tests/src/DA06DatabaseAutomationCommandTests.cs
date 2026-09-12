@@ -22,10 +22,20 @@ public sealed class DA06DatabaseAutomationCommandTests {
 			Assert.Equal( "databaseCatalog", v1.RootElement.GetProperty( "documentKind" ).GetString() );
 			Assert.Equal( 2, v2.RootElement.GetProperty( "schemaVersion" ).GetInt32() );
 			Assert.Equal( "databaseSet", v2.RootElement.GetProperty( "documentKind" ).GetString() );
-			Assert.Equal( new[] { System.IO.Path.GetFullPath( first ), System.IO.Path.GetFullPath( second ) },
-				v2.RootElement.GetProperty( "data" ).GetProperty( "databases" ).EnumerateArray()
-					.Select( element => element.GetProperty( "root" ).GetString() )
-					.ToArray() );
+			Assert.Equal(
+				new[] {
+					System.IO.Path.GetFullPath( first ),
+					System.IO.Path.GetFullPath( second ),
+				},
+				v2.RootElement
+					.GetProperty( "data" )
+					.GetProperty( "databases" )
+					.EnumerateArray()
+					.Select(
+						element => element.GetProperty( "root" ).GetString()
+					)
+					.ToArray()
+			);
 			Assert.EndsWith( "\n", single.Stdout, StringComparison.Ordinal );
 			Assert.False( single.Stdout.EndsWith( "\n\n", StringComparison.Ordinal ) );
 			Assert.EndsWith( "\n", multiple.Stdout, StringComparison.Ordinal );

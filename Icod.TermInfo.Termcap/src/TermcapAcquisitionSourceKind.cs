@@ -4,8 +4,7 @@ namespace Icod.TermInfo.Termcap;
 /// Identifies which explicitly configured termcap source supplied an acquired
 /// root entry.
 /// </summary>
-public enum TermcapAcquisitionSourceKind
-{
+public enum TermcapAcquisitionSourceKind {
 	/// <summary>An inline termcap description supplied directly to acquisition.</summary>
 	InlineTermcap = 0,
 

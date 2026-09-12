@@ -13,31 +13,38 @@ public sealed class T36DirectoryProviderTests {
 	public void PublicSurfaceMatchesT32DirectoryProviderFreeze() {
 		Assert.True(
 			typeof( ITerminalDescriptionProvider ).IsAssignableFrom(
-				typeof( DirectoryTerminalDescriptionProvider ) ) );
+				typeof( DirectoryTerminalDescriptionProvider )
+			)
+		);
 
 		ConstructorInfo constructor =
 			Assert.Single(
 				typeof( DirectoryTerminalDescriptionProvider )
 					.GetConstructors(
 						BindingFlags.Public
-						| BindingFlags.Instance ) );
+						| BindingFlags.Instance
+					)
+			);
 		ParameterInfo[] constructorParameters =
 			constructor.GetParameters();
 
 		Assert.Equal( 2, constructorParameters.Length );
 		Assert.Equal(
 			typeof( string ),
-			constructorParameters[ 0 ].ParameterType );
+			constructorParameters[ 0 ].ParameterType
+		);
 		Assert.Equal(
 			typeof( CompiledTermInfoParserOptions ),
-			constructorParameters[ 1 ].ParameterType );
+			constructorParameters[ 1 ].ParameterType
+		);
 		Assert.True( constructorParameters[ 1 ].HasDefaultValue );
 		Assert.Null( constructorParameters[ 1 ].DefaultValue );
 
 		PropertyInfo root =
 			typeof( DirectoryTerminalDescriptionProvider )
 				.GetProperty(
-					nameof( DirectoryTerminalDescriptionProvider.Root ) )!;
+					nameof( DirectoryTerminalDescriptionProvider.Root )
+				)!;
 		Assert.Equal( typeof( string ), root.PropertyType );
 		Assert.True( root.CanRead );
 		Assert.False( root.CanWrite );
@@ -48,22 +55,26 @@ public sealed class T36DirectoryProviderTests {
 					.GetMethods(
 						BindingFlags.Public
 						| BindingFlags.Instance
-						| BindingFlags.DeclaredOnly )
-						, method => !method.IsSpecialName
-					);
+						| BindingFlags.DeclaredOnly
+					),
+				method => !method.IsSpecialName
+			);
 		Assert.Equal(
 			nameof( DirectoryTerminalDescriptionProvider.TryLoad ),
-			tryLoad.Name );
+			tryLoad.Name
+		);
 
 		ParameterInfo[] tryLoadParameters =
 			tryLoad.GetParameters();
 		Assert.Equal( 2, tryLoadParameters.Length );
 		Assert.Equal(
 			typeof( string ),
-			tryLoadParameters[ 0 ].ParameterType );
+			tryLoadParameters[ 0 ].ParameterType
+		);
 		Assert.Equal(
 			typeof( TerminalDescription ).MakeByRefType(),
-			tryLoadParameters[ 1 ].ParameterType );
+			tryLoadParameters[ 1 ].ParameterType
+		);
 
 		NotNullWhenAttribute? notNullWhen =
 			tryLoadParameters[ 1 ]
@@ -79,32 +90,39 @@ public sealed class T36DirectoryProviderTests {
 			Path.Combine(
 				temporary.Root,
 				"not-created",
-				".." );
+				".."
+			);
 		CompiledTermInfoParserOptions options =
 			new( 64 );
 
 		DirectoryTerminalDescriptionProvider provider =
 			new(
 				suppliedRoot,
-				options );
+				options
+			);
 
 		Assert.Equal(
 			Path.GetFullPath( suppliedRoot ),
-			provider.Root );
+			provider.Root
+		);
 
 		byte[] entry =
 			ReadFixture(
-				"compiled/t29-legacy-minimal.bin" );
+				"compiled/t29-legacy-minimal.bin"
+			);
 		WriteLiteralCandidate(
 			provider.Root,
 			"t29-legacy-minimal",
-			entry );
+			entry
+		);
 
 		CompiledTermInfoFormatException exception =
 			Assert.Throws<CompiledTermInfoFormatException>(
 				() => provider.TryLoad(
 					"t29-legacy-minimal",
-					out _ ) );
+					out _
+				)
+			);
 
 		Assert.Equal( "entry", exception.Section );
 		Assert.Equal( -1, exception.Offset );
@@ -114,10 +132,14 @@ public sealed class T36DirectoryProviderTests {
 	public void ConstructorRejectsNullOrWhitespaceRoot() {
 		Assert.Throws<ArgumentNullException>(
 			() => new DirectoryTerminalDescriptionProvider(
-				null! ) );
+				null!
+			)
+		);
 		Assert.Throws<ArgumentException>(
 			() => new DirectoryTerminalDescriptionProvider(
-				"   " ) );
+				"   "
+			)
+		);
 	}
 
 	[Fact]
@@ -125,26 +147,32 @@ public sealed class T36DirectoryProviderTests {
 		using TemporaryDirectory temporary = new();
 		byte[] entry =
 			ReadFixture(
-				"compiled/t29-legacy-minimal.bin" );
+				"compiled/t29-legacy-minimal.bin"
+			);
 		WriteLiteralCandidate(
 			temporary.Root,
 			"t29-legacy-minimal",
-			entry );
+			entry
+		);
 
 		DirectoryTerminalDescriptionProvider provider =
 			new( temporary.Root );
 		TerminalDescription terminal =
 			Load(
 				provider,
-				"t29-legacy-minimal" );
+				"t29-legacy-minimal"
+			);
 
 		Assert.Equal(
 			"t29-legacy-minimal",
-			terminal.Name );
+			terminal.Name
+		);
 		Assert.Equal<int?>(
 			80,
 			terminal.GetNumber(
-				NumericCapability.Columns ) );
+				NumericCapability.Columns
+			)
+		);
 	}
 
 	[Fact]
@@ -159,19 +187,22 @@ public sealed class T36DirectoryProviderTests {
 			temporary.Root,
 			"6e",
 			name,
-			entry );
+			entry
+		);
 
 		DirectoryTerminalDescriptionProvider provider =
 			new( temporary.Root );
 		TerminalDescription terminal =
 			Load(
 				provider,
-				name );
+				name
+			);
 
 		Assert.Equal( name, terminal.Name );
 		Assert.Equal(
 			new[] { "n29lm" },
-			terminal.Aliases );
+			terminal.Aliases
+		);
 	}
 
 	[Fact]
@@ -181,34 +212,41 @@ public sealed class T36DirectoryProviderTests {
 			"t29-legacy-minimal";
 		byte[] literal =
 			ReadFixture(
-				"compiled/t29-legacy-minimal.bin" );
+				"compiled/t29-legacy-minimal.bin"
+			);
 		byte[] hexadecimal =
 			(byte[])literal.Clone();
 		SetLegacyColumns(
 			hexadecimal,
-			99 );
+			99
+		);
 
 		WriteLiteralCandidate(
 			temporary.Root,
 			name,
-			literal );
+			literal
+		);
 		WriteCandidate(
 			temporary.Root,
 			"74",
 			name,
-			hexadecimal );
+			hexadecimal
+		);
 
 		DirectoryTerminalDescriptionProvider provider =
 			new( temporary.Root );
 		TerminalDescription terminal =
 			Load(
 				provider,
-				name );
+				name
+			);
 
 		Assert.Equal<int?>(
 			80,
 			terminal.GetNumber(
-				NumericCapability.Columns ) );
+				NumericCapability.Columns
+			)
+		);
 	}
 
 	[Fact]
@@ -216,26 +254,31 @@ public sealed class T36DirectoryProviderTests {
 		using TemporaryDirectory temporary = new();
 		byte[] entry =
 			ReadFixture(
-				"compiled/t29-legacy-minimal.bin" );
+				"compiled/t29-legacy-minimal.bin"
+			);
 
 		WriteLiteralCandidate(
 			temporary.Root,
 			"t29lm",
-			entry );
+			entry
+		);
 
 		DirectoryTerminalDescriptionProvider provider =
 			new( temporary.Root );
 		TerminalDescription terminal =
 			Load(
 				provider,
-				"t29lm" );
+				"t29lm"
+			);
 
 		Assert.Equal(
 			"t29-legacy-minimal",
-			terminal.Name );
+			terminal.Name
+		);
 		Assert.Contains(
 			"t29lm",
-			terminal.Aliases );
+			terminal.Aliases
+		);
 	}
 
 	[Fact]
@@ -243,11 +286,13 @@ public sealed class T36DirectoryProviderTests {
 		using TemporaryDirectory temporary = new();
 		byte[] entry =
 			ReadFixture(
-				"compiled/t29-legacy-minimal.bin" );
+				"compiled/t29-legacy-minimal.bin"
+			);
 		WriteLiteralCandidate(
 			temporary.Root,
 			"wrong-name",
-			entry );
+			entry
+		);
 
 		DirectoryTerminalDescriptionProvider provider =
 			new( temporary.Root );
@@ -256,11 +301,14 @@ public sealed class T36DirectoryProviderTests {
 			Assert.Throws<InvalidDataException>(
 				() => provider.TryLoad(
 					"wrong-name",
-					out _ ) );
+					out _
+				)
+			);
 
 		Assert.Contains(
 			"does not declare requested name",
-			exception.Message );
+			exception.Message
+		);
 	}
 
 	[Fact]
@@ -274,21 +322,26 @@ public sealed class T36DirectoryProviderTests {
 		Assert.False(
 			provider.TryLoad(
 				name,
-				out TerminalDescription? missing ) );
+				out TerminalDescription? missing
+			)
+		);
 		Assert.Null( missing );
 
 		byte[] entry =
 			ReadFixture(
-				"compiled/t29-legacy-minimal.bin" );
+				"compiled/t29-legacy-minimal.bin"
+			);
 		WriteLiteralCandidate(
 			temporary.Root,
 			name,
-			entry );
+			entry
+		);
 
 		TerminalDescription terminal =
 			Load(
 				provider,
-				name );
+				name
+			);
 		Assert.Equal( name, terminal.Name );
 	}
 
@@ -299,11 +352,13 @@ public sealed class T36DirectoryProviderTests {
 			"t29-legacy-minimal";
 		byte[] malformed =
 			ReadFixture(
-				"malformed/unsupported-magic.bin" );
+				"malformed/unsupported-magic.bin"
+			);
 		WriteLiteralCandidate(
 			temporary.Root,
 			name,
-			malformed );
+			malformed
+		);
 
 		DirectoryTerminalDescriptionProvider provider =
 			new( temporary.Root );
@@ -311,7 +366,9 @@ public sealed class T36DirectoryProviderTests {
 		Assert.Throws<CompiledTermInfoFormatException>(
 			() => provider.TryLoad(
 				name,
-				out _ ) );
+				out _
+			)
+		);
 	}
 
 	[Fact]
@@ -324,7 +381,9 @@ public sealed class T36DirectoryProviderTests {
 				temporary.Root,
 				name,
 				ReadFixture(
-					"malformed/unsupported-magic.bin" ) );
+					"malformed/unsupported-magic.bin"
+				)
+			);
 
 		DirectoryTerminalDescriptionProvider provider =
 			new( temporary.Root );
@@ -332,17 +391,22 @@ public sealed class T36DirectoryProviderTests {
 		Assert.Throws<CompiledTermInfoFormatException>(
 			() => provider.TryLoad(
 				name,
-				out _ ) );
+				out _
+			)
+		);
 
 		File.WriteAllBytes(
 			path,
 			ReadFixture(
-				"compiled/t29-legacy-minimal.bin" ) );
+				"compiled/t29-legacy-minimal.bin"
+			)
+		);
 
 		TerminalDescription terminal =
 			Load(
 				provider,
-				name );
+				name
+			);
 		Assert.Equal( name, terminal.Name );
 	}
 
@@ -356,24 +420,30 @@ public sealed class T36DirectoryProviderTests {
 				temporary.Root,
 				name,
 				ReadFixture(
-					"compiled/t29-legacy-minimal.bin" ) );
+					"compiled/t29-legacy-minimal.bin"
+				)
+			);
 
 		DirectoryTerminalDescriptionProvider provider =
 			new( temporary.Root );
 		TerminalDescription first =
 			Load(
 				provider,
-				name );
+				name
+			);
 
 		File.WriteAllBytes(
 			path,
 			ReadFixture(
-				"malformed/unsupported-magic.bin" ) );
+				"malformed/unsupported-magic.bin"
+			)
+		);
 
 		TerminalDescription second =
 			Load(
 				provider,
-				name );
+				name
+			);
 
 		Assert.Same( first, second );
 	}
@@ -388,45 +458,58 @@ public sealed class T36DirectoryProviderTests {
 				temporary.Root,
 				name,
 				ReadFixture(
-					"compiled/t29-legacy-minimal.bin" ) );
+					"compiled/t29-legacy-minimal.bin"
+				)
+			);
 
 		DirectoryTerminalDescriptionProvider firstProvider =
 			new( temporary.Root );
 		TerminalDescription first =
 			Load(
 				firstProvider,
-				name );
+				name
+			);
 		Assert.Equal<int?>(
 			80,
 			first.GetNumber(
-				NumericCapability.Columns ) );
+				NumericCapability.Columns
+			)
+		);
 
 		byte[] changed =
 			ReadFixture(
-				"compiled/t29-legacy-minimal.bin" );
+				"compiled/t29-legacy-minimal.bin"
+			);
 		SetLegacyColumns(
 			changed,
-			99 );
+			99
+		);
 		File.WriteAllBytes(
 			path,
-			changed );
+			changed
+		);
 
 		DirectoryTerminalDescriptionProvider secondProvider =
 			new( temporary.Root );
 		TerminalDescription second =
 			Load(
 				secondProvider,
-				name );
+				name
+			);
 
 		Assert.Equal<int?>(
 			99,
 			second.GetNumber(
-				NumericCapability.Columns ) );
+				NumericCapability.Columns
+			)
+		);
 		Assert.Same(
 			first,
 			Load(
 				firstProvider,
-				name ) );
+				name
+			)
+		);
 	}
 
 	[Fact]
@@ -438,7 +521,9 @@ public sealed class T36DirectoryProviderTests {
 			temporary.Root,
 			name,
 			ReadFixture(
-				"compiled/t29-legacy-minimal.bin" ) );
+				"compiled/t29-legacy-minimal.bin"
+			)
+		);
 
 		DirectoryTerminalDescriptionProvider provider =
 			new( temporary.Root );
@@ -446,12 +531,16 @@ public sealed class T36DirectoryProviderTests {
 			Enumerable
 				.Range(
 					0,
-					16 )
+					16
+				)
 				.Select(
 					_ => Task.Run(
 						() => Load(
 							provider,
-							name ) ) )
+							name
+						)
+					)
+				)
 				.ToArray();
 
 		TerminalDescription[] terminals =
@@ -461,7 +550,9 @@ public sealed class T36DirectoryProviderTests {
 			terminals,
 			terminal => Assert.Same(
 				terminals[ 0 ],
-				terminal ) );
+				terminal
+			)
+		);
 	}
 
 	[Fact]
@@ -472,11 +563,14 @@ public sealed class T36DirectoryProviderTests {
 		string directory =
 			Path.Combine(
 				temporary.Root,
-				name[ 0 ].ToString() );
+				name[ 0 ].ToString()
+			);
 		Directory.CreateDirectory(
 			Path.Combine(
 				directory,
-				name ) );
+				name
+			)
+		);
 
 		DirectoryTerminalDescriptionProvider provider =
 			new( temporary.Root );
@@ -485,7 +579,9 @@ public sealed class T36DirectoryProviderTests {
 			Record.Exception(
 				() => provider.TryLoad(
 					name,
-					out _ ) );
+					out _
+				)
+			);
 
 		Assert.NotNull( exception );
 	}
@@ -499,14 +595,18 @@ public sealed class T36DirectoryProviderTests {
 			Path.Combine(
 				temporary.Root,
 				"unrelated",
-				"nested" );
+				"nested"
+			);
 		Directory.CreateDirectory( unrelated );
 		File.WriteAllBytes(
 			Path.Combine(
 				unrelated,
-				name ),
+				name
+			),
 			ReadFixture(
-				"compiled/t29-legacy-minimal.bin" ) );
+				"compiled/t29-legacy-minimal.bin"
+			)
+		);
 
 		DirectoryTerminalDescriptionProvider provider =
 			new( temporary.Root );
@@ -514,7 +614,9 @@ public sealed class T36DirectoryProviderTests {
 		Assert.False(
 			provider.TryLoad(
 				name,
-				out TerminalDescription? terminal ) );
+				out TerminalDescription? terminal
+			)
+		);
 		Assert.Null( terminal );
 	}
 
@@ -529,7 +631,8 @@ public sealed class T36DirectoryProviderTests {
 	[InlineData( "xterm\\..\\vt100" )]
 	[InlineData( "C:\\xterm" )]
 	public void UnsafeTerminalNamesAreRejectedBeforePathConstruction(
-		string name ) {
+		string name
+	) {
 		using TemporaryDirectory temporary = new();
 		DirectoryTerminalDescriptionProvider provider =
 			new( temporary.Root );
@@ -537,7 +640,9 @@ public sealed class T36DirectoryProviderTests {
 		Assert.Throws<ArgumentException>(
 			() => provider.TryLoad(
 				name,
-				out _ ) );
+				out _
+			)
+		);
 	}
 
 	[Fact]
@@ -549,11 +654,15 @@ public sealed class T36DirectoryProviderTests {
 		Assert.Throws<ArgumentNullException>(
 			() => provider.TryLoad(
 				null!,
-				out _ ) );
+				out _
+			)
+		);
 		Assert.Throws<ArgumentException>(
 			() => provider.TryLoad(
 				"bad\0name",
-				out _ ) );
+				out _
+			)
+		);
 	}
 
 	[Fact]
@@ -565,23 +674,31 @@ public sealed class T36DirectoryProviderTests {
 			Path.GetFullPath(
 				Path.Combine(
 					temporary.Root,
-					"xterm" ) );
+					"xterm"
+				)
+			);
 
 		Assert.Throws<ArgumentException>(
 			() => provider.TryLoad(
 				rootedName,
-				out _ ) );
+				out _
+			)
+		);
 	}
 
 	private static TerminalDescription Load(
 		DirectoryTerminalDescriptionProvider provider,
-		string name ) {
+		string name
+	) {
 		Assert.True(
 			provider.TryLoad(
 				name,
-				out TerminalDescription? terminal ) );
+				out TerminalDescription? terminal
+			)
+		);
 		return Assert.IsType<TerminalDescription>(
-			terminal );
+			terminal
+		);
 	}
 
 	private static byte[] ReadFixture( string relativePath ) {
@@ -592,61 +709,75 @@ public sealed class T36DirectoryProviderTests {
 				"compiled-terminfo",
 				relativePath.Replace(
 					'/',
-					Path.DirectorySeparatorChar ) ) );
+					Path.DirectorySeparatorChar
+				)
+			)
+		);
 	}
 
 	private static string WriteLiteralCandidate(
 		string root,
 		string name,
-		byte[] entry ) {
+		byte[] entry
+	) {
 		return WriteCandidate(
 			root,
 			name[ 0 ].ToString(),
 			name,
-			entry );
+			entry
+		);
 	}
 
 	private static string WriteCandidate(
 		string root,
 		string directoryName,
 		string name,
-		byte[] entry ) {
+		byte[] entry
+	) {
 		string directory =
 			Path.Combine(
 				root,
-				directoryName );
+				directoryName
+			);
 		Directory.CreateDirectory( directory );
 
 		string path =
 			Path.Combine(
 				directory,
-				name );
+				name
+			);
 		File.WriteAllBytes(
 			path,
-			entry );
+			entry
+		);
 		return path;
 	}
 
 	private static byte[] CreateRenamedMinimalEntry() {
 		byte[] entry =
 			ReadFixture(
-				"compiled/t29-legacy-minimal.bin" );
+				"compiled/t29-legacy-minimal.bin"
+			);
 		int namesSize =
 			BinaryPrimitives.ReadUInt16LittleEndian(
 				entry.AsSpan(
 					2,
-					sizeof( ushort ) ) );
+					sizeof( ushort )
+				)
+			);
 		Span<byte> names =
 			entry.AsSpan(
 				CompiledHeaderSize,
-				namesSize );
+				namesSize
+			);
 
 		int firstSeparator =
 			names.IndexOf( (byte)'|' );
 		if ( firstSeparator <= 0
 			|| firstSeparator + 1 >= names.Length ) {
 			throw new InvalidDataException(
-				"The minimal fixture does not contain the expected alias layout." );
+				"The minimal fixture does not contain the expected alias layout."
+			);
 		}
 
 		names[ 0 ] = (byte)'n';
@@ -657,19 +788,24 @@ public sealed class T36DirectoryProviderTests {
 
 	private static void SetLegacyColumns(
 		byte[] entry,
-		int columns ) {
+		int columns
+	) {
 		ArgumentNullException.ThrowIfNull( entry );
 
 		int names =
 			BinaryPrimitives.ReadUInt16LittleEndian(
 				entry.AsSpan(
 					2,
-					sizeof( ushort ) ) );
+					sizeof( ushort )
+				)
+			);
 		int booleans =
 			BinaryPrimitives.ReadUInt16LittleEndian(
 				entry.AsSpan(
 					4,
-					sizeof( ushort ) ) );
+					sizeof( ushort )
+				)
+			);
 		int numericOffset =
 			CompiledHeaderSize
 			+ names
@@ -682,8 +818,10 @@ public sealed class T36DirectoryProviderTests {
 		BinaryPrimitives.WriteInt16LittleEndian(
 			entry.AsSpan(
 				numericOffset,
-				sizeof( short ) ),
-			checked((short)columns) );
+				sizeof( short )
+			),
+			checked( (short)columns )
+		);
 	}
 
 	private sealed class TemporaryDirectory : IDisposable {
@@ -692,7 +830,8 @@ public sealed class T36DirectoryProviderTests {
 				Path.Combine(
 					Path.GetTempPath(),
 					"icod-terminfo-t36-"
-					+ Guid.NewGuid().ToString( "N" ) );
+					+ Guid.NewGuid().ToString( "N" )
+				);
 			Directory.CreateDirectory( Root );
 		}
 
@@ -704,7 +843,8 @@ public sealed class T36DirectoryProviderTests {
 			if ( Directory.Exists( Root ) ) {
 				Directory.Delete(
 					Root,
-					recursive: true );
+					recursive: true
+				);
 			}
 		}
 	}

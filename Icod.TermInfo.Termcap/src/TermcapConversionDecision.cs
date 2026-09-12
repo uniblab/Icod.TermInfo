@@ -3,8 +3,7 @@ namespace Icod.TermInfo.Termcap;
 /// <summary>
 /// Identifies how one termcap source construct was represented during conversion.
 /// </summary>
-public enum TermcapConversionDecision
-{
+public enum TermcapConversionDecision {
 	/// <summary>The source construct maps directly to the canonical Runtime model.</summary>
 	Exact = 0,
 

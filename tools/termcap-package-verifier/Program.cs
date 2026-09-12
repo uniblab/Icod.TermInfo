@@ -34,7 +34,7 @@ internal static class Program {
 		try {
 			string root = FindRepositoryRoot();
 			string artifactDirectory =
-				args.Length == 0
+				( args.Length == 0 )
 					? Path.Combine( root, "artifacts" )
 					: Path.GetFullPath( args[0], root )
 			;
@@ -245,9 +245,10 @@ internal static class Program {
 				$"Icod.TermInfo.Termcap-package-verifier-{Guid.NewGuid():N}.dll"
 			);
 		try {
-			using ( Stream source = entry!.Open() )
-			using ( FileStream destination = File.Create( temporaryPath ) ) {
-				source.CopyTo( destination );
+			using ( Stream source = entry!.Open() ) {
+				using ( FileStream destination = File.Create( temporaryPath ) ) {
+					source.CopyTo( destination );
+				}
 			}
 			AssemblyName assemblyName = AssemblyName.GetAssemblyName( temporaryPath );
 			Require( assemblyName.Name == PackageId, $"{path} has unexpected assembly name '{assemblyName.Name}'." );

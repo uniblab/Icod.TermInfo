@@ -7,8 +7,7 @@ namespace Icod.TermInfo.Termcap;
 /// Performs explicit opt-in termcap acquisition without participating in Runtime
 /// terminfo discovery.
 /// </summary>
-public static class TermcapAcquirer
-{
+public static class TermcapAcquirer {
 	/// <summary>
 	/// Acquires one named terminal description through the explicitly configured
 	/// termcap source sequence, resolves <c>tc=</c>, and converts the result into
@@ -59,8 +58,7 @@ public static class TermcapAcquirer
 		);
 	}
 
-	private sealed class AcquisitionEntryProvider : ITermcapSourceEntryProvider
-	{
+	private sealed class AcquisitionEntryProvider : ITermcapSourceEntryProvider {
 		private readonly TermcapAcquisitionOptions _options;
 		private readonly Candidate[] _candidates;
 		private readonly List<TermcapSourceDiagnostic> _diagnostics = [];
@@ -128,10 +126,10 @@ public static class TermcapAcquirer
 		) {
 			ArgumentException.ThrowIfNullOrWhiteSpace( name );
 
-			return _sourceByName.TryGetValue(
+			return ( _sourceByName.TryGetValue(
 				name,
 				out TermcapAcquisitionSource? source
-			)
+			) )
 				? source
 				: null
 			;
@@ -287,8 +285,7 @@ public static class TermcapAcquirer
 		}
 	}
 
-	private sealed class Candidate
-	{
+	private sealed class Candidate {
 		internal Candidate(
 			TermcapAcquisitionSource source,
 			string? inlineSource

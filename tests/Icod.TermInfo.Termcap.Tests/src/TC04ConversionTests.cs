@@ -4,8 +4,7 @@ using Xunit;
 
 namespace Icod.TermInfo.Termcap.Tests;
 
-public sealed class TC04ConversionTests
-{
+public sealed class TC04ConversionTests {
 	[Fact]
 	public void StandardAndExtendedFieldsConvertIntoRuntimeModel() {
 		TermcapConversionResult result =

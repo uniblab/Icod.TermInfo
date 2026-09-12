@@ -10,7 +10,8 @@ public sealed class S06ContractTests {
 	private const string DevelopmentVersion = "$(IcodTermInfoSuiteVersion)";
 	private const string StableAssemblyVersion = "1.0.0.0";
 
-	[Fact]	public void SourceAndRuntimePackagesAdvanceTogetherWithoutChangingAssemblyIdentity() {
+	[Fact]
+	public void SourceAndRuntimePackagesAdvanceTogetherWithoutChangingAssemblyIdentity() {
 		string root = FindRepositoryRoot();
 
 		foreach (
@@ -19,31 +20,41 @@ public sealed class S06ContractTests {
 			{
 				"Icod.TermInfo.csproj",
 				"Icod.TermInfo.Source/Icod.TermInfo.Source.csproj",
-			} ) {
+			}
+		) {
 			XDocument project =
 				XDocument.Load(
 					Path.Combine(
 						root,
 						relativePath.Replace(
 							'/',
-							Path.DirectorySeparatorChar ) ),
-					LoadOptions.None );
+							Path.DirectorySeparatorChar
+						)
+					),
+					LoadOptions.None
+				);
 
 			Assert.Equal(
 				DevelopmentVersion,
 				ReadRequiredProperty(
 					project,
-					"Version" ) );
+					"Version"
+				)
+			);
 			Assert.Equal(
 				DevelopmentVersion,
 				ReadRequiredProperty(
 					project,
-					"PackageVersion" ) );
+					"PackageVersion"
+				)
+			);
 			Assert.Equal(
 				StableAssemblyVersion,
 				ReadRequiredProperty(
 					project,
-					"AssemblyVersion" ) );
+					"AssemblyVersion"
+				)
+			);
 		}
 	}
 
@@ -56,12 +67,14 @@ public sealed class S06ContractTests {
 			assembly.GetExportedTypes(),
 			type =>
 				type.FullName
-					== "Icod.TermInfo.Source.TermInfoSourceCapabilityState" );
+					== "Icod.TermInfo.Source.TermInfoSourceCapabilityState"
+		);
 		Assert.Contains(
 			assembly.GetCustomAttributes<InternalsVisibleToAttribute>(),
 			attribute =>
 				attribute.AssemblyName
-					== "Icod.TermInfo.Source.Tests" );
+					== "Icod.TermInfo.Source.Tests"
+		);
 
 		string root = FindRepositoryRoot();
 		string baseline =
@@ -69,10 +82,13 @@ public sealed class S06ContractTests {
 				Path.Combine(
 					root,
 					"docs",
-					"1.1.0-SOURCE-PUBLIC-API-BASELINE.txt" ) );
+					"1.1.0-SOURCE-PUBLIC-API-BASELINE.txt"
+				)
+			);
 		Assert.DoesNotContain(
 			"TermInfoSourceCapabilityState",
-			baseline );
+			baseline
+		);
 	}
 
 	[Fact]
@@ -82,12 +98,15 @@ public sealed class S06ContractTests {
 			Path.Combine(
 				root,
 				"docs",
-				"1.1.0-S06-CANCELLATION-SEMANTICS.md" );
+				"1.1.0-S06-CANCELLATION-SEMANTICS.md"
+			);
 		string roadmap =
 			File.ReadAllText(
 				Path.Combine(
 					root,
-					"Icod.TermInfo-Post-1.0-Development-Roadmap.md" ) );
+					"Icod.TermInfo-Post-1.0-Development-Roadmap.md"
+				)
+			);
 
 		Assert.True( File.Exists( recordPath ) );
 		string record =
@@ -97,20 +116,26 @@ public sealed class S06ContractTests {
 		Assert.True(
 			record.Contains(
 				"tombstone",
-				StringComparison.OrdinalIgnoreCase ) );
+				StringComparison.OrdinalIgnoreCase
+			)
+		);
 		Assert.True(
 			record.Contains(
 				"rightmost",
-				StringComparison.OrdinalIgnoreCase ) );
+				StringComparison.OrdinalIgnoreCase
+			)
+		);
 		Assert.Contains( "S07", record );
 		Assert.Contains(
 			"1.1.0-S06-CANCELLATION-SEMANTICS.md",
-			roadmap );
+			roadmap
+		);
 	}
 
 	private static string ReadRequiredProperty(
 		XDocument project,
-		string propertyName ) {
+		string propertyName
+	) {
 		ArgumentNullException.ThrowIfNull( project );
 		ArgumentNullException.ThrowIfNull( propertyName );
 
@@ -119,7 +144,8 @@ public sealed class S06ContractTests {
 			.First(
 				element =>
 					element.Name.LocalName
-						== propertyName )
+						== propertyName
+			)
 			.Value
 			.Trim();
 	}
@@ -127,13 +153,18 @@ public sealed class S06ContractTests {
 	private static string FindRepositoryRoot() {
 		DirectoryInfo? current =
 			new(
-				AppContext.BaseDirectory );
+				AppContext.BaseDirectory
+			);
 
 		while ( current is not null ) {
-			if ( File.Exists(
+			if (
+				File.Exists(
 					Path.Combine(
 						current.FullName,
-						"Icod.TermInfo.sln" ) ) ) {
+						"Icod.TermInfo.sln"
+					)
+				)
+			) {
 				return current.FullName;
 			}
 
@@ -142,6 +173,7 @@ public sealed class S06ContractTests {
 		}
 
 		throw new InvalidOperationException(
-			"Unable to locate the Icod.TermInfo repository root." );
+			"Unable to locate the Icod.TermInfo repository root."
+		);
 	}
 }

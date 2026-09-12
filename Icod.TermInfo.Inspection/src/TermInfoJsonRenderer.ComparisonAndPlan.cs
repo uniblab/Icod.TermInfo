@@ -361,7 +361,7 @@ public static partial class TermInfoJsonRenderer {
 		);
 		writer.WriteString(
 			"capabilityClassification",
-			field.CapabilityClassification.HasValue
+			( field.CapabilityClassification.HasValue )
 				? GetSourceCapabilityClassificationName(
 					field.CapabilityClassification.Value
 				)
@@ -373,7 +373,7 @@ public static partial class TermInfoJsonRenderer {
 		);
 		writer.WriteString(
 			"standardValueKind",
-			field.StandardValueKind.HasValue
+			( field.StandardValueKind.HasValue )
 				? GetCapabilityValueKindName(
 					field.StandardValueKind.Value
 				)

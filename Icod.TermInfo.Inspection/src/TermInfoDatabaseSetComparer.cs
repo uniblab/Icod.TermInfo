@@ -456,13 +456,15 @@ public static class TermInfoDatabaseSetComparer {
 		for ( int index = 0; index < count; index++ ) {
 			cancellationToken.ThrowIfCancellationRequested();
 			TermInfoDatabaseSetOccurrence? leftShadow =
-				index < leftLookup.ShadowedOccurrences.Count
+				( index < leftLookup.ShadowedOccurrences.Count )
 					? leftLookup.ShadowedOccurrences[ index ]
-					: null;
+					: null
+			;
 			TermInfoDatabaseSetOccurrence? rightShadow =
-				index < rightLookup.ShadowedOccurrences.Count
+				( index < rightLookup.ShadowedOccurrences.Count )
 					? rightLookup.ShadowedOccurrences[ index ]
-					: null;
+					: null
+			;
 			TermInfoComparisonResult? comparison = null;
 			bool different = leftShadow is null || rightShadow is null;
 			if ( leftShadow is not null && rightShadow is not null ) {
@@ -585,7 +587,7 @@ public static class TermInfoDatabaseSetComparer {
 			out TermInfoDatabaseSetOccurrence? owner
 		) ) {
 			return new AliasResolution(
-				set.IsComplete
+				( set.IsComplete )
 					? AliasResolutionStatus.NotObserved
 					: AliasResolutionStatus.Indeterminate,
 				null
@@ -597,7 +599,7 @@ public static class TermInfoDatabaseSetComparer {
 				database => !database.IsComplete && database.Index <= owner.DatabaseIndex
 			);
 		return new AliasResolution(
-			blocked
+			( blocked )
 				? AliasResolutionStatus.Indeterminate
 				: AliasResolutionStatus.OwnerKnown,
 			owner

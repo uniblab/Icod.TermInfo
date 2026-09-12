@@ -55,7 +55,7 @@ public sealed class TermInfoDatabaseSetOptions {
 			|| maximumDatabaseCount > MaximumSupportedDatabaseCount
 		) {
 			throw new ArgumentOutOfRangeException(
-				nameof(maximumDatabaseCount),
+				nameof( maximumDatabaseCount ),
 				maximumDatabaseCount,
 				$"The maximum database count must be between 1 and {MaximumSupportedDatabaseCount}."
 			);
@@ -65,7 +65,7 @@ public sealed class TermInfoDatabaseSetOptions {
 			|| maximumTotalEntryCount > MaximumSupportedTotalEntryCount
 		) {
 			throw new ArgumentOutOfRangeException(
-				nameof(maximumTotalEntryCount),
+				nameof( maximumTotalEntryCount ),
 				maximumTotalEntryCount,
 				$"The maximum total entry count must be between 1 and {MaximumSupportedTotalEntryCount}."
 			);

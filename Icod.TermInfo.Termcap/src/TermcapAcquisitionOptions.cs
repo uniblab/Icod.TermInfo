@@ -7,8 +7,7 @@ namespace Icod.TermInfo.Termcap;
 /// Configures explicit termcap acquisition without changing Runtime terminal
 /// discovery.
 /// </summary>
-public sealed class TermcapAcquisitionOptions
-{
+public sealed class TermcapAcquisitionOptions {
 	private const string DefaultInlineSourceName = "<inline-termcap>";
 	private readonly IReadOnlyList<string> _termPath;
 
@@ -241,7 +240,7 @@ public sealed class TermcapAcquisitionOptions
 	private static string? NormalizeEnvironmentValue(
 		string? value
 	) {
-		return string.IsNullOrWhiteSpace( value )
+		return ( string.IsNullOrWhiteSpace( value ) )
 			? null
 			: value
 		;

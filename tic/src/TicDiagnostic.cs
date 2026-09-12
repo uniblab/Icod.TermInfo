@@ -153,7 +153,7 @@ internal static class TicDiagnosticWriter {
 			cancellationToken.ThrowIfCancellationRequested();
 
 			string location =
-				diagnostic.Line.HasValue
+				( diagnostic.Line.HasValue )
 					? string.Concat(
 						diagnostic.SourceName,
 						":",
@@ -165,7 +165,7 @@ internal static class TicDiagnosticWriter {
 					: diagnostic.SourceName
 			;
 			string severity =
-				diagnostic.IsError
+				( diagnostic.IsError )
 					? "error"
 					: "warning"
 			;

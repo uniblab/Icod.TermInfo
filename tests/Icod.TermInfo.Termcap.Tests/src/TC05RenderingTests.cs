@@ -4,8 +4,7 @@ using Xunit;
 
 namespace Icod.TermInfo.Termcap.Tests;
 
-public sealed class TC05RenderingTests
-{
+public sealed class TC05RenderingTests {
 	[Fact]
 	public void RendererUsesCanonicalCodesHistoricalSafeEscapesAndStableOrdering() {
 		TerminalDescription description =

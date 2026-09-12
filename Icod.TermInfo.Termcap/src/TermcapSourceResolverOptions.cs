@@ -3,8 +3,7 @@ namespace Icod.TermInfo.Termcap;
 /// <summary>
 /// Configures bounded <c>tc=</c> inheritance resolution.
 /// </summary>
-public sealed class TermcapSourceResolverOptions
-{
+public sealed class TermcapSourceResolverOptions {
 	/// <summary>
 	/// The default maximum number of inheritance edges from the requested root.
 	/// </summary>

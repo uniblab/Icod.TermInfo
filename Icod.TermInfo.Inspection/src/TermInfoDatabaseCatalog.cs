@@ -12,15 +12,15 @@ public sealed class TermInfoDatabaseCatalog {
 		IEnumerable<TermInfoDatabaseCatalogIssue> issues,
 		IEnumerable<string> duplicateCanonicalNames
 	) {
-		ArgumentException.ThrowIfNullOrWhiteSpace(root);
-		ArgumentNullException.ThrowIfNull(entries);
-		ArgumentNullException.ThrowIfNull(issues);
-		ArgumentNullException.ThrowIfNull(duplicateCanonicalNames);
+		ArgumentException.ThrowIfNullOrWhiteSpace( root );
+		ArgumentNullException.ThrowIfNull( entries );
+		ArgumentNullException.ThrowIfNull( issues );
+		ArgumentNullException.ThrowIfNull( duplicateCanonicalNames );
 
-		if (!System.IO.Path.IsPathFullyQualified(root)) {
+		if ( !System.IO.Path.IsPathFullyQualified( root ) ) {
 			throw new ArgumentException(
 				"A terminfo database catalog root must be fully qualified.",
-				nameof(root)
+				nameof( root )
 			);
 		}
 
@@ -31,32 +31,32 @@ public sealed class TermInfoDatabaseCatalog {
 		string[] duplicateArray =
 			duplicateCanonicalNames.ToArray();
 
-		if (entryArray.Any(entry => entry is null)) {
+		if ( entryArray.Any( entry => entry is null ) ) {
 			throw new ArgumentException(
 				"A catalog entry collection cannot contain null.",
-				nameof(entries)
+				nameof( entries )
 			);
 		}
 
-		if (issueArray.Any(issue => issue is null)) {
+		if ( issueArray.Any( issue => issue is null ) ) {
 			throw new ArgumentException(
 				"A catalog issue collection cannot contain null.",
-				nameof(issues)
+				nameof( issues )
 			);
 		}
 
-		if (duplicateArray.Any(string.IsNullOrWhiteSpace)) {
+		if ( duplicateArray.Any( string.IsNullOrWhiteSpace ) ) {
 			throw new ArgumentException(
 				"Duplicate canonical names cannot contain null, empty, or whitespace values.",
-				nameof(duplicateCanonicalNames)
+				nameof( duplicateCanonicalNames )
 			);
 		}
 
 		Root = root;
 		Kind = kind;
-		Entries = Array.AsReadOnly(entryArray);
-		Issues = Array.AsReadOnly(issueArray);
-		DuplicateCanonicalNames = Array.AsReadOnly(duplicateArray);
+		Entries = Array.AsReadOnly( entryArray );
+		Issues = Array.AsReadOnly( issueArray );
+		DuplicateCanonicalNames = Array.AsReadOnly( duplicateArray );
 	}
 
 	/// <summary>

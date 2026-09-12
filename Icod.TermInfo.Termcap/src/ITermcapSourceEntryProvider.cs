@@ -18,8 +18,7 @@ namespace Icod.TermInfo.Termcap;
 /// into clean misses.
 /// </para>
 /// </remarks>
-public interface ITermcapSourceEntryProvider
-{
+public interface ITermcapSourceEntryProvider {
 	/// <summary>
 	/// Attempts to load an unresolved termcap source entry by terminal name.
 	/// </summary>

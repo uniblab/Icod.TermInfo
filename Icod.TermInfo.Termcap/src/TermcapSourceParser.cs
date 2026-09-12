@@ -12,8 +12,7 @@ namespace Icod.TermInfo.Termcap;
 /// terminfo catalog, resolve inheritance, or construct <c>TerminalDescription</c>
 /// values.
 /// </remarks>
-public static class TermcapSourceParser
-{
+public static class TermcapSourceParser {
 	/// <summary>
 	/// Parses complete termcap source text.
 	/// </summary>
@@ -422,8 +421,7 @@ public static class TermcapSourceParser
 						)
 					)
 				);
-			}
-			else {
+			} else {
 				names.Add( name );
 			}
 
@@ -456,7 +454,7 @@ public static class TermcapSourceParser
 			fieldText.Length != 0
 				&& fieldText[0] == '.';
 		int capabilityOffset =
-			disabled
+			( disabled )
 				? 1
 				: 0
 		;
@@ -545,7 +543,7 @@ public static class TermcapSourceParser
 					capabilityName,
 					null,
 					null,
-					referenceName.Length == 0
+					( referenceName.Length == 0 )
 						? null
 						: referenceName,
 					fieldText,
@@ -605,8 +603,7 @@ public static class TermcapSourceParser
 					span
 				)
 			);
-		}
-		else {
+		} else {
 			int numberBase;
 			int digitStart;
 			if (
@@ -616,12 +613,10 @@ public static class TermcapSourceParser
 			) {
 				numberBase = 16;
 				digitStart = 2;
-			}
-			else if ( spelling.Length > 1 && spelling[0] == '0' ) {
+			} else if ( spelling.Length > 1 && spelling[0] == '0' ) {
 				numberBase = 8;
 				digitStart = 1;
-			}
-			else {
+			} else {
 				numberBase = 10;
 				digitStart = 0;
 			}
@@ -635,8 +630,7 @@ public static class TermcapSourceParser
 						span
 					)
 				);
-			}
-			else {
+			} else {
 				int parsed = 0;
 				bool invalid = false;
 				bool outOfRange = false;
@@ -664,8 +658,7 @@ public static class TermcapSourceParser
 							span
 						)
 					);
-				}
-				else if ( outOfRange ) {
+				} else if ( outOfRange ) {
 					diagnostics.Add(
 						new TermcapSourceDiagnostic(
 							TermcapSourceDiagnosticCodes.NumericValueOutOfRange,
@@ -674,8 +667,7 @@ public static class TermcapSourceParser
 							span
 						)
 					);
-				}
-				else {
+				} else {
 					value = parsed;
 				}
 			}
@@ -743,9 +735,10 @@ public static class TermcapSourceParser
 				char target =
 					spelling[++index];
 				int controlValue =
-					target == '?'
+					( target == '?' )
 						? 0x7f
-						: target & 0x1f;
+						: target & 0x1f
+				;
 				if ( controlValue == 0 ) {
 					diagnostics.Add(
 						CreateStringDiagnostic(
@@ -893,7 +886,7 @@ public static class TermcapSourceParser
 			value.Append( translated );
 		}
 
-		return hasErrors
+		return ( hasErrors )
 			? null
 			: value.ToString()
 		;
@@ -1006,8 +999,7 @@ public static class TermcapSourceParser
 		);
 	}
 
-	private sealed class LogicalRecordBuilder
-	{
+	private sealed class LogicalRecordBuilder {
 		private readonly string? sourceName;
 		private readonly StringBuilder text = new();
 		private readonly List<LogicalSegment> segments = [];
@@ -1057,8 +1049,7 @@ public static class TermcapSourceParser
 		}
 	}
 
-	private sealed class LogicalRecord
-	{
+	private sealed class LogicalRecord {
 		private readonly string? sourceName;
 		private readonly LogicalSegment[] segments;
 

@@ -3,8 +3,7 @@ using System.Text;
 
 namespace Icod.TermInfo.Termcap;
 
-internal static class TermcapStringConverter
-{
+internal static class TermcapStringConverter {
 	private static readonly HashSet<string> ParameterizedCapabilityCodes =
 		new(
 			new string[] {
@@ -170,7 +169,7 @@ internal static class TermcapStringConverter
 			position < source.Length
 			&& source[position] == '*';
 		int paddingEnd =
-			proportional
+			( proportional )
 				? checked( position + 1 )
 				: position
 		;

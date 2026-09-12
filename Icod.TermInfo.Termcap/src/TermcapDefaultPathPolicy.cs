@@ -4,8 +4,7 @@ namespace Icod.TermInfo.Termcap;
 /// Selects whether termcap acquisition may append a conventional implicit
 /// database path set after explicitly supplied sources.
 /// </summary>
-public enum TermcapDefaultPathPolicy
-{
+public enum TermcapDefaultPathPolicy {
 	/// <summary>Do not add any implicit termcap database paths.</summary>
 	None = 0,
 

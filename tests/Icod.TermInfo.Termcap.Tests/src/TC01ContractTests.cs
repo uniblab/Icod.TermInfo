@@ -6,8 +6,7 @@ using Xunit;
 
 namespace Icod.TermInfo.Termcap.Tests;
 
-public sealed class TC01ContractTests
-{
+public sealed class TC01ContractTests {
 	private const string Tc01DevelopmentVersion = "1.6.0-Alpha-1";
 	private const string VersionReference = "$(IcodTermInfoSuiteVersion)";
 

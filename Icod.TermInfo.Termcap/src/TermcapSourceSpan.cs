@@ -7,8 +7,7 @@ namespace Icod.TermInfo.Termcap;
 /// <see cref="Offset"/> and <see cref="Length"/> are measured in UTF-16 code
 /// units. <see cref="Line"/> and <see cref="Column"/> are one-based.
 /// </remarks>
-public sealed class TermcapSourceSpan
-{
+public sealed class TermcapSourceSpan {
 	/// <summary>
 	/// Initializes a termcap source span.
 	/// </summary>

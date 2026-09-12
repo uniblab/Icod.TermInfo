@@ -11,40 +11,40 @@ public sealed partial class TermInfoDatabaseSet {
 		IEnumerable<TermInfoDatabaseSetIssue> issues,
 		int totalEntryCount
 	) {
-		ArgumentNullException.ThrowIfNull(entries);
-		ArgumentNullException.ThrowIfNull(identities);
-		ArgumentNullException.ThrowIfNull(issues);
-		if (totalEntryCount < 0) {
-			throw new ArgumentOutOfRangeException(nameof(totalEntryCount));
+		ArgumentNullException.ThrowIfNull( entries );
+		ArgumentNullException.ThrowIfNull( identities );
+		ArgumentNullException.ThrowIfNull( issues );
+		if ( totalEntryCount < 0 ) {
+			throw new ArgumentOutOfRangeException( nameof( totalEntryCount ) );
 		}
 
 		TermInfoDatabaseSetEntry[] entryArray = entries.ToArray();
 		TermInfoDatabaseSetIdentity[] identityArray = identities.ToArray();
 		TermInfoDatabaseSetIssue[] issueArray = issues.ToArray();
-		if (entryArray.Any(entry => entry is null)) {
+		if ( entryArray.Any( entry => entry is null ) ) {
 			throw new ArgumentException(
 				"A database-set entry collection cannot contain null.",
-				nameof(entries)
+				nameof( entries )
 			);
 		}
-		if (identityArray.Any(identity => identity is null)) {
+		if ( identityArray.Any( identity => identity is null ) ) {
 			throw new ArgumentException(
 				"A database-set identity collection cannot contain null.",
-				nameof(identities)
+				nameof( identities )
 			);
 		}
-		if (issueArray.Any(issue => issue is null)) {
+		if ( issueArray.Any( issue => issue is null ) ) {
 			throw new ArgumentException(
 				"A database-set issue collection cannot contain null.",
-				nameof(issues)
+				nameof( issues )
 			);
 		}
 
-		Entries = Array.AsReadOnly(entryArray);
-		Identities = Array.AsReadOnly(identityArray);
-		Issues = Array.AsReadOnly(issueArray);
+		Entries = Array.AsReadOnly( entryArray );
+		Identities = Array.AsReadOnly( identityArray );
+		Issues = Array.AsReadOnly( issueArray );
 		TotalEntryCount = totalEntryCount;
-		IsComplete = entryArray.All(entry => entry.IsComplete);
+		IsComplete = entryArray.All( entry => entry.IsComplete );
 	}
 
 	/// <summary>

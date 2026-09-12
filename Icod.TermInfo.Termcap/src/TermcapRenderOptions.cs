@@ -3,8 +3,7 @@ namespace Icod.TermInfo.Termcap;
 /// <summary>
 /// Controls deterministic physical-line wrapping for rendered termcap source.
 /// </summary>
-public sealed class TermcapRenderOptions
-{
+public sealed class TermcapRenderOptions {
 	/// <summary>Gets the default maximum preferred physical-line length.</summary>
 	public const int DefaultMaximumLineLength = 80;
 

@@ -5,8 +5,7 @@ using Xunit;
 
 namespace Icod.TermInfo.Termcap.Tests;
 
-public sealed class TC02ContractTests
-{
+public sealed class TC02ContractTests {
 	private const string Tc02DevelopmentVersion = "1.6.0-Alpha-2";
 
 	[Fact]
@@ -182,8 +181,7 @@ public sealed class TC02ContractTests
 			Assert.NotEmpty( mappings );
 			Assert.All(
 				mappings,
-				mapping =>
-				{
+				mapping => {
 					Assert.Equal( canonical, mapping.CanonicalTermcapCode );
 					Assert.Equal( origin, mapping.AliasOrigin );
 				}

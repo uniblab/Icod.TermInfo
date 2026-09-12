@@ -3,8 +3,7 @@ namespace Icod.TermInfo.Termcap;
 /// <summary>
 /// Describes one deterministic termcap semantic-conversion decision or failure.
 /// </summary>
-public sealed class TermcapConversionDiagnostic
-{
+public sealed class TermcapConversionDiagnostic {
 	internal TermcapConversionDiagnostic(
 		string code,
 		TermcapConversionDiagnosticSeverity severity,

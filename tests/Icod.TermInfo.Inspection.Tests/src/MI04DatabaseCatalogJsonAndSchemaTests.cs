@@ -26,9 +26,10 @@ public sealed class MI04DatabaseCatalogJsonAndSchemaTests {
 		string fixtureName
 	) {
 		TermInfoDatabaseCatalog catalog =
-			complete
+			( complete )
 				? CreateCompleteCatalog()
-				: CreateIncompleteCatalog();
+				: CreateIncompleteCatalog()
+		;
 		string actual =
 			TermInfoJsonRenderer.Render(
 				catalog,
@@ -439,7 +440,8 @@ public sealed class MI04DatabaseCatalogJsonAndSchemaTests {
 		Assert.Contains(
 			"**Status:** Stable 1.9.0 release contract frozen",
 			roadmap,
-			StringComparison.Ordinal );
+			StringComparison.Ordinal
+		);
 		Assert.Contains(
 			"## MI04 - Database Catalog Manifests and JSON Schema",
 			roadmap,

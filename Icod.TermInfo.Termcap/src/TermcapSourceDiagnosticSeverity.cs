@@ -3,8 +3,7 @@ namespace Icod.TermInfo.Termcap;
 /// <summary>
 /// Identifies the severity of a termcap source diagnostic.
 /// </summary>
-public enum TermcapSourceDiagnosticSeverity
-{
+public enum TermcapSourceDiagnosticSeverity {
 	/// <summary>
 	/// The source is accepted but contains a compatibility concern.
 	/// </summary>

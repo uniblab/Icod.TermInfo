@@ -560,17 +560,17 @@ public sealed class I07ValidationTests {
 	) {
 		TerminalDescriptionBuilder builder =
 			new TerminalDescriptionBuilder(
-				left
+				( left )
 					? "i07-left"
 					: "i07-right"
 			)
 				.SetDescription(
-					left
+					( left )
 						? "I07 left comparison"
 						: "I07 right comparison"
 				)
 				.AddAlias(
-					left
+					( left )
 						? "i07-left-alias"
 						: "i07-right-alias"
 				)
@@ -679,9 +679,10 @@ public sealed class I07ValidationTests {
 	private static string DescribeAliases(
 		IReadOnlyList<string>? aliases
 	) {
-		return aliases is null
+		return ( aliases is null )
 			? string.Empty
-			: string.Join( ",", aliases );
+			: string.Join( ",", aliases )
+		;
 	}
 
 	private static string DescribeCapabilityValue(
@@ -717,9 +718,10 @@ public sealed class I07ValidationTests {
 	private static string FormatNullableInteger(
 		int? value
 	) {
-		return value.HasValue
+		return ( value.HasValue )
 			? value.Value.ToString( CultureInfo.InvariantCulture )
-			: string.Empty;
+			: string.Empty
+		;
 	}
 
 	private static string[] ReadProjectReferences(

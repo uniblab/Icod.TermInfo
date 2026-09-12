@@ -171,7 +171,8 @@ public sealed class MI06CrossHostHardeningTests {
 		Assert.Contains(
 			"**Status:** Stable 1.9.0 release contract frozen",
 			roadmap,
-			StringComparison.Ordinal );
+			StringComparison.Ordinal
+		);
 	}
 
 	private static string ReadNormalized(

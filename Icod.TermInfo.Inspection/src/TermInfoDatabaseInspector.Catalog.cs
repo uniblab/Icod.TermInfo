@@ -63,40 +63,40 @@ public static partial class TermInfoDatabaseInspector {
 		CompiledTermInfoParserOptions? parserOptions,
 		CancellationToken cancellationToken
 	) {
-		ArgumentNullException.ThrowIfNull(root);
+		ArgumentNullException.ThrowIfNull( root );
 
-		if (string.IsNullOrWhiteSpace(root)) {
+		if ( string.IsNullOrWhiteSpace( root ) ) {
 			throw new ArgumentException(
 				"The terminfo database root cannot be empty or whitespace.",
-				nameof(root)
+				nameof( root )
 			);
 		}
 
 		cancellationToken.ThrowIfCancellationRequested();
 
 		string normalizedRoot =
-			Path.GetFullPath(root);
+			Path.GetFullPath( root );
 		CompiledTermInfoParserOptions effectiveParserOptions =
-			SnapshotParserOptions(parserOptions);
+			SnapshotParserOptions( parserOptions );
 
 		FileAttributes rootAttributes;
 		try {
 			rootAttributes =
-				File.GetAttributes(normalizedRoot);
+				File.GetAttributes( normalizedRoot );
 		}
-		catch (FileNotFoundException) {
+		catch ( FileNotFoundException ) {
 			return CreateEmptyCatalog(
 				normalizedRoot,
 				TermInfoDatabaseCatalogKind.Missing
 			);
 		}
-		catch (DirectoryNotFoundException) {
+		catch ( DirectoryNotFoundException ) {
 			return CreateEmptyCatalog(
 				normalizedRoot,
 				TermInfoDatabaseCatalogKind.Missing
 			);
 		}
-		catch (Exception exception) when (IsCatalogIoException(exception)) {
+		catch ( Exception exception ) when ( IsCatalogIoException( exception ) ) {
 			return CreateUnavailableCatalog(
 				normalizedRoot,
 				exception,
@@ -104,7 +104,7 @@ public static partial class TermInfoDatabaseInspector {
 			);
 		}
 
-		if ((rootAttributes & FileAttributes.Directory) == 0) {
+		if ( (rootAttributes & FileAttributes.Directory) == 0 ) {
 			return CreateEmptyCatalog(
 				normalizedRoot,
 				TermInfoDatabaseCatalogKind.UnsupportedStore
@@ -123,8 +123,8 @@ public static partial class TermInfoDatabaseInspector {
 		CompiledTermInfoParserOptions parserOptions,
 		CancellationToken cancellationToken
 	) {
-		ArgumentException.ThrowIfNullOrWhiteSpace(root);
-		ArgumentNullException.ThrowIfNull(parserOptions);
+		ArgumentException.ThrowIfNullOrWhiteSpace( root );
+		ArgumentNullException.ThrowIfNull( parserOptions );
 
 		List<TermInfoDatabaseCatalogEntry> entries = [];
 		List<TermInfoDatabaseCatalogIssue> issues = [];
@@ -132,15 +132,15 @@ public static partial class TermInfoDatabaseInspector {
 		string[] directories;
 		try {
 			directories =
-				Directory.GetDirectories(root);
+				Directory.GetDirectories( root );
 		}
-		catch (DirectoryNotFoundException) {
+		catch ( DirectoryNotFoundException ) {
 			return CreateEmptyCatalog(
 				root,
 				TermInfoDatabaseCatalogKind.Missing
 			);
 		}
-		catch (Exception exception) when (IsCatalogIoException(exception)) {
+		catch ( Exception exception ) when ( IsCatalogIoException( exception ) ) {
 			return CreateUnavailableCatalog(
 				root,
 				exception,
@@ -152,24 +152,24 @@ public static partial class TermInfoDatabaseInspector {
 			string directory
 			in directories
 				.OrderBy(
-					path => Path.GetFileName(path),
+					path => Path.GetFileName( path ),
 					StringComparer.Ordinal
 				)
 		) {
 			cancellationToken.ThrowIfCancellationRequested();
 
 			string directoryName =
-				GetRequiredFileName(directory);
-			if (!IsConventionalCatalogDirectoryName(directoryName)) {
+				GetRequiredFileName( directory );
+			if ( !IsConventionalCatalogDirectoryName( directoryName ) ) {
 				continue;
 			}
 
 			FileAttributes directoryAttributes;
 			try {
 				directoryAttributes =
-					File.GetAttributes(directory);
+					File.GetAttributes( directory );
 			}
-			catch (Exception exception) when (IsCatalogIoException(exception)) {
+			catch ( Exception exception ) when ( IsCatalogIoException( exception ) ) {
 				issues.Add(
 					CreateFileSystemIssue(
 						directory,
@@ -180,7 +180,7 @@ public static partial class TermInfoDatabaseInspector {
 				continue;
 			}
 
-			if (IsCatalogReparsePoint(directoryAttributes)) {
+			if ( IsCatalogReparsePoint( directoryAttributes ) ) {
 				issues.Add(
 					new TermInfoDatabaseCatalogIssue(
 						TermInfoDatabaseCatalogIssueKind.LinkSkipped,
@@ -194,9 +194,9 @@ public static partial class TermInfoDatabaseInspector {
 			string[] files;
 			try {
 				files =
-					Directory.GetFiles(directory);
+					Directory.GetFiles( directory );
 			}
-			catch (Exception exception) when (IsCatalogIoException(exception)) {
+			catch ( Exception exception ) when ( IsCatalogIoException( exception ) ) {
 				issues.Add(
 					CreateFileSystemIssue(
 						directory,
@@ -245,7 +245,7 @@ public static partial class TermInfoDatabaseInspector {
 					issue => issue.Path,
 					StringComparer.Ordinal
 				)
-				.ThenBy(issue => issue.Kind)
+				.ThenBy( issue => issue.Kind )
 				.ThenBy(
 					issue => issue.Message,
 					StringComparer.Ordinal
@@ -258,8 +258,8 @@ public static partial class TermInfoDatabaseInspector {
 					entry => entry.Name,
 					StringComparer.Ordinal
 				)
-				.Where(group => group.Count() > 1)
-				.Select(group => group.Key)
+				.Where( group => group.Count() > 1 )
+				.Select( group => group.Key )
 				.OrderBy(
 					name => name,
 					StringComparer.Ordinal
@@ -283,18 +283,18 @@ public static partial class TermInfoDatabaseInspector {
 		ICollection<TermInfoDatabaseCatalogIssue> issues,
 		CancellationToken cancellationToken
 	) {
-		ArgumentException.ThrowIfNullOrWhiteSpace(directoryName);
-		ArgumentException.ThrowIfNullOrWhiteSpace(path);
-		ArgumentNullException.ThrowIfNull(parserOptions);
-		ArgumentNullException.ThrowIfNull(entries);
-		ArgumentNullException.ThrowIfNull(issues);
+		ArgumentException.ThrowIfNullOrWhiteSpace( directoryName );
+		ArgumentException.ThrowIfNullOrWhiteSpace( path );
+		ArgumentNullException.ThrowIfNull( parserOptions );
+		ArgumentNullException.ThrowIfNull( entries );
+		ArgumentNullException.ThrowIfNull( issues );
 
 		FileAttributes attributes;
 		try {
 			attributes =
-				File.GetAttributes(path);
+				File.GetAttributes( path );
 		}
-		catch (Exception exception) when (IsCatalogIoException(exception)) {
+		catch ( Exception exception ) when ( IsCatalogIoException( exception ) ) {
 			issues.Add(
 				CreateFileSystemIssue(
 					path,
@@ -305,7 +305,7 @@ public static partial class TermInfoDatabaseInspector {
 			return;
 		}
 
-		if (IsCatalogReparsePoint(attributes)) {
+		if ( IsCatalogReparsePoint( attributes ) ) {
 			issues.Add(
 				new TermInfoDatabaseCatalogIssue(
 					TermInfoDatabaseCatalogIssueKind.LinkSkipped,
@@ -325,7 +325,7 @@ public static partial class TermInfoDatabaseInspector {
 					cancellationToken
 				);
 		}
-		catch (CompiledTermInfoFormatException exception) {
+		catch ( CompiledTermInfoFormatException exception ) {
 			issues.Add(
 				new TermInfoDatabaseCatalogIssue(
 					TermInfoDatabaseCatalogIssueKind.MalformedEntry,
@@ -335,7 +335,7 @@ public static partial class TermInfoDatabaseInspector {
 			);
 			return;
 		}
-		catch (Exception exception) when (IsCatalogIoException(exception)) {
+		catch ( Exception exception ) when ( IsCatalogIoException( exception ) ) {
 			issues.Add(
 				CreateFileSystemIssue(
 					path,
@@ -354,12 +354,12 @@ public static partial class TermInfoDatabaseInspector {
 		);
 
 		string fileName =
-			GetRequiredFileName(path);
-		if (!IsConventionallyPlaced(
+			GetRequiredFileName( path );
+		if ( !IsConventionallyPlaced(
 				directoryName,
 				fileName,
 				terminal
-			)) {
+			) ) {
 			issues.Add(
 				new TermInfoDatabaseCatalogIssue(
 					TermInfoDatabaseCatalogIssueKind.InvalidPlacement,
@@ -375,8 +375,8 @@ public static partial class TermInfoDatabaseInspector {
 		CompiledTermInfoParserOptions parserOptions,
 		CancellationToken cancellationToken
 	) {
-		ArgumentException.ThrowIfNullOrWhiteSpace(path);
-		ArgumentNullException.ThrowIfNull(parserOptions);
+		ArgumentException.ThrowIfNullOrWhiteSpace( path );
+		ArgumentNullException.ThrowIfNull( parserOptions );
 
 		using FileStream stream =
 			new(
@@ -390,7 +390,7 @@ public static partial class TermInfoDatabaseInspector {
 
 		long length =
 			stream.Length;
-		if (length > parserOptions.MaximumEntrySize) {
+		if ( length > parserOptions.MaximumEntrySize ) {
 			throw new CompiledTermInfoFormatException(
 				"The compiled entry is "
 				+ $"{length} bytes, exceeding the configured maximum of "
@@ -402,7 +402,7 @@ public static partial class TermInfoDatabaseInspector {
 			new byte[(int)length];
 		int offset = 0;
 
-		while (offset < entry.Length) {
+		while ( offset < entry.Length ) {
 			cancellationToken.ThrowIfCancellationRequested();
 
 			int read =
@@ -411,7 +411,7 @@ public static partial class TermInfoDatabaseInspector {
 					offset,
 					entry.Length - offset
 				);
-			if (read == 0) {
+			if ( read == 0 ) {
 				throw new IOException(
 					$"Compiled terminfo entry '{path}' changed length while it was being read."
 				);
@@ -422,7 +422,7 @@ public static partial class TermInfoDatabaseInspector {
 
 		cancellationToken.ThrowIfCancellationRequested();
 
-		if (stream.ReadByte() != -1) {
+		if ( stream.ReadByte() != -1 ) {
 			throw new IOException(
 				$"Compiled terminfo entry '{path}' changed length while it was being read."
 			);
@@ -451,11 +451,11 @@ public static partial class TermInfoDatabaseInspector {
 	private static string GetRequiredFileName(
 		string path
 	) {
-		ArgumentException.ThrowIfNullOrWhiteSpace(path);
+		ArgumentException.ThrowIfNullOrWhiteSpace( path );
 
 		string? fileName =
-			Path.GetFileName(path);
-		if (string.IsNullOrEmpty(fileName)) {
+			Path.GetFileName( path );
+		if ( string.IsNullOrEmpty( fileName ) ) {
 			throw new InvalidOperationException(
 				$"The filesystem path '{path}' does not identify a file or directory name."
 			);
@@ -469,34 +469,34 @@ public static partial class TermInfoDatabaseInspector {
 		string fileName,
 		TerminalDescription terminal
 	) {
-		ArgumentException.ThrowIfNullOrWhiteSpace(directoryName);
-		ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
-		ArgumentNullException.ThrowIfNull(terminal);
+		ArgumentException.ThrowIfNullOrWhiteSpace( directoryName );
+		ArgumentException.ThrowIfNullOrWhiteSpace( fileName );
+		ArgumentNullException.ThrowIfNull( terminal );
 
-		if (!DeclaresIdentity(
+		if ( !DeclaresIdentity(
 				terminal,
 				fileName
-			)) {
+			) ) {
 			return false;
 		}
 
 		StringComparison pathComparison =
-			OperatingSystem.IsWindows()
+			( OperatingSystem.IsWindows() )
 				? StringComparison.OrdinalIgnoreCase
 				: StringComparison.Ordinal
 		;
 
 		string literalDirectory =
 			fileName[0].ToString();
-		if (string.Equals(
+		if ( string.Equals(
 				directoryName,
 				literalDirectory,
 				pathComparison
-			)) {
+			) ) {
 			return true;
 		}
 
-		if (fileName[0] > byte.MaxValue) {
+		if ( fileName[0] > byte.MaxValue ) {
 			return false;
 		}
 
@@ -517,14 +517,14 @@ public static partial class TermInfoDatabaseInspector {
 		TerminalDescription terminal,
 		string name
 	) {
-		ArgumentNullException.ThrowIfNull(terminal);
-		ArgumentException.ThrowIfNullOrWhiteSpace(name);
+		ArgumentNullException.ThrowIfNull( terminal );
+		ArgumentException.ThrowIfNullOrWhiteSpace( name );
 
-		if (string.Equals(
+		if ( string.Equals(
 				terminal.Name,
 				name,
 				StringComparison.Ordinal
-			)) {
+			) ) {
 			return true;
 		}
 
@@ -541,15 +541,15 @@ public static partial class TermInfoDatabaseInspector {
 	internal static bool IsConventionalCatalogDirectoryName(
 		string name
 	) {
-		ArgumentNullException.ThrowIfNull(name);
+		ArgumentNullException.ThrowIfNull( name );
 
-		if (name.Length == 1) {
-			return !char.IsSurrogate(name[0]);
+		if ( name.Length == 1 ) {
+			return !char.IsSurrogate( name[0] );
 		}
 
 		return name.Length == 2
-			&& IsHexDigit(name[0])
-			&& IsHexDigit(name[1]);
+			&& IsHexDigit( name[0] )
+			&& IsHexDigit( name[1] );
 	}
 
 	internal static bool IsCatalogReparsePoint(
@@ -561,9 +561,9 @@ public static partial class TermInfoDatabaseInspector {
 	internal static TermInfoDatabaseCatalogIssueKind ClassifyCatalogIoException(
 		Exception exception
 	) {
-		ArgumentNullException.ThrowIfNull(exception);
+		ArgumentNullException.ThrowIfNull( exception );
 
-		return exception is UnauthorizedAccessException
+		return ( exception is UnauthorizedAccessException )
 			? TermInfoDatabaseCatalogIssueKind.PermissionFailure
 			: TermInfoDatabaseCatalogIssueKind.IoFailure
 		;
@@ -574,14 +574,14 @@ public static partial class TermInfoDatabaseInspector {
 		Exception exception,
 		string subject
 	) {
-		ArgumentException.ThrowIfNullOrWhiteSpace(path);
-		ArgumentNullException.ThrowIfNull(exception);
-		ArgumentException.ThrowIfNullOrWhiteSpace(subject);
+		ArgumentException.ThrowIfNullOrWhiteSpace( path );
+		ArgumentNullException.ThrowIfNull( exception );
+		ArgumentException.ThrowIfNullOrWhiteSpace( subject );
 
 		TermInfoDatabaseCatalogIssueKind kind =
-			ClassifyCatalogIoException(exception);
+			ClassifyCatalogIoException( exception );
 		string message =
-			kind == TermInfoDatabaseCatalogIssueKind.PermissionFailure
+			( kind == TermInfoDatabaseCatalogIssueKind.PermissionFailure )
 				? $"Access to the {subject} was denied."
 				: $"The {subject} could not be inspected because of an I/O failure."
 		;

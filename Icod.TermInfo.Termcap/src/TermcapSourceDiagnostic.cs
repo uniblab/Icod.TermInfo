@@ -3,8 +3,7 @@ namespace Icod.TermInfo.Termcap;
 /// <summary>
 /// Describes a deterministic termcap source parsing diagnostic.
 /// </summary>
-public sealed class TermcapSourceDiagnostic
-{
+public sealed class TermcapSourceDiagnostic {
 	internal TermcapSourceDiagnostic(
 		string code,
 		TermcapSourceDiagnosticSeverity severity,

@@ -5,105 +5,131 @@ using Xunit;
 
 namespace Icod.TermInfo.Tests;
 
-public sealed class T40ApiPackageFreezeTests
-{
+public sealed class T40ApiPackageFreezeTests {
 	[Fact]
-	public void CompiledParserSurfaceIsFrozen()
-	{
+	public void CompiledParserSurfaceIsFrozen() {
 		Assert.Equal(
 			1_048_576,
-			CompiledTermInfoParserOptions.DefaultMaximumEntrySize);
+			CompiledTermInfoParserOptions.DefaultMaximumEntrySize
+		);
 		Assert.Equal(
 			16_777_216,
-			CompiledTermInfoParserOptions.MaximumSupportedEntrySize);
+			CompiledTermInfoParserOptions.MaximumSupportedEntrySize
+		);
 
 		ConstructorInfo optionsConstructor =
 			Assert.Single(
-				typeof(CompiledTermInfoParserOptions)
+				typeof( CompiledTermInfoParserOptions )
 					.GetConstructors(
 						BindingFlags.Public
-						| BindingFlags.Instance));
+						| BindingFlags.Instance
+					)
+			);
 		ParameterInfo maximumEntrySize =
 			Assert.Single(
-				optionsConstructor.GetParameters());
+				optionsConstructor.GetParameters()
+			);
 
 		Assert.Equal(
-			typeof(int),
-			maximumEntrySize.ParameterType);
+			typeof( int ),
+			maximumEntrySize.ParameterType
+		);
 		Assert.True(
-			maximumEntrySize.HasDefaultValue);
+			maximumEntrySize.HasDefaultValue
+		);
 		Assert.Equal(
 			CompiledTermInfoParserOptions.DefaultMaximumEntrySize,
-			maximumEntrySize.DefaultValue);
+			maximumEntrySize.DefaultValue
+		);
 
 		PropertyInfo maximum =
 			Assert.Single(
-				typeof(CompiledTermInfoParserOptions)
+				typeof( CompiledTermInfoParserOptions )
 					.GetProperties(
 						BindingFlags.Public
 						| BindingFlags.Instance
-						| BindingFlags.DeclaredOnly));
+						| BindingFlags.DeclaredOnly
+					)
+			);
 		Assert.Equal(
-			nameof(CompiledTermInfoParserOptions.MaximumEntrySize),
-			maximum.Name);
+			nameof( CompiledTermInfoParserOptions.MaximumEntrySize ),
+			maximum.Name
+		);
 		Assert.Equal(
-			typeof(int),
-			maximum.PropertyType);
+			typeof( int ),
+			maximum.PropertyType
+		);
 		Assert.True(
-			maximum.CanRead);
+			maximum.CanRead
+		);
 		Assert.False(
-			maximum.CanWrite);
+			maximum.CanWrite
+		);
 
 		Assert.True(
-			typeof(CompiledTermInfoParser).IsAbstract);
+			typeof( CompiledTermInfoParser ).IsAbstract
+		);
 		Assert.True(
-			typeof(CompiledTermInfoParser).IsSealed);
+			typeof( CompiledTermInfoParser ).IsSealed
+		);
 
 		MethodInfo parse =
 			Assert.Single(
-				typeof(CompiledTermInfoParser)
+				typeof( CompiledTermInfoParser )
 					.GetMethods(
 						BindingFlags.Public
 						| BindingFlags.Static
-						| BindingFlags.DeclaredOnly));
+						| BindingFlags.DeclaredOnly
+					)
+			);
 		Assert.Equal(
-			nameof(CompiledTermInfoParser.Parse),
-			parse.Name);
+			nameof( CompiledTermInfoParser.Parse ),
+			parse.Name
+		);
 		Assert.Equal(
-			typeof(TerminalDescription),
-			parse.ReturnType);
+			typeof( TerminalDescription ),
+			parse.ReturnType
+		);
 
 		ParameterInfo[] parameters =
 			parse.GetParameters();
 		Assert.Equal(
 			2,
-			parameters.Length);
+			parameters.Length
+		);
 		Assert.Equal(
-			typeof(ReadOnlySpan<byte>),
-			parameters[0].ParameterType);
+			typeof( ReadOnlySpan<byte> ),
+			parameters[0].ParameterType
+		);
 		Assert.Equal(
-			typeof(CompiledTermInfoParserOptions),
-			parameters[1].ParameterType);
+			typeof( CompiledTermInfoParserOptions ),
+			parameters[1].ParameterType
+		);
 		Assert.True(
-			parameters[1].HasDefaultValue);
+			parameters[1].HasDefaultValue
+		);
 		Assert.Null(
-			parameters[1].DefaultValue);
+			parameters[1].DefaultValue
+		);
 	}
 
 	[Fact]
-	public void CompiledFormatExceptionSurfaceIsFrozen()
-	{
+	public void CompiledFormatExceptionSurfaceIsFrozen() {
 		Assert.True(
-			typeof(FormatException).IsAssignableFrom(
-				typeof(CompiledTermInfoFormatException)));
+			typeof( FormatException ).IsAssignableFrom(
+				typeof( CompiledTermInfoFormatException )
+			)
+		);
 		Assert.True(
-			typeof(CompiledTermInfoFormatException).IsSealed);
+			typeof( CompiledTermInfoFormatException ).IsSealed
+		);
 
 		string[] constructorShapes =
-			typeof(CompiledTermInfoFormatException)
+			typeof( CompiledTermInfoFormatException )
 				.GetConstructors(
 					BindingFlags.Public
-					| BindingFlags.Instance)
+					| BindingFlags.Instance
+				)
 				.Select(
 					constructor =>
 						string.Join(
@@ -112,145 +138,174 @@ public sealed class T40ApiPackageFreezeTests
 								.GetParameters()
 								.Select(
 									parameter =>
-										parameter.ParameterType.Name)))
+										parameter.ParameterType.Name
+								)
+						)
+				)
 				.OrderBy(
 					value => value,
-					StringComparer.Ordinal)
+					StringComparer.Ordinal
+				)
 				.ToArray();
 
 		Assert.Equal(
-			new[]
-			{
+			new[] {
 				string.Empty,
 				"String",
 				"String,Exception",
 			},
-			constructorShapes);
+			constructorShapes
+		);
 
 		PropertyInfo[] properties =
-			typeof(CompiledTermInfoFormatException)
+			typeof( CompiledTermInfoFormatException )
 				.GetProperties(
 					BindingFlags.Public
 					| BindingFlags.Instance
-					| BindingFlags.DeclaredOnly);
+					| BindingFlags.DeclaredOnly
+				);
 
 		Assert.Equal(
-			new[]
-			{
+			new[] {
 				"Offset",
 				"Section",
 			},
 			properties
 				.Select(
-					property => property.Name)
+					property => property.Name
+				)
 				.OrderBy(
 					name => name,
-					StringComparer.Ordinal)
-				.ToArray());
+					StringComparer.Ordinal
+				)
+				.ToArray()
+		);
 		Assert.All(
 			properties,
-			property =>
-			{
+			property => {
 				Assert.True(
-					property.CanRead);
+					property.CanRead
+				);
 				Assert.False(
-					property.CanWrite);
-			});
+					property.CanWrite
+				);
+			}
+		);
 	}
 
 	[Fact]
-	public void DirectoryProviderSurfaceIsFrozen()
-	{
+	public void DirectoryProviderSurfaceIsFrozen() {
 		Assert.True(
-			typeof(ITerminalDescriptionProvider).IsAssignableFrom(
-				typeof(DirectoryTerminalDescriptionProvider)));
+			typeof( ITerminalDescriptionProvider ).IsAssignableFrom(
+				typeof( DirectoryTerminalDescriptionProvider )
+			)
+		);
 
 		ConstructorInfo constructor =
 			Assert.Single(
-				typeof(DirectoryTerminalDescriptionProvider)
+				typeof( DirectoryTerminalDescriptionProvider )
 					.GetConstructors(
 						BindingFlags.Public
-						| BindingFlags.Instance));
+						| BindingFlags.Instance
+					)
+			);
 		ParameterInfo[] parameters =
 			constructor.GetParameters();
 
 		Assert.Equal(
 			2,
-			parameters.Length);
+			parameters.Length
+		);
 		Assert.Equal(
-			typeof(string),
-			parameters[0].ParameterType);
+			typeof( string ),
+			parameters[0].ParameterType
+		);
 		Assert.Equal(
-			typeof(CompiledTermInfoParserOptions),
-			parameters[1].ParameterType);
+			typeof( CompiledTermInfoParserOptions ),
+			parameters[1].ParameterType
+		);
 		Assert.True(
-			parameters[1].HasDefaultValue);
+			parameters[1].HasDefaultValue
+		);
 		Assert.Null(
-			parameters[1].DefaultValue);
+			parameters[1].DefaultValue
+		);
 
 		PropertyInfo root =
 			Assert.Single(
-				typeof(DirectoryTerminalDescriptionProvider)
+				typeof( DirectoryTerminalDescriptionProvider )
 					.GetProperties(
 						BindingFlags.Public
 						| BindingFlags.Instance
-						| BindingFlags.DeclaredOnly));
+						| BindingFlags.DeclaredOnly
+					)
+			);
 		Assert.Equal(
-			nameof(DirectoryTerminalDescriptionProvider.Root),
-			root.Name);
+			nameof( DirectoryTerminalDescriptionProvider.Root ),
+			root.Name
+		);
 		Assert.Equal(
-			typeof(string),
-			root.PropertyType);
+			typeof( string ),
+			root.PropertyType
+		);
 		Assert.True(
-			root.CanRead);
+			root.CanRead
+		);
 		Assert.False(
-			root.CanWrite);
+			root.CanWrite
+		);
 
 		AssertProviderTryLoadContract(
-			typeof(DirectoryTerminalDescriptionProvider));
+			typeof( DirectoryTerminalDescriptionProvider )
+		);
 	}
 
 	[Fact]
-	public void SystemProviderAndOptionsSurfaceIsFrozen()
-	{
+	public void SystemProviderAndOptionsSurfaceIsFrozen() {
 		ConstructorInfo optionsConstructor =
 			Assert.Single(
-				typeof(SystemTerminalDescriptionProviderOptions)
+				typeof( SystemTerminalDescriptionProviderOptions )
 					.GetConstructors(
 						BindingFlags.Public
-						| BindingFlags.Instance));
+						| BindingFlags.Instance
+					)
+			);
 		ParameterInfo[] optionParameters =
 			optionsConstructor.GetParameters();
 
 		Assert.Equal(
 			4,
-			optionParameters.Length);
+			optionParameters.Length
+		);
 		Assert.Equal(
-			new[]
-			{
-				typeof(bool),
-				typeof(bool),
-				typeof(bool),
-				typeof(CompiledTermInfoParserOptions),
+			new[] {
+				typeof( bool ),
+				typeof( bool ),
+				typeof( bool ),
+				typeof( CompiledTermInfoParserOptions ),
 			},
 			optionParameters
 				.Select(
-					parameter => parameter.ParameterType)
-				.ToArray());
+					parameter => parameter.ParameterType
+				)
+				.ToArray()
+		);
 		Assert.All(
 			optionParameters,
 			parameter => Assert.True(
-				parameter.HasDefaultValue));
+				parameter.HasDefaultValue
+			)
+		);
 
 		PropertyInfo[] optionProperties =
-			typeof(SystemTerminalDescriptionProviderOptions)
+			typeof( SystemTerminalDescriptionProviderOptions )
 				.GetProperties(
 					BindingFlags.Public
 					| BindingFlags.Instance
-					| BindingFlags.DeclaredOnly);
+					| BindingFlags.DeclaredOnly
+				);
 		Assert.Equal(
-			new[]
-			{
+			new[] {
 				"ParserOptions",
 				"UseEnvironment",
 				"UseSystemDatabases",
@@ -258,100 +313,121 @@ public sealed class T40ApiPackageFreezeTests
 			},
 			optionProperties
 				.Select(
-					property => property.Name)
+					property => property.Name
+				)
 				.OrderBy(
 					name => name,
-					StringComparer.Ordinal)
-				.ToArray());
+					StringComparer.Ordinal
+				)
+				.ToArray()
+		);
 		Assert.All(
 			optionProperties,
-			property =>
-			{
+			property => {
 				Assert.True(
-					property.CanRead);
+					property.CanRead
+				);
 				Assert.False(
-					property.CanWrite);
-			});
+					property.CanWrite
+				);
+			}
+		);
 
 		ConstructorInfo providerConstructor =
 			Assert.Single(
-				typeof(SystemTerminalDescriptionProvider)
+				typeof( SystemTerminalDescriptionProvider )
 					.GetConstructors(
 						BindingFlags.Public
-						| BindingFlags.Instance));
+						| BindingFlags.Instance
+					)
+			);
 		ParameterInfo options =
 			Assert.Single(
-				providerConstructor.GetParameters());
+				providerConstructor.GetParameters()
+			);
 
 		Assert.Equal(
-			typeof(SystemTerminalDescriptionProviderOptions),
-			options.ParameterType);
+			typeof( SystemTerminalDescriptionProviderOptions ),
+			options.ParameterType
+		);
 		Assert.True(
-			options.HasDefaultValue);
+			options.HasDefaultValue
+		);
 		Assert.Null(
-			options.DefaultValue);
+			options.DefaultValue
+		);
 
 		AssertProviderTryLoadContract(
-			typeof(SystemTerminalDescriptionProvider));
+			typeof( SystemTerminalDescriptionProvider )
+		);
 	}
 
 	[Fact]
-	public void AcquisitionNullabilityContractsAreFrozen()
-	{
+	public void AcquisitionNullabilityContractsAreFrozen() {
 		NullabilityInfoContext context =
 			new();
 
 		MethodInfo parse =
 			Assert.Single(
-				typeof(CompiledTermInfoParser)
+				typeof( CompiledTermInfoParser )
 					.GetMethods(
 						BindingFlags.Public
 						| BindingFlags.Static
-						| BindingFlags.DeclaredOnly));
+						| BindingFlags.DeclaredOnly
+					)
+			);
 		ParameterInfo parserOptions =
 			parse.GetParameters()[1];
 		Assert.Equal(
 			NullabilityState.Nullable,
-			context.Create(parserOptions).ReadState);
+			context.Create( parserOptions ).ReadState
+		);
 
 		ConstructorInfo directoryConstructor =
 			Assert.Single(
-				typeof(DirectoryTerminalDescriptionProvider)
-					.GetConstructors());
+				typeof( DirectoryTerminalDescriptionProvider )
+					.GetConstructors()
+			);
 		Assert.Equal(
 			NullabilityState.Nullable,
 			context
 				.Create(
-					directoryConstructor.GetParameters()[1])
-				.ReadState);
+					directoryConstructor.GetParameters()[1]
+				)
+				.ReadState
+		);
 
 		ConstructorInfo systemConstructor =
 			Assert.Single(
-				typeof(SystemTerminalDescriptionProvider)
-					.GetConstructors());
+				typeof( SystemTerminalDescriptionProvider )
+					.GetConstructors()
+			);
 		Assert.Equal(
 			NullabilityState.Nullable,
 			context
 				.Create(
-					systemConstructor.GetParameters()[0])
-				.ReadState);
+					systemConstructor.GetParameters()[0]
+				)
+				.ReadState
+		);
 
 		PropertyInfo section =
-			typeof(CompiledTermInfoFormatException)
+			typeof( CompiledTermInfoFormatException )
 				.GetProperty(
-					nameof(CompiledTermInfoFormatException.Section))!;
+					nameof( CompiledTermInfoFormatException.Section )
+				)!;
 		Assert.Equal(
 			NullabilityState.Nullable,
-			context.Create(section).ReadState);
+			context.Create( section ).ReadState
+		);
 	}
 
 	[Fact]
-	public void AcquisitionProvidersExposeNoPublicCacheOrRefreshControl()
-	{
+	public void AcquisitionProvidersExposeNoPublicCacheOrRefreshControl() {
 		Type[] providers =
 		[
-			typeof(DirectoryTerminalDescriptionProvider),
-			typeof(SystemTerminalDescriptionProvider),
+			typeof( DirectoryTerminalDescriptionProvider ),
+			typeof( SystemTerminalDescriptionProvider ),
 		];
 		string[] forbiddenFragments =
 		[
@@ -361,14 +437,14 @@ public sealed class T40ApiPackageFreezeTests
 			"Reload",
 		];
 
-		foreach (Type provider in providers)
-		{
+		foreach ( Type provider in providers ) {
 			MemberInfo[] members =
 				provider.GetMembers(
 					BindingFlags.Public
 					| BindingFlags.Instance
 					| BindingFlags.Static
-					| BindingFlags.DeclaredOnly);
+					| BindingFlags.DeclaredOnly
+				);
 
 			Assert.DoesNotContain(
 				members,
@@ -377,66 +453,82 @@ public sealed class T40ApiPackageFreezeTests
 						fragment =>
 							member.Name.Contains(
 								fragment,
-								StringComparison.Ordinal)));
+								StringComparison.Ordinal
+							)
+					)
+			);
 		}
 	}
 
 	[Fact]
-	public void TerminalDatabaseCompositionContractIsFrozen()
-	{
+	public void TerminalDatabaseCompositionContractIsFrozen() {
 		Assert.True(
-			typeof(ITerminalDescriptionProvider).IsAssignableFrom(
-				typeof(TerminalDatabase)));
+			typeof( ITerminalDescriptionProvider ).IsAssignableFrom(
+				typeof( TerminalDatabase )
+			)
+		);
 
 		ITerminalDescriptionProvider builtIn =
 			TerminalDatabase.BuiltIn;
 		Assert.True(
 			builtIn.TryLoad(
 				"xterm",
-				out TerminalDescription? terminal));
+				out TerminalDescription? terminal
+			)
+		);
 		Assert.Same(
 			TerminalProfiles.Xterm,
-			terminal);
+			terminal
+		);
 	}
 
 	private static void AssertProviderTryLoadContract(
-		Type providerType)
-	{
-		ArgumentNullException.ThrowIfNull(providerType);
+		Type providerType
+	) {
+		ArgumentNullException.ThrowIfNull( providerType );
 
 		MethodInfo tryLoad =
 			Assert.Single(
 				providerType.GetMethods(
 					BindingFlags.Public
 					| BindingFlags.Instance
-					| BindingFlags.DeclaredOnly),
+					| BindingFlags.DeclaredOnly
+				),
 				method =>
 					string.Equals(
 						method.Name,
-						nameof(ITerminalDescriptionProvider.TryLoad),
-						StringComparison.Ordinal));
+						nameof( ITerminalDescriptionProvider.TryLoad ),
+						StringComparison.Ordinal
+					)
+			);
 		ParameterInfo[] parameters =
 			tryLoad.GetParameters();
 
 		Assert.Equal(
-			typeof(bool),
-			tryLoad.ReturnType);
+			typeof( bool ),
+			tryLoad.ReturnType
+		);
 		Assert.Equal(
 			2,
-			parameters.Length);
+			parameters.Length
+		);
 		Assert.Equal(
-			typeof(string),
-			parameters[0].ParameterType);
+			typeof( string ),
+			parameters[0].ParameterType
+		);
 		Assert.Equal(
-			typeof(TerminalDescription).MakeByRefType(),
-			parameters[1].ParameterType);
+			typeof( TerminalDescription ).MakeByRefType(),
+			parameters[1].ParameterType
+		);
 
 		NotNullWhenAttribute? notNullWhen =
 			parameters[1]
 				.GetCustomAttribute<NotNullWhenAttribute>();
 		Assert.NotNull(
-			notNullWhen);
+			notNullWhen
+		);
 		Assert.True(
-			notNullWhen!.ReturnValue);
+			notNullWhen!.ReturnValue
+		);
 	}
 }

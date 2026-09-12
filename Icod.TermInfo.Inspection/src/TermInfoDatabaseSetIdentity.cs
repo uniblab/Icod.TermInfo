@@ -9,21 +9,21 @@ public sealed class TermInfoDatabaseSetIdentity {
 		string name,
 		IEnumerable<TermInfoDatabaseSetOccurrence> occurrences
 	) {
-		ArgumentException.ThrowIfNullOrWhiteSpace(name);
-		ArgumentNullException.ThrowIfNull(occurrences);
+		ArgumentException.ThrowIfNullOrWhiteSpace( name );
+		ArgumentNullException.ThrowIfNull( occurrences );
 
 		TermInfoDatabaseSetOccurrence[] occurrenceArray =
 			occurrences.ToArray();
-		if (occurrenceArray.Length == 0) {
+		if ( occurrenceArray.Length == 0 ) {
 			throw new ArgumentException(
 				"A database-set identity must contain at least one occurrence.",
-				nameof(occurrences)
+				nameof( occurrences )
 			);
 		}
-		if (occurrenceArray.Any(occurrence => occurrence is null)) {
+		if ( occurrenceArray.Any( occurrence => occurrence is null ) ) {
 			throw new ArgumentException(
 				"A database-set identity occurrence collection cannot contain null.",
-				nameof(occurrences)
+				nameof( occurrences )
 			);
 		}
 		if (
@@ -37,12 +37,12 @@ public sealed class TermInfoDatabaseSetIdentity {
 		) {
 			throw new ArgumentException(
 				"Every occurrence must declare the database-set canonical identity.",
-				nameof(occurrences)
+				nameof( occurrences )
 			);
 		}
 
 		Name = name;
-		Occurrences = Array.AsReadOnly(occurrenceArray);
+		Occurrences = Array.AsReadOnly( occurrenceArray );
 	}
 
 	/// <summary>

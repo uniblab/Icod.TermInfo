@@ -298,19 +298,21 @@ internal static class InfoCmpComparisonRenderer {
 		TermInfoCapabilityValue? left = difference.LeftCapabilityValue;
 		TermInfoCapabilityValue? right = difference.RightCapabilityValue;
 		string leftText =
-			left.HasValue
+			( left.HasValue )
 				? FormatCapabilityValue(
 					left.Value,
 					includeKind: difference.Kind == TermInfoDifferenceKind.DifferentValueKind
 				)
-				: FormatMissingCapabilityValue( right );
+				: FormatMissingCapabilityValue( right )
+		;
 		string rightText =
-			right.HasValue
+			( right.HasValue )
 				? FormatCapabilityValue(
 					right.Value,
 					includeKind: difference.Kind == TermInfoDifferenceKind.DifferentValueKind
 				)
-				: FormatMissingCapabilityValue( left );
+				: FormatMissingCapabilityValue( left )
+		;
 
 		return $"{difference.CapabilityName}: {leftText}, {rightText}.";
 	}
@@ -521,10 +523,13 @@ internal static class InfoCmpComparisonRenderer {
 	private static string FormatMissingCapabilityValue(
 		TermInfoCapabilityValue? otherValue
 	) {
-		return otherValue.HasValue
+		return (
+			otherValue.HasValue
 			&& otherValue.Value.Kind == TermInfoCapabilityValueKind.Boolean
-				? "F"
-				: "NULL";
+		)
+			? "F"
+			: "NULL"
+		;
 	}
 
 	private static string FormatCapabilityValue(
@@ -533,7 +538,7 @@ internal static class InfoCmpComparisonRenderer {
 	) {
 		string formatted = value.Kind switch {
 			TermInfoCapabilityValueKind.Boolean =>
-				value.BooleanValue
+				( value.BooleanValue )
 					? "T"
 					: "F",
 			TermInfoCapabilityValueKind.Number =>

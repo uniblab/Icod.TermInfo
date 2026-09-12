@@ -3,98 +3,119 @@ using Xunit;
 
 namespace Icod.TermInfo.Tests;
 
-public sealed class T41CompletionGateTests
-{
+public sealed class T41CompletionGateTests {
 	[Fact]
-	public void SupportedCompiledEntryFlowsThroughParserProvidersAndBuiltInFallback()
-	{
+	public void SupportedCompiledEntryFlowsThroughParserProvidersAndBuiltInFallback() {
 		byte[] entry =
 			ReadFixture(
-				"compiled/t29-legacy-minimal.bin");
+				"compiled/t29-legacy-minimal.bin"
+			);
 		TerminalDescription parsed =
 			CompiledTermInfoParser.Parse(
-				entry);
+				entry
+			);
 
 		Assert.Equal(
 			"t29-legacy-minimal",
-			parsed.Name);
+			parsed.Name
+		);
 		Assert.Equal<int?>(
 			80,
 			parsed.GetNumber(
-				NumericCapability.Columns));
+				NumericCapability.Columns
+			)
+		);
 
 		using TemporaryDirectory temporary = new();
 
 		WriteLiteralCandidate(
 			temporary.Root,
 			parsed.Name,
-			entry);
+			entry
+		);
 
 		DirectoryTerminalDescriptionProvider explicitProvider =
 			new(
-				temporary.Root);
+				temporary.Root
+			);
 
 		Assert.True(
 			explicitProvider.TryLoad(
 				parsed.Name,
-				out TerminalDescription? explicitTerminal));
+				out TerminalDescription? explicitTerminal
+			)
+		);
 		Assert.NotNull(
-			explicitTerminal);
+			explicitTerminal
+		);
 		Assert.Equal(
 			parsed.Name,
-			explicitTerminal!.Name);
+			explicitTerminal!.Name
+		);
 
 		SystemTerminalDescriptionProviderOptions options =
 			new(
 				useEnvironment: true,
 				useUserDatabase: false,
-				useSystemDatabases: false);
+				useSystemDatabases: false
+			);
 		SystemTerminalDiscoverySnapshot snapshot =
 			new(
 				termInfo: temporary.Root,
 				termInfoDirs: null,
 				homeDirectory: null,
 				currentDirectory: temporary.Root,
-				platform: TerminalHostPlatform.Linux);
+				platform: TerminalHostPlatform.Linux
+			);
 		SystemTerminalDescriptionProvider systemProvider =
 			new(
 				options,
 				snapshot,
-				Array.Empty<string>());
+				Array.Empty<string>()
+			);
 		TerminalDatabase database =
 			new(
-				new ITerminalDescriptionProvider[]
-				{
+				new ITerminalDescriptionProvider[] {
 					systemProvider,
 					TerminalDatabase.BuiltIn,
-				});
+				}
+			);
 
 		Assert.True(
 			database.TryLoad(
 				parsed.Name,
-				out TerminalDescription? systemTerminal));
+				out TerminalDescription? systemTerminal
+			)
+		);
 		Assert.NotNull(
-			systemTerminal);
+			systemTerminal
+		);
 		Assert.Equal<int?>(
 			80,
 			systemTerminal!.GetNumber(
-				NumericCapability.Columns));
+				NumericCapability.Columns
+			)
+		);
 
 		Assert.Same(
 			TerminalProfiles.Xterm,
 			database.Load(
-				"xterm"));
+				"xterm"
+			)
+		);
 		Assert.False(
 			TerminalDatabase.BuiltIn.TryLoad(
 				parsed.Name,
-				out TerminalDescription? leaked));
+				out TerminalDescription? leaked
+			)
+		);
 		Assert.Null(
-			leaked);
+			leaked
+		);
 	}
 
 	[Fact]
-	public void ReleaseWorkflowBoundaryIsFrozen()
-	{
+	public void ReleaseWorkflowBoundaryIsFrozen() {
 		string root =
 			FindRepositoryRoot();
 		string main =
@@ -104,7 +125,10 @@ public sealed class T41CompletionGateTests
 						root,
 						".github",
 						"workflows",
-						"main.yaml")));
+						"main.yaml"
+					)
+				)
+			);
 		string pullRequest =
 			NormalizeLineEndings(
 				File.ReadAllText(
@@ -112,7 +136,10 @@ public sealed class T41CompletionGateTests
 						root,
 						".github",
 						"workflows",
-						"pull-request.yaml")));
+						"pull-request.yaml"
+					)
+				)
+			);
 		string release =
 			NormalizeLineEndings(
 				File.ReadAllText(
@@ -120,7 +147,10 @@ public sealed class T41CompletionGateTests
 						root,
 						".github",
 						"workflows",
-						"release.yaml")));
+						"release.yaml"
+					)
+				)
+			);
 
 		Assert.StartsWith(
 			"name: main\n"
@@ -129,53 +159,68 @@ public sealed class T41CompletionGateTests
 			+ "  push:\n"
 			+ "    branches:\n"
 			+ "      - main\n",
-			main);
+			main
+		);
 		Assert.DoesNotContain(
 			"pull_request:",
-			main);
+			main
+		);
 		Assert.Contains(
 			"CONFIGURATION: Release",
-			main);
+			main
+		);
 		Assert.Contains(
 			"windows-11-arm",
-			main);
+			main
+		);
 		Assert.Contains(
 			"ubuntu-24.04-arm",
-			main);
+			main
+		);
 		Assert.Contains(
 			"macos-15-intel",
-			main);
+			main
+		);
 		Assert.Contains(
 			"./packaging/PackPackages.ps1",
-			main);
+			main
+		);
 		Assert.Contains(
 			"./packaging/VerifyPackageArtifact.ps1",
-			main);
+			main
+		);
 		Assert.Contains(
 			"./packaging/BuildToolArchives.ps1",
-			main);
+			main
+		);
 
 		Assert.StartsWith(
 			"name: pull-request\n"
 			+ "\n"
 			+ "on:\n"
 			+ "  pull_request:\n",
-			pullRequest);
+			pullRequest
+		);
 		Assert.Contains(
 			"CONFIGURATION: Staging",
-			pullRequest);
+			pullRequest
+		);
 		Assert.Contains(
 			"./packaging/PackPackages.ps1",
-			pullRequest);
+			pullRequest
+		);
 		Assert.Contains(
 			"./packaging/VerifyPackageArtifact.ps1",
-			pullRequest);
+			pullRequest
+		);
 		Assert.Contains(
 			"./packaging/BuildToolArchives.ps1",
-			pullRequest);
+			pullRequest
+		);
 		Assert.DoesNotContain(
 			"CONFIGURATION: Release",
-			pullRequest);
+			pullRequest
+		);
 
 		Assert.StartsWith(
 			"name: release\n"
@@ -184,31 +229,40 @@ public sealed class T41CompletionGateTests
 			+ "  push:\n"
 			+ "    tags:\n"
 			+ "      - 'v*'\n",
-			release);
+			release
+		);
 		Assert.Contains(
 			"Require tagged commit in main",
-			release);
+			release
+		);
 		Assert.Contains(
 			"git merge-base --is-ancestor $env:GITHUB_SHA origin/main",
-			release);
+			release
+		);
 		Assert.Contains(
 			"Validate tag and suite version",
-			release);
+			release
+		);
 		Assert.Contains(
 			"./packaging/PackPackages.ps1",
-			release);
+			release
+		);
 		Assert.Contains(
 			"./packaging/BuildToolArchives.ps1",
-			release);
+			release
+		);
 		Assert.Contains(
 			"NuGet/login@v1",
-			release);
+			release
+		);
 		Assert.Contains(
 			"dotnet nuget push",
-			release);
+			release
+		);
 		Assert.Contains(
 			"gh @arguments",
-			release);
+			release
+		);
 
 		string[] forbiddenPublicationFragments =
 		[
@@ -218,38 +272,42 @@ public sealed class T41CompletionGateTests
 			"id-token: write",
 		];
 
-		foreach (string workflow in new[] { pullRequest, main })
-		{
-			foreach (string fragment in forbiddenPublicationFragments)
-			{
+		foreach ( string workflow in new[] { pullRequest, main } ) {
+			foreach ( string fragment in forbiddenPublicationFragments ) {
 				Assert.False(
 					workflow.Contains(
 						fragment,
-						StringComparison.Ordinal),
-					$"Non-publishing workflow contains forbidden publication fragment '{fragment}'.");
+						StringComparison.Ordinal
+					),
+					$"Non-publishing workflow contains forbidden publication fragment '{fragment}'."
+				);
 			}
 		}
 	}
 
-	private static string FindRepositoryRoot()
-	{
+	private static string FindRepositoryRoot() {
 		DirectoryInfo? current =
 			new(
-				AppContext.BaseDirectory);
+				AppContext.BaseDirectory
+			);
 
-		while (current is not null)
-		{
-			if (File.Exists(
+		while ( current is not null ) {
+			if (
+				File.Exists(
 					Path.Combine(
 						current.FullName,
-						"Icod.TermInfo.csproj"))
+						"Icod.TermInfo.csproj"
+					)
+				)
 				&& File.Exists(
 					Path.Combine(
 						current.FullName,
 						".github",
 						"workflows",
-						"main.yaml")))
-			{
+						"main.yaml"
+					)
+				)
+			) {
 				return current.FullName;
 			}
 
@@ -258,27 +316,30 @@ public sealed class T41CompletionGateTests
 		}
 
 		throw new InvalidOperationException(
-			"Unable to locate the Icod.TermInfo repository root.");
+			"Unable to locate the Icod.TermInfo repository root."
+		);
 	}
 
 	private static string NormalizeLineEndings(
-		string value)
-	{
-		ArgumentNullException.ThrowIfNull(value);
+		string value
+	) {
+		ArgumentNullException.ThrowIfNull( value );
 
 		return value
 			.Replace(
 				"\r\n",
-				"\n")
+				"\n"
+			)
 			.Replace(
 				'\r',
-				'\n');
+				'\n'
+			);
 	}
 
 	private static byte[] ReadFixture(
-		string relativePath)
-	{
-		ArgumentNullException.ThrowIfNull(relativePath);
+		string relativePath
+	) {
+		ArgumentNullException.ThrowIfNull( relativePath );
 
 		return File.ReadAllBytes(
 			Path.Combine(
@@ -287,61 +348,69 @@ public sealed class T41CompletionGateTests
 				"compiled-terminfo",
 				relativePath.Replace(
 					'/',
-					Path.DirectorySeparatorChar)));
+					Path.DirectorySeparatorChar
+				)
+			)
+		);
 	}
 
 	private static string WriteLiteralCandidate(
 		string root,
 		string name,
-		byte[] entry)
-	{
-		ArgumentNullException.ThrowIfNull(root);
-		ArgumentNullException.ThrowIfNull(name);
-		ArgumentNullException.ThrowIfNull(entry);
+		byte[] entry
+	) {
+		ArgumentNullException.ThrowIfNull( root );
+		ArgumentNullException.ThrowIfNull( name );
+		ArgumentNullException.ThrowIfNull( entry );
 
 		string directory =
 			Path.Combine(
 				root,
-				name[0].ToString());
+				name[0].ToString()
+			);
 		Directory.CreateDirectory(
-			directory);
+			directory
+		);
 
 		string path =
 			Path.Combine(
 				directory,
-				name);
+				name
+			);
 		File.WriteAllBytes(
 			path,
-			entry);
+			entry
+		);
 		return path;
 	}
 
-	private sealed class TemporaryDirectory : IDisposable
-	{
-		internal TemporaryDirectory()
-		{
+	private sealed class TemporaryDirectory : IDisposable {
+		internal TemporaryDirectory() {
 			Root =
 				Path.Combine(
 					Path.GetTempPath(),
 					"icod-terminfo-t41-"
-					+ Guid.NewGuid().ToString("N"));
+					+ Guid.NewGuid().ToString( "N" )
+				);
 			Directory.CreateDirectory(
-				Root);
+				Root
+			);
 		}
 
-		internal string Root
-		{
+		internal string Root {
 			get;
 		}
 
-		public void Dispose()
-		{
-			if (Directory.Exists(
-					Root))
-			{
+		public void Dispose() {
+			if (
+				Directory.Exists(
+					Root
+				)
+			) {
 				Directory.Delete(
 					Root,
-					recursive: true);
+					recursive: true
+				);
 			}
 		}
 	}

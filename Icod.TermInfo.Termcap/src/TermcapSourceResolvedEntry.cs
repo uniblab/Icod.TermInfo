@@ -11,8 +11,7 @@ namespace Icod.TermInfo.Termcap;
 /// The effective fields remain termcap source fields. TC03 does not convert
 /// them into Runtime capability identities or a <c>TerminalDescription</c>.
 /// </remarks>
-public sealed class TermcapSourceResolvedEntry
-{
+public sealed class TermcapSourceResolvedEntry {
 	private readonly IReadOnlyDictionary<string, TermcapSourceResolvedField> _byCapabilityName;
 
 	internal TermcapSourceResolvedEntry(

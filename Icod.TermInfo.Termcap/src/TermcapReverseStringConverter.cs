@@ -3,8 +3,7 @@ using System.Text;
 
 namespace Icod.TermInfo.Termcap;
 
-internal static class TermcapReverseStringConverter
-{
+internal static class TermcapReverseStringConverter {
 	private const int MaximumTransformDepth = 16;
 
 	internal static bool TryConvert(
@@ -936,10 +935,9 @@ internal static class TermcapReverseStringConverter
 		string First,
 		string Second,
 		int Current
-	)
-	{
+	) {
 		internal string CurrentExpression =>
-			Current == 0
+			( Current == 0 )
 				? First
 				: Second
 		;
@@ -977,7 +975,7 @@ internal static class TermcapReverseStringConverter
 		) {
 			ArgumentNullException.ThrowIfNull( transform );
 
-			return Current == 0
+			return ( Current == 0 )
 				? new ParameterState(
 					transform( First ),
 					Second,

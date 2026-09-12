@@ -506,7 +506,7 @@ public sealed class TC08DifferentialValidationTests {
 		ArgumentNullException.ThrowIfNull( result );
 
 		string fields =
-			result.Entry is null
+			( result.Entry is null )
 				? string.Empty
 				: string.Join(
 					",",
@@ -607,10 +607,10 @@ public sealed class TC08DifferentialValidationTests {
 			string name
 		) {
 			ArgumentException.ThrowIfNullOrWhiteSpace( name );
-			return _values.TryGetValue(
+			return ( _values.TryGetValue(
 				name,
 				out string? value
-			)
+			) )
 				? value
 				: null
 			;

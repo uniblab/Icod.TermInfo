@@ -518,9 +518,10 @@ public sealed class RP02PlanningTests {
 		ArgumentNullException.ThrowIfNull( options );
 
 		TerminalDescriptionSourceSynthesisParent[] parents =
-			parent is null
+			( parent is null )
 				? []
-				: [ parent ];
+				: [ parent ]
+		;
 		string source;
 		try {
 			source =
@@ -553,9 +554,10 @@ public sealed class RP02PlanningTests {
 				field => field.Kind == TermInfoSourceFieldKind.CancelledCapability
 			);
 		int[] selectedCandidateIndices =
-			candidateIndex.HasValue
+			( candidateIndex.HasValue )
 				? [ candidateIndex.Value ]
-				: [];
+				: []
+		;
 		TerminalDescriptionSourcePlanningScore score =
 			new(
 				localDirectiveCount,

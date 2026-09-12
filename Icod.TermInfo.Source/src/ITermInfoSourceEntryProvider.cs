@@ -18,12 +18,12 @@ namespace Icod.TermInfo.Source;
 /// into clean misses.
 /// </para>
 /// </remarks>
-public interface ITermInfoSourceEntryProvider
-{
-    /// <summary>
-    /// Attempts to load an unresolved source entry by canonical name or alias.
-    /// </summary>
-    bool TryLoad(
-        string name,
-        [NotNullWhen(true)] out TermInfoSourceEntry? entry);
+public interface ITermInfoSourceEntryProvider {
+	/// <summary>
+	/// Attempts to load an unresolved source entry by canonical name or alias.
+	/// </summary>
+	bool TryLoad(
+		string name,
+		[NotNullWhen( true )] out TermInfoSourceEntry? entry
+	);
 }

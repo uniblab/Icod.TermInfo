@@ -117,11 +117,12 @@ public static class PersistentRasterLifecyclePlanner {
 		}
 
 		PersistentRasterLifecyclePlanStatus planStatus =
-			hasUnsupported
+			( hasUnsupported )
 				? PersistentRasterLifecyclePlanStatus.Impossible
-				: hasUncertain
+				: ( hasUncertain )
 					? PersistentRasterLifecyclePlanStatus.Indeterminate
-					: PersistentRasterLifecyclePlanStatus.Success;
+					: PersistentRasterLifecyclePlanStatus.Success
+		;
 		if ( planStatus == PersistentRasterLifecyclePlanStatus.Impossible ) {
 			return new PersistentRasterLifecyclePlan(
 				planStatus,

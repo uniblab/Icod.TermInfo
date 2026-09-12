@@ -7,8 +7,7 @@ namespace Icod.TermInfo.Termcap;
 /// Contains the outcome of explicit termcap acquisition, inheritance resolution,
 /// and Runtime semantic conversion.
 /// </summary>
-public sealed class TermcapAcquisitionResult
-{
+public sealed class TermcapAcquisitionResult {
 	internal TermcapAcquisitionResult(
 		TerminalDescription? description,
 		TermcapAcquisitionSource? source,

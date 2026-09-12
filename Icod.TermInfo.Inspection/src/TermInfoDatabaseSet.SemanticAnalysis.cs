@@ -52,9 +52,10 @@ public sealed partial class TermInfoDatabaseSet {
 							shadow.Entry.Terminal
 						);
 					TermInfoDatabaseSetSemanticRelationship shadowRelationship =
-						comparison.AreEqual
+						( comparison.AreEqual )
 							? TermInfoDatabaseSetSemanticRelationship.SemanticallyEqual
-							: TermInfoDatabaseSetSemanticRelationship.SemanticallyDifferent;
+							: TermInfoDatabaseSetSemanticRelationship.SemanticallyDifferent
+					;
 					hasDifference |= !comparison.AreEqual;
 					shadows.Add(
 						new TermInfoDatabaseSetShadowAnalysis(
@@ -169,9 +170,10 @@ public sealed partial class TermInfoDatabaseSet {
 					.Where( index => index <= firstDatabaseIndex )
 					.ToArray();
 			TermInfoDatabaseSetOccurrence? precedenceOwner =
-				blockingDatabaseIndices.Length == 0
+				( blockingDatabaseIndices.Length == 0 )
 					? occurrences[ 0 ]
-					: null;
+					: null
+			;
 
 			bool hasCanonicalOwnershipConflict =
 				canonicalNames.Length > 1

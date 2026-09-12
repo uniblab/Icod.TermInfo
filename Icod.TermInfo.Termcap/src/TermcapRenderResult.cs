@@ -6,8 +6,7 @@ namespace Icod.TermInfo.Termcap;
 /// Contains deterministic termcap source when reverse rendering succeeds, or the
 /// complete preflight diagnostics when it cannot be performed losslessly.
 /// </summary>
-public sealed class TermcapRenderResult
-{
+public sealed class TermcapRenderResult {
 	internal TermcapRenderResult(
 		string? text,
 		IEnumerable<TermcapRenderDiagnostic> diagnostics

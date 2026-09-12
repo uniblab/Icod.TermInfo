@@ -15,10 +15,10 @@ public sealed class RL01PersistentRasterLifecycleContractTests {
 			},
 			Enum.GetValues<PersistentRasterLifecycleSupportStatus>()
 		);
-		Assert.Equal(0, (int)PersistentRasterLifecycleSupportStatus.Unknown);
-		Assert.Equal(1, (int)PersistentRasterLifecycleSupportStatus.Supported);
-		Assert.Equal(2, (int)PersistentRasterLifecycleSupportStatus.Unsupported);
-		Assert.Equal(3, (int)PersistentRasterLifecycleSupportStatus.Contradicted);
+		Assert.Equal( 0, (int)PersistentRasterLifecycleSupportStatus.Unknown );
+		Assert.Equal( 1, (int)PersistentRasterLifecycleSupportStatus.Supported );
+		Assert.Equal( 2, (int)PersistentRasterLifecycleSupportStatus.Unsupported );
+		Assert.Equal( 3, (int)PersistentRasterLifecycleSupportStatus.Contradicted );
 	}
 
 	[Fact]
@@ -34,11 +34,11 @@ public sealed class RL01PersistentRasterLifecycleContractTests {
 			},
 			Enum.GetValues<PersistentRasterLifecycleOperation>()
 		);
-		Assert.Equal(0, (int)PersistentRasterLifecycleOperation.DisplayEphemeral);
-		Assert.Equal(1, (int)PersistentRasterLifecycleOperation.UploadResource);
-		Assert.Equal(2, (int)PersistentRasterLifecycleOperation.CreatePlacement);
-		Assert.Equal(3, (int)PersistentRasterLifecycleOperation.UpdatePlacement);
-		Assert.Equal(4, (int)PersistentRasterLifecycleOperation.DeletePlacement);
-		Assert.Equal(5, (int)PersistentRasterLifecycleOperation.DeleteResource);
+		Assert.Equal( 0, (int)PersistentRasterLifecycleOperation.DisplayEphemeral );
+		Assert.Equal( 1, (int)PersistentRasterLifecycleOperation.UploadResource );
+		Assert.Equal( 2, (int)PersistentRasterLifecycleOperation.CreatePlacement );
+		Assert.Equal( 3, (int)PersistentRasterLifecycleOperation.UpdatePlacement );
+		Assert.Equal( 4, (int)PersistentRasterLifecycleOperation.DeletePlacement );
+		Assert.Equal( 5, (int)PersistentRasterLifecycleOperation.DeleteResource );
 	}
 }

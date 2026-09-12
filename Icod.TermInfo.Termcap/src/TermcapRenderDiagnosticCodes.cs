@@ -4,8 +4,7 @@ namespace Icod.TermInfo.Termcap;
 /// Defines stable diagnostic codes emitted by termcap representability analysis
 /// and reverse rendering.
 /// </summary>
-public static class TermcapRenderDiagnosticCodes
-{
+public static class TermcapRenderDiagnosticCodes {
 	/// <summary>Terminal header metadata cannot be represented without changing its meaning.</summary>
 	public const string HeaderNotRepresentable = "TREN0001";
 	/// <summary>A Runtime standard capability has no unambiguous adopted termcap spelling.</summary>

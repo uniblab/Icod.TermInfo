@@ -9,13 +9,13 @@ public sealed class TermInfoDatabaseCatalogEntry {
 		string path,
 		TerminalDescription terminal
 	) {
-		ArgumentException.ThrowIfNullOrWhiteSpace(path);
-		ArgumentNullException.ThrowIfNull(terminal);
+		ArgumentException.ThrowIfNullOrWhiteSpace( path );
+		ArgumentNullException.ThrowIfNull( terminal );
 
-		if (!System.IO.Path.IsPathFullyQualified(path)) {
+		if ( !System.IO.Path.IsPathFullyQualified( path ) ) {
 			throw new ArgumentException(
 				"A catalog entry path must be fully qualified.",
-				nameof(path)
+				nameof( path )
 			);
 		}
 

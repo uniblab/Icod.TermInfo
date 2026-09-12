@@ -3,8 +3,7 @@ namespace Icod.TermInfo.Termcap;
 /// <summary>
 /// Controls resource limits for termcap source parsing.
 /// </summary>
-public sealed class TermcapSourceParserOptions
-{
+public sealed class TermcapSourceParserOptions {
 	/// <summary>
 	/// Gets the default maximum accepted source length in UTF-16 code units.
 	/// </summary>

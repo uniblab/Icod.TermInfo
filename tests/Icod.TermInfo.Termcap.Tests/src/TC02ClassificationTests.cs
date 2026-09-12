@@ -4,8 +4,7 @@ using Xunit;
 
 namespace Icod.TermInfo.Termcap.Tests;
 
-public sealed class TC02ClassificationTests
-{
+public sealed class TC02ClassificationTests {
 	[Fact]
 	public void StandardBooleanMapsToRuntimeIdentity() {
 		TermcapCapabilityClassificationResult classification =

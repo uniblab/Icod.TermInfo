@@ -10,8 +10,7 @@ namespace Icod.TermInfo.Termcap;
 /// canonical-name, alias, or prose-description semantics. Those interpretations
 /// belong to the later termcap semantic-model tranche.
 /// </remarks>
-public sealed class TermcapSourceEntry
-{
+public sealed class TermcapSourceEntry {
 	internal TermcapSourceEntry(
 		IEnumerable<string> names,
 		IEnumerable<TermcapSourceField> fields,

@@ -9,8 +9,7 @@ namespace Icod.TermInfo.Termcap;
 /// opt-in caller decision and can be tested without mutating process-global
 /// environment state.
 /// </remarks>
-public interface ITermcapEnvironmentProvider
-{
+public interface ITermcapEnvironmentProvider {
 	/// <summary>
 	/// Gets one environment variable value, or <see langword="null"/> when it is
 	/// not defined.

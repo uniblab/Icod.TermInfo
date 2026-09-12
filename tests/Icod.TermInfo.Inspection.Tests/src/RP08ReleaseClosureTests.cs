@@ -23,23 +23,29 @@ public sealed class RP08ReleaseClosureTests {
 		Assert.True( exportedTypes.Length >= 29 );
 		Assert.Contains(
 			typeof( TerminalDescriptionSourcePlan ),
-			exportedTypes );
+			exportedTypes
+		);
 		Assert.Contains(
 			typeof( TerminalDescriptionSourcePlanner ),
-			exportedTypes );
+			exportedTypes
+		);
 		Assert.Contains(
 			typeof( TerminalDescriptionSourcePlanningOptions ),
-			exportedTypes );
+			exportedTypes
+		);
 		Assert.Contains(
 			typeof( TerminalDescriptionSourcePlanningScore ),
-			exportedTypes );
+			exportedTypes
+		);
 
 		string baseline =
 			File.ReadAllText(
 				Path.Combine(
 					FindRepositoryRoot(),
 					"docs",
-					"1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt" ) );
+					"1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt"
+				)
+			);
 		Assert.Equal(
 			29,
 			baseline
@@ -47,23 +53,30 @@ public sealed class RP08ReleaseClosureTests {
 				.Count(
 					line => line.StartsWith(
 						"TYPE ",
-						StringComparison.Ordinal ) ) );
+						StringComparison.Ordinal
+					)
+				)
+		);
 		Assert.Contains(
 			"TerminalDescriptionSourcePlanner [static]",
 			baseline,
-			StringComparison.Ordinal );
+			StringComparison.Ordinal
+		);
 		Assert.Contains(
 			"DefaultMaximumEvaluatedPlanCount",
 			baseline,
-			StringComparison.Ordinal );
+			StringComparison.Ordinal
+		);
 		Assert.Contains(
 			"PlanFromDirectory",
 			baseline,
-			StringComparison.Ordinal );
+			StringComparison.Ordinal
+		);
 		Assert.Contains(
 			"# AssemblyVersion: 1.0.0.0",
 			baseline,
-			StringComparison.Ordinal );
+			StringComparison.Ordinal
+		);
 	}
 
 	[Fact]
@@ -73,18 +86,22 @@ public sealed class RP08ReleaseClosureTests {
 				Path.Combine(
 					FindRepositoryRoot(),
 					"docs",
-					"1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt" ) )
+					"1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt"
+				)
+			)
 				.Replace( "\r\n", "\n", StringComparison.Ordinal )
 				.Replace( '\r', '\n' );
 		string sha256 =
 			Convert.ToHexString(
 				SHA256.HashData(
-					Encoding.UTF8.GetBytes( baseline ) )
+					Encoding.UTF8.GetBytes( baseline )
+				)
 			).ToLowerInvariant();
 
 		Assert.Equal(
 			HistoricalOneSevenBaselineSha256,
-			sha256 );
+			sha256
+		);
 	}
 
 	[Fact]
@@ -96,39 +113,48 @@ public sealed class RP08ReleaseClosureTests {
 				Path.Combine(
 					".github",
 					"scripts",
-					"verify-release-package.sh" ),
+					"verify-release-package.sh"
+				),
 				Path.Combine(
 					".github",
 					"scripts",
-					"verify-release-package.cmd" ),
+					"verify-release-package.cmd"
+				),
 			}
 		) {
 			string verifier =
 				File.ReadAllText(
 					Path.Combine(
 						root,
-						relativePath ) );
+						relativePath
+					)
+				);
 
 			Assert.Contains(
 				"1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt",
 				verifier,
-				StringComparison.OrdinalIgnoreCase );
+				StringComparison.OrdinalIgnoreCase
+			);
 			Assert.Contains(
 				"1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt",
 				verifier,
-				StringComparison.OrdinalIgnoreCase );
+				StringComparison.OrdinalIgnoreCase
+			);
 			Assert.Contains(
 				"MI07",
 				verifier,
-				StringComparison.Ordinal );
+				StringComparison.Ordinal
+			);
 			Assert.Contains(
 				"--compare",
 				verifier,
-				StringComparison.Ordinal );
+				StringComparison.Ordinal
+			);
 			Assert.Contains(
 				"Icod.TermInfo.Inspection",
 				verifier,
-				StringComparison.Ordinal );
+				StringComparison.Ordinal
+			);
 		}
 	}
 
@@ -139,12 +165,15 @@ public sealed class RP08ReleaseClosureTests {
 				Path.Combine(
 					FindRepositoryRoot(),
 					"docs",
-					"1.8.0-RP08-API-PACKAGING-AND-RELEASE-CLOSURE.md" ) );
+					"1.8.0-RP08-API-PACKAGING-AND-RELEASE-CLOSURE.md"
+				)
+			);
 
 		Assert.Contains(
 			HistoricalDevelopmentVersion,
 			record,
-			StringComparison.Ordinal );
+			StringComparison.Ordinal
+		);
 		Assert.Contains( Rp07Head, record, StringComparison.Ordinal );
 		Assert.Contains( "LocalDirectiveCount", record, StringComparison.Ordinal );
 		Assert.Contains( "SelectedCandidateIndices", record, StringComparison.Ordinal );
@@ -162,7 +191,9 @@ public sealed class RP08ReleaseClosureTests {
 				Path.Combine(
 					FindRepositoryRoot(),
 					"docs",
-					"1.8.0-RELEASE-AUDIT.md" ) );
+					"1.8.0-RELEASE-AUDIT.md"
+				)
+			);
 
 		foreach (
 			string marker
@@ -187,7 +218,8 @@ public sealed class RP08ReleaseClosureTests {
 			Assert.Contains(
 				marker,
 				audit,
-				StringComparison.OrdinalIgnoreCase );
+				StringComparison.OrdinalIgnoreCase
+			);
 		}
 	}
 
@@ -198,30 +230,39 @@ public sealed class RP08ReleaseClosureTests {
 			File.ReadAllText(
 				Path.Combine(
 					root,
-					"Directory.Build.props" ) );
+					"Directory.Build.props"
+				)
+			);
 		string roadmap =
 			File.ReadAllText(
 				Path.Combine(
 					root,
-					"Icod.TermInfo-1.8.0-Relative-Source-Planning-and-Parent-Selection-Roadmap.md" ) );
+					"Icod.TermInfo-1.8.0-Relative-Source-Planning-and-Parent-Selection-Roadmap.md"
+				)
+			);
 		string activeRoadmap =
 			File.ReadAllText(
 				Path.Combine(
 					root,
-					"Icod.TermInfo-Post-1.0-Development-Roadmap.md" ) );
+					"Icod.TermInfo-Post-1.0-Development-Roadmap.md"
+				)
+			);
 
 		Assert.Contains(
 			DevelopmentVersion,
 			buildProperties,
-			StringComparison.Ordinal );
+			StringComparison.Ordinal
+		);
 		Assert.Contains(
 			"Stable 1.8.0 release contract frozen",
 			roadmap,
-			StringComparison.Ordinal );
+			StringComparison.Ordinal
+		);
 		Assert.Contains(
 			"DA06",
 			activeRoadmap,
-			StringComparison.Ordinal );
+			StringComparison.Ordinal
+		);
 	}
 
 	private static string FindRepositoryRoot() {
@@ -233,7 +274,9 @@ public sealed class RP08ReleaseClosureTests {
 				File.Exists(
 					Path.Combine(
 						directory.FullName,
-						"Icod.TermInfo.sln" ) )
+						"Icod.TermInfo.sln"
+					)
+				)
 			) {
 				return directory.FullName;
 			}
@@ -242,6 +285,7 @@ public sealed class RP08ReleaseClosureTests {
 		}
 
 		throw new InvalidOperationException(
-			"Repository root not found." );
+			"Repository root not found."
+		);
 	}
 }

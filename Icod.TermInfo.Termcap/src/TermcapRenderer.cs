@@ -8,8 +8,7 @@ namespace Icod.TermInfo.Termcap;
 /// Performs deterministic preflight analysis and lossless reverse rendering of
 /// Runtime terminal descriptions into conventional termcap source.
 /// </summary>
-public static class TermcapRenderer
-{
+public static class TermcapRenderer {
 	/// <summary>
 	/// Determines whether a Runtime terminal description can be represented by the
 	/// adopted TC05 termcap subset without emitting text.
@@ -173,7 +172,7 @@ public static class TermcapRenderer
 			) {
 				AddDiagnostic(
 					diagnostics,
-					parameterized
+					( parameterized )
 						? TermcapRenderDiagnosticCodes.ParameterProgramNotRepresentable
 						: TermcapRenderDiagnosticCodes.StringValueNotRepresentable,
 					error ?? $"Runtime string capability '{mapping.TermInfoShortName}' cannot be represented faithfully as termcap.",
@@ -634,8 +633,7 @@ public static class TermcapRenderer
 		);
 	}
 
-	private sealed class RenderPlan
-	{
+	private sealed class RenderPlan {
 		internal RenderPlan(
 			string? header,
 			IReadOnlyList<RenderField> fields,

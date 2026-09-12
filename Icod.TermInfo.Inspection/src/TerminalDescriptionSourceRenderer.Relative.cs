@@ -71,12 +71,13 @@ public static partial class TerminalDescriptionSourceRenderer {
 			int? targetValue =
 				plan.Target.GetNumber( metadata.Capability );
 			int? inheritedValue =
-				inherited.NumericCapabilities.TryGetValue(
+				( inherited.NumericCapabilities.TryGetValue(
 					metadata.Capability,
 					out int inheritedNumber
-				)
+				) )
 					? inheritedNumber
-					: null;
+					: null
+			;
 
 			if ( targetValue == inheritedValue ) {
 				continue;
@@ -110,12 +111,13 @@ public static partial class TerminalDescriptionSourceRenderer {
 			string? targetValue =
 				plan.Target.GetString( metadata.Capability );
 			string? inheritedValue =
-				inherited.StringCapabilities.TryGetValue(
+				( inherited.StringCapabilities.TryGetValue(
 					metadata.Capability,
 					out string? inheritedString
-				)
+				) )
 					? inheritedString
-					: null;
+					: null
+			;
 
 			if (
 				string.Equals(
@@ -325,13 +327,14 @@ public static partial class TerminalDescriptionSourceRenderer {
 			}
 
 			TermInfoCapabilityValue orderingValue =
-				targetPresent
+				( targetPresent )
 					? targetValue
-					: inheritedValue;
+					: inheritedValue
+			;
 			directives.Add(
 				new ExtendedRelativeDirective(
 					name,
-					targetPresent
+					( targetPresent )
 						? targetValue
 						: null,
 					GetExtendedKindOrder( orderingValue )

@@ -177,12 +177,13 @@ internal static class ToeSourceDependencyAnalyzer {
 					continue;
 				}
 
-				TermInfoSourceEntry? parent = identities.TryGetValue(
+				TermInfoSourceEntry? parent = ( identities.TryGetValue(
 					referenceName,
 					out TermInfoSourceEntry? resolvedParent
-				)
+				) )
 					? resolvedParent
-					: null;
+					: null
+				;
 				string parentName = parent?.CanonicalName ?? referenceName;
 				if ( !seenParents.Add( parentName ) ) {
 					continue;
@@ -253,7 +254,7 @@ internal static class ToeSourceDependencyAnalyzer {
 		var output = new StringBuilder();
 		foreach ( TermInfoSourceDiagnostic diagnostic in diagnostics ) {
 			TermInfoSourceSpan? span = diagnostic.Span;
-			string location = span is null
+			string location = ( span is null )
 				? "source"
 				: string.Concat(
 					span.SourceName ?? "source",
@@ -270,7 +271,7 @@ internal static class ToeSourceDependencyAnalyzer {
 				.Append( diagnostic.Code )
 				.Append( ' ' )
 				.Append(
-					diagnostic.Severity == TermInfoSourceDiagnosticSeverity.Error
+					( diagnostic.Severity == TermInfoSourceDiagnosticSeverity.Error )
 						? "error"
 						: "warning"
 				)
@@ -336,10 +337,12 @@ internal static class ToeSourceDependencyAnalyzer {
 				).ConfigureAwait( false );
 
 			return (
-				source.Length != 0
+				(
+					source.Length != 0
 					&& source[ 0 ] == '\uFEFF'
-						? source[ 1.. ]
-						: source,
+				)
+					? source[ 1.. ]
+					: source,
 				null
 			);
 		} catch ( DecoderFallbackException ) {

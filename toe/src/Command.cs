@@ -74,7 +74,7 @@ public static class Command {
 					).ConfigureAwait( false );
 				}
 
-				return dependency.HasOperationalFailure
+				return ( dependency.HasOperationalFailure )
 					? CommandExitCodes.Failure
 					: CommandExitCodes.Success
 				;
@@ -175,7 +175,7 @@ public static class Command {
 			}
 
 			if ( options.Json ) {
-				return options.Directories.Count == 1
+				return ( options.Directories.Count == 1 )
 					? await RenderCatalogAsync(
 						options.Directories[ 0 ],
 						stdout,
@@ -187,7 +187,8 @@ public static class Command {
 						stdout,
 						stderr,
 						cancellationToken
-					).ConfigureAwait( false );
+					).ConfigureAwait( false )
+				;
 			}
 
 			ToeListingResult listing = BuildListing(
@@ -211,7 +212,7 @@ public static class Command {
 				).ConfigureAwait( false );
 			}
 
-			return listing.HasOperationalFailure
+			return ( listing.HasOperationalFailure )
 				? CommandExitCodes.Failure
 				: CommandExitCodes.Success
 			;
@@ -481,9 +482,10 @@ public static class Command {
 		bool stopAfterFirstConventional = !explicitDirectories
 			&& !options.AllDatabases;
 		Dictionary<string, ToeDuplicateReference>? duplicateReferences =
-			options.AllDatabases && options.SortByName
+			( options.AllDatabases && options.SortByName )
 				? new Dictionary<string, ToeDuplicateReference>( StringComparer.Ordinal )
-				: null;
+				: null
+		;
 
 		foreach ( string root in roots ) {
 			cancellationToken.ThrowIfCancellationRequested();
@@ -567,9 +569,10 @@ public static class Command {
 							);
 					}
 
-					var namesInCurrentRoot = duplicateReferences is null
+					var namesInCurrentRoot = ( duplicateReferences is null )
 						? null
-						: new HashSet<string>( StringComparer.Ordinal );
+						: new HashSet<string>( StringComparer.Ordinal )
+					;
 					foreach ( TermInfoDatabaseCatalogEntry entry in entries ) {
 						cancellationToken.ThrowIfCancellationRequested();
 
