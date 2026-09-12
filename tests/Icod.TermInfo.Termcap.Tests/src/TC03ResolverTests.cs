@@ -4,8 +4,7 @@ using Xunit;
 
 namespace Icod.TermInfo.Termcap.Tests;
 
-public sealed class TC03ResolverTests
-{
+public sealed class TC03ResolverTests {
 	[Fact]
 	public void LocalFieldsOverrideInheritedFieldsAndPreserveProvenance() {
 		TermcapSourceDocument document =
@@ -363,8 +362,7 @@ public sealed class TC03ResolverTests
 		return result.Document;
 	}
 
-	private sealed class DictionaryEntryProvider : ITermcapSourceEntryProvider
-	{
+	private sealed class DictionaryEntryProvider : ITermcapSourceEntryProvider {
 		private readonly IReadOnlyDictionary<string, TermcapSourceEntry> _entries;
 
 		internal DictionaryEntryProvider(
@@ -398,8 +396,7 @@ public sealed class TC03ResolverTests
 		}
 	}
 
-	private sealed class InvalidProvider : ITermcapSourceEntryProvider
-	{
+	private sealed class InvalidProvider : ITermcapSourceEntryProvider {
 		private readonly TermcapSourceEntry _entry;
 
 		internal InvalidProvider(
