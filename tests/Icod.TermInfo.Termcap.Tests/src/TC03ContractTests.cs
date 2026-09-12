@@ -155,6 +155,7 @@ public sealed class TC03ContractTests {
 						current.FullName,
 						"Icod.TermInfo.sln"
 					)
+				)
 			) {
 				return current.FullName;
 			}
