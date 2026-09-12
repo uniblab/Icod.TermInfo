@@ -91,10 +91,10 @@ public sealed class S04ContractTests {
 	public void UnresolvedModelDoesNotExposeTerminalDescriptionState() {
 		Type[] modelTypes =
 		[
-			typeof(TermInfoSourceDocument),
-			typeof(TermInfoSourceEntry),
-			typeof(TermInfoSourceField),
-			typeof(TermInfoSourceParseResult),
+			typeof( TermInfoSourceDocument ),
+			typeof( TermInfoSourceEntry ),
+			typeof( TermInfoSourceField ),
+			typeof( TermInfoSourceParseResult ),
 		];
 
 		Assert.DoesNotContain(
