@@ -3,8 +3,7 @@ using Xunit;
 
 namespace Icod.TermInfo.Termcap.Tests;
 
-public sealed class TC01ParserTests
-{
+public sealed class TC01ParserTests {
 	[Fact]
 	public void ParsesBasicTermcapEntryWithoutSemanticConversion() {
 		TermcapSourceParseResult result =
@@ -21,19 +20,16 @@ public sealed class TC01ParserTests
 		);
 		Assert.Collection(
 			entry.Fields,
-			field =>
-			{
+			field => {
 				Assert.Equal( TermcapSourceFieldKind.BooleanCapability, field.Kind );
 				Assert.Equal( "am", field.CapabilityName );
 			},
-			field =>
-			{
+			field => {
 				Assert.Equal( TermcapSourceFieldKind.NumericCapability, field.Kind );
 				Assert.Equal( "co", field.CapabilityName );
 				Assert.Equal( 80, field.NumericValue );
 			},
-			field =>
-			{
+			field => {
 				Assert.Equal( TermcapSourceFieldKind.StringCapability, field.Kind );
 				Assert.Equal( "cl", field.CapabilityName );
 				Assert.Equal( "\x1b[H\x1b[2J", field.StringValue );
