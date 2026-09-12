@@ -1,360 +1,377 @@
-using System.Text;
 using Icod.TermInfo;
 using Xunit;
 
 namespace Icod.TermInfo.Tests;
 
-public sealed class TermInfoOutputTests
-{
-    [Fact]
-    public void IgnoreModeStripsPaddingWithoutDelaying()
-    {
-        using StringWriter writer = new();
-        RecordingDelayProvider delayProvider = new();
+public sealed class TermInfoOutputTests {
+	[Fact]
+	public void IgnoreModeStripsPaddingAndPreservesPayload() {
+		StringWriter writer = new();
 
-        TermInfoOutput.TPuts(
-            "A$<2>B$<3*/>C",
-            4,
-            writer,
-            PaddingMode.Ignore,
-            delayProvider);
+		TermInfoOutput.TPuts(
+			"A$<5>B$<2.5/>C$<1*>D",
+			affectedLines: 3,
+			writer,
+			PaddingMode.Ignore
+		);
 
-        Assert.Equal("ABC", writer.ToString());
-        Assert.Empty(delayProvider.Delays);
-    }
+		Assert.Equal( "ABCD", writer.ToString() );
+	}
 
-    [Fact]
-    public void DelayModeInvokesDelaysInOutputOrder()
-    {
-        using StringWriter writer = new();
-        RecordingDelayProvider delayProvider = new();
+	[Fact]
+	public void SleepModeUsesDelayProviderAndMultiplier() {
+		StringWriter writer = new();
+		RecordingDelayProvider delayProvider = new();
 
-        TermInfoOutput.TPuts(
-            "A$<2>B$<3*/>C$<1.5/>D",
-            4,
-            writer,
-            PaddingMode.Delay,
-            delayProvider);
+		TermInfoOutput.TPuts(
+			"A$<5>B$<2.5/>C$<1*>D",
+			affectedLines: 3,
+			writer,
+			PaddingMode.Sleep,
+			delayProvider
+		);
 
-        Assert.Equal("ABCD", writer.ToString());
-        Assert.Collection(
-            delayProvider.Delays,
-            delay =>
-            {
-                Assert.Equal(TimeSpan.FromMilliseconds(2), delay.Duration);
-                Assert.False(delay.IsMandatory);
-            },
-            delay =>
-            {
-                Assert.Equal(TimeSpan.FromMilliseconds(12), delay.Duration);
-                Assert.True(delay.IsMandatory);
-            },
-            delay =>
-            {
-                Assert.Equal(TimeSpan.FromMilliseconds(1.5), delay.Duration);
-                Assert.True(delay.IsMandatory);
-            });
-    }
+		Assert.Equal( "ABCD", writer.ToString() );
+		Assert.Equal(
+			new[] {
+				TimeSpan.FromMilliseconds( 5 ),
+				TimeSpan.FromMilliseconds( 2.5 ),
+				TimeSpan.FromMilliseconds( 3 ),
+			},
+			delayProvider.Delays
+		);
+	}
 
-    [Fact]
-    public void MultiplicativePaddingUsesAffectedLineCount()
-    {
-        using StringWriter writer = new();
-        RecordingDelayProvider delayProvider = new();
+	[Fact]
+	public void MultiplierWithZeroAffectedLinesProducesNoDelay() {
+		StringWriter writer = new();
+		RecordingDelayProvider delayProvider = new();
 
-        TermInfoOutput.TPuts(
-            "A$<2.5*>B",
-            3,
-            writer,
-            PaddingMode.Delay,
-            delayProvider);
+		TermInfoOutput.TPuts(
+			"A$<10*>B",
+			affectedLines: 0,
+			writer,
+			PaddingMode.Sleep,
+			delayProvider
+		);
 
-        TermInfoDelay delay = Assert.Single(delayProvider.Delays);
-        Assert.Equal(TimeSpan.FromMilliseconds(7.5), delay.Duration);
-        Assert.False(delay.IsMandatory);
-    }
+		Assert.Equal( "AB", writer.ToString() );
+		Assert.Empty( delayProvider.Delays );
+	}
 
-    [Fact]
-    public void ZeroAffectedLinesProducesZeroMultiplicativeDelay()
-    {
-        using StringWriter writer = new();
-        RecordingDelayProvider delayProvider = new();
+	[Theory]
+	[InlineData( "unterminated $<5", "Unterminated padding annotation." )]
+	[InlineData( "$<>" , "Padding duration is missing." )]
+	[InlineData( "$<x>", "Padding duration is invalid." )]
+	[InlineData( "$<1..2>", "Padding duration is invalid." )]
+	[InlineData( "$<1**>", "Padding annotation has an invalid modifier." )]
+	[InlineData( "$<1x>", "Padding annotation has an invalid modifier." )]
+	public void MalformedPaddingIsRejected(
+		string value,
+		string expectedMessage
+	) {
+		StringWriter writer = new();
 
-        TermInfoOutput.TPuts(
-            "$<5*>",
-            0,
-            writer,
-            PaddingMode.Delay,
-            delayProvider);
+		TermInfoPaddingFormatException exception =
+			Assert.Throws<TermInfoPaddingFormatException>(
+				() => TermInfoOutput.TPuts(
+					value,
+					affectedLines: 1,
+					writer,
+					PaddingMode.Ignore
+				)
+			);
 
-        TermInfoDelay delay = Assert.Single(delayProvider.Delays);
-        Assert.Equal(TimeSpan.Zero, delay.Duration);
-    }
+		Assert.Contains(
+			expectedMessage,
+			exception.Message,
+			StringComparison.Ordinal
+		);
+	}
 
-    [Fact]
-    public void DelayIsCappedAtThirtySeconds()
-    {
-        using StringWriter writer = new();
-        RecordingDelayProvider delayProvider = new();
+	[Fact]
+	public void NonPaddingDollarSyntaxIsPreserved() {
+		StringWriter writer = new();
 
-        TermInfoOutput.TPuts(
-            "$<20000*>",
-            2,
-            writer,
-            PaddingMode.Delay,
-            delayProvider);
+		TermInfoOutput.TPuts(
+			"price:$5;literal:$<not-padding?",
+			affectedLines: 1,
+			writer,
+			PaddingMode.Ignore
+		);
 
-        TermInfoDelay delay = Assert.Single(delayProvider.Delays);
-        Assert.Equal(TimeSpan.FromSeconds(30), delay.Duration);
-    }
+		Assert.Equal( "price:$5;literal:$<not-padding?", writer.ToString() );
+	}
 
-    [Fact]
-    public void PutPUsesOneAffectedLine()
-    {
-        using StringWriter writer = new();
-        RecordingDelayProvider delayProvider = new();
+	[Fact]
+	public void PutPUsesSingleAffectedLine() {
+		StringWriter writer = new();
+		RecordingDelayProvider delayProvider = new();
 
-        TermInfoOutput.PutP(
-            "A$<4*>B",
-            writer,
-            PaddingMode.Delay,
-            delayProvider);
+		TermInfoOutput.PutP(
+			"A$<4*>B",
+			writer,
+			PaddingMode.Sleep,
+			delayProvider
+		);
 
-        Assert.Equal("AB", writer.ToString());
-        TermInfoDelay delay = Assert.Single(delayProvider.Delays);
-        Assert.Equal(TimeSpan.FromMilliseconds(4), delay.Duration);
-    }
+		Assert.Equal( "AB", writer.ToString() );
+		Assert.Single( delayProvider.Delays );
+		Assert.Equal(
+			TimeSpan.FromMilliseconds( 4 ),
+			delayProvider.Delays[0]
+		);
+	}
 
-    [Fact]
-    public void CharacterCallbackReceivesOnlyTerminalCharacters()
-    {
-        List<char> characters = [];
+	[Fact]
+	public void CallbackOverloadPreservesPayload() {
+		List<char> output = [];
 
-        TermInfoOutput.TPuts(
-            "A$<5>B",
-            1,
-            characters.Add);
+		TermInfoOutput.TPuts(
+			"A$<5>B",
+			affectedLines: 2,
+			output.Add,
+			PaddingMode.Ignore
+		);
 
-        Assert.Equal("AB", new string(characters.ToArray()));
-    }
+		Assert.Equal( "AB", new string( output.ToArray() ) );
+	}
 
-    [Fact]
-    public void StreamOutputUsesCallerSuppliedEncoding()
-    {
-        using MemoryStream stream = new();
+	[Fact]
+	public void CallbackOverloadValidatesCallback() {
+		Assert.Throws<ArgumentNullException>(
+			() => TermInfoOutput.TPuts(
+				"value",
+				affectedLines: 1,
+				(Action<char>)null!,
+				PaddingMode.Ignore
+			)
+		);
+	}
 
-        TermInfoOutput.TPuts(
-            "\x1b[A$<2>é",
-            1,
-            stream,
-            Encoding.UTF8);
+	[Fact]
+	public void AsyncWriterOverloadUsesAsyncDelayProvider() {
+		StringWriter writer = new();
+		RecordingDelayProvider delayProvider = new();
 
-        Assert.Equal(
-            Encoding.UTF8.GetBytes("\x1b[Aé"),
-            stream.ToArray());
-    }
+		TermInfoOutput.TPutsAsync(
+			"A$<3>B$<2*>C",
+			affectedLines: 4,
+			writer,
+			PaddingMode.Sleep,
+			delayProvider
+		).GetAwaiter().GetResult();
 
-    [Fact]
-    public async Task AsyncTextWriterUsesAsyncDelayProvider()
-    {
-        using StringWriter writer = new();
-        RecordingDelayProvider delayProvider = new();
+		Assert.Equal( "ABC", writer.ToString() );
+		Assert.Equal(
+			new[] {
+				TimeSpan.FromMilliseconds( 3 ),
+				TimeSpan.FromMilliseconds( 8 ),
+			},
+			delayProvider.AsyncDelays
+		);
+		Assert.Empty( delayProvider.Delays );
+	}
 
-        await TermInfoOutput.TPutsAsync(
-            "A$<2.5/>B",
-            1,
-            writer,
-            PaddingMode.Delay,
-            delayProvider);
+	[Fact]
+	public void AsyncPutPUsesSingleAffectedLine() {
+		StringWriter writer = new();
+		RecordingDelayProvider delayProvider = new();
 
-        Assert.Equal("AB", writer.ToString());
-        Assert.Equal(0, delayProvider.SynchronousDelayCount);
-        Assert.Equal(1, delayProvider.AsynchronousDelayCount);
+		TermInfoOutput.PutPAsync(
+			"A$<4*>B",
+			writer,
+			PaddingMode.Sleep,
+			delayProvider
+		).GetAwaiter().GetResult();
 
-        TermInfoDelay delay = Assert.Single(delayProvider.Delays);
-        Assert.Equal(TimeSpan.FromMilliseconds(2.5), delay.Duration);
-        Assert.True(delay.IsMandatory);
-    }
+		Assert.Equal( "AB", writer.ToString() );
+		Assert.Single( delayProvider.AsyncDelays );
+		Assert.Equal(
+			TimeSpan.FromMilliseconds( 4 ),
+			delayProvider.AsyncDelays[0]
+		);
+	}
 
-    [Fact]
-    public async Task AsyncStreamWritesBytesAndDelaysWithoutSleeping()
-    {
-        using MemoryStream stream = new();
-        RecordingDelayProvider delayProvider = new();
+	[Fact]
+	public void AsyncCancellationIsObservedBeforeOutput() {
+		StringWriter writer = new();
+		using CancellationTokenSource source = new();
+		source.Cancel();
 
-        await TermInfoOutput.TPutsAsync(
-            "A$<3>B",
-            1,
-            stream,
-            Encoding.ASCII,
-            PaddingMode.Delay,
-            delayProvider);
+		Assert.Throws<OperationCanceledException>(
+			() => TermInfoOutput.TPutsAsync(
+				"payload",
+				affectedLines: 1,
+				writer,
+				PaddingMode.Ignore,
+				cancellationToken: source.Token
+			).GetAwaiter().GetResult()
+		);
 
-        Assert.Equal(Encoding.ASCII.GetBytes("AB"), stream.ToArray());
-        Assert.Equal(1, delayProvider.AsynchronousDelayCount);
-        Assert.Single(delayProvider.Delays);
-    }
+		Assert.Equal( string.Empty, writer.ToString() );
+	}
 
-    [Fact]
-    public async Task PutPAsyncUsesOneAffectedLine()
-    {
-        using StringWriter writer = new();
-        RecordingDelayProvider delayProvider = new();
+	[Fact]
+	public void AsyncSleepCancellationCanInterruptDelay() {
+		StringWriter writer = new();
+		RecordingDelayProvider delayProvider = new() {
+			CancelAsync = true,
+		};
 
-        await TermInfoOutput.PutPAsync(
-            "A$<6*>B",
-            writer,
-            PaddingMode.Delay,
-            delayProvider);
+		Assert.Throws<OperationCanceledException>(
+			() => TermInfoOutput.TPutsAsync(
+				"A$<10>B",
+				affectedLines: 1,
+				writer,
+				PaddingMode.Sleep,
+				delayProvider
+			).GetAwaiter().GetResult()
+		);
 
-        Assert.Equal("AB", writer.ToString());
-        TermInfoDelay delay = Assert.Single(delayProvider.Delays);
-        Assert.Equal(TimeSpan.FromMilliseconds(6), delay.Duration);
-    }
+		Assert.Equal( "A", writer.ToString() );
+		Assert.Single( delayProvider.AsyncDelays );
+	}
 
-    [Fact]
-    public async Task AsyncOutputObservesCancellationBeforeWriting()
-    {
-        using StringWriter writer = new();
-        using CancellationTokenSource cancellation = new();
-        cancellation.Cancel();
+	[Fact]
+	public void SyncOutputFlushesBeforeDelay() {
+		RecordingWriter writer = new();
+		RecordingDelayProvider delayProvider = new() {
+			OnDelay = () => Assert.Equal( 1, writer.FlushCount ),
+		};
 
-        await Assert.ThrowsAsync<OperationCanceledException>(
-            async () => await TermInfoOutput.TPutsAsync(
-                "ABC",
-                1,
-                writer,
-                cancellationToken: cancellation.Token));
+		TermInfoOutput.TPuts(
+			"A$<1>B",
+			affectedLines: 1,
+			writer,
+			PaddingMode.Sleep,
+			delayProvider
+		);
 
-        Assert.Equal(string.Empty, writer.ToString());
-    }
+		Assert.Equal( "AB", writer.ToString() );
+		Assert.Equal( 1, writer.FlushCount );
+	}
 
-    [Fact]
-    public void OrdinaryDollarAndAngleCharactersArePreserved()
-    {
-        using StringWriter writer = new();
+	[Fact]
+	public void AsyncOutputFlushesBeforeDelay() {
+		RecordingWriter writer = new();
+		RecordingDelayProvider delayProvider = new() {
+			OnAsyncDelay = () => Assert.Equal( 1, writer.AsyncFlushCount ),
+		};
 
-        TermInfoOutput.TPuts(
-            "cost=$5 <tag> $",
-            1,
-            writer);
+		TermInfoOutput.TPutsAsync(
+			"A$<1>B",
+			affectedLines: 1,
+			writer,
+			PaddingMode.Sleep,
+			delayProvider
+		).GetAwaiter().GetResult();
 
-        Assert.Equal("cost=$5 <tag> $", writer.ToString());
-    }
+		Assert.Equal( "AB", writer.ToString() );
+		Assert.Equal( 1, writer.AsyncFlushCount );
+	}
 
-    [Theory]
-    [InlineData("$<>")]
-    [InlineData("$<.5>")]
-    [InlineData("$<5.>")]
-    [InlineData("$<5.00>")]
-    [InlineData("$<5x>")]
-    [InlineData("$<5**>")]
-    [InlineData("$<5//>")]
-    [InlineData("$<5")]
-    public void MalformedPaddingThrowsBeforeAnyOutput(string value)
-    {
-        using StringWriter writer = new();
+	[Theory]
+	[InlineData( -1 )]
+	[InlineData( -42 )]
+	public void NegativeAffectedLinesAreRejected( int affectedLines ) {
+		Assert.Throws<ArgumentOutOfRangeException>(
+			() => TermInfoOutput.TPuts(
+				"value",
+				affectedLines,
+				TextWriter.Null,
+				PaddingMode.Ignore
+			)
+		);
+	}
 
-        TermInfoPaddingFormatException exception =
-            Assert.Throws<TermInfoPaddingFormatException>(
-                () => TermInfoOutput.TPuts(
-                    $"prefix{value}suffix",
-                    1,
-                    writer));
+	[Fact]
+	public void UndefinedPaddingModeIsRejected() {
+		PaddingMode invalid = (PaddingMode)int.MaxValue;
 
-        Assert.True(exception.Position >= 0);
-        Assert.Equal(string.Empty, writer.ToString());
-    }
+		Assert.Throws<ArgumentOutOfRangeException>(
+			() => TermInfoOutput.TPuts(
+				"value",
+				affectedLines: 1,
+				TextWriter.Null,
+				invalid
+			)
+		);
+	}
 
-    [Fact]
-    public void BothPaddingSuffixesMayAppearTogether()
-    {
-        using StringWriter writer = new();
-        RecordingDelayProvider delayProvider = new();
+	[Fact]
+	public void NullInputsAreRejected() {
+		Assert.Throws<ArgumentNullException>(
+			() => TermInfoOutput.TPuts(
+				null!,
+				affectedLines: 1,
+				TextWriter.Null,
+				PaddingMode.Ignore
+			)
+		);
+		Assert.Throws<ArgumentNullException>(
+			() => TermInfoOutput.TPuts(
+				"value",
+				affectedLines: 1,
+				(TextWriter)null!,
+				PaddingMode.Ignore
+			)
+		);
+		Assert.Throws<ArgumentNullException>(
+			() => TermInfoOutput.TPutsAsync(
+				"value",
+				affectedLines: 1,
+				(TextWriter)null!,
+				PaddingMode.Ignore
+			).GetAwaiter().GetResult()
+		);
+	}
 
-        TermInfoOutput.TPuts(
-            "$<3/*>",
-            2,
-            writer,
-            PaddingMode.Delay,
-            delayProvider);
+	private sealed class RecordingDelayProvider : ITermInfoDelayProvider {
+		internal List<TimeSpan> Delays { get; } = [];
 
-        TermInfoDelay delay = Assert.Single(delayProvider.Delays);
-        Assert.Equal(TimeSpan.FromMilliseconds(6), delay.Duration);
-        Assert.True(delay.IsMandatory);
-    }
+		internal List<TimeSpan> AsyncDelays { get; } = [];
 
-    [Fact]
-    public void NegativeAffectedLineCountIsRejected()
-    {
-        using StringWriter writer = new();
+		internal bool CancelAsync { get; init; }
 
-        Assert.Throws<ArgumentOutOfRangeException>(
-            () => TermInfoOutput.TPuts(
-                "ABC",
-                -1,
-                writer));
-    }
+		internal Action? OnDelay { get; init; }
 
-    [Fact]
-    public void UnknownPaddingModeIsRejected()
-    {
-        using StringWriter writer = new();
+		internal Action? OnAsyncDelay { get; init; }
 
-        Assert.Throws<ArgumentOutOfRangeException>(
-            () => TermInfoOutput.TPuts(
-                "ABC",
-                1,
-                writer,
-                (PaddingMode)999));
-    }
+		public void Delay( TimeSpan delay ) {
+			Delays.Add( delay );
+			OnDelay?.Invoke();
+		}
 
-    [Fact]
-    public void NonWritableStreamIsRejected()
-    {
-        using MemoryStream stream =
-            new(Array.Empty<byte>(), writable: false);
+		public ValueTask DelayAsync(
+			TimeSpan delay,
+			CancellationToken cancellationToken = default
+		) {
+			AsyncDelays.Add( delay );
+			OnAsyncDelay?.Invoke();
 
-        Assert.Throws<ArgumentException>(
-            () => TermInfoOutput.TPuts(
-                "ABC",
-                1,
-                stream,
-                Encoding.ASCII));
-    }
+			if ( CancelAsync ) {
+				throw new OperationCanceledException( cancellationToken );
+			}
 
-    [Fact]
-    public void TermInfoDelayRejectsNegativeDuration()
-    {
-        Assert.Throws<ArgumentOutOfRangeException>(
-            () => new TermInfoDelay(
-                TimeSpan.FromMilliseconds(-1),
-                false));
-    }
+			cancellationToken.ThrowIfCancellationRequested();
+			return ValueTask.CompletedTask;
+		}
+	}
 
-    private sealed class RecordingDelayProvider : ITermInfoDelayProvider
-    {
-        internal List<TermInfoDelay> Delays { get; } = [];
+	private sealed class RecordingWriter : StringWriter {
+		internal int FlushCount { get; private set; }
 
-        internal int SynchronousDelayCount { get; private set; }
+		internal int AsyncFlushCount { get; private set; }
 
-        internal int AsynchronousDelayCount { get; private set; }
+		public override void Flush() {
+			FlushCount++;
+			base.Flush();
+		}
 
-        public void Delay(TermInfoDelay delay)
-        {
-            SynchronousDelayCount++;
-            Delays.Add(delay);
-        }
-
-        public ValueTask DelayAsync(
-            TermInfoDelay delay,
-            CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            AsynchronousDelayCount++;
-            Delays.Add(delay);
-            return ValueTask.CompletedTask;
-        }
-    }
+		public override Task FlushAsync() {
+			AsyncFlushCount++;
+			return base.FlushAsync();
+		}
+	}
 }
