@@ -179,7 +179,7 @@ public static class TermInfoSourceResolver {
 					ResolvedNode? parent =
 						ResolveNamed(
 							referenceName,
-							checked(depth + 1),
+							checked( depth + 1 ),
 							field.Span );
 					if ( parent is null ) {
 						parentFailed = true;
@@ -330,7 +330,6 @@ public static class TermInfoSourceResolver {
 			entry = null;
 			return false;
 		}
-	}
 
 	private sealed class ResolvedNode {
 		internal ResolvedNode(
