@@ -13,10 +13,12 @@ public sealed class CodingConventionTests {
 	[
 		"src/Environment/TerminalSize.cs",
 		"src/Environment/TerminalStandardStream.cs",
+		"src/Platform/ITerminalSizeProvider.cs",
 		"src/Platform/IWindowsConsoleModeApi.cs",
 		"src/Platform/UnixTerminalSizeProvider.cs",
 		"src/Platform/WindowsTerminalSizeProvider.cs",
 		"src/Platform/WindowsVirtualTerminal.cs",
+		"src/Platform/WindowsVirtualTerminalLease.cs",
 		"src/TerminalDescription.cs",
 		"src/TerminalDescriptionBuilder.cs",
 		"tools/public-api-snapshot/Program.cs",
