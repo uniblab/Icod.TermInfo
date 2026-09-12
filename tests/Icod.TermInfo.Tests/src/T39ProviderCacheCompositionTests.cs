@@ -650,7 +650,7 @@ public sealed class T39ProviderCacheCompositionTests {
 			entry.AsSpan(
 				numericOffset,
 				sizeof( short ) ),
-			checked((short)columns) );
+			checked( (short)columns ) );
 	}
 
 	private static string WriteLiteralCandidate(
