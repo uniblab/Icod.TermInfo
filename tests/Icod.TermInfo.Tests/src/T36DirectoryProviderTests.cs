@@ -683,7 +683,7 @@ public sealed class T36DirectoryProviderTests {
 			entry.AsSpan(
 				numericOffset,
 				sizeof( short ) ),
-			checked((short)columns) );
+			checked( (short)columns ) );
 	}
 
 	private sealed class TemporaryDirectory : IDisposable {
