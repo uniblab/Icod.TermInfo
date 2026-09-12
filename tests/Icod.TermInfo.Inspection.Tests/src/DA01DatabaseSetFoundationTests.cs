@@ -13,11 +13,11 @@ public sealed class DA01DatabaseSetFoundationTests {
 				Array.Empty<TermInfoDatabaseCatalog>()
 			);
 
-		Assert.Empty(set.Entries);
-		Assert.Empty(set.Identities);
-		Assert.Empty(set.Issues);
-		Assert.Equal(0, set.TotalEntryCount);
-		Assert.True(set.IsComplete);
+		Assert.Empty( set.Entries );
+		Assert.Empty( set.Identities );
+		Assert.Empty( set.Issues );
+		Assert.Equal( 0, set.TotalEntryCount );
+		Assert.True( set.IsComplete );
 	}
 
 	[Fact]
@@ -25,29 +25,29 @@ public sealed class DA01DatabaseSetFoundationTests {
 		TermInfoDatabaseCatalog first =
 			CreateCatalog(
 				"first",
-				CreateTerminal("zeta", "shared")
+				CreateTerminal( "zeta", "shared" )
 			);
 		TermInfoDatabaseCatalog second =
 			CreateCatalog(
 				"second",
-				CreateTerminal("alpha", "shared")
+				CreateTerminal( "alpha", "shared" )
 			);
 		List<TermInfoDatabaseCatalog> catalogs = [ first, second ];
 
 		TermInfoDatabaseSet set =
-			TermInfoDatabaseInspector.CreateSet(catalogs);
+			TermInfoDatabaseInspector.CreateSet( catalogs );
 		catalogs.Clear();
 
-		Assert.Equal(2, set.Entries.Count);
-		Assert.Same(first, set.Entries[0].Catalog);
-		Assert.Same(second, set.Entries[1].Catalog);
-		Assert.Equal(0, set.Entries[0].Index);
-		Assert.Equal(1, set.Entries[1].Index);
+		Assert.Equal( 2, set.Entries.Count );
+		Assert.Same( first, set.Entries[ 0 ].Catalog );
+		Assert.Same( second, set.Entries[ 1 ].Catalog );
+		Assert.Equal( 0, set.Entries[ 0 ].Index );
+		Assert.Equal( 1, set.Entries[ 1 ].Index );
 		Assert.Equal(
 			new[] { "alpha", "zeta" },
-			set.Identities.Select(identity => identity.Name).ToArray()
+			set.Identities.Select( identity => identity.Name ).ToArray()
 		);
-		Assert.Equal(2, set.TotalEntryCount);
+		Assert.Equal( 2, set.TotalEntryCount );
 	}
 
 	[Fact]
@@ -55,27 +55,27 @@ public sealed class DA01DatabaseSetFoundationTests {
 		TermInfoDatabaseCatalog first =
 			CreateCatalog(
 				"first-duplicate",
-				CreateTerminal("same", "first-alias"),
-				CreateTerminal("same", "second-alias")
+				CreateTerminal( "same", "first-alias" ),
+				CreateTerminal( "same", "second-alias" )
 			);
 		TermInfoDatabaseCatalog second =
 			CreateCatalog(
 				"second-duplicate",
-				CreateTerminal("same", "third-alias")
+				CreateTerminal( "same", "third-alias" )
 			);
 
 		TermInfoDatabaseSet set =
-			TermInfoDatabaseInspector.CreateSet([ first, second ]);
-		TermInfoDatabaseSetIdentity identity = Assert.Single(set.Identities);
+			TermInfoDatabaseInspector.CreateSet( [ first, second ] );
+		TermInfoDatabaseSetIdentity identity = Assert.Single( set.Identities );
 
-		Assert.Equal("same", identity.Name);
-		Assert.Equal(3, identity.Occurrences.Count);
-		Assert.Equal(0, identity.Occurrences[0].DatabaseIndex);
-		Assert.Equal(0, identity.Occurrences[0].CatalogEntryIndex);
-		Assert.Equal(0, identity.Occurrences[1].DatabaseIndex);
-		Assert.Equal(1, identity.Occurrences[1].CatalogEntryIndex);
-		Assert.Equal(1, identity.Occurrences[2].DatabaseIndex);
-		Assert.Equal(0, identity.Occurrences[2].CatalogEntryIndex);
+		Assert.Equal( "same", identity.Name );
+		Assert.Equal( 3, identity.Occurrences.Count );
+		Assert.Equal( 0, identity.Occurrences[ 0 ].DatabaseIndex );
+		Assert.Equal( 0, identity.Occurrences[ 0 ].CatalogEntryIndex );
+		Assert.Equal( 0, identity.Occurrences[ 1 ].DatabaseIndex );
+		Assert.Equal( 1, identity.Occurrences[ 1 ].CatalogEntryIndex );
+		Assert.Equal( 1, identity.Occurrences[ 2 ].DatabaseIndex );
+		Assert.Equal( 0, identity.Occurrences[ 2 ].CatalogEntryIndex );
 	}
 
 	[Fact]
@@ -85,31 +85,31 @@ public sealed class DA01DatabaseSetFoundationTests {
 				[
 					CreateCatalog(
 						"aliases-a",
-						CreateTerminal("canonical-a", "shared-alias")
+						CreateTerminal( "canonical-a", "shared-alias" )
 					),
 					CreateCatalog(
 						"aliases-b",
-						CreateTerminal("canonical-b", "shared-alias")
+						CreateTerminal( "canonical-b", "shared-alias" )
 					),
 				]
 			);
 
 		Assert.Equal(
 			new[] { "canonical-a", "canonical-b" },
-			set.Identities.Select(identity => identity.Name).ToArray()
+			set.Identities.Select( identity => identity.Name ).ToArray()
 		);
 		Assert.All(
 			set.Identities,
 			identity => Assert.Contains(
 				"shared-alias",
-				Assert.Single(identity.Occurrences).Aliases
+				Assert.Single( identity.Occurrences ).Aliases
 			)
 		);
 	}
 
 	[Fact]
 	public void MissingAndIssueBearingCatalogsMakeAggregateIncompleteWithoutLosingEvidence() {
-		string missingRoot = AbsolutePath("missing");
+		string missingRoot = AbsolutePath( "missing" );
 		TermInfoDatabaseCatalog missing =
 			new(
 				missingRoot,
@@ -118,11 +118,11 @@ public sealed class DA01DatabaseSetFoundationTests {
 				Array.Empty<TermInfoDatabaseCatalogIssue>(),
 				Array.Empty<string>()
 			);
-		string issueRoot = AbsolutePath("issues");
+		string issueRoot = AbsolutePath( "issues" );
 		TermInfoDatabaseCatalogIssue issue =
 			new(
 				TermInfoDatabaseCatalogIssueKind.MalformedEntry,
-				Path.Combine(issueRoot, "a", "bad"),
+				Path.Combine( issueRoot, "a", "bad" ),
 				"DA01 malformed fixture."
 			);
 		TermInfoDatabaseCatalog incomplete =
@@ -135,16 +135,16 @@ public sealed class DA01DatabaseSetFoundationTests {
 			);
 
 		TermInfoDatabaseSet set =
-			TermInfoDatabaseInspector.CreateSet([ missing, incomplete ]);
+			TermInfoDatabaseInspector.CreateSet( [ missing, incomplete ] );
 
-		Assert.False(set.IsComplete);
-		Assert.False(set.Entries[0].IsComplete);
-		Assert.False(set.Entries[1].IsComplete);
-		TermInfoDatabaseSetIssue aggregateIssue = Assert.Single(set.Issues);
-		Assert.Equal(1, aggregateIssue.DatabaseIndex);
-		Assert.Equal(0, aggregateIssue.CatalogIssueIndex);
-		Assert.Same(issue, aggregateIssue.Issue);
-		Assert.Equal(TermInfoDatabaseCatalogKind.Missing, set.Entries[0].Catalog.Kind);
+		Assert.False( set.IsComplete );
+		Assert.False( set.Entries[ 0 ].IsComplete );
+		Assert.False( set.Entries[ 1 ].IsComplete );
+		TermInfoDatabaseSetIssue aggregateIssue = Assert.Single( set.Issues );
+		Assert.Equal( 1, aggregateIssue.DatabaseIndex );
+		Assert.Equal( 0, aggregateIssue.CatalogIssueIndex );
+		Assert.Same( issue, aggregateIssue.Issue );
+		Assert.Equal( TermInfoDatabaseCatalogKind.Missing, set.Entries[ 0 ].Catalog.Kind );
 	}
 
 	[Fact]
@@ -152,27 +152,27 @@ public sealed class DA01DatabaseSetFoundationTests {
 		TermInfoDatabaseCatalog catalog =
 			CreateCatalog(
 				"culture",
-				CreateTerminal("zebra"),
-				CreateTerminal("I-terminal"),
-				CreateTerminal("ı-terminal")
+				CreateTerminal( "zebra" ),
+				CreateTerminal( "I-terminal" ),
+				CreateTerminal( "ı-terminal" )
 			);
 		CultureInfo originalCulture = CultureInfo.CurrentCulture;
 		CultureInfo originalUiCulture = CultureInfo.CurrentUICulture;
 		try {
-			CultureInfo.CurrentCulture = new CultureInfo("tr-TR");
-			CultureInfo.CurrentUICulture = new CultureInfo("tr-TR");
+			CultureInfo.CurrentCulture = new CultureInfo( "tr-TR" );
+			CultureInfo.CurrentUICulture = new CultureInfo( "tr-TR" );
 			string[] first =
-				TermInfoDatabaseInspector.CreateSet([ catalog ])
+				TermInfoDatabaseInspector.CreateSet( [ catalog ] )
 					.Identities
-					.Select(identity => identity.Name)
+					.Select( identity => identity.Name )
 					.ToArray();
 			string[] second =
-				TermInfoDatabaseInspector.CreateSet([ catalog ])
+				TermInfoDatabaseInspector.CreateSet( [ catalog ] )
 					.Identities
-					.Select(identity => identity.Name)
+					.Select( identity => identity.Name )
 					.ToArray();
 
-			Assert.Equal(first, second);
+			Assert.Equal( first, second );
 			Assert.Equal(
 				new[] { "I-terminal", "zebra", "ı-terminal" },
 				first
@@ -186,9 +186,9 @@ public sealed class DA01DatabaseSetFoundationTests {
 	[Fact]
 	public void CancellationAndConfiguredBoundsAreObservedBeforeMisleadingResults() {
 		TermInfoDatabaseCatalog first =
-			CreateCatalog("bound-one", CreateTerminal("one"));
+			CreateCatalog( "bound-one", CreateTerminal( "one" ) );
 		TermInfoDatabaseCatalog second =
-			CreateCatalog("bound-two", CreateTerminal("two"));
+			CreateCatalog( "bound-two", CreateTerminal( "two" ) );
 		Assert.Throws<ArgumentException>(
 			() => TermInfoDatabaseInspector.CreateSet(
 				[ first, second ],
@@ -218,7 +218,7 @@ public sealed class DA01DatabaseSetFoundationTests {
 		);
 		Assert.Throws<OperationCanceledException>(
 			() => TermInfoDatabaseInspector.InspectSet(
-				[ AbsolutePath("never-inspected") ],
+				[ AbsolutePath( "never-inspected" ) ],
 				cancellationToken: cancellation.Token
 			)
 		);
@@ -227,43 +227,43 @@ public sealed class DA01DatabaseSetFoundationTests {
 	[Fact]
 	public void Da01AddsOnlyTheReviewedDatabaseSetConceptFamily() {
 		Type[] exportedTypes =
-			typeof(TermInfoDatabaseSet).Assembly.GetExportedTypes();
+			typeof( TermInfoDatabaseSet ).Assembly.GetExportedTypes();
 		foreach (
 			Type expected
 			in new[] {
-				typeof(TermInfoDatabaseSet),
-				typeof(TermInfoDatabaseSetEntry),
-				typeof(TermInfoDatabaseSetIdentity),
-				typeof(TermInfoDatabaseSetOccurrence),
-				typeof(TermInfoDatabaseSetIssue),
-				typeof(TermInfoDatabaseSetOptions),
+				typeof( TermInfoDatabaseSet ),
+				typeof( TermInfoDatabaseSetEntry ),
+				typeof( TermInfoDatabaseSetIdentity ),
+				typeof( TermInfoDatabaseSetOccurrence ),
+				typeof( TermInfoDatabaseSetIssue ),
+				typeof( TermInfoDatabaseSetOptions ),
 			}
 		) {
-			Assert.Contains(expected, exportedTypes);
+			Assert.Contains( expected, exportedTypes );
 		}
-		Assert.InRange(exportedTypes.Length, 37, int.MaxValue);
+		Assert.InRange( exportedTypes.Length, 37, int.MaxValue );
 	}
 
 	private static TermInfoDatabaseCatalog CreateCatalog(
 		string rootName,
 		params TerminalDescription[] terminals
 	) {
-		string root = AbsolutePath(rootName);
+		string root = AbsolutePath( rootName );
 		TermInfoDatabaseCatalogEntry[] entries =
 			terminals
 				.Select(
-					(terminal, index) => new TermInfoDatabaseCatalogEntry(
-						Path.Combine(root, "entries", index.ToString(CultureInfo.InvariantCulture)),
+					( terminal, index ) => new TermInfoDatabaseCatalogEntry(
+						Path.Combine( root, "entries", index.ToString( CultureInfo.InvariantCulture ) ),
 						terminal
 					)
 				)
 				.ToArray();
 		string[] duplicates =
 			entries
-				.GroupBy(entry => entry.Name, StringComparer.Ordinal)
-				.Where(group => group.Count() > 1)
-				.Select(group => group.Key)
-				.OrderBy(name => name, StringComparer.Ordinal)
+				.GroupBy( entry => entry.Name, StringComparer.Ordinal )
+				.Where( group => group.Count() > 1 )
+				.Select( group => group.Key )
+				.OrderBy( name => name, StringComparer.Ordinal )
 				.ToArray();
 		return new TermInfoDatabaseCatalog(
 			root,
@@ -279,9 +279,9 @@ public sealed class DA01DatabaseSetFoundationTests {
 		params string[] aliases
 	) {
 		TerminalDescriptionBuilder builder =
-			new TerminalDescriptionBuilder(name);
-		foreach (string alias in aliases) {
-			builder.AddAlias(alias);
+			new TerminalDescriptionBuilder( name );
+		foreach ( string alias in aliases ) {
+			builder.AddAlias( alias );
 		}
 		return builder.Build();
 	}
