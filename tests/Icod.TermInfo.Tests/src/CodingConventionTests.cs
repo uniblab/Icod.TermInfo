@@ -116,6 +116,30 @@ public sealed class CodingConventionTests {
 		);
 	}
 
+	[Fact]
+	public void RepositoryCSharpMultilineCallsAndDeclarationsCloseParenthesisOnOwnLine() {
+		string repositoryRoot = FindRepositoryRoot();
+		List<string> violations = [];
+
+		foreach ( string path in EnumerateCSharpFiles( repositoryRoot ) ) {
+			string source = MaskNonCode( File.ReadAllText( path ) );
+			int violationIndex = FindMultilineClosingParenthesisViolation( source );
+
+			if ( violationIndex >= 0 ) {
+				violations.Add(
+					$"{GetRelativePath( repositoryRoot, path )}:{GetLineNumber( source, violationIndex )}"
+				);
+			}
+		}
+
+		Assert.True(
+			violations.Count == 0,
+			"C# files with multiline calls/declarations whose closing ')' shares the final argument line:"
+				+ Environment.NewLine
+				+ string.Join( Environment.NewLine, violations )
+		);
+	}
+
 	private static bool ContainsUnbracedControlFlow( string source ) {
 		ArgumentNullException.ThrowIfNull( source );
 
@@ -187,6 +211,35 @@ public sealed class CodingConventionTests {
 
 			if ( !ParenthesisInteriorUsesRepositorySpacing( source, i ) ) {
 				return i;
+			}
+		}
+
+		return -1;
+	}
+
+	private static int FindMultilineClosingParenthesisViolation( string source ) {
+		ArgumentNullException.ThrowIfNull( source );
+
+		for ( int i = 0; i < source.Length; i++ ) {
+			if ( source[i] != '(' || !IsCallLikeOpenParenthesis( source, i ) ) {
+				continue;
+			}
+
+			int closeParenthesis = FindMatchingParenthesis( source, i );
+			if ( closeParenthesis < 0 ) {
+				continue;
+			}
+
+			int firstLineBreak = source.IndexOf( '\n', i + 1 );
+			if ( firstLineBreak < 0 || firstLineBreak > closeParenthesis ) {
+				continue;
+			}
+
+			int lineStart = source.LastIndexOf( '\n', closeParenthesis - 1 ) + 1;
+			for ( int j = lineStart; j < closeParenthesis; j++ ) {
+				if ( !char.IsWhiteSpace( source[j] ) ) {
+					return closeParenthesis;
+				}
 			}
 		}
 
