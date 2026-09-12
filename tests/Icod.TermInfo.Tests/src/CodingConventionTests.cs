@@ -28,6 +28,10 @@ public sealed class CodingConventionTests {
 		@"\b(?:if|for|foreach|while|switch|catch|using|lock|fixed)\(",
 		RegexOptions.CultureInvariant
 	);
+	private static readonly Regex MultilineTernaryQuestionPattern = new(
+		@"(?m)^(?<indent>[\t ]*)\?[\t ]+",
+		RegexOptions.CultureInvariant
+	);
 
 	[Fact]
 	public void RepositoryCSharpFilesUseOneTrueBraceStyle() {
@@ -143,6 +147,34 @@ public sealed class CodingConventionTests {
 		Assert.True(
 			violations.Count == 0,
 			"C# files with multiline calls/declarations whose closing ')' shares the final argument line:"
+				+ Environment.NewLine
+				+ string.Join( Environment.NewLine, violations )
+		);
+	}
+
+	[Fact]
+	public void RepositoryCSharpMultilineTernariesUseRepositoryLayout() {
+		string repositoryRoot = FindRepositoryRoot();
+		List<string> violations = [];
+
+		foreach ( string path in EnumerateCSharpFiles( repositoryRoot ) ) {
+			string source = File.ReadAllText( path );
+			string maskedSource = MaskNonCode( source );
+			int violationIndex = FindMultilineTernaryViolation(
+				maskedSource,
+				source
+			);
+
+			if ( violationIndex >= 0 ) {
+				violations.Add(
+					$"{GetRelativePath( repositoryRoot, path )}:{GetLineNumber( source, violationIndex )}"
+				);
+			}
+		}
+
+		Assert.True(
+			violations.Count == 0,
+			"C# files with multiline ternaries that do not use a parenthesized condition, aligned branches, and an own-line semicolon:"
 				+ Environment.NewLine
 				+ string.Join( Environment.NewLine, violations )
 		);
@@ -280,6 +312,104 @@ public sealed class CodingConventionTests {
 		return -1;
 	}
 
+	private static int FindMultilineTernaryViolation(
+		string maskedSource,
+		string source
+	) {
+		ArgumentNullException.ThrowIfNull( maskedSource );
+		ArgumentNullException.ThrowIfNull( source );
+
+		foreach ( Match match in MultilineTernaryQuestionPattern.Matches( maskedSource ) ) {
+			int questionIndex =
+				match.Index + match.Value.IndexOf( '?' );
+			int previous = FindPreviousNonWhitespace( maskedSource, questionIndex - 1 );
+			if ( previous < 0 || maskedSource[previous] != ')' ) {
+				return questionIndex;
+			}
+
+			int conditionOpen = FindMatchingOpenParenthesis( maskedSource, previous );
+			if (
+				conditionOpen < 0
+				|| IsCallLikeOpenParenthesis( maskedSource, conditionOpen )
+			) {
+				return questionIndex;
+			}
+
+			string indent = match.Groups[ "indent" ].Value;
+			int colonIndex = FindTernaryBranchMarker(
+				maskedSource,
+				questionIndex + 1,
+				indent,
+				':'
+			);
+			if ( colonIndex < 0 ) {
+				return questionIndex;
+			}
+
+			int semicolonIndex = maskedSource.IndexOf( ';', colonIndex + 1 );
+			if ( semicolonIndex < 0 ) {
+				return colonIndex;
+			}
+
+			int semicolonLineStart =
+				maskedSource.LastIndexOf( '\n', semicolonIndex - 1 ) + 1;
+			string semicolonIndent =
+				maskedSource[ semicolonLineStart..semicolonIndex ];
+			if (
+				semicolonIndent != indent
+				|| semicolonIndent.Any( character => !char.IsWhiteSpace( character ) )
+			) {
+				return semicolonIndex;
+			}
+		}
+
+		return -1;
+	}
+
+	private static int FindTernaryBranchMarker(
+		string source,
+		int startIndex,
+		string indent,
+		char marker
+	) {
+		ArgumentNullException.ThrowIfNull( source );
+		ArgumentNullException.ThrowIfNull( indent );
+
+		int lineStart = source.IndexOf( '\n', startIndex );
+		if ( lineStart < 0 ) {
+			return -1;
+		}
+		lineStart++;
+
+		while ( lineStart < source.Length ) {
+			int lineEnd = source.IndexOf( '\n', lineStart );
+			if ( lineEnd < 0 ) {
+				lineEnd = source.Length;
+			}
+
+			int first = lineStart;
+			while ( first < lineEnd && char.IsWhiteSpace( source[first] ) ) {
+				first++;
+			}
+
+			if ( first < lineEnd && source[first] == ';' ) {
+				return -1;
+			}
+
+			if ( first < lineEnd && source[first] == marker ) {
+				string markerIndent = source[ lineStart..first ];
+				return ( markerIndent == indent )
+					? first
+					: -1
+				;
+			}
+
+			lineStart = lineEnd + 1;
+		}
+
+		return -1;
+	}
+
 	private static bool IsCallLikeOpenParenthesis(
 		string source,
 		int openParenthesis
@@ -377,7 +507,6 @@ public sealed class CodingConventionTests {
 				if ( depth == 0 ) {
 					return i;
 				}
-			}
 		}
 
 		return -1;
