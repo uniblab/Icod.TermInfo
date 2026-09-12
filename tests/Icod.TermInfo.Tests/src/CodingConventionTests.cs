@@ -324,6 +324,7 @@ public sealed class CodingConventionTests {
 			if ( masked[i] != '\r' && masked[i] != '\n' ) {
 				masked[i] = ' ';
 			}
+		}
 	}
 
 	private static IEnumerable<string> EnumerateCSharpFiles(
@@ -374,7 +375,6 @@ public sealed class CodingConventionTests {
 						directory.FullName,
 						"Icod.TermInfo.sln"
 					)
-				)
 			) {
 				return directory.FullName;
 			}
