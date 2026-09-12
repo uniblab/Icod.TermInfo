@@ -11,6 +11,7 @@ public sealed class CodingConventionTests {
 
 	private static readonly string[] InitialAuditPaths =
 	[
+		"src/Environment/TerminalEnvironment.cs",
 		"src/Environment/TerminalSize.cs",
 		"src/Environment/TerminalStandardStream.cs",
 		"src/Platform/ITerminalSizeProvider.cs",
