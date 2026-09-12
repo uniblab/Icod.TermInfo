@@ -1,7 +1,7 @@
 from pathlib import Path
 
 # Temporary branch-scoped driver; removed after the convention gate is green.
-# Current checkpoint normalizes the final repository ternary finding.
+# Verification checkpoint: the repository ternary inventory should now be empty.
 
 
 def replace_exact(path: str, old: str, new: str) -> None:
