@@ -5,31 +5,30 @@ using Xunit;
 
 namespace Icod.TermInfo.Tests;
 
-public sealed class T42ContractTests
-{
+public sealed class T42ContractTests {
 	[Fact]
-	public void StableOneXAssemblyIdentityAndUnsignedPolicyAreFrozen()
-	{
+	public void StableOneXAssemblyIdentityAndUnsignedPolicyAreFrozen() {
 		AssemblyName assemblyName =
-			typeof(TerminalDescription)
+			typeof( TerminalDescription )
 				.Assembly
 				.GetName();
 
 		Assert.Equal(
-			new Version(1, 0, 0, 0),
-			assemblyName.Version);
+			new Version( 1, 0, 0, 0 ),
+			assemblyName.Version
+		);
 
 		byte[]? publicKeyToken =
 			assemblyName.GetPublicKeyToken();
 		Assert.True(
 			publicKeyToken is null
 				|| publicKeyToken.Length == 0,
-			"Icod.TermInfo 1.x is intentionally unsigned.");
+			"Icod.TermInfo 1.x is intentionally unsigned."
+		);
 	}
 
 	[Fact]
-	public void SupportedTargetFrameworkMatrixIsFrozen()
-	{
+	public void SupportedTargetFrameworkMatrixIsFrozen() {
 		string root =
 			FindRepositoryRoot();
 
@@ -42,14 +41,15 @@ public sealed class T42ContractTests
 			"tools/package-smoke/Icod.TermInfo.PackageSmoke.csproj",
 		];
 
-		foreach (string relativePath in multiTargetProjects)
-		{
+		foreach ( string relativePath in multiTargetProjects ) {
 			Assert.Equal(
 				"net8.0;net9.0;net10.0",
 				ReadProjectProperty(
 					root,
 					relativePath,
-					"TargetFrameworks"));
+					"TargetFrameworks"
+				)
+			);
 		}
 
 		string[] maintenanceProjects =
@@ -60,33 +60,37 @@ public sealed class T42ContractTests
 			"tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj",
 		];
 
-		foreach (string relativePath in maintenanceProjects)
-		{
+		foreach ( string relativePath in maintenanceProjects ) {
 			Assert.Equal(
 				"net10.0",
 				ReadProjectProperty(
 					root,
 					relativePath,
-					"TargetFramework"));
+					"TargetFramework"
+				)
+			);
 			Assert.Null(
 				ReadOptionalProjectProperty(
 					root,
 					relativePath,
-					"TargetFrameworks"));
+					"TargetFrameworks"
+				)
+			);
 		}
 	}
 
 	[Fact]
-	public void AssemblyAndSigningPolicyIsExplicitInProject()
-	{
+	public void AssemblyAndSigningPolicyIsExplicitInProject() {
 		string root =
 			FindRepositoryRoot();
 		XDocument project =
 			XDocument.Load(
 				Path.Combine(
 					root,
-					"Icod.TermInfo.csproj"),
-				LoadOptions.None);
+					"Icod.TermInfo.csproj"
+				),
+				LoadOptions.None
+			);
 
 		Assert.Equal(
 			"1.0.0.0",
@@ -95,9 +99,11 @@ public sealed class T42ContractTests
 				.Single(
 					element =>
 						element.Name.LocalName
-							== "AssemblyVersion")
+							== "AssemblyVersion"
+				)
 				.Value
-				.Trim());
+				.Trim()
+		);
 
 		string[] signingValues =
 			project
@@ -105,25 +111,29 @@ public sealed class T42ContractTests
 				.Where(
 					element =>
 						element.Name.LocalName
-							== "SignAssembly")
+							== "SignAssembly"
+				)
 				.Select(
 					element =>
-						element.Value.Trim())
+						element.Value.Trim()
+				)
 				.ToArray();
 
 		Assert.NotEmpty(
-			signingValues);
+			signingValues
+		);
 		Assert.All(
 			signingValues,
 			value =>
 				Assert.Equal(
 					"false",
-					value));
+					value
+				)
+		);
 	}
 
 	[Fact]
-	public void BuildAndPackageValidationInstallAllSupportedSdks()
-	{
+	public void BuildAndPackageValidationInstallAllSupportedSdks() {
 		string root =
 			FindRepositoryRoot();
 		string pullRequest =
@@ -133,7 +143,10 @@ public sealed class T42ContractTests
 						root,
 						".github",
 						"workflows",
-						"pull-request.yaml")));
+						"pull-request.yaml"
+					)
+				)
+			);
 		string main =
 			NormalizeLineEndings(
 				File.ReadAllText(
@@ -141,7 +154,10 @@ public sealed class T42ContractTests
 						root,
 						".github",
 						"workflows",
-						"main.yaml")));
+						"main.yaml"
+					)
+				)
+			);
 		string release =
 			NormalizeLineEndings(
 				File.ReadAllText(
@@ -149,16 +165,19 @@ public sealed class T42ContractTests
 						root,
 						".github",
 						"workflows",
-						"release.yaml")));
+						"release.yaml"
+					)
+				)
+			);
 
-		foreach (string workflow in new[] { pullRequest, main, release })
-		{
+		foreach ( string workflow in new[] { pullRequest, main, release } ) {
 			Assert.Contains(
 				"DOTNET_VERSIONS: |\n"
 				+ "    8.0.x\n"
 				+ "    9.0.x\n"
 				+ "    10.0.x\n",
-				workflow);
+				workflow
+			);
 		}
 
 		Assert.StartsWith(
@@ -168,91 +187,110 @@ public sealed class T42ContractTests
 			+ "  push:\n"
 			+ "    branches:\n"
 			+ "      - main\n",
-			main);
+			main
+		);
 		Assert.DoesNotContain(
 			"pull_request:",
-			main);
+			main
+		);
 		Assert.Contains(
 			"CONFIGURATION: Staging",
-			pullRequest);
+			pullRequest
+		);
 		Assert.Contains(
 			"CONFIGURATION: Release",
-			main);
+			main
+		);
 		Assert.Contains(
 			"CONFIGURATION: Release",
-			release);
+			release
+		);
 
-		foreach (string workflow in new[] { pullRequest, main, release })
-		{
+		foreach ( string workflow in new[] { pullRequest, main, release } ) {
 			Assert.Contains(
 				"dotnet build ${{ env.SOLUTION_PATH }}",
-				workflow);
+				workflow
+			);
 			Assert.Contains(
 				"dotnet test ${{ env.SOLUTION_PATH }}",
-				workflow);
+				workflow
+			);
 		}
 
 		Assert.Contains(
 			"./packaging/PackPackages.ps1",
-			pullRequest);
+			pullRequest
+		);
 		Assert.Contains(
 			"./packaging/VerifyPackageArtifact.ps1",
-			pullRequest);
+			pullRequest
+		);
 		Assert.Contains(
 			"./packaging/PackPackages.ps1",
-			main);
+			main
+		);
 		Assert.Contains(
 			"./packaging/VerifyPackageArtifact.ps1",
-			main);
+			main
+		);
 		Assert.Contains(
 			"./packaging/PackPackages.ps1",
-			release);
+			release
+		);
 		Assert.Contains(
 			"./packaging/VerifyPackageArtifact.ps1",
-			release);
+			release
+		);
 
 		Assert.Contains(
 			"actions/upload-artifact@v4",
-			pullRequest);
+			pullRequest
+		);
 		Assert.Contains(
 			"name: terminfo-pr-packages",
-			pullRequest);
+			pullRequest
+		);
 		Assert.DoesNotContain(
 			"dotnet nuget push",
-			pullRequest);
+			pullRequest
+		);
 		Assert.DoesNotContain(
 			"dotnet nuget push",
-			main);
+			main
+		);
 		Assert.Contains(
 			"dotnet nuget push",
-			release);
+			release
+		);
 	}
 
 	private static string ReadProjectProperty(
 		string root,
 		string relativePath,
-		string propertyName)
-	{
-		ArgumentNullException.ThrowIfNull(root);
-		ArgumentNullException.ThrowIfNull(relativePath);
-		ArgumentNullException.ThrowIfNull(propertyName);
+		string propertyName
+	) {
+		ArgumentNullException.ThrowIfNull( root );
+		ArgumentNullException.ThrowIfNull( relativePath );
+		ArgumentNullException.ThrowIfNull( propertyName );
 
 		return ReadOptionalProjectProperty(
 				root,
 				relativePath,
-				propertyName)
+				propertyName
+			)
 			?? throw new InvalidOperationException(
-				$"Project '{relativePath}' does not define '{propertyName}'.");
+				$"Project '{relativePath}' does not define '{propertyName}'."
+			);
 	}
 
 	private static string? ReadOptionalProjectProperty(
 		string root,
 		string relativePath,
-		string propertyName)
-	{
-		ArgumentNullException.ThrowIfNull(root);
-		ArgumentNullException.ThrowIfNull(relativePath);
-		ArgumentNullException.ThrowIfNull(propertyName);
+		string propertyName
+	) {
+		ArgumentNullException.ThrowIfNull( root );
+		ArgumentNullException.ThrowIfNull( relativePath );
+		ArgumentNullException.ThrowIfNull( propertyName );
 
 		XDocument project =
 			XDocument.Load(
@@ -260,32 +298,38 @@ public sealed class T42ContractTests
 					root,
 					relativePath.Replace(
 						'/',
-						Path.DirectorySeparatorChar)),
-				LoadOptions.None);
+						Path.DirectorySeparatorChar
+					)
+				),
+				LoadOptions.None
+			);
 
 		return project
 			.Descendants()
 			.FirstOrDefault(
 				element =>
 					element.Name.LocalName
-						== propertyName)
+						== propertyName
+			)
 			?.Value
 			.Trim();
 	}
 
-	private static string FindRepositoryRoot()
-	{
+	private static string FindRepositoryRoot() {
 		DirectoryInfo? current =
 			new(
-				AppContext.BaseDirectory);
+				AppContext.BaseDirectory
+			);
 
-		while (current is not null)
-		{
-			if (File.Exists(
+		while ( current is not null ) {
+			if (
+				File.Exists(
 					Path.Combine(
 						current.FullName,
-						"Icod.TermInfo.csproj")))
-			{
+						"Icod.TermInfo.csproj"
+					)
+				)
+			) {
 				return current.FullName;
 			}
 
@@ -294,20 +338,23 @@ public sealed class T42ContractTests
 		}
 
 		throw new InvalidOperationException(
-			"Unable to locate the Icod.TermInfo repository root.");
+			"Unable to locate the Icod.TermInfo repository root."
+		);
 	}
 
 	private static string NormalizeLineEndings(
-		string value)
-	{
-		ArgumentNullException.ThrowIfNull(value);
+		string value
+	) {
+		ArgumentNullException.ThrowIfNull( value );
 
 		return value
 			.Replace(
 				"\r\n",
-				"\n")
+				"\n"
+			)
 			.Replace(
 				'\r',
-				'\n');
+				'\n'
+			);
 	}
 }
