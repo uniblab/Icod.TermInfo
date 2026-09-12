@@ -256,9 +256,10 @@ internal static class Program {
 				$"Icod.TermInfo.Compiler-package-verifier-{Guid.NewGuid():N}.dll"
 			);
 		try {
-			using ( Stream source = entry!.Open() )
-			using ( FileStream destination = File.Create( temporaryPath ) ) {
-				source.CopyTo( destination );
+			using ( Stream source = entry!.Open() ) {
+				using ( FileStream destination = File.Create( temporaryPath ) ) {
+					source.CopyTo( destination );
+				}
 			}
 			AssemblyName assemblyName = AssemblyName.GetAssemblyName( temporaryPath );
 			Require( assemblyName.Name == PackageId, $"{path} has unexpected assembly name '{assemblyName.Name}'." );
