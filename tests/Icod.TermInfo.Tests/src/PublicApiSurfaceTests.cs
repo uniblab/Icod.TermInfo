@@ -210,10 +210,12 @@ public sealed class PublicApiSurfaceTests {
 					| BindingFlags.Instance
 					| BindingFlags.DeclaredOnly
 				)
-				.Where( method => method.Name.Contains(
-					"Extended",
-					StringComparison.Ordinal
-				) )
+				.Where(
+					method => method.Name.Contains(
+						"Extended",
+						StringComparison.Ordinal
+					)
+				)
 				.Select( method =>
 					$"{method.Name}/{method.GetParameters().Length}"
 				)
@@ -226,10 +228,12 @@ public sealed class PublicApiSurfaceTests {
 					| BindingFlags.Instance
 					| BindingFlags.DeclaredOnly
 				)
-				.Where( method => method.Name.Contains(
-					"Extended",
-					StringComparison.Ordinal
-				) )
+				.Where(
+					method => method.Name.Contains(
+						"Extended",
+						StringComparison.Ordinal
+					)
+				)
 				.Select( method =>
 					$"{method.Name}/{method.GetParameters().Length}"
 				)
