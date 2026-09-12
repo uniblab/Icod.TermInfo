@@ -1,7 +1,7 @@
 from pathlib import Path
 
 # Temporary branch-scoped driver; removed after the convention gate is green.
-# Current checkpoint normalizes the final three ternary findings.
+# Current checkpoint normalizes the final repository ternary finding.
 
 
 def replace_exact(path: str, old: str, new: str) -> None:
@@ -22,19 +22,7 @@ def replace_exact(path: str, old: str, new: str) -> None:
 
 
 replace_exact(
-    "tests/Icod.TermInfo.Inspection.Tests/src/I07ValidationTests.cs",
-    """\t\treturn value.HasValue\n\t\t\t? value.Value.ToString( CultureInfo.InvariantCulture )\n\t\t\t: string.Empty;\n""",
-    """\t\treturn ( value.HasValue )\n\t\t\t? value.Value.ToString( CultureInfo.InvariantCulture )\n\t\t\t: string.Empty\n\t\t;\n""",
-)
-
-replace_exact(
     "toe/src/Command.cs",
-    """\t\tDictionary<string, ToeDuplicateReference>? duplicateReferences =\n\t\t\toptions.AllDatabases && options.SortByName\n\t\t\t\t? new Dictionary<string, ToeDuplicateReference>( StringComparer.Ordinal )\n\t\t\t\t: null;\n""",
-    """\t\tDictionary<string, ToeDuplicateReference>? duplicateReferences =\n\t\t\t( options.AllDatabases && options.SortByName )\n\t\t\t\t? new Dictionary<string, ToeDuplicateReference>( StringComparer.Ordinal )\n\t\t\t\t: null\n\t\t;\n""",
-)
-
-replace_exact(
-    "tools/public-api-snapshot/Program.cs",
-    """\t\t\tbool boolean =>\n\t\t\t\tboolean\n\t\t\t\t\t? \"true\"\n\t\t\t\t\t: \"false\",\n""",
-    """\t\t\tbool boolean =>\n\t\t\t\t( boolean )\n\t\t\t\t\t? \"true\"\n\t\t\t\t\t: \"false\",\n""",
+    """\t\t\t\t\tvar namesInCurrentRoot = duplicateReferences is null\n\t\t\t\t\t\t? null\n\t\t\t\t\t\t: new HashSet<string>( StringComparer.Ordinal );\n""",
+    """\t\t\t\t\tvar namesInCurrentRoot = ( duplicateReferences is null )\n\t\t\t\t\t\t? null\n\t\t\t\t\t\t: new HashSet<string>( StringComparer.Ordinal )\n\t\t\t\t\t;\n""",
 )
