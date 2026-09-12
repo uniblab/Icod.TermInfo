@@ -3,15 +3,17 @@
 `Icod.TermInfo.Inspection` is the optional managed inspection and semantic-
 comparison layer for the `Icod.TermInfo` package family.
 
-## 1.11 RL08 release candidate
+## 1.11 release status
 
-`1.11.0-Alpha-8` freezes the complete additive persistent-raster lifecycle
-surface introduced by RL01-RL07. The new contract is protocol-neutral:
-Inspection owns immutable evidence, provenance, classification, contradiction,
-uncertainty, deterministic semantic planning, description/database-set
-composition, and version-3 machine-readable profile/plan documents. Live
-terminal verification, protocol execution, resource and placement identities,
-generation invalidation, acknowledgements, and cleanup remain outside TermInfo.
+Version `1.11.0` promotes the complete additive persistent-raster lifecycle
+surface frozen by `1.11.0-Alpha-8` without feature, public API, schema,
+dependency, target-framework, or command-semantic changes. The contract is
+protocol-neutral: Inspection owns immutable evidence, provenance,
+classification, contradiction, uncertainty, deterministic semantic planning,
+description/database-set composition, and version-3 machine-readable
+profile/plan documents. Live terminal verification, protocol execution, resource
+and placement identities, generation invalidation, acknowledgements, and cleanup
+remain outside TermInfo.
 
 The complete 1.11 Inspection reflection manifest has normalized-LF SHA-256
 `69c7350d5d44d502ecf1698c8fe1c1336f03d38eb1a36e36219f50ac33585a86`.
@@ -25,12 +27,16 @@ and contains exactly `persistentRasterLifecycleProfile` and
 `persistentRasterLifecyclePlan`; the three exact schema fingerprints are
 recorded in `docs/1.11.0-RL08-FREEZE-FINGERPRINTS.txt`.
 
+The Alpha-8 product contract passed workflow #286 / `34662961312`; the stable
+version-only promotion passed workflow #289 / `34663869047`. Publication remains
+gated by the normal `main` and immutable `v*` tag workflows.
+
 For consumer-facing use, see
 `docs/1.11.0-PERSISTENT-RASTER-LIFECYCLE-GUIDE.md` and
 `samples/Icod.TermInfo.PersistentRasterLifecycle.Sample/README.md`. The
 NuGet-only qualification consumer and the checked-in sample are permanently run
 on `net8.0`, `net9.0`, and `net10.0` by release validation. See
-`docs/1.11.0-RELEASE-AUDIT.md` for release-closure evidence.
+`docs/1.11.0-RELEASE-AUDIT.md` for release evidence.
 
 ## 1.10 DA08 release freeze
 
@@ -196,9 +202,9 @@ string catalogJson =
 	);
 ```
 
-Completeness is true only for a conventional directory with no inspection
-issues. Duplicate canonical names remain explicit ambiguity evidence and do not
-erase otherwise complete inspection evidence. Missing, unsupported, unavailable,
+Completeness is true only for a conventional directory with no issues.
+Duplicate canonical names remain explicit ambiguity evidence and do not erase
+otherwise complete inspection evidence. Missing, unsupported, unavailable,
 malformed, permission-failed, and partial states never claim completeness.
 
 The complete draft 2020-12 version-1 schema is published as
@@ -522,7 +528,7 @@ and Source packages.
 ## Install
 
 ```text
-dotnet add package Icod.TermInfo.Inspection --version 1.10.0
+dotnet add package Icod.TermInfo.Inspection --version 1.11.0
 ```
 
 The package targets `net8.0`, `net9.0`, and `net10.0`, depends on matching
@@ -747,8 +753,8 @@ IReadOnlyList<TermInfoDatabaseLocation> locations = TermInfoDatabaseInspector.Ge
 Each location identifies whether it came from encoded `TERMINFO`, directory
 `TERMINFO`, the user database, `TERMINFO_DIRS`, or a final platform default.
 Directory paths are normalized and preserve Runtime precedence and duplicate-root
-semantics. Encoded `TERMINFO` is reported without exposing its payload. T02 does
-not enumerate database contents; conventional catalog enumeration remains T03.
+semantics. Encoded payload bytes are not exposed. T02 does not enumerate database
+contents; conventional catalog enumeration remains T03.
 
 The Runtime 1.0 public API remains unchanged. Inspection consumes a narrow
 internal Runtime discovery seam and continues to have no production dependency
