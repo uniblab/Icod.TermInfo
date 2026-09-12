@@ -330,6 +330,7 @@ public static class TermInfoSourceResolver {
 			entry = null;
 			return false;
 		}
+	}
 
 	private sealed class ResolvedNode {
 		internal ResolvedNode(
