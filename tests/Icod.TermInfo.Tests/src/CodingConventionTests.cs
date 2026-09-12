@@ -204,12 +204,36 @@ public sealed class CodingConventionTests {
 		}
 
 		char previous = source[openParenthesis - 1];
-		return char.IsLetterOrDigit( previous )
+		if (
+			char.IsLetterOrDigit( previous )
 			|| previous == '_'
 			|| previous == '>'
 			|| previous == ']'
-			|| previous == ')'
-			|| previous == '!';
+		) {
+			return true;
+		}
+
+		if ( previous == '!' ) {
+			return openParenthesis > 1
+				&& IsInvocationReceiverCharacter( source[openParenthesis - 2] );
+		}
+
+		if ( previous != ')' ) {
+			return false;
+		}
+
+		int precedingOpenParenthesis =
+			FindMatchingOpenParenthesis( source, openParenthesis - 1 );
+		return precedingOpenParenthesis >= 0
+			&& IsCallLikeOpenParenthesis( source, precedingOpenParenthesis );
+	}
+
+	private static bool IsInvocationReceiverCharacter( char value ) {
+		return char.IsLetterOrDigit( value )
+			|| value == '_'
+			|| value == '>'
+			|| value == ']'
+			|| value == ')';
 	}
 
 	private static bool ParenthesisInteriorUsesRepositorySpacing(
@@ -238,6 +262,27 @@ public sealed class CodingConventionTests {
 			if ( source[i] == '(' ) {
 				depth++;
 			} else if ( source[i] == ')' ) {
+				depth--;
+				if ( depth == 0 ) {
+					return i;
+				}
+			}
+		}
+
+		return -1;
+	}
+
+	private static int FindMatchingOpenParenthesis(
+		string source,
+		int closeParenthesis
+	) {
+		ArgumentNullException.ThrowIfNull( source );
+
+		int depth = 0;
+		for ( int i = closeParenthesis; i >= 0; i-- ) {
+			if ( source[i] == ')' ) {
+				depth++;
+			} else if ( source[i] == '(' ) {
 				depth--;
 				if ( depth == 0 ) {
 					return i;
