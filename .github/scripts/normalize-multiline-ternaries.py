@@ -1,5 +1,7 @@
 from pathlib import Path
 
+# Temporary branch-scoped driver; removed after the convention gate is green.
+
 
 def replace_exact(path: str, old: str, new: str) -> None:
     target = Path(path)
