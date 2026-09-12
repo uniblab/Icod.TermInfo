@@ -440,13 +440,14 @@ internal static class Program {
 				"Inspection package does not contain the published JSON Schema."
 			);
 		string schema;
-		using ( Stream stream = schemaEntry.Open() )
-		using ( StreamReader reader = new( stream, Encoding.UTF8 ) ) {
-			schema =
-				reader
-					.ReadToEnd()
-					.Replace( "\r\n", "\n", StringComparison.Ordinal )
-					.Replace( '\r', '\n' );
+		using ( Stream stream = schemaEntry.Open() ) {
+			using ( StreamReader reader = new( stream, Encoding.UTF8 ) ) {
+				schema =
+					reader
+						.ReadToEnd()
+						.Replace( "\r\n", "\n", StringComparison.Ordinal )
+						.Replace( '\r', '\n' );
+			}
 		}
 		string schemaSha256 =
 			Convert.ToHexString(
@@ -504,13 +505,14 @@ internal static class Program {
 				"Inspection package does not contain the database automation JSON Schema."
 			);
 		string schemaV2;
-		using ( Stream stream = schemaV2Entry.Open() )
-		using ( StreamReader reader = new( stream, Encoding.UTF8 ) ) {
-			schemaV2 =
-				reader
-					.ReadToEnd()
-					.Replace( "\r\n", "\n", StringComparison.Ordinal )
-					.Replace( '\r', '\n' );
+		using ( Stream stream = schemaV2Entry.Open() ) {
+			using ( StreamReader reader = new( stream, Encoding.UTF8 ) ) {
+				schemaV2 =
+					reader
+						.ReadToEnd()
+						.Replace( "\r\n", "\n", StringComparison.Ordinal )
+						.Replace( '\r', '\n' );
+			}
 		}
 		string schemaV2Sha256 =
 			Convert.ToHexString(
@@ -566,13 +568,14 @@ internal static class Program {
 				"Inspection package does not contain the persistent-raster lifecycle JSON Schema."
 			);
 		string schemaV3;
-		using ( Stream stream = schemaV3Entry.Open() )
-		using ( StreamReader reader = new( stream, Encoding.UTF8 ) ) {
-			schemaV3 =
-				reader
-					.ReadToEnd()
-					.Replace( "\r\n", "\n", StringComparison.Ordinal )
-					.Replace( '\r', '\n' );
+		using ( Stream stream = schemaV3Entry.Open() ) {
+			using ( StreamReader reader = new( stream, Encoding.UTF8 ) ) {
+				schemaV3 =
+					reader
+						.ReadToEnd()
+						.Replace( "\r\n", "\n", StringComparison.Ordinal )
+						.Replace( '\r', '\n' );
+			}
 		}
 		string schemaV3Sha256 =
 			Convert.ToHexString(
@@ -644,11 +647,12 @@ internal static class Program {
 				$"Icod.TermInfo.Inspection-package-verifier-{Guid.NewGuid():N}.dll"
 			);
 		try {
-			using ( Stream source = entry!.Open() )
-			using ( FileStream destination = File.Create( temporaryPath ) ) {
-				source.CopyTo(
-					destination
-				);
+			using ( Stream source = entry!.Open() ) {
+				using ( FileStream destination = File.Create( temporaryPath ) ) {
+					source.CopyTo(
+						destination
+					);
+				}
 			}
 			AssemblyName assemblyName =
 				AssemblyName.GetAssemblyName(
