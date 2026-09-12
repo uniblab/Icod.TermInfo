@@ -569,9 +569,10 @@ public static class Command {
 							);
 					}
 
-					var namesInCurrentRoot = duplicateReferences is null
+					var namesInCurrentRoot = ( duplicateReferences is null )
 						? null
-						: new HashSet<string>( StringComparer.Ordinal );
+						: new HashSet<string>( StringComparer.Ordinal )
+					;
 					foreach ( TermInfoDatabaseCatalogEntry entry in entries ) {
 						cancellationToken.ThrowIfCancellationRequested();
 
