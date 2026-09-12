@@ -346,15 +346,19 @@ public sealed class CodingConventionTests {
 				return questionIndex;
 			}
 
-			if ( IsNestedInParenthesesOrBrackets( maskedSource, questionIndex ) ) {
+			int terminatorIndex =
+				FindTernaryExpressionTerminator(
+					maskedSource,
+					colonIndex + 1
+				);
+			if ( terminatorIndex < 0 ) {
+				return colonIndex;
+			}
+			if ( maskedSource[ terminatorIndex ] != ';' ) {
 				continue;
 			}
 
-			int semicolonIndex = maskedSource.IndexOf( ';', colonIndex + 1 );
-			if ( semicolonIndex < 0 ) {
-				return colonIndex;
-			}
-
+			int semicolonIndex = terminatorIndex;
 			int semicolonLineStart =
 				maskedSource.LastIndexOf( '\n', semicolonIndex - 1 ) + 1;
 			for ( int i = semicolonLineStart; i < semicolonIndex; i++ ) {
@@ -411,28 +415,62 @@ public sealed class CodingConventionTests {
 		return -1;
 	}
 
-	private static bool IsNestedInParenthesesOrBrackets(
+	private static int FindTernaryExpressionTerminator(
 		string source,
-		int index
+		int startIndex
 	) {
 		ArgumentNullException.ThrowIfNull( source );
-		ArgumentOutOfRangeException.ThrowIfNegative( index );
+		ArgumentOutOfRangeException.ThrowIfNegative( startIndex );
 
 		int parenthesisDepth = 0;
 		int bracketDepth = 0;
-		for ( int i = 0; i < index; i++ ) {
+		int braceDepth = 0;
+		for ( int i = startIndex; i < source.Length; i++ ) {
 			if ( source[i] == '(' ) {
 				parenthesisDepth++;
-			} else if ( source[i] == ')' ) {
-				parenthesisDepth--;
-			} else if ( source[i] == '[' ) {
+				continue;
+			}
+			if ( source[i] == '[' ) {
 				bracketDepth++;
-			} else if ( source[i] == ']' ) {
+				continue;
+			}
+			if ( source[i] == '{' ) {
+				braceDepth++;
+				continue;
+			}
+			if ( source[i] == ')' ) {
+				if ( parenthesisDepth == 0 ) {
+					return i;
+				}
+				parenthesisDepth--;
+				continue;
+			}
+			if ( source[i] == ']' ) {
+				if ( bracketDepth == 0 ) {
+					return i;
+				}
 				bracketDepth--;
+				continue;
+			}
+			if ( source[i] == '}' ) {
+				if ( braceDepth == 0 ) {
+					return i;
+				}
+				braceDepth--;
+				continue;
+			}
+
+			if (
+				parenthesisDepth == 0
+				&& bracketDepth == 0
+				&& braceDepth == 0
+				&& ( source[i] == ',' || source[i] == ';' )
+			) {
+				return i;
 			}
 		}
 
-		return parenthesisDepth > 0 || bracketDepth > 0;
+		return -1;
 	}
 
 	private static bool IsCallLikeOpenParenthesis(
