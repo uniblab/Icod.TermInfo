@@ -7,23 +7,25 @@
 
 `Icod.TermInfo` is a managed, dependency-free .NET implementation of the low-level terminal-capability model traditionally supplied by `libtinfo`.
 
-Version `1.10.0` is the current stable coordinated release. It extends the
-machine-readable Inspection layer to deterministic caller-ordered sets of
-explicit conventional terminfo databases while preserving the frozen Runtime,
-Source, Compiler, Termcap, synthesis, planning, and version-1 JSON contracts.
+Version `1.11.0` is the current stable coordinated release. It adds
+protocol-neutral persistent-raster lifecycle evidence, classification, planning,
+description/database-set composition, and version-3 machine-readable profile and
+plan documents through `Icod.TermInfo.Inspection` while preserving the frozen
+Runtime, Source, Compiler, Termcap, synthesis, planning, and version-1/version-2
+JSON contracts.
 
 The package family targets `net8.0`, `net9.0`, and `net10.0`; packages use C# 13,
 contain no native ncurses/terminfo payload, and are intended to run on Windows,
 Linux, and macOS.
 
-## 1.11 release candidate status
+## 1.11 release status
 
-The `1.11.0` branch is currently at `1.11.0-Alpha-8`, the release-hardening
-candidate for protocol-neutral persistent-raster lifecycle semantics and planning.
-The additive Inspection surface provides immutable evidence/provenance,
-`Unknown`/`Supported`/`Unsupported`/`Contradicted` classification, deterministic
-semantic lifecycle plans, `TerminalDescription` and database-set composition,
-and additive version-3 profile/plan JSON documents.
+Version `1.11.0` promotes the fully validated `1.11.0-Alpha-8` contract without
+feature, public API, schema, dependency, target-framework, command-semantic, or
+archive-RID changes. The additive Inspection surface provides immutable
+evidence/provenance, `Unknown`/`Supported`/`Unsupported`/`Contradicted`
+classification, deterministic semantic lifecycle plans, `TerminalDescription`
+and database-set composition, and additive version-3 profile/plan JSON documents.
 
 TermInfo does not perform live graphics protocol I/O or own terminal image,
 resource, or placement identities. Live verification, protocol execution,
@@ -37,11 +39,13 @@ removing only the reviewed 1.11 delta. JSON schema versions 1 and 2 remain
 unchanged; version 3 contains only `persistentRasterLifecycleProfile` and
 `persistentRasterLifecyclePlan`.
 
+The Alpha-8 product contract passed workflow #286 / `34662961312`; the stable
+version-only promotion passed workflow #289 / `34663869047`. Publication remains
+gated by the normal `main` and immutable `v*` tag workflows.
+
 See `docs/1.11.0-PERSISTENT-RASTER-LIFECYCLE-GUIDE.md`,
 `samples/Icod.TermInfo.PersistentRasterLifecycle.Sample`, and
-`docs/1.11.0-RELEASE-AUDIT.md`. Stable `1.11.0` will be a promotion-only
-transition after the exact Alpha-8 Staging gate is fully green; publication
-remains gated by the normal main/tag workflows.
+`docs/1.11.0-RELEASE-AUDIT.md`.
 
 ## 1.10 release status
 
@@ -76,35 +80,34 @@ The final post-documentation Staging gate is green (`33736812176`, head
 Runtime-only consumers use:
 
 ```text
-dotnet add package Icod.TermInfo --version 1.10.0
+dotnet add package Icod.TermInfo --version 1.11.0
 ```
 
 Applications which need terminfo source-language support use:
 
 ```text
-dotnet add package Icod.TermInfo.Source --version 1.10.0
+dotnet add package Icod.TermInfo.Source --version 1.11.0
 ```
 
 Applications which need opt-in termcap parsing, conversion, rendering, or
 explicit historical termcap acquisition use:
 
 ```text
-dotnet add package Icod.TermInfo.Termcap --version 1.10.0
+dotnet add package Icod.TermInfo.Termcap --version 1.11.0
 ```
 
 Applications which compile terminfo source or write conventional compiled
 terminfo databases use:
 
 ```text
-dotnet add package Icod.TermInfo.Compiler --version 1.10.0
+dotnet add package Icod.TermInfo.Compiler --version 1.11.0
 ```
 
 Applications which need canonical rendering, semantic comparison, provider-aware
-inspection, database-set automation, or (on the 1.11 prerelease line) persistent-
-raster lifecycle planning use:
+inspection, database-set automation, or persistent-raster lifecycle planning use:
 
 ```text
-dotnet add package Icod.TermInfo.Inspection --version 1.10.0
+dotnet add package Icod.TermInfo.Inspection --version 1.11.0
 ```
 
 `Icod.TermInfo.Source` and `Icod.TermInfo.Termcap` each depend on the matching
@@ -117,7 +120,7 @@ Inspection does not depend on Compiler, Termcap, `Icod.Terminal`, or
 The same validated package artifacts are published to NuGet.org and GitHub
 Packages. Historical release contracts remain recorded in the versioned release
 audits; the current stable publication contract is recorded in
-`docs/1.10.0-RELEASE-AUDIT.md`.
+`docs/1.11.0-RELEASE-AUDIT.md`.
 
 ## Tool Suite
 
@@ -144,7 +147,7 @@ distribution-only router package.
 Install the coordinated router as a .NET tool with:
 
 ```text
-dotnet tool install --global Icod.TermInfo.Tools --version 1.10.0
+dotnet tool install --global Icod.TermInfo.Tools --version 1.11.0
 
 icod-terminfo tic -V
 icod-terminfo infocmp -V
@@ -169,7 +172,7 @@ Icod.TermInfo.Tools.<version>.osx-x64.tar.gz
 Icod.TermInfo.Tools.<version>.osx-arm64.tar.gz
 ```
 
-Each 1.10.0 archive contains the traditional `tic`, `infocmp`, `toe`,
+Each 1.11.0 archive contains the traditional `tic`, `infocmp`, `toe`,
 `captoinfo`, and `infotocap` command names and their required managed
 dependencies. The user supplies the .NET 10 runtime and controls where the
 archive is unpacked and whether that location is placed on `PATH`. The archive
@@ -1261,9 +1264,9 @@ for the 1.3 Inspection contract,
 and `docs/1.8.0-RELEASE-AUDIT.md` for the frozen 1.8 planning contract,
 `Icod.TermInfo-1.9.0-Machine-Readable-Inspection-and-Planning-Automation-Roadmap.md`
 and `docs/1.9.0-RELEASE-AUDIT.md` for the frozen 1.9 machine-readable contract,
-`docs/1.10.0-RELEASE-AUDIT.md` for the current stable multi-database automation
-contract, and `docs/1.11.0-RELEASE-AUDIT.md` for the active persistent-raster
-lifecycle release candidate. See `docs/VERSIONING.md` and
+`docs/1.10.0-RELEASE-AUDIT.md` for the frozen multi-database automation
+contract, and `docs/1.11.0-RELEASE-AUDIT.md` for the current stable persistent-
+raster lifecycle contract. See `docs/VERSIONING.md` and
 `docs/COMPATIBILITY.md` for the 1.x promises.
 The 0.6.0 through 1.0.0 roadmaps remain historical frozen contracts.
 
