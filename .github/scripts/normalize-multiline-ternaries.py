@@ -1,6 +1,7 @@
 from pathlib import Path
 
 # Temporary branch-scoped driver; removed after the convention gate is green.
+# Current checkpoint verifies forward ternary-expression terminators.
 
 
 def replace_exact(path: str, old: str, new: str) -> None:
