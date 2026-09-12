@@ -24,6 +24,10 @@ public sealed class CodingConventionTests {
 		@"(?m)^[\t ]*do\b",
 		RegexOptions.CultureInvariant
 	);
+	private static readonly Regex ControlKeywordWithoutSpaceBeforeParenthesisPattern = new(
+		@"\b(?:if|for|foreach|while|switch|catch|using|lock|fixed)\(",
+		RegexOptions.CultureInvariant
+	);
 
 	[Fact]
 	public void RepositoryCSharpFilesUseOneTrueBraceStyle() {
@@ -88,6 +92,27 @@ public sealed class CodingConventionTests {
 		);
 	}
 
+	[Fact]
+	public void RepositoryCSharpParenthesesUseRepositorySpacing() {
+		string repositoryRoot = FindRepositoryRoot();
+		List<string> violations = [];
+
+		foreach ( string path in EnumerateCSharpFiles( repositoryRoot ) ) {
+			string source = MaskNonCode( File.ReadAllText( path ) );
+
+			if ( ContainsParenthesisSpacingViolation( source ) ) {
+				violations.Add( GetRelativePath( repositoryRoot, path ) );
+			}
+		}
+
+		Assert.True(
+			violations.Count == 0,
+			"C# files using non-repository parenthesis spacing:"
+				+ Environment.NewLine
+				+ string.Join( Environment.NewLine, violations )
+		);
+	}
+
 	private static bool ContainsUnbracedControlFlow( string source ) {
 		ArgumentNullException.ThrowIfNull( source );
 
@@ -128,6 +153,38 @@ public sealed class CodingConventionTests {
 		foreach ( Match match in DoControlFlowPattern.Matches( source ) ) {
 			int next = FindNextNonWhitespace( source, match.Index + match.Length );
 			if ( next < 0 || source[next] != '{' ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private static bool ContainsParenthesisSpacingViolation( string source ) {
+		ArgumentNullException.ThrowIfNull( source );
+
+		if ( ControlKeywordWithoutSpaceBeforeParenthesisPattern.IsMatch( source ) ) {
+			return true;
+		}
+
+		for ( int i = 0; i < source.Length; i++ ) {
+			if ( source[i] != '(' ) {
+				continue;
+			}
+
+			int closeParenthesis = FindMatchingParenthesis( source, i );
+			if ( closeParenthesis < 0 ) {
+				continue;
+			}
+
+			if ( closeParenthesis == i + 1 ) {
+				continue;
+			}
+
+			if (
+				!char.IsWhiteSpace( source[i + 1] )
+				|| !char.IsWhiteSpace( source[closeParenthesis - 1] )
+			) {
 				return true;
 			}
 		}
