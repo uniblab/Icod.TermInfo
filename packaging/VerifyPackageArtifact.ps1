@@ -41,6 +41,13 @@ try {
         throw "PG07 package-only placement interoperability consumer exited with status $LASTEXITCODE."
     }
 
+    & ./.github/scripts/smoke-re07-runtime-evidence-interop.ps1 `
+        -ArtifactDirectory $ArtifactDirectory `
+        -Configuration $Configuration
+    if (0 -ne $LASTEXITCODE) {
+        throw "RE07 package-only runtime-evidence interoperability consumer exited with status $LASTEXITCODE."
+    }
+
     $lifecycleSampleProject = Join-Path `
         $repositoryRoot `
         'samples/Icod.TermInfo.PersistentRasterLifecycle.Sample/Icod.TermInfo.PersistentRasterLifecycle.Sample.csproj'
@@ -76,6 +83,25 @@ try {
             --no-restore
         if (0 -ne $LASTEXITCODE) {
             throw "PG07 persistent-raster placement sample failed on $framework."
+        }
+    }
+
+    $runtimeIntegrationSampleProject = Join-Path `
+        $repositoryRoot `
+        'samples/Icod.TermInfo.PersistentRasterRuntimeIntegration.Sample/Icod.TermInfo.PersistentRasterRuntimeIntegration.Sample.csproj'
+    & dotnet restore $runtimeIntegrationSampleProject
+    if (0 -ne $LASTEXITCODE) {
+        throw 'RE07 persistent-raster runtime-integration sample restore failed.'
+    }
+
+    foreach ($framework in @('net8.0', 'net9.0', 'net10.0')) {
+        & dotnet run `
+            --project $runtimeIntegrationSampleProject `
+            -c $Configuration `
+            -f $framework `
+            --no-restore
+        if (0 -ne $LASTEXITCODE) {
+            throw "RE07 persistent-raster runtime-integration sample failed on $framework."
         }
     }
 
