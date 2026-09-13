@@ -7,41 +7,36 @@
 
 `Icod.TermInfo` is a managed, dependency-free .NET implementation of the low-level terminal-capability model traditionally supplied by `libtinfo`.
 
-Version `1.11.0` is the current stable coordinated release. It adds
-protocol-neutral persistent-raster lifecycle evidence, classification, planning,
-description/database-set composition, and version-3 machine-readable profile and
-plan documents through `Icod.TermInfo.Inspection` while preserving the frozen
-Runtime, Source, Compiler, Termcap, synthesis, planning, and version-1/version-2
-JSON contracts.
+Version `1.12.0` is the current stable coordinated release. It adds
+protocol-neutral advanced persistent-raster placement evidence, classification,
+lifecycle-aware planning, description/database-set composition, and additive
+version-4 profile/plan JSON through `Icod.TermInfo.Inspection` while preserving
+the frozen 1.11 lifecycle surface and version-1/version-2/version-3 JSON
+contracts.
 
 The package family targets `net8.0`, `net9.0`, and `net10.0`; packages use C# 13,
 contain no native ncurses/terminfo payload, and are intended to run on Windows,
 Linux, and macOS.
 
-## 1.12 release candidate
+## 1.12 release status
 
-`1.12.0-Alpha-8` is the frozen candidate for advanced persistent-raster
-placement semantics and planning. The 1.12 Inspection layer adds exactly two
-protocol-neutral placement requirements: pixel-space source rectangles and
-signed z-order. It composes those requirements with the frozen 1.11 lifecycle
-planner, ordered database-set precedence, and additive version-4 profile/plan
-JSON without adding live graphics execution to TermInfo.
+Version `1.12.0` promotes the fully validated `1.12.0-Alpha-8` contract without
+feature, public API, schema, dependency, target-framework, command-semantic, or
+archive-RID changes. The 1.12 Inspection layer adds exactly two protocol-neutral
+placement requirements: pixel-space source rectangles and signed z-order, and
+composes them with the frozen 1.11 lifecycle planner and ordered database-set
+precedence.
 
-The complete candidate Inspection API is frozen at 81 exported public types with
+The complete Inspection API remains frozen at 81 exported public types with
 normalized-LF SHA-256
 `f71501dcd27a530051c1a02083325144ced2b6173b6b967b9571c620815198f0`.
 JSON versions 1 through 3 remain unchanged; version 4 contains exactly
 `persistentRasterPlacementProfile` and `persistentRasterPlacementPlan`.
 
 Production `Icod.TermInfo` and `Icod.TermInfo.Inspection` still do not depend on
-`Icod.Terminal`. PG07 qualifies the semantic handoff separately against published
-`Icod.Terminal 1.12.0` through a package-only consumer and the
-`Icod.TermInfo.PersistentRasterPlacement.Sample` on `net8.0`, `net9.0`, and
-`net10.0`.
-
-Stable install examples below intentionally remain at `1.11.0` until Alpha-8
-passes the full release matrix and a separate promotion-only commit advances the
-coordinated release to stable `1.12.0`. See
+`Icod.Terminal`. The Alpha-8 contract passed workflow #725 / `34763187115`.
+Stable promotion is version/documentation-only and is validated separately before
+merge or publication. See
 `docs/1.12.0-ADVANCED-PERSISTENT-RASTER-PLACEMENT-GUIDE.md` and
 `docs/1.12.0-RELEASE-AUDIT.md`.
 
@@ -107,34 +102,34 @@ The final post-documentation Staging gate is green (`33736812176`, head
 Runtime-only consumers use:
 
 ```text
-dotnet add package Icod.TermInfo --version 1.11.0
+dotnet add package Icod.TermInfo --version 1.12.0
 ```
 
 Applications which need terminfo source-language support use:
 
 ```text
-dotnet add package Icod.TermInfo.Source --version 1.11.0
+dotnet add package Icod.TermInfo.Source --version 1.12.0
 ```
 
 Applications which need opt-in termcap parsing, conversion, rendering, or
 explicit historical termcap acquisition use:
 
 ```text
-dotnet add package Icod.TermInfo.Termcap --version 1.11.0
+dotnet add package Icod.TermInfo.Termcap --version 1.12.0
 ```
 
 Applications which compile terminfo source or write conventional compiled
 terminfo databases use:
 
 ```text
-dotnet add package Icod.TermInfo.Compiler --version 1.11.0
+dotnet add package Icod.TermInfo.Compiler --version 1.12.0
 ```
 
 Applications which need canonical rendering, semantic comparison, provider-aware
 inspection, database-set automation, or persistent-raster lifecycle planning use:
 
 ```text
-dotnet add package Icod.TermInfo.Inspection --version 1.11.0
+dotnet add package Icod.TermInfo.Inspection --version 1.12.0
 ```
 
 `Icod.TermInfo.Source` and `Icod.TermInfo.Termcap` each depend on the matching
@@ -147,7 +142,7 @@ Inspection does not depend on Compiler, Termcap, `Icod.Terminal`, or
 The same validated package artifacts are published to NuGet.org and GitHub
 Packages. Historical release contracts remain recorded in the versioned release
 audits; the current stable publication contract is recorded in
-`docs/1.11.0-RELEASE-AUDIT.md`.
+`docs/1.12.0-RELEASE-AUDIT.md`.
 
 ## Tool Suite
 
@@ -174,7 +169,7 @@ distribution-only router package.
 Install the coordinated router as a .NET tool with:
 
 ```text
-dotnet tool install --global Icod.TermInfo.Tools --version 1.11.0
+dotnet tool install --global Icod.TermInfo.Tools --version 1.12.0
 
 icod-terminfo tic -V
 icod-terminfo infocmp -V
@@ -199,7 +194,7 @@ Icod.TermInfo.Tools.<version>.osx-x64.tar.gz
 Icod.TermInfo.Tools.<version>.osx-arm64.tar.gz
 ```
 
-Each 1.11.0 archive contains the traditional `tic`, `infocmp`, `toe`,
+Each 1.12.0 archive contains the traditional `tic`, `infocmp`, `toe`,
 `captoinfo`, and `infotocap` command names and their required managed
 dependencies. The user supplies the .NET 10 runtime and controls where the
 archive is unpacked and whether that location is placed on `PATH`. The archive
@@ -219,7 +214,7 @@ remains unsigned. The frozen 1.0 and 1.1 releases support `net8.0` and
 target-framework policy are documented in `docs/VERSIONING.md` and
 `docs/COMPATIBILITY.md`.
 
-The runtime 1.0 public API remains frozen. Version 1.1 adds source-language functionality in the separate `Icod.TermInfo.Source` package rather than making the runtime package depend on parser/front-end code. The 1.2 line adds deterministic compiled-entry writing in the separate `Icod.TermInfo.Compiler` package. The 1.3 line adds canonical rendering and semantic comparison in the separate `Icod.TermInfo.Inspection` package. The 1.4 line composes those libraries into the separate `tic`, `infocmp`, and `toe` command layer without moving command policy into the reusable packages. Live terminal sessions, input decoding, and active probing belong to the sibling `Icod.Terminal` layer; curses-style screen/window behavior belongs to `Icod.DCurses`. Version 1.11 adds protocol-neutral persistent-raster lifecycle evidence and planning to Inspection while preserving that live-session ownership boundary. PTYs, terminal emulation, and graphics protocol execution remain separate later or sibling work.
+The runtime 1.0 public API remains frozen. Version 1.1 adds source-language functionality in the separate `Icod.TermInfo.Source` package rather than making the runtime package depend on parser/front-end code. The 1.2 line adds deterministic compiled-entry writing in the separate `Icod.TermInfo.Compiler` package. The 1.3 line adds canonical rendering and semantic comparison in the separate `Icod.TermInfo.Inspection` package. The 1.4 line composes those libraries into the separate `tic`, `infocmp`, and `toe` command layer without moving command policy into the reusable packages. Live terminal sessions, input decoding, and active probing belong to the sibling `Icod.Terminal` layer; curses-style screen/window behavior belongs to `Icod.DCurses`. Version 1.11 adds protocol-neutral persistent-raster lifecycle evidence and planning to Inspection while preserving that live-session ownership boundary. Version 1.12 adds protocol-neutral source-rectangle and signed-z-order placement semantics and planning while keeping concrete execution values and live protocol work downstream. PTYs, terminal emulation, and graphics protocol execution remain separate later or sibling work.
 
 ## What 1.0 provides
 

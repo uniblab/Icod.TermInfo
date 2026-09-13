@@ -87,7 +87,7 @@ public sealed class PG08ReleaseClosureTests {
 	}
 
 	[Fact]
-	public void ReleaseFacingMetadataDescribesOneTwelveAlphaEight() {
+	public void ReleaseFacingMetadataDescribesStableOneTwelve() {
 		string rootReadme = ReadRepositoryFile( "README.md" );
 		string inspectionReadme = ReadRepositoryFile(
 			"Icod.TermInfo.Inspection/README.md"
@@ -121,7 +121,7 @@ public sealed class PG08ReleaseClosureTests {
 			StringComparison.Ordinal
 		);
 		Assert.Contains(
-			"<IcodTermInfoSuiteVersion>1.12.0-Alpha-8</IcodTermInfoSuiteVersion>",
+			"<IcodTermInfoSuiteVersion>1.12.0</IcodTermInfoSuiteVersion>",
 			buildProperties,
 			StringComparison.Ordinal
 		);

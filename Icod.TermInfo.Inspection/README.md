@@ -3,10 +3,11 @@
 `Icod.TermInfo.Inspection` is the optional managed inspection and semantic-
 comparison layer for the `Icod.TermInfo` package family.
 
-## 1.12 release candidate
+## 1.12 release status
 
-Version `1.12.0-Alpha-8` freezes the additive advanced persistent-raster
-placement surface. Inspection now classifies and plans two placement semantics:
+Version `1.12.0` promotes the additive advanced persistent-raster placement
+surface frozen by `1.12.0-Alpha-8` without semantic, API, schema, dependency,
+target-framework, or command changes. Inspection now classifies and plans two placement semantics:
 `SourceRectangle` and `SignedZOrder`. The new placement planner consumes the
 already-produced 1.11 lifecycle plan rather than reinterpreting lifecycle
 support, and database-set composition preserves the frozen ordered precedence
@@ -553,7 +554,7 @@ and Source packages.
 ## Install
 
 ```text
-dotnet add package Icod.TermInfo.Inspection --version 1.11.0
+dotnet add package Icod.TermInfo.Inspection --version 1.12.0
 ```
 
 The package targets `net8.0`, `net9.0`, and `net10.0`, depends on matching
