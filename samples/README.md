@@ -7,9 +7,11 @@ examples stay easy to copy without mixing unrelated concerns.
 
 The 1.12 addition is `Icod.TermInfo.PersistentRasterPlacement.Sample`. It shows
 the deliberate boundary between protocol-neutral TermInfo planning and
-consumer-owned `Icod.Terminal 1.12.0` execution values: TermInfo establishes that
-source rectangles and signed z-order are admissible requirements, then the
-consumer supplies an actual `TerminalRasterSourceRectangle` and `ZIndex`.
+consumer-owned `Icod.Terminal 1.12.0` execution values. With no advanced-placement
+evidence, source rectangles and signed z-order remain `Unknown` and planning
+requires runtime verification. The consumer then supplies its own `Verified`
+evidence, replans to `Satisfied`, and only then constructs an actual
+`TerminalRasterSourceRectangle` and `ZIndex`.
 
 The 1.11 addition is `Icod.TermInfo.PersistentRasterLifecycle.Sample`, an
 executable public-API walkthrough for protocol-neutral persistent-raster
@@ -154,14 +156,17 @@ See `Icod.TermInfo.PersistentRasterLifecycle.Sample/README.md`.
 ## Icod.TermInfo.PersistentRasterPlacement.Sample
 
 `Icod.TermInfo.PersistentRasterPlacement.Sample` is the focused 1.12 downstream
-integration example. It first constructs a successful lifecycle plan and a
-placement profile that verifies both `SourceRectangle` and `SignedZOrder`, then
-requires those semantics through `PersistentRasterPlacementPlanner`.
+integration example. It first constructs a successful lifecycle plan with no
+advanced-placement evidence. Both `SourceRectangle` and `SignedZOrder` therefore
+remain `Unknown`, and a request requiring both semantics produces
+`RequiresRuntimeVerification`.
 
-Only after the semantic plan is satisfied does the consumer construct concrete
-`Icod.Terminal 1.12.0` execution values: a `TerminalRasterSourceRectangle` and a
-signed `TerminalRasterPlacementOptions.ZIndex`. This demonstrates that TermInfo
-never owns the actual crop coordinates or z-order integer.
+The consumer then adds caller-owned `Verified` evidence, reclassifies, and
+replans to `Satisfied`. The sample renders both version-4 placement profile and
+plan documents before constructing concrete `Icod.Terminal 1.12.0` execution
+values: a `TerminalRasterSourceRectangle` and a signed
+`TerminalRasterPlacementOptions.ZIndex`. This demonstrates that TermInfo never
+owns the actual crop coordinates or z-order integer.
 
 Run it with:
 

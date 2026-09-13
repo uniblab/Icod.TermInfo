@@ -35,8 +35,10 @@ JSON versions 1 through 3 remain unchanged; version 4 contains exactly
 
 Production `Icod.TermInfo` and `Icod.TermInfo.Inspection` still do not depend on
 `Icod.Terminal`. The Alpha-8 contract passed workflow #725 / `34763187115`.
-The stable promotion passed workflow #731 / `34764253699` on exact head
-`1674c008f1df2cbe82295b8eaa9ae9d34ac5d999`, with all 12 jobs green.
+The release-ready stable contract passed workflow #741 / `34764960954` on
+exact head `292ea7b490747ada55d1960461e1cdb676a8e3e9`, with all 12 jobs green.
+The release audit records the subsequent pre-merge sample/documentation polish
+separately.
 Publication remains gated by merge to `main` and the normal immutable-tag release
 workflow. See
 `docs/1.12.0-ADVANCED-PERSISTENT-RASTER-PLACEMENT-GUIDE.md` and
@@ -981,7 +983,7 @@ The first provider which resolves the requested name wins.
 
 ## Sample applications
 
-The repository contains five executable API samples plus one command-suite
+The repository contains six executable API samples plus one command-suite
 walkthrough with deliberately different purposes.
 
 ### General terminal API sample
@@ -1002,7 +1004,7 @@ walkthrough with deliberately different purposes.
 - redirection handling and explicit Windows VT enablement;
 - a custom provider implementation.
 
-All five executable API sample projects target `net8.0`, `net9.0`, and
+All six executable API sample projects target `net8.0`, `net9.0`, and
 `net10.0`; `dotnet run` therefore needs an explicit framework. Run the ordinary
 demonstration with:
 
@@ -1117,6 +1119,30 @@ Release verification executes the sample on `net8.0`, `net9.0`, and `net10.0`.
 See `samples/Icod.TermInfo.PersistentRasterLifecycle.Sample/README.md` and
 `docs/1.11.0-PERSISTENT-RASTER-LIFECYCLE-GUIDE.md`.
 
+### Persistent-raster placement sample
+
+`samples/Icod.TermInfo.PersistentRasterPlacement.Sample` is the focused 1.12
+Inspection/Terminal boundary example. It begins with a successful lifecycle plan
+but no advanced-placement evidence, so both `SourceRectangle` and
+`SignedZOrder` remain `Unknown` and the placement planner returns
+`RequiresRuntimeVerification`.
+
+The consumer then contributes its own `Verified` evidence, reclassifies the
+placement profile, and obtains a `Satisfied` plan. The sample renders both the
+version-4 placement profile and placement plan before constructing any concrete
+Terminal execution values. Only after semantic planning succeeds does it create
+a `TerminalRasterSourceRectangle` and signed `ZIndex`.
+
+Run it with:
+
+```text
+dotnet run --project samples/Icod.TermInfo.PersistentRasterPlacement.Sample/Icod.TermInfo.PersistentRasterPlacement.Sample.csproj -f net10.0
+```
+
+Release verification executes the sample on `net8.0`, `net9.0`, and `net10.0`.
+See `samples/Icod.TermInfo.PersistentRasterPlacement.Sample/README.md` and
+`docs/1.12.0-ADVANCED-PERSISTENT-RASTER-PLACEMENT-GUIDE.md`.
+
 ### Managed tool-suite walkthrough
 
 `samples/ToolSuite` is a data-and-command walkthrough for `tic`, `infocmp`, `toe`,
@@ -1135,19 +1161,20 @@ automation.
 See `samples/README.md`, `samples/ToolSuite/README.md`,
 `samples/Icod.TermInfo.Acquisition.Sample/README.md`,
 `samples/Icod.TermInfo.Toolchain.Sample/README.md`,
-`samples/Icod.TermInfo.PersistentRasterLifecycle.Sample/README.md`, and
+`samples/Icod.TermInfo.PersistentRasterLifecycle.Sample/README.md`,
+`samples/Icod.TermInfo.PersistentRasterPlacement.Sample/README.md`, and
 `docs/0.9.0-ACQUISITION-GUIDE.md` for the complete examples.
 
 ## Project-family boundary
 
-`Icod.TermInfo` owns immutable terminal-description data, acquisition of that data, and pure transformations required to interpret, expand, and output terminal capabilities. `Icod.TermInfo.Source` owns optional source-language parsing and inheritance resolution, `Icod.TermInfo.Compiler` owns compiled output, `Icod.TermInfo.Inspection` owns canonical rendering, semantic comparison, database-set automation, and protocol-neutral persistent-raster lifecycle evidence/classification/planning, and `Icod.TermInfo.Termcap` owns optional termcap interoperability. None of those packages owns a live terminal session, terminal graphics resource identity, a child pseudo-terminal, or a virtual screen.
+`Icod.TermInfo` owns immutable terminal-description data, acquisition of that data, and pure transformations required to interpret, expand, and output terminal capabilities. `Icod.TermInfo.Source` owns optional source-language parsing and inheritance resolution, `Icod.TermInfo.Compiler` owns compiled output, `Icod.TermInfo.Inspection` owns canonical rendering, semantic comparison, database-set automation, protocol-neutral persistent-raster lifecycle and placement evidence/classification/planning, and versioned machine-readable views, and `Icod.TermInfo.Termcap` owns optional termcap interoperability. None of those packages owns a live terminal session, terminal graphics resource identity, a child pseudo-terminal, or a virtual screen.
 
 The intended family boundary is now explicit:
 
 - **`Icod.TermInfo`** — descriptions, compiled-database acquisition, capability semantics, parameter expansion, and output transformation;
 - **`Icod.TermInfo.Source`** — `.ti` lexical analysis, source diagnostics, unresolved entries, cancellation, `use=` inheritance, and materialization into `TerminalDescription`;
 - **`Icod.TermInfo.Compiler`** — deterministic compiled-entry writing, source compilation, and explicit conventional database-layout publication;
-- **`Icod.TermInfo.Inspection`** — canonical effective/source rendering, relative-source synthesis and parent planning, structured semantic comparison, provider/database-set inspection, and persistent-raster lifecycle evidence, classification, planning, and version-3 machine-readable views;
+- **`Icod.TermInfo.Inspection`** — canonical effective/source rendering, relative-source synthesis and parent planning, structured semantic comparison, provider/database-set inspection, persistent-raster lifecycle and advanced-placement evidence/classification/planning, and version-3/version-4 machine-readable views;
 - **`Icod.TermInfo.Termcap`** — bounded termcap parsing, classification, `tc=` resolution, Runtime conversion, reverse rendering, and explicit termcap acquisition;
 - **`tic`, `infocmp`, `toe`, `captoinfo`, and `infotocap`** — managed command applications which compose the reusable libraries and own command-line policy;
 - **`Icod.TermInfo.Tools` / `icod-terminfo`** — distribution-only .NET tool router which dispatches to the five command applications;
