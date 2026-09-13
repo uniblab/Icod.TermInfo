@@ -18,6 +18,33 @@ The package family targets `net8.0`, `net9.0`, and `net10.0`; packages use C# 13
 contain no native ncurses/terminfo payload, and are intended to run on Windows,
 Linux, and macOS.
 
+## 1.12 release candidate
+
+`1.12.0-Alpha-8` is the frozen candidate for advanced persistent-raster
+placement semantics and planning. The 1.12 Inspection layer adds exactly two
+protocol-neutral placement requirements: pixel-space source rectangles and
+signed z-order. It composes those requirements with the frozen 1.11 lifecycle
+planner, ordered database-set precedence, and additive version-4 profile/plan
+JSON without adding live graphics execution to TermInfo.
+
+The complete candidate Inspection API is frozen at 81 exported public types with
+normalized-LF SHA-256
+`f71501dcd27a530051c1a02083325144ced2b6173b6b967b9571c620815198f0`.
+JSON versions 1 through 3 remain unchanged; version 4 contains exactly
+`persistentRasterPlacementProfile` and `persistentRasterPlacementPlan`.
+
+Production `Icod.TermInfo` and `Icod.TermInfo.Inspection` still do not depend on
+`Icod.Terminal`. PG07 qualifies the semantic handoff separately against published
+`Icod.Terminal 1.12.0` through a package-only consumer and the
+`Icod.TermInfo.PersistentRasterPlacement.Sample` on `net8.0`, `net9.0`, and
+`net10.0`.
+
+Stable install examples below intentionally remain at `1.11.0` until Alpha-8
+passes the full release matrix and a separate promotion-only commit advances the
+coordinated release to stable `1.12.0`. See
+`docs/1.12.0-ADVANCED-PERSISTENT-RASTER-PLACEMENT-GUIDE.md` and
+`docs/1.12.0-RELEASE-AUDIT.md`.
+
 ## 1.11 release status
 
 Version `1.11.0` promotes the fully validated `1.11.0-Alpha-8` contract without

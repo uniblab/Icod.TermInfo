@@ -6,6 +6,27 @@ This document defines the supported 1.x compatibility boundary for
 `Icod.TermInfo.Inspection` package, and beginning with 1.6 the optional
 `Icod.TermInfo.Termcap` package.
 
+## 1.12 compatibility freeze
+
+Version 1.12 is additive above the stable 1.11 boundary. PG08 freezes the
+complete 1.12 Inspection reflection manifest at 81 exported public types with
+normalized-LF SHA-256
+`f71501dcd27a530051c1a02083325144ced2b6173b6b967b9571c620815198f0`
+and requires exact public API equality across `net8.0`, `net9.0`, and
+`net10.0`. Removing only the exact reviewed 1.12 placement type/member delta
+must reconstruct the frozen 1.11 public API fingerprint exactly.
+
+Version 1.12 adds only the protocol-neutral `SourceRectangle` and `SignedZOrder`
+placement semantic family to Inspection. It does not add concrete placement
+coordinates, z-order values, resource identities, live probing, wire protocol
+selection, terminal I/O, or a production dependency on `Icod.Terminal`.
+
+JSON schema versions 1, 2, and 3 remain immutable historical contracts. Version
+4 is additive and contains exactly `persistentRasterPlacementProfile` and
+`persistentRasterPlacementPlan`. Stable 1.12 promotion may not change any frozen
+schema, the exact 1.12 public surface, package dependency direction, target
+frameworks, command semantics, or archive topology.
+
 ## 1.11 compatibility freeze
 
 Version 1.11 is additive above the stable 1.10 boundary. RL08 freezes the

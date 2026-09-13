@@ -3,6 +3,31 @@
 `Icod.TermInfo.Inspection` is the optional managed inspection and semantic-
 comparison layer for the `Icod.TermInfo` package family.
 
+## 1.12 release candidate
+
+Version `1.12.0-Alpha-8` freezes the additive advanced persistent-raster
+placement surface. Inspection now classifies and plans two placement semantics:
+`SourceRectangle` and `SignedZOrder`. The new placement planner consumes the
+already-produced 1.11 lifecycle plan rather than reinterpreting lifecycle
+support, and database-set composition preserves the frozen ordered precedence
+boundary.
+
+The complete 1.12 Inspection reflection manifest contains 81 exported public
+types and has normalized-LF SHA-256
+`f71501dcd27a530051c1a02083325144ced2b6173b6b967b9571c620815198f0`.
+Removing only the reviewed 1.12 placement type/member delta must reconstruct the
+frozen 1.11 manifest exactly. JSON versions 1-3 remain immutable; version 4 adds
+only `persistentRasterPlacementProfile` and `persistentRasterPlacementPlan`.
+
+Inspection retains no production `Icod.Terminal` dependency. The dedicated PG07
+package consumer and placement sample qualify `Icod.Terminal 1.12.0` only at the
+downstream application boundary. Concrete rectangle coordinates and z-order
+integers remain consumer-owned execution values.
+
+See `docs/1.12.0-ADVANCED-PERSISTENT-RASTER-PLACEMENT-GUIDE.md`,
+`docs/1.12.0-INSPECTION-PUBLIC-API-FREEZE.md`, and
+`docs/1.12.0-RELEASE-AUDIT.md`.
+
 ## 1.11 release status
 
 Version `1.11.0` promotes the complete additive persistent-raster lifecycle
