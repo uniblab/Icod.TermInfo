@@ -131,13 +131,16 @@ public static class PersistentRasterPlacementInspector {
 				);
 			}
 
-			effectiveProfile = callerEvidence is null
-				? occurrenceProfiles[ 0 ]
-				: Inspect(
-					lookup.Winner.Entry.Terminal,
-					callerEvidence,
-					options
-				);
+			effectiveProfile = (
+				callerEvidence is null
+					? occurrenceProfiles[ 0 ]
+					: Inspect(
+						lookup.Winner.Entry.Terminal,
+						callerEvidence,
+						options
+					)
+			)
+			;
 		}
 
 		return new PersistentRasterPlacementDatabaseSetInspection(
