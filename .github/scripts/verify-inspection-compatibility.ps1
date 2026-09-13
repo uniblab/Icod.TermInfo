@@ -16,6 +16,7 @@ $repositoryRoot = [System.IO.Path]::GetFullPath(
 $baselinePath = Join-Path $repositoryRoot 'docs/1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt'
 $approvedAdditionsPath = Join-Path $repositoryRoot 'docs/1.11.0-INSPECTION-PUBLIC-API-ADDITIONS.txt'
 $approvedMembersPath = Join-Path $repositoryRoot 'docs/1.11.0-INSPECTION-PUBLIC-API-ADDITIVE-MEMBERS.txt'
+$oneTwelveAdditionsPath = Join-Path $repositoryRoot 'docs/1.12.0-PG01-INSPECTION-PUBLIC-API-ADDITIONS.txt'
 $oneElevenApiSha256 = '69c7350d5d44d502ecf1698c8fe1c1336f03d38eb1a36e36219f50ac33585a86'
 $assemblyFullPath = if ([System.IO.Path]::IsPathRooted($AssemblyPath)) {
     [System.IO.Path]::GetFullPath($AssemblyPath)
@@ -31,6 +32,9 @@ if (-not (Test-Path -LiteralPath $approvedAdditionsPath -PathType Leaf)) {
 }
 if (-not (Test-Path -LiteralPath $approvedMembersPath -PathType Leaf)) {
     throw "Approved 1.11 Inspection API additive members file not found: $approvedMembersPath"
+}
+if (-not (Test-Path -LiteralPath $oneTwelveAdditionsPath -PathType Leaf)) {
+    throw "Approved 1.12 PG01 Inspection API additions file not found: $oneTwelveAdditionsPath"
 }
 if (-not (Test-Path -LiteralPath $assemblyFullPath -PathType Leaf)) {
     throw "Inspection assembly not found: $assemblyFullPath"
@@ -87,6 +91,40 @@ function Read-ApprovedOneElevenTypes {
 
     if ($approved.Count -eq 0) {
         throw 'Approved 1.11 Inspection API additions file is empty.'
+    }
+
+    return $approved
+}
+
+function Read-ApprovedOneTwelveTypes {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Path
+    )
+
+    $approved = [System.Collections.Generic.HashSet[string]]::new(
+        [System.StringComparer]::Ordinal
+    )
+    foreach ($line in [System.IO.File]::ReadAllLines($Path)) {
+        $candidate = $line.Trim()
+        if ($candidate.Length -eq 0 -or $candidate.StartsWith('#', [System.StringComparison]::Ordinal)) {
+            continue
+        }
+        if (
+            -not $candidate.StartsWith(
+                'Icod.TermInfo.Inspection.PersistentRasterPlacement',
+                [System.StringComparison]::Ordinal
+            )
+        ) {
+            throw "Approved 1.12 Inspection API addition is outside the persistent-raster placement namespace: $candidate"
+        }
+        if (-not $approved.Add($candidate)) {
+            throw "Approved 1.12 Inspection API additions file contains a duplicate type: $candidate"
+        }
+    }
+
+    if ($approved.Count -eq 0) {
+        throw 'Approved 1.12 Inspection API additions file is empty.'
     }
 
     return $approved
@@ -190,13 +228,19 @@ function Remove-ApprovedOneElevenMembers {
     }
 }
 
-function Remove-ApprovedOneElevenTypes {
+function Remove-ApprovedTypes {
     param(
         [Parameter(Mandatory = $true)]
         [string]$Manifest,
 
         [Parameter(Mandatory = $true)]
-        [System.Collections.Generic.HashSet[string]]$ApprovedTypes
+        [System.Collections.Generic.HashSet[string]]$ApprovedTypes,
+
+        [Parameter(Mandatory = $true)]
+        [string]$RequiredPrefix,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ReleaseLabel
     )
 
     $lines = (Normalize-Text -Text $Manifest).Split("`n")
@@ -221,12 +265,12 @@ function Remove-ApprovedOneElevenTypes {
                 $typeName = $Matches[1]
                 if (
                     $typeName.StartsWith(
-                        'Icod.TermInfo.Inspection.PersistentRasterLifecycle',
+                        $RequiredPrefix,
                         [System.StringComparison]::Ordinal
                     )
                 ) {
                     if (-not $ApprovedTypes.Contains($typeName)) {
-                        throw "Unapproved 1.11 Inspection public API addition: $typeName"
+                        throw "Unapproved $ReleaseLabel Inspection public API addition: $typeName"
                     }
                     if (-not $removedTypes.Add($typeName)) {
                         throw "Inspection API manifest contains duplicate public type blocks: $typeName"
@@ -249,12 +293,12 @@ function Remove-ApprovedOneElevenTypes {
     }
 
     if ($skipBlock) {
-        throw 'Inspection API manifest ended inside an approved 1.11 type block.'
+        throw "Inspection API manifest ended inside an approved $ReleaseLabel type block."
     }
 
     foreach ($approvedType in $ApprovedTypes) {
         if (-not $removedTypes.Contains($approvedType)) {
-            throw "Approved 1.11 Inspection public API type is missing from the current assembly: $approvedType"
+            throw "Approved $ReleaseLabel Inspection public API type is missing from the current assembly: $approvedType"
         }
     }
 
@@ -282,25 +326,34 @@ try {
 
         $frozen = Normalize-Text -Text ([System.IO.File]::ReadAllText($baselinePath))
         $current = [System.IO.File]::ReadAllText($temporaryManifest)
-        $currentSha256 = Get-NormalizedSha256 -Text $current
-        if (-not [string]::Equals($oneElevenApiSha256, $currentSha256, [System.StringComparison]::Ordinal)) {
-            throw "Icod.TermInfo.Inspection current 1.11 public API fingerprint changed. Expected $oneElevenApiSha256, actual $currentSha256."
+
+        $approvedOneTwelveTypes = Read-ApprovedOneTwelveTypes -Path $oneTwelveAdditionsPath
+        $oneElevenCandidate = Remove-ApprovedTypes `
+            -Manifest $current `
+            -ApprovedTypes $approvedOneTwelveTypes `
+            -RequiredPrefix 'Icod.TermInfo.Inspection.PersistentRasterPlacement' `
+            -ReleaseLabel '1.12 PG01'
+        $oneElevenCandidateSha256 = Get-NormalizedSha256 -Text $oneElevenCandidate.Manifest
+        if (-not [string]::Equals($oneElevenApiSha256, $oneElevenCandidateSha256, [System.StringComparison]::Ordinal)) {
+            throw "Icod.TermInfo.Inspection reconstructed 1.11 public API fingerprint changed. Expected $oneElevenApiSha256, actual $oneElevenCandidateSha256."
         }
 
         $approvedMembers = Read-ApprovedOneElevenMembers -Path $approvedMembersPath
         $memberFiltered = Remove-ApprovedOneElevenMembers `
-            -Manifest $current `
+            -Manifest $oneElevenCandidate.Manifest `
             -ApprovedMembers $approvedMembers
         $approvedTypes = Read-ApprovedOneElevenTypes -Path $approvedAdditionsPath
-        $filtered = Remove-ApprovedOneElevenTypes `
+        $filtered = Remove-ApprovedTypes `
             -Manifest $memberFiltered.Manifest `
-            -ApprovedTypes $approvedTypes
+            -ApprovedTypes $approvedTypes `
+            -RequiredPrefix 'Icod.TermInfo.Inspection.PersistentRasterLifecycle' `
+            -ReleaseLabel '1.11'
 
         if (-not [string]::Equals($frozen, $filtered.Manifest, [System.StringComparison]::Ordinal)) {
-            throw 'Icod.TermInfo.Inspection changed the frozen 1.10 public API outside explicitly approved 1.11 additions.'
+            throw 'Icod.TermInfo.Inspection changed the frozen 1.10 public API outside explicitly approved 1.11 and 1.12 additions.'
         }
 
-        Write-Host "Verified exact 1.11 Inspection public API SHA-256 $currentSha256."
+        Write-Host "Verified reconstructed exact 1.11 Inspection public API SHA-256 $oneElevenCandidateSha256 after excluding $($oneElevenCandidate.RemovedTypeCount) approved 1.12 PG01 type block(s)."
         Write-Host (
             "Verified frozen 1.10 Inspection API compatibility after excluding {0} explicitly approved 1.11 public type block(s) and {1} additive member(s)." -f `
                 $filtered.RemovedTypeCount, `
