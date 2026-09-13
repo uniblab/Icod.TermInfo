@@ -257,12 +257,17 @@ public sealed class MI07ReleaseClosureTests {
 			StringComparison.Ordinal
 		);
 		Assert.Contains(
-			"PG01 - Architecture, vocabulary, and public API regret gate",
+			"**Current coordinated version:**",
 			activeRoadmap,
-			StringComparison.OrdinalIgnoreCase
+			StringComparison.Ordinal
 		);
 		Assert.Contains(
-			"1.12.0",
+			"**Status:**",
+			activeRoadmap,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"**Release audit:**",
 			activeRoadmap,
 			StringComparison.Ordinal
 		);
