@@ -18,7 +18,7 @@ public sealed class ContractTests {
 				"Directory.Build.props"
 			);
 		Assert.StartsWith(
-			"1.11.0",
+			"1.12.0",
 			ReadRequiredProperty(
 				buildProperties,
 				"IcodTermInfoSuiteVersion"
