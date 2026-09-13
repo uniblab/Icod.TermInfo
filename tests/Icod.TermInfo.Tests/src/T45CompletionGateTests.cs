@@ -7,7 +7,7 @@ namespace Icod.TermInfo.Tests;
 
 public sealed class T45CompletionGateTests {
 	[Fact]
-	public void AssemblyRetainsStableIdentityDuringOneNineDevelopment() {
+	public void AssemblyRetainsStableIdentityDuringCurrentDevelopment() {
 		Assembly assembly =
 			typeof( TerminalDescription ).Assembly;
 		AssemblyName assemblyName =
@@ -33,14 +33,14 @@ public sealed class T45CompletionGateTests {
 				)[ 0 ];
 
 		Assert.StartsWith(
-			"1.11.0",
+			"1.12.0",
 			semanticVersion,
 			StringComparison.Ordinal
 		);
 	}
 
 	[Fact]
-	public void ProjectMetadataIdentifiesOneNineDevelopmentAndStableAssembly() {
+	public void ProjectMetadataIdentifiesCurrentDevelopmentAndStableAssembly() {
 		string root =
 			FindRepositoryRoot();
 		XDocument project =
@@ -61,7 +61,7 @@ public sealed class T45CompletionGateTests {
 			);
 
 		Assert.StartsWith(
-			"1.11.0",
+			"1.12.0",
 			ReadRequiredProperty(
 				buildProperties,
 				"IcodTermInfoSuiteVersion"
