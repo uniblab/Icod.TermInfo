@@ -217,9 +217,7 @@ public sealed class PG08ReleaseClosureTests {
 					isPositive: true,
 					PersistentRasterPlacementEvidenceKind.Declared,
 					$"pg08-{index:D4}",
-					index == PersistentRasterPlacementEvidenceOptions.MaximumSupportedEvidenceCount - 1
-						? int.MaxValue
-						: index
+					index == PersistentRasterPlacementEvidenceOptions.MaximumSupportedEvidenceCount - 1 ? int.MaxValue : index
 				)
 			)
 			.ToArray();
