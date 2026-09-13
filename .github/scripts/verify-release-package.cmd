@@ -105,7 +105,7 @@ rem development, only reviewed PersistentRasterLifecycle* public types may be
 rem additive above that surface; every 1.10 type/member remains exact.
 echo.
 echo === Verify Icod.TermInfo.Inspection 1.10 compatibility plus approved 1.11 additions (%CONFIGURATION%) ===
-pwsh -NoLogo -NoProfile -File .github\scripts\verify-inspection-compatibility.ps1 -Configuration %CONFIGURATION% -AssemblyPath Icod.TermInfo.Inspection\bin\%CONFIGURATION%\net10.0\Icod.TermInfo.Inspection.dll
+powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -File .github\scripts\verify-inspection-compatibility.ps1 -Configuration %CONFIGURATION% -AssemblyPath Icod.TermInfo.Inspection\bin\%CONFIGURATION%\net10.0\Icod.TermInfo.Inspection.dll
 if errorlevel 1 goto fail
 
 echo.

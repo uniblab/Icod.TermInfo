@@ -10,15 +10,19 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
-**Current coordinated version:** `1.10.0-Alpha-6`
+**Current coordinated version:** `1.12.0`
 **Final 1.6 prerelease:** `1.6.0-Alpha-8`
 **Final 1.7 prerelease:** `1.7.0-Alpha-8`
 **Final 1.8 prerelease:** `1.8.0-Alpha-8`
 **Final 1.9 prerelease:** `1.9.0-Alpha-7`
-**Next development line:** `1.10.0` - Deterministic Multi-Database Inspection, Comparison, and Planning Automation
-**Status:** 1.10.0 implementation in progress
-**Current tranche:** DA06 - Command and machine-readable automation composition
-**Primary objective:** Render effective descriptions, comparisons, plans, and explicit catalogs as deterministic bounded versioned JSON, then compose that reusable representation through `infocmp` and `toe` without changing frozen lower-layer semantics.
+**Final 1.10 prerelease:** `1.10.0-Alpha-8`
+**Final 1.11 prerelease:** `1.11.0-Alpha-8`
+**Final 1.12 prerelease:** `1.12.0-Alpha-8`
+**Latest completed line:** `1.12.0` - Advanced Persistent-Raster Placement Semantics and Planning
+**Status:** 1.12.0 implementation and stable promotion complete; PR #42 remains open pending merge
+**Completed tranches:** PG01-PG08
+**Primary objective:** Completed - protocol-neutral source-rectangle and signed-z-order placement semantics beside the frozen 1.11 persistent-raster lifecycle model, preserving JSON v1-v3 and downstream execution ownership.
+**Release audit:** `docs/1.12.0-RELEASE-AUDIT.md`
 
 ---
 
@@ -91,7 +95,9 @@ in a new version-specific roadmap, not in the retired inventory.
 | **1.8.0** | Relative source planning | Select deterministic bounded ordered parents for the frozen 1.7 relative-source synthesizer |
 | **1.9.0** | Machine-readable inspection and planning automation | Render versioned deterministic JSON for Inspection values and expose explicit command automation without parsing human output |
 | **1.10.0** | Deterministic multi-database inspection, comparison, and planning automation | Aggregate ordered explicit catalogs with stable evidence, then add precedence, conflict analysis, set comparison, multi-catalog planning, and versioned automation |
-| **later** | Exotic storage/formats | Berkeley DB provider and historical Unix dialects as justified |
+| **1.11.0** | Persistent-raster lifecycle semantics and planning | Classify protocol-neutral persistent-raster lifecycle evidence and produce deterministic advisory plans without owning terminal execution |
+| **1.12.0** | Advanced persistent-raster placement semantics and planning | Classify source-rectangle and signed-z-order placement support and compose those requirements with the frozen 1.11 lifecycle model |
+| **later** | Exotic storage/formats and broader graphics policy | Berkeley DB, historical Unix dialects, multi-protocol preference/negotiation, and other deferred work as justified |
 
 The completed 1.5 release contract is recorded in
 [`Icod.TermInfo-1.5.0-Coordinated-Distribution-Roadmap.md`](Icod.TermInfo-1.5.0-Coordinated-Distribution-Roadmap.md)

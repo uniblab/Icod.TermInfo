@@ -1,9 +1,17 @@
 # Icod.TermInfo Samples
 
-The repository contains five executable API samples and one command-suite
+The repository contains six executable API samples and one command-suite
 walkthrough. The API samples remain separate so acquisition, terminal-control,
-toolchain, multi-database, and persistent-raster lifecycle examples stay easy to
-copy without mixing unrelated concerns.
+toolchain, multi-database, persistent-raster lifecycle, and advanced-placement
+examples stay easy to copy without mixing unrelated concerns.
+
+The 1.12 addition is `Icod.TermInfo.PersistentRasterPlacement.Sample`. It shows
+the deliberate boundary between protocol-neutral TermInfo planning and
+consumer-owned `Icod.Terminal 1.12.0` execution values. With no advanced-placement
+evidence, source rectangles and signed z-order remain `Unknown` and planning
+requires runtime verification. The consumer then supplies its own `Verified`
+evidence, replans to `Satisfied`, and only then constructs an actual
+`TerminalRasterSourceRectangle` and `ZIndex`.
 
 The 1.11 addition is `Icod.TermInfo.PersistentRasterLifecycle.Sample`, an
 executable public-API walkthrough for protocol-neutral persistent-raster
@@ -28,8 +36,8 @@ the coordinated five-command suite: `tic`, `infocmp`, `toe`, `captoinfo`, and
 `infotocap`, including both the frozen 1.9 version-1 JSON forms and the additive
 1.10 database-set automation forms.
 
-All five executable API sample projects target `net8.0`, `net9.0`, and
-`net10.0`. Every `dotnet run` example therefore specifies a framework; substitute
+All six executable API sample projects target `net8.0`, `net9.0`, and `net10.0`.
+Every `dotnet run` example therefore specifies a framework; substitute
 `-f net8.0` or `-f net9.0` when exercising those consumer targets.
 
 ## Icod.TermInfo.Sample
@@ -145,6 +153,29 @@ dotnet run --project samples/Icod.TermInfo.PersistentRasterLifecycle.Sample/Icod
 
 See `Icod.TermInfo.PersistentRasterLifecycle.Sample/README.md`.
 
+## Icod.TermInfo.PersistentRasterPlacement.Sample
+
+`Icod.TermInfo.PersistentRasterPlacement.Sample` is the focused 1.12 downstream
+integration example. It first constructs a successful lifecycle plan with no
+advanced-placement evidence. Both `SourceRectangle` and `SignedZOrder` therefore
+remain `Unknown`, and a request requiring both semantics produces
+`RequiresRuntimeVerification`.
+
+The consumer then adds caller-owned `Verified` evidence, reclassifies, and
+replans to `Satisfied`. The sample renders both version-4 placement profile and
+plan documents before constructing concrete `Icod.Terminal 1.12.0` execution
+values: a `TerminalRasterSourceRectangle` and a signed
+`TerminalRasterPlacementOptions.ZIndex`. This demonstrates that TermInfo never
+owns the actual crop coordinates or z-order integer.
+
+Run it with:
+
+```text
+dotnet run --project samples/Icod.TermInfo.PersistentRasterPlacement.Sample/Icod.TermInfo.PersistentRasterPlacement.Sample.csproj -f net10.0
+```
+
+See `Icod.TermInfo.PersistentRasterPlacement.Sample/README.md`.
+
 ## ToolSuite
 
 `ToolSuite` is a data-and-command walkthrough for the managed command suite. It
@@ -159,8 +190,8 @@ validation, semantic comparison, conventional database enumeration,
 forward/reverse `use=` dependency reports, termcap-to-terminfo conversion,
 terminfo-to-termcap round trips, all four frozen version-1 JSON document kinds,
 and the three additive 1.10 database-set JSON document kinds. Persistent-raster
-lifecycle planning is intentionally absent here because 1.11 exposes it only
-through the reusable Inspection API.
+lifecycle and advanced-placement planning are intentionally absent here because
+1.11/1.12 expose them through the reusable Inspection API.
 
 See `ToolSuite/README.md`.
 

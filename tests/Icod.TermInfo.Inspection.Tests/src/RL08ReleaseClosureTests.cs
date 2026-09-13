@@ -28,10 +28,53 @@ public sealed class RL08ReleaseClosureTests {
 		string additiveMembers = ReadRepositoryFile(
 			"docs/1.11.0-INSPECTION-PUBLIC-API-ADDITIVE-MEMBERS.txt"
 		);
+		string oneTwelveAdditions = ReadRepositoryFile(
+			"docs/1.12.0-PG01-INSPECTION-PUBLIC-API-ADDITIONS.txt"
+		);
+		HashSet<string> approvedOneTwelveTypes = oneTwelveAdditions
+			.Split( '\n' )
+			.Select( line => line.Trim() )
+			.Where(
+				line =>
+					line.Length > 0
+					&& !line.StartsWith( "#", StringComparison.Ordinal )
+			)
+			.ToHashSet( StringComparer.Ordinal );
+		Type[] currentTypes =
+			typeof( PersistentRasterLifecycleProfile ).Assembly.GetExportedTypes();
+		Type[] reconstructedOneElevenTypes = currentTypes
+			.Where(
+				type =>
+					type.FullName is null
+					|| !approvedOneTwelveTypes.Contains( type.FullName )
+			)
+			.ToArray();
 
+		Assert.Equal( 67, reconstructedOneElevenTypes.Length );
 		Assert.Equal(
-			67,
-			typeof( PersistentRasterLifecycleProfile ).Assembly.GetExportedTypes().Length
+			approvedOneTwelveTypes.Count,
+			currentTypes.Count(
+				type =>
+					type.FullName?.StartsWith(
+						"Icod.TermInfo.Inspection.PersistentRasterPlacement",
+						StringComparison.Ordinal
+					) == true
+			)
+		);
+		foreach ( string approvedType in approvedOneTwelveTypes ) {
+			Assert.Contains(
+				currentTypes,
+				type => string.Equals(
+					type.FullName,
+					approvedType,
+					StringComparison.Ordinal
+				)
+			);
+		}
+		Assert.Contains(
+			"Icod.TermInfo.Inspection.PersistentRasterPlacementSubject",
+			oneTwelveAdditions,
+			StringComparison.Ordinal
 		);
 		Assert.Contains( InspectionApiSha256, freeze, StringComparison.Ordinal );
 		Assert.Contains( InspectionApiSha256, fingerprints, StringComparison.Ordinal );
@@ -106,10 +149,15 @@ public sealed class RL08ReleaseClosureTests {
 			compatibility,
 			StringComparison.Ordinal
 		);
+		Assert.Contains(
+			"1.12.0-PG01-INSPECTION-PUBLIC-API-ADDITIONS.txt",
+			compatibility,
+			StringComparison.Ordinal
+		);
 	}
 
 	[Fact]
-	public void ReleaseFacingDocumentationAndMetadataDescribeOneEleven() {
+	public void HistoricalReleaseDocumentationRetainsOneEleven() {
 		string rootReadme = ReadRepositoryFile( "README.md" );
 		string inspectionReadme = ReadRepositoryFile(
 			"Icod.TermInfo.Inspection/README.md"
@@ -122,9 +170,6 @@ public sealed class RL08ReleaseClosureTests {
 		string audit = ReadRepositoryFile(
 			"docs/1.11.0-RELEASE-AUDIT.md"
 		);
-		string inspectionProject = ReadRepositoryFile(
-			"Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj"
-		);
 
 		Assert.Contains( "1.11", rootReadme, StringComparison.Ordinal );
 		Assert.Contains( "1.11", inspectionReadme, StringComparison.Ordinal );
@@ -133,8 +178,13 @@ public sealed class RL08ReleaseClosureTests {
 		Assert.Contains( "PersistentRasterLifecycle", guide, StringComparison.Ordinal );
 		Assert.Contains( "1.11.0-Alpha-8", audit, StringComparison.Ordinal );
 		Assert.Contains(
-			"<PackageReleaseNotes>1.11.0",
-			inspectionProject,
+			"stable `1.11.0` is fully validated",
+			audit,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"Validated stable release-facing head",
+			audit,
 			StringComparison.Ordinal
 		);
 	}

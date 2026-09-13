@@ -1,0 +1,265 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:icod:terminfo:inspection:json:4",
+  "title": "Icod.TermInfo.Inspection persistent raster placement JSON version 4",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/persistentRasterPlacementProfileDocument"
+    },
+    {
+      "$ref": "#/$defs/persistentRasterPlacementPlanDocument"
+    }
+  ],
+  "$defs": {
+    "supportStatus": {
+      "type": "string",
+      "enum": [
+        "unknown",
+        "supported",
+        "unsupported",
+        "contradicted"
+      ]
+    },
+    "placementSubject": {
+      "type": "string",
+      "enum": [
+        "sourceRectangle",
+        "signedZOrder"
+      ]
+    },
+    "evidenceKind": {
+      "type": "string",
+      "enum": [
+        "capabilityDerived",
+        "declared",
+        "verified"
+      ]
+    },
+    "placementPlanStatus": {
+      "type": "string",
+      "enum": [
+        "satisfied",
+        "requiresRuntimeVerification",
+        "indeterminate",
+        "impossible"
+      ]
+    },
+    "lifecyclePlanStatus": {
+      "type": "string",
+      "enum": [
+        "success",
+        "indeterminate",
+        "impossible"
+      ]
+    },
+    "profileStates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceRectangle",
+        "signedZOrder"
+      ],
+      "properties": {
+        "sourceRectangle": {
+          "$ref": "#/$defs/supportStatus"
+        },
+        "signedZOrder": {
+          "$ref": "#/$defs/supportStatus"
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "subject",
+        "isPositive",
+        "kind",
+        "sourceLabel",
+        "sourceOrdinal"
+      ],
+      "properties": {
+        "subject": {
+          "$ref": "#/$defs/placementSubject"
+        },
+        "isPositive": {
+          "type": "boolean"
+        },
+        "kind": {
+          "$ref": "#/$defs/evidenceKind"
+        },
+        "sourceLabel": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceOrdinal": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        }
+      }
+    },
+    "planRequirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "subject",
+        "supportStatus",
+        "requiresRuntimeVerification"
+      ],
+      "properties": {
+        "subject": {
+          "$ref": "#/$defs/placementSubject"
+        },
+        "supportStatus": {
+          "$ref": "#/$defs/supportStatus"
+        },
+        "requiresRuntimeVerification": {
+          "type": "boolean"
+        }
+      }
+    },
+    "planIssue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "subject",
+        "supportStatus",
+        "requiresRuntimeVerification"
+      ],
+      "properties": {
+        "subject": {
+          "$ref": "#/$defs/placementSubject"
+        },
+        "supportStatus": {
+          "type": "string",
+          "enum": [
+            "unknown",
+            "unsupported",
+            "contradicted"
+          ]
+        },
+        "requiresRuntimeVerification": {
+          "type": "boolean"
+        }
+      }
+    },
+    "persistentRasterPlacementProfileDocument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "schemaVersion",
+        "documentKind",
+        "data"
+      ],
+      "properties": {
+        "schema": {
+          "const": "urn:icod:terminfo:inspection:json:4"
+        },
+        "schemaVersion": {
+          "const": 4
+        },
+        "documentKind": {
+          "const": "persistentRasterPlacementProfile"
+        },
+        "data": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "states",
+            "evidenceCount",
+            "evidence"
+          ],
+          "properties": {
+            "states": {
+              "$ref": "#/$defs/profileStates"
+            },
+            "evidenceCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 4096
+            },
+            "evidence": {
+              "type": "array",
+              "maxItems": 4096,
+              "items": {
+                "$ref": "#/$defs/evidence"
+              }
+            }
+          }
+        }
+      }
+    },
+    "persistentRasterPlacementPlanDocument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "schemaVersion",
+        "documentKind",
+        "data"
+      ],
+      "properties": {
+        "schema": {
+          "const": "urn:icod:terminfo:inspection:json:4"
+        },
+        "schemaVersion": {
+          "const": 4
+        },
+        "documentKind": {
+          "const": "persistentRasterPlacementPlan"
+        },
+        "data": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "lifecycleStatus",
+            "requiresRuntimeVerification",
+            "requirementCount",
+            "issueCount",
+            "requirements",
+            "issues"
+          ],
+          "properties": {
+            "status": {
+              "$ref": "#/$defs/placementPlanStatus"
+            },
+            "lifecycleStatus": {
+              "$ref": "#/$defs/lifecyclePlanStatus"
+            },
+            "requiresRuntimeVerification": {
+              "type": "boolean"
+            },
+            "requirementCount": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2
+            },
+            "issueCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2
+            },
+            "requirements": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 2,
+              "items": {
+                "$ref": "#/$defs/planRequirement"
+              }
+            },
+            "issues": {
+              "type": "array",
+              "maxItems": 2,
+              "items": {
+                "$ref": "#/$defs/planIssue"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

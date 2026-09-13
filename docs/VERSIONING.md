@@ -3,6 +3,31 @@
 The `Icod.TermInfo` package family follows Semantic Versioning for its public
 package contracts.
 
+## 1.12 release line
+
+The PG01-PG08 development sequence is `1.12.0-Alpha-1` through
+`1.12.0-Alpha-8`. Version 1.12 adds compatible public API only to
+`Icod.TermInfo.Inspection` for advanced persistent-raster placement evidence,
+classification, lifecycle-aware semantic planning, description/database-set
+composition, and additive version-4 profile/plan JSON automation. Runtime,
+Source, Compiler, and Termcap public APIs remain frozen.
+
+PG08 freezes the complete 1.12 Inspection reflection manifest at 81 exported
+public types with normalized-LF SHA-256
+`f71501dcd27a530051c1a02083325144ced2b6173b6b967b9571c620815198f0`.
+Release verification independently removes only the reviewed 1.12 placement
+public type/member delta and requires the remainder to reproduce the frozen 1.11
+manifest fingerprint exactly. JSON versions 1 through 3 remain immutable;
+version 4 is additive and contains exactly the placement profile and plan
+document kinds.
+
+After the exact Alpha-8 head passes the complete Staging package, package-only
+consumer, sample, installed-tool, and six-RID archive gates, stable `1.12.0` is a
+promotion-only transition. Promotion may change coordinated release identity and
+stable-facing documentation only; it may not introduce feature semantics,
+public API, schema fields, production dependencies, target frameworks, command
+behavior, or archive RIDs, and it requires its own fresh full validation.
+
 ## 1.11 release line
 
 The RL01-RL08 development sequence is `1.11.0-Alpha-1` through

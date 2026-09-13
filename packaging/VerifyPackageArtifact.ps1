@@ -27,12 +27,18 @@ try {
         throw "Package artifact verification exited with status $LASTEXITCODE."
     }
 
-    & pwsh -NoLogo -NoProfile -File `
-        .github/scripts/smoke-rl07-package-consumer.ps1 `
+    & ./.github/scripts/smoke-rl07-package-consumer.ps1 `
         -ArtifactDirectory $ArtifactDirectory `
         -Configuration $Configuration
     if (0 -ne $LASTEXITCODE) {
         throw "RL07 package-only lifecycle consumer exited with status $LASTEXITCODE."
+    }
+
+    & ./.github/scripts/smoke-pg07-placement-interop.ps1 `
+        -ArtifactDirectory $ArtifactDirectory `
+        -Configuration $Configuration
+    if (0 -ne $LASTEXITCODE) {
+        throw "PG07 package-only placement interoperability consumer exited with status $LASTEXITCODE."
     }
 
     $lifecycleSampleProject = Join-Path `
@@ -51,6 +57,25 @@ try {
             --no-restore
         if (0 -ne $LASTEXITCODE) {
             throw "RL07 persistent-raster lifecycle sample failed on $framework."
+        }
+    }
+
+    $placementSampleProject = Join-Path `
+        $repositoryRoot `
+        'samples/Icod.TermInfo.PersistentRasterPlacement.Sample/Icod.TermInfo.PersistentRasterPlacement.Sample.csproj'
+    & dotnet restore $placementSampleProject
+    if (0 -ne $LASTEXITCODE) {
+        throw 'PG07 persistent-raster placement sample restore failed.'
+    }
+
+    foreach ($framework in @('net8.0', 'net9.0', 'net10.0')) {
+        & dotnet run `
+            --project $placementSampleProject `
+            -c $Configuration `
+            -f $framework `
+            --no-restore
+        if (0 -ne $LASTEXITCODE) {
+            throw "PG07 persistent-raster placement sample failed on $framework."
         }
     }
 

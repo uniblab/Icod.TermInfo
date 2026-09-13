@@ -222,7 +222,7 @@ public sealed class MI07ReleaseClosureTests {
 	}
 
 	[Fact]
-	public void CoordinatedMetadataIdentifiesStableReleaseAndCompletedTranche() {
+	public void CoordinatedMetadataPreservesOneNineClosureAndIdentifiesCurrentDevelopment() {
 		string root = FindRepositoryRoot();
 		string buildProperties =
 			File.ReadAllText(
@@ -257,9 +257,19 @@ public sealed class MI07ReleaseClosureTests {
 			StringComparison.Ordinal
 		);
 		Assert.Contains(
-			"DA06 - Command and machine-readable automation composition",
+			"**Current coordinated version:**",
 			activeRoadmap,
-			StringComparison.OrdinalIgnoreCase
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"**Status:**",
+			activeRoadmap,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"**Release audit:**",
+			activeRoadmap,
+			StringComparison.Ordinal
 		);
 	}
 

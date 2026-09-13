@@ -44,6 +44,10 @@ jobs:
         run: dotnet restore ${{ env.SOLUTION_PATH }}
       - name: Build
         run: dotnet build ${{ env.SOLUTION_PATH }} -c ${{ env.CONFIGURATION }} --no-restore -p:ContinuousIntegrationBuild=true
+      - name: Verify Inspection compatibility under Windows PowerShell
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: ./.github/scripts/verify-inspection-compatibility.ps1 -Configuration '${{ env.CONFIGURATION }}' -AssemblyPath 'Icod.TermInfo.Inspection/bin/${{ env.CONFIGURATION }}/net10.0/Icod.TermInfo.Inspection.dll'
       - name: Test
         run: dotnet test ${{ env.SOLUTION_PATH }} -c ${{ env.CONFIGURATION }} --no-build --no-restore --logger trx
       - name: Pack coordinated Staging packages
