@@ -2,12 +2,16 @@
 
 This 1.12 sample demonstrates the boundary between protocol-neutral TermInfo placement planning and consumer-owned Terminal execution values.
 
-The sample first classifies verified lifecycle and advanced-placement evidence, then requests both 1.12 placement semantics:
+The sample begins with a successful 1.11 lifecycle plan but no advanced-placement evidence. Both 1.12 placement subjects therefore remain `Unknown`:
 
 - pixel-space source rectangles; and
 - signed z-order.
 
-`PersistentRasterPlacementPlanner` must produce a satisfied semantic plan before the sample creates any concrete Terminal execution values. Only after that planning boundary does the consumer construct:
+A placement request requiring both semantics initially produces `RequiresRuntimeVerification`. The sample renders both the version-4 placement profile and placement plan so consumers can see the machine-readable unknown state and the planner's verification requirement.
+
+The sample then adds caller-owned `Verified` evidence representing a result obtained by the consuming application's own live/runtime verification layer. Reclassification produces a supported placement profile, replanning produces `Satisfied`, and the verified profile and plan are rendered again through the version-4 JSON contract.
+
+Only after the semantic plan is satisfied does the consumer construct concrete Terminal execution values:
 
 ```csharp
 TerminalRasterSourceRectangle sourceRectangle = new(
@@ -22,7 +26,7 @@ TerminalRasterPlacementOptions executionOptions = new() {
 };
 ```
 
-The coordinates and z-order value are intentionally absent from the TermInfo plan. They belong to the consuming application and `Icod.Terminal`.
+The coordinates and z-order value are intentionally absent from every TermInfo plan. TermInfo owns semantic evidence, classification, and planning; actual rectangle coordinates, signed stacking values, live verification, and protocol execution belong to the consuming application and `Icod.Terminal`.
 
 The sample targets `net8.0`, `net9.0`, and `net10.0`. For example:
 
