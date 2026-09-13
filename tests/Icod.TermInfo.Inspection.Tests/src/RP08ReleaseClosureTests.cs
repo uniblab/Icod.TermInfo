@@ -6,7 +6,7 @@ using Xunit;
 namespace Icod.TermInfo.Inspection.Tests;
 
 public sealed class RP08ReleaseClosureTests {
-	private const string DevelopmentVersion = "1.11.0";
+	private const string DevelopmentVersion = "1.12.0";
 	private const string HistoricalDevelopmentVersion = "1.8.0-Alpha-8";
 	private const string Rp07Head =
 		"a88237d0d2f0ecdf74a7d96f6ff1cb9a2e8e647d";
@@ -224,7 +224,7 @@ public sealed class RP08ReleaseClosureTests {
 	}
 
 	[Fact]
-	public void CoordinatedMetadataPreservesStableClosureAndIdentifiesMi01() {
+	public void CoordinatedMetadataPreservesStableClosureAndIdentifiesCurrentDevelopment() {
 		string root = FindRepositoryRoot();
 		string buildProperties =
 			File.ReadAllText(
@@ -259,7 +259,7 @@ public sealed class RP08ReleaseClosureTests {
 			StringComparison.Ordinal
 		);
 		Assert.Contains(
-			"DA06",
+			"1.12.0",
 			activeRoadmap,
 			StringComparison.Ordinal
 		);
@@ -276,7 +276,6 @@ public sealed class RP08ReleaseClosureTests {
 						directory.FullName,
 						"Icod.TermInfo.sln"
 					)
-				)
 			) {
 				return directory.FullName;
 			}
