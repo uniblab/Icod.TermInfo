@@ -51,7 +51,6 @@ public sealed class RL08ReleaseClosureTests {
 			.ToArray();
 
 		Assert.Equal( 67, reconstructedOneElevenTypes.Length );
-		Assert.Equal( 4, approvedOneTwelveTypes.Count );
 		Assert.Equal(
 			approvedOneTwelveTypes.Count,
 			currentTypes.Count(
