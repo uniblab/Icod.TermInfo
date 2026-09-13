@@ -3,8 +3,12 @@ name: pull-request
 on:
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 permissions:
-  contents: write
+  contents: read
 
 env:
   DOTNET_VERSIONS: |
@@ -15,30 +19,7 @@ env:
   SOLUTION_PATH: Icod.TermInfo.sln
 
 jobs:
-  roadmap-handoff:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-          fetch-depth: 0
-      - name: Apply bounded 1.13 roadmap handoff
-        run: python .github/scripts/apply-1.13-roadmap-handoff.py
-      - name: Commit roadmap handoff if needed
-        shell: bash
-        run: |
-          if git diff --quiet; then
-            echo "1.13 roadmap handoff already applied."
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add Icod.TermInfo-Post-1.0-Development-Roadmap.md
-          git commit -m "Update long-range roadmap for 1.13.0"
-          git push origin HEAD:${{ github.event.pull_request.head.ref }}
-
   build:
-    needs: roadmap-handoff
     strategy:
       fail-fast: false
       matrix:
