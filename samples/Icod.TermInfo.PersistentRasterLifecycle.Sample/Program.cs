@@ -46,44 +46,48 @@ internal static class Program {
 			"Unknown persistent support must require consumer-owned runtime verification."
 		);
 
-		List<PersistentRasterLifecycleEvidence> strengthenedEvidence =
-			staticProfile.Evidence.ToList();
-		strengthenedEvidence.Add(
-			new PersistentRasterLifecycleEvidence(
-				PersistentRasterLifecycleEvidenceSubject.PersistentUpload,
-				isPositive: true,
-				PersistentRasterLifecycleEvidenceKind.Verified,
-				"consumer-runtime-verification",
-				sourceOrdinal: 0
-			)
+		PersistentRasterRuntimeObservationSet observations = new(
+			new[] {
+				new PersistentRasterRuntimeLifecycleObservation(
+					PersistentRasterLifecycleEvidenceSubject.PersistentUpload,
+					PersistentRasterRuntimeObservationOutcome.Supported,
+					"consumer-runtime-verification",
+					0
+				),
+				new PersistentRasterRuntimeLifecycleObservation(
+					PersistentRasterLifecycleEvidenceSubject.PlacementCreation,
+					PersistentRasterRuntimeObservationOutcome.Supported,
+					"consumer-runtime-verification",
+					1
+				),
+			},
+			Array.Empty<PersistentRasterRuntimePlacementObservation>()
 		);
-		strengthenedEvidence.Add(
-			new PersistentRasterLifecycleEvidence(
-				PersistentRasterLifecycleEvidenceSubject.PlacementCreation,
-				isPositive: true,
-				PersistentRasterLifecycleEvidenceKind.Verified,
-				"consumer-runtime-verification",
-				sourceOrdinal: 1
-			)
-		);
-
-		PersistentRasterLifecycleProfile strengthenedProfile =
-			PersistentRasterLifecycleClassifier.Classify(
-				strengthenedEvidence
+		PersistentRasterPlacementProfile placementProfile =
+			PersistentRasterPlacementClassifier.Classify(
+				Array.Empty<PersistentRasterPlacementEvidence>()
+			);
+		PersistentRasterRuntimeIntegrationResult integration =
+			PersistentRasterRuntimeEvidenceIntegrator.Integrate(
+				staticProfile,
+				placementProfile,
+				observations
 			);
 		PersistentRasterLifecyclePlan strengthenedPlan =
-			PersistentRasterLifecyclePlanner.Plan(
-				strengthenedProfile,
-				request
-			);
+			integration.CreateLifecyclePlan( request );
+
+		Require(
+			integration.Succeeded,
+			"Conclusive runtime observations must integrate successfully."
+		);
 		Require(
 			strengthenedPlan.Status
 				== PersistentRasterLifecyclePlanStatus.Success,
-			"Verified consumer evidence must strengthen the lifecycle plan to success."
+			"Verified consumer observations must strengthen the lifecycle plan to success."
 		);
 		Require(
 			!strengthenedPlan.RequiresRuntimeVerification,
-			"Verified consumer evidence must remove runtime-verification requirements."
+			"Verified consumer observations must remove runtime-verification requirements."
 		);
 		Require(
 			strengthenedPlan.Steps.Count == 2,
@@ -102,7 +106,7 @@ internal static class Program {
 
 		Console.WriteLine(
 			TermInfoJsonRenderer.Render(
-				strengthenedProfile
+				integration
 			)
 		);
 		Console.WriteLine(
