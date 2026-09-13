@@ -1,42 +1,49 @@
 using Icod.Terminal;
 using Icod.TermInfo.Inspection;
 
-PersistentRasterLifecycleProfile lifecycleProfile =
+PersistentRasterLifecycleProfile initialLifecycleProfile =
 	PersistentRasterLifecycleClassifier.Classify(
-		new[] {
-			new PersistentRasterLifecycleEvidence(
-				PersistentRasterLifecycleEvidenceSubject.PlacementCreation,
-				true,
-				PersistentRasterLifecycleEvidenceKind.Verified,
-				"sample lifecycle",
-				0
-			),
-		}
+		Array.Empty<PersistentRasterLifecycleEvidence>()
 	);
-PersistentRasterLifecyclePlan lifecyclePlan =
-	PersistentRasterLifecyclePlanner.Plan(
-		lifecycleProfile,
-		new PersistentRasterLifecycleRequest( placementCount: 1 )
-	);
-PersistentRasterPlacementRequest placementRequest =
-	new(
-		requireSourceRectangle: true,
-		requireSignedZOrder: true
-	);
-
 PersistentRasterPlacementProfile initialPlacementProfile =
 	PersistentRasterPlacementClassifier.Classify(
 		Array.Empty<PersistentRasterPlacementEvidence>()
 	);
+PersistentRasterLifecycleRequest lifecycleRequest =
+	new( placementCount: 1 );
+PersistentRasterPlacementRequest placementRequest = new(
+	requireSourceRectangle: true,
+	requireSignedZOrder: true
+);
+
+PersistentRasterRuntimeObservationSet lifecycleObservations = new(
+	new[] {
+		new PersistentRasterRuntimeLifecycleObservation(
+			PersistentRasterLifecycleEvidenceSubject.PlacementCreation,
+			PersistentRasterRuntimeObservationOutcome.Supported,
+			"sample lifecycle runtime verification",
+			0
+		),
+	},
+	Array.Empty<PersistentRasterRuntimePlacementObservation>()
+);
+PersistentRasterRuntimeIntegrationResult lifecycleIntegration =
+	PersistentRasterRuntimeEvidenceIntegrator.Integrate(
+		initialLifecycleProfile,
+		initialPlacementProfile,
+		lifecycleObservations
+	);
+PersistentRasterLifecyclePlan lifecyclePlan =
+	lifecycleIntegration.CreateLifecyclePlan( lifecycleRequest );
 PersistentRasterPlacementPlan initialPlacementPlan =
 	PersistentRasterPlacementPlanner.Plan(
 		lifecyclePlan,
-		initialPlacementProfile,
+		lifecycleIntegration.PlacementProfile,
 		placementRequest
 	);
 
-Console.WriteLine( "initial placement profile:" );
-Console.WriteLine( TermInfoJsonRenderer.Render( initialPlacementProfile ) );
+Console.WriteLine( "initial runtime integration:" );
+Console.WriteLine( TermInfoJsonRenderer.Render( lifecycleIntegration ) );
 Console.WriteLine( "initial placement plan:" );
 Console.WriteLine( TermInfoJsonRenderer.Render( initialPlacementPlan ) );
 if (
@@ -46,34 +53,37 @@ if (
 	return 1;
 }
 
-PersistentRasterPlacementProfile verifiedPlacementProfile =
-	PersistentRasterPlacementClassifier.Classify(
-		new[] {
-			new PersistentRasterPlacementEvidence(
-				PersistentRasterPlacementSubject.SourceRectangle,
-				true,
-				PersistentRasterPlacementEvidenceKind.Verified,
-				"consumer runtime verification",
-				0
-			),
-			new PersistentRasterPlacementEvidence(
-				PersistentRasterPlacementSubject.SignedZOrder,
-				true,
-				PersistentRasterPlacementEvidenceKind.Verified,
-				"consumer runtime verification",
-				1
-			),
-		}
+PersistentRasterRuntimeObservationSet placementObservations = new(
+	Array.Empty<PersistentRasterRuntimeLifecycleObservation>(),
+	new[] {
+		new PersistentRasterRuntimePlacementObservation(
+			PersistentRasterPlacementSubject.SourceRectangle,
+			PersistentRasterRuntimeObservationOutcome.Supported,
+			"consumer runtime verification",
+			0
+		),
+		new PersistentRasterRuntimePlacementObservation(
+			PersistentRasterPlacementSubject.SignedZOrder,
+			PersistentRasterRuntimeObservationOutcome.Supported,
+			"consumer runtime verification",
+			1
+		),
+	}
+);
+PersistentRasterRuntimeIntegrationResult verifiedIntegration =
+	PersistentRasterRuntimeEvidenceIntegrator.Integrate(
+		lifecycleIntegration.LifecycleProfile,
+		lifecycleIntegration.PlacementProfile,
+		placementObservations
 	);
 PersistentRasterPlacementPlan verifiedPlacementPlan =
-	PersistentRasterPlacementPlanner.Plan(
-		lifecyclePlan,
-		verifiedPlacementProfile,
+	verifiedIntegration.CreatePlacementPlan(
+		lifecycleRequest,
 		placementRequest
 	);
 
-Console.WriteLine( "verified placement profile:" );
-Console.WriteLine( TermInfoJsonRenderer.Render( verifiedPlacementProfile ) );
+Console.WriteLine( "verified runtime integration:" );
+Console.WriteLine( TermInfoJsonRenderer.Render( verifiedIntegration ) );
 Console.WriteLine( "verified placement plan:" );
 Console.WriteLine( TermInfoJsonRenderer.Render( verifiedPlacementPlan ) );
 if ( verifiedPlacementPlan.Status != PersistentRasterPlacementPlanStatus.Satisfied ) {
