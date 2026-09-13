@@ -10,17 +10,19 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
-**Current coordinated version:** `1.12.0-Alpha-1`
+**Current coordinated version:** `1.12.0`
 **Final 1.6 prerelease:** `1.6.0-Alpha-8`
 **Final 1.7 prerelease:** `1.7.0-Alpha-8`
 **Final 1.8 prerelease:** `1.8.0-Alpha-8`
 **Final 1.9 prerelease:** `1.9.0-Alpha-7`
 **Final 1.10 prerelease:** `1.10.0-Alpha-8`
 **Final 1.11 prerelease:** `1.11.0-Alpha-8`
-**Next development line:** `1.12.0` - Advanced Persistent-Raster Placement Semantics and Planning
-**Status:** 1.12.0 implementation in progress
-**Current tranche:** PG01 - Architecture, vocabulary, and public API regret gate
-**Primary objective:** Add protocol-neutral source-rectangle and signed-z-order placement semantics beside the frozen 1.11 persistent-raster lifecycle model, preserving JSON v1-v3 and downstream execution ownership.
+**Final 1.12 prerelease:** `1.12.0-Alpha-8`
+**Latest completed line:** `1.12.0` - Advanced Persistent-Raster Placement Semantics and Planning
+**Status:** 1.12.0 implementation and stable promotion complete; PR #42 remains open pending merge
+**Completed tranches:** PG01-PG08
+**Primary objective:** Completed - protocol-neutral source-rectangle and signed-z-order placement semantics beside the frozen 1.11 persistent-raster lifecycle model, preserving JSON v1-v3 and downstream execution ownership.
+**Release audit:** `docs/1.12.0-RELEASE-AUDIT.md`
 
 ---
 

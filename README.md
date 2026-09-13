@@ -35,8 +35,10 @@ JSON versions 1 through 3 remain unchanged; version 4 contains exactly
 
 Production `Icod.TermInfo` and `Icod.TermInfo.Inspection` still do not depend on
 `Icod.Terminal`. The Alpha-8 contract passed workflow #725 / `34763187115`.
-Stable promotion is version/documentation-only and is validated separately before
-merge or publication. See
+The stable promotion passed workflow #731 / `34764253699` on exact head
+`1674c008f1df2cbe82295b8eaa9ae9d34ac5d999`, with all 12 jobs green.
+Publication remains gated by merge to `main` and the normal immutable-tag release
+workflow. See
 `docs/1.12.0-ADVANCED-PERSISTENT-RASTER-PLACEMENT-GUIDE.md` and
 `docs/1.12.0-RELEASE-AUDIT.md`.
 
@@ -126,7 +128,8 @@ dotnet add package Icod.TermInfo.Compiler --version 1.12.0
 ```
 
 Applications which need canonical rendering, semantic comparison, provider-aware
-inspection, database-set automation, or persistent-raster lifecycle planning use:
+inspection, database-set automation, or persistent-raster lifecycle/placement
+planning use:
 
 ```text
 dotnet add package Icod.TermInfo.Inspection --version 1.12.0

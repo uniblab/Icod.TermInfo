@@ -7,7 +7,11 @@
 **Primary package:** `Icod.TermInfo.Inspection`  
 **Baseline:** stable `1.11.0`  
 **Downstream integration target:** `Icod.Terminal 1.12.0`  
-**Frozen contracts:** existing 1.x Runtime/Source/Compiler/Termcap APIs, Inspection contracts through 1.11, JSON schemas v1-v3, database-set precedence, and persistent-raster lifecycle semantics except for unavoidable defect corrections
+**Frozen contracts:** existing 1.x Runtime/Source/Compiler/Termcap APIs, Inspection contracts through 1.11, JSON schemas v1-v3, database-set precedence, and persistent-raster lifecycle semantics except for unavoidable defect corrections  
+**Status:** Completed; stable `1.12.0` promotion validated  
+**Alpha-8 witness:** workflow #725 / `34763187115`  
+**Stable promotion witness:** workflow #731 / `34764253699`  
+**Release audit:** `docs/1.12.0-RELEASE-AUDIT.md`
 
 ---
 

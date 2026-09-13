@@ -25,6 +25,11 @@ package consumer and placement sample qualify `Icod.Terminal 1.12.0` only at the
 downstream application boundary. Concrete rectangle coordinates and z-order
 integers remain consumer-owned execution values.
 
+The Alpha-8 product contract passed workflow #725 / `34763187115`; the stable
+promotion passed workflow #731 / `34764253699` on exact head
+`1674c008f1df2cbe82295b8eaa9ae9d34ac5d999`, with all 12 jobs green. Publication
+remains gated by merge to `main` and the normal immutable-tag release workflow.
+
 See `docs/1.12.0-ADVANCED-PERSISTENT-RASTER-PLACEMENT-GUIDE.md`,
 `docs/1.12.0-INSPECTION-PUBLIC-API-FREEZE.md`, and
 `docs/1.12.0-RELEASE-AUDIT.md`.
