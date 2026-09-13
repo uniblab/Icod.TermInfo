@@ -8,7 +8,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: read
+  contents: write
 
 env:
   DOTNET_VERSIONS: |
@@ -19,7 +19,30 @@ env:
   SOLUTION_PATH: Icod.TermInfo.sln
 
 jobs:
+  pg08-release-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+      - name: Insert bounded PG08 release sections
+        run: python .github/scripts/insert-pg08-release-sections.py
+      - name: Commit release documentation if needed
+        shell: bash
+        run: |
+          if git diff --quiet -- README.md Icod.TermInfo.Inspection/README.md docs/VERSIONING.md docs/COMPATIBILITY.md; then
+            echo "PG08 release documentation is already normalized."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md Icod.TermInfo.Inspection/README.md docs/VERSIONING.md docs/COMPATIBILITY.md
+          git commit -m "Complete PG08 release-facing documentation"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
+
   build:
+    needs: pg08-release-docs
     strategy:
       fail-fast: false
       matrix:
