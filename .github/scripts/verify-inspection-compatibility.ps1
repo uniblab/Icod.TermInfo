@@ -121,10 +121,10 @@ function Read-ApprovedRendererMembers {
         if ($classification.Length -eq 0 -or $classification.StartsWith('#', [System.StringComparison]::Ordinal)) {
             continue
         }
-        if (
-            -not $candidate.StartsWith('  FIELD ', [System.StringComparison]::Ordinal)
-            -and -not $candidate.StartsWith('  METHOD ', [System.StringComparison]::Ordinal)
-        ) {
+
+        $isField = $candidate.StartsWith('  FIELD ', [System.StringComparison]::Ordinal)
+        $isMethod = $candidate.StartsWith('  METHOD ', [System.StringComparison]::Ordinal)
+        if (-not $isField -and -not $isMethod) {
             throw "Approved $ReleaseLabel additive API member is not a public API manifest field or method line: $candidate"
         }
         if ($candidate.IndexOf($RequiredToken, [System.StringComparison]::Ordinal) -lt 0) {
@@ -178,10 +178,8 @@ function Remove-ApprovedRendererMembers {
             continue
         }
 
-        if (
-            $insideRenderer
-            -and $line.IndexOf($RequiredToken, [System.StringComparison]::Ordinal) -ge 0
-        ) {
+        $matchesToken = $line.IndexOf($RequiredToken, [System.StringComparison]::Ordinal) -ge 0
+        if ($insideRenderer -and $matchesToken) {
             if (-not $ApprovedMembers.Contains($line)) {
                 throw "Unapproved $ReleaseLabel additive public member on TermInfoJsonRenderer: $line"
             }
