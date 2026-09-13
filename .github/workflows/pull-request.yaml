@@ -8,7 +8,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: write
+  contents: read
 
 env:
   DOTNET_VERSIONS: |
@@ -19,30 +19,7 @@ env:
   SOLUTION_PATH: Icod.TermInfo.sln
 
 jobs:
-  finalize-status:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-          fetch-depth: 0
-      - name: Apply bounded final status closure
-        run: python .github/scripts/finalize-1.12.0-status.py
-      - name: Commit status closure if needed
-        shell: bash
-        run: |
-          if git diff --quiet; then
-            echo "Final status closure already applied."
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add README.md Icod.TermInfo.Inspection/README.md docs/1.12.0-RELEASE-AUDIT.md Icod.TermInfo-Post-1.0-Development-Roadmap.md Icod.TermInfo-1.12.0-Advanced-Persistent-Raster-Placement-Semantics-and-Planning-Roadmap.md
-          git commit -m "Record Icod.TermInfo 1.12.0 stable validation"
-          git push origin HEAD:${{ github.event.pull_request.head.ref }}
-
   build:
-    needs: finalize-status
     strategy:
       fail-fast: false
       matrix:
