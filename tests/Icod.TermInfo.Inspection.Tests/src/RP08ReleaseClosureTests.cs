@@ -276,6 +276,7 @@ public sealed class RP08ReleaseClosureTests {
 						directory.FullName,
 						"Icod.TermInfo.sln"
 					)
+				)
 			) {
 				return directory.FullName;
 			}
