@@ -77,9 +77,11 @@ Console.WriteLine( TermInfoJsonRenderer.Render( integration ) );
 Console.WriteLine( "Plan after runtime evidence:" );
 Console.WriteLine( TermInfoJsonRenderer.Render( strengthenedPlan ) );
 
-return strengthenedPlan.Status == PersistentRasterLifecyclePlanStatus.Success
-	? 0
-	: 2;
+return
+	( strengthenedPlan.Status == PersistentRasterLifecyclePlanStatus.Success )
+		? 0
+		: 2
+;
 
 static PersistentRasterRuntimeObservationOutcome MapPersistentRasterStatus(
 	TerminalCapabilityStatus status
