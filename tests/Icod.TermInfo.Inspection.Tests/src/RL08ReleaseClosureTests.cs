@@ -157,7 +157,7 @@ public sealed class RL08ReleaseClosureTests {
 	}
 
 	[Fact]
-	public void ReleaseFacingDocumentationAndMetadataDescribeOneEleven() {
+	public void HistoricalReleaseDocumentationRetainsOneEleven() {
 		string rootReadme = ReadRepositoryFile( "README.md" );
 		string inspectionReadme = ReadRepositoryFile(
 			"Icod.TermInfo.Inspection/README.md"
@@ -170,9 +170,6 @@ public sealed class RL08ReleaseClosureTests {
 		string audit = ReadRepositoryFile(
 			"docs/1.11.0-RELEASE-AUDIT.md"
 		);
-		string inspectionProject = ReadRepositoryFile(
-			"Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj"
-		);
 
 		Assert.Contains( "1.11", rootReadme, StringComparison.Ordinal );
 		Assert.Contains( "1.11", inspectionReadme, StringComparison.Ordinal );
@@ -181,8 +178,13 @@ public sealed class RL08ReleaseClosureTests {
 		Assert.Contains( "PersistentRasterLifecycle", guide, StringComparison.Ordinal );
 		Assert.Contains( "1.11.0-Alpha-8", audit, StringComparison.Ordinal );
 		Assert.Contains(
-			"<PackageReleaseNotes>1.11.0",
-			inspectionProject,
+			"stable `1.11.0` is fully validated",
+			audit,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"Validated stable release-facing head",
+			audit,
 			StringComparison.Ordinal
 		);
 	}
