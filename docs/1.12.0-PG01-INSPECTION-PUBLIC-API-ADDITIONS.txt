@@ -1,0 +1,2 @@
+# Icod.TermInfo.Inspection 1.12 PG01 approved public API additions
+Icod.TermInfo.Inspection.PersistentRasterPlacementSubject
