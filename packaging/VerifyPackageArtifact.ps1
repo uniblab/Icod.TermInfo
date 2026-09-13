@@ -27,8 +27,7 @@ try {
         throw "Package artifact verification exited with status $LASTEXITCODE."
     }
 
-    & pwsh -NoLogo -NoProfile -File `
-        .github/scripts/smoke-rl07-package-consumer.ps1 `
+    & ./.github/scripts/smoke-rl07-package-consumer.ps1 `
         -ArtifactDirectory $ArtifactDirectory `
         -Configuration $Configuration
     if (0 -ne $LASTEXITCODE) {
