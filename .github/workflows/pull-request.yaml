@@ -36,7 +36,7 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add tests
+          git add tests Icod.TermInfo-Post-1.0-Development-Roadmap.md
           git commit -m "Apply PG01 release-line rollover"
           git push origin HEAD:${{ github.head_ref }}
 
