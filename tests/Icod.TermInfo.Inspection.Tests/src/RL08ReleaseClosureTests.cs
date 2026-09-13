@@ -28,10 +28,33 @@ public sealed class RL08ReleaseClosureTests {
 		string additiveMembers = ReadRepositoryFile(
 			"docs/1.11.0-INSPECTION-PUBLIC-API-ADDITIVE-MEMBERS.txt"
 		);
+		string pg01Additions = ReadRepositoryFile(
+			"docs/1.12.0-PG01-INSPECTION-PUBLIC-API-ADDITIONS.txt"
+		);
+		Type[] currentTypes =
+			typeof( PersistentRasterLifecycleProfile ).Assembly.GetExportedTypes();
+		Type[] reconstructedOneElevenTypes =
+			currentTypes
+				.Where(
+					type => type != typeof( PersistentRasterPlacementSubject )
+				)
+				.ToArray();
 
-		Assert.Equal(
-			67,
-			typeof( PersistentRasterLifecycleProfile ).Assembly.GetExportedTypes().Length
+		Assert.Equal( 67, reconstructedOneElevenTypes.Length );
+		Assert.Contains( typeof( PersistentRasterPlacementSubject ), currentTypes );
+		Assert.Single(
+			currentTypes.Where(
+				type =>
+					type.FullName?.StartsWith(
+						"Icod.TermInfo.Inspection.PersistentRasterPlacement",
+						StringComparison.Ordinal
+					) == true
+			)
+		);
+		Assert.Contains(
+			"Icod.TermInfo.Inspection.PersistentRasterPlacementSubject",
+			pg01Additions,
+			StringComparison.Ordinal
 		);
 		Assert.Contains( InspectionApiSha256, freeze, StringComparison.Ordinal );
 		Assert.Contains( InspectionApiSha256, fingerprints, StringComparison.Ordinal );
@@ -103,6 +126,11 @@ public sealed class RL08ReleaseClosureTests {
 		);
 		Assert.Contains(
 			"1.11.0-INSPECTION-PUBLIC-API-ADDITIVE-MEMBERS.txt",
+			compatibility,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"1.12.0-PG01-INSPECTION-PUBLIC-API-ADDITIONS.txt",
 			compatibility,
 			StringComparison.Ordinal
 		);
