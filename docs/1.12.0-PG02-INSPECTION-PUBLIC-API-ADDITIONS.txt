@@ -1,0 +1,4 @@
+# Icod.TermInfo.Inspection 1.12 PG02 approved public API additions
+Icod.TermInfo.Inspection.PersistentRasterPlacementEvidenceKind
+Icod.TermInfo.Inspection.PersistentRasterPlacementEvidenceOptions
+Icod.TermInfo.Inspection.PersistentRasterPlacementEvidence
