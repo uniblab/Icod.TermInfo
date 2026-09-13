@@ -19,6 +19,7 @@ $oneElevenMembersPath = Join-Path $repositoryRoot 'docs/1.11.0-INSPECTION-PUBLIC
 $oneTwelveTypesPath = Join-Path $repositoryRoot 'docs/1.12.0-PG01-INSPECTION-PUBLIC-API-ADDITIONS.txt'
 $oneTwelveMembersPath = Join-Path $repositoryRoot 'docs/1.12.0-PG06-INSPECTION-PUBLIC-API-ADDITIVE-MEMBERS.txt'
 $oneThirteenTypesPath = Join-Path $repositoryRoot 'docs/1.13.0-RE01-INSPECTION-PUBLIC-API-ADDITIONS.txt'
+$oneThirteenMembersPath = Join-Path $repositoryRoot 'docs/1.13.0-RE06-INSPECTION-PUBLIC-API-ADDITIVE-MEMBERS.txt'
 $oneElevenApiSha256 = '69c7350d5d44d502ecf1698c8fe1c1336f03d38eb1a36e36219f50ac33585a86'
 $oneTwelveApiSha256 = 'f71501dcd27a530051c1a02083325144ced2b6173b6b967b9571c620815198f0'
 $assemblyFullPath = if ([System.IO.Path]::IsPathRooted($AssemblyPath)) {
@@ -34,6 +35,7 @@ foreach ($requiredPath in @(
     $oneTwelveTypesPath,
     $oneTwelveMembersPath,
     $oneThirteenTypesPath,
+    $oneThirteenMembersPath,
     $assemblyFullPath
 )) {
     if (-not (Test-Path -LiteralPath $requiredPath -PathType Leaf)) {
@@ -301,12 +303,22 @@ try {
         $frozen = Normalize-Text -Text ([System.IO.File]::ReadAllText($baselinePath))
         $current = [System.IO.File]::ReadAllText($temporaryManifest)
 
+        $approvedOneThirteenMembers = Read-ApprovedRendererMembers `
+            -Path $oneThirteenMembersPath `
+            -RequiredToken 'PersistentRasterRuntime' `
+            -ReleaseLabel '1.13 RE06'
+        $oneThirteenMemberFiltered = Remove-ApprovedRendererMembers `
+            -Manifest $current `
+            -ApprovedMembers $approvedOneThirteenMembers `
+            -RequiredToken 'PersistentRasterRuntime' `
+            -ReleaseLabel '1.13 RE06'
+
         $approvedOneThirteenTypes = Read-ApprovedTypes `
             -Path $oneThirteenTypesPath `
             -RequiredPrefix 'Icod.TermInfo.Inspection.PersistentRasterRuntime' `
             -ReleaseLabel '1.13'
         $oneTwelveCandidate = Remove-ApprovedTypes `
-            -Manifest $current `
+            -Manifest $oneThirteenMemberFiltered.Manifest `
             -ApprovedTypes $approvedOneThirteenTypes `
             -RequiredPrefix 'Icod.TermInfo.Inspection.PersistentRasterRuntime' `
             -ReleaseLabel '1.13'
@@ -359,13 +371,14 @@ try {
             -ReleaseLabel '1.11'
 
         if (-not [string]::Equals($frozen, $filtered.Manifest, [System.StringComparison]::Ordinal)) {
-            throw 'Icod.TermInfo.Inspection changed the frozen 1.10 public API outside explicitly approved 1.11 and 1.12 additions.'
+            throw 'Icod.TermInfo.Inspection changed the frozen 1.10 public API outside explicitly approved 1.11, 1.12, and 1.13 additions.'
         }
 
         Write-Host (
-            "Verified reconstructed exact 1.12 Inspection public API SHA-256 {0} after excluding {1} approved 1.13 type block(s)." -f `
+            "Verified reconstructed exact 1.12 Inspection public API SHA-256 {0} after excluding {1} approved 1.13 type block(s) and {2} RE06 renderer member(s)." -f `
                 $oneTwelveCandidateSha256, `
-                $oneTwelveCandidate.RemovedTypeCount
+                $oneTwelveCandidate.RemovedTypeCount, `
+                $oneThirteenMemberFiltered.RemovedMemberCount
         )
         Write-Host (
             "Verified reconstructed exact 1.11 Inspection public API SHA-256 {0} after excluding {1} approved 1.12 type block(s) and {2} PG06 renderer member(s)." -f `
