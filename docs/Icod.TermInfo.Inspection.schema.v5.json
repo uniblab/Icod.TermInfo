@@ -1,0 +1,427 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:icod:terminfo:inspection:json:5",
+  "title": "Icod.TermInfo.Inspection persistent raster runtime JSON version 5",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/persistentRasterRuntimeObservationSetDocument"
+    },
+    {
+      "$ref": "#/$defs/persistentRasterRuntimeIntegrationDocument"
+    }
+  ],
+  "$defs": {
+    "runtimeOutcome": {
+      "type": "string",
+      "enum": [
+        "supported",
+        "unsupported",
+        "inconclusive"
+      ]
+    },
+    "supportStatus": {
+      "type": "string",
+      "enum": [
+        "unknown",
+        "supported",
+        "unsupported",
+        "contradicted"
+      ]
+    },
+    "lifecycleSubject": {
+      "type": "string",
+      "enum": [
+        "rasterDisplay",
+        "persistentUpload",
+        "acknowledgedUpload",
+        "placementCreation",
+        "multiplePlacements",
+        "placementUpdate",
+        "placementDeletion",
+        "resourceDeletion"
+      ]
+    },
+    "placementSubject": {
+      "type": "string",
+      "enum": [
+        "sourceRectangle",
+        "signedZOrder"
+      ]
+    },
+    "sourceLabel": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "sourceOrdinal": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2147483647
+    },
+    "lifecycleObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "subject",
+        "outcome",
+        "sourceLabel",
+        "sourceOrdinal"
+      ],
+      "properties": {
+        "subject": {
+          "$ref": "#/$defs/lifecycleSubject"
+        },
+        "outcome": {
+          "$ref": "#/$defs/runtimeOutcome"
+        },
+        "sourceLabel": {
+          "$ref": "#/$defs/sourceLabel"
+        },
+        "sourceOrdinal": {
+          "$ref": "#/$defs/sourceOrdinal"
+        }
+      }
+    },
+    "placementObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "subject",
+        "outcome",
+        "sourceLabel",
+        "sourceOrdinal"
+      ],
+      "properties": {
+        "subject": {
+          "$ref": "#/$defs/placementSubject"
+        },
+        "outcome": {
+          "$ref": "#/$defs/runtimeOutcome"
+        },
+        "sourceLabel": {
+          "$ref": "#/$defs/sourceLabel"
+        },
+        "sourceOrdinal": {
+          "$ref": "#/$defs/sourceOrdinal"
+        }
+      }
+    },
+    "lifecycleEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "subject",
+        "isPositive",
+        "kind",
+        "sourceLabel",
+        "sourceOrdinal"
+      ],
+      "properties": {
+        "subject": {
+          "$ref": "#/$defs/lifecycleSubject"
+        },
+        "isPositive": {
+          "type": "boolean"
+        },
+        "kind": {
+          "const": "verified"
+        },
+        "sourceLabel": {
+          "$ref": "#/$defs/sourceLabel"
+        },
+        "sourceOrdinal": {
+          "$ref": "#/$defs/sourceOrdinal"
+        }
+      }
+    },
+    "placementEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "subject",
+        "isPositive",
+        "kind",
+        "sourceLabel",
+        "sourceOrdinal"
+      ],
+      "properties": {
+        "subject": {
+          "$ref": "#/$defs/placementSubject"
+        },
+        "isPositive": {
+          "type": "boolean"
+        },
+        "kind": {
+          "const": "verified"
+        },
+        "sourceLabel": {
+          "$ref": "#/$defs/sourceLabel"
+        },
+        "sourceOrdinal": {
+          "$ref": "#/$defs/sourceOrdinal"
+        }
+      }
+    },
+    "integrationIssue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "existingEvidenceCount",
+        "requestedImportCount"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "lifecycleEvidenceCapacityExhausted",
+            "placementEvidenceCapacityExhausted",
+            "lifecycleOrdinalSpaceExhausted",
+            "placementOrdinalSpaceExhausted"
+          ]
+        },
+        "existingEvidenceCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4096
+        },
+        "requestedImportCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4096
+        }
+      }
+    },
+    "lifecycleStates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rasterDisplay",
+        "persistentUpload",
+        "acknowledgedUpload",
+        "placementCreation",
+        "multiplePlacements",
+        "placementUpdate",
+        "placementDeletion",
+        "resourceDeletion"
+      ],
+      "properties": {
+        "rasterDisplay": {
+          "$ref": "#/$defs/supportStatus"
+        },
+        "persistentUpload": {
+          "$ref": "#/$defs/supportStatus"
+        },
+        "acknowledgedUpload": {
+          "$ref": "#/$defs/supportStatus"
+        },
+        "placementCreation": {
+          "$ref": "#/$defs/supportStatus"
+        },
+        "multiplePlacements": {
+          "$ref": "#/$defs/supportStatus"
+        },
+        "placementUpdate": {
+          "$ref": "#/$defs/supportStatus"
+        },
+        "placementDeletion": {
+          "$ref": "#/$defs/supportStatus"
+        },
+        "resourceDeletion": {
+          "$ref": "#/$defs/supportStatus"
+        }
+      }
+    },
+    "placementStates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceRectangle",
+        "signedZOrder"
+      ],
+      "properties": {
+        "sourceRectangle": {
+          "$ref": "#/$defs/supportStatus"
+        },
+        "signedZOrder": {
+          "$ref": "#/$defs/supportStatus"
+        }
+      }
+    },
+    "persistentRasterRuntimeObservationSetDocument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "schemaVersion",
+        "documentKind",
+        "data"
+      ],
+      "properties": {
+        "schema": {
+          "const": "urn:icod:terminfo:inspection:json:5"
+        },
+        "schemaVersion": {
+          "const": 5
+        },
+        "documentKind": {
+          "const": "persistentRasterRuntimeObservationSet"
+        },
+        "data": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "observationCount",
+            "lifecycleObservationCount",
+            "placementObservationCount",
+            "lifecycleObservations",
+            "placementObservations"
+          ],
+          "properties": {
+            "observationCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 4096
+            },
+            "lifecycleObservationCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 4096
+            },
+            "placementObservationCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 4096
+            },
+            "lifecycleObservations": {
+              "type": "array",
+              "maxItems": 4096,
+              "items": {
+                "$ref": "#/$defs/lifecycleObservation"
+              }
+            },
+            "placementObservations": {
+              "type": "array",
+              "maxItems": 4096,
+              "items": {
+                "$ref": "#/$defs/placementObservation"
+              }
+            }
+          }
+        }
+      }
+    },
+    "persistentRasterRuntimeIntegrationDocument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "schemaVersion",
+        "documentKind",
+        "data"
+      ],
+      "properties": {
+        "schema": {
+          "const": "urn:icod:terminfo:inspection:json:5"
+        },
+        "schemaVersion": {
+          "const": 5
+        },
+        "documentKind": {
+          "const": "persistentRasterRuntimeIntegration"
+        },
+        "data": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "succeeded",
+            "observationCount",
+            "observations",
+            "importedLifecycleEvidence",
+            "importedPlacementEvidence",
+            "inconclusiveLifecycleObservations",
+            "inconclusivePlacementObservations",
+            "issues",
+            "lifecycleStates",
+            "placementStates"
+          ],
+          "properties": {
+            "succeeded": {
+              "type": "boolean"
+            },
+            "observationCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 4096
+            },
+            "observations": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "lifecycle",
+                "placement"
+              ],
+              "properties": {
+                "lifecycle": {
+                  "type": "array",
+                  "maxItems": 4096,
+                  "items": {
+                    "$ref": "#/$defs/lifecycleObservation"
+                  }
+                },
+                "placement": {
+                  "type": "array",
+                  "maxItems": 4096,
+                  "items": {
+                    "$ref": "#/$defs/placementObservation"
+                  }
+                }
+              }
+            },
+            "importedLifecycleEvidence": {
+              "type": "array",
+              "maxItems": 4096,
+              "items": {
+                "$ref": "#/$defs/lifecycleEvidence"
+              }
+            },
+            "importedPlacementEvidence": {
+              "type": "array",
+              "maxItems": 4096,
+              "items": {
+                "$ref": "#/$defs/placementEvidence"
+              }
+            },
+            "inconclusiveLifecycleObservations": {
+              "type": "array",
+              "maxItems": 4096,
+              "items": {
+                "$ref": "#/$defs/lifecycleObservation"
+              }
+            },
+            "inconclusivePlacementObservations": {
+              "type": "array",
+              "maxItems": 4096,
+              "items": {
+                "$ref": "#/$defs/placementObservation"
+              }
+            },
+            "issues": {
+              "type": "array",
+              "maxItems": 2,
+              "items": {
+                "$ref": "#/$defs/integrationIssue"
+              }
+            },
+            "lifecycleStates": {
+              "$ref": "#/$defs/lifecycleStates"
+            },
+            "placementStates": {
+              "$ref": "#/$defs/placementStates"
+            }
+          }
+        }
+      }
+    }
+  }
+}
