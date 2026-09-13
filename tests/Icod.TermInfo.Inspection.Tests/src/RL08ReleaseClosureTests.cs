@@ -28,31 +28,53 @@ public sealed class RL08ReleaseClosureTests {
 		string additiveMembers = ReadRepositoryFile(
 			"docs/1.11.0-INSPECTION-PUBLIC-API-ADDITIVE-MEMBERS.txt"
 		);
-		string pg01Additions = ReadRepositoryFile(
+		string oneTwelveAdditions = ReadRepositoryFile(
 			"docs/1.12.0-PG01-INSPECTION-PUBLIC-API-ADDITIONS.txt"
 		);
+		HashSet<string> approvedOneTwelveTypes = oneTwelveAdditions
+			.Split( '\n' )
+			.Select( line => line.Trim() )
+			.Where(
+				line =>
+					line.Length > 0
+					&& !line.StartsWith( '#', StringComparison.Ordinal )
+			)
+			.ToHashSet( StringComparer.Ordinal );
 		Type[] currentTypes =
 			typeof( PersistentRasterLifecycleProfile ).Assembly.GetExportedTypes();
-		Type[] reconstructedOneElevenTypes =
-			currentTypes
-				.Where(
-					type => type != typeof( PersistentRasterPlacementSubject )
-				)
-				.ToArray();
+		Type[] reconstructedOneElevenTypes = currentTypes
+			.Where(
+				type =>
+					type.FullName is null
+					|| !approvedOneTwelveTypes.Contains( type.FullName )
+			)
+			.ToArray();
 
 		Assert.Equal( 67, reconstructedOneElevenTypes.Length );
-		Assert.Contains( typeof( PersistentRasterPlacementSubject ), currentTypes );
-		Assert.Single(
-			currentTypes,
-			type =>
-				type.FullName?.StartsWith(
-					"Icod.TermInfo.Inspection.PersistentRasterPlacement",
-					StringComparison.Ordinal
-				) == true
+		Assert.Equal( 4, approvedOneTwelveTypes.Count );
+		Assert.Equal(
+			approvedOneTwelveTypes.Count,
+			currentTypes.Count(
+				type =>
+					type.FullName?.StartsWith(
+						"Icod.TermInfo.Inspection.PersistentRasterPlacement",
+						StringComparison.Ordinal
+					) == true
+			)
 		);
+		foreach ( string approvedType in approvedOneTwelveTypes ) {
+			Assert.Contains(
+				currentTypes,
+				type => string.Equals(
+					type.FullName,
+					approvedType,
+					StringComparison.Ordinal
+				)
+			);
+		}
 		Assert.Contains(
 			"Icod.TermInfo.Inspection.PersistentRasterPlacementSubject",
-			pg01Additions,
+			oneTwelveAdditions,
 			StringComparison.Ordinal
 		);
 		Assert.Contains( InspectionApiSha256, freeze, StringComparison.Ordinal );
