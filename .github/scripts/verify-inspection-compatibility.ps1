@@ -19,6 +19,7 @@ $oneElevenMembersPath = Join-Path $repositoryRoot 'docs/1.11.0-INSPECTION-PUBLIC
 $oneTwelveTypesPath = Join-Path $repositoryRoot 'docs/1.12.0-PG01-INSPECTION-PUBLIC-API-ADDITIONS.txt'
 $oneTwelveMembersPath = Join-Path $repositoryRoot 'docs/1.12.0-PG06-INSPECTION-PUBLIC-API-ADDITIVE-MEMBERS.txt'
 $oneElevenApiSha256 = '69c7350d5d44d502ecf1698c8fe1c1336f03d38eb1a36e36219f50ac33585a86'
+$oneTwelveApiSha256 = 'f71501dcd27a530051c1a02083325144ced2b6173b6b967b9571c620815198f0'
 $assemblyFullPath = if ([System.IO.Path]::IsPathRooted($AssemblyPath)) {
     [System.IO.Path]::GetFullPath($AssemblyPath)
 } else {
@@ -297,6 +298,10 @@ try {
 
         $frozen = Normalize-Text -Text ([System.IO.File]::ReadAllText($baselinePath))
         $current = [System.IO.File]::ReadAllText($temporaryManifest)
+        $currentSha256 = Get-NormalizedSha256 -Text $current
+        if (-not [string]::Equals($oneTwelveApiSha256, $currentSha256, [System.StringComparison]::Ordinal)) {
+            throw "Icod.TermInfo.Inspection exact 1.12 public API fingerprint changed. Expected $oneTwelveApiSha256, actual $currentSha256."
+        }
 
         $approvedOneTwelveMembers = Read-ApprovedRendererMembers `
             -Path $oneTwelveMembersPath `
@@ -345,6 +350,7 @@ try {
             throw 'Icod.TermInfo.Inspection changed the frozen 1.10 public API outside explicitly approved 1.11 and 1.12 additions.'
         }
 
+        Write-Host "Verified exact 1.12 Inspection public API SHA-256 $currentSha256."
         Write-Host (
             "Verified reconstructed exact 1.11 Inspection public API SHA-256 {0} after excluding {1} approved 1.12 type block(s) and {2} PG06 renderer member(s)." -f `
                 $oneElevenCandidateSha256, `
