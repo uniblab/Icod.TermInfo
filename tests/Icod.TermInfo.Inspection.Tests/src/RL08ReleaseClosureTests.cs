@@ -43,13 +43,12 @@ public sealed class RL08ReleaseClosureTests {
 		Assert.Equal( 67, reconstructedOneElevenTypes.Length );
 		Assert.Contains( typeof( PersistentRasterPlacementSubject ), currentTypes );
 		Assert.Single(
-			currentTypes.Where(
-				type =>
-					type.FullName?.StartsWith(
-						"Icod.TermInfo.Inspection.PersistentRasterPlacement",
-						StringComparison.Ordinal
-					) == true
-			)
+			currentTypes,
+			type =>
+				type.FullName?.StartsWith(
+					"Icod.TermInfo.Inspection.PersistentRasterPlacement",
+					StringComparison.Ordinal
+				) == true
 		);
 		Assert.Contains(
 			"Icod.TermInfo.Inspection.PersistentRasterPlacementSubject",
