@@ -153,10 +153,10 @@ function Read-ApprovedOneElevenMembers {
             throw "Approved 1.11 additive API member is not a public API manifest field or method line: $candidate"
         }
         if (
-            -not $candidate.Contains(
+            $candidate.IndexOf(
                 'PersistentRasterLifecycle',
                 [System.StringComparison]::Ordinal
-            )
+            ) -lt 0
         ) {
             throw "Approved 1.11 additive API member is outside the persistent-raster lifecycle surface: $candidate"
         }
@@ -203,9 +203,11 @@ function Remove-ApprovedOneElevenMembers {
         }
 
         if (
-            $insideRenderer -and $line.Contains(
-                'PersistentRasterLifecycle',
-                [System.StringComparison]::Ordinal
+            $insideRenderer -and (
+                $line.IndexOf(
+                    'PersistentRasterLifecycle',
+                    [System.StringComparison]::Ordinal
+                ) -ge 0
             )
         ) {
             if (-not $ApprovedMembers.Contains($line)) {
