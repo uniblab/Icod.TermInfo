@@ -103,8 +103,14 @@ merge or publication. See
 replace_count( "README.md", "--version 1.11.0", "--version 1.12.0", 6 )
 replace_once(
     "README.md",
-    "`docs/1.11.0-RELEASE-AUDIT.md`.",
-    "`docs/1.12.0-RELEASE-AUDIT.md`.",
+    """Packages. Historical release contracts remain recorded in the versioned release
+audits; the current stable publication contract is recorded in
+`docs/1.11.0-RELEASE-AUDIT.md`.
+""",
+    """Packages. Historical release contracts remain recorded in the versioned release
+audits; the current stable publication contract is recorded in
+`docs/1.12.0-RELEASE-AUDIT.md`.
+""",
 )
 replace_once(
     "README.md",
