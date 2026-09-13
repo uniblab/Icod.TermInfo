@@ -8,7 +8,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: read
+  contents: write
 
 env:
   DOTNET_VERSIONS: |
@@ -19,7 +19,30 @@ env:
   SOLUTION_PATH: Icod.TermInfo.sln
 
 jobs:
+  promote-stable:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+      - name: Apply bounded stable promotion
+        run: python .github/scripts/promote-1.12.0-stable.py
+      - name: Commit stable promotion if needed
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo "Stable promotion already applied."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Directory.Build.props README.md Icod.TermInfo.Inspection/README.md tests/Icod.TermInfo.Tests/src/T45CompletionGateTests.cs tests/Icod.TermInfo.Inspection.Tests/src/PG08ReleaseClosureTests.cs docs/1.12.0-RELEASE-AUDIT.md
+          git commit -m "Promote Icod.TermInfo 1.12.0 stable"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
+
   build:
+    needs: promote-stable
     strategy:
       fail-fast: false
       matrix:
