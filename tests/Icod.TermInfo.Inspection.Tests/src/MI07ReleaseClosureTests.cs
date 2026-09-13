@@ -222,7 +222,7 @@ public sealed class MI07ReleaseClosureTests {
 	}
 
 	[Fact]
-	public void CoordinatedMetadataIdentifiesStableReleaseAndCompletedTranche() {
+	public void CoordinatedMetadataPreservesOneNineClosureAndIdentifiesCurrentDevelopment() {
 		string root = FindRepositoryRoot();
 		string buildProperties =
 			File.ReadAllText(
@@ -257,9 +257,14 @@ public sealed class MI07ReleaseClosureTests {
 			StringComparison.Ordinal
 		);
 		Assert.Contains(
-			"DA06 - Command and machine-readable automation composition",
+			"PG01 - Architecture, vocabulary, and public API regret gate",
 			activeRoadmap,
 			StringComparison.OrdinalIgnoreCase
+		);
+		Assert.Contains(
+			"1.12.0",
+			activeRoadmap,
+			StringComparison.Ordinal
 		);
 	}
 
