@@ -24,10 +24,10 @@ TerminalRasterPlacementOptions executionOptions = new() {
 
 The coordinates and z-order value are intentionally absent from the TermInfo plan. They belong to the consuming application and `Icod.Terminal`.
 
-Run the sample with:
+The sample targets `net8.0`, `net9.0`, and `net10.0`. For example:
 
 ```text
-dotnet run --project samples/Icod.TermInfo.PersistentRasterPlacement.Sample/Icod.TermInfo.PersistentRasterPlacement.Sample.csproj
+dotnet run --project samples/Icod.TermInfo.PersistentRasterPlacement.Sample/Icod.TermInfo.PersistentRasterPlacement.Sample.csproj -f net10.0
 ```
 
 The sample references the in-repository `Icod.TermInfo.Inspection` project and stable `Icod.Terminal 1.12.0`. That Terminal dependency is qualification/sample-only; no production TermInfo project depends on `Icod.Terminal`.

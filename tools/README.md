@@ -32,10 +32,15 @@ the NuGet package.
 - `compiler-package-smoke` — package-reference-only consumer for
   `Icod.TermInfo.Compiler`; it exercises the writer and transitive Runtime and
   Source dependencies without a repository-local project reference.
-- `inspection-package-smoke` — package-reference-only consumer for
+- `inspection-package-smoke` — frozen package-reference-only consumer for
   `Icod.TermInfo.Inspection`; it exercises rendering/inspection through the
   packaged Runtime and Source dependency graph without repository-local project
   references.
+- `placement-interop-package-smoke` — PG07 package-reference-only downstream
+  consumer that combines the freshly produced `Icod.TermInfo.Inspection`
+  package with stable `Icod.Terminal 1.12.0` to qualify source-rectangle and
+  signed-z-order semantic interoperability without changing production package
+  dependencies.
 
 Repository maintenance utilities target `net10.0` unless their purpose is to
 exercise a shipped consumer target. All package-smoke consumers deliberately

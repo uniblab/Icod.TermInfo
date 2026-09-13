@@ -34,10 +34,9 @@ the coordinated five-command suite: `tic`, `infocmp`, `toe`, `captoinfo`, and
 `infotocap`, including both the frozen 1.9 version-1 JSON forms and the additive
 1.10 database-set automation forms.
 
-Most executable API sample projects target `net8.0`, `net9.0`, and `net10.0`.
-The 1.12 persistent-raster placement interop sample targets `net10.0` because it
-is a focused downstream integration example. Multi-target sample commands below
-therefore specify a framework explicitly.
+All six executable API sample projects target `net8.0`, `net9.0`, and `net10.0`.
+Every `dotnet run` example therefore specifies a framework; substitute
+`-f net8.0` or `-f net9.0` when exercising those consumer targets.
 
 ## Icod.TermInfo.Sample
 
@@ -167,7 +166,7 @@ never owns the actual crop coordinates or z-order integer.
 Run it with:
 
 ```text
-dotnet run --project samples/Icod.TermInfo.PersistentRasterPlacement.Sample/Icod.TermInfo.PersistentRasterPlacement.Sample.csproj
+dotnet run --project samples/Icod.TermInfo.PersistentRasterPlacement.Sample/Icod.TermInfo.PersistentRasterPlacement.Sample.csproj -f net10.0
 ```
 
 See `Icod.TermInfo.PersistentRasterPlacement.Sample/README.md`.
