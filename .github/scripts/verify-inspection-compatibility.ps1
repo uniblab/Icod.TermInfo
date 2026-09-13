@@ -57,9 +57,13 @@ function Get-NormalizedSha256 {
 
     $normalized = Normalize-Text -Text $Text
     $bytes = [System.Text.Encoding]::UTF8.GetBytes($normalized)
-    return [Convert]::ToHexString(
-        [System.Security.Cryptography.SHA256]::HashData($bytes)
-    ).ToLowerInvariant()
+    $sha256 = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        $digest = $sha256.ComputeHash($bytes)
+    } finally {
+        $sha256.Dispose()
+    }
+    return [System.BitConverter]::ToString($digest).Replace('-', '').ToLowerInvariant()
 }
 
 function Read-ApprovedOneElevenTypes {
@@ -124,7 +128,7 @@ function Read-ApprovedOneTwelveTypes {
     }
 
     if ($approved.Count -eq 0) {
-        throw 'Approved 1.12 Inspection API additions file is empty.'
+        throw 'Approved 1.12 PG01 Inspection API additions file is empty.'
     }
 
     return $approved
