@@ -1,3 +1,6 @@
-# Icod.TermInfo.Inspection 1.13 approved public API additions through RE01
+# Icod.TermInfo.Inspection 1.13 approved public API additions through RE02
 Icod.TermInfo.Inspection.PersistentRasterRuntimeObservationOutcome
 Icod.TermInfo.Inspection.PersistentRasterRuntimeObservationOptions
+Icod.TermInfo.Inspection.PersistentRasterRuntimeLifecycleObservation
+Icod.TermInfo.Inspection.PersistentRasterRuntimePlacementObservation
+Icod.TermInfo.Inspection.PersistentRasterRuntimeObservationSet
