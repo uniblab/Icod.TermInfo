@@ -18,38 +18,66 @@ PersistentRasterLifecyclePlan lifecyclePlan =
 		lifecycleProfile,
 		new PersistentRasterLifecycleRequest( placementCount: 1 )
 	);
-PersistentRasterPlacementProfile placementProfile =
+PersistentRasterPlacementRequest placementRequest =
+	new(
+		requireSourceRectangle: true,
+		requireSignedZOrder: true
+	);
+
+PersistentRasterPlacementProfile initialPlacementProfile =
+	PersistentRasterPlacementClassifier.Classify(
+		Array.Empty<PersistentRasterPlacementEvidence>()
+	);
+PersistentRasterPlacementPlan initialPlacementPlan =
+	PersistentRasterPlacementPlanner.Plan(
+		lifecyclePlan,
+		initialPlacementProfile,
+		placementRequest
+	);
+
+Console.WriteLine( "initial placement profile:" );
+Console.WriteLine( TermInfoJsonRenderer.Render( initialPlacementProfile ) );
+Console.WriteLine( "initial placement plan:" );
+Console.WriteLine( TermInfoJsonRenderer.Render( initialPlacementPlan ) );
+if (
+	initialPlacementPlan.Status
+	!= PersistentRasterPlacementPlanStatus.RequiresRuntimeVerification
+) {
+	return 1;
+}
+
+PersistentRasterPlacementProfile verifiedPlacementProfile =
 	PersistentRasterPlacementClassifier.Classify(
 		new[] {
 			new PersistentRasterPlacementEvidence(
 				PersistentRasterPlacementSubject.SourceRectangle,
 				true,
 				PersistentRasterPlacementEvidenceKind.Verified,
-				"sample placement",
+				"consumer runtime verification",
 				0
 			),
 			new PersistentRasterPlacementEvidence(
 				PersistentRasterPlacementSubject.SignedZOrder,
 				true,
 				PersistentRasterPlacementEvidenceKind.Verified,
-				"sample placement",
+				"consumer runtime verification",
 				1
 			),
 		}
 	);
-PersistentRasterPlacementPlan placementPlan =
+PersistentRasterPlacementPlan verifiedPlacementPlan =
 	PersistentRasterPlacementPlanner.Plan(
 		lifecyclePlan,
-		placementProfile,
-		new PersistentRasterPlacementRequest(
-			requireSourceRectangle: true,
-			requireSignedZOrder: true
-		)
+		verifiedPlacementProfile,
+		placementRequest
 	);
 
-Console.WriteLine( TermInfoJsonRenderer.Render( placementPlan ) );
-if ( placementPlan.Status != PersistentRasterPlacementPlanStatus.Satisfied ) {
-	return 1;
+Console.WriteLine( "verified placement profile:" );
+Console.WriteLine( TermInfoJsonRenderer.Render( verifiedPlacementProfile ) );
+Console.WriteLine( "verified placement plan:" );
+Console.WriteLine( TermInfoJsonRenderer.Render( verifiedPlacementPlan ) );
+if ( verifiedPlacementPlan.Status != PersistentRasterPlacementPlanStatus.Satisfied ) {
+	return 2;
 }
 
 // TermInfo has now finished its job: the required semantics are admissible.
