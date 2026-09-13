@@ -37,7 +37,7 @@ public sealed class RL08ReleaseClosureTests {
 			.Where(
 				line =>
 					line.Length > 0
-					&& !line.StartsWith( '#', StringComparison.Ordinal )
+					&& !line.StartsWith( "#", StringComparison.Ordinal )
 			)
 			.ToHashSet( StringComparer.Ordinal );
 		Type[] currentTypes =
