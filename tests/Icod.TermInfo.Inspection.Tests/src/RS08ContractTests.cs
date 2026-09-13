@@ -6,7 +6,7 @@ namespace Icod.TermInfo.Inspection.Tests;
 
 public sealed class RS08ContractTests {
 	private const string ReleaseVersion = "1.7.0";
-	private const string CurrentDevelopmentVersion = "1.11.0";
+	private const string CurrentDevelopmentVersion = "1.12.0";
 
 	[Fact]
 	public void CurrentDevelopmentRetainsRs08ReleaseRecords() {
