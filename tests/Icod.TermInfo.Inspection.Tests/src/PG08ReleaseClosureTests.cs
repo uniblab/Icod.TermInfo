@@ -31,14 +31,52 @@ public sealed class PG08ReleaseClosureTests {
 		string additiveMembers = ReadRepositoryFile(
 			"docs/1.12.0-PG06-INSPECTION-PUBLIC-API-ADDITIVE-MEMBERS.txt"
 		);
+		string oneThirteenAdditions = ReadRepositoryFile(
+			"docs/1.13.0-RE01-INSPECTION-PUBLIC-API-ADDITIONS.txt"
+		);
+		HashSet<string> approvedOneThirteenTypes = oneThirteenAdditions
+			.Split( '\n' )
+			.Select( line => line.Trim() )
+			.Where(
+				line =>
+					line.Length > 0
+					&& !line.StartsWith( "#", StringComparison.Ordinal )
+			)
+			.ToHashSet( StringComparer.Ordinal );
+		Type[] currentTypes =
+			typeof( PersistentRasterPlacementProfile ).Assembly.GetExportedTypes();
+		Type[] reconstructedOneTwelveTypes = currentTypes
+			.Where(
+				type =>
+					type.FullName is null
+					|| !approvedOneThirteenTypes.Contains( type.FullName )
+			)
+			.ToArray();
 		string compatibility = ReadRepositoryFile(
 			".github/scripts/verify-inspection-compatibility.ps1"
 		);
 
+		Assert.Equal( 81, reconstructedOneTwelveTypes.Length );
 		Assert.Equal(
-			81,
-			typeof( PersistentRasterPlacementProfile ).Assembly.GetExportedTypes().Length
+			approvedOneThirteenTypes.Count,
+			currentTypes.Count(
+				type =>
+					type.FullName?.StartsWith(
+						"Icod.TermInfo.Inspection.PersistentRasterRuntime",
+						StringComparison.Ordinal
+					) == true
+			)
 		);
+		foreach ( string approvedType in approvedOneThirteenTypes ) {
+			Assert.Contains(
+				currentTypes,
+				type => string.Equals(
+					type.FullName,
+					approvedType,
+					StringComparison.Ordinal
+				)
+			);
+		}
 		Assert.Contains( InspectionApiSha256, freeze, StringComparison.Ordinal );
 		Assert.Contains( InspectionApiSha256, fingerprints, StringComparison.Ordinal );
 		Assert.Contains( InspectionApiSha256, compatibility, StringComparison.Ordinal );
@@ -106,7 +144,6 @@ public sealed class PG08ReleaseClosureTests {
 		string inspectionProject = ReadRepositoryFile(
 			"Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj"
 		);
-		string buildProperties = ReadRepositoryFile( "Directory.Build.props" );
 
 		Assert.Contains( "1.12", rootReadme, StringComparison.Ordinal );
 		Assert.Contains( "1.12", inspectionReadme, StringComparison.Ordinal );
@@ -118,11 +155,6 @@ public sealed class PG08ReleaseClosureTests {
 		Assert.Contains(
 			"<PackageReleaseNotes>1.12.0",
 			inspectionProject,
-			StringComparison.Ordinal
-		);
-		Assert.Contains(
-			"<IcodTermInfoSuiteVersion>1.12.0</IcodTermInfoSuiteVersion>",
-			buildProperties,
 			StringComparison.Ordinal
 		);
 	}

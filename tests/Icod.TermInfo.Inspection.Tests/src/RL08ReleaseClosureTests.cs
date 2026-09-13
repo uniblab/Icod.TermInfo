@@ -31,7 +31,19 @@ public sealed class RL08ReleaseClosureTests {
 		string oneTwelveAdditions = ReadRepositoryFile(
 			"docs/1.12.0-PG01-INSPECTION-PUBLIC-API-ADDITIONS.txt"
 		);
+		string oneThirteenAdditions = ReadRepositoryFile(
+			"docs/1.13.0-RE01-INSPECTION-PUBLIC-API-ADDITIONS.txt"
+		);
 		HashSet<string> approvedOneTwelveTypes = oneTwelveAdditions
+			.Split( '\n' )
+			.Select( line => line.Trim() )
+			.Where(
+				line =>
+					line.Length > 0
+					&& !line.StartsWith( "#", StringComparison.Ordinal )
+			)
+			.ToHashSet( StringComparer.Ordinal );
+		HashSet<string> approvedOneThirteenTypes = oneThirteenAdditions
 			.Split( '\n' )
 			.Select( line => line.Trim() )
 			.Where(
@@ -42,7 +54,14 @@ public sealed class RL08ReleaseClosureTests {
 			.ToHashSet( StringComparer.Ordinal );
 		Type[] currentTypes =
 			typeof( PersistentRasterLifecycleProfile ).Assembly.GetExportedTypes();
-		Type[] reconstructedOneElevenTypes = currentTypes
+		Type[] reconstructedOneTwelveTypes = currentTypes
+			.Where(
+				type =>
+					type.FullName is null
+					|| !approvedOneThirteenTypes.Contains( type.FullName )
+			)
+			.ToArray();
+		Type[] reconstructedOneElevenTypes = reconstructedOneTwelveTypes
 			.Where(
 				type =>
 					type.FullName is null
@@ -52,8 +71,18 @@ public sealed class RL08ReleaseClosureTests {
 
 		Assert.Equal( 67, reconstructedOneElevenTypes.Length );
 		Assert.Equal(
-			approvedOneTwelveTypes.Count,
+			approvedOneThirteenTypes.Count,
 			currentTypes.Count(
+				type =>
+					type.FullName?.StartsWith(
+						"Icod.TermInfo.Inspection.PersistentRasterRuntime",
+						StringComparison.Ordinal
+					) == true
+			)
+		);
+		Assert.Equal(
+			approvedOneTwelveTypes.Count,
+			reconstructedOneTwelveTypes.Count(
 				type =>
 					type.FullName?.StartsWith(
 						"Icod.TermInfo.Inspection.PersistentRasterPlacement",
@@ -62,6 +91,16 @@ public sealed class RL08ReleaseClosureTests {
 			)
 		);
 		foreach ( string approvedType in approvedOneTwelveTypes ) {
+			Assert.Contains(
+				reconstructedOneTwelveTypes,
+				type => string.Equals(
+					type.FullName,
+					approvedType,
+					StringComparison.Ordinal
+				)
+			);
+		}
+		foreach ( string approvedType in approvedOneThirteenTypes ) {
 			Assert.Contains(
 				currentTypes,
 				type => string.Equals(
@@ -151,6 +190,11 @@ public sealed class RL08ReleaseClosureTests {
 		);
 		Assert.Contains(
 			"1.12.0-PG01-INSPECTION-PUBLIC-API-ADDITIONS.txt",
+			compatibility,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"1.13.0-RE01-INSPECTION-PUBLIC-API-ADDITIONS.txt",
 			compatibility,
 			StringComparison.Ordinal
 		);

@@ -33,7 +33,7 @@ public sealed class T45CompletionGateTests {
 				)[ 0 ];
 
 		Assert.StartsWith(
-			"1.12.0",
+			"1.13.0",
 			semanticVersion,
 			StringComparison.Ordinal
 		);
@@ -61,7 +61,7 @@ public sealed class T45CompletionGateTests {
 			);
 
 		Assert.StartsWith(
-			"1.12.0",
+			"1.13.0",
 			ReadRequiredProperty(
 				buildProperties,
 				"IcodTermInfoSuiteVersion"
