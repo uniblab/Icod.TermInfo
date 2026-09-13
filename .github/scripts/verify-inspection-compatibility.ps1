@@ -18,6 +18,7 @@ $oneElevenTypesPath = Join-Path $repositoryRoot 'docs/1.11.0-INSPECTION-PUBLIC-A
 $oneElevenMembersPath = Join-Path $repositoryRoot 'docs/1.11.0-INSPECTION-PUBLIC-API-ADDITIVE-MEMBERS.txt'
 $oneTwelveTypesPath = Join-Path $repositoryRoot 'docs/1.12.0-PG01-INSPECTION-PUBLIC-API-ADDITIONS.txt'
 $oneTwelveMembersPath = Join-Path $repositoryRoot 'docs/1.12.0-PG06-INSPECTION-PUBLIC-API-ADDITIVE-MEMBERS.txt'
+$oneThirteenTypesPath = Join-Path $repositoryRoot 'docs/1.13.0-RE01-INSPECTION-PUBLIC-API-ADDITIONS.txt'
 $oneElevenApiSha256 = '69c7350d5d44d502ecf1698c8fe1c1336f03d38eb1a36e36219f50ac33585a86'
 $oneTwelveApiSha256 = 'f71501dcd27a530051c1a02083325144ced2b6173b6b967b9571c620815198f0'
 $assemblyFullPath = if ([System.IO.Path]::IsPathRooted($AssemblyPath)) {
@@ -32,6 +33,7 @@ foreach ($requiredPath in @(
     $oneElevenMembersPath,
     $oneTwelveTypesPath,
     $oneTwelveMembersPath,
+    $oneThirteenTypesPath,
     $assemblyFullPath
 )) {
     if (-not (Test-Path -LiteralPath $requiredPath -PathType Leaf)) {
@@ -298,9 +300,19 @@ try {
 
         $frozen = Normalize-Text -Text ([System.IO.File]::ReadAllText($baselinePath))
         $current = [System.IO.File]::ReadAllText($temporaryManifest)
-        $currentSha256 = Get-NormalizedSha256 -Text $current
-        if (-not [string]::Equals($oneTwelveApiSha256, $currentSha256, [System.StringComparison]::Ordinal)) {
-            throw "Icod.TermInfo.Inspection exact 1.12 public API fingerprint changed. Expected $oneTwelveApiSha256, actual $currentSha256."
+
+        $approvedOneThirteenTypes = Read-ApprovedTypes `
+            -Path $oneThirteenTypesPath `
+            -RequiredPrefix 'Icod.TermInfo.Inspection.PersistentRasterRuntime' `
+            -ReleaseLabel '1.13'
+        $oneTwelveCandidate = Remove-ApprovedTypes `
+            -Manifest $current `
+            -ApprovedTypes $approvedOneThirteenTypes `
+            -RequiredPrefix 'Icod.TermInfo.Inspection.PersistentRasterRuntime' `
+            -ReleaseLabel '1.13'
+        $oneTwelveCandidateSha256 = Get-NormalizedSha256 -Text $oneTwelveCandidate.Manifest
+        if (-not [string]::Equals($oneTwelveApiSha256, $oneTwelveCandidateSha256, [System.StringComparison]::Ordinal)) {
+            throw "Icod.TermInfo.Inspection reconstructed 1.12 public API fingerprint changed. Expected $oneTwelveApiSha256, actual $oneTwelveCandidateSha256."
         }
 
         $approvedOneTwelveMembers = Read-ApprovedRendererMembers `
@@ -308,7 +320,7 @@ try {
             -RequiredToken 'PersistentRasterPlacement' `
             -ReleaseLabel '1.12 PG06'
         $oneTwelveMemberFiltered = Remove-ApprovedRendererMembers `
-            -Manifest $current `
+            -Manifest $oneTwelveCandidate.Manifest `
             -ApprovedMembers $approvedOneTwelveMembers `
             -RequiredToken 'PersistentRasterPlacement' `
             -ReleaseLabel '1.12 PG06'
@@ -350,7 +362,11 @@ try {
             throw 'Icod.TermInfo.Inspection changed the frozen 1.10 public API outside explicitly approved 1.11 and 1.12 additions.'
         }
 
-        Write-Host "Verified exact 1.12 Inspection public API SHA-256 $currentSha256."
+        Write-Host (
+            "Verified reconstructed exact 1.12 Inspection public API SHA-256 {0} after excluding {1} approved 1.13 type block(s)." -f `
+                $oneTwelveCandidateSha256, `
+                $oneTwelveCandidate.RemovedTypeCount
+        )
         Write-Host (
             "Verified reconstructed exact 1.11 Inspection public API SHA-256 {0} after excluding {1} approved 1.12 type block(s) and {2} PG06 renderer member(s)." -f `
                 $oneElevenCandidateSha256, `
