@@ -114,4 +114,56 @@ public sealed class PersistentRasterRuntimeIntegrationResult {
 	public bool Succeeded {
 		get;
 	}
+
+	/// <summary>
+	/// Creates a lifecycle plan from the resulting integrated lifecycle profile by
+	/// delegating to the frozen lifecycle planner.
+	/// </summary>
+	/// <param name="request">The bounded semantic lifecycle request.</param>
+	/// <returns>The frozen lifecycle planner result.</returns>
+	/// <exception cref="ArgumentNullException">
+	/// <paramref name="request"/> is <see langword="null"/>.
+	/// </exception>
+	public PersistentRasterLifecyclePlan CreateLifecyclePlan(
+		PersistentRasterLifecycleRequest request
+	) {
+		ArgumentNullException.ThrowIfNull( request );
+
+		return PersistentRasterLifecyclePlanner.Plan(
+			LifecycleProfile,
+			request
+		);
+	}
+
+	/// <summary>
+	/// Creates an advanced placement plan by first planning the supplied lifecycle
+	/// request from the resulting integrated lifecycle profile and then delegating
+	/// the placement request to the frozen placement planner.
+	/// </summary>
+	/// <param name="lifecycleRequest">The bounded semantic lifecycle request.</param>
+	/// <param name="placementRequest">
+	/// The non-empty advanced-placement requirement request.
+	/// </param>
+	/// <returns>The frozen placement planner result.</returns>
+	/// <exception cref="ArgumentNullException">
+	/// Either request is <see langword="null"/>.
+	/// </exception>
+	public PersistentRasterPlacementPlan CreatePlacementPlan(
+		PersistentRasterLifecycleRequest lifecycleRequest,
+		PersistentRasterPlacementRequest placementRequest
+	) {
+		ArgumentNullException.ThrowIfNull( lifecycleRequest );
+		ArgumentNullException.ThrowIfNull( placementRequest );
+
+		PersistentRasterLifecyclePlan lifecyclePlan =
+			PersistentRasterLifecyclePlanner.Plan(
+				LifecycleProfile,
+				lifecycleRequest
+			);
+		return PersistentRasterPlacementPlanner.Plan(
+			lifecyclePlan,
+			PlacementProfile,
+			placementRequest
+		);
+	}
 }
