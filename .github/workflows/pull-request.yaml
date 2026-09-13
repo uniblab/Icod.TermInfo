@@ -8,7 +8,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: write
+  contents: read
 
 env:
   DOTNET_VERSIONS: |
@@ -19,29 +19,7 @@ env:
   SOLUTION_PATH: Icod.TermInfo.sln
 
 jobs:
-  pg01-rollover:
-    if: github.head_ref == '1.12.0'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref }}
-      - name: Apply exact PG01 release-line rollover
-        run: python .github/scripts/pg01-rollover.py
-      - name: Commit rollover changes when needed
-        shell: bash
-        run: |
-          if git diff --quiet; then
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add tests Icod.TermInfo-Post-1.0-Development-Roadmap.md
-          git commit -m "Apply PG01 release-line rollover"
-          git push origin HEAD:${{ github.head_ref }}
-
   build:
-    needs: pg01-rollover
     strategy:
       fail-fast: false
       matrix:
