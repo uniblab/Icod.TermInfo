@@ -27,10 +27,10 @@
 		<RepositoryType>git</RepositoryType>
 		<RepositoryUrl>https://github.com/uniblab/Icod.TermInfo</RepositoryUrl>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
-		<PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
+		<PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 		<PackageReleaseNotes>1.11.0 preserves the frozen routed command contract, installed-tool validation, and six-RID archive topology while the coordinated reusable Inspection package adds persistent-raster lifecycle semantics and planning; command semantics remain unchanged.</PackageReleaseNotes>
-		<PackageTags>terminfo;termcap;libtinfo;tic;infocmp;toe;captoinfo;infotocap;terminal;tool;dotnet;csharp;icod</PackageTags>
+		<PackageTags>captoinfo;cli;command-line;console;cross-platform;csharp;dotnet;icod;infocmp;infotocap;libtinfo;termcap;terminal;termcaps;terminal-capabilities;terminfo;tic;toe;tool;tui;text-ui</PackageTags>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(PlatformTarget)' == '' ">

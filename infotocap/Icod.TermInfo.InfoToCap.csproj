@@ -15,9 +15,24 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Icod.CommandFramework" Version="2.0.0" />
+		<PackageReference Include="Icod.CommandFramework" Version="2.2.1" />
 		<ProjectReference Include="..\Icod.TermInfo.Termcap\Icod.TermInfo.Termcap.csproj" />
 		<ProjectReference Include="..\Icod.TermInfo.Source\Icod.TermInfo.Source.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<Content Include="README.md">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<TargetPath>$(AssemblyName).README.md</TargetPath>
+			<Pack>true</Pack>
+			<PackagePath>\</PackagePath>
+		</Content>
+		<Content Include="..\LICENSE">
+			<Link>LICENSE</Link>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<TargetPath>$(AssemblyName).LICENSE.txt</TargetPath>
+			<Pack>true</Pack>
+			<PackagePath>\</PackagePath>
+		</Content>
 	</ItemGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
