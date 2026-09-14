@@ -14,6 +14,14 @@ command behavior, package-consumer topology, or archive RIDs. Stable `1.12.0`
 remains the published release until PR #43 is merged and the normal tag-based
 publication flow is performed.
 
+## Support the Project
+
+`Icod.TermInfo` and its ecosystem packages (`Icod.Terminal` and `Icod.DCurses`) are built and maintained by a solo developer. If these packages save you or your team time, please consider supporting their continued development and maintenance.
+
+[![GitHub Sponsors](https://img.shields.io/badge/GitHub-Sponsor?logo=githubsponsors)](https://github.com/sponsors/uniblab)
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-Support?logo=kofi)](https://ko-fi.com/TimothyBruce)
+[![PayPal](https://img.shields.io/badge/PayPal-Support?logo=paypal)](https://paypal.me/uniblab)
+
 ## 1.13 release-ready status
 
 Version `1.13.0` promotes the fully validated `1.13.0-Alpha-8` contract
