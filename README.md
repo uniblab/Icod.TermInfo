@@ -163,8 +163,8 @@ dotnet add package Icod.TermInfo.Compiler --version 1.13.0
 ```
 
 Applications which need canonical rendering, semantic comparison, provider-aware
-inspection, database-set automation, or persistent-raster lifecycle/placement
-planning use:
+inspection, database-set automation, persistent-raster lifecycle/placement
+planning, or 1.13 runtime-evidence interchange and integration use:
 
 ```text
 dotnet add package Icod.TermInfo.Inspection --version 1.13.0
@@ -578,6 +578,42 @@ See
 `Icod.TermInfo-1.9.0-Machine-Readable-Inspection-and-Planning-Automation-Roadmap.md`,
 `docs/1.9.0-MI07-API-SCHEMA-PACKAGING-AND-RELEASE-CLOSURE.md`, and
 `docs/1.9.0-RELEASE-AUDIT.md` for the 1.9 machine-readable contract.
+
+## What 1.13 adds
+
+Version 1.13.0 adds protocol-neutral runtime-evidence interchange above the
+frozen 1.11 lifecycle and 1.12 placement models without moving live terminal I/O
+into TermInfo:
+
+- immutable bounded `PersistentRasterRuntimeLifecycleObservation` and
+  `PersistentRasterRuntimePlacementObservation` values plus canonical observation
+  sets;
+- deterministic mapping of conclusive runtime outcomes into the existing
+  `Verified` evidence model with safe final source ordinals;
+- atomic-per-family handling of evidence-capacity and ordinal-space exhaustion;
+- audit-visible `Inconclusive` observations and structured integration issues;
+- `CreateLifecyclePlan(...)` and `CreatePlacementPlan(...)` conveniences which
+  delegate directly to the existing frozen planners;
+- additive JSON version 5 documents for
+  `persistentRasterRuntimeObservationSet` and
+  `persistentRasterRuntimeIntegration`; and
+- package-only qualification against published `Icod.Terminal 1.12.0` while the
+  production `Icod.TermInfo.Inspection` package remains free of any
+  `Icod.Terminal` dependency.
+
+The intended consumer flow is:
+
+```text
+static TermInfo evidence -> classify / plan -> runtime verification required
+    -> caller-owned verifier -> runtime observations
+    -> PersistentRasterRuntimeEvidenceIntegrator -> frozen classifiers / planners
+```
+
+TermInfo does not infer protocol/backend identity, perform live probing, own
+terminal resource identities, or expand a sibling layer's coarse capability into
+TermInfo subjects. Those adapter decisions remain explicit consumer policy. See
+`samples/Icod.TermInfo.PersistentRasterRuntimeIntegration.Sample/README.md` and
+`docs/1.13.0-PERSISTENT-RASTER-RUNTIME-EVIDENCE-GUIDE.md`.
 
 ## Getting started
 
@@ -1016,7 +1052,7 @@ The first provider which resolves the requested name wins.
 
 ## Sample applications
 
-The repository contains six executable API samples plus one command-suite
+The repository contains seven executable API samples plus one command-suite
 walkthrough with deliberately different purposes.
 
 ### General terminal API sample
@@ -1037,7 +1073,7 @@ walkthrough with deliberately different purposes.
 - redirection handling and explicit Windows VT enablement;
 - a custom provider implementation.
 
-All six executable API sample projects target `net8.0`, `net9.0`, and
+All seven executable API sample projects target `net8.0`, `net9.0`, and
 `net10.0`; `dotnet run` therefore needs an explicit framework. Run the ordinary
 demonstration with:
 
@@ -1135,12 +1171,14 @@ The permanent release verifier checks the sample's normalized JSON fixtures on
 ### Persistent-raster lifecycle sample
 
 `samples/Icod.TermInfo.PersistentRasterLifecycle.Sample` is the focused 1.11
-reusable-API example. It starts from ordinary Sixel evidence, demonstrates that
-persistent upload and placement remain `Unknown`, plans an indeterminate request,
-then appends caller-owned `Verified` evidence, reclassifies, and obtains a
-successful protocol-neutral upload/placement plan. It also renders the version-3
-profile and plan JSON documents. The sample performs no terminal I/O and has no
-`Icod.Terminal` dependency.
+lifecycle example updated for the 1.13 integration path. It starts from ordinary
+Sixel evidence, demonstrates that persistent upload and placement remain
+`Unknown`, plans an indeterminate request, then represents consumer-owned runtime
+results as immutable lifecycle observations. `PersistentRasterRuntimeEvidenceIntegrator`
+maps the conclusive observations into existing `Verified` evidence with safe final
+ordinals, and `CreateLifecyclePlan(...)` delegates replanning to the frozen
+lifecycle planner. The sample performs no terminal I/O and has no `Icod.Terminal`
+dependency.
 
 Run it with:
 
@@ -1160,11 +1198,12 @@ but no advanced-placement evidence, so both `SourceRectangle` and
 `SignedZOrder` remain `Unknown` and the placement planner returns
 `RequiresRuntimeVerification`.
 
-The consumer then contributes its own `Verified` evidence, reclassifies the
-placement profile, and obtains a `Satisfied` plan. The sample renders both the
-version-4 placement profile and placement plan before constructing any concrete
-Terminal execution values. Only after semantic planning succeeds does it create
-a `TerminalRasterSourceRectangle` and signed `ZIndex`.
+The consumer then contributes immutable placement runtime observations for
+`SourceRectangle` and `SignedZOrder`. `PersistentRasterRuntimeEvidenceIntegrator`
+maps those conclusive observations into the frozen placement evidence model, and
+`CreatePlacementPlan(...)` delegates replanning to produce `Satisfied`. Only after
+TermInfo has finished semantic planning does the sample create a
+`TerminalRasterSourceRectangle` and signed `ZIndex`.
 
 Run it with:
 
@@ -1175,6 +1214,40 @@ dotnet run --project samples/Icod.TermInfo.PersistentRasterPlacement.Sample/Icod
 Release verification executes the sample on `net8.0`, `net9.0`, and `net10.0`.
 See `samples/Icod.TermInfo.PersistentRasterPlacement.Sample/README.md` and
 `docs/1.12.0-ADVANCED-PERSISTENT-RASTER-PLACEMENT-GUIDE.md`.
+
+### Persistent-raster runtime-integration sample
+
+`samples/Icod.TermInfo.PersistentRasterRuntimeIntegration.Sample` is the focused
+1.13 caller-adapter example. It begins with a static persistent-raster lifecycle
+plan that requires runtime verification, then optionally asks published
+`Icod.Terminal 1.12.0` to verify its coarse `PersistentRasterGraphics` semantic
+capability. Consumer code maps that sibling-layer result into TermInfo's
+protocol-neutral `Supported` / `Unsupported` / `Inconclusive` runtime outcomes,
+expands the coarse capability into the explicitly chosen lifecycle subjects, and
+passes the resulting observations to `PersistentRasterRuntimeEvidenceIntegrator`.
+
+The default mode is deterministic and performs no terminal I/O; `--live` performs
+the actual `VerifyCapabilityAsync(...)` call on an interactive terminal. Static
+advertisement is never promoted to runtime support: non-live evidence and
+`Unknown` / `Advertised` support map to `Inconclusive`. The sample then renders
+the version-5 integration audit and replans through `CreateLifecyclePlan(...)`.
+
+Run the deterministic form with:
+
+```text
+dotnet run --project samples/Icod.TermInfo.PersistentRasterRuntimeIntegration.Sample/Icod.TermInfo.PersistentRasterRuntimeIntegration.Sample.csproj -f net10.0
+```
+
+For interactive verification:
+
+```text
+dotnet run --project samples/Icod.TermInfo.PersistentRasterRuntimeIntegration.Sample/Icod.TermInfo.PersistentRasterRuntimeIntegration.Sample.csproj -f net10.0 -- --live
+```
+
+Release verification executes the deterministic form on `net8.0`, `net9.0`, and
+`net10.0`. See
+`samples/Icod.TermInfo.PersistentRasterRuntimeIntegration.Sample/README.md` and
+`docs/1.13.0-PERSISTENT-RASTER-RUNTIME-EVIDENCE-GUIDE.md`.
 
 ### Managed tool-suite walkthrough
 
@@ -1195,7 +1268,8 @@ See `samples/README.md`, `samples/ToolSuite/README.md`,
 `samples/Icod.TermInfo.Acquisition.Sample/README.md`,
 `samples/Icod.TermInfo.Toolchain.Sample/README.md`,
 `samples/Icod.TermInfo.PersistentRasterLifecycle.Sample/README.md`,
-`samples/Icod.TermInfo.PersistentRasterPlacement.Sample/README.md`, and
+`samples/Icod.TermInfo.PersistentRasterPlacement.Sample/README.md`,
+`samples/Icod.TermInfo.PersistentRasterRuntimeIntegration.Sample/README.md`, and
 `docs/0.9.0-ACQUISITION-GUIDE.md` for the complete examples.
 
 ## Project-family boundary
@@ -1207,7 +1281,7 @@ The intended family boundary is now explicit:
 - **`Icod.TermInfo`** — descriptions, compiled-database acquisition, capability semantics, parameter expansion, and output transformation;
 - **`Icod.TermInfo.Source`** — `.ti` lexical analysis, source diagnostics, unresolved entries, cancellation, `use=` inheritance, and materialization into `TerminalDescription`;
 - **`Icod.TermInfo.Compiler`** — deterministic compiled-entry writing, source compilation, and explicit conventional database-layout publication;
-- **`Icod.TermInfo.Inspection`** — canonical effective/source rendering, relative-source synthesis and parent planning, structured semantic comparison, provider/database-set inspection, persistent-raster lifecycle and advanced-placement evidence/classification/planning, and version-3/version-4 machine-readable views;
+- **`Icod.TermInfo.Inspection`** — canonical effective/source rendering, relative-source synthesis and parent planning, structured semantic comparison, provider/database-set inspection, persistent-raster lifecycle and advanced-placement evidence/classification/planning, protocol-neutral runtime-evidence interchange/integration, and versioned machine-readable views through JSON version 5;
 - **`Icod.TermInfo.Termcap`** — bounded termcap parsing, classification, `tc=` resolution, Runtime conversion, reverse rendering, and explicit termcap acquisition;
 - **`tic`, `infocmp`, `toe`, `captoinfo`, and `infotocap`** — managed command applications which compose the reusable libraries and own command-line policy;
 - **`Icod.TermInfo.Tools` / `icod-terminfo`** — distribution-only .NET tool router which dispatches to the five command applications;
