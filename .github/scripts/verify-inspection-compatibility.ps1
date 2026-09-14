@@ -18,8 +18,8 @@ $oneFourteenTypesPath = Join-Path $repositoryRoot 'docs/1.14.0-RB01-INSPECTION-P
 $historyVerifierPath = Join-Path $PSScriptRoot 'verify-inspection-compatibility-history.ps1'
 
 # Keep historical authorities explicit at the public verifier entry point. Exact
-# reconstruction to the frozen whole-1.13 fingerprint makes the already-frozen
-# 1.13 -> 1.12 -> 1.11 -> 1.10 reconstruction transitive for 1.14.
+# reconstruction to the frozen whole-1.13 fingerprint is followed by the
+# established 1.13 -> 1.12 -> 1.11 -> 1.10 reconstruction.
 $oneTenBaselinePath = Join-Path $repositoryRoot 'docs/1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt'
 $oneElevenTypesPath = Join-Path $repositoryRoot 'docs/1.11.0-INSPECTION-PUBLIC-API-ADDITIONS.txt'
 $oneElevenMembersPath = Join-Path $repositoryRoot 'docs/1.11.0-INSPECTION-PUBLIC-API-ADDITIVE-MEMBERS.txt'
@@ -184,6 +184,9 @@ try {
     $temporaryManifest = Join-Path (
         [System.IO.Path]::GetTempPath()
     ) ("Icod.TermInfo.Inspection-1.14-api-{0}.txt" -f [Guid]::NewGuid().ToString('N'))
+    $reconstructedOneThirteenManifestPath = Join-Path (
+        [System.IO.Path]::GetTempPath()
+    ) ("Icod.TermInfo.Inspection-1.13-reconstructed-{0}.txt" -f [Guid]::NewGuid().ToString('N'))
     try {
         & dotnet run `
             --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj `
@@ -225,10 +228,25 @@ try {
                 $oneThirteenCandidateSha256, `
                 $oneThirteenCandidate.RemovedTypeCount
         )
-        Write-Host "Historical reconstruction authorities remain frozen at 1.11 SHA-256 $oneElevenApiSha256 and 1.12 SHA-256 $oneTwelveApiSha256; exact 1.13 reconstruction transitively preserves the reviewed 1.13 -> 1.10 chain in $historyVerifierPath."
+
+        [System.IO.File]::WriteAllText(
+            $reconstructedOneThirteenManifestPath,
+            (Normalize-Text -Text $oneThirteenCandidate.Manifest)
+        )
+        & $historyVerifierPath `
+            -Configuration $Configuration `
+            -ManifestPath $reconstructedOneThirteenManifestPath
+        if (0 -ne $LASTEXITCODE) {
+            throw "Historical Inspection compatibility verification exited with status $LASTEXITCODE."
+        }
+
+        Write-Host "Verified the established historical Inspection reconstruction through frozen 1.10 from exact reconstructed 1.13."
     } finally {
         if (Test-Path -LiteralPath $temporaryManifest) {
             Remove-Item -LiteralPath $temporaryManifest -Force
+        }
+        if (Test-Path -LiteralPath $reconstructedOneThirteenManifestPath) {
+            Remove-Item -LiteralPath $reconstructedOneThirteenManifestPath -Force
         }
     }
 } finally {
