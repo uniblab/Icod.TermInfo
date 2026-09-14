@@ -33,6 +33,20 @@ On an interactive terminal, pass `--live` to open an `Icod.Terminal` session and
 dotnet run --project samples/Icod.TermInfo.PersistentRasterRuntimeIntegration.Sample -f net10.0 -- --live
 ```
 
-The Terminal 1.12 `PersistentRasterGraphics` capability is intentionally coarser than TermInfo's lifecycle vocabulary. This sample therefore makes the consumer policy visible: a conclusive coarse result is expanded to the persistent-upload, acknowledged-upload, placement-create/multiple/update/delete, and resource-delete lifecycle subjects. TermInfo itself does not infer that expansion.
+The caller adapter intentionally maps Terminal's semantic result into TermInfo's protocol-neutral runtime-outcome vocabulary as follows:
+
+| `Icod.Terminal` result | TermInfo runtime outcome |
+| --- | --- |
+| `LiveObservation` + `Verified` | `Supported` |
+| `LiveObservation` + `Unsupported` | `Unsupported` |
+| `LiveObservation` + `Unknown` | `Inconclusive` |
+| `LiveObservation` + `Advertised` | `Inconclusive` |
+| any non-live evidence kind | `Inconclusive` |
+
+The mapping is deliberately conservative. Static advertisement alone is not promoted to runtime support, and TermInfo does not interpret Terminal-specific evidence kinds itself.
+
+Terminal 1.12's `PersistentRasterGraphics` capability is intentionally coarser than TermInfo's lifecycle vocabulary. This sample therefore makes the second piece of consumer policy visible: a conclusive coarse result is expanded to the persistent-upload, acknowledged-upload, placement-create/multiple/update/delete, and resource-delete lifecycle subjects. TermInfo itself does not infer that expansion.
+
+The resulting `PersistentRasterRuntimeObservationSet` is handed to `PersistentRasterRuntimeEvidenceIntegrator`. Conclusive observations become existing `Verified` evidence with safe final source ordinals; inconclusive observations remain visible in the integration audit. `CreateLifecyclePlan(...)` then delegates to the existing frozen lifecycle planner.
 
 The sample does not execute image transport or persistent-raster operations. Its purpose is the interchange contract: static plan → live semantic result → runtime observations → integration → replan.
