@@ -14,6 +14,31 @@ version-4 profile/plan JSON through `Icod.TermInfo.Inspection` while preserving
 the frozen 1.11 lifecycle surface and version-1/version-2/version-3 JSON
 contracts.
 
+## 1.13 release-candidate status
+
+Version `1.13.0-Alpha-8` is the release-hardening candidate for the additive
+`Icod.TermInfo.Inspection` runtime-evidence interchange layer. Version 1.13 adds
+bounded immutable `PersistentRasterRuntime*` observations, deterministic
+atomic-per-family conversion of conclusive observations into existing `Verified`
+evidence, audit-visible inconclusive observations and integration issues,
+planner-delegating replanning conveniences, and additive version-5 JSON for
+runtime observation sets and integration results.
+
+The complete candidate Inspection surface contains 90 exported public types with
+normalized-LF SHA-256
+`fd827a25abafb8e9ff3915567f45f9f2ec51b332bfd8a82dd4e4bca20290e764`.
+JSON versions 1 through 4 remain unchanged; version 5 contains exactly
+`persistentRasterRuntimeObservationSet` and
+`persistentRasterRuntimeIntegration`. Production `Icod.TermInfo.Inspection`
+still has no `Icod.Terminal` dependency. Downstream qualification remains pinned
+to published `Icod.Terminal 1.12.0`.
+
+Stable `1.12.0` remains the published release while Alpha-8 is being qualified,
+so the install commands below intentionally remain at `1.12.0`. See
+`docs/1.13.0-PERSISTENT-RASTER-RUNTIME-EVIDENCE-GUIDE.md`,
+`docs/1.13.0-INSPECTION-PUBLIC-API-FREEZE.md`, and
+`docs/1.13.0-RELEASE-AUDIT.md`.
+
 The package family targets `net8.0`, `net9.0`, and `net10.0`; packages use C# 13,
 contain no native ncurses/terminfo payload, and are intended to run on Windows,
 Linux, and macOS.

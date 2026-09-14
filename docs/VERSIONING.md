@@ -3,6 +3,33 @@
 The `Icod.TermInfo` package family follows Semantic Versioning for its public
 package contracts.
 
+## 1.13 release line
+
+The RE01-RE08 development sequence is `1.13.0-Alpha-1` through
+`1.13.0-Alpha-8`. Version 1.13 adds compatible public API only to
+`Icod.TermInfo.Inspection` for caller-owned persistent-raster runtime observations,
+deterministic integration into the frozen 1.11 lifecycle and 1.12 placement
+evidence models, planner-delegating replanning, and additive version-5 JSON.
+Runtime, Source, Compiler, and Termcap public APIs remain frozen.
+
+RE08 freezes the complete 1.13 Inspection reflection manifest at 90 exported
+public types with normalized-LF SHA-256
+`fd827a25abafb8e9ff3915567f45f9f2ec51b332bfd8a82dd4e4bca20290e764`.
+Release verification first requires that exact current 1.13 surface, then removes
+only the reviewed six RE06 renderer members and nine cumulative
+`PersistentRasterRuntime*` type blocks to reproduce frozen 1.12 SHA-256
+`f71501dcd27a530051c1a02083325144ced2b6173b6b967b9571c620815198f0`.
+JSON versions 1 through 4 remain immutable; version 5 contains exactly the
+runtime observation-set and integration-audit document kinds.
+
+After the exact Alpha-8 head passes the complete Staging package, historical and
+RE07 package-consumer/sample, installed-tool, and six-RID archive gates, stable
+`1.13.0` is a promotion-only transition. Promotion may change coordinated
+release identity and stable-facing documentation only; it may not introduce
+feature semantics, public API, schema fields, production dependencies, target
+frameworks, command behavior, or archive RIDs, and it requires its own fresh full
+validation.
+
 ## 1.12 release line
 
 The PG01-PG08 development sequence is `1.12.0-Alpha-1` through

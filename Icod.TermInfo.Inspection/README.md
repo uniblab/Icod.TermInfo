@@ -3,6 +3,30 @@
 `Icod.TermInfo.Inspection` is the optional managed inspection and semantic-
 comparison layer for the `Icod.TermInfo` package family.
 
+## 1.13 Alpha-8 release candidate
+
+`1.13.0-Alpha-8` freezes the additive `PersistentRasterRuntime*` interchange
+contract. Caller-owned lifecycle and placement runtime observations are immutable,
+bounded, canonical, and protocol-neutral. Conclusive observations integrate as
+existing `Verified` evidence through the frozen classifiers; inconclusive
+observations remain audit-visible, and represented family capacity/ordinal
+limitations fail atomically per family.
+
+`PersistentRasterRuntimeIntegrationResult` delegates lifecycle and placement
+replanning to the existing planners. JSON version 5 adds exactly
+`persistentRasterRuntimeObservationSet` and
+`persistentRasterRuntimeIntegration`, while JSON versions 1 through 4 remain
+byte-frozen. The whole candidate Inspection reflection manifest contains 90
+exported public types and has normalized-LF SHA-256
+`fd827a25abafb8e9ff3915567f45f9f2ec51b332bfd8a82dd4e4bca20290e764`.
+
+Inspection still has no production `Icod.Terminal` dependency. RE07 qualifies
+the caller adapter boundary using published `Icod.Terminal 1.12.0` beside the
+fresh Inspection package on net8.0, net9.0, and net10.0. See
+`../docs/1.13.0-PERSISTENT-RASTER-RUNTIME-EVIDENCE-GUIDE.md`,
+`../docs/1.13.0-INSPECTION-PUBLIC-API-FREEZE.md`, and
+`../docs/1.13.0-RELEASE-AUDIT.md`.
+
 ## 1.12 release status
 
 Version `1.12.0` promotes the additive advanced persistent-raster placement

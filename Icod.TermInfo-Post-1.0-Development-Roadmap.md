@@ -10,7 +10,7 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
-**Current coordinated version:** `1.12.0`
+**Current coordinated version:** `1.13.0-Alpha-8`
 **Next development line:** `1.13.0`
 **Final 1.6 prerelease:** `1.6.0-Alpha-8`
 **Final 1.7 prerelease:** `1.7.0-Alpha-8`
@@ -19,8 +19,9 @@
 **Final 1.10 prerelease:** `1.10.0-Alpha-8`
 **Final 1.11 prerelease:** `1.11.0-Alpha-8`
 **Final 1.12 prerelease:** `1.12.0-Alpha-8`
+**Final 1.13 prerelease:** `1.13.0-Alpha-8`
 **Latest completed line:** `1.12.0` - Advanced Persistent-Raster Placement Semantics and Planning
-**Status:** 1.13.0 planning approved; draft PR #43 open; implementation not yet started
+**Status:** RE01-RE07 accepted; RE08 `1.13.0-Alpha-8` release hardening and whole-surface freeze in progress in draft PR #43
 **Planned tranches:** RE01-RE08
 **Primary objective:** Add protocol-neutral runtime-evidence interchange and deterministic integration so external verification can strengthen the frozen 1.11 lifecycle and 1.12 placement models without manual evidence construction or source-ordinal management.
 **Active development roadmap:** `Icod.TermInfo-1.13.0-Persistent-Raster-Runtime-Evidence-Interchange-and-Integration-Roadmap.md`
