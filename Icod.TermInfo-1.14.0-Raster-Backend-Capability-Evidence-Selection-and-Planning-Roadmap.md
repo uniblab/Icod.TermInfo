@@ -328,8 +328,10 @@ The 1.14 request SHALL compose existing request types:
 
 ```text
 PersistentRasterLifecycleRequest
-PersistentRasterPlacementRequest
+PersistentRasterPlacementRequest?
 ```
+
+`PlacementRequest = null` means no advanced 1.12 placement semantics are requested. This is required because the frozen `PersistentRasterPlacementRequest` intentionally rejects an empty request.
 
 1.14 SHALL NOT duplicate their semantic fields.
 
@@ -343,10 +345,11 @@ For each candidate:
 4. if backend availability is `Supported`, call the existing lifecycle planner;
 5. lifecycle `Impossible` -> candidate `Impossible`;
 6. lifecycle `Indeterminate` -> candidate `RequiresRuntimeVerification`;
-7. lifecycle `Success` -> call the existing placement planner;
-8. placement `Impossible` -> candidate `Impossible`;
-9. placement `RequiresRuntimeVerification` or `Indeterminate` -> candidate `RequiresRuntimeVerification`; and
-10. placement `Satisfied` -> candidate `Satisfied`.
+7. lifecycle `Success` with no placement request -> candidate `Satisfied`;
+8. lifecycle `Success` with a placement request -> call the existing placement planner;
+9. placement `Impossible` -> candidate `Impossible`;
+10. placement `RequiresRuntimeVerification` or `Indeterminate` -> candidate `RequiresRuntimeVerification`; and
+11. placement `Satisfied` -> candidate `Satisfied`.
 
 The candidate evaluation SHALL retain the actual lifecycle and placement plans used to reach the status.
 
