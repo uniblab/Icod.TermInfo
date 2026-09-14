@@ -76,7 +76,7 @@ public sealed class T01ContractTests {
 						StringComparison.Ordinal
 					)
 			);
-			Assert.Equal( "2.0.0", frameworkReference.Attribute( "Version" )?.Value );
+			Assert.Equal( "2.2.1", frameworkReference.Attribute( "Version" )?.Value );
 
 			foreach (
 				XElement reference
