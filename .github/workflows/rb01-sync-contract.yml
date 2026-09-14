@@ -1,0 +1,34 @@
+name: rb01-sync-contract
+
+on:
+  push:
+    branches:
+      - 1.14.0
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 1.14.0
+          fetch-depth: 0
+      - name: Apply RB01 contract synchronization
+        shell: pwsh
+        run: ./.github/scripts/rb01-sync-contract.ps1
+      - name: Commit synchronized contract and remove helper
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/scripts/rb01-sync-contract.ps1
+          rm .github/workflows/rb01-sync-contract.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          git commit -m 'Synchronize RB01 contract authorities'
+          git push origin HEAD:1.14.0
