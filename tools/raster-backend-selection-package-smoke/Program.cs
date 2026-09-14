@@ -3,6 +3,7 @@ using Icod.TermInfo;
 using Icod.TermInfo.Inspection;
 
 _ = typeof( TerminalCapabilityStatus );
+_ = TerminalCapability.PersistentRasterGraphics;
 
 TerminalDescription description =
 	new TerminalDescriptionBuilder( "rb07-package-smoke" )
