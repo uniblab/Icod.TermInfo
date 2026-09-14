@@ -4,16 +4,22 @@ namespace Icod.TermInfo.Inspection.Tests;
 
 public sealed class RB07VersionAuthorityTests {
 	[Fact]
-	public void CoordinatedVersionIsAlphaSeven() {
-		string properties = File.ReadAllText(
-			Path.Combine( FindRepositoryRoot(), "Directory.Build.props" )
+	public void Rb07RecordPreservesAcceptedAlphaSevenIdentity() {
+		string record = File.ReadAllText(
+			Path.Combine(
+				FindRepositoryRoot(),
+				"docs",
+				"1.14.0-RB07-TERMINAL-INTEROPERABILITY-AND-PACKAGE-QUALIFICATION.md"
+			)
 		);
 
+		Assert.Contains( "1.14.0-Alpha-7", record, StringComparison.Ordinal );
 		Assert.Contains(
-			"<IcodTermInfoSuiteVersion>1.14.0-Alpha-7</IcodTermInfoSuiteVersion>",
-			properties,
+			"0ce8df7f08064de807db17a2662f38252a814ce5",
+			record,
 			StringComparison.Ordinal
 		);
+		Assert.Contains( "34898618294", record, StringComparison.Ordinal );
 	}
 
 	[Fact]
