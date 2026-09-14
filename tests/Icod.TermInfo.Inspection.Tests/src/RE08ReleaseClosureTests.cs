@@ -25,12 +25,37 @@ public sealed class RE08ReleaseClosureTests {
 
 	[Fact]
 	public void ExactOneThirteenInspectionSurfaceHasFreezeInputs() {
-		Type[] exportedTypes =
+		string oneFourteenAdditions = ReadRequiredRepositoryFile(
+			"docs/1.14.0-RB01-INSPECTION-PUBLIC-API-ADDITIONS.txt"
+		);
+		HashSet<string> approvedOneFourteenTypes = oneFourteenAdditions
+			.Split( '\n' )
+			.Select( line => line.Trim() )
+			.Where(
+				line =>
+					line.Length > 0
+					&& !line.StartsWith( "#", StringComparison.Ordinal )
+			)
+			.ToHashSet( StringComparer.Ordinal );
+		Type[] currentTypes =
 			typeof( PersistentRasterRuntimeObservationSet ).Assembly.GetExportedTypes();
-		Assert.Equal( 90, exportedTypes.Length );
+		Type[] reconstructedOneThirteenTypes = currentTypes
+			.Where(
+				type =>
+					type.FullName is null
+					|| !approvedOneFourteenTypes.Contains( type.FullName )
+			)
+			.ToArray();
+
+		Assert.Equal( 13, approvedOneFourteenTypes.Count );
+		Assert.Equal( 90, reconstructedOneThirteenTypes.Length );
+		Assert.Equal(
+			approvedOneFourteenTypes.Count,
+			currentTypes.Length - reconstructedOneThirteenTypes.Length
+		);
 		Assert.Equal(
 			9,
-			exportedTypes.Count(
+			reconstructedOneThirteenTypes.Count(
 				type => type.FullName?.StartsWith(
 					"Icod.TermInfo.Inspection.PersistentRasterRuntime",
 					StringComparison.Ordinal

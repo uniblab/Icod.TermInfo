@@ -34,6 +34,18 @@ public sealed class PG08ReleaseClosureTests {
 		string oneThirteenAdditions = ReadRepositoryFile(
 			"docs/1.13.0-RE01-INSPECTION-PUBLIC-API-ADDITIONS.txt"
 		);
+		string oneFourteenAdditions = ReadRepositoryFile(
+			"docs/1.14.0-RB01-INSPECTION-PUBLIC-API-ADDITIONS.txt"
+		);
+		HashSet<string> approvedOneFourteenTypes = oneFourteenAdditions
+			.Split( '\n' )
+			.Select( line => line.Trim() )
+			.Where(
+				line =>
+					line.Length > 0
+					&& !line.StartsWith( "#", StringComparison.Ordinal )
+			)
+			.ToHashSet( StringComparer.Ordinal );
 		HashSet<string> approvedOneThirteenTypes = oneThirteenAdditions
 			.Split( '\n' )
 			.Select( line => line.Trim() )
@@ -45,7 +57,14 @@ public sealed class PG08ReleaseClosureTests {
 			.ToHashSet( StringComparer.Ordinal );
 		Type[] currentTypes =
 			typeof( PersistentRasterPlacementProfile ).Assembly.GetExportedTypes();
-		Type[] reconstructedOneTwelveTypes = currentTypes
+		Type[] reconstructedOneThirteenTypes = currentTypes
+			.Where(
+				type =>
+					type.FullName is null
+					|| !approvedOneFourteenTypes.Contains( type.FullName )
+			)
+			.ToArray();
+		Type[] reconstructedOneTwelveTypes = reconstructedOneThirteenTypes
 			.Where(
 				type =>
 					type.FullName is null
@@ -56,10 +75,11 @@ public sealed class PG08ReleaseClosureTests {
 			".github/scripts/verify-inspection-compatibility.ps1"
 		);
 
+		Assert.Equal( 13, approvedOneFourteenTypes.Count );
 		Assert.Equal( 81, reconstructedOneTwelveTypes.Length );
 		Assert.Equal(
 			approvedOneThirteenTypes.Count,
-			currentTypes.Count(
+			reconstructedOneThirteenTypes.Count(
 				type =>
 					type.FullName?.StartsWith(
 						"Icod.TermInfo.Inspection.PersistentRasterRuntime",
@@ -69,7 +89,7 @@ public sealed class PG08ReleaseClosureTests {
 		);
 		foreach ( string approvedType in approvedOneThirteenTypes ) {
 			Assert.Contains(
-				currentTypes,
+				reconstructedOneThirteenTypes,
 				type => string.Equals(
 					type.FullName,
 					approvedType,
