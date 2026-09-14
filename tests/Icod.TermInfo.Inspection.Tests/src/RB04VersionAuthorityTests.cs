@@ -53,7 +53,7 @@ public sealed class RB04VersionAuthorityTests {
 			)
 		)
 			.Select( line => line.TrimEnd() )
-			.Where( line => line.Length != 0 && !line.StartsWith( '#') )
+			.Where( line => line.Length != 0 && !line.StartsWith( '#' ) )
 			.ToArray();
 
 		string member = Assert.Single( lines );
