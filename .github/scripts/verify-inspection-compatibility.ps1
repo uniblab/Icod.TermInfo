@@ -17,6 +17,7 @@ $freezePath = Join-Path $repositoryRoot 'docs/1.13.0-INSPECTION-PUBLIC-API-FREEZ
 $oneFourteenRb01TypesPath = Join-Path $repositoryRoot 'docs/1.14.0-RB01-INSPECTION-PUBLIC-API-ADDITIONS.txt'
 $oneFourteenRb02TypesPath = Join-Path $repositoryRoot 'docs/1.14.0-RB02-INSPECTION-PUBLIC-API-ADDITIONS.txt'
 $oneFourteenRb03TypesPath = Join-Path $repositoryRoot 'docs/1.14.0-RB03-INSPECTION-PUBLIC-API-ADDITIONS.txt'
+$oneFourteenRb06MembersPath = Join-Path $repositoryRoot 'docs/1.14.0-RB06-INSPECTION-PUBLIC-API-ADDITIVE-MEMBERS.txt'
 $historyVerifierPath = Join-Path $PSScriptRoot 'verify-inspection-compatibility-history.ps1'
 
 # Keep historical authorities explicit at the public verifier entry point. Exact
@@ -43,6 +44,7 @@ foreach ($requiredPath in @(
     $oneFourteenRb01TypesPath,
     $oneFourteenRb02TypesPath,
     $oneFourteenRb03TypesPath,
+    $oneFourteenRb06MembersPath,
     $historyVerifierPath,
     $oneTenBaselinePath,
     $oneElevenTypesPath,
@@ -122,6 +124,51 @@ function Read-ApprovedTypes {
     Write-Output -NoEnumerate $approved
 }
 
+function Read-ApprovedRendererMembers {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Path,
+
+        [Parameter(Mandatory = $true)]
+        [int]$ExpectedCount,
+
+        [Parameter(Mandatory = $true)]
+        [string]$RequiredToken,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ReleaseLabel
+    )
+
+    $approved = [System.Collections.Generic.HashSet[string]]::new(
+        [System.StringComparer]::Ordinal
+    )
+    foreach ($line in [System.IO.File]::ReadAllLines($Path)) {
+        $candidate = $line.TrimEnd()
+        $classification = $candidate.Trim()
+        if ($classification.Length -eq 0 -or $classification.StartsWith('#', [System.StringComparison]::Ordinal)) {
+            continue
+        }
+
+        $isField = $candidate.StartsWith('  FIELD ', [System.StringComparison]::Ordinal)
+        $isMethod = $candidate.StartsWith('  METHOD ', [System.StringComparison]::Ordinal)
+        if (-not $isField -and -not $isMethod) {
+            throw "Approved $ReleaseLabel additive API member is not a public API manifest field or method line: $candidate"
+        }
+        if ($candidate.IndexOf($RequiredToken, [System.StringComparison]::Ordinal) -lt 0) {
+            throw "Approved $ReleaseLabel additive API member is outside the required renderer surface: $candidate"
+        }
+        if (-not $approved.Add($candidate)) {
+            throw "Approved $ReleaseLabel additive API members file contains a duplicate member: $candidate"
+        }
+    }
+
+    if ($approved.Count -ne $ExpectedCount) {
+        throw "Approved $ReleaseLabel additive API members file must contain exactly $ExpectedCount members; found $($approved.Count)."
+    }
+
+    Write-Output -NoEnumerate $approved
+}
+
 function Remove-ApprovedTypes {
     param(
         [Parameter(Mandatory = $true)]
@@ -191,6 +238,68 @@ function Remove-ApprovedTypes {
     }
 }
 
+function Remove-ApprovedRendererMembers {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Manifest,
+
+        [Parameter(Mandatory = $true)]
+        [System.Collections.Generic.HashSet[string]]$ApprovedMembers,
+
+        [Parameter(Mandatory = $true)]
+        [string]$RequiredToken,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ReleaseLabel
+    )
+
+    $rendererTypeHeader = 'TYPE class Icod.TermInfo.Inspection.TermInfoJsonRenderer [static]'
+    $lines = (Normalize-Text -Text $Manifest).Split("`n")
+    $result = [System.Collections.Generic.List[string]]::new()
+    $removedMembers = [System.Collections.Generic.HashSet[string]]::new(
+        [System.StringComparer]::Ordinal
+    )
+    $insideRenderer = $false
+
+    foreach ($line in $lines) {
+        if ($line -eq $rendererTypeHeader) {
+            $insideRenderer = $true
+            $result.Add($line)
+            continue
+        }
+
+        if ($insideRenderer -and $line -eq 'END') {
+            $insideRenderer = $false
+            $result.Add($line)
+            continue
+        }
+
+        $matchesToken = $line.IndexOf($RequiredToken, [System.StringComparison]::Ordinal) -ge 0
+        if ($insideRenderer -and $matchesToken) {
+            if (-not $ApprovedMembers.Contains($line)) {
+                throw "Unapproved $ReleaseLabel additive public member on TermInfoJsonRenderer: $line"
+            }
+            if (-not $removedMembers.Add($line)) {
+                throw "Inspection API manifest contains duplicate approved $ReleaseLabel member lines: $line"
+            }
+            continue
+        }
+
+        $result.Add($line)
+    }
+
+    foreach ($approvedMember in $ApprovedMembers) {
+        if (-not $removedMembers.Contains($approvedMember)) {
+            throw "Approved $ReleaseLabel additive public API member is missing from the current assembly: $approvedMember"
+        }
+    }
+
+    return [PSCustomObject]@{
+        Manifest = Normalize-Text -Text ($result -join "`n")
+        RemovedMemberCount = $removedMembers.Count
+    }
+}
+
 Push-Location $repositoryRoot
 try {
     $temporaryManifest = Join-Path (
@@ -229,6 +338,11 @@ try {
             -Path $oneFourteenRb03TypesPath `
             -ExpectedCount 1 `
             -ReleaseLabel '1.14 RB03'
+        $approvedRb06Members = Read-ApprovedRendererMembers `
+            -Path $oneFourteenRb06MembersPath `
+            -ExpectedCount 6 `
+            -RequiredToken 'RasterBackend' `
+            -ReleaseLabel '1.14 RB06'
         $approvedOneFourteenTypes = [System.Collections.Generic.HashSet[string]]::new(
             [System.StringComparer]::Ordinal
         )
@@ -251,9 +365,14 @@ try {
             throw "Reviewed 1.14 Inspection public type set must contain exactly 16 types through RB03; found $($approvedOneFourteenTypes.Count)."
         }
 
-        $oneThirteenCandidate = Remove-ApprovedTypes `
+        $oneThirteenTypeCandidate = Remove-ApprovedTypes `
             -Manifest $current `
             -ApprovedTypes $approvedOneFourteenTypes
+        $oneThirteenCandidate = Remove-ApprovedRendererMembers `
+            -Manifest $oneThirteenTypeCandidate.Manifest `
+            -ApprovedMembers $approvedRb06Members `
+            -RequiredToken 'RasterBackend' `
+            -ReleaseLabel '1.14 RB06'
         $oneThirteenCandidateSha256 = Get-NormalizedSha256 -Text $oneThirteenCandidate.Manifest
         if (-not [string]::Equals(
             $oneThirteenApiSha256,
@@ -269,9 +388,10 @@ try {
         }
 
         Write-Host (
-            "Verified exact 1.13 Inspection public API SHA-256 {0} after excluding {1} approved 1.14 type block(s): {2} RB01, {3} RB02, and {4} RB03." -f `
+            "Verified exact 1.13 Inspection public API SHA-256 {0} after excluding {1} approved 1.14 type block(s) and {2} RB06 renderer member(s): {3} RB01, {4} RB02, and {5} RB03 types." -f `
                 $oneThirteenCandidateSha256, `
-                $oneThirteenCandidate.RemovedTypeCount, `
+                $oneThirteenTypeCandidate.RemovedTypeCount, `
+                $oneThirteenCandidate.RemovedMemberCount, `
                 $approvedRb01Types.Count, `
                 $approvedRb02Types.Count, `
                 $approvedRb03Types.Count

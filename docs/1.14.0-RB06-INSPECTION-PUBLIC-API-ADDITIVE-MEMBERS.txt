@@ -1,0 +1,8 @@
+# Icod.TermInfo.Inspection 1.14 RB06 reviewed public members added to TermInfoJsonRenderer.
+# Exact public-api-snapshot manifest lines; all earlier renderer members remain frozen.
+  FIELD public static const System.Int32 RasterBackendSchemaVersion null=not-null/not-null value=6
+  FIELD public static const System.String RasterBackendSchemaIdentifier null=not-null/not-null value="urn:icod:terminfo:inspection:json:6"
+  METHOD public static System.String Render(Icod.TermInfo.Inspection.RasterBackendProfile profile null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.String Render(Icod.TermInfo.Inspection.RasterBackendProfile profile null=not-null/not-null, Icod.TermInfo.Inspection.TermInfoJsonRendererOptions options null=not-null/not-null, System.Threading.CancellationToken cancellationToken null=not-null/not-null default=null) return-null=not-null/not-null
+  METHOD public static System.String Render(Icod.TermInfo.Inspection.RasterBackendSelectionPlan plan null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.String Render(Icod.TermInfo.Inspection.RasterBackendSelectionPlan plan null=not-null/not-null, Icod.TermInfo.Inspection.TermInfoJsonRendererOptions options null=not-null/not-null, System.Threading.CancellationToken cancellationToken null=not-null/not-null default=null) return-null=not-null/not-null
