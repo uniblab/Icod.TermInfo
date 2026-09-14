@@ -1,269 +1,50 @@
-# Icod.TermInfo 1.14.0 — Raster Backend Capability Evidence, Selection, and Planning Roadmap
+# Icod.TermInfo 1.14.0 — Raster Backend Capability Evidence, Selection, and Planning
 
-**Project:** `Icod.TermInfo`  
-**Release:** `1.14.0`  
-**Development branch:** `1.14.0`  
-**Theme:** Raster Backend Capability Evidence, Selection, and Deterministic Advisory Planning  
-**Primary package:** `Icod.TermInfo.Inspection`  
-**Baseline:** stable `1.13.0`  
-**Downstream qualification target:** published stable `Icod.Terminal 1.13.0`  
-**Frozen contracts:** existing 1.x Runtime/Source/Compiler/Termcap APIs, Inspection contracts through 1.13, JSON schemas v1-v5, database-set precedence, 1.11 persistent-raster lifecycle semantics, 1.12 advanced-placement semantics, and 1.13 runtime-observation/integration semantics except for unavoidable defect corrections  
-**Status:** planning approved; design/spec recorded; implementation not yet started  
-**Tranche prefix:** `RB`  
-**Planned final prerelease:** `1.14.0-Alpha-8`  
-**Design authority:** `docs/superpowers/specs/2026-09-14-1.14.0-raster-backend-evidence-selection-design.md`  
-**Release audit:** `docs/1.14.0-RELEASE-AUDIT.md` when created
+## 1. Purpose
+
+`Icod.TermInfo 1.14.0` adds a backend-selection layer above the frozen persistent-raster semantic stack. It answers a new question without weakening the existing answers:
+
+```text
+1.11  lifecycle evidence / classification / planning
+1.12  advanced placement semantics / planning
+1.13  backend-neutral runtime observations / integration
+1.14  backend availability evidence / candidate evaluation / selection
+```
+
+The new layer remains advisory and lives in `Icod.TermInfo.Inspection`. TermInfo does not probe terminals, execute graphics protocols, allocate terminal-side identities, or depend on `Icod.Terminal` in production.
+
+## 2. Release-wide design rules
+
+1. Initial concrete backend identities are Sixel and Kitty Graphics.
+2. Backend availability is independent from lifecycle and placement capability truth.
+3. Frozen 1.11 lifecycle and 1.12 placement planners remain authoritative.
+4. Frozen 1.13 runtime observations remain backend-neutral and unchanged.
+5. Callers maintain separate 1.13 integration contexts per backend when performing backend-specific verification.
+6. No terminal-name, emulator-brand, profile-name, or enum-order heuristic may infer backend support or preference.
+7. No hidden backend ranking is permitted.
+8. With no explicit caller preference and multiple viable candidates, planning returns `RequiresPreference`.
+9. A complete explicit preference order is semantic fallback policy: an unverified preferred candidate blocks fallback until verified or impossible.
+10. Production `Icod.TermInfo.Inspection` remains free of any `Icod.Terminal` package/project dependency.
 
 ---
 
-## 1. Release objective
+# 3. RB01 / Alpha-1 — Backend evidence and public model foundation
 
-`Icod.TermInfo 1.14.0` SHALL add a protocol-aware but execution-free advisory layer for evaluating concrete raster backends against the semantic requirements already modeled by 1.11-1.13.
+RB01 establishes the reviewed 1.14 backend-selection vocabulary and immutable model.
 
-The completed stack before 1.14 is:
+**Accepted exact head:** `7f43c4ad27f1858f8648237cbcb26e6808142458`
 
-```text
-1.11  persistent-raster lifecycle evidence / classification / planning
-1.12  advanced placement evidence / classification / planning
-1.13  backend-neutral runtime observations and evidence integration
-```
+**Qualification:** workflow #865 / run `34862203053`, all 12 jobs green.
 
-Version 1.14 adds the next layer:
-
-```text
-backend availability evidence
-        +
-per-backend lifecycle profile
-        +
-per-backend placement profile
-        |
-        v
-backend candidate evaluation
-        |
-        +---- explicit caller preference policy
-        |
-        v
-deterministic backend selection plan
-```
-
-The initial concrete backend vocabulary is Sixel and Kitty Graphics because both are meaningful real downstream backends today. Their wire protocols remain outside TermInfo.
-
-TermInfo SHALL answer questions such as:
-
-- Is this backend known supported, unsupported, unknown, or contradicted?
-- Can this backend satisfy the requested lifecycle semantics?
-- Can this backend satisfy the requested advanced placement semantics?
-- Which candidate is selected under the caller's explicit preference order?
-- Is runtime verification still required before the preferred backend can be used?
-- Is a choice impossible, or merely missing caller preference?
-
-TermInfo SHALL NOT send graphics, probe the terminal, allocate terminal-side identities, or own backend execution.
+RB01 adds exactly 13 reviewed `Icod.TermInfo.Inspection.RasterBackend*` public types and preserves exact historical Inspection compatibility.
 
 ---
 
-## 2. Architectural rules
+# 4. RB02 / Alpha-2 — Backend classification and conservative static inspection
 
-### 2.1 Preserve 1.11-1.13 semantics
+RB02 adds deterministic backend availability classification and static inspection.
 
-The following remain authoritative:
-
-- `PersistentRasterLifecycleProfile` and the 1.11 lifecycle classifier/planner;
-- `PersistentRasterPlacementProfile` and the 1.12 placement classifier/planner; and
-- `PersistentRasterRuntimeObservationSet`, `PersistentRasterRuntimeIntegrationResult`, and the 1.13 evidence integrator.
-
-1.14 SHALL compose those contracts rather than replacing or widening them.
-
-A backend candidate therefore carries existing lifecycle and placement profiles. Backend identity does not create a second copy of lifecycle/placement semantics.
-
-### 2.2 Backend availability is a separate semantic question
-
-A backend being usable for ordinary raster display does not imply persistent upload, acknowledgement, placement creation, multiple placements, placement update/deletion, resource deletion, source rectangles, or signed z-order.
-
-Backend availability SHALL have its own evidence/profile model.
-
-Lifecycle and placement facts remain independently classified.
-
-### 2.3 1.13 observations remain backend-neutral
-
-The 1.13 interchange contract deliberately omitted protocol/backend identity.
-
-1.14 SHALL NOT modify those frozen types.
-
-A caller that verifies multiple backends maintains independent 1.13 integration contexts and then composes each strengthened lifecycle/placement result into a 1.14 backend candidate.
-
-### 2.4 No live terminal ownership
-
-Production TermInfo SHALL NOT:
-
-- open terminal sessions;
-- send Sixel DCS;
-- send Kitty Graphics APC;
-- wait for acknowledgements;
-- call Terminal probing APIs;
-- inspect PTY/TTY handles;
-- own resource IDs or placement IDs;
-- retain terminal generations;
-- transmit image payloads;
-- manage cleanup; or
-- depend on `Icod.Terminal`.
-
-### 2.5 No terminal-brand heuristics
-
-1.14 SHALL NOT infer backend support from terminal names, emulator names, environment variables, process ancestry, or profile-brand heuristics.
-
-Explicit capability metadata and explicit caller evidence are authoritative.
-
-### 2.6 No hidden backend ranking
-
-Sixel and Kitty Graphics SHALL NOT have an implicit quality ordering.
-
-Backend enum numeric identity, canonical output ordering, and caller input order SHALL NOT select a winner.
-
-If more than one candidate remains viable and no complete explicit preference policy resolves the choice, the planner SHALL return a preference-required result.
-
----
-
-## 3. Proposed public responsibilities
-
-Exact names and enum numerics are frozen by RB01, but the release SHALL provide responsibilities equivalent to:
-
-```text
-RasterBackendKind
-RasterBackendEvidenceKind
-RasterBackendEvidence
-RasterBackendSupportStatus
-RasterBackendProfile
-RasterBackendEvidenceOptions
-RasterBackendInspector
-RasterBackendClassifier
-
-RasterBackendCandidate
-RasterBackendSelectionRequest
-RasterBackendSelectionOptions
-RasterBackendCandidateStatus
-RasterBackendCandidateEvaluation
-RasterBackendSelectionStatus
-RasterBackendSelectionPlan
-RasterBackendPlanner
-```
-
-The planned initial backend identities are:
-
-```text
-Sixel
-KittyGraphics
-```
-
-The planned availability statuses are:
-
-```text
-Unknown
-Supported
-Unsupported
-Contradicted
-```
-
-The planned evidence provenance categories are:
-
-```text
-CapabilityDerived
-Declared
-Verified
-```
-
-The planned candidate statuses are:
-
-```text
-Satisfied
-RequiresRuntimeVerification
-Impossible
-```
-
-The planned overall selection statuses are:
-
-```text
-Selected
-RequiresRuntimeVerification
-RequiresPreference
-Impossible
-```
-
-No additional public status or backend value SHALL be added casually after RB01.
-
----
-
-# 4. RB01 / Alpha-1 — Contract and public API regret gate
-
-## 4.1 Objective
-
-Freeze the minimum public vocabulary, bounds, validation rules, and selection-policy invariants before implementing behavior.
-
-## 4.2 Required work
-
-RB01 SHALL:
-
-- add test-first API/regret-gate coverage for the proposed 1.14 public responsibilities;
-- freeze numeric identities for backend/status/evidence enums;
-- define immutable backend availability evidence;
-- define immutable backend profile shape;
-- define immutable backend candidate shape;
-- define the selection request/options/result vocabulary;
-- freeze source-label and evidence-count bounds by reusing existing Inspection safety conventions where possible;
-- require exactly one candidate per backend in a selection operation;
-- define complete-preference validation;
-- establish that no preference means no hidden ranking;
-- prove that existing 1.13 public types remain unchanged; and
-- advance the coordinated development version to `1.14.0-Alpha-1` only after the RED contract is reviewed.
-
-## 4.3 Evidence shape
-
-Backend availability evidence SHALL be equivalent in responsibility to:
-
-```text
-Backend
-IsPositive
-Kind
-SourceLabel
-SourceOrdinal
-```
-
-It SHALL NOT carry lifecycle or placement subjects.
-
-## 4.4 Candidate shape
-
-A backend candidate SHALL compose:
-
-```text
-backend availability profile
-existing PersistentRasterLifecycleProfile
-existing PersistentRasterPlacementProfile
-```
-
-No backend-specific lifecycle enum is introduced.
-
-## 4.5 Preference invariant
-
-A non-empty preference order SHALL be a unique complete ordering of the candidate backends being planned.
-
-Partial preferences SHALL fail argument validation instead of being interpreted as hidden fallback policy.
-
-## 4.6 Gate
-
-**RB01 gate:** tests prove the proposed public contract, validation, bounds, enum numerics, frozen 1.13 surface, and no-hidden-preference rule before behavioral implementation proceeds.
-
-**Alpha checkpoint:** `1.14.0-Alpha-1` only after the contract is green on Windows, Linux, and macOS.
-
----
-
-# 5. RB02 / Alpha-2 — Backend evidence, classification, and conservative static inspection
-
-## 5.1 Objective
-
-Implement deterministic backend-availability evidence classification and the minimal safe `TerminalDescription` inspection path.
-
-## 5.2 Classifier semantics
-
-Backend evidence precedence SHALL mirror the proven lifecycle precedence shape:
+`RasterBackendClassifier` uses:
 
 ```text
 Verified > Declared > CapabilityDerived
@@ -271,60 +52,32 @@ Verified > Declared > CapabilityDerived
 
 Within the highest present precedence:
 
-- positive only -> `Supported`;
-- negative only -> `Unsupported`;
-- both polarities -> `Contradicted`;
-- no evidence -> `Unknown`.
+- positive only => `Supported`;
+- negative only => `Unsupported`;
+- both polarities => `Contradicted`;
+- no evidence => `Unknown`.
 
-Lower-precedence evidence SHALL NOT override a higher-precedence conclusion.
+Lower-precedence contradictions do not override stronger conclusions.
 
-## 5.3 Static Sixel inspection
+`RasterBackendInspector` recognizes only exact Boolean Sixel metadata. Absence remains unknown. Kitty Graphics is never inferred from terminal names, profile identities, unrelated capabilities, xterm/Windows Terminal identity, or Sixel metadata.
 
-`RasterBackendInspector` SHALL recognize explicit positive Sixel capability metadata already present in `TerminalDescription`.
+**Accepted exact head:** `6321de472a6e54a8382dd214996c22a4cf62e816`
 
-The existing extended Boolean `Sixel` may produce positive `CapabilityDerived` evidence for backend availability.
+**Qualification:** workflow #875 / run `34865731077`, all 12 jobs green.
 
-Absence SHALL remain `Unknown`.
-
-## 5.4 Kitty static inspection
-
-RB02 SHALL NOT infer Kitty Graphics from:
-
-- terminal name;
-- built-in profile name;
-- Windows Terminal identity;
-- xterm identity;
-- environment variables; or
-- unrelated graphics metadata.
-
-Without explicit authoritative capability metadata or caller evidence, Kitty availability remains `Unknown`.
-
-## 5.5 Determinism
-
-Evidence snapshots and classified profiles SHALL be deterministic across:
-
-- evidence input order;
-- collection implementation;
-- current culture; and
-- process execution.
-
-## 5.6 Gate
-
-**RB02 gate:** static Sixel advertisement is supported, absence stays unknown, Kitty is never inferred by brand/name, evidence precedence and contradictions are fully characterized, and immutable snapshots are proven.
-
-**Alpha checkpoint:** `1.14.0-Alpha-2`.
+RB02 adds exactly two more reviewed public types, bringing the reviewed whole-1.14 type set through RB02 to 15.
 
 ---
 
-# 6. RB03 / Alpha-3 — Backend candidate composition and frozen-planner evaluation
+# 5. RB03 / Alpha-3 — Candidate composition through frozen planners
 
-## 6.1 Objective
+## 5.1 Objective
 
-Evaluate each backend candidate by delegating to the frozen lifecycle and placement planners.
+Compose backend availability with the already-frozen lifecycle and placement planners without duplicating their semantics.
 
-## 6.2 Selection request
+## 5.2 Selection request
 
-The 1.14 request SHALL compose existing request types:
+The request composes the existing frozen request types:
 
 ```text
 PersistentRasterLifecycleRequest
@@ -335,7 +88,7 @@ PersistentRasterPlacementRequest?
 
 1.14 SHALL NOT duplicate their semantic fields.
 
-## 6.3 Candidate evaluation algorithm
+## 5.3 Candidate evaluation algorithm
 
 For each candidate:
 
@@ -353,27 +106,33 @@ For each candidate:
 
 The candidate evaluation SHALL retain the actual lifecycle and placement plans used to reach the status.
 
-## 6.4 No backend inference
+## 5.4 No backend inference
 
 The evaluator SHALL NOT special-case Sixel or Kitty Graphics capabilities.
 
 Backend kind identifies the candidate only; lifecycle/placement truth comes from the candidate's profiles.
 
-## 6.5 Gate
+## 5.5 Gate
 
 **RB03 gate:** candidate status is a pure deterministic composition of backend availability plus the frozen 1.11/1.12 planners, with no duplicated semantic rules.
+
+**Accepted exact head:** `22f38e9c6516bec9d5f6b8662f00e9b5bace7c2b`
+
+**Qualification:** workflow #885 / run `34871582203`, all 12 jobs green.
+
+The tranche also hardened the compatibility helper so singleton reviewed-type ledgers retain collection identity under Windows PowerShell and PowerShell 7.
 
 **Alpha checkpoint:** `1.14.0-Alpha-3`.
 
 ---
 
-# 7. RB04 / Alpha-4 — Deterministic preference-aware backend selection
+# 6. RB04 / Alpha-4 — Deterministic preference-aware backend selection
 
-## 7.1 Objective
+## 6.1 Objective
 
 Turn candidate evaluations into one explicit overall advisory decision without hidden ranking.
 
-## 7.2 Explicit preference semantics
+## 6.2 Explicit preference semantics
 
 When a complete caller preference order is supplied, candidates are considered in that order:
 
@@ -384,7 +143,7 @@ When a complete caller preference order is supplied, candidates are considered i
 
 This intentionally prevents silent fallback past an unverified preferred candidate.
 
-## 7.3 No-preference semantics
+## 6.3 No-preference semantics
 
 When no preference order is supplied:
 
@@ -394,29 +153,33 @@ When no preference order is supplied:
 
 Canonical evaluation ordering SHALL NOT choose a backend.
 
-## 7.4 Selected backend
+## 6.4 Selected backend
 
 `SelectedBackend` SHALL be populated only when overall status is `Selected`.
 
 All other statuses expose an explicit null/absent selection and retain candidate evaluations explaining why.
 
-## 7.5 Gate
+## 6.5 Gate
 
 **RB04 gate:** permutation tests prove input-order independence, explicit preference controls fallback deterministically, and the no-preference path never chooses between multiple viable candidates.
+
+**Accepted exact head:** `d202fd2e452b083de92b84521f1845a30354aede`
+
+**Qualification:** workflow #896 / run `34877834128`, all 12 jobs green.
 
 **Alpha checkpoint:** `1.14.0-Alpha-4`.
 
 ---
 
-# 8. RB05 / Alpha-5 — 1.13 runtime-integration composition and orchestration
+# 7. RB05 / Alpha-5 — 1.13 runtime-integration composition and orchestration
 
-## 8.1 Objective
+## 7.1 Objective
 
 Make per-backend runtime verification convenient without changing the frozen 1.13 observation/integration model.
 
-## 8.2 Composition helper
+## 7.2 Composition helper
 
-RB05 MAY add a convenience composition responsibility equivalent to:
+RB05 adds a convenience composition responsibility equivalent to:
 
 ```text
 RasterBackendProfile
@@ -426,9 +189,9 @@ RasterBackendProfile
 
 The integration result already contains strengthened lifecycle and placement profiles.
 
-The helper SHALL package those profiles; it SHALL NOT re-integrate evidence.
+The helper packages those profiles; it does not re-integrate evidence.
 
-## 8.3 Backend-specific verification contexts
+## 7.3 Backend-specific verification contexts
 
 Consumers verifying more than one backend SHALL maintain separate 1.13 integration contexts.
 
@@ -448,7 +211,7 @@ Kitty runtime observations
 
 The same backend-neutral observation type may be reused in each context because backend scope is supplied by the caller's composition, not embedded in the 1.13 type.
 
-## 8.4 No trust elevation
+## 7.4 No trust elevation
 
 RB05 SHALL NOT:
 
@@ -458,23 +221,27 @@ RB05 SHALL NOT:
 - weaken evidence capacity/ordinal failure behavior; or
 - manufacture `Verified` evidence outside the existing 1.13 integrator.
 
-## 8.5 Gate
+## 7.5 Gate
 
 **RB05 gate:** strengthened 1.13 results can feed 1.14 candidates without manual lifecycle/placement evidence reconstruction and without any change to the 1.13 public surface or behavior.
+
+**Accepted exact head:** `a4aab5e7af4d554cad7c978cef20491744100c80`
+
+**Qualification:** workflow #900 / run `34880872852`, all 12 jobs green.
 
 **Alpha checkpoint:** `1.14.0-Alpha-5`.
 
 ---
 
-# 9. RB06 / Alpha-6 — JSON version 6 backend automation
+# 8. RB06 / Alpha-6 — JSON version 6 backend automation
 
-## 9.1 Objective
+## 8.1 Objective
 
 Add deterministic machine-readable backend profile and selection-plan output while preserving JSON versions 1-5.
 
-## 9.2 Schema version
+## 8.2 Schema version
 
-RB06 SHALL add:
+RB06 adds:
 
 ```text
 urn:icod:terminfo:inspection:json:6
@@ -487,9 +254,9 @@ rasterBackendProfile
 rasterBackendSelectionPlan
 ```
 
-## 9.3 Backend profile document
+## 8.3 Backend profile document
 
-The profile document SHALL preserve:
+The profile document preserves:
 
 - backend identity;
 - support status;
@@ -497,9 +264,9 @@ The profile document SHALL preserve:
 - evidence kind/polarity/source label/source ordinal; and
 - deterministic ordering.
 
-## 9.4 Selection-plan document
+## 8.4 Selection-plan document
 
-The plan document SHALL preserve:
+The plan document preserves:
 
 - lifecycle request;
 - placement request;
@@ -512,102 +279,113 @@ The plan document SHALL preserve:
 - placement plan status/requirements; and
 - the explicit remaining blocker: verification, preference, or impossibility.
 
-## 9.5 Compatibility
+## 8.5 Compatibility
 
-JSON versions 1 through 5 SHALL remain byte-for-byte stable for their existing inputs.
+JSON versions 1 through 5 remain byte-for-byte stable for their existing inputs.
 
 No JSON input/deserialization is introduced.
 
-## 9.6 Bounds
+## 8.6 Bounds
 
-The renderer SHALL continue using existing `TermInfoJsonRendererOptions` output-byte bounds and cancellation semantics.
+The renderer continues using existing `TermInfoJsonRendererOptions` output-byte bounds and cancellation semantics.
 
-## 9.7 Gate
+## 8.7 Gate
 
 **RB06 gate:** version-6 output is deterministic, schema-valid, culture-independent, bounded, repeatable across processes, and additive to frozen v1-v5.
+
+**Accepted exact head:** `d20d1c7b9a727b20dbcb931f1ac980a0e961b372`
+
+**Qualification:** workflow #904 / run `34893643336`, all 12 jobs green.
+
+The accepted Alpha-6 head contains the synchronized version authority, exact six-member additive renderer ledger, compatibility reconstruction support, packaged strict v6 schema, and qualified JSON behavior.
 
 **Alpha checkpoint:** `1.14.0-Alpha-6`.
 
 ---
 
-# 10. RB07 / Alpha-7 — Terminal 1.13 qualification and focused samples
+# 9. RB07 / Alpha-7 — Terminal 1.13 qualification and focused samples
 
-## 10.1 Objective
+## 9.1 Objective
 
 Prove the loose-coupling contract against real published downstream packages without adding a production Terminal dependency.
 
-## 10.2 Package-only consumer
+## 9.2 Package-only consumer
 
-Add an isolated consumer that references:
+The isolated consumer references:
 
-- freshly packed `Icod.TermInfo`/`Icod.TermInfo.Inspection` 1.14 candidate packages; and
+- freshly packed `Icod.TermInfo.Inspection` 1.14 candidate package; and
 - published stable `Icod.Terminal 1.13.0`.
 
-It SHALL use no project reference to production TermInfo projects.
+It uses no project reference to production TermInfo projects.
 
-## 10.3 Adapter boundary
+## 9.3 Adapter boundary
 
-The consumer SHALL make Terminal-to-TermInfo mapping policy explicit.
+The consumer makes Terminal-to-TermInfo mapping policy explicit.
 
-A suitable qualification flow is:
+The qualification flow is:
 
 ```text
 TermInfo TerminalDescription
     -> explicit Sixel capability-derived backend evidence
     -> Sixel candidate
 
-Terminal session / semantic verification
-    -> caller-owned conclusive result
-    -> explicit Kitty backend availability policy
+Terminal semantic verification
+    -> caller-owned conclusive-result mapping
     -> backend-specific 1.13 observations/integration
+    -> explicit caller-owned Kitty availability evidence
     -> Kitty candidate
 
 Sixel + Kitty candidates
     -> 1.14 backend planner
     -> explicit preference-aware plan
+    -> JSON v6 output
 ```
 
-If a Terminal semantic capability is coarser than the TermInfo semantic vocabulary, the expansion SHALL remain visible caller policy just as in 1.13 qualification.
+If a Terminal semantic capability is coarser than the TermInfo semantic vocabulary, the expansion remains visible caller policy just as in 1.13 qualification.
 
-The sample SHALL NOT inspect Terminal internal backend resolver types.
+The sample does not inspect Terminal internal backend resolver types.
 
-## 10.4 Focused sample
+## 9.4 Focused sample
 
-Add a dedicated sample responsibility-equivalent to:
+RB07 adds:
 
 ```text
 samples/Icod.TermInfo.RasterBackendSelection.Sample
 ```
 
-The default mode SHALL be deterministic and CI-safe.
+The default mode is deterministic and CI-safe. Live mode uses the published `TerminalSession.VerifyCapabilityAsync(TerminalCapability.PersistentRasterGraphics)` API and keeps real observation facts separate from caller mapping policy.
 
-A live mode MAY use published Terminal APIs, but the sample must remain explicit about which facts are real live observations and which mappings are caller policy.
+## 9.5 Existing samples
 
-## 10.5 Existing samples
+Existing lifecycle, placement, and runtime-integration samples remain valid and are not rewritten merely to advertise 1.14.
 
-Existing lifecycle, placement, and runtime-integration samples SHALL remain valid and SHALL NOT be rewritten merely to advertise 1.14.
+## 9.6 Production dependency gate
 
-Only targeted documentation cross-links should be added where useful.
+Permanent tests prove production `Icod.TermInfo.Inspection` has no `Icod.Terminal` package or assembly dependency.
 
-## 10.6 Production dependency gate
-
-Permanent tests SHALL prove production `Icod.TermInfo.Inspection` has no `Icod.Terminal` package or assembly dependency.
-
-## 10.7 Gate
+## 9.7 Gate
 
 **RB07 gate:** package-only net8/net9/net10 consumers, focused sample, published Terminal 1.13 interop, tool package smoke, and all six archive RIDs remain green without production coupling.
+
+**Accepted exact head:** `0ce8df7f08064de807db17a2662f38252a814ce5`
+
+**Qualification:** workflow #910 / run `34898618294`, all 12 jobs green.
+
+The accepted head synchronizes `1.14.0-Alpha-7` accounting on top of the qualified package-only consumer and sample. RB07 adds no Inspection public API.
 
 **Alpha checkpoint:** `1.14.0-Alpha-7`.
 
 ---
 
-# 11. RB08 / Alpha-8 — Adversarial hardening, exact freeze, documentation, and release closure
+# 10. RB08 / Alpha-8 — Adversarial hardening, exact freeze, documentation, and release closure
 
-## 11.1 Objective
+## 10.1 Objective
 
 Freeze 1.14 only after adversarial proof that backend selection is deterministic, bounded, non-heuristic, and backward-compatible.
 
-## 11.2 Required adversarial cases
+**Status:** IN PROGRESS from accepted Alpha-7 authority `0ce8df7f08064de807db17a2662f38252a814ce5`.
+
+## 10.2 Required adversarial cases
 
 RB08 SHALL test at least:
 
@@ -638,17 +416,17 @@ RB08 SHALL test at least:
 - JSON exact byte-bound boundaries; and
 - package-only consumption across all target frameworks.
 
-## 11.3 Public API freeze
+## 10.3 Public API freeze
 
 Generate the exact complete Inspection reflection manifest from a validated package artifact and freeze its normalized-LF SHA-256.
 
 The freeze SHALL prove the 1.14 surface is additive to the accepted 1.13 surface.
 
-## 11.4 JSON freeze
+## 10.4 JSON freeze
 
 Freeze normalized-LF fingerprints for JSON schemas v1-v6 and verify historical versions exactly.
 
-## 11.5 Documentation
+## 10.5 Documentation
 
 Produce at minimum:
 
@@ -668,7 +446,7 @@ Update:
 - `docs/COMPATIBILITY.md`; and
 - `Icod.TermInfo-Post-1.0-Development-Roadmap.md`.
 
-## 11.6 Release qualification
+## 10.6 Release qualification
 
 The exact Alpha-8 head SHALL pass the complete 12-job Staging-equivalent matrix:
 
@@ -680,7 +458,7 @@ The exact Alpha-8 head SHALL pass the complete 12-job Staging-equivalent matrix:
 
 Stable `1.14.0` promotion SHALL then be version/status-only unless an explicitly reviewed release defect requires correction.
 
-## 11.7 Gate
+## 10.7 Gate
 
 **RB08 gate:** exact API/schema fingerprints are frozen, all adversarial and distribution gates are green, release-facing documentation is internally consistent, and stable promotion can occur without semantic changes.
 
@@ -688,7 +466,7 @@ Stable `1.14.0` promotion SHALL then be version/status-only unless an explicitly
 
 ---
 
-# 12. Release-wide invariants
+# 11. Release-wide invariants
 
 Every 1.14 tranche SHALL preserve:
 
@@ -699,57 +477,8 @@ Every 1.14 tranche SHALL preserve:
 5. 1.13 runtime observations remain backend-neutral.
 6. 1.11 lifecycle semantics remain authoritative.
 7. 1.12 placement semantics remain authoritative.
-8. JSON v1-v5 remain stable.
-9. Backend availability does not imply lifecycle/placement support.
-10. Static absence is not negative evidence.
-11. Terminal names and brands are not evidence.
-12. Backend enum ordering is not preference policy.
-13. No preference means no hidden selection among multiple viable candidates.
-14. Preference order, when supplied, is explicit and semantic.
-15. Selection remains advisory; execution stays downstream.
-16. All caller collections are bounded and snapshotted.
-17. Deterministic output is culture-independent.
-18. New package/sample qualification uses published dependencies rather than sibling source coupling.
-
----
-
-# 13. Explicit exclusions from 1.14
-
-The following are not part of this release:
-
-- iTerm image protocol support;
-- Sixel encoder/transmitter implementation;
-- Kitty encoder/transmitter implementation;
-- graphics payload abstraction;
-- alpha-channel semantic planning;
-- pixel-format negotiation;
-- compression negotiation;
-- image dimensions or scaling policy;
-- performance/latency/bandwidth scoring;
-- automatic quality ranking;
-- terminal-brand backend preference;
-- session endpoint health;
-- resource/placement lifetime ownership;
-- scene/layout policy;
-- JSON deserialization/import;
-- Berkeley DB/hashed terminfo acquisition; or
-- historical vendor binary formats.
-
-Those remain candidates for later releases when independently justified.
-
----
-
-# 14. Acceptance definition
-
-`Icod.TermInfo 1.14.0` is complete when a consumer can:
-
-1. represent Sixel/Kitty backend availability evidence without using terminal-name heuristics;
-2. combine each backend with independently established lifecycle/placement profiles;
-3. reuse 1.13 runtime integration per backend without changing 1.13 observations;
-4. ask one deterministic planner to evaluate every backend against the same semantic request;
-5. provide explicit backend preference when desired;
-6. receive `Selected`, `RequiresRuntimeVerification`, `RequiresPreference`, or `Impossible` with complete candidate evidence;
-7. serialize backend profiles and selection plans through JSON v6; and
-8. consume the feature from ordinary NuGet packages without introducing `Icod.Terminal` into production TermInfo dependencies.
-
-The release SHALL make uncertainty visible rather than guess, make caller policy explicit rather than hidden, and keep all live graphics execution downstream.
+8. Backend availability remains a separate dimension.
+9. Preference remains caller-owned policy.
+10. Canonical ordering remains output determinism only, never hidden ranking.
+11. JSON import/deserialization remains excluded.
+12. Stable promotion does not change semantics, public API, schema, dependencies, TFMs, command topology, package-consumer topology, or archive RIDs after accepted Alpha-8.
