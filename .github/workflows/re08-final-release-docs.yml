@@ -1,0 +1,30 @@
+name: re08-final-release-docs
+
+on:
+  push:
+    branches:
+      - 1.13.0
+
+permissions:
+  contents: write
+
+jobs:
+  close-release-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 1.13.0
+          fetch-depth: 0
+      - name: Apply final release documentation closure
+        run: python .github/scripts/re08-final-release-docs.py
+      - name: Commit closure and remove helpers
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md Icod.TermInfo.Inspection/README.md Icod.TermInfo-Post-1.0-Development-Roadmap.md Icod.TermInfo-1.13.0-Persistent-Raster-Runtime-Evidence-Interchange-and-Integration-Roadmap.md docs/1.13.0-RELEASE-AUDIT.md
+          git rm .github/scripts/re08-final-release-docs.py .github/workflows/re08-final-release-docs.yml
+          git diff --cached --check
+          git commit -m "Record Icod.TermInfo 1.13.0 release-ready validation"
+          git push origin HEAD:1.13.0
