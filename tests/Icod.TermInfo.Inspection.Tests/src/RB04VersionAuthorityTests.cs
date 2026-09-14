@@ -4,19 +4,22 @@ namespace Icod.TermInfo.Inspection.Tests;
 
 public sealed class RB04VersionAuthorityTests {
 	[Fact]
-	public void CoordinatedVersionIsAlphaFour() {
-		string properties = File.ReadAllText(
+	public void Rb04RecordPreservesAcceptedAlphaFourIdentity() {
+		string record = File.ReadAllText(
 			Path.Combine(
 				FindRepositoryRoot(),
-				"Directory.Build.props"
+				"docs",
+				"1.14.0-RB04-DETERMINISTIC-BACKEND-SELECTION.md"
 			)
 		);
 
+		Assert.Contains( "1.14.0-Alpha-4", record, StringComparison.Ordinal );
 		Assert.Contains(
-			"<IcodTermInfoSuiteVersion>1.14.0-Alpha-4</IcodTermInfoSuiteVersion>",
-			properties,
+			"d202fd2e452b083de92b84521f1845a30354aede",
+			record,
 			StringComparison.Ordinal
 		);
+		Assert.Contains( "34877834128", record, StringComparison.Ordinal );
 	}
 
 	[Fact]
