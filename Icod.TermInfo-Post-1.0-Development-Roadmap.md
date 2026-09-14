@@ -10,7 +10,8 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
-**Current coordinated version:** `1.12.0`
+**Current coordinated version:** `1.13.0`
+**Next development line:** `TBD`
 **Final 1.6 prerelease:** `1.6.0-Alpha-8`
 **Final 1.7 prerelease:** `1.7.0-Alpha-8`
 **Final 1.8 prerelease:** `1.8.0-Alpha-8`
@@ -18,11 +19,13 @@
 **Final 1.10 prerelease:** `1.10.0-Alpha-8`
 **Final 1.11 prerelease:** `1.11.0-Alpha-8`
 **Final 1.12 prerelease:** `1.12.0-Alpha-8`
-**Latest completed line:** `1.12.0` - Advanced Persistent-Raster Placement Semantics and Planning
-**Status:** 1.12.0 implementation and stable promotion complete; PR #42 remains open pending merge
-**Completed tranches:** PG01-PG08
-**Primary objective:** Completed - protocol-neutral source-rectangle and signed-z-order placement semantics beside the frozen 1.11 persistent-raster lifecycle model, preserving JSON v1-v3 and downstream execution ownership.
-**Release audit:** `docs/1.12.0-RELEASE-AUDIT.md`
+**Final 1.13 prerelease:** `1.13.0-Alpha-8`
+**Latest completed line:** `1.13.0` - Persistent-Raster Runtime Evidence Interchange and Integration
+**Status:** RE01-RE08 complete; Alpha-8 and stable `1.13.0` product candidates validated; release-ready in draft PR #43; merge/tag/publication not performed
+**Planned tranches:** RE01-RE08
+**Primary objective:** Add protocol-neutral runtime-evidence interchange and deterministic integration so external verification can strengthen the frozen 1.11 lifecycle and 1.12 placement models without manual evidence construction or source-ordinal management.
+**Active development roadmap:** `Icod.TermInfo-1.13.0-Persistent-Raster-Runtime-Evidence-Interchange-and-Integration-Roadmap.md`
+**Latest completed release audit:** `docs/1.13.0-RELEASE-AUDIT.md`
 
 ---
 
@@ -97,7 +100,12 @@ in a new version-specific roadmap, not in the retired inventory.
 | **1.10.0** | Deterministic multi-database inspection, comparison, and planning automation | Aggregate ordered explicit catalogs with stable evidence, then add precedence, conflict analysis, set comparison, multi-catalog planning, and versioned automation |
 | **1.11.0** | Persistent-raster lifecycle semantics and planning | Classify protocol-neutral persistent-raster lifecycle evidence and produce deterministic advisory plans without owning terminal execution |
 | **1.12.0** | Advanced persistent-raster placement semantics and planning | Classify source-rectangle and signed-z-order placement support and compose those requirements with the frozen 1.11 lifecycle model |
-| **later** | Exotic storage/formats and broader graphics policy | Berkeley DB, historical Unix dialects, multi-protocol preference/negotiation, and other deferred work as justified |
+| **1.13.0** | Persistent-raster runtime evidence interchange and integration | Normalize caller-owned runtime observations, integrate conclusive results as existing verified lifecycle/placement evidence, and remove manual evidence/ordinal bridging without owning live verification |
+| **later** | Exotic storage/formats and broader graphics policy | Berkeley DB, historical Unix dialects, multi-protocol preference/negotiation after runtime-evidence interchange is mature, and other deferred work as justified |
+
+Version 1.13.0 is governed by
+[`Icod.TermInfo-1.13.0-Persistent-Raster-Runtime-Evidence-Interchange-and-Integration-Roadmap.md`](Icod.TermInfo-1.13.0-Persistent-Raster-Runtime-Evidence-Interchange-and-Integration-Roadmap.md).
+RE01 freezes the runtime-observation vocabulary and API regret gate while preserving the frozen 1.11 lifecycle and 1.12 placement semantics. RE02 adds immutable bounded runtime observations. RE03 maps conclusive observations into existing `Verified` evidence with deterministic safe ordinal assignment. RE04 proves integration through the frozen classifiers and contradiction rules. RE05 composes strengthened profiles back through the frozen planners without inventing a replacement planning model. RE06 adds additive JSON version 5 observation/integration documents while preserving v1-v4. RE07 qualifies loose coupling with `Icod.Terminal` and removes hand-written evidence/ordinal bridging from the downstream sample. RE08 hardens, fingerprints, documents, and closes the release. Multi-protocol preference/negotiation remains a later track after runtime-evidence interchange is mature and multiple meaningful backends justify policy.
 
 The completed 1.5 release contract is recorded in
 [`Icod.TermInfo-1.5.0-Coordinated-Distribution-Roadmap.md`](Icod.TermInfo-1.5.0-Coordinated-Distribution-Roadmap.md)

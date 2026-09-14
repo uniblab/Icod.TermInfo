@@ -1,0 +1,8 @@
+# Icod.TermInfo.Inspection 1.13 RE06 reviewed public members added to TermInfoJsonRenderer.
+# Exact public-api-snapshot manifest lines; all earlier renderer members remain frozen.
+  FIELD public static const System.Int32 PersistentRasterRuntimeSchemaVersion null=not-null/not-null value=5
+  FIELD public static const System.String PersistentRasterRuntimeSchemaIdentifier null=not-null/not-null value="urn:icod:terminfo:inspection:json:5"
+  METHOD public static System.String Render(Icod.TermInfo.Inspection.PersistentRasterRuntimeIntegrationResult integration null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.String Render(Icod.TermInfo.Inspection.PersistentRasterRuntimeIntegrationResult integration null=not-null/not-null, Icod.TermInfo.Inspection.TermInfoJsonRendererOptions options null=not-null/not-null, System.Threading.CancellationToken cancellationToken null=not-null/not-null default=null) return-null=not-null/not-null
+  METHOD public static System.String Render(Icod.TermInfo.Inspection.PersistentRasterRuntimeObservationSet observations null=not-null/not-null) return-null=not-null/not-null
+  METHOD public static System.String Render(Icod.TermInfo.Inspection.PersistentRasterRuntimeObservationSet observations null=not-null/not-null, Icod.TermInfo.Inspection.TermInfoJsonRendererOptions options null=not-null/not-null, System.Threading.CancellationToken cancellationToken null=not-null/not-null default=null) return-null=not-null/not-null

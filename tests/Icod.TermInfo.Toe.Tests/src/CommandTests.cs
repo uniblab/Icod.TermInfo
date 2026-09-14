@@ -48,7 +48,7 @@ public sealed class CommandTests {
 		);
 
 		Assert.Equal( CommandExitCodes.Success, status );
-		Assert.Contains( "1.12.0", ReadText( stdout ) );
+		Assert.Contains( "1.13.0", ReadText( stdout ) );
 		Assert.Empty( ReadText( stderr ) );
 	}
 

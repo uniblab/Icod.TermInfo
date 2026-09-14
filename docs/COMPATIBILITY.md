@@ -6,6 +6,30 @@ This document defines the supported 1.x compatibility boundary for
 `Icod.TermInfo.Inspection` package, and beginning with 1.6 the optional
 `Icod.TermInfo.Termcap` package.
 
+## 1.13 compatibility freeze
+
+Version 1.13 is additive above the stable 1.12 boundary. RE08 freezes the complete
+1.13 Inspection reflection manifest at 90 exported public types with normalized-LF
+SHA-256
+`fd827a25abafb8e9ff3915567f45f9f2ec51b332bfd8a82dd4e4bca20290e764`
+and requires equivalent public API across `net8.0`, `net9.0`, and `net10.0`.
+The verifier first proves that complete 1.13 surface, then removes exactly the
+reviewed RE06 renderer-member delta and cumulative `PersistentRasterRuntime*`
+type delta to reconstruct frozen 1.12 SHA-256
+`f71501dcd27a530051c1a02083325144ced2b6173b6b967b9571c620815198f0`.
+The established 1.12 -> 1.11 -> 1.10 reconstruction chain remains unchanged.
+
+Version 1.13 adds only protocol-neutral caller-owned runtime observation and
+evidence-integration semantics to Inspection. It does not add live probing,
+backend ranking, protocol negotiation, raw protocol responses, terminal session
+or resource identity, or a production dependency on `Icod.Terminal`.
+
+JSON schema versions 1 through 4 remain immutable historical contracts. Version
+5 is additive and contains exactly `persistentRasterRuntimeObservationSet` and
+`persistentRasterRuntimeIntegration`. Stable 1.13 promotion may not change any
+frozen schema, the exact 1.13 public surface, package dependency direction,
+target frameworks, command semantics, package-consumer topology, or archive RIDs.
+
 ## 1.12 compatibility freeze
 
 Version 1.12 is additive above the stable 1.11 boundary. PG08 freezes the

@@ -170,12 +170,22 @@ public sealed class RL07PackageQualificationTests {
 			StringComparison.Ordinal
 		);
 		Assert.Contains(
-			"PersistentRasterLifecycleEvidenceKind.Verified",
+			"PersistentRasterRuntimeLifecycleObservation",
 			source,
 			StringComparison.Ordinal
 		);
 		Assert.Contains(
-			"PersistentRasterLifecyclePlanner.Plan",
+			"PersistentRasterRuntimeEvidenceIntegrator.Integrate",
+			source,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"CreateLifecyclePlan",
+			source,
+			StringComparison.Ordinal
+		);
+		Assert.DoesNotContain(
+			"PersistentRasterLifecycleEvidenceKind.Verified",
 			source,
 			StringComparison.Ordinal
 		);

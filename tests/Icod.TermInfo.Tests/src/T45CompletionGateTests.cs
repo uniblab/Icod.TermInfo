@@ -33,7 +33,7 @@ public sealed class T45CompletionGateTests {
 				)[ 0 ];
 
 		Assert.StartsWith(
-			"1.12.0",
+			"1.13.0",
 			semanticVersion,
 			StringComparison.Ordinal
 		);
@@ -61,7 +61,7 @@ public sealed class T45CompletionGateTests {
 			);
 
 		Assert.StartsWith(
-			"1.12.0",
+			"1.13.0",
 			ReadRequiredProperty(
 				buildProperties,
 				"IcodTermInfoSuiteVersion"
@@ -111,27 +111,27 @@ public sealed class T45CompletionGateTests {
 			);
 
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo --version 1.12.0",
+			"dotnet add package Icod.TermInfo --version 1.13.0",
 			readme
 		);
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo.Source --version 1.12.0",
+			"dotnet add package Icod.TermInfo.Source --version 1.13.0",
 			readme
 		);
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo.Termcap --version 1.12.0",
+			"dotnet add package Icod.TermInfo.Termcap --version 1.13.0",
 			readme
 		);
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo.Compiler --version 1.12.0",
+			"dotnet add package Icod.TermInfo.Compiler --version 1.13.0",
 			readme
 		);
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo.Inspection --version 1.12.0",
+			"dotnet add package Icod.TermInfo.Inspection --version 1.13.0",
 			readme
 		);
 		Assert.Contains(
-			"dotnet tool install --global Icod.TermInfo.Tools --version 1.12.0",
+			"dotnet tool install --global Icod.TermInfo.Tools --version 1.13.0",
 			readme
 		);
 		Assert.DoesNotContain(
@@ -164,6 +164,10 @@ public sealed class T45CompletionGateTests {
 		);
 		Assert.Contains(
 			"docs/1.12.0-RELEASE-AUDIT.md",
+			readme
+		);
+		Assert.Contains(
+			"docs/1.13.0-RELEASE-AUDIT.md",
 			readme
 		);
 	}
