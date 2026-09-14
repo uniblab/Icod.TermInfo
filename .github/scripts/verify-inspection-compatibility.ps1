@@ -14,7 +14,8 @@ $repositoryRoot = [System.IO.Path]::GetFullPath(
     (Join-Path (Join-Path $PSScriptRoot '..') '..')
 )
 $freezePath = Join-Path $repositoryRoot 'docs/1.13.0-INSPECTION-PUBLIC-API-FREEZE.md'
-$oneFourteenTypesPath = Join-Path $repositoryRoot 'docs/1.14.0-RB01-INSPECTION-PUBLIC-API-ADDITIONS.txt'
+$oneFourteenRb01TypesPath = Join-Path $repositoryRoot 'docs/1.14.0-RB01-INSPECTION-PUBLIC-API-ADDITIONS.txt'
+$oneFourteenRb02TypesPath = Join-Path $repositoryRoot 'docs/1.14.0-RB02-INSPECTION-PUBLIC-API-ADDITIONS.txt'
 $historyVerifierPath = Join-Path $PSScriptRoot 'verify-inspection-compatibility-history.ps1'
 
 # Keep historical authorities explicit at the public verifier entry point. Exact
@@ -38,7 +39,8 @@ $assemblyFullPath = if ([System.IO.Path]::IsPathRooted($AssemblyPath)) {
 
 foreach ($requiredPath in @(
     $freezePath,
-    $oneFourteenTypesPath,
+    $oneFourteenRb01TypesPath,
+    $oneFourteenRb02TypesPath,
     $historyVerifierPath,
     $oneTenBaselinePath,
     $oneElevenTypesPath,
@@ -84,7 +86,13 @@ function Get-NormalizedSha256 {
 function Read-ApprovedTypes {
     param(
         [Parameter(Mandatory = $true)]
-        [string]$Path
+        [string]$Path,
+
+        [Parameter(Mandatory = $true)]
+        [int]$ExpectedCount,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ReleaseLabel
     )
 
     $approved = [System.Collections.Generic.HashSet[string]]::new(
@@ -96,15 +104,15 @@ function Read-ApprovedTypes {
             continue
         }
         if (-not $candidate.StartsWith('Icod.TermInfo.Inspection.RasterBackend', [System.StringComparison]::Ordinal)) {
-            throw "Approved 1.14 RB01 Inspection public type is outside the RasterBackend prefix: $candidate"
+            throw "Approved $ReleaseLabel Inspection public type is outside the RasterBackend prefix: $candidate"
         }
         if (-not $approved.Add($candidate)) {
-            throw "Approved 1.14 RB01 Inspection public types file contains a duplicate: $candidate"
+            throw "Approved $ReleaseLabel Inspection public types file contains a duplicate: $candidate"
         }
     }
 
-    if ($approved.Count -ne 13) {
-        throw "Approved 1.14 RB01 Inspection public types file must contain exactly 13 types; found $($approved.Count)."
+    if ($approved.Count -ne $ExpectedCount) {
+        throw "Approved $ReleaseLabel Inspection public types file must contain exactly $ExpectedCount types; found $($approved.Count)."
     }
 
     return $approved
@@ -141,7 +149,7 @@ function Remove-ApprovedTypes {
                 $typeName = $Matches[1]
                 if ($typeName.StartsWith('Icod.TermInfo.Inspection.RasterBackend', [System.StringComparison]::Ordinal)) {
                     if (-not $ApprovedTypes.Contains($typeName)) {
-                        throw "Unapproved 1.14 RB01 Inspection public API addition: $typeName"
+                        throw "Unapproved 1.14 Inspection public API addition: $typeName"
                     }
                     if (-not $removedTypes.Add($typeName)) {
                         throw "Inspection API manifest contains duplicate 1.14 public type blocks: $typeName"
@@ -169,7 +177,7 @@ function Remove-ApprovedTypes {
 
     foreach ($approvedType in $ApprovedTypes) {
         if (-not $removedTypes.Contains($approvedType)) {
-            throw "Approved 1.14 RB01 Inspection public API type is missing from the current assembly: $approvedType"
+            throw "Approved 1.14 Inspection public API type is missing from the current assembly: $approvedType"
         }
     }
 
@@ -205,7 +213,31 @@ try {
             throw 'Icod.TermInfo.Inspection public API unexpectedly references Icod.Terminal.'
         }
 
-        $approvedOneFourteenTypes = Read-ApprovedTypes -Path $oneFourteenTypesPath
+        $approvedRb01Types = Read-ApprovedTypes `
+            -Path $oneFourteenRb01TypesPath `
+            -ExpectedCount 13 `
+            -ReleaseLabel '1.14 RB01'
+        $approvedRb02Types = Read-ApprovedTypes `
+            -Path $oneFourteenRb02TypesPath `
+            -ExpectedCount 2 `
+            -ReleaseLabel '1.14 RB02'
+        $approvedOneFourteenTypes = [System.Collections.Generic.HashSet[string]]::new(
+            [System.StringComparer]::Ordinal
+        )
+        foreach ($approvedType in $approvedRb01Types) {
+            if (-not $approvedOneFourteenTypes.Add($approvedType)) {
+                throw "Duplicate reviewed 1.14 Inspection public type across tranche ledgers: $approvedType"
+            }
+        }
+        foreach ($approvedType in $approvedRb02Types) {
+            if (-not $approvedOneFourteenTypes.Add($approvedType)) {
+                throw "Duplicate reviewed 1.14 Inspection public type across tranche ledgers: $approvedType"
+            }
+        }
+        if ($approvedOneFourteenTypes.Count -ne 15) {
+            throw "Reviewed 1.14 Inspection public type set must contain exactly 15 types through RB02; found $($approvedOneFourteenTypes.Count)."
+        }
+
         $oneThirteenCandidate = Remove-ApprovedTypes `
             -Manifest $current `
             -ApprovedTypes $approvedOneFourteenTypes
@@ -224,9 +256,11 @@ try {
         }
 
         Write-Host (
-            "Verified exact 1.13 Inspection public API SHA-256 {0} after excluding {1} approved 1.14 RB01 type block(s)." -f `
+            "Verified exact 1.13 Inspection public API SHA-256 {0} after excluding {1} approved 1.14 type block(s): {2} RB01 and {3} RB02." -f `
                 $oneThirteenCandidateSha256, `
-                $oneThirteenCandidate.RemovedTypeCount
+                $oneThirteenCandidate.RemovedTypeCount, `
+                $approvedRb01Types.Count, `
+                $approvedRb02Types.Count
         )
 
         [System.IO.File]::WriteAllText(
