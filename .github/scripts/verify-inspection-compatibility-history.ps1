@@ -411,11 +411,10 @@ try {
                 $oneElevenMemberFiltered.RemovedMemberCount
         )
     } finally {
-        if (
-            $null -ne $temporaryManifest
-            -and (Test-Path -LiteralPath $temporaryManifest)
-        ) {
-            Remove-Item -LiteralPath $temporaryManifest -Force
+        if ($null -ne $temporaryManifest) {
+            if (Test-Path -LiteralPath $temporaryManifest) {
+                Remove-Item -LiteralPath $temporaryManifest -Force
+            }
         }
     }
 } finally {
