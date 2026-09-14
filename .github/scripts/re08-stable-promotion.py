@@ -180,7 +180,7 @@ release_roadmap = "Icod.TermInfo-1.13.0-Persistent-Raster-Runtime-Evidence-Inter
 replace_exact(
     release_roadmap,
     "**Status:** Planning approved; implementation not yet started  ",
-    "**Status:** RE01-RE08 complete; Alpha-8 accepted; stable `1.13.0` promotion validation in progress  ",
+    "**Status:** RE01-RE08 complete; Alpha-8 accepted; stable `1.13.0` promotion validation in progress",
 )
 
 audit = "docs/1.13.0-RELEASE-AUDIT.md"
