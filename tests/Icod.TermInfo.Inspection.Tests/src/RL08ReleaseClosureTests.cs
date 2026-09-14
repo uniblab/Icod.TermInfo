@@ -34,11 +34,15 @@ public sealed class RL08ReleaseClosureTests {
 		string oneThirteenAdditions = ReadRepositoryFile(
 			"docs/1.13.0-RE01-INSPECTION-PUBLIC-API-ADDITIONS.txt"
 		);
-		string oneFourteenAdditions = ReadRepositoryFile(
+		string oneFourteenRb01Additions = ReadRepositoryFile(
 			"docs/1.14.0-RB01-INSPECTION-PUBLIC-API-ADDITIONS.txt"
 		);
-		HashSet<string> approvedOneFourteenTypes = oneFourteenAdditions
+		string oneFourteenRb02Additions = ReadRepositoryFile(
+			"docs/1.14.0-RB02-INSPECTION-PUBLIC-API-ADDITIONS.txt"
+		);
+		HashSet<string> approvedOneFourteenTypes = oneFourteenRb01Additions
 			.Split( '\n' )
+			.Concat( oneFourteenRb02Additions.Split( '\n' ) )
 			.Select( line => line.Trim() )
 			.Where(
 				line =>
@@ -88,7 +92,7 @@ public sealed class RL08ReleaseClosureTests {
 			)
 			.ToArray();
 
-		Assert.Equal( 13, approvedOneFourteenTypes.Count );
+		Assert.Equal( 15, approvedOneFourteenTypes.Count );
 		Assert.Equal( 67, reconstructedOneElevenTypes.Length );
 		Assert.Equal(
 			approvedOneThirteenTypes.Count,

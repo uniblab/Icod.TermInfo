@@ -25,11 +25,15 @@ public sealed class RE08ReleaseClosureTests {
 
 	[Fact]
 	public void ExactOneThirteenInspectionSurfaceHasFreezeInputs() {
-		string oneFourteenAdditions = ReadRequiredRepositoryFile(
+		string oneFourteenRb01Additions = ReadRequiredRepositoryFile(
 			"docs/1.14.0-RB01-INSPECTION-PUBLIC-API-ADDITIONS.txt"
 		);
-		HashSet<string> approvedOneFourteenTypes = oneFourteenAdditions
+		string oneFourteenRb02Additions = ReadRequiredRepositoryFile(
+			"docs/1.14.0-RB02-INSPECTION-PUBLIC-API-ADDITIONS.txt"
+		);
+		HashSet<string> approvedOneFourteenTypes = oneFourteenRb01Additions
 			.Split( '\n' )
+			.Concat( oneFourteenRb02Additions.Split( '\n' ) )
 			.Select( line => line.Trim() )
 			.Where(
 				line =>
@@ -47,7 +51,7 @@ public sealed class RE08ReleaseClosureTests {
 			)
 			.ToArray();
 
-		Assert.Equal( 13, approvedOneFourteenTypes.Count );
+		Assert.Equal( 15, approvedOneFourteenTypes.Count );
 		Assert.Equal( 90, reconstructedOneThirteenTypes.Length );
 		Assert.Equal(
 			approvedOneFourteenTypes.Count,
