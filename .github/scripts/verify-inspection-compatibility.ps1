@@ -15,6 +15,20 @@ $repositoryRoot = [System.IO.Path]::GetFullPath(
 )
 $freezePath = Join-Path $repositoryRoot 'docs/1.13.0-INSPECTION-PUBLIC-API-FREEZE.md'
 $historyVerifierPath = Join-Path $PSScriptRoot 'verify-inspection-compatibility-history.ps1'
+
+# Keep every historical compatibility authority explicit at the public verifier
+# entry point. The delegated history verifier consumes these same frozen files
+# and fingerprints; these declarations also make the full reconstruction chain
+# visible to release-closure audits without duplicating its implementation.
+$oneTenBaselinePath = Join-Path $repositoryRoot 'docs/1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt'
+$oneElevenTypesPath = Join-Path $repositoryRoot 'docs/1.11.0-INSPECTION-PUBLIC-API-ADDITIONS.txt'
+$oneElevenMembersPath = Join-Path $repositoryRoot 'docs/1.11.0-INSPECTION-PUBLIC-API-ADDITIVE-MEMBERS.txt'
+$oneTwelveTypesPath = Join-Path $repositoryRoot 'docs/1.12.0-PG01-INSPECTION-PUBLIC-API-ADDITIONS.txt'
+$oneTwelveMembersPath = Join-Path $repositoryRoot 'docs/1.12.0-PG06-INSPECTION-PUBLIC-API-ADDITIVE-MEMBERS.txt'
+$oneThirteenTypesPath = Join-Path $repositoryRoot 'docs/1.13.0-RE01-INSPECTION-PUBLIC-API-ADDITIONS.txt'
+$oneThirteenMembersPath = Join-Path $repositoryRoot 'docs/1.13.0-RE06-INSPECTION-PUBLIC-API-ADDITIVE-MEMBERS.txt'
+$oneElevenApiSha256 = '69c7350d5d44d502ecf1698c8fe1c1336f03d38eb1a36e36219f50ac33585a86'
+$oneTwelveApiSha256 = 'f71501dcd27a530051c1a02083325144ced2b6173b6b967b9571c620815198f0'
 $oneThirteenApiSha256 = 'fd827a25abafb8e9ff3915567f45f9f2ec51b332bfd8a82dd4e4bca20290e764'
 $assemblyFullPath = if ([System.IO.Path]::IsPathRooted($AssemblyPath)) {
     [System.IO.Path]::GetFullPath($AssemblyPath)
@@ -22,7 +36,18 @@ $assemblyFullPath = if ([System.IO.Path]::IsPathRooted($AssemblyPath)) {
     [System.IO.Path]::GetFullPath((Join-Path $repositoryRoot $AssemblyPath))
 }
 
-foreach ($requiredPath in @($freezePath, $historyVerifierPath, $assemblyFullPath)) {
+foreach ($requiredPath in @(
+    $freezePath,
+    $historyVerifierPath,
+    $oneTenBaselinePath,
+    $oneElevenTypesPath,
+    $oneElevenMembersPath,
+    $oneTwelveTypesPath,
+    $oneTwelveMembersPath,
+    $oneThirteenTypesPath,
+    $oneThirteenMembersPath,
+    $assemblyFullPath
+)) {
     if (-not (Test-Path -LiteralPath $requiredPath -PathType Leaf)) {
         throw "Required Inspection compatibility input not found: $requiredPath"
     }
@@ -101,6 +126,8 @@ try {
     if (0 -ne $LASTEXITCODE) {
         throw "Historical Inspection compatibility verification exited with status $LASTEXITCODE."
     }
+
+    Write-Host "Historical reconstruction authorities remain frozen at 1.11 SHA-256 $oneElevenApiSha256 and 1.12 SHA-256 $oneTwelveApiSha256."
 } finally {
     Pop-Location
 }
