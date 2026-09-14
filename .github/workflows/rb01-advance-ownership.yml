@@ -1,0 +1,56 @@
+name: rb01-advance-ownership
+
+on:
+  push:
+    branches:
+      - 1.14.0
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 1.14.0
+          fetch-depth: 0
+
+      - name: Apply current-development and historical-surface ownership corrections
+        run: python .github/scripts/rb01-advance-ownership.py
+
+      - name: Commit ownership corrections and remove temporary helper
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/scripts/rb01-advance-ownership.py
+          rm .github/workflows/rb01-advance-ownership.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          git add \
+            tests/Icod.TermInfo.Tests/src/T45CompletionGateTests.cs \
+            tests/Icod.TermInfo.Termcap.Tests/src/TC08ContractTests.cs \
+            tests/Icod.TermInfo.Inspection.Tests/src/RP08ReleaseClosureTests.cs \
+            tests/Icod.TermInfo.Inspection.Tests/src/RS08ContractTests.cs \
+            tests/Icod.TermInfo.Tic.Tests/src/ReleaseClosureTests.cs \
+            tests/Icod.TermInfo.Tic.Tests/src/CommandTests.cs \
+            tests/Icod.TermInfo.InfoCmp.Tests/src/CommandTests.cs \
+            tests/Icod.TermInfo.Toe.Tests/src/CommandTests.cs \
+            tests/Icod.TermInfo.Router.Tests/src/ContractTests.cs \
+            tests/Icod.TermInfo.Router.Tests/src/CommandTests.cs
+          git diff --cached --check
+          git commit -m 'Advance current development ownership to 1.14'
+
+          git add \
+            tests/Icod.TermInfo.Inspection.Tests/src/RE08ReleaseClosureTests.cs \
+            tests/Icod.TermInfo.Inspection.Tests/src/PG08ReleaseClosureTests.cs \
+            tests/Icod.TermInfo.Inspection.Tests/src/RL08ReleaseClosureTests.cs \
+            .github/scripts/rb01-advance-ownership.py \
+            .github/workflows/rb01-advance-ownership.yml
+          git diff --cached --check
+          git commit -m 'Reconstruct historical Inspection surfaces across RB01'
+
+          git push origin HEAD:1.14.0
