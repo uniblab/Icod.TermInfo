@@ -4,19 +4,22 @@ namespace Icod.TermInfo.Inspection.Tests;
 
 public sealed class RB06VersionAuthorityTests {
 	[Fact]
-	public void CoordinatedVersionIsAlphaSix() {
-		string properties = File.ReadAllText(
+	public void Rb06RecordPreservesAcceptedAlphaSixIdentity() {
+		string record = File.ReadAllText(
 			Path.Combine(
 				FindRepositoryRoot(),
-				"Directory.Build.props"
+				"docs",
+				"1.14.0-RB06-JSON-V6-BACKEND-AUTOMATION.md"
 			)
 		);
 
+		Assert.Contains( "1.14.0-Alpha-6", record, StringComparison.Ordinal );
 		Assert.Contains(
-			"<IcodTermInfoSuiteVersion>1.14.0-Alpha-6</IcodTermInfoSuiteVersion>",
-			properties,
+			"d20d1c7b9a727b20dbcb931f1ac980a0e961b372",
+			record,
 			StringComparison.Ordinal
 		);
+		Assert.Contains( "34893643336", record, StringComparison.Ordinal );
 	}
 
 	[Fact]
