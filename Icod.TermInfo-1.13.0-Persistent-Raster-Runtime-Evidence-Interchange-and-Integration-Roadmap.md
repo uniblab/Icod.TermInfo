@@ -8,7 +8,7 @@
 **Baseline:** stable `1.12.0`  
 **Downstream qualification target:** `Icod.Terminal` semantic capability inspection and verification  
 **Frozen contracts:** existing 1.x Runtime/Source/Compiler/Termcap APIs, Inspection contracts through 1.12, JSON schemas v1-v4, database-set precedence, persistent-raster lifecycle semantics, and advanced persistent-raster placement semantics except for unavoidable defect corrections  
-**Status:** Planning approved; implementation not yet started  
+**Status:** RE01-RE08 complete; Alpha-8 accepted; stable `1.13.0` promotion validation in progress
 **Tranche prefix:** `RE`  
 **Release audit:** `docs/1.13.0-RELEASE-AUDIT.md` when created
 

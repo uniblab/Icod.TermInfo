@@ -433,7 +433,7 @@ public sealed class RE08ReleaseClosureTests {
 	}
 
 	[Fact]
-	public void AlphaEightReleaseDocumentationIsCompleteWithoutPrematureStablePromotion() {
+	public void ReleaseDocumentationDescribesStableOneThirteen() {
 		string buildProperties = ReadRequiredRepositoryFile( "Directory.Build.props" );
 		string rootReadme = ReadRequiredRepositoryFile( "README.md" );
 		string inspectionReadme = ReadRequiredRepositoryFile(
@@ -458,14 +458,14 @@ public sealed class RE08ReleaseClosureTests {
 		);
 
 		Assert.Contains(
-			"<IcodTermInfoSuiteVersion>1.13.0-Alpha-8</IcodTermInfoSuiteVersion>",
+			"<IcodTermInfoSuiteVersion>1.13.0</IcodTermInfoSuiteVersion>",
 			buildProperties,
 			StringComparison.Ordinal
 		);
 		Assert.Contains( "1.13", rootReadme, StringComparison.Ordinal );
 		Assert.Contains( "1.13", inspectionReadme, StringComparison.Ordinal );
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo.Inspection --version 1.12.0",
+			"dotnet add package Icod.TermInfo.Inspection --version 1.13.0",
 			rootReadme,
 			StringComparison.Ordinal
 		);

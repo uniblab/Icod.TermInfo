@@ -3,26 +3,31 @@
 `Icod.TermInfo.Inspection` is the optional managed inspection and semantic-
 comparison layer for the `Icod.TermInfo` package family.
 
-## 1.13 Alpha-8 release candidate
+## 1.13 stable-promotion status
 
-`1.13.0-Alpha-8` freezes the additive `PersistentRasterRuntime*` interchange
-contract. Caller-owned lifecycle and placement runtime observations are immutable,
-bounded, canonical, and protocol-neutral. Conclusive observations integrate as
-existing `Verified` evidence through the frozen classifiers; inconclusive
-observations remain audit-visible, and represented family capacity/ordinal
-limitations fail atomically per family.
+`1.13.0` promotes the validated Alpha-8 additive
+`PersistentRasterRuntime*` interchange contract without semantic, public-API,
+schema, dependency, target-framework, or command changes. Caller-owned lifecycle
+and placement runtime observations are immutable, bounded, canonical, and
+protocol-neutral. Conclusive observations integrate as existing `Verified`
+evidence through the frozen classifiers; inconclusive observations remain
+audit-visible, and represented family capacity/ordinal limitations fail atomically
+per family.
 
 `PersistentRasterRuntimeIntegrationResult` delegates lifecycle and placement
 replanning to the existing planners. JSON version 5 adds exactly
 `persistentRasterRuntimeObservationSet` and
 `persistentRasterRuntimeIntegration`, while JSON versions 1 through 4 remain
-byte-frozen. The whole candidate Inspection reflection manifest contains 90
+byte-frozen. The whole 1.13 Inspection reflection manifest contains 90
 exported public types and has normalized-LF SHA-256
 `fd827a25abafb8e9ff3915567f45f9f2ec51b332bfd8a82dd4e4bca20290e764`.
 
 Inspection still has no production `Icod.Terminal` dependency. RE07 qualifies
 the caller adapter boundary using published `Icod.Terminal 1.12.0` beside the
-fresh Inspection package on net8.0, net9.0, and net10.0. See
+fresh Inspection package on net8.0, net9.0, and net10.0. Exact Alpha-8
+product head `f236c33d8239e80379bf8cf0f1123abd6c93c3cb` passed qualification run
+`34797445315` across all 12 jobs. Stable promotion is now undergoing its own
+fresh full validation. See
 `../docs/1.13.0-PERSISTENT-RASTER-RUNTIME-EVIDENCE-GUIDE.md`,
 `../docs/1.13.0-INSPECTION-PUBLIC-API-FREEZE.md`, and
 `../docs/1.13.0-RELEASE-AUDIT.md`.
