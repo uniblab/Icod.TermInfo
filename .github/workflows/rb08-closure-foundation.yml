@@ -1,0 +1,273 @@
+name: rb08-closure-foundation
+
+on:
+  push:
+    branches:
+      - 1.14.0
+    paths:
+      - .github/workflows/rb08-closure-foundation.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 1.14.0
+          fetch-depth: 0
+
+      - name: Apply RB08 freeze and documentation foundation
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+
+          verifier_path = Path('.github/scripts/verify-inspection-compatibility.ps1')
+          verifier = verifier_path.read_text(encoding='utf-8')
+
+          old = "$freezePath = Join-Path $repositoryRoot 'docs/1.13.0-INSPECTION-PUBLIC-API-FREEZE.md'"
+          new = "\n".join([
+              "$oneThirteenFreezePath = Join-Path $repositoryRoot 'docs/1.13.0-INSPECTION-PUBLIC-API-FREEZE.md'",
+              "$oneFourteenFreezePath = Join-Path $repositoryRoot 'docs/1.14.0-INSPECTION-PUBLIC-API-FREEZE.md'",
+          ])
+          assert verifier.count(old) == 1, 'unexpected 1.13 freeze-path anchor count'
+          verifier = verifier.replace(old, new, 1)
+          verifier = verifier.replace('$freezePath', '$oneThirteenFreezePath')
+
+          old = "$oneThirteenApiSha256 = 'fd827a25abafb8e9ff3915567f45f9f2ec51b332bfd8a82dd4e4bca20290e764'"
+          new = "\n".join([
+              old,
+              "$oneFourteenApiSha256 = 'e9f240a562aec5274d64fb2ec3647862fe4ef5684582af2b442ba3c55e189497'",
+          ])
+          assert verifier.count(old) == 1, 'unexpected 1.13 API hash anchor count'
+          verifier = verifier.replace(old, new, 1)
+
+          old = "    $oneThirteenFreezePath,\n    $oneFourteenRb01TypesPath,"
+          new = "    $oneThirteenFreezePath,\n    $oneFourteenFreezePath,\n    $oneFourteenRb01TypesPath,"
+          assert verifier.count(old) == 1, 'unexpected required-path anchor count'
+          verifier = verifier.replace(old, new, 1)
+
+          old = """        $current = [System.IO.File]::ReadAllText($temporaryManifest)
+        if ($current.IndexOf('Icod.Terminal', [System.StringComparison]::Ordinal) -ge 0) {
+            throw 'Icod.TermInfo.Inspection public API unexpectedly references Icod.Terminal.'
+        }
+
+        $approvedRb01Types = Read-ApprovedTypes `
+"""
+          new = """        $current = [System.IO.File]::ReadAllText($temporaryManifest)
+        if ($current.IndexOf('Icod.Terminal', [System.StringComparison]::Ordinal) -ge 0) {
+            throw 'Icod.TermInfo.Inspection public API unexpectedly references Icod.Terminal.'
+        }
+
+        $currentOneFourteenSha256 = Get-NormalizedSha256 -Text $current
+        if (-not [string]::Equals(
+            $oneFourteenApiSha256,
+            $currentOneFourteenSha256,
+            [System.StringComparison]::Ordinal
+        )) {
+            throw "Icod.TermInfo.Inspection whole 1.14 public API fingerprint changed. Expected $oneFourteenApiSha256, actual $currentOneFourteenSha256."
+        }
+
+        $oneFourteenFreeze = [System.IO.File]::ReadAllText($oneFourteenFreezePath)
+        if ($oneFourteenFreeze.IndexOf($oneFourteenApiSha256, [System.StringComparison]::Ordinal) -lt 0) {
+            throw '1.14.0-INSPECTION-PUBLIC-API-FREEZE.md does not record the expected whole-surface fingerprint.'
+        }
+
+        Write-Host "Verified exact 1.14 Inspection public API SHA-256 $currentOneFourteenSha256."
+
+        $approvedRb01Types = Read-ApprovedTypes `
+"""
+          assert verifier.count(old) == 1, 'unexpected current-manifest anchor count'
+          verifier = verifier.replace(old, new, 1)
+          verifier_path.write_text(verifier, encoding='utf-8', newline='\n')
+
+          Path('docs/1.14.0-INSPECTION-PUBLIC-API-FREEZE.md').write_text(r'''# Icod.TermInfo 1.14.0 Inspection Public API Freeze
+
+## Exact surface identity
+
+The complete `Icod.TermInfo.Inspection` 1.14 public reflection manifest is frozen by normalized-LF SHA-256:
+
+```text
+e9f240a562aec5274d64fb2ec3647862fe4ef5684582af2b442ba3c55e189497
+```
+
+The manifest uses `Icod.TermInfo.PublicApiSnapshot/v1`, retains assembly version `1.0.0.0`, and contains exactly **106 exported public types**. The fingerprint was derived from the exact `1.14.0-Alpha-8` Staging package/API artifact produced by head `57cf05576466f599cd1c1819105b7e7b90c274f2` in workflow #915 / run `34902088356`, which passed all 12 jobs before RB08 added release-facing closure authorities.
+
+RB08 release verification first generates the complete manifest from every candidate assembly and rejects a normalized fingerprint other than the value above.
+
+## Compatibility decomposition
+
+The 1.14 surface is strictly additive above the frozen 1.13 Inspection contract:
+
+1. the complete 1.13 Inspection manifest remains frozen by normalized-LF SHA-256 `fd827a25abafb8e9ff3915567f45f9f2ec51b332bfd8a82dd4e4bca20290e764`;
+2. RB01 contributes exactly 13 reviewed `RasterBackend*` public type blocks;
+3. RB02 contributes exactly 2 reviewed `RasterBackend*` public type blocks;
+4. RB03 contributes exactly 1 reviewed `RasterBackend*` public type block;
+5. RB04 and RB05 add behavior to the already-reviewed types without introducing another public type;
+6. RB06 contributes exactly 6 reviewed additive `TermInfoJsonRenderer` member lines for JSON v6; and
+7. RB07 and RB08 add no production public API.
+
+Release verification therefore proves the complete 1.14 surface first. It then removes exactly the 16 RB01/RB02/RB03 type blocks and the 6 RB06 renderer members and requires the result to reproduce the frozen 1.13 SHA-256 exactly. The established 1.13 -> 1.12 -> 1.11 -> 1.10 historical reconstruction chain then runs unchanged.
+
+An accidental change to an earlier member, an approved 1.14 addition, or an unreviewed new public member fails the release gate.
+
+## Cross-target equality
+
+The package targets `net8.0`, `net9.0`, and `net10.0`. Package verification requires equivalent public API manifests on all three TFMs; no target framework owns a divergent 1.14 surface.
+
+## Dependency boundary
+
+Production `Icod.TermInfo.Inspection` remains free of `Icod.Terminal`. RB07 qualifies caller-owned adaptation against published `Icod.Terminal 1.13.0` only in package-consumer and sample code. TermInfo does not perform live Sixel or Kitty Graphics protocol I/O, allocate terminal-side identities, or own graphics transport policy.
+
+## Machine-readable contract
+
+The public API freeze is independent from the JSON schema freeze. Exact normalized-LF fingerprints for versions 1 through 6 are recorded in `docs/1.14.0-RB08-FREEZE-FINGERPRINTS.txt`. Versions 1 through 5 remain immutable historical contracts. JSON v6 contains exactly the 1.14 raster-backend document kinds:
+
+```text
+rasterBackendProfile
+rasterBackendSelectionPlan
+```
+''', encoding='utf-8', newline='\n')
+
+          Path('docs/1.14.0-RB08-FREEZE-FINGERPRINTS.txt').write_text(r'''# Icod.TermInfo 1.14.0 RB08 exact release freeze
+inspection-public-api-normalized-lf-sha256=e9f240a562aec5274d64fb2ec3647862fe4ef5684582af2b442ba3c55e189497
+inspection-exported-public-type-count=106
+json-v1-normalized-lf-sha256=76578f421b254802d24453af6868edaf8c23c4b78a87c7e8ef86b233ff0e8500
+json-v2-normalized-lf-sha256=ae4d53608881344e902f02303c71e2d432500969e60cfb005d70feea607499d0
+json-v3-normalized-lf-sha256=33ca95aee120f84d0d160ac189f8ddb4db183361b7bd83885c99c1c8ed355a97
+json-v4-normalized-lf-sha256=6383052f389d903683a9e24d55b73c97eb165db89c6ab5f26dbcb5a3c7fdda87
+json-v5-normalized-lf-sha256=a151c7915d8b637d8bb64ef9d649168a4c120d7b9b7104299b6a78dab1f0a394
+json-v6-normalized-lf-sha256=9d51ec6659f8978c867408881eefb106f3c4976dfcf2da12b23c374a222665c2
+''', encoding='utf-8', newline='\n')
+
+          Path('docs/1.14.0-RASTER-BACKEND-SELECTION-GUIDE.md').write_text(r'''# Icod.TermInfo 1.14.0 Raster Backend Selection Guide
+
+## Scope
+
+Icod.TermInfo 1.14 adds an advisory, protocol-neutral raster-backend selection layer to `Icod.TermInfo.Inspection`. The first concrete backend identities are **Sixel** and **Kitty Graphics**. Inspection classifies evidence and plans; it does not transmit graphics, probe a live terminal, allocate terminal-side resource identities, or execute either protocol.
+
+Backend availability is deliberately separate from the frozen persistent-raster lifecycle and placement contracts. A backend can be available while a requested lifecycle or placement operation remains unsupported or unverified.
+
+## Evidence and static inspection
+
+`RasterBackendEvidence` carries a backend identity, polarity, provenance kind, source label, and source-local ordinal. Classification uses `Verified > Declared > CapabilityDerived` precedence. At the highest precedence present, positive-only evidence means supported, negative-only means unsupported, both polarities mean contradicted, and no evidence means unknown.
+
+Static inspection is conservative. An exact Boolean `Sixel` extended capability is positive capability-derived evidence for Sixel. Absence does not prove Sixel unsupported. Kitty Graphics is never inferred from terminal names, emulator brands, xterm identity, Windows Terminal identity, Sixel metadata, or unrelated capabilities.
+
+## Candidate evaluation
+
+A `RasterBackendCandidate` composes three independent snapshots: backend availability, the existing lifecycle profile, and the existing placement profile. `RasterBackendPlanner.Evaluate` delegates lifecycle and placement semantics to the frozen 1.11 and 1.12 planners.
+
+- backend unsupported => candidate impossible;
+- backend unknown or contradicted => `RequiresRuntimeVerification`;
+- supported backend + impossible semantic plan => impossible;
+- supported backend + indeterminate or verification-required semantic plan => `RequiresRuntimeVerification`;
+- supported backend + satisfied requested semantics => satisfied.
+
+The actual lifecycle and placement plans are retained for auditability.
+
+## Selection policy
+
+Preference is caller policy, never hidden library ranking.
+
+With no explicit preference order, all impossible candidates yield impossible; exactly one non-impossible candidate can be reflected directly; and more than one viable candidate yields `RequiresPreference`. Candidate input order and backend enum numeric order never choose a winner.
+
+With a complete explicit preference order, impossible candidates are skipped. The first satisfied preferred candidate is selected. A preferred candidate that still needs runtime verification stops fallback and yields `RequiresRuntimeVerification`; the planner does not silently pass it to select a lower-ranked backend. This makes the preference order an explicit fallback policy rather than a hint.
+
+## Runtime verification composition
+
+The 1.13 runtime observation and integration model remains backend-neutral and unchanged. A caller that verifies multiple backends maintains a separate integration context for each backend, converts its observations through `PersistentRasterRuntimeEvidenceIntegrator`, and composes the strengthened lifecycle and placement profiles into that backend's candidate before replanning.
+
+RB07 qualifies this boundary against published **Icod.Terminal 1.13.0** on `net8.0`, `net9.0`, and `net10.0`. Mapping `Icod.Terminal` capability results to backend evidence remains caller-owned; production Inspection still has no Terminal dependency.
+
+## Machine-readable audit output
+
+**JSON v6** adds two deterministic bounded documents:
+
+```text
+rasterBackendProfile
+rasterBackendSelectionPlan
+```
+
+Earlier JSON versions remain frozen. Selection-plan output retains the semantic request, explicit preference order, canonical candidate evaluations, overall status, selected backend only when selected, and the remaining blocker for non-selected outcomes.
+
+## Recommended flow
+
+1. Build or inspect backend availability evidence.
+2. Keep lifecycle and placement evidence independent of backend identity.
+3. Compose one candidate per backend.
+4. Call `RasterBackendPlanner.Plan` with no preference to discover whether a choice is required, or provide a complete explicit preference order when policy is already known.
+5. If the result is `RequiresRuntimeVerification`, perform live verification outside TermInfo, integrate the observations into the corresponding backend context, compose a strengthened candidate, and plan again.
+6. Execute the selected graphics protocol outside TermInfo.
+
+## Deliberate exclusions
+
+1.14 does not add graphics transport, image codecs, terminal-brand heuristics, alpha/pixel-format planning, performance scoring, latency ranking, scene/layout policy, terminal-side image/resource identity management, animation, or generic JSON deserialization.
+''', encoding='utf-8', newline='\n')
+
+          Path('docs/1.14.0-RELEASE-AUDIT.md').write_text(r'''# Icod.TermInfo 1.14.0 Release Audit
+
+## Scope
+
+Icod.TermInfo 1.14.0 is **Raster Backend Capability Evidence, Selection, and Planning**. The release adds protocol-neutral backend availability evidence, deterministic classification, candidate composition, preference-aware selection, backend-local reuse of the frozen 1.13 runtime integration model, JSON v6 audit documents, and package-only qualification against published Icod.Terminal 1.13.0.
+
+RB08 is the release-hardening and freeze tranche. It adds no new feature semantics or production public API.
+
+## Accepted tranche evidence
+
+- RB01 / Alpha-1: exact head `7f43c4ad27f1858f8648237cbcb26e6808142458`; workflow #865 / run `34862203053`; all 12 jobs green.
+- RB02 / Alpha-2: exact head `6321de472a6e54a8382dd214996c22a4cf62e816`; workflow #875 / run `34865731077`; all 12 jobs green.
+- RB03 / Alpha-3: exact head `22f38e9c6516bec9d5f6b8662f00e9b5bace7c2b`; workflow #885 / run `34871582203`; all 12 jobs green.
+- RB04 / Alpha-4: exact head `d202fd2e452b083de92b84521f1845a30354aede`; workflow #896 / run `34877834128`; all 12 jobs green.
+- RB05 / Alpha-5: exact head `a4aab5e7af4d554cad7c978cef20491744100c80`; workflow #900 / run `34880872852`; all 12 jobs green.
+- RB06 / Alpha-6: exact head `d20d1c7b9a727b20dbcb931f1ac980a0e961b372`; workflow #904 / run `34893643336`; all 12 jobs green.
+- RB07 / Alpha-7: exact head `0ce8df7f08064de807db17a2662f38252a814ce5`; workflow #910 / run `34898618294`; all 12 jobs green.
+- Alpha-8 funding-inclusive base: exact head `57cf05576466f599cd1c1819105b7e7b90c274f2`; workflow #915 / run `34902088356`; all 12 jobs green.
+
+The RB08 TDD RED witness is head `f3ee5956672bdd3e8f05eb530546aa6353fbe814`, workflow #916 / run `34903328999`. Build remained green and the new closure suite failed only because the 1.14 freeze/fingerprint/guide authorities and whole-1.14 verifier lock did not yet exist.
+
+## Exact API freeze
+
+The complete `Icod.TermInfo.Inspection` 1.14 reflection manifest contains **106 exported public types** and has normalized-LF SHA-256:
+
+```text
+e9f240a562aec5274d64fb2ec3647862fe4ef5684582af2b442ba3c55e189497
+```
+
+RB01/RB02/RB03 contribute exactly 16 reviewed `RasterBackend*` public type blocks. RB06 contributes exactly six reviewed additive `TermInfoJsonRenderer` member lines. Removing those exact 1.14 additions reconstructs the frozen 1.13 surface with SHA-256 `fd827a25abafb8e9ff3915567f45f9f2ec51b332bfd8a82dd4e4bca20290e764`, after which the established historical reconstruction continues through 1.10.
+
+## JSON schema freeze
+
+Versions 1 through 5 retain their accepted hashes. JSON v6 is frozen by normalized-LF SHA-256:
+
+```text
+9d51ec6659f8978c867408881eefb106f3c4976dfcf2da12b23c374a222665c2
+```
+
+Version 6 contains exactly `rasterBackendProfile` and `rasterBackendSelectionPlan`.
+
+## Adversarial coverage
+
+RB08 closes the release by relying on permanent tranche-owned tests rather than duplicating them: RB01 owns enum/bounds/provenance/duplicate preference validation; RB02 owns evidence precedence, contradictions, permutation/culture behavior, conservative Sixel inspection, and anti-brand-heuristic cases; RB04 owns duplicate candidates, complete-preference enforcement, input permutations, no-preference ambiguity, verification blockers, impossible fallback, and all-impossible selection; RB05 owns runtime-integration composition; RB06 owns exact JSON shapes, repeatability, culture independence, cancellation, and exact UTF-8 byte bounds; RB07 owns package-only all-TFM interoperability and the production dependency boundary. RB08 additionally locks the whole API and all schema fingerprints together.
+
+## Dependency and distribution boundary
+
+Production `Icod.TermInfo.Inspection` does not reference `Icod.Terminal`. The package-only RB07 consumer and focused sample pin published `Icod.Terminal 1.13.0` and keep mapping policy outside TermInfo. The normal PR matrix validates Windows, Linux, macOS, exact Staging packages, isolated consumers, installed-tool smokes, and all six archive RIDs.
+
+## Release state
+
+The coordinated version is `1.14.0-Alpha-8`. Final RB08 GREEN qualification and stable promotion evidence are not recorded until their exact heads pass the full 12-job matrix. PR #44 remains draft and unmerged; no `v1.14.0` tag or stable package publication has been performed.
+''', encoding='utf-8', newline='\n')
+
+          workflow = Path('.github/workflows/rb08-closure-foundation.yml')
+          workflow.unlink()
+          PY
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Close RB08 release freeze foundation'
+          git push origin HEAD:1.14.0
