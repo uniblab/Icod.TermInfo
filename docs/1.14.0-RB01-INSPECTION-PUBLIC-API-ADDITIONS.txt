@@ -1,0 +1,14 @@
+# Icod.TermInfo.Inspection 1.14.0 RB01 additive public types
+Icod.TermInfo.Inspection.RasterBackendCandidate
+Icod.TermInfo.Inspection.RasterBackendCandidateEvaluation
+Icod.TermInfo.Inspection.RasterBackendCandidateStatus
+Icod.TermInfo.Inspection.RasterBackendEvidence
+Icod.TermInfo.Inspection.RasterBackendEvidenceKind
+Icod.TermInfo.Inspection.RasterBackendEvidenceOptions
+Icod.TermInfo.Inspection.RasterBackendKind
+Icod.TermInfo.Inspection.RasterBackendProfile
+Icod.TermInfo.Inspection.RasterBackendSelectionOptions
+Icod.TermInfo.Inspection.RasterBackendSelectionPlan
+Icod.TermInfo.Inspection.RasterBackendSelectionRequest
+Icod.TermInfo.Inspection.RasterBackendSelectionStatus
+Icod.TermInfo.Inspection.RasterBackendSupportStatus
