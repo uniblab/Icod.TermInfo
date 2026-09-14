@@ -4,19 +4,22 @@ namespace Icod.TermInfo.Inspection.Tests;
 
 public sealed class RB05VersionAuthorityTests {
 	[Fact]
-	public void CoordinatedVersionIsAlphaFive() {
-		string properties = File.ReadAllText(
+	public void Rb05RecordPreservesAcceptedAlphaFiveIdentity() {
+		string record = File.ReadAllText(
 			Path.Combine(
 				FindRepositoryRoot(),
-				"Directory.Build.props"
+				"docs",
+				"1.14.0-RB05-RUNTIME-INTEGRATION-COMPOSITION.md"
 			)
 		);
 
+		Assert.Contains( "1.14.0-Alpha-5", record, StringComparison.Ordinal );
 		Assert.Contains(
-			"<IcodTermInfoSuiteVersion>1.14.0-Alpha-5</IcodTermInfoSuiteVersion>",
-			properties,
+			"a4aab5e7af4d554cad7c978cef20491744100c80",
+			record,
 			StringComparison.Ordinal
 		);
+		Assert.Contains( "34880872852", record, StringComparison.Ordinal );
 	}
 
 	[Fact]
