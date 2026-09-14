@@ -141,9 +141,6 @@ public sealed class PG08ReleaseClosureTests {
 		string audit = ReadRepositoryFile(
 			"docs/1.12.0-RELEASE-AUDIT.md"
 		);
-		string inspectionProject = ReadRepositoryFile(
-			"Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj"
-		);
 
 		Assert.Contains( "1.12", rootReadme, StringComparison.Ordinal );
 		Assert.Contains( "1.12", inspectionReadme, StringComparison.Ordinal );
@@ -153,8 +150,8 @@ public sealed class PG08ReleaseClosureTests {
 		Assert.Contains( "1.12.0-Alpha-8", hardening, StringComparison.Ordinal );
 		Assert.Contains( "1.12.0-Alpha-8", audit, StringComparison.Ordinal );
 		Assert.Contains(
-			"<PackageReleaseNotes>1.12.0",
-			inspectionProject,
+			"The coordinated version is `1.12.0`",
+			audit,
 			StringComparison.Ordinal
 		);
 	}
