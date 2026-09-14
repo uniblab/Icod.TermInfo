@@ -1,0 +1,9 @@
+# Icod.TermInfo 1.14.0 RB08 exact release freeze
+inspection-public-api-normalized-lf-sha256=e9f240a562aec5274d64fb2ec3647862fe4ef5684582af2b442ba3c55e189497
+inspection-exported-public-type-count=106
+json-v1-normalized-lf-sha256=76578f421b254802d24453af6868edaf8c23c4b78a87c7e8ef86b233ff0e8500
+json-v2-normalized-lf-sha256=ae4d53608881344e902f02303c71e2d432500969e60cfb005d70feea607499d0
+json-v3-normalized-lf-sha256=33ca95aee120f84d0d160ac189f8ddb4db183361b7bd83885c99c1c8ed355a97
+json-v4-normalized-lf-sha256=6383052f389d903683a9e24d55b73c97eb165db89c6ab5f26dbcb5a3c7fdda87
+json-v5-normalized-lf-sha256=a151c7915d8b637d8bb64ef9d649168a4c120d7b9b7104299b6a78dab1f0a394
+json-v6-normalized-lf-sha256=9d51ec6659f8978c867408881eefb106f3c4976dfcf2da12b23c374a222665c2
