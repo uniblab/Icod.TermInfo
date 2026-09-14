@@ -11,7 +11,7 @@
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`
 **Frozen runtime contract:** `1.0.0`
 **Current coordinated version:** `1.13.0`
-**Next development line:** `TBD`
+**Next development line:** `1.14.0` - Raster Backend Capability Evidence, Selection, and Planning
 **Final 1.6 prerelease:** `1.6.0-Alpha-8`
 **Final 1.7 prerelease:** `1.7.0-Alpha-8`
 **Final 1.8 prerelease:** `1.8.0-Alpha-8`
@@ -20,11 +20,12 @@
 **Final 1.11 prerelease:** `1.11.0-Alpha-8`
 **Final 1.12 prerelease:** `1.12.0-Alpha-8`
 **Final 1.13 prerelease:** `1.13.0-Alpha-8`
+**Planned final 1.14 prerelease:** `1.14.0-Alpha-8`
 **Latest completed line:** `1.13.0` - Persistent-Raster Runtime Evidence Interchange and Integration
-**Status:** RE01-RE08 complete; Alpha-8 and stable `1.13.0` product candidates validated; release-ready in draft PR #43; merge/tag/publication not performed
-**Planned tranches:** RE01-RE08
-**Primary objective:** Add protocol-neutral runtime-evidence interchange and deterministic integration so external verification can strengthen the frozen 1.11 lifecycle and 1.12 placement models without manual evidence construction or source-ordinal management.
-**Active development roadmap:** `Icod.TermInfo-1.13.0-Persistent-Raster-Runtime-Evidence-Interchange-and-Integration-Roadmap.md`
+**Status:** stable `1.13.0` merged to `main`; 1.14 planning approved and active on branch `1.14.0`
+**Planned tranches:** RB01-RB08
+**Primary objective:** Add backend-scoped raster availability evidence and deterministic advisory selection so callers can choose among concrete raster backends using explicit preference policy while reusing the frozen 1.11 lifecycle, 1.12 placement, and 1.13 runtime-integration semantics.
+**Active development roadmap:** `Icod.TermInfo-1.14.0-Raster-Backend-Capability-Evidence-Selection-and-Planning-Roadmap.md`
 **Latest completed release audit:** `docs/1.13.0-RELEASE-AUDIT.md`
 
 ---
@@ -101,11 +102,16 @@ in a new version-specific roadmap, not in the retired inventory.
 | **1.11.0** | Persistent-raster lifecycle semantics and planning | Classify protocol-neutral persistent-raster lifecycle evidence and produce deterministic advisory plans without owning terminal execution |
 | **1.12.0** | Advanced persistent-raster placement semantics and planning | Classify source-rectangle and signed-z-order placement support and compose those requirements with the frozen 1.11 lifecycle model |
 | **1.13.0** | Persistent-raster runtime evidence interchange and integration | Normalize caller-owned runtime observations, integrate conclusive results as existing verified lifecycle/placement evidence, and remove manual evidence/ordinal bridging without owning live verification |
-| **later** | Exotic storage/formats and broader graphics policy | Berkeley DB, historical Unix dialects, multi-protocol preference/negotiation after runtime-evidence interchange is mature, and other deferred work as justified |
+| **1.14.0** | Raster backend capability evidence, selection, and planning | Classify concrete raster-backend availability and deterministically plan selection using explicit caller preference while reusing frozen lifecycle, placement, and runtime-integration semantics |
+| **later** | Exotic storage/formats and broader graphics policy | Berkeley DB, historical Unix dialects, additional raster backends and richer graphics semantics after 1.14, and other deferred work as justified |
 
-Version 1.13.0 is governed by
+The completed 1.13.0 line is governed by
 [`Icod.TermInfo-1.13.0-Persistent-Raster-Runtime-Evidence-Interchange-and-Integration-Roadmap.md`](Icod.TermInfo-1.13.0-Persistent-Raster-Runtime-Evidence-Interchange-and-Integration-Roadmap.md).
 RE01 freezes the runtime-observation vocabulary and API regret gate while preserving the frozen 1.11 lifecycle and 1.12 placement semantics. RE02 adds immutable bounded runtime observations. RE03 maps conclusive observations into existing `Verified` evidence with deterministic safe ordinal assignment. RE04 proves integration through the frozen classifiers and contradiction rules. RE05 composes strengthened profiles back through the frozen planners without inventing a replacement planning model. RE06 adds additive JSON version 5 observation/integration documents while preserving v1-v4. RE07 qualifies loose coupling with `Icod.Terminal` and removes hand-written evidence/ordinal bridging from the downstream sample. RE08 hardens, fingerprints, documents, and closes the release. Multi-protocol preference/negotiation remains a later track after runtime-evidence interchange is mature and multiple meaningful backends justify policy.
+
+Version 1.14.0 is governed by
+[`Icod.TermInfo-1.14.0-Raster-Backend-Capability-Evidence-Selection-and-Planning-Roadmap.md`](Icod.TermInfo-1.14.0-Raster-Backend-Capability-Evidence-Selection-and-Planning-Roadmap.md).
+RB01 freezes the backend-availability evidence and selection vocabulary. RB02 implements conservative backend classification and static Sixel inspection without terminal-brand heuristics. RB03 evaluates backend candidates by delegating to the frozen lifecycle and placement planners. RB04 adds explicit preference-aware selection with no hidden ranking. RB05 composes strengthened 1.13 integration results into backend candidates without changing backend-neutral observations. RB06 adds additive JSON version 6 backend profile and selection-plan documents while preserving v1-v5. RB07 qualifies the loose-coupling boundary against published `Icod.Terminal 1.13.0` and adds a focused sample. RB08 adversarially hardens, fingerprints, documents, and closes the release.
 
 The completed 1.5 release contract is recorded in
 [`Icod.TermInfo-1.5.0-Coordinated-Distribution-Roadmap.md`](Icod.TermInfo-1.5.0-Coordinated-Distribution-Roadmap.md)
