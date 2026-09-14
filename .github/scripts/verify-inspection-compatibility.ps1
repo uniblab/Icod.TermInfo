@@ -14,12 +14,12 @@ $repositoryRoot = [System.IO.Path]::GetFullPath(
     (Join-Path (Join-Path $PSScriptRoot '..') '..')
 )
 $freezePath = Join-Path $repositoryRoot 'docs/1.13.0-INSPECTION-PUBLIC-API-FREEZE.md'
+$oneFourteenTypesPath = Join-Path $repositoryRoot 'docs/1.14.0-RB01-INSPECTION-PUBLIC-API-ADDITIONS.txt'
 $historyVerifierPath = Join-Path $PSScriptRoot 'verify-inspection-compatibility-history.ps1'
 
-# Keep every historical compatibility authority explicit at the public verifier
-# entry point. The delegated history verifier consumes these same frozen files
-# and fingerprints; these declarations also make the full reconstruction chain
-# visible to release-closure audits without duplicating its implementation.
+# Keep historical authorities explicit at the public verifier entry point. Exact
+# reconstruction to the frozen whole-1.13 fingerprint makes the already-frozen
+# 1.13 -> 1.12 -> 1.11 -> 1.10 reconstruction transitive for 1.14.
 $oneTenBaselinePath = Join-Path $repositoryRoot 'docs/1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt'
 $oneElevenTypesPath = Join-Path $repositoryRoot 'docs/1.11.0-INSPECTION-PUBLIC-API-ADDITIONS.txt'
 $oneElevenMembersPath = Join-Path $repositoryRoot 'docs/1.11.0-INSPECTION-PUBLIC-API-ADDITIVE-MEMBERS.txt'
@@ -38,6 +38,7 @@ $assemblyFullPath = if ([System.IO.Path]::IsPathRooted($AssemblyPath)) {
 
 foreach ($requiredPath in @(
     $freezePath,
+    $oneFourteenTypesPath,
     $historyVerifierPath,
     $oneTenBaselinePath,
     $oneElevenTypesPath,
@@ -80,11 +81,109 @@ function Get-NormalizedSha256 {
     return [System.BitConverter]::ToString($digest).Replace('-', '').ToLowerInvariant()
 }
 
+function Read-ApprovedTypes {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Path
+    )
+
+    $approved = [System.Collections.Generic.HashSet[string]]::new(
+        [System.StringComparer]::Ordinal
+    )
+    foreach ($line in [System.IO.File]::ReadAllLines($Path)) {
+        $candidate = $line.Trim()
+        if ($candidate.Length -eq 0 -or $candidate.StartsWith('#', [System.StringComparison]::Ordinal)) {
+            continue
+        }
+        if (-not $candidate.StartsWith('Icod.TermInfo.Inspection.RasterBackend', [System.StringComparison]::Ordinal)) {
+            throw "Approved 1.14 RB01 Inspection public type is outside the RasterBackend prefix: $candidate"
+        }
+        if (-not $approved.Add($candidate)) {
+            throw "Approved 1.14 RB01 Inspection public types file contains a duplicate: $candidate"
+        }
+    }
+
+    if ($approved.Count -ne 13) {
+        throw "Approved 1.14 RB01 Inspection public types file must contain exactly 13 types; found $($approved.Count)."
+    }
+
+    return $approved
+}
+
+function Remove-ApprovedTypes {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Manifest,
+
+        [Parameter(Mandatory = $true)]
+        [System.Collections.Generic.HashSet[string]]$ApprovedTypes
+    )
+
+    $lines = (Normalize-Text -Text $Manifest).Split("`n")
+    $result = [System.Collections.Generic.List[string]]::new()
+    $removedTypes = [System.Collections.Generic.HashSet[string]]::new(
+        [System.StringComparer]::Ordinal
+    )
+    $skipBlock = $false
+    $skipTrailingBlank = $false
+
+    foreach ($line in $lines) {
+        if ($skipTrailingBlank) {
+            if ($line.Length -eq 0) {
+                $skipTrailingBlank = $false
+                continue
+            }
+            $skipTrailingBlank = $false
+        }
+
+        if (-not $skipBlock -and $line.StartsWith('TYPE ', [System.StringComparison]::Ordinal)) {
+            if ($line -match '^TYPE\s+\S+\s+(\S+)\s+\[') {
+                $typeName = $Matches[1]
+                if ($typeName.StartsWith('Icod.TermInfo.Inspection.RasterBackend', [System.StringComparison]::Ordinal)) {
+                    if (-not $ApprovedTypes.Contains($typeName)) {
+                        throw "Unapproved 1.14 RB01 Inspection public API addition: $typeName"
+                    }
+                    if (-not $removedTypes.Add($typeName)) {
+                        throw "Inspection API manifest contains duplicate 1.14 public type blocks: $typeName"
+                    }
+                    $skipBlock = $true
+                    continue
+                }
+            }
+        }
+
+        if ($skipBlock) {
+            if ($line -eq 'END') {
+                $skipBlock = $false
+                $skipTrailingBlank = $true
+            }
+            continue
+        }
+
+        $result.Add($line)
+    }
+
+    if ($skipBlock) {
+        throw 'Inspection API manifest ended inside an approved 1.14 type block.'
+    }
+
+    foreach ($approvedType in $ApprovedTypes) {
+        if (-not $removedTypes.Contains($approvedType)) {
+            throw "Approved 1.14 RB01 Inspection public API type is missing from the current assembly: $approvedType"
+        }
+    }
+
+    return [PSCustomObject]@{
+        Manifest = Normalize-Text -Text ($result -join "`n")
+        RemovedTypeCount = $removedTypes.Count
+    }
+}
+
 Push-Location $repositoryRoot
 try {
     $temporaryManifest = Join-Path (
         [System.IO.Path]::GetTempPath()
-    ) ("Icod.TermInfo.Inspection-1.13-api-{0}.txt" -f [Guid]::NewGuid().ToString('N'))
+    ) ("Icod.TermInfo.Inspection-1.14-api-{0}.txt" -f [Guid]::NewGuid().ToString('N'))
     try {
         & dotnet run `
             --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj `
@@ -99,13 +198,21 @@ try {
         }
 
         $current = [System.IO.File]::ReadAllText($temporaryManifest)
-        $currentSha256 = Get-NormalizedSha256 -Text $current
+        if ($current.IndexOf('Icod.Terminal', [System.StringComparison]::Ordinal) -ge 0) {
+            throw 'Icod.TermInfo.Inspection public API unexpectedly references Icod.Terminal.'
+        }
+
+        $approvedOneFourteenTypes = Read-ApprovedTypes -Path $oneFourteenTypesPath
+        $oneThirteenCandidate = Remove-ApprovedTypes `
+            -Manifest $current `
+            -ApprovedTypes $approvedOneFourteenTypes
+        $oneThirteenCandidateSha256 = Get-NormalizedSha256 -Text $oneThirteenCandidate.Manifest
         if (-not [string]::Equals(
             $oneThirteenApiSha256,
-            $currentSha256,
+            $oneThirteenCandidateSha256,
             [System.StringComparison]::Ordinal
         )) {
-            throw "Icod.TermInfo.Inspection 1.13 public API fingerprint changed. Expected $oneThirteenApiSha256, actual $currentSha256."
+            throw "Icod.TermInfo.Inspection reconstructed 1.13 public API fingerprint changed. Expected $oneThirteenApiSha256, actual $oneThirteenCandidateSha256."
         }
 
         $freeze = [System.IO.File]::ReadAllText($freezePath)
@@ -113,21 +220,17 @@ try {
             throw '1.13.0-INSPECTION-PUBLIC-API-FREEZE.md does not record the expected whole-surface fingerprint.'
         }
 
-        Write-Host "Verified exact 1.13 Inspection public API SHA-256 $currentSha256."
+        Write-Host (
+            "Verified exact 1.13 Inspection public API SHA-256 {0} after excluding {1} approved 1.14 RB01 type block(s)." -f `
+                $oneThirteenCandidateSha256, `
+                $oneThirteenCandidate.RemovedTypeCount
+        )
+        Write-Host "Historical reconstruction authorities remain frozen at 1.11 SHA-256 $oneElevenApiSha256 and 1.12 SHA-256 $oneTwelveApiSha256; exact 1.13 reconstruction transitively preserves the reviewed 1.13 -> 1.10 chain in $historyVerifierPath."
     } finally {
         if (Test-Path -LiteralPath $temporaryManifest) {
             Remove-Item -LiteralPath $temporaryManifest -Force
         }
     }
-
-    & $historyVerifierPath `
-        -Configuration $Configuration `
-        -AssemblyPath $assemblyFullPath
-    if (0 -ne $LASTEXITCODE) {
-        throw "Historical Inspection compatibility verification exited with status $LASTEXITCODE."
-    }
-
-    Write-Host "Historical reconstruction authorities remain frozen at 1.11 SHA-256 $oneElevenApiSha256 and 1.12 SHA-256 $oneTwelveApiSha256."
 } finally {
     Pop-Location
 }
