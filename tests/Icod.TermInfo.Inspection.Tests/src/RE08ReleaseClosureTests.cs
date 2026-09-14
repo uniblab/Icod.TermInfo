@@ -111,10 +111,12 @@ public sealed class RE08ReleaseClosureTests {
 					PersistentRasterLifecycleEvidenceSubject.RasterDisplay,
 					PersistentRasterRuntimeObservationOutcome.Supported,
 					maximumLabel,
-					index
-						== PersistentRasterRuntimeObservationOptions.MaximumSupportedObservationCount - 1
-							? int.MaxValue
-							: index
+					(
+						index
+							== PersistentRasterRuntimeObservationOptions.MaximumSupportedObservationCount - 1
+					)
+						? int.MaxValue
+						: index
 				)
 			)
 			.ToList();
