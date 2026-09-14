@@ -7,13 +7,14 @@
 
 `Icod.TermInfo` is a managed, dependency-free .NET implementation of the low-level terminal-capability model traditionally supplied by `libtinfo`.
 
-Version `1.13.0` is the coordinated stable-promotion candidate. It
-promotes the validated Alpha-8 persistent-raster runtime-evidence interchange
-surface without changing feature semantics, public API, schemas, dependencies,
-target frameworks, command behavior, package-consumer topology, or archive RIDs.
-Stable `1.12.0` remains the published release until merge and tag publication.
+Version `1.13.0` is the validated coordinated stable release candidate. It
+promotes the persistent-raster runtime-evidence interchange surface without
+changing feature semantics, public API, schemas, dependencies, target frameworks,
+command behavior, package-consumer topology, or archive RIDs. Stable `1.12.0`
+remains the published release until PR #43 is merged and the normal tag-based
+publication flow is performed.
 
-## 1.13 stable-promotion status
+## 1.13 release-ready status
 
 Version `1.13.0` promotes the fully validated `1.13.0-Alpha-8` contract
 without feature, public API, schema, dependency, target-framework,
@@ -25,7 +26,7 @@ audit-visible inconclusive observations and integration issues, planner-delegati
 replanning conveniences, and additive version-5 JSON for runtime observation sets
 and integration results.
 
-The complete candidate Inspection surface contains 90 exported public types with
+The complete 1.13 Inspection surface contains 90 exported public types with
 normalized-LF SHA-256
 `fd827a25abafb8e9ff3915567f45f9f2ec51b332bfd8a82dd4e4bca20290e764`.
 JSON versions 1 through 4 remain unchanged; version 5 contains exactly
@@ -35,10 +36,13 @@ still has no `Icod.Terminal` dependency. Downstream qualification remains pinned
 to published `Icod.Terminal 1.12.0`.
 
 The Alpha-8 contract was accepted on exact product head
-`f236c33d8239e80379bf8cf0f1123abd6c93c3cb` by qualification run `34797445315`,
-with all 12 jobs green. Stable `1.13.0` promotion now requires its own fresh full
-validation; publication remains gated by merge to `main` and the normal immutable
-tag workflow. The install commands below now target `1.13.0`. See
+`f236c33d8239e80379bf8cf0f1123abd6c93c3cb` by qualification run `34797445315`.
+Stable product head `6e9217b16c3023fb10fa34dbaa74afe48448d858` then passed qualification run
+`34799272472` with all 12 jobs green, including Windows whole-surface/historical
+Inspection compatibility, package verification, three installed-tool smokes, and
+all six archive RIDs. PR #43 remains unmerged; tag and package publication remain
+gated by the normal release workflow. The install commands below target
+`1.13.0`. See
 `docs/1.13.0-PERSISTENT-RASTER-RUNTIME-EVIDENCE-GUIDE.md`,
 `docs/1.13.0-INSPECTION-PUBLIC-API-FREEZE.md`, and
 `docs/1.13.0-RELEASE-AUDIT.md`.

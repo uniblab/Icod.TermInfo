@@ -3,7 +3,7 @@
 `Icod.TermInfo.Inspection` is the optional managed inspection and semantic-
 comparison layer for the `Icod.TermInfo` package family.
 
-## 1.13 stable-promotion status
+## 1.13 release-ready status
 
 `1.13.0` promotes the validated Alpha-8 additive
 `PersistentRasterRuntime*` interchange contract without semantic, public-API,
@@ -26,8 +26,9 @@ Inspection still has no production `Icod.Terminal` dependency. RE07 qualifies
 the caller adapter boundary using published `Icod.Terminal 1.12.0` beside the
 fresh Inspection package on net8.0, net9.0, and net10.0. Exact Alpha-8
 product head `f236c33d8239e80379bf8cf0f1123abd6c93c3cb` passed qualification run
-`34797445315` across all 12 jobs. Stable promotion is now undergoing its own
-fresh full validation. See
+`34797445315`; stable product head `6e9217b16c3023fb10fa34dbaa74afe48448d858`
+then passed qualification run `34799272472`, again with all 12 jobs green. PR #43
+remains unmerged and no tag or package publication has been performed. See
 `../docs/1.13.0-PERSISTENT-RASTER-RUNTIME-EVIDENCE-GUIDE.md`,
 `../docs/1.13.0-INSPECTION-PUBLIC-API-FREEZE.md`, and
 `../docs/1.13.0-RELEASE-AUDIT.md`.
