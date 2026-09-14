@@ -1,0 +1,3 @@
+# Icod.TermInfo 1.14.0 RB02 Inspection public API additions
+Icod.TermInfo.Inspection.RasterBackendClassifier
+Icod.TermInfo.Inspection.RasterBackendInspector
