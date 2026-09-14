@@ -16,6 +16,7 @@ $repositoryRoot = [System.IO.Path]::GetFullPath(
 $freezePath = Join-Path $repositoryRoot 'docs/1.13.0-INSPECTION-PUBLIC-API-FREEZE.md'
 $oneFourteenRb01TypesPath = Join-Path $repositoryRoot 'docs/1.14.0-RB01-INSPECTION-PUBLIC-API-ADDITIONS.txt'
 $oneFourteenRb02TypesPath = Join-Path $repositoryRoot 'docs/1.14.0-RB02-INSPECTION-PUBLIC-API-ADDITIONS.txt'
+$oneFourteenRb03TypesPath = Join-Path $repositoryRoot 'docs/1.14.0-RB03-INSPECTION-PUBLIC-API-ADDITIONS.txt'
 $historyVerifierPath = Join-Path $PSScriptRoot 'verify-inspection-compatibility-history.ps1'
 
 # Keep historical authorities explicit at the public verifier entry point. Exact
@@ -41,6 +42,7 @@ foreach ($requiredPath in @(
     $freezePath,
     $oneFourteenRb01TypesPath,
     $oneFourteenRb02TypesPath,
+    $oneFourteenRb03TypesPath,
     $historyVerifierPath,
     $oneTenBaselinePath,
     $oneElevenTypesPath,
@@ -221,6 +223,10 @@ try {
             -Path $oneFourteenRb02TypesPath `
             -ExpectedCount 2 `
             -ReleaseLabel '1.14 RB02'
+        $approvedRb03Types = Read-ApprovedTypes `
+            -Path $oneFourteenRb03TypesPath `
+            -ExpectedCount 1 `
+            -ReleaseLabel '1.14 RB03'
         $approvedOneFourteenTypes = [System.Collections.Generic.HashSet[string]]::new(
             [System.StringComparer]::Ordinal
         )
@@ -234,8 +240,13 @@ try {
                 throw "Duplicate reviewed 1.14 Inspection public type across tranche ledgers: $approvedType"
             }
         }
-        if ($approvedOneFourteenTypes.Count -ne 15) {
-            throw "Reviewed 1.14 Inspection public type set must contain exactly 15 types through RB02; found $($approvedOneFourteenTypes.Count)."
+        foreach ($approvedType in $approvedRb03Types) {
+            if (-not $approvedOneFourteenTypes.Add($approvedType)) {
+                throw "Duplicate reviewed 1.14 Inspection public type across tranche ledgers: $approvedType"
+            }
+        }
+        if ($approvedOneFourteenTypes.Count -ne 16) {
+            throw "Reviewed 1.14 Inspection public type set must contain exactly 16 types through RB03; found $($approvedOneFourteenTypes.Count)."
         }
 
         $oneThirteenCandidate = Remove-ApprovedTypes `
@@ -256,11 +267,12 @@ try {
         }
 
         Write-Host (
-            "Verified exact 1.13 Inspection public API SHA-256 {0} after excluding {1} approved 1.14 type block(s): {2} RB01 and {3} RB02." -f `
+            "Verified exact 1.13 Inspection public API SHA-256 {0} after excluding {1} approved 1.14 type block(s): {2} RB01, {3} RB02, and {4} RB03." -f `
                 $oneThirteenCandidateSha256, `
                 $oneThirteenCandidate.RemovedTypeCount, `
                 $approvedRb01Types.Count, `
-                $approvedRb02Types.Count
+                $approvedRb02Types.Count, `
+                $approvedRb03Types.Count
         )
 
         [System.IO.File]::WriteAllText(

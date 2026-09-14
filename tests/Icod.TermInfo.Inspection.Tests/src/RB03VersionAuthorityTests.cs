@@ -2,24 +2,21 @@ using Xunit;
 
 namespace Icod.TermInfo.Inspection.Tests;
 
-public sealed class RB02VersionAuthorityTests {
+public sealed class RB03VersionAuthorityTests {
 	[Fact]
-	public void Rb02RecordPreservesAcceptedAlphaTwoIdentity() {
-		string record = File.ReadAllText(
+	public void CoordinatedVersionIsAlphaThree() {
+		string properties = File.ReadAllText(
 			Path.Combine(
 				FindRepositoryRoot(),
-				"docs",
-				"1.14.0-RB02-BACKEND-EVIDENCE-CLASSIFICATION-AND-STATIC-INSPECTION.md"
+				"Directory.Build.props"
 			)
 		);
 
-		Assert.Contains( "1.14.0-Alpha-2", record, StringComparison.Ordinal );
 		Assert.Contains(
-			"6321de472a6e54a8382dd214996c22a4cf62e816",
-			record,
+			"<IcodTermInfoSuiteVersion>1.14.0-Alpha-3</IcodTermInfoSuiteVersion>",
+			properties,
 			StringComparison.Ordinal
 		);
-		Assert.Contains( "34865731077", record, StringComparison.Ordinal );
 	}
 
 	private static string FindRepositoryRoot() {
