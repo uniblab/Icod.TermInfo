@@ -117,7 +117,9 @@ function Read-ApprovedTypes {
         throw "Approved $ReleaseLabel Inspection public types file must contain exactly $ExpectedCount types; found $($approved.Count)."
     }
 
-    return $approved
+    # PowerShell enumerates collection return values. Preserve the HashSet as
+    # one object so a one-entry tranche ledger does not collapse to a scalar.
+    Write-Output -NoEnumerate $approved
 }
 
 function Remove-ApprovedTypes {
