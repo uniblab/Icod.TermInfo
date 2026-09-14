@@ -13,7 +13,8 @@ Set-StrictMode -Version Latest
 $repositoryRoot = [System.IO.Path]::GetFullPath(
     (Join-Path (Join-Path $PSScriptRoot '..') '..')
 )
-$freezePath = Join-Path $repositoryRoot 'docs/1.13.0-INSPECTION-PUBLIC-API-FREEZE.md'
+$oneThirteenFreezePath = Join-Path $repositoryRoot 'docs/1.13.0-INSPECTION-PUBLIC-API-FREEZE.md'
+$oneFourteenFreezePath = Join-Path $repositoryRoot 'docs/1.14.0-INSPECTION-PUBLIC-API-FREEZE.md'
 $oneFourteenRb01TypesPath = Join-Path $repositoryRoot 'docs/1.14.0-RB01-INSPECTION-PUBLIC-API-ADDITIONS.txt'
 $oneFourteenRb02TypesPath = Join-Path $repositoryRoot 'docs/1.14.0-RB02-INSPECTION-PUBLIC-API-ADDITIONS.txt'
 $oneFourteenRb03TypesPath = Join-Path $repositoryRoot 'docs/1.14.0-RB03-INSPECTION-PUBLIC-API-ADDITIONS.txt'
@@ -33,6 +34,7 @@ $oneThirteenMembersPath = Join-Path $repositoryRoot 'docs/1.13.0-RE06-INSPECTION
 $oneElevenApiSha256 = '69c7350d5d44d502ecf1698c8fe1c1336f03d38eb1a36e36219f50ac33585a86'
 $oneTwelveApiSha256 = 'f71501dcd27a530051c1a02083325144ced2b6173b6b967b9571c620815198f0'
 $oneThirteenApiSha256 = 'fd827a25abafb8e9ff3915567f45f9f2ec51b332bfd8a82dd4e4bca20290e764'
+$oneFourteenApiSha256 = 'e9f240a562aec5274d64fb2ec3647862fe4ef5684582af2b442ba3c55e189497'
 $assemblyFullPath = if ([System.IO.Path]::IsPathRooted($AssemblyPath)) {
     [System.IO.Path]::GetFullPath($AssemblyPath)
 } else {
@@ -40,7 +42,8 @@ $assemblyFullPath = if ([System.IO.Path]::IsPathRooted($AssemblyPath)) {
 }
 
 foreach ($requiredPath in @(
-    $freezePath,
+    $oneThirteenFreezePath,
+    $oneFourteenFreezePath,
     $oneFourteenRb01TypesPath,
     $oneFourteenRb02TypesPath,
     $oneFourteenRb03TypesPath,
@@ -326,6 +329,22 @@ try {
             throw 'Icod.TermInfo.Inspection public API unexpectedly references Icod.Terminal.'
         }
 
+        $currentOneFourteenSha256 = Get-NormalizedSha256 -Text $current
+        if (-not [string]::Equals(
+            $oneFourteenApiSha256,
+            $currentOneFourteenSha256,
+            [System.StringComparison]::Ordinal
+        )) {
+            throw "Icod.TermInfo.Inspection whole 1.14 public API fingerprint changed. Expected $oneFourteenApiSha256, actual $currentOneFourteenSha256."
+        }
+
+        $oneFourteenFreeze = [System.IO.File]::ReadAllText($oneFourteenFreezePath)
+        if ($oneFourteenFreeze.IndexOf($oneFourteenApiSha256, [System.StringComparison]::Ordinal) -lt 0) {
+            throw '1.14.0-INSPECTION-PUBLIC-API-FREEZE.md does not record the expected whole-surface fingerprint.'
+        }
+
+        Write-Host "Verified exact 1.14 Inspection public API SHA-256 $currentOneFourteenSha256."
+
         $approvedRb01Types = Read-ApprovedTypes `
             -Path $oneFourteenRb01TypesPath `
             -ExpectedCount 13 `
@@ -382,7 +401,7 @@ try {
             throw "Icod.TermInfo.Inspection reconstructed 1.13 public API fingerprint changed. Expected $oneThirteenApiSha256, actual $oneThirteenCandidateSha256."
         }
 
-        $freeze = [System.IO.File]::ReadAllText($freezePath)
+        $freeze = [System.IO.File]::ReadAllText($oneThirteenFreezePath)
         if ($freeze.IndexOf($oneThirteenApiSha256, [System.StringComparison]::Ordinal) -lt 0) {
             throw '1.13.0-INSPECTION-PUBLIC-API-FREEZE.md does not record the expected whole-surface fingerprint.'
         }
