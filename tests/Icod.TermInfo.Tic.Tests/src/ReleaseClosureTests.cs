@@ -316,6 +316,7 @@ public sealed class ReleaseClosureTests {
 						current.FullName,
 						"Icod.TermInfo.sln"
 					)
+				)
 			) {
 				return current.FullName;
 			}
