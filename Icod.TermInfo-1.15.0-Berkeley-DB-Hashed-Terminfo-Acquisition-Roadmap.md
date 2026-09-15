@@ -6,8 +6,8 @@
 **Optional package:** `Icod.TermInfo.BerkeleyDb`  
 **Language:** C# 13  
 **Reusable target frameworks:** `net8.0`; `net9.0`; `net10.0`  
-**Status:** HDB00 accepted; HDB01 optional-package foundation in progress  
-**Current coordinated prerelease:** `1.15.0-Alpha-1`
+**Status:** HDB00 and HDB01 accepted; HDB02 internal reader in progress  
+**Current coordinated prerelease:** `1.15.0-Alpha-2`
 
 ---
 
@@ -629,7 +629,10 @@ Acceptance evidence is frozen in the HDB00 decision record and PR history.
 
 ### HDB01 — Optional Package Foundation
 
-**Status:** IN PROGRESS
+**Status:** COMPLETE / ACCEPTED
+
+Accepted exact head: `407fcea3a0a40e43c654a6a5ae365ee2c814ecd5`.
+Closure evidence: `docs/1.15.0-HDB01-OPTIONAL-PACKAGE-FOUNDATION.md`.
 
 Create and qualify:
 
@@ -659,6 +662,11 @@ HDB01 establishes packaging and dependency boundaries only. It does not expose a
 provider prematurely.
 
 ### HDB02 — Managed Read-only Berkeley DB Hash-v9 Reader
+
+**Status:** IN PROGRESS (`1.15.0-Alpha-2`)
+
+Progress and remaining qualification:
+`docs/1.15.0-HDB02-MANAGED-HASH-V9-READER.md`.
 
 Productionize the HDB00 research findings as internal package code using
 red-green TDD.

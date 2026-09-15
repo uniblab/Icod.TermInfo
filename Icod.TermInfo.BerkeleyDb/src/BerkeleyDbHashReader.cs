@@ -57,6 +57,8 @@ internal static class BerkeleyDbHashReader {
 				continue;
 			}
 
+			ValidatePageIdentity( page, pageNumber, metadata.IsBigEndian );
+
 			ushort entryCount = ReadUInt16(
 				page,
 				20,
@@ -123,6 +125,8 @@ internal static class BerkeleyDbHashReader {
 				"The file is not a supported Berkeley DB Hash database."
 			);
 		}
+
+		ValidatePageIdentity( bytes, 0, isBigEndian );
 
 		uint version = ReadUInt32( bytes, 16, isBigEndian );
 		if ( version != SupportedHashVersion ) {
@@ -322,6 +326,8 @@ internal static class BerkeleyDbHashReader {
 				);
 			}
 
+			ValidatePageIdentity( page, pageNumber, metadata.IsBigEndian );
+
 			ushort chunkLength = ReadUInt16(
 				page,
 				22,
@@ -357,6 +363,19 @@ internal static class BerkeleyDbHashReader {
 		}
 
 		return result;
+	}
+
+	private static void ValidatePageIdentity(
+		ReadOnlySpan<byte> page,
+		uint expectedPageNumber,
+		bool isBigEndian
+	) {
+		uint storedPageNumber = ReadUInt32( page, 8, isBigEndian );
+		if ( storedPageNumber != expectedPageNumber ) {
+			throw new InvalidDataException(
+				$"Berkeley DB page {expectedPageNumber} identifies itself as page {storedPageNumber}."
+			);
+		}
 	}
 
 	private static ReadOnlySpan<byte> GetPage(
