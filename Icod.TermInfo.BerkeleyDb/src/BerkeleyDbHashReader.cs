@@ -41,8 +41,10 @@ internal static class BerkeleyDbHashReader {
 		int maximumItemSize = 1024 * 1024
 	) {
 		ArgumentException.ThrowIfNullOrWhiteSpace( databasePath );
+		ArgumentOutOfRangeException.ThrowIfNegativeOrZero( maximumDatabaseSize );
+		ArgumentOutOfRangeException.ThrowIfNegativeOrZero( maximumItemSize );
 
-		byte[] database = File.ReadAllBytes( databasePath );
+		byte[] database = ReadDatabase( databasePath, maximumDatabaseSize );
 		DatabaseMetadata metadata = ReadMetadata( database );
 
 		for (
@@ -84,7 +86,8 @@ internal static class BerkeleyDbHashReader {
 					database,
 					metadata,
 					page,
-					index
+					index,
+					maximumItemSize
 				);
 				if ( !requestedKey.SequenceEqual( key ) ) {
 					continue;
@@ -94,7 +97,8 @@ internal static class BerkeleyDbHashReader {
 					database,
 					metadata,
 					page,
-					index + 1
+					index + 1,
+					maximumItemSize
 				);
 				return true;
 			}
@@ -102,6 +106,41 @@ internal static class BerkeleyDbHashReader {
 
 		value = [];
 		return false;
+	}
+
+	private static byte[] ReadDatabase(
+		string databasePath,
+		int maximumDatabaseSize
+	) {
+		using FileStream stream = new FileStream(
+			databasePath,
+			FileMode.Open,
+			FileAccess.Read,
+			FileShare.Read,
+			4096,
+			FileOptions.SequentialScan
+		);
+		long length = stream.Length;
+		if ( length > maximumDatabaseSize || length > Array.MaxLength ) {
+			throw new InvalidDataException(
+				$"Berkeley DB file length {length} exceeds the supported database size."
+			);
+		}
+		if ( length < 512 ) {
+			throw new InvalidDataException(
+				"The Berkeley DB file is too small to contain a metadata page."
+			);
+		}
+
+		byte[] database = new byte[(int)length];
+		stream.ReadExactly( database );
+		if ( stream.ReadByte() != -1 ) {
+			throw new IOException(
+				"The Berkeley DB file grew while it was being read."
+			);
+		}
+
+		return database;
 	}
 
 	private static DatabaseMetadata ReadMetadata( byte[] database ) {
@@ -229,7 +268,8 @@ internal static class BerkeleyDbHashReader {
 		byte[] database,
 		DatabaseMetadata metadata,
 		ReadOnlySpan<byte> page,
-		int index
+		int index,
+		int maximumItemSize
 	) {
 		ushort offset = ReadUInt16(
 			page,
@@ -254,6 +294,11 @@ internal static class BerkeleyDbHashReader {
 
 		switch ( page[offset] ) {
 			case HashKeyData:
+				if ( itemLength - 1 > maximumItemSize ) {
+					throw new InvalidDataException(
+						"The Berkeley DB inline item exceeds the configured item size."
+					);
+				}
 				return page.Slice(
 					offset + 1,
 					itemLength - 1
@@ -280,7 +325,8 @@ internal static class BerkeleyDbHashReader {
 					database,
 					metadata,
 					overflowPage,
-					totalLength
+					totalLength,
+					maximumItemSize
 				);
 
 			default:
@@ -294,10 +340,12 @@ internal static class BerkeleyDbHashReader {
 		byte[] database,
 		DatabaseMetadata metadata,
 		uint firstPage,
-		uint totalLength
+		uint totalLength,
+		int maximumItemSize
 	) {
 		if (
-			totalLength > int.MaxValue
+			totalLength > maximumItemSize
+			|| totalLength > Array.MaxLength
 			|| totalLength > database.Length
 		) {
 			throw new InvalidDataException(
