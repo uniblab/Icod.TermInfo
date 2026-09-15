@@ -178,9 +178,10 @@ AssemblyVersion    1.0.0.0
 Strong-name signed no
 ```
 
-Package minor/patch versions do not advance `AssemblyVersion`. Adding a strong
-name or otherwise changing assembly identity is a major-version design decision
-unless a future compatibility review proves a safe migration.
+All five reusable assemblies remain **unsigned** throughout the compatible 1.x
+line. Package minor/patch versions do not advance `AssemblyVersion`. Adding a
+strong name or otherwise changing assembly identity is a major-version design
+decision unless a future compatibility review proves a safe migration.
 
 ## Public API freezes
 
