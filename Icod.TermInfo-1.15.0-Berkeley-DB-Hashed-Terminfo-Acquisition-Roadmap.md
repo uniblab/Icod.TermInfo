@@ -663,10 +663,15 @@ provider prematurely.
 
 ### HDB02 — Managed Read-only Berkeley DB Hash-v9 Reader
 
-**Status:** IN PROGRESS (`1.15.0-Alpha-2`)
+**Status:** COMPLETE / ACCEPTED (`1.15.0-Alpha-2`)
 
-Progress and remaining qualification:
+Accepted implementation head: `0495addc76c0655ab99d716b19bcc303b05a6f0c`.
+Closure evidence and supported-subset limits:
 `docs/1.15.0-HDB02-MANAGED-HASH-V9-READER.md`.
+
+Qualification: PR workflow #1049 / 35024125144, all 12 jobs; HDB00 workflow
+#78 / 35024125102, all 3 jobs. The production reader passed 165 unit cases and
+6 native-oracle cases per TFM on Windows, Linux, and macOS.
 
 Productionize the HDB00 research findings as internal package code using
 red-green TDD.
