@@ -230,7 +230,6 @@ public sealed class RL08ReleaseClosureTests {
 
 	[Fact]
 	public void HistoricalReleaseDocumentationRetainsOneEleven() {
-		string rootReadme = ReadRepositoryFile( "README.md" );
 		string inspectionReadme = ReadRepositoryFile(
 			"Icod.TermInfo.Inspection/README.md"
 		);
@@ -243,7 +242,6 @@ public sealed class RL08ReleaseClosureTests {
 			"docs/1.11.0-RELEASE-AUDIT.md"
 		);
 
-		Assert.Contains( "1.11", rootReadme, StringComparison.Ordinal );
 		Assert.Contains( "1.11", inspectionReadme, StringComparison.Ordinal );
 		Assert.Contains( "## 1.11 release line", versioning, StringComparison.Ordinal );
 		Assert.Contains( "## 1.11 compatibility freeze", compatibility, StringComparison.Ordinal );

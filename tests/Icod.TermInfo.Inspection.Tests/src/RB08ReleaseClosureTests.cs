@@ -255,7 +255,27 @@ public sealed class RB08ReleaseClosureTests {
 			buildProperties,
 			StringComparison.Ordinal
 		);
-		Assert.Contains( "## 1.14 release status", rootReadme, StringComparison.Ordinal );
+		Assert.Contains( "## Status", rootReadme, StringComparison.Ordinal );
+		Assert.Contains( "Icod.TermInfo 1.14.0", rootReadme, StringComparison.Ordinal );
+		Assert.Contains( "## Architecture", rootReadme, StringComparison.Ordinal );
+		Assert.Contains( "## Quick Start", rootReadme, StringComparison.Ordinal );
+		Assert.Contains( "## Feature Inventory", rootReadme, StringComparison.Ordinal );
+		Assert.Contains( "## Packages and Tools", rootReadme, StringComparison.Ordinal );
+		Assert.Contains(
+			"## Design Boundaries and Guarantees",
+			rootReadme,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"## Compatibility and Versioning",
+			rootReadme,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"Release-by-release chronology belongs",
+			rootReadme,
+			StringComparison.Ordinal
+		);
 		Assert.Contains(
 			"dotnet add package Icod.TermInfo.Inspection --version 1.14.0",
 			rootReadme,

@@ -154,7 +154,6 @@ public sealed class PG08ReleaseClosureTests {
 
 	[Fact]
 	public void ReleaseFacingMetadataDescribesStableOneTwelve() {
-		string rootReadme = ReadRepositoryFile( "README.md" );
 		string inspectionReadme = ReadRepositoryFile(
 			"Icod.TermInfo.Inspection/README.md"
 		);
@@ -170,7 +169,6 @@ public sealed class PG08ReleaseClosureTests {
 			"docs/1.12.0-RELEASE-AUDIT.md"
 		);
 
-		Assert.Contains( "1.12", rootReadme, StringComparison.Ordinal );
 		Assert.Contains( "1.12", inspectionReadme, StringComparison.Ordinal );
 		Assert.Contains( "## 1.12 release line", versioning, StringComparison.Ordinal );
 		Assert.Contains( "## 1.12 compatibility freeze", compatibility, StringComparison.Ordinal );
