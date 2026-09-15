@@ -176,19 +176,8 @@ public sealed class RB08ReleaseClosureTests {
 	}
 
 	[Fact]
-	public void AlphaEightAndTerminalDependencyBoundariesRemainFrozen() {
+	public void ProductionDependencyAndRb07QualificationTopologyRemainFrozen() {
 		string root = FindRepositoryRoot();
-		XDocument directoryProps = XDocument.Load(
-			Path.Combine( root, "Directory.Build.props" )
-		);
-		Assert.Equal(
-			"1.14.0-Alpha-8",
-			Assert.Single(
-				directoryProps.Descendants(),
-				element => element.Name.LocalName == "IcodTermInfoSuiteVersion"
-			).Value
-		);
-
 		XDocument inspectionProject = XDocument.Load(
 			Path.Combine(
 				root,
@@ -233,6 +222,79 @@ public sealed class RB08ReleaseClosureTests {
 					&& element.Attribute( "Include" )?.Value == "Icod.Terminal"
 			).Attribute( "Version" )?.Value
 		);
+	}
+
+	[Fact]
+	public void ReleaseDocumentationDescribesStableOneFourteen() {
+		string buildProperties = ReadRequiredRepositoryFile( "Directory.Build.props" );
+		string rootReadme = ReadRequiredRepositoryFile( "README.md" );
+		string inspectionReadme = ReadRequiredRepositoryFile(
+			"Icod.TermInfo.Inspection/README.md"
+		);
+		string inspectionProject = ReadRequiredRepositoryFile(
+			"Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj"
+		);
+		string samplesReadme = ReadRequiredRepositoryFile( "samples/README.md" );
+		string versioning = ReadRequiredRepositoryFile( "docs/VERSIONING.md" );
+		string compatibility = ReadRequiredRepositoryFile( "docs/COMPATIBILITY.md" );
+		string longRange = ReadRequiredRepositoryFile(
+			"Icod.TermInfo-Post-1.0-Development-Roadmap.md"
+		);
+		string trancheRoadmap = ReadRequiredRepositoryFile(
+			"Icod.TermInfo-1.14.0-Raster-Backend-Capability-Evidence-Selection-and-Planning-Roadmap.md"
+		);
+		string guide = ReadRequiredRepositoryFile(
+			"docs/1.14.0-RASTER-BACKEND-SELECTION-GUIDE.md"
+		);
+		string audit = ReadRequiredRepositoryFile(
+			"docs/1.14.0-RELEASE-AUDIT.md"
+		);
+
+		Assert.Contains(
+			"<IcodTermInfoSuiteVersion>1.14.0</IcodTermInfoSuiteVersion>",
+			buildProperties,
+			StringComparison.Ordinal
+		);
+		Assert.Contains( "## 1.14 release status", rootReadme, StringComparison.Ordinal );
+		Assert.Contains(
+			"dotnet add package Icod.TermInfo.Inspection --version 1.14.0",
+			rootReadme,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"## 1.14 release status",
+			inspectionReadme,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"<PackageReleaseNotes>1.14.0",
+			inspectionProject,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"Icod.TermInfo.RasterBackendSelection.Sample",
+			samplesReadme,
+			StringComparison.Ordinal
+		);
+		Assert.Contains( "## 1.14 release line", versioning, StringComparison.Ordinal );
+		Assert.Contains(
+			"## 1.14 compatibility freeze",
+			compatibility,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"**Current coordinated version:** `1.14.0`",
+			longRange,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"**Latest completed line:** `1.14.0`",
+			longRange,
+			StringComparison.Ordinal
+		);
+		Assert.Contains( "**Status:** COMPLETE", trancheRoadmap, StringComparison.Ordinal );
+		Assert.Contains( "RasterBackend", guide, StringComparison.Ordinal );
+		Assert.Contains( "1.14.0-Alpha-8", audit, StringComparison.Ordinal );
 	}
 
 	[Fact]
