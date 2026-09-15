@@ -11,7 +11,7 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`  
 **Frozen runtime contract:** `1.0.0`  
-**Latest completed coordinated version:** `1.14.0`  
+**Current coordinated version:** `1.14.0`  
 **Latest completed line:** `1.14.0` - Raster Backend Capability Evidence, Selection, and Planning  
 **Latest completed prerelease:** `1.14.0-Alpha-8`  
 **Status:** stable `1.14.0` is merged; `1.15.0` Berkeley DB / hashed terminfo acquisition is the active development line  
@@ -156,7 +156,7 @@ Composes backend availability with the frozen 1.11 lifecycle and 1.12 placement
 planners without duplicating their semantics.
 
 Accepted head: `22f38e9c6516bec9d5f6b8662f00e9b5bace7c2b`  
-Qualification: workflow #885 / `34871582203`
+Qualification: workflow #885 / `34865731077`
 
 ### RB04 — explicit preference-aware selection
 
