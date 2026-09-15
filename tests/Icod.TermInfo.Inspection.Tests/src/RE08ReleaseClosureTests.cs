@@ -466,13 +466,10 @@ public sealed class RE08ReleaseClosureTests {
 	}
 
 	[Fact]
-	public void ReleaseDocumentationDescribesStableOneThirteen() {
+	public void ReleaseDocumentationPreservesOneThirteenHistoricalAuthority() {
 		string rootReadme = ReadRequiredRepositoryFile( "README.md" );
 		string inspectionReadme = ReadRequiredRepositoryFile(
 			"Icod.TermInfo.Inspection/README.md"
-		);
-		string inspectionProject = ReadRequiredRepositoryFile(
-			"Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj"
 		);
 		string versioning = ReadRequiredRepositoryFile( "docs/VERSIONING.md" );
 		string compatibility = ReadRequiredRepositoryFile( "docs/COMPATIBILITY.md" );
@@ -489,18 +486,8 @@ public sealed class RE08ReleaseClosureTests {
 			"docs/1.13.0-RELEASE-AUDIT.md"
 		);
 
-		Assert.Contains( "1.13", rootReadme, StringComparison.Ordinal );
-		Assert.Contains( "1.13", inspectionReadme, StringComparison.Ordinal );
-		Assert.Contains(
-			"dotnet add package Icod.TermInfo.Inspection --version 1.13.0",
-			rootReadme,
-			StringComparison.Ordinal
-		);
-		Assert.Contains(
-			"<PackageReleaseNotes>1.13.0",
-			inspectionProject,
-			StringComparison.Ordinal
-		);
+		Assert.Contains( "## 1.13 release status", rootReadme, StringComparison.Ordinal );
+		Assert.Contains( "## 1.13 release status", inspectionReadme, StringComparison.Ordinal );
 		Assert.Contains( "## 1.13 release line", versioning, StringComparison.Ordinal );
 		Assert.Contains(
 			"## 1.13 compatibility freeze",
