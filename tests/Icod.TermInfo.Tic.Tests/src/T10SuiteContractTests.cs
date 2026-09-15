@@ -208,7 +208,7 @@ public sealed class T10SuiteContractTests {
 		);
 
 		Assert.Contains(
-			"## Tool Suite",
+			"## Packages and Tools",
 			readme,
 			StringComparison.Ordinal
 		);
@@ -224,6 +224,16 @@ public sealed class T10SuiteContractTests {
 		);
 		Assert.Contains(
 			"toe",
+			readme,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"captoinfo",
+			readme,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"infotocap",
 			readme,
 			StringComparison.Ordinal
 		);

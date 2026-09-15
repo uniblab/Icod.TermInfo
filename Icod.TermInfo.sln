@@ -73,6 +73,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Icod.TermInfo.Tools.Package
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Icod.TermInfo.DatabaseSet.Sample", "samples\Icod.TermInfo.DatabaseSet.Sample\Icod.TermInfo.DatabaseSet.Sample.csproj", "{27EC28A1-0786-4397-A7C4-1E9B63509F4A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Icod.TermInfo.Termcap.Sample", "samples\Icod.TermInfo.Termcap.Sample\Icod.TermInfo.Termcap.Sample.csproj", "{7F178A3E-0AC5-4C8D-9449-ADFE4D6B99D2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -662,6 +664,24 @@ Global
 		{27EC28A1-0786-4397-A7C4-1E9B63509F4A}.Staging|x64.Build.0 = Staging|Any CPU
 		{27EC28A1-0786-4397-A7C4-1E9B63509F4A}.Staging|x86.ActiveCfg = Staging|Any CPU
 		{27EC28A1-0786-4397-A7C4-1E9B63509F4A}.Staging|x86.Build.0 = Staging|Any CPU
+		{7F178A3E-0AC5-4C8D-9449-ADFE4D6B99D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F178A3E-0AC5-4C8D-9449-ADFE4D6B99D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F178A3E-0AC5-4C8D-9449-ADFE4D6B99D2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7F178A3E-0AC5-4C8D-9449-ADFE4D6B99D2}.Debug|x64.Build.0 = Debug|Any CPU
+		{7F178A3E-0AC5-4C8D-9449-ADFE4D6B99D2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7F178A3E-0AC5-4C8D-9449-ADFE4D6B99D2}.Debug|x86.Build.0 = Debug|Any CPU
+		{7F178A3E-0AC5-4C8D-9449-ADFE4D6B99D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F178A3E-0AC5-4C8D-9449-ADFE4D6B99D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F178A3E-0AC5-4C8D-9449-ADFE4D6B99D2}.Release|x64.ActiveCfg = Release|Any CPU
+		{7F178A3E-0AC5-4C8D-9449-ADFE4D6B99D2}.Release|x64.Build.0 = Release|Any CPU
+		{7F178A3E-0AC5-4C8D-9449-ADFE4D6B99D2}.Release|x86.ActiveCfg = Release|Any CPU
+		{7F178A3E-0AC5-4C8D-9449-ADFE4D6B99D2}.Release|x86.Build.0 = Release|Any CPU
+		{7F178A3E-0AC5-4C8D-9449-ADFE4D6B99D2}.Staging|Any CPU.ActiveCfg = Staging|Any CPU
+		{7F178A3E-0AC5-4C8D-9449-ADFE4D6B99D2}.Staging|Any CPU.Build.0 = Staging|Any CPU
+		{7F178A3E-0AC5-4C8D-9449-ADFE4D6B99D2}.Staging|x64.ActiveCfg = Staging|Any CPU
+		{7F178A3E-0AC5-4C8D-9449-ADFE4D6B99D2}.Staging|x64.Build.0 = Staging|Any CPU
+		{7F178A3E-0AC5-4C8D-9449-ADFE4D6B99D2}.Staging|x86.ActiveCfg = Staging|Any CPU
+		{7F178A3E-0AC5-4C8D-9449-ADFE4D6B99D2}.Staging|x86.Build.0 = Staging|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -688,5 +708,6 @@ Global
 		{6652E4DE-40F4-42F5-9C8E-707C49DEA570} = {C78B23CF-38CD-4C34-8C20-4BC8DFF8A2D1}
 		{3E1A6D2B-938D-4BA2-A68C-582B0A6AE724} = {C78B23CF-38CD-4C34-8C20-4BC8DFF8A2D1}
 		{27EC28A1-0786-4397-A7C4-1E9B63509F4A} = {8B94AE15-A91A-49D7-B324-C395C84E68D7}
+		{7F178A3E-0AC5-4C8D-9449-ADFE4D6B99D2} = {8B94AE15-A91A-49D7-B324-C395C84E68D7}
 	EndGlobalSection
 EndGlobal

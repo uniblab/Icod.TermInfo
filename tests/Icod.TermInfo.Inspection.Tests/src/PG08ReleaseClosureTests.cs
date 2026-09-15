@@ -34,6 +34,26 @@ public sealed class PG08ReleaseClosureTests {
 		string oneThirteenAdditions = ReadRepositoryFile(
 			"docs/1.13.0-RE01-INSPECTION-PUBLIC-API-ADDITIONS.txt"
 		);
+		string oneFourteenRb01Additions = ReadRepositoryFile(
+			"docs/1.14.0-RB01-INSPECTION-PUBLIC-API-ADDITIONS.txt"
+		);
+		string oneFourteenRb02Additions = ReadRepositoryFile(
+			"docs/1.14.0-RB02-INSPECTION-PUBLIC-API-ADDITIONS.txt"
+		);
+		string oneFourteenRb03Additions = ReadRepositoryFile(
+			"docs/1.14.0-RB03-INSPECTION-PUBLIC-API-ADDITIONS.txt"
+		);
+		HashSet<string> approvedOneFourteenTypes = oneFourteenRb01Additions
+			.Split( '\n' )
+			.Concat( oneFourteenRb02Additions.Split( '\n' ) )
+			.Concat( oneFourteenRb03Additions.Split( '\n' ) )
+			.Select( line => line.Trim() )
+			.Where(
+				line =>
+					line.Length > 0
+					&& !line.StartsWith( "#", StringComparison.Ordinal )
+			)
+			.ToHashSet( StringComparer.Ordinal );
 		HashSet<string> approvedOneThirteenTypes = oneThirteenAdditions
 			.Split( '\n' )
 			.Select( line => line.Trim() )
@@ -45,7 +65,14 @@ public sealed class PG08ReleaseClosureTests {
 			.ToHashSet( StringComparer.Ordinal );
 		Type[] currentTypes =
 			typeof( PersistentRasterPlacementProfile ).Assembly.GetExportedTypes();
-		Type[] reconstructedOneTwelveTypes = currentTypes
+		Type[] reconstructedOneThirteenTypes = currentTypes
+			.Where(
+				type =>
+					type.FullName is null
+					|| !approvedOneFourteenTypes.Contains( type.FullName )
+			)
+			.ToArray();
+		Type[] reconstructedOneTwelveTypes = reconstructedOneThirteenTypes
 			.Where(
 				type =>
 					type.FullName is null
@@ -56,10 +83,11 @@ public sealed class PG08ReleaseClosureTests {
 			".github/scripts/verify-inspection-compatibility.ps1"
 		);
 
+		Assert.Equal( 16, approvedOneFourteenTypes.Count );
 		Assert.Equal( 81, reconstructedOneTwelveTypes.Length );
 		Assert.Equal(
 			approvedOneThirteenTypes.Count,
-			currentTypes.Count(
+			reconstructedOneThirteenTypes.Count(
 				type =>
 					type.FullName?.StartsWith(
 						"Icod.TermInfo.Inspection.PersistentRasterRuntime",
@@ -69,7 +97,7 @@ public sealed class PG08ReleaseClosureTests {
 		);
 		foreach ( string approvedType in approvedOneThirteenTypes ) {
 			Assert.Contains(
-				currentTypes,
+				reconstructedOneThirteenTypes,
 				type => string.Equals(
 					type.FullName,
 					approvedType,
@@ -126,7 +154,6 @@ public sealed class PG08ReleaseClosureTests {
 
 	[Fact]
 	public void ReleaseFacingMetadataDescribesStableOneTwelve() {
-		string rootReadme = ReadRepositoryFile( "README.md" );
 		string inspectionReadme = ReadRepositoryFile(
 			"Icod.TermInfo.Inspection/README.md"
 		);
@@ -142,7 +169,6 @@ public sealed class PG08ReleaseClosureTests {
 			"docs/1.12.0-RELEASE-AUDIT.md"
 		);
 
-		Assert.Contains( "1.12", rootReadme, StringComparison.Ordinal );
 		Assert.Contains( "1.12", inspectionReadme, StringComparison.Ordinal );
 		Assert.Contains( "## 1.12 release line", versioning, StringComparison.Ordinal );
 		Assert.Contains( "## 1.12 compatibility freeze", compatibility, StringComparison.Ordinal );

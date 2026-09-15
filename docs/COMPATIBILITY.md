@@ -1,106 +1,133 @@
 # Icod.TermInfo Compatibility Policy
 
 This document defines the supported 1.x compatibility boundary for
-`Icod.TermInfo`, the optional `Icod.TermInfo.Source` and
-`Icod.TermInfo.Compiler` packages, beginning with 1.3 the optional
-`Icod.TermInfo.Inspection` package, and beginning with 1.6 the optional
-`Icod.TermInfo.Termcap` package.
+`Icod.TermInfo`, `Icod.TermInfo.Source`, `Icod.TermInfo.Compiler`,
+`Icod.TermInfo.Inspection`, `Icod.TermInfo.Termcap`, and the coordinated tool
+distribution. Exact release evidence remains in the versioned API freezes,
+schema files, roadmaps, and release audits.
+
+## 1.14 compatibility freeze
+
+Version 1.14 is additive above the stable 1.13 boundary. RB08 freezes the complete
+1.14 `Icod.TermInfo.Inspection` reflection manifest at **106 exported public
+types** with normalized-LF SHA-256:
+
+```text
+e9f240a562aec5274d64fb2ec3647862fe4ef5684582af2b442ba3c55e189497
+```
+
+Release verification first proves that complete 1.14 surface across `net8.0`,
+`net9.0`, and `net10.0`. It then removes only the reviewed 1.14 additions — the
+16 `RasterBackend*` type blocks introduced through RB03 and the six additive
+RB06 `TermInfoJsonRenderer` member lines — and requires the remainder to
+reconstruct frozen 1.13 SHA-256 exactly:
+
+```text
+fd827a25abafb8e9ff3915567f45f9f2ec51b332bfd8a82dd4e4bca20290e764
+```
+
+The existing 1.13 -> 1.12 -> 1.11 -> 1.10 reconstruction chain remains
+unchanged.
+
+Version 1.14 adds only advisory raster-backend availability and selection
+semantics to Inspection. Backend availability is independent from lifecycle and
+placement capability truth. Sixel and Kitty Graphics are the initial concrete
+backend identities. Static inspection may derive positive Sixel evidence only
+from exact authoritative metadata; terminal names, emulator brands, profile
+names, enum values, and candidate input order never imply support or preference.
+
+The planner has no hidden backend ranking. With no explicit caller preference,
+multiple viable candidates return `RequiresPreference`. With a complete caller
+preference order, a preferred candidate requiring runtime verification blocks
+fallback until it is verified or becomes impossible.
+
+JSON schema versions 1 through 5 remain immutable historical contracts. Version
+6 is additive and contains exactly `rasterBackendProfile` and
+`rasterBackendSelectionPlan`, with normalized-LF SHA-256:
+
+```text
+9d51ec6659f8978c867408881eefb106f3c4976dfcf2da12b23c374a222665c2
+```
+
+Production Inspection remains free of an `Icod.Terminal` package/project
+reference. RB07 qualifies a package-only consumer beside published
+`Icod.Terminal 1.13.0`; the caller owns mapping of live Terminal results into
+TermInfo backend evidence and backend-scoped runtime-integration contexts.
+
+Stable 1.14 promotion may not change the exact frozen API, any released JSON
+schema, production dependency direction, target frameworks, command semantics,
+package-consumer topology, or archive RIDs. Stable promotion requires a fresh
+full qualification matrix.
 
 ## 1.13 compatibility freeze
 
 Version 1.13 is additive above the stable 1.12 boundary. RE08 freezes the complete
-1.13 Inspection reflection manifest at 90 exported public types with normalized-LF
-SHA-256
-`fd827a25abafb8e9ff3915567f45f9f2ec51b332bfd8a82dd4e4bca20290e764`
-and requires equivalent public API across `net8.0`, `net9.0`, and `net10.0`.
-The verifier first proves that complete 1.13 surface, then removes exactly the
-reviewed RE06 renderer-member delta and cumulative `PersistentRasterRuntime*`
-type delta to reconstruct frozen 1.12 SHA-256
-`f71501dcd27a530051c1a02083325144ced2b6173b6b967b9571c620815198f0`.
-The established 1.12 -> 1.11 -> 1.10 reconstruction chain remains unchanged.
+1.13 Inspection manifest at 90 exported public types with normalized-LF SHA-256
+`fd827a25abafb8e9ff3915567f45f9f2ec51b332bfd8a82dd4e4bca20290e764`.
+The verifier removes only the reviewed 1.13 runtime-observation type and renderer
+member delta to reconstruct frozen 1.12 exactly.
 
-Version 1.13 adds only protocol-neutral caller-owned runtime observation and
-evidence-integration semantics to Inspection. It does not add live probing,
-backend ranking, protocol negotiation, raw protocol responses, terminal session
-or resource identity, or a production dependency on `Icod.Terminal`.
-
-JSON schema versions 1 through 4 remain immutable historical contracts. Version
-5 is additive and contains exactly `persistentRasterRuntimeObservationSet` and
-`persistentRasterRuntimeIntegration`. Stable 1.13 promotion may not change any
-frozen schema, the exact 1.13 public surface, package dependency direction,
-target frameworks, command semantics, package-consumer topology, or archive RIDs.
+Version 1.13 adds protocol-neutral caller-owned runtime observation and evidence
+integration semantics. It does not add live probing, backend ranking, protocol
+negotiation, raw protocol responses, terminal session/resource identity, or a
+production `Icod.Terminal` dependency. JSON v5 contains exactly
+`persistentRasterRuntimeObservationSet` and
+`persistentRasterRuntimeIntegration`; v1-v4 remain frozen.
 
 ## 1.12 compatibility freeze
 
 Version 1.12 is additive above the stable 1.11 boundary. PG08 freezes the
-complete 1.12 Inspection reflection manifest at 81 exported public types with
-normalized-LF SHA-256
-`f71501dcd27a530051c1a02083325144ced2b6173b6b967b9571c620815198f0`
-and requires exact public API equality across `net8.0`, `net9.0`, and
-`net10.0`. Removing only the exact reviewed 1.12 placement type/member delta
-must reconstruct the frozen 1.11 public API fingerprint exactly.
+complete 1.12 Inspection manifest at 81 exported public types with normalized-LF
+SHA-256
+`f71501dcd27a530051c1a02083325144ced2b6173b6b967b9571c620815198f0`.
+Removing only the reviewed placement delta reconstructs frozen 1.11 exactly.
 
-Version 1.12 adds only the protocol-neutral `SourceRectangle` and `SignedZOrder`
-placement semantic family to Inspection. It does not add concrete placement
-coordinates, z-order values, resource identities, live probing, wire protocol
-selection, terminal I/O, or a production dependency on `Icod.Terminal`.
-
-JSON schema versions 1, 2, and 3 remain immutable historical contracts. Version
-4 is additive and contains exactly `persistentRasterPlacementProfile` and
-`persistentRasterPlacementPlan`. Stable 1.12 promotion may not change any frozen
-schema, the exact 1.12 public surface, package dependency direction, target
-frameworks, command semantics, or archive topology.
+Version 1.12 adds the protocol-neutral `SourceRectangle` and `SignedZOrder`
+placement semantic families. Concrete placement coordinates, z-order values,
+resource identities, live probing, wire-protocol selection, and terminal I/O
+remain outside TermInfo. JSON v4 contains exactly
+`persistentRasterPlacementProfile` and `persistentRasterPlacementPlan`; v1-v3
+remain frozen.
 
 ## 1.11 compatibility freeze
 
-Version 1.11 is additive above the stable 1.10 boundary. RL08 freezes the
-complete 1.11 Inspection reflection manifest by exact normalized-LF SHA-256
-`69c7350d5d44d502ecf1698c8fe1c1336f03d38eb1a36e36219f50ac33585a86`
-and requires exact public API equality across `net8.0`, `net9.0`, and
-`net10.0`. It also removes only the exact reviewed 1.11 lifecycle type/member
-delta and requires the remainder to equal the frozen 1.10 manifest exactly.
-Runtime, Source, Compiler, and Termcap retain their previously frozen APIs and
-assembly identity `1.0.0.0`.
+Version 1.11 is additive above the stable 1.10 boundary. RL08 freezes the complete
+1.11 Inspection manifest by normalized-LF SHA-256
+`69c7350d5d44d502ecf1698c8fe1c1336f03d38eb1a36e36219f50ac33585a86`.
+Removing only the reviewed lifecycle delta reconstructs frozen 1.10 exactly.
 
 Version 1.11 adds protocol-neutral persistent-raster lifecycle evidence,
-classification, planning, description/database-set composition, and version-3
-profile/plan JSON only to Inspection. Static absence remains `Unknown`; ordinary
-raster/Sixel evidence does not imply persistence. Live verification, graphics
-protocol transmission, terminal resource/placement identity, acknowledgements,
-generation invalidation, and cleanup remain outside TermInfo. Inspection gains
-no production dependency on `Icod.Terminal` or `Icod.DCurses`.
-
-Version-1 and version-2 JSON identifiers, schemas, document kinds, ordering,
-bounds, and historical command forms remain immutable. Version 3 is additive
-and contains only `persistentRasterLifecycleProfile` and
-`persistentRasterLifecyclePlan`. Stable 1.11 promotion may not change any of the
-three frozen schemas, the exact 1.11 public surface, package dependency direction,
-or command semantics.
+classification, planning, and JSON v3 only to Inspection. Live verification,
+graphics protocol transmission, terminal resource/placement identity,
+acknowledgements, generation invalidation, and cleanup remain outside TermInfo.
 
 ## 1.10 compatibility freeze
 
 Version 1.10 is additive above the stable 1.9 boundary. DA08 freezes the complete
-1.10 Inspection surface in `docs/1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt` and
-requires exact equality across `net8.0`, `net9.0`, and `net10.0`. Runtime, Source,
-Compiler, and Termcap retain their previously frozen APIs and assembly identity
-`1.0.0.0`.
+1.10 Inspection surface in `1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt` and
+requires exact equality across `net8.0`, `net9.0`, and `net10.0`. Version-1 JSON
+remains immutable; version 2 adds only `databaseSet`, `databaseSetComparison`,
+and `databaseSetPlan`.
 
-The version-1 JSON identifier, schema, four document kinds, ordering, UTF-8
-bounds, and historical `toe`/`infocmp` JSON command forms remain immutable. The
-version-2 schema is additive and contains only `databaseSet`,
-`databaseSetComparison`, and `databaseSetPlan`. Stable 1.10 promotion may not
-change either frozen schema or command semantics.
+## Public API compatibility
 
-## Supported target frameworks
+The 1.x line is compatible-additive:
 
-The frozen 1.0 and 1.1 package lines support:
+- released public types and members are not removed or incompatibly changed;
+- enum numeric values and public default values are part of the contract;
+- parameter order, names, modifiers, generic constraints, nullability, and
+  relevant attributes are checked by API snapshots;
+- routine validation must not regenerate a baseline to accept an accidental
+  difference; and
+- incompatible contract changes require a new major release unless a documented
+  emergency compatibility decision explicitly says otherwise.
 
-```text
-net8.0
-net10.0
-```
+Runtime, Source, Compiler, Inspection, and Termcap retain reusable assembly
+version `1.0.0.0` throughout the compatible 1.x package line.
 
-Beginning with 1.2.0, every package in the coordinated family supports:
+## Target-framework compatibility
+
+Current coordinated reusable packages target:
 
 ```text
 net8.0
@@ -108,519 +135,87 @@ net9.0
 net10.0
 ```
 
-For 1.2 and later, all three target frameworks are first-class package targets.
-Release validation requires equivalent public API manifests between target
-frameworks and fresh-package execution for each target for every package present
-in that release.
+The public reusable API must be equivalent across those target frameworks.
+Supported release validation runs on Windows, Linux, and macOS. A platform may
+have platform-specific acquisition or live-host behavior, but no reusable API
+shape may silently differ by target framework or host OS.
 
-Beginning with T01 in 1.4, the `tic`, `infocmp`, and `toe` command layer targets
-`net10.0`. Beginning with 1.5, the `icod-terminfo` router also targets `net10.0`.
-TC07 in 1.6 adds `captoinfo` and `infotocap` as additional `net10.0` command
-projects. These command-host choices do not remove `net8.0` or `net9.0` from any
-reusable TermInfo library package.
+## Package dependency compatibility
 
-Dropping a supported target framework is considered a breaking support-contract
-change and normally requires a new major version.
-
-## Supported host families
-
-The repository validates on:
+The production dependency direction is frozen:
 
 ```text
-Windows
-Linux
-macOS
+Icod.TermInfo                 dependency-free
+Icod.TermInfo.Source          -> Runtime
+Icod.TermInfo.Termcap         -> Runtime
+Icod.TermInfo.Compiler        -> Runtime + Source
+Icod.TermInfo.Inspection      -> Runtime + Source
 ```
 
-The package family is predominantly managed and platform-neutral. Narrow
-platform-specific runtime functionality, such as Windows virtual-terminal mode
-enablement, remains explicitly isolated and must fail gracefully when it is not
-applicable.
-
-Support means a package is expected to operate on platform/runtime combinations
-supported by the corresponding .NET target. It does not promise every historical
-OS release.
-
-## Public API compatibility
-
-The runtime 1.0 public API is frozen by
-`docs/1.0.0-PUBLIC-API-BASELINE.txt` and its semantic surface tests.
-
-The Source 1.1 public API is independently frozen by
-`docs/1.1.0-SOURCE-PUBLIC-API-BASELINE.txt` and its source-contract tests.
-
-The Compiler 1.2 public API is frozen through
-`docs/1.2.0-COMPILER-PUBLIC-API-BASELINE.txt` and its compiler-contract tests.
-
-The Inspection 1.3 public API is independently frozen by
-`docs/1.3.0-INSPECTION-PUBLIC-API-BASELINE.txt` and Inspection contract tests.
-I01 started with an empty public surface, I02-I06 established the reviewed API,
-and I07 froze that contract for release.
-
-The frozen 1.4 Inspection baseline is
-`docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt`. T01 began from the frozen 1.3
-surface; the reviewed T02/T03 database-inspection additions and T06 renderer
-controls were added compatibly and frozen at 1.4.0. Patch release 1.4.1 reuses
-that baseline unchanged rather than creating a new API contract.
-
-RS08 freezes the additive 1.7 Inspection public API in
-`docs/1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt`. Relative-source synthesis adds
-only `TerminalDescriptionSourceSynthesisParent`,
-`TerminalDescriptionSourceSynthesisOptions`, and
-`TerminalDescriptionSourceSynthesizer` to the already-frozen 1.4 Inspection
-surface. The 1.3 and 1.4 baselines remain immutable historical records.
-
-RP08 freezes the additive 1.8 Inspection public API in
-`docs/1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt`. Planning adds only
-`TerminalDescriptionSourcePlan`, `TerminalDescriptionSourcePlanner`,
-`TerminalDescriptionSourcePlanningOptions`, and
-`TerminalDescriptionSourcePlanningScore` to the frozen 1.7 Inspection surface.
-The 1.7 synthesis types and every earlier Inspection baseline remain unchanged.
-
-TC08 freezes the 1.6 Termcap public API in
-`docs/1.6.0-TERMCAP-PUBLIC-API-BASELINE.txt`. Release verification requires the
-full `PublicApiSnapshot/v1` reflection-manifest SHA-256
-`1e24b8a555b506594c58cf58d03bf87b2b60192f6316537cb4200498c6a92ab0`, exact compiled-assembly API equivalence across net8/net9/net10, and the
-packaged XML documentation member-ID inventory recorded by the same baseline.
-
-The 1.9 Inspection public API is frozen by
-`docs/1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt`. The complete 1.10 additive
-surface is frozen by `docs/1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt`.
-Version 1.11 uses the composite exact freeze in
-`docs/1.11.0-INSPECTION-PUBLIC-API-FREEZE.md`, combining the frozen 1.10
-manifest, the exact reviewed 1.11 type/member delta, and the complete 1.11
-manifest SHA-256. Release validation rejects any whole-surface change even when
-it remains source-compatible.
-
-Within 1.x:
-
-- existing public signatures remain source/binary compatible;
-- enum names and numeric values remain stable;
-- nullability and optional/default parameter contracts are treated as public
-  contract;
-- additions must be compatible and documented;
-- behavior changes must preserve documented semantic contracts unless they
-  correct an acknowledged defect.
-
-Runtime, Source, Compiler, Inspection, and Termcap assemblies retain version `1.0.0.0`
-and remain unsigned throughout 1.x.
-
-## 1.7 relative-source synthesis compatibility
-
-Inspection 1.7 may synthesize deterministic terminfo source for an effective
-`TerminalDescription` relative to an explicit ordered parent list. The caller's
-parent order and exact `UseName` spelling are semantic inputs. Parent aggregation
-follows the existing Source resolver precedence, required inherited removals are
-rendered as cancellations, and extended capability names remain ordinal and
-case-sensitive.
-
-The stable command adapter is `infocmp -u target parent [parent ...]`; `-A`
-selects the target database and `-B` the parent database. `-c -u` is the frozen
-ncurses-compatible synonym, while `-d -u`, `-n -u`, and `-q -u` remain usage
-errors. The command does not duplicate synthesis semantics.
-
-The production Inspection package continues to depend only on Runtime and Source.
-Compiler and ncurses are verification references only.
-
-## 1.8 relative-source planning compatibility
-
-Inspection 1.8 may select a deterministic ordered parent plan for the frozen
-1.7 relative-source synthesizer. Candidate order and candidate position are
-semantic inputs. The planner snapshots the caller sequence once, never selects
-the same position twice, and uses candidate-index order as the final score
-tie-break.
-
-Plans are ranked lexicographically by local directive count, cancellation
-count, parent count, rendered UTF-8 byte count, and selected candidate-index
-sequence. The zero-parent plan is part of the search. Exhaustive search and an
-explicitly bounded deterministic prefix are distinguishable through result
-evidence; a budget limit is never reported as exhaustive completion.
-
-Planning limits, checked plan-space arithmetic, cancellation behavior, and
-source-size enforcement are compatibility contracts. Explicit catalog and
-directory orchestration never consult environment discovery or platform
-defaults. The stable command adapter is `infocmp --plan-use`; it remains a thin
-adapter over Inspection and produces the same source through the standalone
-command, installable router, and matching release archive.
-
-The 1.8 planner does not change 1.7 synthesis semantics, create intermediate
-parents, infer author intent, or introduce a production Compiler or Termcap
-dependency.
-
-## 1.9 machine-readable Inspection compatibility
-
-Inspection 1.9 adds a versioned deterministic JSON representation of existing
-immutable descriptions, comparison results, planning results, and explicit
-database catalogs. JSON is an output representation and does not become a
-second semantic model.
-
-MI01 freezes:
-
-- schema identifier `urn:icod:terminfo:inspection:json:1`;
-- schema version `1`;
-- top-level `schema`, `schemaVersion`, `documentKind`, and `data` property order;
-- `terminalDescription`, `comparison`, `sourcePlan`, and `databaseCatalog`
-  document-kind strings;
-- compact output by default and one reviewed indented form;
-- bounded UTF-8 output size;
-- typed renderer entry points and operation-local cancellation;
-- absence of caller-supplied converters, naming policies, encoders, or delegates.
-
-MI02 makes the `terminalDescription` payload operational. It freezes exact
-identity, immutable alias order, explicit JSON null for a missing description,
-typed capability objects, compiled database order for standard capabilities,
-and value-kind plus exact ordinal-name order for extended capabilities. Absent
-capabilities receive no defaults, and effective JSON contains neither source
-ancestry nor cancellation tombstones. Compact output has no trailing whitespace;
-the optional indented form uses LF and two spaces. Both forms enforce the exact
-final UTF-8 byte count and the default safe JSON escaping policy.
-
-MI03 makes `comparison` and `sourcePlan` payloads operational. Comparison JSON
-retains the existing difference order, exact difference kind, capability
-identity, typed values, and source-aware entry, field, index, and span evidence.
-Each left/right side uses a stable shape with explicit null for evidence which
-is absent by semantic design. Plan JSON retains ordered selected parent names,
-generated LF source, every frozen score component, selected candidate indices,
-evaluated-plan count, `isExhaustive`, and accepted candidate count. Rendering is
-a direct projection and does not recompute comparison or planning semantics.
-
-MI04 makes `databaseCatalog` operational. Catalog JSON retains the normalized
-root, explicit catalog kind, derived completeness, ordered entry path and
-identity summaries, ordered issue evidence, and ordered duplicate canonical
-names. Completeness is true only for a conventional directory with no issues;
-duplicate names remain visible ambiguity evidence. The complete draft 2020-12
-version-1 JSON Schema is published at
-`docs/Icod.TermInfo.Inspection.schema.json` and is packaged with Inspection.
-Once a payload field is published under version 1, its meaning and value kind
-shall not be repurposed. A breaking schema change requires a new schema version
-and identifier.
-
-Existing human-readable commands and the frozen 1.7 synthesis and 1.8 planning
-semantics remain unchanged. MI05 command JSON modes produce exactly one JSON
-document followed by one LF on successful stdout; diagnostics remain on stderr.
-`infocmp --json` projects the effective description, structured difference, or
-source plan already owned by Inspection. `toe --json directory` projects the
-exact explicit catalog, including incomplete catalog evidence. Explicit
-all-candidates planning requires `--plan-use`, exactly one target, and a
-caller-selected `-B` database directory; it never introduces implicit host-wide
-discovery.
-
-MI06 changes none of those contracts. The package-reference-only consumer,
-checked-in source-plan fixture, repeated-process sample, large and pathological
-inputs, exact UTF-8 boundaries, and tool-package/archive smoke require the same
-JSON bytes and meanings across `net8.0`, `net9.0`, `net10.0`, Windows, Linux,
-macOS, and representative non-default cultures.
-
-MI07 adds no feature behavior. It freezes the exact 31-type Inspection public
-surface, the version-1 JSON Schema fingerprint, existing command semantics,
-package dependency graph, sample and fixture evidence, and router/archive
-topology. Stable `1.9.0` promotes the green `1.9.0-Alpha-7` contract without a
-semantic, public-API, schema, package-graph, or command change.
-
-## Runtime terminfo semantic compatibility
-
-The stable runtime responsibility includes:
-
-- immutable terminal descriptions;
-- complete standard and extended capability representation;
-- signed 32-bit numeric semantics;
-- reversible 8-bit compiled capability strings;
-- parameter expansion;
-- padding-aware output;
-- built-in terminal profiles;
-- conventional compiled terminfo parsing;
-- explicit directory acquisition;
-- deterministic environment/user/system discovery;
-- provider-local caching and explicit new-provider refresh;
-- explicit provider composition.
-
-The supported compiled family is the frozen conventional System V/ncurses
-contract documented by the 0.9 acquisition records: legacy `0432`, ncurses
-extended sections, and `01036` 32-bit numerics.
-
-## Source-language compatibility
-
-`Icod.TermInfo.Source` 1.1 adds the optional source-language path:
-
-- `.ti` lexical analysis and source locations;
-- deterministic diagnostics;
-- Boolean, numeric, string, cancellation, and `use=` source forms;
-- standard and extended capability classification;
-- unresolved source documents and entries;
-- bounded inheritance resolution with cycle and depth diagnostics;
-- deterministic duplicate source-name/alias warnings;
-- materialization into the existing immutable `TerminalDescription` model.
-
-The Source package does not redefine runtime capability semantics. A resolved
-source entry is required to enter the same runtime model used by compiled
-acquisition.
-
-## Compiler compatibility
-
-`Icod.TermInfo.Compiler` 1.2 adds the optional compiled-output path without
-moving compiler responsibilities into the runtime package.
-
-The compiler contract includes:
-
-- deterministic conventional compiled-entry writing;
-- legacy `0432` output;
-- `01036` wide-numeric output;
-- ncurses extended sections;
-- standard ordering through the runtime capability catalog;
-- strict reversible Latin-1 byte semantics;
-- checked count, offset, and total-size arithmetic;
-- explicit representation failure rather than silent truncation;
-- source compilation through the existing Source parser/resolver;
-- controlled conventional database-layout output;
-- semantic round-trip validation through the existing runtime parser.
-
-The low-level binary writer is pure. It does not read environment variables,
-discover system databases, invoke native ncurses tools, or write filesystem
-layouts. Filesystem output belongs to the later database-layout layer.
-
-`TerminalDescription` represents effective runtime state and does not retain
-source cancellation tombstones. A writer receiving only a
-`TerminalDescription` therefore emits absence for absent capabilities and does
-not invent cancellation.
-
-Compiled output is byte-oriented. Identity strings, capability names, and
-capability values which cannot be represented under the selected conventional
-format fail deterministically. The compiler does not silently replace Unicode,
-truncate numeric values, wrap offsets, or synthesize missing identity metadata.
-
-For deterministic output, standard capabilities use canonical binary metadata
-and extended capability names are ordered ordinally within their value kinds.
-
-## Inspection compatibility
-
-`Icod.TermInfo.Inspection` 1.3 is the optional human-readable inspection and
-semantic-comparison layer. It is deliberately separate from Runtime, Source, and
-Compiler so those frozen public contracts do not acquire tooling-oriented API.
-
-The 1.3 architectural contract distinguishes two domains:
-
-- effective inspection/comparison over `TerminalDescription`;
-- source-aware inspection/comparison over unresolved Source models.
-
-Effective inspection SHALL NOT invent `use=` relationships, cancellation
-tombstones, duplicate-source history, comments, or provenance that
-`TerminalDescription` does not retain. Source-aware operations SHALL preserve
-field order where order is semantically significant and likewise shall not
-invent source information the parsed model does not retain.
-
-The released 1.3 contract includes canonical effective rendering, normalized
-unresolved-source rendering, structured effective and source-aware comparison,
-and provider-aware inspection orchestration. Those behaviors are frozen through
-the independent Inspection baseline and its semantic tests.
-
-Beginning with T02 in the 1.4 line, Inspection additionally exposes a read-only
-snapshot of the ordered system database locations considered by Runtime
-discovery. The API distinguishes encoded `TERMINFO`, directory `TERMINFO`, the
-user database, `TERMINFO_DIRS`, and final platform defaults. Encoded payload bytes
-are not exposed. Directory paths are normalized, Runtime precedence and
-platform-specific duplicate handling are preserved, and no database contents are
-enumerated until the separate T03 catalog tranche. Runtime public API remains
-unchanged.
-
-Beginning with T03, Inspection can also enumerate one explicit conventional
-terminfo directory without changing Runtime provider semantics. Enumeration is
-limited to immediate literal first-character and two-digit hexadecimal
-subdirectories, parses candidate bytes through `CompiledTermInfoParser`, applies
-the configured Runtime parser size limit, preserves physical paths and parsed
-terminal identity, reports duplicate canonical identities deterministically, and
-retains malformed/I/O/link/placement issues instead of silently discarding them.
-Arbitrary recursion and hashed/Berkeley DB parsing remain outside the contract.
-
-## 1.6 termcap interoperability compatibility
-
-Beginning with TC01, `Icod.TermInfo.Termcap` is a fifth coordinated reusable
-package targeting `net8.0`, `net9.0`, and `net10.0`. It depends only on Runtime;
-no existing reusable package acquires a Termcap dependency.
-
-TC01-TC06 establish bounded conventional termcap parsing, Runtime-derived
-two-character capability classification, bounded `tc=` inheritance resolution,
-explicit semantic conversion to `TerminalDescription`, deterministic reverse
-representability/rendering, and opt-in `TERMCAP` / `TERMPATH` acquisition.
-Termcap acquisition remains separate from Runtime `TERMINFO` discovery.
-
-TC07 composes those engines into `net10.0` `captoinfo` and `infotocap` commands.
-Both commands emit effective resolved state rather than reconstructing source
-history. `captoinfo` composes Termcap with Inspection's effective terminfo source
-renderer; `infotocap` composes Source with the Termcap reverse renderer.
-Representational loss and incompatibility remain explicit diagnostics.
-
-TC08 freezes the active 1.6 Termcap public API and package graph without adding
-new semantics. Checked-in BSD/GNU-style corpus tests, hostile-input and bounded
-seeded mutation tests, package-structure verification, and isolated package-only
-consumers become normal release evidence. Runtime, Source, Compiler, Inspection,
-`tic`, `infocmp`, `toe`, `captoinfo`, `infotocap`, and router semantics are not
-reopened by the freeze.
-
-## T04 `tic` validation compatibility
-
-Beginning with T04 in the 1.4 line, the `net10.0` `tic` command exposes a
-non-mutating validation path over the already-frozen Source and Compiler engines.
-`tic -c` reads one strict UTF-8 source document from a file or standard input,
-parses the complete document, preserves Source diagnostic codes and locations,
-optionally selects canonical names or aliases through `-e`, resolves each selected
-entry and its `use=` graph, and performs compiled representability checks through
-`CompiledTermInfoWriter` entirely in memory.
-
-Without `-x`, selected entries and their reachable parents may use standard and
-known extended capabilities, but a syntactically valid capability classified by
-Source as `UnknownExtended` is a command error. `-x` permits those unknown
-extensions to flow through the existing Source/Compiler semantic model. Source
-parser errors anywhere in the supplied document remain errors even when `-e`
-selects only a subset, because T04 parses the complete source before selection.
-Resolver/representation validation is limited to selected entries and the parents
-needed by their inheritance graphs.
-
-T04 adds no public Runtime, Source, Compiler, or Inspection API. It does not call
-`CompiledTermInfoDatabaseWriter`, create terminfo database directories, or publish
-compiled entries.
-
-## T05 `tic` publication compatibility
-
-Beginning with T05, omitting `-c` after successful source validation publishes the
-selected effective terminal descriptions through the existing frozen
-`CompiledTermInfoDatabaseWriter`. `-o` chooses an explicit conventional database
-root. Without `-o`, command policy considers only directory-valued `TERMINFO`, then
-the Runtime-defined user database. Encoded `TERMINFO`, `TERMINFO_DIRS`, and
-platform-default/system roots are never selected implicitly for writes.
-
-Existing destinations are rejected by default. `--force` maps to the Compiler
-writer's existing explicit overwrite option, while `-s` reports the normalized
-output root, selected entry count, and warning count on standard error. The command
-does not duplicate Compiler path derivation, alias publication, preflight, staging,
-reparse/link rejection, or final move/replace behavior.
-
-The frozen Compiler writer is synchronous, so T05 checks cancellation before the
-publication transaction begins and then treats the writer call as an indivisible
-commit boundary. T05 does not change Runtime, Source, Compiler, or Inspection
-public API.
-
-## T06 `infocmp` rendering compatibility
-
-T06 makes `infocmp` operational for zero/one-terminal inspection. Normal
-acquisition uses `SystemTerminalDescriptionProvider`; `-A` uses an explicit
-`DirectoryTerminalDescriptionProvider` without mutating process discovery
-environment. A clean provider miss remains distinguishable from malformed data or
-other provider failures.
-
-The additive `TerminalDescriptionSourceRendererOptions`,
-`TerminalDescriptionSourceLayout`, and
-`TerminalDescriptionSourceCapabilityOrder` contracts provide reusable layout,
-wrapping, ordering, and extended-capability filtering. Existing 1.3
-`TerminalDescriptionSourceRenderer.Render(TerminalDescription)` and
-`Write(TextWriter, TerminalDescription)` output is unchanged. A parameterless
-options instance selects that same frozen policy.
-
-Standard-capability ordering is ordinal and deterministic within Boolean, numeric,
-and string groups. `infocmp` defaults to standard capabilities and requires `-x`
-to include effective extended capabilities. This filtering changes presentation
-only; it never mutates the acquired `TerminalDescription`. T06 adds no Runtime,
-Source, or Compiler public API.
-
-## T07 `infocmp` comparison compatibility
-
-T07 extends `infocmp` to two or more terminal operands. The first terminal is
-compared with each subsequent terminal. With no explicit `-d`, `-c`, or `-n`
-selector, comparison defaults to semantic differences. `-A` selects the first
-terminal database and `-B` selects the database used for subsequent terminals;
-neither option mutates process environment variables.
-
-Difference mode delegates to the frozen `TerminalDescriptionComparer`; the
-command does not parse rendered source to determine equality. Differences are
-successful command output and return status 0. Common-capability reporting uses
-the already-acquired immutable descriptions and Runtime capability metadata.
-Absent-capability reporting is defined only over the closed standard capability
-catalog and therefore does not invent absent extended names. `-q` changes
-presentation only. T07 adds no Runtime, Source, Compiler, or Inspection public
-API.
-
-## Discovery and failure compatibility
-
-Runtime discovery precedence, clean-miss behavior, parser failures,
-I/O/permission propagation, terminal-name validation, and provider-local
-cache/refresh rules are part of the compatibility contract.
-
-For source resolution, a clean `ITermInfoSourceEntryProvider` miss becomes a
-source diagnostic. Provider failures propagate. Resolver diagnostics and
-duplicate-identity lookup remain deterministic and ordinal/case-sensitive.
-
-`TerminalDatabase.BuiltIn` remains environment-independent and I/O-free.
-
-## Package compatibility
-
-Beginning with 1.2, `Icod.TermInfo` contains managed/XML assets and portable
-symbols for all three supported target frameworks. It has no runtime NuGet
-dependency and no native ncurses/terminfo payload.
-
-`Icod.TermInfo.Source` likewise contains corresponding three-target managed/XML
-and symbol assets and depends on the matching `Icod.TermInfo` package. The
-dependency direction is one-way: `Icod.TermInfo` never depends on Source.
-
-Beginning with 1.2, `Icod.TermInfo.Compiler` contains corresponding three-target
-managed/XML and symbol assets. It depends directly on the matching runtime
-package and may depend on the matching Source package for source compilation.
-Runtime and Source never depend on Compiler.
-
-Beginning with 1.3, `Icod.TermInfo.Inspection` contains corresponding three-target
-managed/XML and symbol assets and depends directly on the matching Runtime and
-Source packages. Inspection does not depend on Compiler. Runtime, Source, and
-Compiler do not depend on Inspection. Beginning with 1.11, Inspection also
-explicitly does not depend on `Icod.Terminal` or `Icod.DCurses`; callers may use
-those sibling layers to verify or execute a semantic lifecycle plan without
-creating a reverse package dependency.
-
-Beginning with 1.6, `Icod.TermInfo.Termcap` contains corresponding three-target
-managed/XML and symbol assets and depends only on the matching Runtime package.
-No existing reusable package depends on Termcap.
-
-Beginning with 1.4, the command executables sit above this package family. They
-may use `Icod.CommandFramework` and the appropriate TermInfo libraries, but no
-dependency flows back from Runtime, Source, Compiler, Inspection, or Termcap
-into the command layer. The command projects remain non-packable and are
-distributed together as six framework-dependent .NET 10 suite archives.
-
-Beginning with 1.5, `Icod.TermInfo.Tools` is a distribution-only .NET tool
-package. Its `icod-terminfo` router may reference `tic`, `infocmp`, and `toe` to
-dispatch to their existing `Command.RunAsync` entry points. The three semantic
-commands still do not reference one another, and the router introduces no
-terminfo semantics of its own. Archive distribution remains independent and
-continues to expose the traditional command names directly.
-
-Beginning with 1.6, the router and archives additionally expose `captoinfo` and
-`infotocap`. All five command projects remain mutually independent; the router
-is the only project which references command implementations for dispatch.
-
-The same validated registry package artifacts for a release are used for
-NuGet.org and GitHub Packages.
-
-## Explicit non-goals
-
-The reusable `Icod.TermInfo` package family does not promise:
-
-- Berkeley DB/hashed terminfo stores;
-- divergent undocumented vendor binary dialects;
-- live raw/cooked terminal session ownership;
-- input-event decoding or active probing;
-- PTY/ConPTY lifecycle;
-- curses/virtual-screen behavior;
-- terminal emulation or graphics protocols.
-
-Version 1.11 may describe and plan protocol-neutral persistent-raster lifecycle
-semantics, but it does not implement a graphics wire protocol, live terminal
-resource registry, placement registry, or session lifecycle. Those execution
-concerns remain sibling-layer work.
-
-The 1.4 line provides the managed `tic`, `infocmp`, and `toe` command
-applications. Version 1.5 adds the `Icod.TermInfo.Tools` installation router.
-Version 1.6 adds the optional Termcap package plus `captoinfo` and `infotocap`
-without reopening the frozen 1.4 mainstream terminfo command semantics.
-Exhaustive ncurses option compatibility is not claimed.
-
-The remaining non-goals stay outside the reusable TermInfo package family and
-belong to later or sibling-system work. Current post-1.0 planning is governed by
-`../Icod.TermInfo-Post-1.0-Development-Roadmap.md`; the old
-`FUTURE-WORK-INVENTORY.md` is retained only as a retired historical document.
+Runtime never depends upward on optional layers. Inspection does not depend on
+Compiler or Termcap. Reusable packages do not depend on command projects or
+`Icod.CommandFramework`. Beginning with 1.11 and continuing through 1.14,
+Inspection also must not acquire a production dependency on `Icod.Terminal` or
+`Icod.DCurses`.
+
+Tests, samples, and isolated package consumers may reference sibling packages to
+prove downstream interoperability without changing the production graph.
+
+## Behavioral compatibility
+
+The project distinguishes descriptive/advisory semantics from live terminal
+execution:
+
+- Runtime owns terminal descriptions, compiled database acquisition, capability
+  semantics, parameter expansion, and output transformation;
+- Source owns `.ti` parsing and inheritance resolution;
+- Compiler owns deterministic compiled-entry writing/publication;
+- Termcap owns opt-in termcap parsing/conversion/acquisition;
+- Inspection owns deterministic rendering, comparison, synthesis/planning,
+  database automation, persistent-raster evidence/planning, runtime-evidence
+  integration, raster-backend availability/selection, and versioned JSON views;
+- `Icod.Terminal` owns live terminal/session verification and protocol execution;
+- `Icod.DCurses` owns higher-level curses-style virtual-screen/window policy.
+
+Loading descriptions or calling Inspection planners never implicitly probes a
+terminal, changes terminal modes, allocates terminal-side identities, or sends a
+graphics protocol.
+
+## JSON compatibility
+
+Released Inspection JSON versions are immutable for their historical inputs:
+
+```text
+v1  effective description/comparison/source plan/catalog
+v2  ordered database-set automation
+v3  persistent-raster lifecycle profile/plan
+v4  persistent-raster placement profile/plan
+v5  runtime observation set/integration
+v6  raster backend profile/selection plan
+```
+
+New incompatible shapes require a new schema version. Existing schema identifiers,
+field semantics, deterministic ordering, UTF-8 bounds, and historical renderer
+forms must remain compatible. Inspection deliberately does not provide generic
+JSON input/deserialization into operational terminal state.
+
+## Command and distribution compatibility
+
+The coordinated tool package continues to expose the `icod-terminfo` router and
+the standalone archive distribution continues to provide the traditional
+`tic`, `infocmp`, `toe`, `captoinfo`, and `infotocap` command names. Minor
+Inspection API additions do not implicitly change existing command semantics.
+
+Release validation verifies exact package contents, installed-tool behavior, and
+all six supported archive RIDs. A stable promotion from an accepted prerelease
+may not alter that topology without an explicitly reviewed release defect.
+
+## Platform and scope boundaries
+
+`Icod.TermInfo` is not a curses implementation, terminal emulator, PTY/ConPTY
+layer, termios session manager, input-event decoder, or live graphics protocol
+executor. Those exclusions are compatibility promises: adding descriptive
+metadata or advisory plans does not transfer live-state ownership into TermInfo.
+
+See `VERSIONING.md` for package/API version rules and the versioned release audits
+for exact qualification evidence.

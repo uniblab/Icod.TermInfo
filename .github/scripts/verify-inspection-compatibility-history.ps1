@@ -3,8 +3,11 @@ param(
     [ValidateSet('Debug', 'Staging', 'Release')]
     [string]$Configuration,
 
-    [Parameter(Mandatory = $true)]
-    [string]$AssemblyPath
+    [Parameter(Mandatory = $true, ParameterSetName = 'Assembly')]
+    [string]$AssemblyPath,
+
+    [Parameter(Mandatory = $true, ParameterSetName = 'Manifest')]
+    [string]$ManifestPath
 )
 
 $ErrorActionPreference = 'Stop'
@@ -22,10 +25,18 @@ $oneThirteenTypesPath = Join-Path $repositoryRoot 'docs/1.13.0-RE01-INSPECTION-P
 $oneThirteenMembersPath = Join-Path $repositoryRoot 'docs/1.13.0-RE06-INSPECTION-PUBLIC-API-ADDITIVE-MEMBERS.txt'
 $oneElevenApiSha256 = '69c7350d5d44d502ecf1698c8fe1c1336f03d38eb1a36e36219f50ac33585a86'
 $oneTwelveApiSha256 = 'f71501dcd27a530051c1a02083325144ced2b6173b6b967b9571c620815198f0'
-$assemblyFullPath = if ([System.IO.Path]::IsPathRooted($AssemblyPath)) {
-    [System.IO.Path]::GetFullPath($AssemblyPath)
+$inputFullPath = if ($PSCmdlet.ParameterSetName -eq 'Assembly') {
+    if ([System.IO.Path]::IsPathRooted($AssemblyPath)) {
+        [System.IO.Path]::GetFullPath($AssemblyPath)
+    } else {
+        [System.IO.Path]::GetFullPath((Join-Path $repositoryRoot $AssemblyPath))
+    }
 } else {
-    [System.IO.Path]::GetFullPath((Join-Path $repositoryRoot $AssemblyPath))
+    if ([System.IO.Path]::IsPathRooted($ManifestPath)) {
+        [System.IO.Path]::GetFullPath($ManifestPath)
+    } else {
+        [System.IO.Path]::GetFullPath((Join-Path $repositoryRoot $ManifestPath))
+    }
 }
 
 foreach ($requiredPath in @(
@@ -36,7 +47,7 @@ foreach ($requiredPath in @(
     $oneTwelveMembersPath,
     $oneThirteenTypesPath,
     $oneThirteenMembersPath,
-    $assemblyFullPath
+    $inputFullPath
 )) {
     if (-not (Test-Path -LiteralPath $requiredPath -PathType Leaf)) {
         throw "Required Inspection compatibility input not found: $requiredPath"
@@ -286,22 +297,30 @@ function Remove-ApprovedTypes {
 
 Push-Location $repositoryRoot
 try {
-    $temporaryManifest = Join-Path ([System.IO.Path]::GetTempPath()) ("Icod.TermInfo.Inspection-api-{0}.txt" -f [Guid]::NewGuid().ToString('N'))
+    $temporaryManifest = $null
     try {
-        & dotnet run `
-            --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj `
-            -c $Configuration `
-            --no-build `
-            -- `
-            --write `
-            $temporaryManifest `
-            $assemblyFullPath
-        if (0 -ne $LASTEXITCODE) {
-            throw "Public API snapshot generation exited with status $LASTEXITCODE."
+        if ($PSCmdlet.ParameterSetName -eq 'Assembly') {
+            $temporaryManifest = Join-Path (
+                [System.IO.Path]::GetTempPath()
+            ) ("Icod.TermInfo.Inspection-api-{0}.txt" -f [Guid]::NewGuid().ToString('N'))
+            & dotnet run `
+                --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj `
+                -c $Configuration `
+                --no-build `
+                -- `
+                --write `
+                $temporaryManifest `
+                $inputFullPath
+            if (0 -ne $LASTEXITCODE) {
+                throw "Public API snapshot generation exited with status $LASTEXITCODE."
+            }
+
+            $current = [System.IO.File]::ReadAllText($temporaryManifest)
+        } else {
+            $current = [System.IO.File]::ReadAllText($inputFullPath)
         }
 
         $frozen = Normalize-Text -Text ([System.IO.File]::ReadAllText($baselinePath))
-        $current = [System.IO.File]::ReadAllText($temporaryManifest)
 
         $approvedOneThirteenMembers = Read-ApprovedRendererMembers `
             -Path $oneThirteenMembersPath `
@@ -392,8 +411,10 @@ try {
                 $oneElevenMemberFiltered.RemovedMemberCount
         )
     } finally {
-        if (Test-Path -LiteralPath $temporaryManifest) {
-            Remove-Item -LiteralPath $temporaryManifest -Force
+        if ($null -ne $temporaryManifest) {
+            if (Test-Path -LiteralPath $temporaryManifest) {
+                Remove-Item -LiteralPath $temporaryManifest -Force
+            }
         }
     }
 } finally {

@@ -1,0 +1,3 @@
+# Icod.TermInfo.Inspection 1.14.0 RB04 reviewed additive member on RasterBackendPlanner.
+# Exact public-api-snapshot manifest line; RasterBackendPlanner remains wholly removed by the RB03 type ledger during 1.14 -> 1.13 reconstruction.
+  METHOD public static Icod.TermInfo.Inspection.RasterBackendSelectionPlan Plan(System.Collections.Generic.IEnumerable<Icod.TermInfo.Inspection.RasterBackendCandidate> candidates null=not-null/not-null<not-null/not-null>, Icod.TermInfo.Inspection.RasterBackendSelectionRequest request null=not-null/not-null, Icod.TermInfo.Inspection.RasterBackendSelectionOptions options null=nullable/nullable default=null) return-null=not-null/not-null

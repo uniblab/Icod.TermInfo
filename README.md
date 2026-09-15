@@ -5,209 +5,131 @@
 [![PR Staging build](https://github.com/uniblab/Icod.TermInfo/actions/workflows/pull-request.yaml/badge.svg)](https://github.com/uniblab/Icod.TermInfo/actions/workflows/pull-request.yaml)
 [![Main Release validation](https://github.com/uniblab/Icod.TermInfo/actions/workflows/main.yaml/badge.svg?branch=main)](https://github.com/uniblab/Icod.TermInfo/actions/workflows/main.yaml)
 
-`Icod.TermInfo` is a managed, dependency-free .NET implementation of the low-level terminal-capability model traditionally supplied by `libtinfo`.
+`Icod.TermInfo` is a managed, cross-platform .NET implementation of the low-level terminal-capability model traditionally supplied by `libtinfo`. The runtime package is dependency-free; optional sibling packages add terminfo source parsing, compilation, termcap interoperability, inspection, comparison, planning, and automation without enlarging the core runtime contract.
 
-Version `1.13.0` is the validated coordinated stable release candidate. It
-promotes the persistent-raster runtime-evidence interchange surface without
-changing feature semantics, public API, schemas, dependencies, target frameworks,
-command behavior, package-consumer topology, or archive RIDs. Stable `1.12.0`
-remains the published release until PR #43 is merged and the normal tag-based
-publication flow is performed.
+## Status
 
-## 1.13 release-ready status
+Current release line: `Icod.TermInfo 1.14.0`.
 
-Version `1.13.0` promotes the fully validated `1.13.0-Alpha-8` contract
-without feature, public API, schema, dependency, target-framework,
-command-semantic, package-consumer-topology, or archive-RID changes. The additive
-`Icod.TermInfo.Inspection` runtime-evidence interchange layer provides bounded
-immutable `PersistentRasterRuntime*` observations, deterministic atomic-per-family
-conversion of conclusive observations into existing `Verified` evidence,
-audit-visible inconclusive observations and integration issues, planner-delegating
-replanning conveniences, and additive version-5 JSON for runtime observation sets
-and integration results.
+Version `1.14.0` adds raster-backend availability evidence, deterministic candidate evaluation, and explicit caller-preference-aware backend selection in `Icod.TermInfo.Inspection`, while preserving the Runtime, Source, Compiler, Termcap, command, package, and archive contracts.
 
-The complete 1.13 Inspection surface contains 90 exported public types with
-normalized-LF SHA-256
-`fd827a25abafb8e9ff3915567f45f9f2ec51b332bfd8a82dd4e4bca20290e764`.
-JSON versions 1 through 4 remain unchanged; version 5 contains exactly
-`persistentRasterRuntimeObservationSet` and
-`persistentRasterRuntimeIntegration`. Production `Icod.TermInfo.Inspection`
-still has no `Icod.Terminal` dependency. Downstream qualification remains pinned
-to published `Icod.Terminal 1.12.0`.
+The 1.14 release contract passed the complete Staging qualification matrix on Windows, Linux, and macOS, including package verification, isolated consumers, installed-tool smoke, and all six standalone archive RIDs.
 
-The Alpha-8 contract was accepted on exact product head
-`f236c33d8239e80379bf8cf0f1123abd6c93c3cb` by qualification run `34797445315`.
-Stable product head `6e9217b16c3023fb10fa34dbaa74afe48448d858` then passed qualification run
-`34799272472` with all 12 jobs green, including Windows whole-surface/historical
-Inspection compatibility, package verification, three installed-tool smokes, and
-all six archive RIDs. PR #43 remains unmerged; tag and package publication remain
-gated by the normal release workflow. The install commands below target
-`1.13.0`. See
-`docs/1.13.0-PERSISTENT-RASTER-RUNTIME-EVIDENCE-GUIDE.md`,
-`docs/1.13.0-INSPECTION-PUBLIC-API-FREEZE.md`, and
-`docs/1.13.0-RELEASE-AUDIT.md`.
+## Support the Project
 
-The package family targets `net8.0`, `net9.0`, and `net10.0`; packages use C# 13,
-contain no native ncurses/terminfo payload, and are intended to run on Windows,
-Linux, and macOS.
+`Icod.TermInfo` and its ecosystem packages (`Icod.Terminal` and `Icod.DCurses`) are built and maintained by a solo developer. If these packages save you or your team time, please consider supporting their continued development and maintenance.
 
-## 1.12 release status
+[![GitHub Sponsors](https://img.shields.io/badge/GitHub-Sponsor?logo=githubsponsors)](https://github.com/sponsors/uniblab)
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-Support?logo=kofi)](https://ko-fi.com/TimothyBruce)
+[![PayPal](https://img.shields.io/badge/PayPal-Support?logo=paypal)](https://paypal.me/uniblab)
 
-Version `1.12.0` promotes the fully validated `1.12.0-Alpha-8` contract without
-feature, public API, schema, dependency, target-framework, command-semantic, or
-archive-RID changes. The 1.12 Inspection layer adds exactly two protocol-neutral
-placement requirements: pixel-space source rectangles and signed z-order, and
-composes them with the frozen 1.11 lifecycle planner and ordered database-set
-precedence.
+## Architecture
 
-The complete Inspection API remains frozen at 81 exported public types with
-normalized-LF SHA-256
-`f71501dcd27a530051c1a02083325144ced2b6173b6b967b9571c620815198f0`.
-JSON versions 1 through 3 remain unchanged; version 4 contains exactly
-`persistentRasterPlacementProfile` and `persistentRasterPlacementPlan`.
-
-Production `Icod.TermInfo` and `Icod.TermInfo.Inspection` still do not depend on
-`Icod.Terminal`. The Alpha-8 contract passed workflow #725 / `34763187115`.
-The release-ready stable contract passed workflow #741 / `34764960954` on
-exact head `292ea7b490747ada55d1960461e1cdb676a8e3e9`, with all 12 jobs green.
-The release audit records the subsequent pre-merge sample/documentation polish
-separately.
-Publication remains gated by merge to `main` and the normal immutable-tag release
-workflow. See
-`docs/1.12.0-ADVANCED-PERSISTENT-RASTER-PLACEMENT-GUIDE.md` and
-`docs/1.12.0-RELEASE-AUDIT.md`.
-
-## 1.11 release status
-
-Version `1.11.0` promotes the fully validated `1.11.0-Alpha-8` contract without
-feature, public API, schema, dependency, target-framework, command-semantic, or
-archive-RID changes. The additive Inspection surface provides immutable
-evidence/provenance, `Unknown`/`Supported`/`Unsupported`/`Contradicted`
-classification, deterministic semantic lifecycle plans, `TerminalDescription`
-and database-set composition, and additive version-3 profile/plan JSON documents.
-
-TermInfo does not perform live graphics protocol I/O or own terminal image,
-resource, or placement identities. Live verification, protocol execution,
-acknowledgements, generation invalidation, and cleanup remain consumer/sibling-
-layer responsibilities such as `Icod.Terminal`.
-
-The exact complete 1.11 Inspection reflection manifest is frozen by SHA-256
-`69c7350d5d44d502ecf1698c8fe1c1336f03d38eb1a36e36219f50ac33585a86`
-while release verification independently reconstructs the frozen 1.10 API after
-removing only the reviewed 1.11 delta. JSON schema versions 1 and 2 remain
-unchanged; version 3 contains only `persistentRasterLifecycleProfile` and
-`persistentRasterLifecyclePlan`.
-
-The Alpha-8 product contract passed workflow #286 / `34662961312`; the stable
-version-only promotion passed workflow #289 / `34663869047`. Publication remains
-gated by the normal `main` and immutable `v*` tag workflows.
-
-See `docs/1.11.0-PERSISTENT-RASTER-LIFECYCLE-GUIDE.md`,
-`samples/Icod.TermInfo.PersistentRasterLifecycle.Sample`, and
-`docs/1.11.0-RELEASE-AUDIT.md`.
-
-## 1.10 release status
-
-Version `1.10.0` promotes the frozen and fully validated Alpha-8 contract without
-semantic changes. Version 1.10 extends the 1.9 automation layer to caller-ordered sets
-of explicit conventional terminfo databases: deterministic precedence and
-shadow evidence, semantic duplicate and alias-collision analysis, set
-comparison, bounded multi-database parent planning, and the additive version-2
-JSON documents `databaseSet`, `databaseSetComparison`, and `databaseSetPlan`.
-
-The complete 1.10 Inspection public surface is frozen in
-`docs/1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt`. The 1.9 version-1 JSON schema
-and command forms remain unchanged; the additive version-2 schema is frozen in
-`docs/Icod.TermInfo.Inspection.schema.v2.json`. DA07 hardening exercises real
-generated databases, isolated package consumers on `net8.0`/`net9.0`/`net10.0`,
-installed tools on all three hosts, and all six standalone archive RIDs.
-
-The exact Alpha-8 product gate and final consumer-closure gate are green. The
-stable release includes the executable documentation closure: the consolidated
-`docs/1.10.0-MULTI-DATABASE-GUIDE.md`, the reusable-API
-`samples/Icod.TermInfo.DatabaseSet.Sample`, and the 1.10 extensions in
-`samples/ToolSuite`. The new sample's normalized v2 fixtures are now part of the
-permanent release verifier on `net8.0`, `net9.0`, and `net10.0`.
-
-The final post-documentation Staging gate is green (`33736812176`, head
-`b312c946e2e003f2d00761dff3d49957dbfbbeaf`). The coordinated stable version is
-`1.10.0`; publication remains gated by the normal main/tag release workflow. See
-`docs/1.10.0-RELEASE-AUDIT.md`.
-
-## Install
-
-Runtime-only consumers use:
+`Icod.TermInfo` is the capability-data foundation of the Icod terminal stack. Higher layers may stop at whichever abstraction they need:
 
 ```text
-dotnet add package Icod.TermInfo --version 1.13.0
+higher-level terminal applications
+             |
+        Icod.DCurses
+             |
+        Icod.Terminal
+             |
+     Icod.TermInfo family
+             |
+ terminal capability databases
 ```
 
-Applications which need terminfo source-language support use:
+- `Icod.TermInfo` owns immutable terminal descriptions, capability metadata, compiled terminfo acquisition, expansion, color semantics, padding-aware output, and built-in terminal profiles.
+- `Icod.Terminal` owns the live terminal conversation: input, lifecycle, active queries, semantic protocols, terminal state, raster execution, and reversible session ownership.
+- `Icod.DCurses` owns higher-level cells, windows, pads, retained panels, layout, composition, refresh/damage policy, and curses-style interaction abstractions.
+
+The reusable TermInfo package family is deliberately layered:
 
 ```text
-dotnet add package Icod.TermInfo.Source --version 1.13.0
+Icod.TermInfo                    runtime / capability authority
+├── Icod.TermInfo.Source         .ti parsing and resolution
+├── Icod.TermInfo.Termcap        termcap interoperability
+├── Icod.TermInfo.Compiler       compilation / database writing
+└── Icod.TermInfo.Inspection     inspection / comparison / planning
+
+Icod.TermInfo.Tools              command distribution / routing
 ```
 
-Applications which need opt-in termcap parsing, conversion, rendering, or
-explicit historical termcap acquisition use:
+Dependency boundaries are explicit: Runtime has no production package dependencies; Source and Termcap each depend on Runtime; Compiler and Inspection each depend on Runtime and Source. Inspection does not depend on Compiler, Termcap, `Icod.Terminal`, or `Icod.DCurses`.
+
+## Quick Start
+
+Install the runtime package:
 
 ```text
-dotnet add package Icod.TermInfo.Termcap --version 1.13.0
+dotnet add package Icod.TermInfo --version 1.14.0
 ```
 
-Applications which compile terminfo source or write conventional compiled
-terminfo databases use:
+Resolve the current terminal through conventional system discovery with immutable built-in fallback:
 
-```text
-dotnet add package Icod.TermInfo.Compiler --version 1.13.0
+```csharp
+using Icod.TermInfo;
+
+TerminalDatabase database = new(
+	new ITerminalDescriptionProvider[] {
+		new SystemTerminalDescriptionProvider(),
+		TerminalDatabase.BuiltIn,
+	}
+);
+
+TerminalDescription terminal = TerminalEnvironment.Resolve(
+	database,
+	TerminalProfiles.Dumb
+);
+
+Console.WriteLine( $"Terminal: {terminal.Name}" );
+
+string? clear = terminal.GetString( StringCapability.ClearScreen );
+if ( clear is not null ) {
+	TermInfoOutput.PutP( clear, Console.Out );
+}
 ```
 
-Applications which need canonical rendering, semantic comparison, provider-aware
-inspection, database-set automation, persistent-raster lifecycle/placement
-planning, or 1.13 runtime-evidence interchange and integration use:
+Applications that only need compiled terminfo acquisition, immutable `TerminalDescription` values, capability lookup, expansion, or output continue to reference `Icod.TermInfo` alone. Add the optional packages only for the higher-level source, compiler, termcap, or planning workflows described below.
+
+## Feature Inventory
+
+The root README describes the current product by capability rather than by the release in which each feature first appeared.
+
+- **Terminal capability model** — immutable terminal descriptions; standard and extended Boolean, numeric, and string capabilities; canonical capability metadata; aliases and descriptions; built-in `dumb`, ANSI, DEC VT100/VT102/VT220, xterm, Windows Console, and Windows Terminal profiles.
+- **Compiled terminfo acquisition** — bounded parsing of conventional compiled entries, explicit directory providers, deterministic system discovery, provider composition, successful-entry caching, and built-in fallback.
+- **Expansion and output** — reusable parsed parameter programs, bounded parameter evaluation, extended-string expansion, reversible 8-bit capability-string semantics, and padding-aware `tputs`/`putp`-style output.
+- **Color and environment semantics** — monochrome, indexed-color, and direct-RGB inspection and selector expansion; terminal-size queries; explicit Windows virtual-terminal output enablement kept separate from profile selection.
+- **Terminfo source language** — `Icod.TermInfo.Source` provides `.ti` lexing, parsing, diagnostics, capability classification, cancellation semantics, `use=` inheritance resolution, and materialization into ordinary `TerminalDescription` values.
+- **Compilation and publication** — `Icod.TermInfo.Compiler` writes deterministic legacy and wide compiled entries, validates representability, compiles resolved descriptions or `.ti` source, and publishes explicit conventional terminfo directory layouts.
+- **Termcap interoperability** — `Icod.TermInfo.Termcap` provides bounded termcap parsing, capability classification, `tc=` resolution, semantic conversion, reverse representability/rendering, and explicit historical `TERMCAP` / `TERMPATH` acquisition.
+- **Inspection, comparison, and planning** — `Icod.TermInfo.Inspection` provides canonical effective-source rendering, semantic comparison, database catalogs and ordered database-set analysis, relative-source synthesis and parent planning, machine-readable JSON automation, persistent-raster lifecycle/placement/runtime-evidence planning, and raster-backend availability and selection.
+- **Managed command toolchain** — `tic`, `infocmp`, `toe`, `captoinfo`, and `infotocap` expose the reusable engines as traditional command-line workflows; `Icod.TermInfo.Tools` provides the non-colliding `icod-terminfo` router.
+
+## Packages and Tools
+
+| Package | Purpose |
+| --- | --- |
+| `Icod.TermInfo` | Runtime capability model, compiled acquisition, expansion, profiles, and output |
+| `Icod.TermInfo.Source` | Terminfo `.ti` source parsing and `use=` resolution |
+| `Icod.TermInfo.Termcap` | Termcap parsing, conversion, rendering, and explicit acquisition |
+| `Icod.TermInfo.Compiler` | Deterministic compiled terminfo writing and database publication |
+| `Icod.TermInfo.Inspection` | Rendering, comparison, database analysis, planning, and JSON automation |
+| `Icod.TermInfo.Tools` | Installable `icod-terminfo` multi-command router |
+
+Install an optional package only when its capability is needed:
 
 ```text
-dotnet add package Icod.TermInfo.Inspection --version 1.13.0
+dotnet add package Icod.TermInfo.Source --version 1.14.0
+dotnet add package Icod.TermInfo.Termcap --version 1.14.0
+dotnet add package Icod.TermInfo.Compiler --version 1.14.0
+dotnet add package Icod.TermInfo.Inspection --version 1.14.0
 ```
 
-`Icod.TermInfo.Source` and `Icod.TermInfo.Termcap` each depend on the matching
-`Icod.TermInfo` package. `Icod.TermInfo.Compiler` and
-`Icod.TermInfo.Inspection` each depend on matching Runtime and Source packages;
-Inspection does not depend on Compiler, Termcap, `Icod.Terminal`, or
-`Icod.DCurses`. Applications which only load compiled terminfo or consume
-`TerminalDescription` values continue to reference `Icod.TermInfo` alone.
-
-The same validated package artifacts are published to NuGet.org and GitHub
-Packages. Historical release contracts remain recorded in the versioned release
-audits; the 1.13 promotion and release contract is recorded in
-`docs/1.13.0-RELEASE-AUDIT.md`.
-
-## Tool Suite
-
-The 1.4 line added three managed .NET 10 command-line tools above the reusable
-package family:
+Install the command router with:
 
 ```text
-tic       validate and publish terminfo source
-infocmp   render and semantically compare terminal descriptions
-toe       enumerate conventional databases and analyze use= dependencies
-```
-
-Version 1.6.0 adds two additional non-packable conversion commands:
-
-```text
-captoinfo convert termcap descriptions to effective terminfo source
-infotocap convert effective terminfo source to conventional termcap
-```
-
-All five standalone command projects remain non-packable and do not introduce
-command-to-command dependencies. `Icod.TermInfo.Tools` remains the separate
-distribution-only router package.
-
-Install the coordinated router as a .NET tool with:
-
-```text
-dotnet tool install --global Icod.TermInfo.Tools --version 1.13.0
+dotnet tool install --global Icod.TermInfo.Tools --version 1.14.0
 
 icod-terminfo tic -V
 icod-terminfo infocmp -V
@@ -216,1218 +138,55 @@ icod-terminfo captoinfo -V
 icod-terminfo infotocap -V
 ```
 
-The router strips the command name and dispatches in-process to the existing
-command implementation. It does not duplicate command option parsing or
-terminfo semantics.
+The standalone release archives expose the traditional command names directly for `win-x64`, `win-arm64`, `linux-x64`, `linux-arm64`, `osx-x64`, and `osx-arm64`. They are framework-dependent .NET 10 distributions; the user supplies the .NET 10 runtime and controls installation and `PATH` placement.
 
-The standalone distribution remains a framework-dependent .NET 10 suite archive
-for each supported RID:
+## Platforms and Targets
+
+The reusable package family targets:
 
 ```text
-Icod.TermInfo.Tools.<version>.win-x64.zip
-Icod.TermInfo.Tools.<version>.win-arm64.zip
-Icod.TermInfo.Tools.<version>.linux-x64.tar.gz
-Icod.TermInfo.Tools.<version>.linux-arm64.tar.gz
-Icod.TermInfo.Tools.<version>.osx-x64.tar.gz
-Icod.TermInfo.Tools.<version>.osx-arm64.tar.gz
+net8.0
+net9.0
+net10.0
 ```
 
-Each 1.13.0 archive contains the traditional `tic`, `infocmp`, `toe`,
-`captoinfo`, and `infotocap` command names and their required managed
-dependencies. The user supplies the .NET 10 runtime and controls where the
-archive is unpacked and whether that location is placed on `PATH`. The archive
-therefore remains suitable for intentional drop-in installation of the
-traditional names, while the NuGet tool uses the non-colliding `icod-terminfo`
-router name.
+The repository uses C# 13. The command projects and router target .NET 10. Release validation covers Windows, Linux, and macOS, with x64 and ARM64 standalone tool archives for each operating-system family.
 
-## 1.x stability contract
+The managed packages contain no native ncurses or system terminfo payload. Runtime discovery consumes caller-selected or conventional host databases and can fall back to immutable built-in profiles.
 
-The 1.x line keeps runtime assembly identity `Icod.TermInfo, Version=1.0.0.0` and
-remains unsigned. The frozen 1.0 and 1.1 releases support `net8.0` and
-`net10.0`; beginning with 1.2, the supported consumer targets are `net8.0`,
-`net9.0`, and `net10.0`. `Icod.TermInfo.Source`, `Icod.TermInfo.Compiler`,
-`Icod.TermInfo.Inspection`, and `Icod.TermInfo.Termcap` retain assembly version
-`1.0.0.0` throughout their
-1.x lines. Public API, binary/package compatibility, deprecation, and
-target-framework policy are documented in `docs/VERSIONING.md` and
-`docs/COMPATIBILITY.md`.
+## Design Boundaries and Guarantees
 
-The runtime 1.0 public API remains frozen. Version 1.1 adds source-language functionality in the separate `Icod.TermInfo.Source` package rather than making the runtime package depend on parser/front-end code. The 1.2 line adds deterministic compiled-entry writing in the separate `Icod.TermInfo.Compiler` package. The 1.3 line adds canonical rendering and semantic comparison in the separate `Icod.TermInfo.Inspection` package. The 1.4 line composes those libraries into the separate `tic`, `infocmp`, and `toe` command layer without moving command policy into the reusable packages. Live terminal sessions, input decoding, and active probing belong to the sibling `Icod.Terminal` layer; curses-style screen/window behavior belongs to `Icod.DCurses`. Version 1.11 adds protocol-neutral persistent-raster lifecycle evidence and planning to Inspection while preserving that live-session ownership boundary. Version 1.12 adds protocol-neutral source-rectangle and signed-z-order placement semantics and planning while keeping concrete execution values and live protocol work downstream. Version 1.13 adds protocol-neutral caller-owned runtime observations, deterministic integration into existing verified evidence, and runtime-evidence audit JSON while keeping live verification downstream. PTYs, terminal emulation, and graphics protocol execution remain separate later or sibling work.
+- Runtime capability data is immutable and reusable; live terminal-session ownership is intentionally outside TermInfo.
+- TermInfo does not install a competing terminal input reader, own application event loops, or perform general live terminal probing.
+- Persistent-raster planning is protocol-neutral. TermInfo does not allocate terminal-side image/resource/placement identities, execute Sixel or Kitty Graphics, process acknowledgements, or own terminal cleanup; those responsibilities belong to live-session layers such as `Icod.Terminal`.
+- Backend planning does not use terminal-brand heuristics or hidden backend ranking. Caller preference is explicit, and ambiguity remains visible rather than being resolved by enum value or input order.
+- Curses-style cells, windows, layout, retained presentation state, refresh/damage policy, and interaction routing belong to `Icod.DCurses`.
+- PTY/process hosting and terminal emulation are separate concerns.
+- Parsing, compilation, comparison, synthesis, planning, and machine-readable output are designed to be deterministic and bounded for equivalent caller input.
+- `TermInfoOutput` can emit resolved capability strings and honor terminfo padding semantics without turning the library into the owner of a live terminal conversation.
 
-## What 1.0 provides
+## Samples and Documentation
 
-- immutable terminal descriptions with canonical name, aliases, and a separate verbose `Description`;
-- a complete ncurses/System V-compatible standard capability catalog: 44 Boolean, 39 numeric, and 414 string table positions;
-- canonical standard-capability metadata including fixed future binary index, short name, long/variable name, termcap code, and managed enum identity;
-- deterministic read-only enumeration of the standard catalog and of effectively present standard capabilities on each description;
-- signed 32-bit standard and extended numeric semantics;
-- generic extended Boolean, numeric, and string capabilities with exact case-sensitive names;
-- reusable parsed terminfo parameter programs, hardened parsing/evaluation, and per-description bounded lazy expansion caches;
-- explicit `ExpandExtendedString` symmetry for parameterized extended strings;
-- reversible 8-bit capability-string semantics: bytes `0x01`-`0xFF` map one-to-one through .NET strings and round-trip with `Encoding.Latin1`;
-- simple and terminal-aware `tputs`/`putp`-style output, including `xon`, `pb`, `npc`, `pad`, affected-line multiplication, and caller-supplied baud-rate semantics;
-- semantic monochrome, indexed-color, and direct-RGB inspection and selector expansion;
-- built-in `dumb`, ANSI, DEC VT100/VT102/VT220, xterm indexed/direct-color, `winconsole`, `ms-terminal`, and `ms-terminal-direct` profiles;
-- descriptive mouse, focus, bracketed-paste, modified-key, cursor-style, reporting, and clipboard metadata where the selected profile advertises it;
-- live terminal-size queries kept distinct from environment/profile defaults;
-- explicit and reversible Windows virtual-terminal output enablement, separate from profile selection;
-- pure parsing of supported conventional compiled terminfo entries from caller-supplied bytes;
-- caller-owned explicit conventional-directory providers with literal/hex first-character lookup and identity verification;
-- deterministic system discovery through encoded or directory `TERMINFO`, user `.terminfo`, ordered `TERMINFO_DIRS`, and frozen platform defaults;
-- provider-local successful-entry caching with retryable clean misses/failures and new-provider refresh semantics;
-- explicit provider composition, including system lookup followed by immutable built-in fallback.
+The [`samples`](samples/README.md) directory contains focused examples for runtime acquisition, reusable Termcap parsing/conversion/acquisition, the source/compiler toolchain, database-set analysis, persistent-raster lifecycle and placement planning, runtime-evidence integration, raster-backend selection, and command-tool workflows.
 
-The 0.6.0 behavior of `dumb`, `ansi`, and `vt100` remains intentionally conservative: `dumb` is minimal, `ansi` is the traditional eight-color profile, and `vt100` remains monochrome.
+Recommended documentation entry points:
 
-## What 1.1 adds
+- [`CHANGELOG.md`](CHANGELOG.md) — release-by-release feature history;
+- [`docs/VERSIONING.md`](docs/VERSIONING.md) — versioning and compatibility policy;
+- [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md) — public and binary compatibility commitments;
+- [`docs/1.14.0-RASTER-BACKEND-SELECTION-GUIDE.md`](docs/1.14.0-RASTER-BACKEND-SELECTION-GUIDE.md) — current raster-backend evidence and selection model;
+- [`docs/1.14.0-RELEASE-AUDIT.md`](docs/1.14.0-RELEASE-AUDIT.md) — exact 1.14 qualification and release evidence;
+- [`Icod.TermInfo-Post-1.0-Development-Roadmap.md`](Icod.TermInfo-Post-1.0-Development-Roadmap.md) — longer-range development direction.
 
-The optional `Icod.TermInfo.Source` package adds the source-language path without changing the runtime package contract:
+Release audits, public-API baselines, schema freezes, tranche records, and historical roadmaps remain in the repository as engineering evidence. They are intentionally not repeated in this README.
 
-- deterministic `.ti` lexical analysis with source spans and diagnostics;
-- terminfo string and numeric source-value semantics;
-- unresolved documents, entries, fields, aliases, and descriptions;
-- classification of standard and extended capabilities against the runtime catalog;
-- cancellation semantics and `use=` inheritance resolution;
-- materialization of resolved source entries into ordinary immutable `TerminalDescription` values;
-- stable duplicate source-name and alias diagnostics;
-- bounded source and inheritance processing, deterministic mutation fuzzing, and checked-in source/compiled compatibility fixtures.
+## Compatibility and Versioning
 
-The source package is optional. Compiled-database users and higher-level terminal consumers do not acquire it transitively through `Icod.TermInfo`.
+The 1.x line keeps reusable assembly identity at version `1.0.0.0`; the assemblies remain unsigned. The current reusable packages support `net8.0`, `net9.0`, and `net10.0`.
 
-## What 1.2 adds
+The runtime 1.0 public API remains frozen. Later reusable capabilities were added through sibling packages or compatible additive surfaces rather than by turning the dependency-free Runtime package into a monolith. Public API, binary/package compatibility, deprecation, and target-framework policy are maintained in [`docs/VERSIONING.md`](docs/VERSIONING.md) and [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md).
 
-The optional `Icod.TermInfo.Compiler` package completes the managed inverse of
-the existing compiled-term acquisition path:
-
-- deterministic legacy `0432` and wide `01036` compiled-entry writing;
-- standard and ncurses extended-capability emission;
-- automatic or explicit format selection with strict representation validation;
-- direct compilation from resolved `TerminalDescription` values;
-- `.ti` source compilation through the existing Source parser and inheritance
-  resolver, preserving Source diagnostics;
-- controlled publication into explicit conventional terminfo directory layouts;
-- safe path derivation, overwrite policy, and failure-resistant database writes;
-- semantic source → resolve → write → parse round-trip validation;
-- byte-for-byte determinism checks and pinned ncurses/`tic` differential corpus
-  coverage.
-
-Compiler remains opt-in. The Runtime package remains dependency-free, Source
-depends only on Runtime, and Compiler depends on Runtime and Source.
-
-## What 1.3 adds
-
-The optional `Icod.TermInfo.Inspection` package adds reusable inspection and
-comparison engines without enlarging the already-frozen Runtime, Source, or
-Compiler public contracts:
-
-- canonical `.ti`-style rendering of effective `TerminalDescription` values;
-- normalized rendering of unresolved Source entries and documents while
-  preserving semantically significant field order;
-- deterministic structured comparison of effective terminal descriptions;
-- source-aware comparison which preserves cancellation, disabled fields,
-  duplicate declarations, `use=` references, and source ordering;
-- provider-aware inspection through explicit provider/name targets;
-- deterministic comparison ordering across cultures and extended-capability
-  insertion order;
-- corpus-backed managed render/compile/parse/compare validation across the
-  existing Runtime, Source, and Compiler layers.
-
-Inspection remains opt-in. It depends on matching Runtime and Source packages
-and deliberately has no production dependency on Compiler. The 1.4 command
-layer consumes Inspection without changing that package dependency boundary.
-
-## What 1.4 adds
-
-The 1.4 line completes the first managed command-toolchain layer above the
-reusable package family while keeping command policy out of Runtime, Source,
-Compiler, and Inspection:
-
-- Inspection adds read-only system database-location inspection and conventional
-  database catalog enumeration without enlarging the frozen Runtime API;
-- Inspection adds configurable effective-source renderer layout, width,
-  capability ordering, and extended-capability filtering while preserving the
-  released 1.3 renderer overload behavior;
-- `tic` validates strict UTF-8 `.ti` source, resolves `use=` inheritance, checks
-  compiled representability, and publishes explicit conventional databases;
-- `infocmp` renders effective descriptions and performs structured semantic
-  difference/common/absent-standard reporting over explicit or discovered
-  providers;
-- `toe` enumerates conventional databases and provides forward/reverse `use=`
-  source-dependency reports with deterministic duplicate handling;
-- the three commands ship together in six framework-dependent .NET 10 archives
-  for Windows, Linux, and macOS, with structural verification and matching-host
-  execution smoke.
-
-Version 1.4.1 retained the exact 1.4.0 API and command semantics while
-correcting release-facing documentation.
-
-## What 1.5 adds
-
-Version 1.5 changes distribution and release infrastructure rather than terminfo
-semantics:
-
-- `Directory.Build.props` contains the single `IcodTermInfoSuiteVersion` source
-  used by all four libraries, all three standalone commands, and the router;
-- the new `Icod.TermInfo.Tools` NuGet package installs the `icod-terminfo`
-  multi-command router;
-- `icod-terminfo tic`, `icod-terminfo infocmp`, and `icod-terminfo toe` dispatch
-  directly to the existing command implementations;
-- standalone `tic`, `infocmp`, and `toe` remain non-packable projects and remain
-  available in the six framework-dependent release archives;
-- CI installs and executes the packed router tool on Windows, Linux, and macOS
-  in addition to continuing matching-host archive smoke tests.
-
-No frozen Runtime, Source, Compiler, or Inspection public API changes in 1.5.0,
-and no routed command semantics change.
-
-## What 1.6 adds
-
-Version 1.6.0 adds opt-in historical termcap interoperability while preserving
-the existing terminfo-first Runtime discovery contract:
-
-- `Icod.TermInfo.Termcap` is a fifth coordinated reusable library package and
-  depends only on Runtime;
-- TC01-TC06 provide bounded termcap parsing, Runtime-derived capability
-  classification, `tc=` resolution, semantic conversion, reverse
-  representability/rendering, and explicit `TERMCAP` / `TERMPATH` acquisition;
-- TC07 adds standalone `captoinfo` and `infotocap` commands and routes both
-  through `icod-terminfo`;
-- `captoinfo` composes Termcap conversion with Inspection's effective terminfo
-  source renderer;
-- `infotocap` composes the existing terminfo Source parser/resolver with the
-  Termcap reverse renderer;
-- all six RID archives carry five standalone launchers: `tic`, `infocmp`, `toe`,
-  `captoinfo`, and `infotocap`;
-- conversion output is effective resolved state; comments, original formatting,
-  cancellations/disabled fields, and inheritance ancestry are not reconstructed;
-- conversion loss and termcap representability failures are reported instead of
-  being silently hidden;
-- TC08 provides checked-in differential/hostile-input coverage, bounded seeded
-  mutation validation, the frozen Termcap public API baseline, a structural
-  Termcap package verifier, and isolated package-reference consumers on
-  `net8.0`, `net9.0`, and `net10.0`.
-
-The 1.6.0 code/API/package/CLI contract is frozen. The stable `v1.6.0` release
-was published on 2026-08-31 from the exact validated release commit
-`4238632f22fce41726f1f94e5621383a9d3303a7`. The frozen release contract and
-post-publication record are documented in `docs/1.6.0-RELEASE-AUDIT.md`.
-
-## What 1.7 adds
-
-Version 1.7.0 adds deterministic relative terminfo source synthesis while
-preserving the frozen Runtime, Source, Compiler, and Termcap public contracts:
-
-- `Icod.TermInfo.Inspection` adds
-  `TerminalDescriptionSourceSynthesisParent`,
-  `TerminalDescriptionSourceSynthesisOptions`, and
-  `TerminalDescriptionSourceSynthesizer`;
-- callers supply an effective target and an explicit ordered parent list whose
-  exact `UseName` values become ordered `use=` references;
-- the synthesizer omits inherited values already equal to the target, emits
-  local additions and overrides, and emits `cap@` cancellations where inherited
-  state must be removed;
-- standard and ordinal case-sensitive extended capabilities participate in the
-  same deterministic semantic model;
-- canonical, single-line, and one-capability-per-line layouts retain the existing
-  width and standard-capability ordering controls and always produce LF source;
-- `infocmp -u target parent [parent ...]` exposes the reusable engine through
-  the standalone command and `icod-terminfo` router;
-- Source and Compiler round trips, reproducible generated-state tests, a pinned
-  ncurses semantic differential corpus, package consumers, router smoke, and all
-  six standalone archives permanently validate the feature.
-
-Applications which already have effective target and parent descriptions can
-synthesize relative source directly:
-
-```csharp
-using Icod.TermInfo;
-using Icod.TermInfo.Inspection;
-
-TerminalDescription target =
-	TerminalDatabase.BuiltIn.Load( "xterm-256color" );
-TerminalDescription parent =
-	TerminalDatabase.BuiltIn.Load( "xterm" );
-
-string relativeSource = TerminalDescriptionSourceSynthesizer.Synthesize(
-	target,
-	new[] {
-		new TerminalDescriptionSourceSynthesisParent(
-			"xterm",
-			parent
-		),
-	}
-);
-```
-
-Parent order is semantic and is never optimized, reordered, or pruned. The
-generated source resolves to the target when combined with source representations
-of the supplied effective parents.
-
-## What 1.8 adds
-
-Version 1.8.0 adds deterministic parent planning above the unchanged 1.7
-relative-source synthesizer:
-
-- `TerminalDescriptionSourcePlanner` evaluates zero-, one-, and ordered
-  multi-parent plans from an explicit caller-supplied candidate sequence;
-- `TerminalDescriptionSourcePlanningOptions` applies independent candidate,
-  selected-parent, evaluated-plan, and generated-source bounds;
-- `TerminalDescriptionSourcePlanningScore` ranks plans lexicographically by
-  local directives, cancellations, parent count, rendered UTF-8 bytes, and
-  candidate-index sequence;
-- `TerminalDescriptionSourcePlan` returns selected parents, generated source,
-  score, evaluated-plan count, and exhaustive-versus-bounded evidence;
-- explicit catalog and directory helpers load only caller-selected data and do
-  not consult environment or platform-default discovery; and
-- `infocmp --plan-use` exposes the same planner through the standalone command,
-  `icod-terminfo` router, tool package, and six release archives.
-
-Applications can plan directly from effective descriptions:
-
-```csharp
-using Icod.TermInfo;
-using Icod.TermInfo.Inspection;
-
-TerminalDescription target =
-	TerminalDatabase.BuiltIn.Load( "xterm-256color" );
-TerminalDescription candidate =
-	TerminalDatabase.BuiltIn.Load( "xterm" );
-
-TerminalDescriptionSourcePlan plan =
-	TerminalDescriptionSourcePlanner.Plan(
-		target,
-		new[] {
-			new TerminalDescriptionSourceSynthesisParent(
-				"xterm",
-				candidate
-			),
-		}
-	);
-```
-
-The planner does not infer ancestry or rewrite synthesis semantics. Every
-evaluated plan delegates source generation to the frozen 1.7 synthesizer, and
-the result reports whether the configured search space was exhausted.
-
-## What 1.9 adds
-
-Version 1.9.0 adds deterministic machine-readable Inspection output and
-explicit planning automation. MI07 freezes the exact API, schema, command,
-package, sample, fixture, router, and archive contract after MI06 hardened the
-reusable and command surface. The reusable renderer includes database-catalog
-manifests, and the package publishes the complete version-1 schema alongside
-the MI02 effective-description and MI03 comparison and plan payloads:
-
-```csharp
-using Icod.TermInfo;
-using Icod.TermInfo.Inspection;
-
-TermInfoJsonRendererOptions jsonOptions =
-	new(
-		TermInfoJsonRendererOptions.DefaultMaximumOutputByteCount,
-		writeIndented: true
-	);
-
-TerminalDescription terminal =
-	TerminalDatabase.BuiltIn.Load( "xterm-256color" );
-string descriptionJson =
-	TermInfoJsonRenderer.Render(
-		terminal,
-		jsonOptions
-	);
-
-TermInfoComparisonResult comparison =
-	TerminalDescriptionComparer.Compare( terminal, terminal );
-string comparisonJson =
-	TermInfoJsonRenderer.Render( comparison, jsonOptions );
-
-TermInfoDatabaseCatalog catalog =
-	TermInfoDatabaseInspector.InspectDirectory( explicitDatabaseRoot );
-string catalogJson =
-	TermInfoJsonRenderer.Render( catalog, jsonOptions );
-```
-
-The version-1 schema identifier is
-`urn:icod:terminfo:inspection:json:1`. MI03 preserves ordered effective and
-source-aware differences, typed left/right values, retained source entry, field,
-index, and span evidence, and explicit nulls. Plan JSON preserves selected
-parent names, generated LF source, every score component, selected candidate
-indices, evaluation count, exhaustive status, and candidate count. Catalog JSON
-preserves the normalized root, explicit catalog kind and completeness, ordered
-entries and issues, and duplicate canonical-name evidence. The published
-`docs/Icod.TermInfo.Inspection.schema.json` describes all four version-1 document
-kinds and is included in the Inspection package. `infocmp --json` emits
-description, comparison, and source-plan documents; `toe --json` emits catalog
-documents. Explicit-directory all-candidates planning is available only through
-one caller-selected database root.
-
-MI06 adds a JSON-producing Toolchain sample, ToolSuite automation examples,
-package-reference-only rendering for all four document kinds, and tool-package
-plus six-archive smoke. Culture, separate-process, large/pathological-input,
-exact UTF-8 boundary, and Windows/Linux/macOS evidence remain release gates. The
-frozen 1.7 synthesis and 1.8 planning contracts remain unchanged.
-
-MI07 adds no feature behavior. The complete 31-type Inspection surface is
-frozen in `docs/1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt`; the version-1 schema,
-package graph, direct and routed commands, six-archive topology, samples,
-fixtures, and release verification are frozen in
-`docs/1.9.0-RELEASE-AUDIT.md`. Stable 1.9.0 promotes the validated Alpha-7
-surface without changing behavior, public API, schema, or package topology.
-
-See
-`Icod.TermInfo-1.9.0-Machine-Readable-Inspection-and-Planning-Automation-Roadmap.md`,
-`docs/1.9.0-MI07-API-SCHEMA-PACKAGING-AND-RELEASE-CLOSURE.md`, and
-`docs/1.9.0-RELEASE-AUDIT.md` for the 1.9 machine-readable contract.
-
-## What 1.13 adds
-
-Version 1.13.0 adds protocol-neutral runtime-evidence interchange above the
-frozen 1.11 lifecycle and 1.12 placement models without moving live terminal I/O
-into TermInfo:
-
-- immutable bounded `PersistentRasterRuntimeLifecycleObservation` and
-  `PersistentRasterRuntimePlacementObservation` values plus canonical observation
-  sets;
-- deterministic mapping of conclusive runtime outcomes into the existing
-  `Verified` evidence model with safe final source ordinals;
-- atomic-per-family handling of evidence-capacity and ordinal-space exhaustion;
-- audit-visible `Inconclusive` observations and structured integration issues;
-- `CreateLifecyclePlan(...)` and `CreatePlacementPlan(...)` conveniences which
-  delegate directly to the existing frozen planners;
-- additive JSON version 5 documents for
-  `persistentRasterRuntimeObservationSet` and
-  `persistentRasterRuntimeIntegration`; and
-- package-only qualification against published `Icod.Terminal 1.12.0` while the
-  production `Icod.TermInfo.Inspection` package remains free of any
-  `Icod.Terminal` dependency.
-
-The intended consumer flow is:
-
-```text
-static TermInfo evidence -> classify / plan -> runtime verification required
-    -> caller-owned verifier -> runtime observations
-    -> PersistentRasterRuntimeEvidenceIntegrator -> frozen classifiers / planners
-```
-
-TermInfo does not infer protocol/backend identity, perform live probing, own
-terminal resource identities, or expand a sibling layer's coarse capability into
-TermInfo subjects. Those adapter decisions remain explicit consumer policy. See
-`samples/Icod.TermInfo.PersistentRasterRuntimeIntegration.Sample/README.md` and
-`docs/1.13.0-PERSISTENT-RASTER-RUNTIME-EVIDENCE-GUIDE.md`.
-
-## Getting started
-
-Terminal resolution remains explicit and conservative. A normal application can
-search the host database first and then fall back to the immutable built-ins:
-
-```csharp
-using Icod.TermInfo;
-
-TerminalDatabase database = new(
-    new ITerminalDescriptionProvider[] {
-        new SystemTerminalDescriptionProvider(),
-        TerminalDatabase.BuiltIn,
-    }
-);
-
-TerminalDescription terminal = TerminalEnvironment.Resolve(
-    database,
-    TerminalProfiles.Dumb
-);
-
-Console.WriteLine($"Terminal profile: {terminal.Name}");
-```
-
-`TerminalDatabase.BuiltIn` remains environment-independent and I/O-free.
-Unknown names are not silently coerced to ANSI, VT100, or xterm.
-
-To select a known modern profile explicitly:
-
-```csharp
-TerminalDescription xterm = TerminalDatabase.BuiltIn.Load("xterm");
-TerminalDescription xterm256 = TerminalDatabase.BuiltIn.Load("xterm-256color");
-TerminalDescription xtermDirect = TerminalDatabase.BuiltIn.Load("xterm-direct256");
-TerminalDescription winConsole = TerminalDatabase.BuiltIn.Load("winconsole");
-TerminalDescription windowsTerminal = TerminalDatabase.BuiltIn.Load("ms-terminal");
-TerminalDescription windowsTerminalDirect = TerminalDatabase.BuiltIn.Load("ms-terminal-direct");
-```
-
-Aliases remain exact and intentional. For example, `vt100-am` resolves to `vt100`, and `vt200` resolves to `vt220`. Windows identities are not aliases for ANSI or xterm.
-
-## Standard and extended capabilities
-
-Typed lookup is the preferred API for standard capabilities:
-
-```csharp
-bool automaticMargins = terminal.GetBoolean(BooleanCapability.AutoRightMargin);
-int? columns = terminal.GetNumber(NumericCapability.Columns);
-string? clear = terminal.GetString(StringCapability.ClearScreen);
-```
-
-Traditional short-name lookup remains available:
-
-```csharp
-bool hasColors = terminal.TryGetNumber("colors", out int colors);
-bool hasClear = terminal.TryGetString("clear", out string? clear);
-```
-
-The complete standard catalog is inspectable in compiled-table order. Managed enum values are deliberately independent from those binary indices:
-
-```csharp
-StandardCapabilityMetadata<StringCapability> cupMetadata = StandardCapabilityCatalog.GetMetadata(
-    StringCapability.CursorAddress
-);
-
-Console.WriteLine(
-    $"{cupMetadata.ShortName}: binary index {cupMetadata.BinaryIndex}"
-);
-
-foreach (StandardCapabilityMetadata<NumericCapability> metadata
-    in StandardCapabilityCatalog.NumericCapabilities) {
-    Console.WriteLine(
-        $"{metadata.ShortName} / {metadata.LongName}"
-    );
-}
-```
-
-A terminal description also exposes its effective standard capabilities in the same deterministic order:
-
-```csharp
-Console.WriteLine(terminal.Description ?? "(no verbose description)");
-
-foreach (KeyValuePair<NumericCapability, int> capability
-    in terminal.NumericCapabilities) {
-    Console.WriteLine($"{capability.Key} = {capability.Value}");
-}
-```
-
-Absent and internally canceled capabilities do not appear as effective present values. Extended capabilities remain separately enumerable through `ExtendedCapabilities`.
-
-Modern capabilities which are not part of the fixed standard terminfo vocabulary are carried through the extended-capability store:
-
-```csharp
-if (xterm.TryGetExtendedString("BE", out string? enablePaste)) {
-    Console.WriteLine("Bracketed-paste enable metadata is present.");
-}
-
-if (xterm.TryGetExtendedString("XM", out _)) {
-    string enableMouse = xterm.ExpandExtendedString("XM", 1);
-}
-```
-
-Extended names are case-sensitive. Standard capability names cannot be silently shadowed by extended capabilities.
-
-Reusable arbitrary-source parameter programs can be parsed once and expanded repeatedly. Structural/type analysis remains internal safety machinery rather than a second public model:
-
-```csharp
-TermInfoParameterProgram program = TermInfoParameterProgram.Parse("%p1%{1}%+%d");
-
-Console.WriteLine(program.Source);     // %p1%{1}%+%d
-Console.WriteLine(program.Expand(41)); // 42
-```
-
-Per-description standard and extended expansion use bounded lazy caches owned by the immutable description. There is no process-global arbitrary-string cache.
-
-## Color inspection
-
-Color semantics are derived from raw terminfo data rather than from terminal-name checks:
-
-```csharp
-TerminalColorSupport support = TerminalColors.GetColorSupport(xterm256);
-
-Console.WriteLine(support.Model);             // Indexed
-Console.WriteLine(support.Tier);              // Color256
-Console.WriteLine(support.IndexedColorCount); // 256
-```
-
-Raw `colors`, `pairs`, `ncv`, selectors, `bce`, `ccc`, `hls`, `initc`, `op`, `oc`, and extended `RGB`/`CO` metadata remain authoritative. `pairs` is never synthesized from `colors`.
-
-### Indexed color
-
-Use the semantic helper rather than embedding ANSI escape strings:
-
-```csharp
-string foreground = TerminalColors.ExpandForeground(
-    TerminalProfiles.Xterm256Color,
-    196
-);
-
-TermInfoOutput.PutP(foreground, Console.Out);
-```
-
-The helper validates the terminal's advertised indexed range and expands the terminal's own `setaf` capability through the shared parameter engine.
-
-### Direct RGB color
-
-Direct profiles expose an RGB layout and any retained indexed prefix:
-
-```csharp
-TerminalDescription direct = TerminalProfiles.XtermDirect256;
-TerminalColorSupport support = TerminalColors.GetColorSupport(direct);
-TerminalRgbColor purple = new(0x80, 0x40, 0xC0);
-
-string foreground = TerminalColors.ExpandForeground(
-    direct,
-    purple
-);
-```
-
-The selected xterm direct profiles use packed 8/8/8 RGB semantics and retain 8, 16, or 256 indexed entries according to their `CO` metadata. The library validates collisions between packed RGB values and that retained indexed prefix instead of guessing.
-
-## Cursor positioning and full-screen primitives
-
-Parameterized standard capabilities use the same terminfo expansion engine:
-
-```csharp
-string move = xterm.Expand(
-    StringCapability.CursorAddress,
-    10,
-    20
-);
-```
-
-Profiles can also advertise cursor-addressing lifecycle and cursor-visibility primitives:
-
-```csharp
-string? enter = xterm.GetString(StringCapability.EnterCursorAddressingMode);
-string? leave = xterm.GetString(StringCapability.ExitCursorAddressingMode);
-string? hideCursor = xterm.GetString(StringCapability.CursorInvisible);
-string? normalCursor = xterm.GetString(StringCapability.CursorNormal);
-```
-
-These are capability strings, not a session manager. `Icod.TermInfo` does not decide when to enter full-screen mode, hide the cursor, recover from exceptions, or restore terminal state. A caller or the sibling `Icod.Terminal` session layer owns that lifecycle; `Icod.DCurses` builds higher-level screen/window policy above it.
-
-## Mouse, focus, paste, and clipboard metadata
-
-The modern xterm profiles carry descriptive protocol metadata such as:
-
-- standard `kmous` plus extended `XM`/`xm` mouse strings;
-- focus enable/disable and focus-in/focus-out strings;
-- bracketed-paste enable/disable and begin/end strings;
-- modified-key strings;
-- cursor-style and terminal-reporting strings;
-- OSC 52 clipboard/selection metadata where present in the selected profile.
-
-This package does **not** decode mouse events, focus events, keys, or paste payloads. It also does not perform clipboard operations or terminal probing. The metadata is intentionally available so the sibling `Icod.Terminal` layer can consume it without teaching `Icod.TermInfo` about live input state.
-
-## VT100 and padding
-
-VT100 strings preserve their historical terminfo padding annotations through parameter expansion:
-
-```csharp
-TerminalDescription vt100 = TerminalProfiles.Vt100;
-
-string move = vt100.Expand(
-    StringCapability.CursorAddress,
-    10,
-    20
-);
-
-// move contains ESC[11;21H$<5>
-```
-
-Applications should emit capability strings through the output layer. Modern terminals normally use the default `PaddingMode.Ignore`, which removes delay annotations without writing them literally:
-
-```csharp
-TermInfoOutput.TPuts(
-    move,
-    affectedLines: 1,
-    Console.Out
-);
-```
-
-Physical or serial terminals can opt into delays:
-
-```csharp
-TermInfoOutput.TPuts(
-    move,
-    affectedLines: 1,
-    Console.Out,
-    PaddingMode.Delay
-);
-```
-
-The output API also supports asynchronous `TextWriter` output, byte streams with a caller-selected encoding, character callbacks, and an injectable `ITermInfoDelayProvider`.
-
-### Exact capability bytes
-
-Capability strings are protocol byte data, not application text. For data originating in conventional compiled terminfo, `Icod.TermInfo` uses a one-to-one Latin-1 bridge: byte `0x80` is represented by `\u0080`, byte `0xFF` by `\u00FF`, and so on. Use `Encoding.Latin1` when exact capability bytes must be emitted:
-
-```csharp
-using MemoryStream stream = new();
-
-TermInfoOutput.TPuts(
-    "\u0080",
-    affectedLines: 1,
-    stream,
-    Encoding.Latin1
-);
-
-byte[] bytes = stream.ToArray(); // { 0x80 }
-```
-
-This does **not** prescribe the encoding of application text. Text encoding remains caller-owned.
-
-### Terminal-aware padding
-
-When padding policy needs terminal facts, pass immutable `TermInfoOutputOptions` explicitly:
-
-```csharp
-TermInfoOutputOptions options = new(
-    vt100,
-    baudRate: 9600,
-    paddingMode: PaddingMode.Delay
-);
-
-TermInfoOutput.TPuts(
-    move,
-    affectedLines: 1,
-    Console.Out,
-    options
-);
-```
-
-The library never discovers baud rate and never owns a tty/file descriptor. Advisory padding is suppressed according to the terminal's `xon` and `pb` capabilities; mandatory padding remains mandatory unless the caller explicitly chooses `PaddingMode.Ignore`. `PaddingMode.PadCharacters` also honors `npc` and `pad`.
-
-## Compatibility-shaped API
-
-`TermInfoCompatibility` provides familiar terminfo operation names while retaining managed semantics and explicit terminal ownership:
-
-```csharp
-bool am = TermInfoCompatibility.TiGetFlag(xterm, "am");
-int? colorCount = TermInfoCompatibility.TiGetNum(xterm, "colors");
-string? cup = TermInfoCompatibility.TiGetStr(xterm, "cup");
-```
-
-There is no process-global `cur_term`, no sentinel-pointer result, and no hidden persistent expansion state. Persistent uppercase `%P/%g` variables require an explicit caller-owned `TermInfoExpansionContext`.
-
-## Terminal size
-
-Live dimensions are distinct from configured and profile-default dimensions:
-
-```csharp
-TerminalSize size;
-
-if (TerminalEnvironment.TryGetLiveSize(out size)) {
-    Console.WriteLine($"Live: {size.Columns}x{size.Rows}");
-} else if (TerminalEnvironment.TryGetEnvironmentSize(out size)) {
-    Console.WriteLine($"Configured: {size.Columns}x{size.Rows}");
-} else if (TerminalEnvironment.TryGetProfileSize(terminal, out size)) {
-    Console.WriteLine($"Profile default: {size.Columns}x{size.Rows}");
-}
-```
-
-A failed live query never substitutes `COLUMNS`/`LINES` or a profile default. Fallback order belongs to the caller.
-
-## Windows virtual-terminal output
-
-Windows VT output mode is always opt-in:
-
-```csharp
-using IDisposable? mode = WindowsVirtualTerminal.TryEnableOutput();
-```
-
-The helper returns `null` on non-Windows systems, redirected output, non-console handles, or when Windows refuses the mode change. When it changes console mode, disposing the returned lease restores the exact previous mode. Loading a terminal profile never changes console state.
-
-Windows profile selection is separate and side-effect free:
-
-```csharp
-TerminalDescription console = TerminalProfiles.WinConsole;
-TerminalDescription wt = TerminalProfiles.MsTerminal;
-TerminalDescription wtDirect = TerminalProfiles.MsTerminalDirect;
-```
-
-`winconsole` describes the authoritative modern Windows Console terminfo identity. `ms-terminal` is the indexed-color Windows Terminal identity, while `ms-terminal-direct` advertises direct RGB through the same generic color engine used by other profiles. `WT_SESSION`, `WT_PROFILE_ID`, and `COLORTERM` do not silently select or mutate any profile.
-
-## Custom terminal providers
-
-Applications can add descriptions without changing the built-in database or generic engines:
-
-```csharp
-TerminalDescription example = new TerminalDescriptionBuilder("example-terminal")
-    .SetBoolean(BooleanCapability.AutoRightMargin)
-    .SetNumber(NumericCapability.Columns, 80)
-    .SetNumber(NumericCapability.Lines, 24)
-    .SetExtendedBoolean("exampleFlag")
-    .SetExtendedString("exampleString", "value")
-    .Build();
-
-ITerminalDescriptionProvider provider = new InMemoryTerminalDescriptionProvider(
-    new[] { example }
-);
-
-TerminalDatabase database = new(new[] { provider });
-```
-
-Provider ordering is explicit and deterministic; the first provider that resolves a name wins.
-
-## Compiled terminfo acquisition
-
-For a task-oriented explanation of parser formats, directory layout, discovery
-precedence, option boundaries, errors, caching, and refresh, see
-`docs/0.9.0-ACQUISITION-GUIDE.md`. The focused
-`samples/Icod.TermInfo.Acquisition.Sample` executable demonstrates the same
-public acquisition paths without emitting terminal-control strings.
-
-### Parse caller-supplied bytes
-
-The parser is independently usable and has no filesystem or environment
-dependency:
-
-```csharp
-byte[] entry = File.ReadAllBytes("xterm.compiled");
-TerminalDescription parsed = CompiledTermInfoParser.Parse(entry);
-```
-
-`CompiledTermInfoParserOptions` bounds accepted entry size. Malformed or
-unsupported compiled data throws `CompiledTermInfoFormatException`; it is not
-reported as a clean provider miss.
-
-### Load an explicit directory
-
-When an application owns a conventional terminfo directory tree, use
-`DirectoryTerminalDescriptionProvider`:
-
-```csharp
-ITerminalDescriptionProvider applicationTermInfo = new DirectoryTerminalDescriptionProvider(
-    "/opt/myapp/share/terminfo"
-);
-
-TerminalDescription terminal = new TerminalDatabase(
-    new[] { applicationTermInfo }
-)
-    .Load("my-terminal");
-```
-
-The provider performs exact-name lookup only and propagates malformed-entry,
-permission, and I/O failures.
-
-### Construct a restricted system provider
-
-Each system discovery category can be disabled independently:
-
-```csharp
-SystemTerminalDescriptionProvider restricted = new(
-    new SystemTerminalDescriptionProviderOptions(
-        useEnvironment: false,
-        useUserDatabase: false,
-        useSystemDatabases: false
-    )
-);
-```
-
-That provider has no enabled acquisition source and therefore returns a clean
-miss for valid terminal names.
-
-### Use normal system discovery
-
-The default system provider snapshots its permitted discovery inputs at
-construction:
-
-```csharp
-SystemTerminalDescriptionProvider system = new();
-```
-
-On non-Windows systems this can search encoded/directory `TERMINFO`, the
-user-local `.terminfo` database, `TERMINFO_DIRS`, and frozen platform defaults.
-Windows does not invent Unix-style implicit roots; explicit `TERMINFO`,
-`TERMINFO_DIRS`, and `DirectoryTerminalDescriptionProvider` remain available.
-
-### Compose system and built-in fallback
-
-`TerminalDatabase` is itself an `ITerminalDescriptionProvider`, so built-in
-fallback remains explicit:
-
-```csharp
-TerminalDatabase database = new(
-    new ITerminalDescriptionProvider[] {
-        new SystemTerminalDescriptionProvider(),
-        TerminalDatabase.BuiltIn,
-    }
-);
-```
-
-The first provider which resolves the requested name wins.
-`TerminalDatabase.BuiltIn` is never mutated by system discovery.
-
-## Sample applications
-
-The repository contains seven executable API samples plus one command-suite
-walkthrough with deliberately different purposes.
-
-### General terminal API sample
-
-`samples/Icod.TermInfo.Sample` demonstrates:
-
-- conservative environment resolution with an explicit `dumb` fallback;
-- system-to-built-in provider composition for ordinary resolution;
-- verbose description plus standard catalog/per-description enumeration;
-- reusable standard and extended parameterized-string expansion;
-- exact Latin-1 capability-byte output;
-- terminal-aware padding with explicit terminal facts;
-- semantic indexed/direct color inspection and expansion;
-- Windows Console and Windows Terminal profile selection without side effects;
-- full-screen/cursor-visibility capability discovery without taking ownership of
-  a full-screen session;
-- live/configured/profile size selection;
-- redirection handling and explicit Windows VT enablement;
-- a custom provider implementation.
-
-All seven executable API sample projects target `net8.0`, `net9.0`, and
-`net10.0`; `dotnet run` therefore needs an explicit framework. Run the ordinary
-demonstration with:
-
-```text
-dotnet run --project samples/Icod.TermInfo.Sample/Icod.TermInfo.Sample.csproj -f net10.0
-```
-
-For CI, documentation checks, or any environment where terminal-control output
-is inappropriate, use the non-interactive descriptive mode:
-
-```text
-dotnet run --project samples/Icod.TermInfo.Sample/Icod.TermInfo.Sample.csproj -f net10.0 -- --describe-only --profile xterm-direct256
-```
-
-Use `-f net8.0` or `-f net9.0` instead when validating those consumer targets.
-
-`--profile <name>` selects an exact built-in profile instead of consulting
-`TERM`. `--describe-only` exercises metadata/enumeration, expansion, byte-output,
-padding, profile, color, and extended-capability APIs but emits no
-terminal-control strings to the active terminal.
-
-### Compiled terminfo acquisition sample
-
-`samples/Icod.TermInfo.Acquisition.Sample` is the focused, non-interactive
-compiled-database acquisition sample introduced in 0.9 and retained for 1.0. It
-demonstrates:
-
-```text
-parse <compiled-file>
-directory <root> <terminal-name>
-system <terminal-name>
-restricted <terminal-name>
-fallback <terminal-name>
-```
-
-For example:
-
-```text
-dotnet run --project samples/Icod.TermInfo.Acquisition.Sample/Icod.TermInfo.Acquisition.Sample.csproj -f net10.0 -- system xterm-256color
-```
-
-and:
-
-```text
-dotnet run --project samples/Icod.TermInfo.Acquisition.Sample/Icod.TermInfo.Acquisition.Sample.csproj -f net10.0 -- directory /usr/share/terminfo xterm
-```
-
-The sample prints the resolved terminal identity, aliases, selected numeric
-facts, and standard/extended capability counts. It does not write any capability
-string to the terminal.
-
-### Reusable library-toolchain sample
-
-`samples/Icod.TermInfo.Toolchain.Sample` demonstrates the reusable post-1.0
-library stack without invoking the command layer. It parses and resolves a
-controlled `.ti` source document, synthesizes the child relative to its base,
-reparses and resolves the synthesized source, compiles and publishes it into a
-temporary conventional database, reloads the child through the Runtime provider,
-verifies semantic equality through Inspection, and emits the immutable plan as
-one version-1 `sourcePlan` JSON document.
-
-Run it with:
-
-```text
-dotnet run --project samples/Icod.TermInfo.Toolchain.Sample/Icod.TermInfo.Toolchain.Sample.csproj -f net10.0
-```
-
-The sample is deterministic and does not inspect the host terminfo database. It
-is executed twice by release validation on Windows, Linux, and macOS and checked
-against its exact JSON fixture. Use `-f net8.0` or `-f net9.0` when exercising
-those reusable-library target frameworks.
-
-See `samples/Icod.TermInfo.Toolchain.Sample/README.md` for the complete flow.
-
-### Multi-database Inspection sample
-
-`samples/Icod.TermInfo.DatabaseSet.Sample` is the focused 1.10 reusable-API
-example. It creates controlled conventional databases through the public
-Compiler API and exercises ordered `InspectSet(...)` construction, conclusive
-lookup precedence, semantic shadow and alias-collision analysis, set comparison,
-conflict-free multi-database parent planning, and all three version-2 JSON
-document kinds.
-
-Run it with:
-
-```text
-dotnet run --project samples/Icod.TermInfo.DatabaseSet.Sample/Icod.TermInfo.DatabaseSet.Sample.csproj -f net10.0
-```
-
-The permanent release verifier checks the sample's normalized JSON fixtures on
-`net8.0`, `net9.0`, and `net10.0`. See
-`samples/Icod.TermInfo.DatabaseSet.Sample/README.md` and
-`docs/1.10.0-MULTI-DATABASE-GUIDE.md`.
-
-### Persistent-raster lifecycle sample
-
-`samples/Icod.TermInfo.PersistentRasterLifecycle.Sample` is the focused 1.11
-lifecycle example updated for the 1.13 integration path. It starts from ordinary
-Sixel evidence, demonstrates that persistent upload and placement remain
-`Unknown`, plans an indeterminate request, then represents consumer-owned runtime
-results as immutable lifecycle observations. `PersistentRasterRuntimeEvidenceIntegrator`
-maps the conclusive observations into existing `Verified` evidence with safe final
-ordinals, and `CreateLifecyclePlan(...)` delegates replanning to the frozen
-lifecycle planner. The sample performs no terminal I/O and has no `Icod.Terminal`
-dependency.
-
-Run it with:
-
-```text
-dotnet run --project samples/Icod.TermInfo.PersistentRasterLifecycle.Sample/Icod.TermInfo.PersistentRasterLifecycle.Sample.csproj -f net10.0
-```
-
-Release verification executes the sample on `net8.0`, `net9.0`, and `net10.0`.
-See `samples/Icod.TermInfo.PersistentRasterLifecycle.Sample/README.md` and
-`docs/1.11.0-PERSISTENT-RASTER-LIFECYCLE-GUIDE.md`.
-
-### Persistent-raster placement sample
-
-`samples/Icod.TermInfo.PersistentRasterPlacement.Sample` is the focused 1.12
-Inspection/Terminal boundary example. It begins with a successful lifecycle plan
-but no advanced-placement evidence, so both `SourceRectangle` and
-`SignedZOrder` remain `Unknown` and the placement planner returns
-`RequiresRuntimeVerification`.
-
-The consumer then contributes immutable placement runtime observations for
-`SourceRectangle` and `SignedZOrder`. `PersistentRasterRuntimeEvidenceIntegrator`
-maps those conclusive observations into the frozen placement evidence model, and
-`CreatePlacementPlan(...)` delegates replanning to produce `Satisfied`. Only after
-TermInfo has finished semantic planning does the sample create a
-`TerminalRasterSourceRectangle` and signed `ZIndex`.
-
-Run it with:
-
-```text
-dotnet run --project samples/Icod.TermInfo.PersistentRasterPlacement.Sample/Icod.TermInfo.PersistentRasterPlacement.Sample.csproj -f net10.0
-```
-
-Release verification executes the sample on `net8.0`, `net9.0`, and `net10.0`.
-See `samples/Icod.TermInfo.PersistentRasterPlacement.Sample/README.md` and
-`docs/1.12.0-ADVANCED-PERSISTENT-RASTER-PLACEMENT-GUIDE.md`.
-
-### Persistent-raster runtime-integration sample
-
-`samples/Icod.TermInfo.PersistentRasterRuntimeIntegration.Sample` is the focused
-1.13 caller-adapter example. It begins with a static persistent-raster lifecycle
-plan that requires runtime verification, then optionally asks published
-`Icod.Terminal 1.12.0` to verify its coarse `PersistentRasterGraphics` semantic
-capability. Consumer code maps that sibling-layer result into TermInfo's
-protocol-neutral `Supported` / `Unsupported` / `Inconclusive` runtime outcomes,
-expands the coarse capability into the explicitly chosen lifecycle subjects, and
-passes the resulting observations to `PersistentRasterRuntimeEvidenceIntegrator`.
-
-The default mode is deterministic and performs no terminal I/O; `--live` performs
-the actual `VerifyCapabilityAsync(...)` call on an interactive terminal. Static
-advertisement is never promoted to runtime support: non-live evidence and
-`Unknown` / `Advertised` support map to `Inconclusive`. The sample then renders
-the version-5 integration audit and replans through `CreateLifecyclePlan(...)`.
-
-Run the deterministic form with:
-
-```text
-dotnet run --project samples/Icod.TermInfo.PersistentRasterRuntimeIntegration.Sample/Icod.TermInfo.PersistentRasterRuntimeIntegration.Sample.csproj -f net10.0
-```
-
-For interactive verification:
-
-```text
-dotnet run --project samples/Icod.TermInfo.PersistentRasterRuntimeIntegration.Sample/Icod.TermInfo.PersistentRasterRuntimeIntegration.Sample.csproj -f net10.0 -- --live
-```
-
-Release verification executes the deterministic form on `net8.0`, `net9.0`, and
-`net10.0`. See
-`samples/Icod.TermInfo.PersistentRasterRuntimeIntegration.Sample/README.md` and
-`docs/1.13.0-PERSISTENT-RASTER-RUNTIME-EVIDENCE-GUIDE.md`.
-
-### Managed tool-suite walkthrough
-
-`samples/ToolSuite` is a data-and-command walkthrough for `tic`, `infocmp`, `toe`,
-`captoinfo`, and `infotocap`. It uses controlled terminfo and termcap source files
-and an explicit local database root so validation, publication, rendering,
-comparison, relative synthesis through `infocmp -u`, enumeration,
-explicit-candidate planning through `infocmp --plan-use`, forward/reverse `use=`
-dependency reporting, and bidirectional conversion do not depend on
-host-installed terminfo or termcap databases. The planning walkthrough includes
-an inferior decoy, direct and routed forms, and `tic -c` validation of the
-selected source.
-The MI06 walkthrough also covers all four version-1 JSON document kinds,
-explicit-directory all-candidates planning, and byte-identical direct/router
-automation.
-
-See `samples/README.md`, `samples/ToolSuite/README.md`,
-`samples/Icod.TermInfo.Acquisition.Sample/README.md`,
-`samples/Icod.TermInfo.Toolchain.Sample/README.md`,
-`samples/Icod.TermInfo.PersistentRasterLifecycle.Sample/README.md`,
-`samples/Icod.TermInfo.PersistentRasterPlacement.Sample/README.md`,
-`samples/Icod.TermInfo.PersistentRasterRuntimeIntegration.Sample/README.md`, and
-`docs/0.9.0-ACQUISITION-GUIDE.md` for the complete examples.
-
-## Project-family boundary
-
-`Icod.TermInfo` owns immutable terminal-description data, acquisition of that data, and pure transformations required to interpret, expand, and output terminal capabilities. `Icod.TermInfo.Source` owns optional source-language parsing and inheritance resolution, `Icod.TermInfo.Compiler` owns compiled output, `Icod.TermInfo.Inspection` owns canonical rendering, semantic comparison, database-set automation, protocol-neutral persistent-raster lifecycle and placement evidence/classification/planning, and versioned machine-readable views, and `Icod.TermInfo.Termcap` owns optional termcap interoperability. None of those packages owns a live terminal session, terminal graphics resource identity, a child pseudo-terminal, or a virtual screen.
-
-The intended family boundary is now explicit:
-
-- **`Icod.TermInfo`** — descriptions, compiled-database acquisition, capability semantics, parameter expansion, and output transformation;
-- **`Icod.TermInfo.Source`** — `.ti` lexical analysis, source diagnostics, unresolved entries, cancellation, `use=` inheritance, and materialization into `TerminalDescription`;
-- **`Icod.TermInfo.Compiler`** — deterministic compiled-entry writing, source compilation, and explicit conventional database-layout publication;
-- **`Icod.TermInfo.Inspection`** — canonical effective/source rendering, relative-source synthesis and parent planning, structured semantic comparison, provider/database-set inspection, persistent-raster lifecycle and advanced-placement evidence/classification/planning, protocol-neutral runtime-evidence interchange/integration, and versioned machine-readable views through JSON version 5;
-- **`Icod.TermInfo.Termcap`** — bounded termcap parsing, classification, `tc=` resolution, Runtime conversion, reverse rendering, and explicit termcap acquisition;
-- **`tic`, `infocmp`, `toe`, `captoinfo`, and `infotocap`** — managed command applications which compose the reusable libraries and own command-line policy;
-- **`Icod.TermInfo.Tools` / `icod-terminfo`** — distribution-only .NET tool router which dispatches to the five command applications;
-- **`Icod.Terminal`** — sibling live-terminal/session layer for modes, input decoding, keyboard/mouse/paste/focus events, active probing/negotiation, persistent-raster resource/placement execution, and reversible presentation lifecycle;
-- **future `Icod.Pty`** — Unix PTY and Windows ConPTY creation, resize propagation, and child-process plumbing;
-- **`Icod.DCurses`** — sibling curses-like virtual-screen/window layer above `Icod.Terminal` and `Icod.TermInfo`.
-
-Current post-1.0 package-family ownership and future release planning are governed
-by `Icod.TermInfo-Post-1.0-Development-Roadmap.md`.
-
-## Acquisition foundation inherited from 0.9.0
-
-Version 0.8 completed **terminfo semantics in memory**. Version 0.9 added the
-acquisition layer without redesigning that semantic model. Version 1.0 freezes
-that combined low-level contract rather than replacing it.
-
-The implemented acquisition dependency chain is:
-
-```text
-pure compiled-byte parser
-    -> explicit directory provider
-    -> TERMINFO / TERMINFO_DIRS / user / platform discovery
-    -> provider-local cache and refresh semantics
-    -> frozen API/package contract
-```
-
-The parser independently accepts caller-supplied bytes and supports the frozen
-conventional `0432`, ncurses extended-section, and `01036` / signed-32-bit
-formats. Directory and system providers reuse that parser rather than embedding
-their own binary logic. Encoded `TERMINFO=hex:...` and
-`TERMINFO=b64:...` entries use the same parser path.
-
-0.9 deliberately does **not** include `.ti` source parsing, `tic`/`infocmp`,
-termcap, Berkeley-DB hashed terminfo stores, divergent historical vendor binary
-formats, live input/session management, active probing, PTYs, curses, terminal
-emulation, or graphics protocol execution.
-
-See `docs/0.9.0-ACQUISITION-GUIDE.md` for the consumer-facing acquisition
-guide, `Icod.TermInfo-Development-Roadmap-0.9.0.md` for the detailed frozen
-tranche contract, `docs/0.9.0-CONTRACT-AUDIT.md` for the final completion
-evidence, `docs/0.9.0-T40-API-PACKAGE-FREEZE.md` for the release-candidate
-API/package freeze.
-
-## Build, test, and pack
-
-```text
-dotnet restore Icod.TermInfo.sln
-
-dotnet build Icod.TermInfo.sln -c Debug
-dotnet test Icod.TermInfo.sln -c Debug
-
-dotnet build Icod.TermInfo.sln -c Staging
-dotnet test Icod.TermInfo.sln -c Staging
-dotnet pack Icod.TermInfo.csproj -c Staging --output artifacts
-dotnet pack Icod.TermInfo.Source/Icod.TermInfo.Source.csproj -c Staging --output artifacts
-dotnet pack Icod.TermInfo.Termcap/Icod.TermInfo.Termcap.csproj -c Staging --output artifacts
-dotnet pack Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj -c Staging --output artifacts
-dotnet pack Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj -c Staging --output artifacts
-dotnet pack icod-terminfo/Icod.TermInfo.Router.csproj -c Staging --output artifacts
-
-dotnet build Icod.TermInfo.sln -c Release
-dotnet test Icod.TermInfo.sln -c Release
-dotnet pack Icod.TermInfo.csproj -c Release --output artifacts
-dotnet pack Icod.TermInfo.Source/Icod.TermInfo.Source.csproj -c Release --output artifacts
-dotnet pack Icod.TermInfo.Termcap/Icod.TermInfo.Termcap.csproj -c Release --output artifacts
-dotnet pack Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj -c Release --output artifacts
-dotnet pack Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj -c Release --output artifacts
-dotnet pack icod-terminfo/Icod.TermInfo.Router.csproj -c Release --output artifacts
-```
-
-Use the verifier with the same configuration used to build and pack.
-
-For Staging validation:
-
-```text
-.github\scripts\verify-release-package.cmd artifacts Staging
-bash .github/scripts/verify-release-package.sh artifacts Staging
-```
-
-For final Release validation:
-
-```text
-.github\scripts\verify-release-package.cmd artifacts Release
-bash .github/scripts/verify-release-package.sh artifacts Release
-```
-
-Both wrappers retain the coordinated five-library release verifier: generated
-capability metadata, all five public-API baselines, net8/net9/net10 API
-equivalence, package/XML/symbol/dependency validation, isolated package-reference
-consumers including the 1.11 lifecycle consumer, the general sample's non-
-interactive `--describe-only` path, the deterministic reusable toolchain and
-lifecycle samples, and structural validation of the sixth registry package,
-`Icod.TermInfo.Tools`. The separate `smoke-tool-package.ps1` gate installs and
-executes that router package on each supported host family. Windows package
-validation does not require Bash or Python.
-
-Pull requests use Staging throughout and may upload verified package artifacts,
-but never publish. Pushes to `main` run the non-publishing Release validation
-matrix. Only an immutable `v*` tag matching the coordinated package version may
-start registry publication through `.github/workflows/release.yaml`.
-
-See `RELEASING.md` for the current release procedure,
-`Icod.TermInfo-1.4.0-Tool-Suite-Roadmap.md` for the frozen T01-T11 command
-semantic contract, `docs/1.5.0-RELEASE-AUDIT.md` for the published 1.5
-distribution/versioning gate,
-`docs/1.6.0-TC08-DIFFERENTIAL-VALIDATION-FUZZING-AND-FREEZE.md` for frozen 1.6
-pre-release closure evidence, `docs/1.6.0-RELEASE-AUDIT.md` for the published
-1.6.0 contract and post-publication record, and `docs/1.6.1-RELEASE-AUDIT.md`
-for the release-verifier isolation hotfix and 1.6.1 publication gate. The 1.7
-release contract is defined by
-`Icod.TermInfo 1.7.0 - Relative Terminfo Source Synthesis Roadmap.md`. The 1.8
-planning contract is defined by
-`Icod.TermInfo-1.8.0-Relative-Source-Planning-and-Parent-Selection-Roadmap.md`,
-and its publication gate is recorded in `docs/1.8.0-RELEASE-AUDIT.md`. The 1.9
-machine-readable Inspection contract is defined by
-`Icod.TermInfo-1.9.0-Machine-Readable-Inspection-and-Planning-Automation-Roadmap.md`,
-and its publication gate is recorded in `docs/1.9.0-RELEASE-AUDIT.md`. Version
-1.10 is defined by
-`Icod.TermInfo-1.10.0-Deterministic-Multi-Database-Inspection-Comparison-and-Planning-Automation-Roadmap.md`
-and `docs/1.10.0-RELEASE-AUDIT.md`; version 1.11 is defined by
-`Icod.TermInfo-1.11.0-Persistent-Raster-Lifecycle-Semantics-and-Planning-Roadmap.md`
-and `docs/1.11.0-RELEASE-AUDIT.md`.
-
-## Scope
-
-`Icod.TermInfo` is not curses, a terminal emulator, a PTY implementation, a termios session manager, an input-event parser, a live graphics protocol executor, or a general terminal UI toolkit. It intentionally carries low-level descriptive and protocol-neutral planning data which those higher-level systems may consume. Source, Compiler, Inspection, and Termcap remain optional sibling layers and do not change those runtime boundaries.
-
-See `Icod.TermInfo-Development-Roadmap-0.9.0.md` for the frozen acquisition
-contract, `Icod.TermInfo-Development-Roadmap-1.0.0.md` for the 1.0 runtime
-stability contract, `Icod.TermInfo-Post-1.0-Development-Roadmap.md` for the
-post-1.0 package-family sequence, `Icod.TermInfo-1.3.0-Inspection-and-Comparison-Roadmap.md`
-for the 1.3 Inspection contract,
-`Icod.TermInfo-1.4.0-Tool-Suite-Roadmap.md` for the frozen 1.4 command contract,
-`docs/1.6.0-RELEASE-AUDIT.md` for the frozen 1.6.0 release contract,
-`docs/1.6.1-RELEASE-AUDIT.md` for the published patch-release contract,
-`Icod.TermInfo 1.7.0 - Relative Terminfo Source Synthesis Roadmap.md` and
-`docs/1.7.0-RELEASE-AUDIT.md` for the frozen 1.7 synthesis contract,
-`Icod.TermInfo-1.8.0-Relative-Source-Planning-and-Parent-Selection-Roadmap.md`
-and `docs/1.8.0-RELEASE-AUDIT.md` for the frozen 1.8 planning contract,
-`Icod.TermInfo-1.9.0-Machine-Readable-Inspection-and-Planning-Automation-Roadmap.md`
-and `docs/1.9.0-RELEASE-AUDIT.md` for the frozen 1.9 machine-readable contract,
-`docs/1.10.0-RELEASE-AUDIT.md` for the frozen multi-database automation
-contract, and `docs/1.11.0-RELEASE-AUDIT.md` for the current stable persistent-
-raster lifecycle contract. See `docs/VERSIONING.md` and
-`docs/COMPATIBILITY.md` for the 1.x promises.
-The 0.6.0 through 1.0.0 roadmaps remain historical frozen contracts.
+This README is maintained as a current product and contributor entry point. Release-by-release chronology belongs in [`CHANGELOG.md`](CHANGELOG.md), release notes, versioned roadmaps, API/schema baselines, and release audits rather than accumulating here.
 
 ## Authors
 
@@ -1441,4 +200,8 @@ Copyright (c) 2026 Timothy J. Bruce
 
 ## License
 
-Licensed under the GNU Lesser General Public License v3.0 or later. See `LICENSE`.
+The reusable `Icod.TermInfo`, `Icod.TermInfo.Source`, `Icod.TermInfo.Termcap`, `Icod.TermInfo.Compiler`, and `Icod.TermInfo.Inspection` library projects are licensed under the GNU Lesser General Public License, version 3 or later.
+
+Executable command, sample, and repository tooling projects are licensed under the GNU General Public License, version 3 or later, as stated in their project and source declarations.
+
+See `LICENSE` and the per-project/source declarations for the applicable terms.

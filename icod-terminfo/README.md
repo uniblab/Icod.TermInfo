@@ -1,91 +1,55 @@
 # Icod.TermInfo.Tools
 
 `Icod.TermInfo.Tools` is the installable .NET tool router for the managed
-`Icod.TermInfo` command suite.
+Icod.TermInfo command suite. The package installs one command, `icod-terminfo`,
+which dispatches to the existing `tic`, `infocmp`, `toe`, `captoinfo`, and
+`infotocap` implementations without duplicating their semantics.
 
-The tool targets `net10.0` and therefore requires a .NET 10 runtime.
+The tool targets `net10.0` and requires a .NET 10 runtime.
 
-## 1.9 JSON automation
+## 1.14 release status
 
-Version `1.9.0` publishes the same frozen machine-readable command contracts as
-the standalone commands:
+Version `1.14.0` preserves the frozen five-command router contract, direct/routed
+command equivalence, installed-tool validation, and six-RID standalone archive
+topology. Raster-backend evidence and selection are reusable Inspection APIs;
+1.14 adds no router-owned command or option semantics.
 
-```text
-icod-terminfo infocmp --json target
-icod-terminfo infocmp --json -d left right
-icod-terminfo infocmp --json --plan-use target candidate
-icod-terminfo infocmp --json --plan-use --all-candidates -B directory target
-icod-terminfo toe --json directory
-```
-
-The router adds no JSON or planning semantics. It forwards arguments, streams,
-cancellation, diagnostics, and exit status, so routed and direct output is
-byte-for-byte identical.
-
-The stable release adds no router behavior. It publishes the validated dispatch
-contract, installed tool-package evidence, and every matching standalone archive
-on Windows, Linux, and macOS as part of the complete 1.9 release.
-
-## 1.8 release status
-
-Version 1.8.0 adds routed relative-source planning without adding router-owned
-semantics:
-
-```text
-icod-terminfo infocmp -A ./target-db -B ./candidate-db --max-parents 2 --require-exhaustive --plan-use target decoy useful
-```
-
-The router forwards the exact `--plan-use` arguments, streams, cancellation
-token, diagnostics, and exit status to `Icod.TermInfo.InfoCmp.Command`. Direct
-`infocmp` and routed `icod-terminfo infocmp` planning are therefore required to
-produce byte-for-byte identical source. The installable package smoke and every
-matching standalone archive smoke execute the same controlled planning case.
-
-Version 1.8.0 freezes that command and distribution surface. The stable release
-adds no router-owned option or dispatch behavior beyond the validated planning
-composition.
-
-## 1.7 release status
-
-Version 1.7.0 adds `infocmp -u` relative-source synthesis to the coordinated
-tool distribution. The router still owns no terminfo semantics; it forwards the
-operation to the same standalone command implementation and retains the
-five-command dispatch topology.
+The coordinated tool version advances with the reusable package family so a
+single release identity covers Runtime, Source, Compiler, Inspection, Termcap,
+and the tool distribution.
 
 ## Install
 
 ```text
-dotnet tool install --global Icod.TermInfo.Tools --version 1.9.0
+dotnet tool install --global Icod.TermInfo.Tools --version 1.14.0
 ```
 
 Update or remove the global tool with:
 
 ```text
-dotnet tool update --global Icod.TermInfo.Tools --version 1.9.0
+dotnet tool update --global Icod.TermInfo.Tools --version 1.14.0
 dotnet tool uninstall --global Icod.TermInfo.Tools
 ```
 
-For repository-local or application-local use, install through a tool manifest:
+For repository-local or application-local use:
 
 ```text
 dotnet new tool-manifest
-dotnet tool install Icod.TermInfo.Tools --version 1.9.0
+dotnet tool install Icod.TermInfo.Tools --version 1.14.0
 dotnet tool run icod-terminfo --version
 ```
 
-The package installs one unambiguous command:
+The package installs only:
 
 ```text
 icod-terminfo
 ```
 
 It does not install global commands named `tic`, `infocmp`, `toe`, `captoinfo`,
-or `infotocap`. Those traditional command names belong to separately downloaded
+or `infotocap`. Those traditional names belong to separately downloaded
 standalone release archives.
 
-Version 1.9.0 retains all five coordinated commands introduced in 1.6.0,
-preserves 1.7 relative synthesis and 1.8 relative-source planning, and adds the
-machine-readable `infocmp` and `toe` forms shown above:
+## Commands
 
 ```text
 icod-terminfo tic -V
@@ -93,53 +57,63 @@ icod-terminfo infocmp -V
 icod-terminfo toe -V
 icod-terminfo captoinfo -V
 icod-terminfo infotocap -V
+```
+
+The router strips the first command token and delegates the remaining arguments,
+streams, diagnostics, cancellation, and exit status to the corresponding command
+implementation.
+
+## Frozen command features
+
+The coordinated command line retains the features added by earlier releases,
+including:
+
+- `infocmp -u` deterministic relative-source synthesis from 1.7;
+- `infocmp --plan-use` bounded deterministic parent planning from 1.8;
+- `infocmp --json` machine-readable description/comparison/plan forms from 1.9;
+- `toe --json` machine-readable database catalogs from 1.9; and
+- the additive 1.10 multi-database automation forms.
+
+Examples:
+
+```text
 icod-terminfo infocmp -u target parent
 icod-terminfo infocmp --plan-use target candidate
+icod-terminfo infocmp --json target
+icod-terminfo infocmp --json -d left right
+icod-terminfo infocmp --json --plan-use target candidate
+icod-terminfo infocmp --json --plan-use --all-candidates -B directory target
+icod-terminfo toe --json directory
 ```
 
 The router owns no terminfo semantics and does not reparse command-specific
-options. It removes the first command operand and calls the existing
-`Icod.TermInfo.Tic.Command`, `Icod.TermInfo.InfoCmp.Command`,
-`Icod.TermInfo.Toe.Command`, `Icod.TermInfo.CapToInfo.Command`, or
-`Icod.TermInfo.InfoToCap.Command` implementation in-process, preserving the selected
-command's standard streams, cancellation behavior, diagnostics, and exit status.
+options. Direct and routed forms are required to preserve the same behavior and,
+for deterministic machine-readable/source outputs, byte-identical content.
 
-## Router options
+## Standalone archives
 
-```text
-icod-terminfo --help
-icod-terminfo -h
-icod-terminfo --version
-icod-terminfo -V
-```
-
-For command-specific help, route the command's normal help option:
+The release distribution also provides framework-dependent .NET 10 archives for:
 
 ```text
-icod-terminfo tic --help
-icod-terminfo infocmp --help
-icod-terminfo toe --help
-icod-terminfo captoinfo --help
-icod-terminfo infotocap --help
+win-x64
+win-arm64
+linux-x64
+linux-arm64
+osx-x64
+osx-arm64
 ```
 
-## Standalone distribution
+Each archive contains the traditional `tic`, `infocmp`, `toe`, `captoinfo`, and
+`infotocap` launcher names plus their managed dependencies. Archive users provide
+the .NET 10 runtime and choose the unpack/install location.
 
-The router package complements rather than replaces the release archives. Each
-of the six framework-dependent 1.9.0 tool-suite archives contains standalone
-executables named exactly:
+## Release validation
 
-```text
-tic
-infocmp
-toe
-captoinfo
-infotocap
-```
+PR validation installs the freshly packed `Icod.TermInfo.Tools` package and
+executes router smoke on supported hosts. The release pipeline also builds and
+structurally verifies all six archive RIDs and executes matching-host archive
+smoke. Version 1.14 changes release identity only for the command layer; existing
+command semantics remain frozen.
 
-Users control where those archives are unpacked and whether their directory is
-placed on `PATH`. This keeps intentional traditional-name installation separate
-from the globally installable `icod-terminfo` router.
-
-All five reusable libraries, all five standalone commands, and this router
-consume the single `IcodTermInfoSuiteVersion` value in `Directory.Build.props`.
+See the root `../README.md`, `../docs/VERSIONING.md`, and
+`../docs/COMPATIBILITY.md` for the coordinated release contract.

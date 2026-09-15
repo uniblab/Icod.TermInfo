@@ -25,12 +25,45 @@ public sealed class RE08ReleaseClosureTests {
 
 	[Fact]
 	public void ExactOneThirteenInspectionSurfaceHasFreezeInputs() {
-		Type[] exportedTypes =
+		string oneFourteenRb01Additions = ReadRequiredRepositoryFile(
+			"docs/1.14.0-RB01-INSPECTION-PUBLIC-API-ADDITIONS.txt"
+		);
+		string oneFourteenRb02Additions = ReadRequiredRepositoryFile(
+			"docs/1.14.0-RB02-INSPECTION-PUBLIC-API-ADDITIONS.txt"
+		);
+		string oneFourteenRb03Additions = ReadRequiredRepositoryFile(
+			"docs/1.14.0-RB03-INSPECTION-PUBLIC-API-ADDITIONS.txt"
+		);
+		HashSet<string> approvedOneFourteenTypes = oneFourteenRb01Additions
+			.Split( '\n' )
+			.Concat( oneFourteenRb02Additions.Split( '\n' ) )
+			.Concat( oneFourteenRb03Additions.Split( '\n' ) )
+			.Select( line => line.Trim() )
+			.Where(
+				line =>
+					line.Length > 0
+					&& !line.StartsWith( "#", StringComparison.Ordinal )
+			)
+			.ToHashSet( StringComparer.Ordinal );
+		Type[] currentTypes =
 			typeof( PersistentRasterRuntimeObservationSet ).Assembly.GetExportedTypes();
-		Assert.Equal( 90, exportedTypes.Length );
+		Type[] reconstructedOneThirteenTypes = currentTypes
+			.Where(
+				type =>
+					type.FullName is null
+					|| !approvedOneFourteenTypes.Contains( type.FullName )
+			)
+			.ToArray();
+
+		Assert.Equal( 16, approvedOneFourteenTypes.Count );
+		Assert.Equal( 90, reconstructedOneThirteenTypes.Length );
+		Assert.Equal(
+			approvedOneFourteenTypes.Count,
+			currentTypes.Length - reconstructedOneThirteenTypes.Length
+		);
 		Assert.Equal(
 			9,
-			exportedTypes.Count(
+			reconstructedOneThirteenTypes.Count(
 				type => type.FullName?.StartsWith(
 					"Icod.TermInfo.Inspection.PersistentRasterRuntime",
 					StringComparison.Ordinal
@@ -433,14 +466,9 @@ public sealed class RE08ReleaseClosureTests {
 	}
 
 	[Fact]
-	public void ReleaseDocumentationDescribesStableOneThirteen() {
-		string buildProperties = ReadRequiredRepositoryFile( "Directory.Build.props" );
-		string rootReadme = ReadRequiredRepositoryFile( "README.md" );
+	public void ReleaseDocumentationPreservesOneThirteenHistoricalAuthority() {
 		string inspectionReadme = ReadRequiredRepositoryFile(
 			"Icod.TermInfo.Inspection/README.md"
-		);
-		string inspectionProject = ReadRequiredRepositoryFile(
-			"Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj"
 		);
 		string versioning = ReadRequiredRepositoryFile( "docs/VERSIONING.md" );
 		string compatibility = ReadRequiredRepositoryFile( "docs/COMPATIBILITY.md" );
@@ -457,23 +485,7 @@ public sealed class RE08ReleaseClosureTests {
 			"docs/1.13.0-RELEASE-AUDIT.md"
 		);
 
-		Assert.Contains(
-			"<IcodTermInfoSuiteVersion>1.13.0</IcodTermInfoSuiteVersion>",
-			buildProperties,
-			StringComparison.Ordinal
-		);
-		Assert.Contains( "1.13", rootReadme, StringComparison.Ordinal );
-		Assert.Contains( "1.13", inspectionReadme, StringComparison.Ordinal );
-		Assert.Contains(
-			"dotnet add package Icod.TermInfo.Inspection --version 1.13.0",
-			rootReadme,
-			StringComparison.Ordinal
-		);
-		Assert.Contains(
-			"<PackageReleaseNotes>1.13.0",
-			inspectionProject,
-			StringComparison.Ordinal
-		);
+		Assert.Contains( "## 1.13 release status", inspectionReadme, StringComparison.Ordinal );
 		Assert.Contains( "## 1.13 release line", versioning, StringComparison.Ordinal );
 		Assert.Contains(
 			"## 1.13 compatibility freeze",

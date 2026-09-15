@@ -1,5 +1,15 @@
 # infocmp
 
+## 1.14 release status
+
+Version `1.14.0` carries the existing `infocmp` rendering, comparison,
+relative-source synthesis/planning, and JSON automation command contracts
+forward unchanged. Raster-backend evidence and selection are reusable
+`Icod.TermInfo.Inspection` APIs and JSON v6 documents; 1.14 adds no new
+`infocmp` option or command-owned selection policy. Direct `infocmp` and routed
+`icod-terminfo infocmp` retain the frozen command behavior while reporting the
+coordinated `1.14.0` suite version.
+
 ## 1.10 multi-database planning automation
 
 Version `1.10.0-Alpha-8` freezes repeatable explicit candidate roots:

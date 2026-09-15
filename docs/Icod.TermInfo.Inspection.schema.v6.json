@@ -1,0 +1,582 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:icod:terminfo:inspection:json:6",
+  "title": "Icod.TermInfo.Inspection raster backend JSON version 6",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/rasterBackendProfileDocument"
+    },
+    {
+      "$ref": "#/$defs/rasterBackendSelectionPlanDocument"
+    }
+  ],
+  "$defs": {
+    "backend": {
+      "type": "string",
+      "enum": [
+        "sixel",
+        "kittyGraphics"
+      ]
+    },
+    "backendSupportStatus": {
+      "type": "string",
+      "enum": [
+        "unknown",
+        "supported",
+        "unsupported",
+        "contradicted"
+      ]
+    },
+    "backendEvidenceKind": {
+      "type": "string",
+      "enum": [
+        "capabilityDerived",
+        "declared",
+        "verified"
+      ]
+    },
+    "candidateStatus": {
+      "type": "string",
+      "enum": [
+        "satisfied",
+        "requiresRuntimeVerification",
+        "impossible"
+      ]
+    },
+    "selectionStatus": {
+      "type": "string",
+      "enum": [
+        "selected",
+        "requiresRuntimeVerification",
+        "requiresPreference",
+        "impossible"
+      ]
+    },
+    "remainingBlocker": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        null,
+        "runtimeVerification",
+        "preference",
+        "impossibility"
+      ]
+    },
+    "sourceLabel": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "sourceOrdinal": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2147483647
+    },
+    "backendEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "backend",
+        "isPositive",
+        "kind",
+        "sourceLabel",
+        "sourceOrdinal"
+      ],
+      "properties": {
+        "backend": {
+          "$ref": "#/$defs/backend"
+        },
+        "isPositive": {
+          "type": "boolean"
+        },
+        "kind": {
+          "$ref": "#/$defs/backendEvidenceKind"
+        },
+        "sourceLabel": {
+          "$ref": "#/$defs/sourceLabel"
+        },
+        "sourceOrdinal": {
+          "$ref": "#/$defs/sourceOrdinal"
+        }
+      }
+    },
+    "lifecyclePlanStatus": {
+      "type": "string",
+      "enum": [
+        "success",
+        "indeterminate",
+        "impossible"
+      ]
+    },
+    "placementPlanStatus": {
+      "type": "string",
+      "enum": [
+        "satisfied",
+        "requiresRuntimeVerification",
+        "indeterminate",
+        "impossible"
+      ]
+    },
+    "lifecycleSupportStatus": {
+      "type": "string",
+      "enum": [
+        "unknown",
+        "supported",
+        "unsupported",
+        "contradicted"
+      ]
+    },
+    "lifecycleOperation": {
+      "type": "string",
+      "enum": [
+        "displayEphemeral",
+        "uploadResource",
+        "createPlacement",
+        "updatePlacement",
+        "deletePlacement",
+        "deleteResource"
+      ]
+    },
+    "lifecycleSubject": {
+      "type": "string",
+      "enum": [
+        "rasterDisplay",
+        "persistentUpload",
+        "acknowledgedUpload",
+        "placementCreation",
+        "multiplePlacements",
+        "placementUpdate",
+        "placementDeletion",
+        "resourceDeletion"
+      ]
+    },
+    "placementSubject": {
+      "type": "string",
+      "enum": [
+        "sourceRectangle",
+        "signedZOrder"
+      ]
+    },
+    "lifecycleRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "displayEphemeral",
+        "uploadResource",
+        "placementCount",
+        "updatePlacement",
+        "deletePlacement",
+        "deleteResource",
+        "requireAcknowledgedUpload"
+      ],
+      "properties": {
+        "displayEphemeral": {
+          "type": "boolean"
+        },
+        "uploadResource": {
+          "type": "boolean"
+        },
+        "placementCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 256
+        },
+        "updatePlacement": {
+          "type": "boolean"
+        },
+        "deletePlacement": {
+          "type": "boolean"
+        },
+        "deleteResource": {
+          "type": "boolean"
+        },
+        "requireAcknowledgedUpload": {
+          "type": "boolean"
+        }
+      }
+    },
+    "placementRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requireSourceRectangle",
+        "requireSignedZOrder"
+      ],
+      "properties": {
+        "requireSourceRectangle": {
+          "type": "boolean"
+        },
+        "requireSignedZOrder": {
+          "type": "boolean"
+        }
+      }
+    },
+    "selectionRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lifecycle",
+        "placement"
+      ],
+      "properties": {
+        "lifecycle": {
+          "$ref": "#/$defs/lifecycleRequest"
+        },
+        "placement": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/placementRequest"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "lifecyclePlanStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sequenceIndex",
+        "operation",
+        "requiresRuntimeVerification"
+      ],
+      "properties": {
+        "sequenceIndex": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "operation": {
+          "$ref": "#/$defs/lifecycleOperation"
+        },
+        "requiresRuntimeVerification": {
+          "type": "boolean"
+        }
+      }
+    },
+    "lifecyclePlanIssue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation",
+        "subject",
+        "supportStatus",
+        "requiresRuntimeVerification"
+      ],
+      "properties": {
+        "operation": {
+          "$ref": "#/$defs/lifecycleOperation"
+        },
+        "subject": {
+          "$ref": "#/$defs/lifecycleSubject"
+        },
+        "supportStatus": {
+          "$ref": "#/$defs/lifecycleSupportStatus"
+        },
+        "requiresRuntimeVerification": {
+          "type": "boolean"
+        }
+      }
+    },
+    "lifecyclePlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "requiresRuntimeVerification",
+        "stepCount",
+        "issueCount",
+        "steps",
+        "issues"
+      ],
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/lifecyclePlanStatus"
+        },
+        "requiresRuntimeVerification": {
+          "type": "boolean"
+        },
+        "stepCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "issueCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/lifecyclePlanStep"
+          }
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/lifecyclePlanIssue"
+          }
+        }
+      }
+    },
+    "placementPlanRequirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "subject",
+        "supportStatus",
+        "requiresRuntimeVerification"
+      ],
+      "properties": {
+        "subject": {
+          "$ref": "#/$defs/placementSubject"
+        },
+        "supportStatus": {
+          "$ref": "#/$defs/lifecycleSupportStatus"
+        },
+        "requiresRuntimeVerification": {
+          "type": "boolean"
+        }
+      }
+    },
+    "placementPlanIssue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "subject",
+        "supportStatus",
+        "requiresRuntimeVerification"
+      ],
+      "properties": {
+        "subject": {
+          "$ref": "#/$defs/placementSubject"
+        },
+        "supportStatus": {
+          "$ref": "#/$defs/lifecycleSupportStatus"
+        },
+        "requiresRuntimeVerification": {
+          "type": "boolean"
+        }
+      }
+    },
+    "placementPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "lifecycleStatus",
+        "requiresRuntimeVerification",
+        "requirementCount",
+        "issueCount",
+        "requirements",
+        "issues"
+      ],
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/placementPlanStatus"
+        },
+        "lifecycleStatus": {
+          "$ref": "#/$defs/lifecyclePlanStatus"
+        },
+        "requiresRuntimeVerification": {
+          "type": "boolean"
+        },
+        "requirementCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2
+        },
+        "issueCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2
+        },
+        "requirements": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "items": {
+            "$ref": "#/$defs/placementPlanRequirement"
+          }
+        },
+        "issues": {
+          "type": "array",
+          "maxItems": 2,
+          "items": {
+            "$ref": "#/$defs/placementPlanIssue"
+          }
+        }
+      }
+    },
+    "candidateEvaluation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "backend",
+        "backendStatus",
+        "status",
+        "lifecyclePlan",
+        "placementPlan"
+      ],
+      "properties": {
+        "backend": {
+          "$ref": "#/$defs/backend"
+        },
+        "backendStatus": {
+          "$ref": "#/$defs/backendSupportStatus"
+        },
+        "status": {
+          "$ref": "#/$defs/candidateStatus"
+        },
+        "lifecyclePlan": {
+          "$ref": "#/$defs/lifecyclePlan"
+        },
+        "placementPlan": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/placementPlan"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "rasterBackendProfileData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "backend",
+        "status",
+        "evidenceCount",
+        "evidence"
+      ],
+      "properties": {
+        "backend": {
+          "$ref": "#/$defs/backend"
+        },
+        "status": {
+          "$ref": "#/$defs/backendSupportStatus"
+        },
+        "evidenceCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4096
+        },
+        "evidence": {
+          "type": "array",
+          "maxItems": 4096,
+          "items": {
+            "$ref": "#/$defs/backendEvidence"
+          }
+        }
+      }
+    },
+    "rasterBackendSelectionPlanData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request",
+        "preferenceOrder",
+        "status",
+        "selectedBackend",
+        "remainingBlocker",
+        "candidateEvaluationCount",
+        "candidateEvaluations"
+      ],
+      "properties": {
+        "request": {
+          "$ref": "#/$defs/selectionRequest"
+        },
+        "preferenceOrder": {
+          "type": "array",
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/backend"
+          }
+        },
+        "status": {
+          "$ref": "#/$defs/selectionStatus"
+        },
+        "selectedBackend": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/backend"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "remainingBlocker": {
+          "$ref": "#/$defs/remainingBlocker"
+        },
+        "candidateEvaluationCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2
+        },
+        "candidateEvaluations": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "items": {
+            "$ref": "#/$defs/candidateEvaluation"
+          }
+        }
+      }
+    },
+    "rasterBackendProfileDocument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "schemaVersion",
+        "documentKind",
+        "data"
+      ],
+      "properties": {
+        "schema": {
+          "const": "urn:icod:terminfo:inspection:json:6"
+        },
+        "schemaVersion": {
+          "const": 6
+        },
+        "documentKind": {
+          "const": "rasterBackendProfile"
+        },
+        "data": {
+          "$ref": "#/$defs/rasterBackendProfileData"
+        }
+      }
+    },
+    "rasterBackendSelectionPlanDocument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "schemaVersion",
+        "documentKind",
+        "data"
+      ],
+      "properties": {
+        "schema": {
+          "const": "urn:icod:terminfo:inspection:json:6"
+        },
+        "schemaVersion": {
+          "const": 6
+        },
+        "documentKind": {
+          "const": "rasterBackendSelectionPlan"
+        },
+        "data": {
+          "$ref": "#/$defs/rasterBackendSelectionPlanData"
+        }
+      }
+    }
+  }
+}

@@ -48,6 +48,13 @@ try {
         throw "RE07 package-only runtime-evidence interoperability consumer exited with status $LASTEXITCODE."
     }
 
+    & ./.github/scripts/smoke-rb07-raster-backend-selection-interop.ps1 `
+        -ArtifactDirectory $ArtifactDirectory `
+        -Configuration $Configuration
+    if (0 -ne $LASTEXITCODE) {
+        throw "RB07 package-only raster-backend selection interoperability consumer exited with status $LASTEXITCODE."
+    }
+
     $lifecycleSampleProject = Join-Path `
         $repositoryRoot `
         'samples/Icod.TermInfo.PersistentRasterLifecycle.Sample/Icod.TermInfo.PersistentRasterLifecycle.Sample.csproj'
@@ -102,6 +109,44 @@ try {
             --no-restore
         if (0 -ne $LASTEXITCODE) {
             throw "RE07 persistent-raster runtime-integration sample failed on $framework."
+        }
+    }
+
+    $termcapSampleProject = Join-Path `
+        $repositoryRoot `
+        'samples/Icod.TermInfo.Termcap.Sample/Icod.TermInfo.Termcap.Sample.csproj'
+    & dotnet restore $termcapSampleProject
+    if (0 -ne $LASTEXITCODE) {
+        throw 'Termcap reusable-API sample restore failed.'
+    }
+
+    foreach ($framework in @('net8.0', 'net9.0', 'net10.0')) {
+        & dotnet run `
+            --project $termcapSampleProject `
+            -c $Configuration `
+            -f $framework `
+            --no-restore
+        if (0 -ne $LASTEXITCODE) {
+            throw "Termcap reusable-API sample failed on $framework."
+        }
+    }
+
+    $rasterBackendSampleProject = Join-Path `
+        $repositoryRoot `
+        'samples/Icod.TermInfo.RasterBackendSelection.Sample/Icod.TermInfo.RasterBackendSelection.Sample.csproj'
+    & dotnet restore $rasterBackendSampleProject
+    if (0 -ne $LASTEXITCODE) {
+        throw 'RB07 raster-backend selection sample restore failed.'
+    }
+
+    foreach ($framework in @('net8.0', 'net9.0', 'net10.0')) {
+        & dotnet run `
+            --project $rasterBackendSampleProject `
+            -c $Configuration `
+            -f $framework `
+            --no-restore
+        if (0 -ne $LASTEXITCODE) {
+            throw "RB07 raster-backend selection sample failed on $framework."
         }
     }
 

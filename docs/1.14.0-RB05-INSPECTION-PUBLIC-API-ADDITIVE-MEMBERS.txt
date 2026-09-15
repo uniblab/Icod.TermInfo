@@ -1,0 +1,3 @@
+# Icod.TermInfo.Inspection 1.14 RB05 reviewed additive member on RasterBackendCandidate
+# Exact public-api-snapshot manifest line; all RB01-RB04 public API remains frozen.
+  CTOR public RasterBackendCandidate(Icod.TermInfo.Inspection.RasterBackendProfile backendProfile null=not-null/not-null, Icod.TermInfo.Inspection.PersistentRasterRuntimeIntegrationResult integration null=not-null/not-null)

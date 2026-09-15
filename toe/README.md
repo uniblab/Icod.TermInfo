@@ -3,6 +3,15 @@
 `toe` is the managed conventional terminfo database-listing command in the
 `Icod.TermInfo` tool suite.
 
+## 1.14 release status
+
+Version `1.14.0` carries the frozen `toe` database-listing, source-dependency,
+and multi-database JSON automation contracts forward unchanged. Raster-backend
+selection is isolated in `Icod.TermInfo.Inspection`; `toe` gains no new command
+semantics, options, dependencies, or discovery behavior. Standalone `toe` and
+routed `icod-terminfo toe` retain their existing behavior while reporting the
+coordinated `1.14.0` suite version.
+
 ## 1.10 multi-database JSON automation
 
 Version `1.10.0-Alpha-8` freezes the additive explicit database-set forms:

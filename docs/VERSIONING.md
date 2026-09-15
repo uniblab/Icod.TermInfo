@@ -1,103 +1,122 @@
 # Icod.TermInfo Versioning Policy
 
 The `Icod.TermInfo` package family follows Semantic Versioning for its public
-package contracts.
+package contracts. Version-specific roadmaps, API freezes, schema fingerprints,
+and release audits remain the authoritative historical evidence for completed
+releases; this document defines the current cross-release policy.
+
+## 1.14 release line
+
+The RB01-RB08 development sequence is `1.14.0-Alpha-1` through
+`1.14.0-Alpha-8`. Version 1.14 adds compatible public API only to
+`Icod.TermInfo.Inspection` for raster-backend availability evidence,
+classification, lifecycle/placement-aware candidate evaluation, explicit
+preference-aware backend selection, composition with the frozen 1.13 runtime
+integration result, and additive version-6 JSON. Runtime, Source, Compiler, and
+Termcap public APIs remain frozen.
+
+RB08 freezes the complete 1.14 Inspection reflection manifest at **106 exported
+public types** with normalized-LF SHA-256:
+
+```text
+e9f240a562aec5274d64fb2ec3647862fe4ef5684582af2b442ba3c55e189497
+```
+
+The reviewed 1.14 type delta is the 16 `RasterBackend*` type blocks introduced
+through RB03. RB06 contributes exactly six additive `TermInfoJsonRenderer`
+member lines. Release verification first requires the complete 1.14 surface,
+then removes only those reviewed 1.14 additions to reconstruct the frozen 1.13
+surface with SHA-256:
+
+```text
+fd827a25abafb8e9ff3915567f45f9f2ec51b332bfd8a82dd4e4bca20290e764
+```
+
+The established historical reconstruction chain then continues through frozen
+1.12, 1.11, and 1.10.
+
+JSON versions 1 through 5 remain immutable historical contracts. Version 6 is
+additive and contains exactly `rasterBackendProfile` and
+`rasterBackendSelectionPlan`; its normalized-LF schema SHA-256 is:
+
+```text
+9d51ec6659f8978c867408881eefb106f3c4976dfcf2da12b23c374a222665c2
+```
+
+Production `Icod.TermInfo.Inspection` does not acquire an `Icod.Terminal`
+dependency. RB07 qualifies a package-only consumer against published
+`Icod.Terminal 1.13.0` on `net8.0`, `net9.0`, and `net10.0`.
+
+After the exact Alpha-8 head passes the complete Staging package, historical
+compatibility, RB07 package-consumer/sample, installed-tool, and six-RID archive
+gates, stable `1.14.0` is a promotion-only transition. Promotion may change the
+coordinated release identity and stable-facing documentation only; it may not
+introduce feature semantics, public API, schema fields, production dependencies,
+target frameworks, command behavior, package-consumer topology, or archive RIDs,
+and it requires its own fresh full validation.
 
 ## 1.13 release line
 
-The RE01-RE08 development sequence is `1.13.0-Alpha-1` through
-`1.13.0-Alpha-8`. Version 1.13 adds compatible public API only to
-`Icod.TermInfo.Inspection` for caller-owned persistent-raster runtime observations,
-deterministic integration into the frozen 1.11 lifecycle and 1.12 placement
-evidence models, planner-delegating replanning, and additive version-5 JSON.
-Runtime, Source, Compiler, and Termcap public APIs remain frozen.
+The RE01-RE08 sequence is `1.13.0-Alpha-1` through `1.13.0-Alpha-8`.
+Version 1.13 added compatible public API only to Inspection for caller-owned
+persistent-raster runtime observations, deterministic integration into the frozen
+1.11 lifecycle and 1.12 placement evidence models, planner-delegating replanning,
+and additive version-5 JSON.
 
-RE08 freezes the complete 1.13 Inspection reflection manifest at 90 exported
-public types with normalized-LF SHA-256
+RE08 freezes the complete 1.13 Inspection surface at 90 exported public types
+with normalized-LF SHA-256
 `fd827a25abafb8e9ff3915567f45f9f2ec51b332bfd8a82dd4e4bca20290e764`.
-Release verification first requires that exact current 1.13 surface, then removes
-only the reviewed six RE06 renderer members and nine cumulative
-`PersistentRasterRuntime*` type blocks to reproduce frozen 1.12 SHA-256
-`f71501dcd27a530051c1a02083325144ced2b6173b6b967b9571c620815198f0`.
-JSON versions 1 through 4 remain immutable; version 5 contains exactly the
-runtime observation-set and integration-audit document kinds.
-
-After the exact Alpha-8 head passes the complete Staging package, historical and
-RE07 package-consumer/sample, installed-tool, and six-RID archive gates, stable
-`1.13.0` is a promotion-only transition. Promotion may change coordinated
-release identity and stable-facing documentation only; it may not introduce
-feature semantics, public API, schema fields, production dependencies, target
-frameworks, command behavior, or archive RIDs, and it requires its own fresh full
-validation.
+JSON versions 1 through 4 remain immutable; version 5 contains exactly
+`persistentRasterRuntimeObservationSet` and
+`persistentRasterRuntimeIntegration`. Stable 1.13 promotion is semantic/API/schema
+neutral relative to the validated Alpha-8 contract.
 
 ## 1.12 release line
 
-The PG01-PG08 development sequence is `1.12.0-Alpha-1` through
-`1.12.0-Alpha-8`. Version 1.12 adds compatible public API only to
-`Icod.TermInfo.Inspection` for advanced persistent-raster placement evidence,
-classification, lifecycle-aware semantic planning, description/database-set
-composition, and additive version-4 profile/plan JSON automation. Runtime,
-Source, Compiler, and Termcap public APIs remain frozen.
-
-PG08 freezes the complete 1.12 Inspection reflection manifest at 81 exported
-public types with normalized-LF SHA-256
+The PG01-PG08 sequence is `1.12.0-Alpha-1` through `1.12.0-Alpha-8`.
+Version 1.12 added compatible Inspection API for advanced persistent-raster
+placement evidence and planning. PG08 freezes the complete 1.12 Inspection
+surface at 81 exported public types with normalized-LF SHA-256
 `f71501dcd27a530051c1a02083325144ced2b6173b6b967b9571c620815198f0`.
-Release verification independently removes only the reviewed 1.12 placement
-public type/member delta and requires the remainder to reproduce the frozen 1.11
-manifest fingerprint exactly. JSON versions 1 through 3 remain immutable;
-version 4 is additive and contains exactly the placement profile and plan
-document kinds.
-
-After the exact Alpha-8 head passes the complete Staging package, package-only
-consumer, sample, installed-tool, and six-RID archive gates, stable `1.12.0` is a
-promotion-only transition. Promotion may change coordinated release identity and
-stable-facing documentation only; it may not introduce feature semantics,
-public API, schema fields, production dependencies, target frameworks, command
-behavior, or archive RIDs, and it requires its own fresh full validation.
+JSON versions 1 through 3 remain immutable; version 4 contains exactly
+`persistentRasterPlacementProfile` and `persistentRasterPlacementPlan`.
 
 ## 1.11 release line
 
-The RL01-RL08 development sequence is `1.11.0-Alpha-1` through
-`1.11.0-Alpha-8`. Version 1.11 adds compatible public API only to
-`Icod.TermInfo.Inspection`: protocol-neutral persistent-raster lifecycle evidence,
-classification, semantic planning, description/database-set composition, and
-additive version-3 profile/plan JSON automation. Runtime, Source, Compiler, and
-Termcap public APIs remain frozen, and the command/router layer gains no new
-command semantics.
-
-RL08 freezes the complete 1.11 Inspection reflection manifest by exact normalized-
-LF SHA-256 while independently proving that removing only the reviewed 1.11 type
-and renderer-member delta reconstructs the frozen 1.10 manifest exactly. JSON
-schema versions 1 and 2 remain immutable historical contracts; version 3 is the
-additive lifecycle-only schema.
-
-After the exact Alpha-8 head passes the complete Staging package, NuGet-only
-consumer, reusable sample, installed-tool, and six-RID archive gates, stable
-`1.11.0` is a promotion-only transition. Stable promotion may not introduce new
-feature semantics, public API, schema fields, dependencies, target frameworks,
-command behavior, or archive RIDs and requires its own fresh full validation.
+The RL01-RL08 sequence is `1.11.0-Alpha-1` through `1.11.0-Alpha-8`.
+Version 1.11 established protocol-neutral persistent-raster lifecycle evidence,
+classification, and deterministic semantic planning in Inspection. The complete
+1.11 manifest is frozen by normalized-LF SHA-256
+`69c7350d5d44d502ecf1698c8fe1c1336f03d38eb1a36e36219f50ac33585a86`.
+JSON versions 1 and 2 remain immutable; version 3 contains only
+`persistentRasterLifecycleProfile` and `persistentRasterLifecyclePlan`.
 
 ## 1.10 release line
 
-The DA01-DA08 development sequence is `1.10.0-Alpha-1` through
-`1.10.0-Alpha-8`. DA08 freezes the exact complete 1.10 Inspection API and the
-additive version-2 JSON schema while preserving the frozen 1.9 version-1 schema.
-After the exact Alpha-8 head passes the full package and six-RID distribution
-gate, stable `1.10.0` is a promotion-only version transition: no new feature
-semantics, public API, schema fields, dependencies, target frameworks, command
-behavior, or archive RIDs may be introduced.
+The DA01-DA08 sequence is `1.10.0-Alpha-1` through `1.10.0-Alpha-8`.
+Version 1.10 added deterministic ordered multi-database inspection, precedence,
+conflict analysis, comparison, planning, and additive version-2 JSON. The frozen
+complete Inspection surface is recorded in
+`1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt`; version-1 JSON remains immutable.
+
+## 1.9 release line
+
+The MI01-MI07 sequence established deterministic versioned JSON rendering and
+command automation in Inspection without changing earlier synthesis/planning
+semantics. Stable 1.9 freezes the 31-type Inspection surface in
+`1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt` and the version-1 JSON contract in
+`Icod.TermInfo.Inspection.schema.json`.
 
 ## Package versions
 
-The NuGet packages use:
+Coordinated NuGet packages use Semantic Versioning:
 
 ```text
 MAJOR.MINOR.PATCH
 ```
 
-Development tranches use the repository's established prerelease form, such as
-`1.4.0-Alpha-1`, `1.4.0-Alpha-2`, and later `-Beta-X` / `-RC-X` forms when
-needed.
+Development tranches use prerelease identities such as `1.14.0-Alpha-1`.
+Stable release tags are exactly `v<PackageVersion>`.
 
 For the 1.x line:
 
@@ -108,306 +127,34 @@ For the 1.x line:
 - removal, incompatible signature changes, incompatible enum-value changes, or
   deliberate semantic-contract breaks require a new major version.
 
-Beginning with 1.1.0, `Icod.TermInfo` and `Icod.TermInfo.Source` advance
-together. In each project, `<Version>` and `<PackageVersion>` must be identical,
-and the package versions of the two projects must match.
-
-Beginning with C01 in the 1.2.0 development line,
-`Icod.TermInfo.Compiler` joins the coordinated package family. From that point
-forward, Runtime, Source, and Compiler carry the same package version. The
-C01-C07 development sequence is `1.2.0-Alpha-1` through `1.2.0-Alpha-7`.
-
-Beginning with I01 in the 1.3.0 development line,
-`Icod.TermInfo.Inspection` joins the coordinated package family. Runtime, Source,
-Compiler, and Inspection SHALL all carry the same package version for every I01-I07
-development tranche and final release. The I01-I07 development sequence is
-`1.3.0-Alpha-1` through `1.3.0-Alpha-7`.
-
-Beginning with T01 in the 1.4.0 development line, the four library packages
-continue to advance together. The `tic`, `infocmp`, and `toe` command projects
-carry the matching 1.4 development version for command identity, but T01 keeps
-them non-packable executables rather than adding three new coordinated NuGet
-package IDs. The command layer targets `net10.0` because it uses
-`Icod.CommandFramework 2.0.0`; this does not reduce the library package family
-from its `net8.0` / `net9.0` / `net10.0` targets.
-
-Patch release 1.4.1 advances all four package versions and all three command
-versions together. It corrects release-facing documentation and metadata only;
-it does not create a new public API baseline or change the frozen 1.4.0 command
-semantics.
-
 Beginning with 1.5.0, `Directory.Build.props` contains the single
-`IcodTermInfoSuiteVersion` release-version authority. Runtime, Source, Compiler,
-Inspection, `tic`, `infocmp`, `toe`, and the `Icod.TermInfo.Tools` router consume
-that property rather than carrying independent current-version literals. The
-router is a packable .NET tool with command name `icod-terminfo`; the three
-semantic command projects remain non-packable. The router joins the coordinated
-registry package set without changing any reusable-library assembly identity or
-frozen public API baseline.
+`IcodTermInfoSuiteVersion` authority. Runtime, Source, Compiler, Inspection,
+Termcap, all five standalone command projects, and the `Icod.TermInfo.Tools`
+router consume that coordinated release identity rather than carrying independent
+current-version literals.
 
-Beginning with TC01 in the 1.6.0 development line, `Icod.TermInfo.Termcap` joins
-the coordinated reusable package family. It targets `net8.0`, `net9.0`, and
-`net10.0`, consumes the centralized suite version, retains assembly version
-`1.0.0.0`, and depends only on Runtime. Existing reusable packages do not acquire
-a Termcap dependency. Stable publication of the new package ID and its final API
-baseline are release-closure work for the 1.6 line.
+## Coordinated package family
 
-TC02 advances the coordinated development version to `1.6.0-Alpha-2` and adds
-public termcap capability-mapping and classification APIs only to
-`Icod.TermInfo.Termcap`. Runtime, Source, Compiler, and Inspection retain their
-frozen public API baselines. The Termcap public surface remains a development
-contract until the 1.6 release-closure freeze.
+The coordinated registry family is:
 
-TC03 advances the coordinated development version to `1.6.0-Alpha-3` and adds
-termcap-specific bounded `tc=` resolution, cancellation, provider lookup, and
-source-provenance APIs only to `Icod.TermInfo.Termcap`. The resolver does not add
-a Source dependency and does not alter any frozen Runtime, Source, Compiler, or
-Inspection public API baseline.
+```text
+Icod.TermInfo
+Icod.TermInfo.Source
+Icod.TermInfo.Compiler
+Icod.TermInfo.Inspection
+Icod.TermInfo.Termcap
+Icod.TermInfo.Tools
+```
 
-TC04 advances the coordinated development version to `1.6.0-Alpha-4` and adds
-resolved-termcap semantic conversion APIs only to `Icod.TermInfo.Termcap`. The
-converter materializes the existing Runtime `TerminalDescription` model directly,
-preserves representable unmapped fields through Runtime extended capabilities,
-and does not add a Source dependency or alter any frozen Runtime, Source,
-Compiler, or Inspection public API baseline.
-
-TC05 advances the coordinated development version to `1.6.0-Alpha-5` and adds
-Runtime-to-termcap representability and deterministic reverse-rendering APIs only
-to `Icod.TermInfo.Termcap`. The renderer consumes the existing Runtime model and
-TC02 mapping metadata directly, does not add a Source dependency, performs no
-environment or filesystem acquisition, and does not alter any frozen Runtime,
-Source, Compiler, or Inspection public API baseline.
-
-TC06 advances the coordinated development version to `1.6.0-Alpha-6` and adds
-explicit opt-in termcap acquisition APIs only to `Icod.TermInfo.Termcap`.
-Environment and filesystem access are isolated behind caller-selected provider
-seams, and acquisition composes the existing Termcap parser, resolver, and
-converter without joining Runtime terminal discovery. The Termcap package still
-depends only on Runtime, and no frozen Runtime, Source, Compiler, or Inspection
-public API baseline changes.
-
-TC07 advances the coordinated development version to `1.6.0-Alpha-7` and adds
-the non-packable `captoinfo` and `infotocap` command projects. They consume the
-central suite version and are distributed both as standalone archive launchers
-and as routes of the single `Icod.TermInfo.Tools` command. TC07 adds no reusable
-Termcap public API: `captoinfo` composes Termcap with Inspection, `infotocap`
-composes Source with Termcap, and `Icod.TermInfo.Termcap` itself continues to
-depend only on Runtime. The existing `tic`, `infocmp`, and `toe` command
-semantics remain frozen.
-
-TC08 advances the coordinated development version to `1.6.0-Alpha-8` without
-adding reusable API or command semantics. It freezes the active Termcap public
-surface, adds checked-in differential and bounded hostile-input/mutation
-validation, requires structural verification of the packed Termcap artifact,
-and executes an isolated package-reference-only Termcap consumer on `net8.0`,
-`net9.0`, and `net10.0`. The Runtime-only Termcap dependency and the TC07
-command/router/archive topology are frozen for 1.6 release closure.
-
-Stable 1.6.0 promotes that frozen Alpha-8 surface without further public API or
-command-semantic changes. Runtime, Source, Termcap, Compiler, Inspection, all
-five standalone commands, and `Icod.TermInfo.Tools` consume the centralized
-`1.6.0` suite version while the five reusable assemblies retain `1.0.0.0`.
-
-Patch release 1.6.1 advances the coordinated package and command version to
-`1.6.1` while preserving every frozen reusable API baseline, command contract,
-dependency direction, target framework, and assembly identity. Its production
-change is limited to release-verifier environment isolation: temporary
-package-smoke `NUGET_PACKAGES` values must not leak into repository sample or
-toolchain builds.
-
-RS01 advances the coordinated development version to `1.7.0-Alpha-1` and adds
-relative-source synthesis contract types only to `Icod.TermInfo.Inspection`.
-Runtime, Source, Compiler, and Termcap retain their frozen public API baselines;
-Inspection continues to depend only on Runtime and Source in production, and all
-five reusable assemblies retain `1.0.0.0`. During 1.7 development the release
-verifier enforces cross-framework Inspection API equality and package smoke
-coverage for the additive surface. The exact stable 1.7 Inspection API baseline
-is intentionally frozen by RS08 rather than by RS01.
-
-RS02 advances the coordinated development version to `1.7.0-Alpha-2` without
-adding public API. Inspection now executes deterministic standard Boolean,
-numeric, and string relative-source deltas and cancellations against the ordered
-parent contract frozen by RS01. Runtime, Source, Compiler, and Termcap retain
-their frozen public API baselines; Inspection retains Runtime-and-Source-only
-production dependencies and assembly version `1.0.0.0`. Extended capability
-relative synthesis remains assigned to RS03.
-
-RS03 advances the coordinated development version to `1.7.0-Alpha-3` and adds
-only the additive `TerminalDescriptionSourceSynthesisOptions` extended-output
-property/constructor overload to Inspection. Relative synthesis now covers
-ordinal case-sensitive extended values, inherited cancellation, value-kind
-changes, deterministic ordering, and semantically safe filtering. Runtime,
-Source, Compiler, and Termcap remain frozen; Inspection retains its
-Runtime-and-Source-only dependency graph and assembly version `1.0.0.0`.
-
-RS04 advances the coordinated development version to `1.7.0-Alpha-4` without
-adding public API. Inspection now freezes exact ordered multi-parent composition
-and source-reference fidelity: `UseName` is emitted independently of effective
-parent canonical identity, repeated/equivalent parents remain legal under
-distinct references, and Source-backed cross-checks verify the existing
-leftmost-parent precedence across standard and extended capabilities. Runtime,
-Source, Compiler, and Termcap remain frozen; Inspection retains its
-Runtime-and-Source-only dependency graph and assembly version `1.0.0.0`.
-
-RS05 advances the coordinated development version to `1.7.0-Alpha-5` without
-adding public API. It freezes deterministic relative-source layout, wrapping,
-capability ordering, LF output, target identity, cancellations, and ordered
-`use=` rendering. Source parser/resolver and Compiler round trips become
-permanent semantic gates while Compiler remains a test/sample dependency only.
-
-RS06 advances the coordinated development version to `1.7.0-Alpha-6` without
-adding reusable API. It exposes relative synthesis through `infocmp -u`, keeps
-the command as a thin adapter over Inspection, preserves `-A` target and `-B`
-parent acquisition policy, freezes presentation-option interactions, and routes
-the same behavior through `icod-terminfo` without duplicating command semantics.
-
-RS07 advances the coordinated development version to `1.7.0-Alpha-7` without
-adding API or command semantics. It adds reproducible generated-state round
-trips, maximum-parent and pathological-input coverage, and a checked-in semantic
-differential corpus pinned to ncurses `6.5.20250216`. Normal validation remains
-independent of host ncurses installation and host terminfo state.
-
-RS08 advances the coordinated development version to `1.7.0-Alpha-8` and
-freezes the complete additive Inspection 1.7 public surface. It validates the
-five reusable packages, router package, six standalone archives, Toolchain
-sample, version reporting, dependency direction, and cross-platform release
-pipeline. Stable 1.7.0 promotes this validated surface without semantic or API
-changes.
-
-RP01 advances the coordinated development version to `1.8.0-Alpha-1` and adds
-relative-source planning contract types only to `Icod.TermInfo.Inspection`.
-Runtime, Source, Compiler, and Termcap retain their frozen public API baselines;
-the frozen 1.7 Inspection baseline remains immutable historical evidence;
-Inspection continues to depend only on Runtime and Source in production; and all
-five reusable assemblies retain `1.0.0.0`. During 1.8 development the release
-verifier enforces cross-framework Inspection API equality and package-smoke
-coverage for the additive surface. RP08 freezes the exact stable 1.8 Inspection
-API baseline.
-
-RP02 advances the coordinated development version to `1.8.0-Alpha-2` and makes
-the planner operational for the zero-parent baseline plus every legal single
-candidate position. The public API surface is unchanged from RP01. Inspection
-adds only internal synthesis evidence so the frozen score can be computed during
-rendering without reparsing generated source; the frozen 1.7 public synthesizer
-contract and Runtime-and-Source-only production dependency boundary remain
-unchanged. The other coordinated packages and commands advance their package and
-reported versions without public API or command-semantic changes.
-
-RP03 advances the coordinated development version to `1.8.0-Alpha-3` and makes
-ordered multi-parent planning operational through the configured selected-parent
-bound. Candidate positions cannot repeat within one plan, distinct equal
-positions remain eligible, fixed-depth enumeration is lexicographic, and exact
-selected order is passed unchanged to the frozen leftmost-precedence synthesizer.
-The public API and production dependency graph remain unchanged.
-
-RP04 advances the coordinated development version to `1.8.0-Alpha-4` and
-freezes bounded-search arithmetic, deterministic partial-search evidence, and
-stable cancellation boundaries. Hostile candidate and plan spaces terminate
-within validated candidate, parent, evaluation, and generated-source limits.
-Cancellation and operational failure publish no partial plan. The public API
-and production dependency graph remain unchanged.
-
-RP05 advances the coordinated development version to `1.8.0-Alpha-5` and adds
-explicit catalog and conventional-directory orchestration to the Inspection
-planner. Catalog candidates use ordinal canonical-name order, equivalent
-physical publications collapse deterministically, conflicting duplicates and
-issue-bearing catalogs are rejected, and parser limits, planning bounds, and
-cancellation remain authoritative. The frozen 1.4 catalog types, frozen 1.7
-synthesizer, production dependency graph, and reusable assembly identities are
-unchanged.
-
-RP06 advances the coordinated development version to `1.8.0-Alpha-6` and
-exposes explicit-candidate planning through `infocmp --plan-use`. Existing
-`-A`/`-B` acquisition and source-presentation controls map into the reusable
-planner; reviewed parent, evaluation, and exhaustive-versus-bounded controls
-remain enforced by Inspection. Direct and routed command behavior is identical,
-tool-package and archive smoke execute a controlled planning path, and matching
-CI runners exercise all six standalone archive RIDs. No reusable public API,
-production dependency direction, frozen 1.7 synthesis behavior, or reusable
-assembly identity changes.
-
-RP07 advances the coordinated development version to `1.8.0-Alpha-7` and adds
-generated-state, independent-oracle, bounded-prefix, score-tie, permutation,
-equivalent-description, capability-kind, cancellation, maximum-boundary,
-one-past-boundary, culture, insertion-order, repeated-call, and repeated-process
-validation. It reuses the pinned 1.7 differential corpus and extends the
-Toolchain sample through plan, synthesize, compile, publish, reacquire, and
-compare. No public API, production semantic, package dependency, target-
-framework, or assembly-identity change is introduced.
-
-RP08 advances the coordinated development version to `1.8.0-Alpha-8` without
-adding another feature tranche. It freezes the complete additive planning API,
-score, bounds, candidate order, completeness evidence, explicit catalog
-orchestration, package-consumer surface, command and archive composition,
-deterministic samples, release verifiers, and release audit. A green Alpha-8 to
-stable `1.8.0` transition changes release metadata and documentation only. The
-stable release promotes the validated Alpha-8 surface without semantic or API
-changes.
-
-MI01 advances the coordinated development version to `1.9.0-Alpha-1` and adds
-only `TermInfoJsonRendererOptions` and `TermInfoJsonRenderer` to Inspection. It
-freezes the schema identifier/version, typed value kinds, deterministic text
-policy, immutable UTF-8 output bounds, cancellation boundary, and future
-operational tranche ownership. Runtime, Source, Compiler, Termcap, 1.7 synthesis,
-and 1.8 planning APIs and semantics remain frozen. Inspection retains only
-Runtime and Source production dependencies. The 1.8 Inspection baseline remains
-immutable historical evidence while cross-framework API equality and explicit
-MI01 contract/package-smoke tests guard the additive prerelease surface. MI07
-will freeze the exact stable 1.9 Inspection baseline.
-
-MI02 advances the coordinated development version to `1.9.0-Alpha-2` without
-adding public API. It makes only the existing `TerminalDescription` renderer
-overloads operational, freezing the effective-description payload, deterministic
-ordering and escaping, compact and LF/two-space indented forms, exact UTF-8
-bounds, and deterministic cancellation boundaries. Comparison and planning
-rendering remain deferred to MI03, and catalog rendering remains deferred to
-MI04. Historical MI01 records retain their Alpha-1 version.
-
-MI03 advances the coordinated development version to `1.9.0-Alpha-3` without
-adding public API. It makes the existing comparison and source-plan renderer
-overloads operational, freezing typed side values, source-aware evidence,
-ordered parent names, generated source, planning-score components, candidate
-indices, evaluation counts, completeness evidence, deterministic formatting,
-exact UTF-8 bounds, and cancellation. Catalog rendering remains deferred to
-MI04. Historical MI01 and MI02 records retain their original development
-versions.
-
-MI04 advances the coordinated development version to `1.9.0-Alpha-4` without
-adding public API. It makes the existing database-catalog renderer overloads
-operational, freezing normalized-root, kind, completeness, ordered-entry,
-ordered-issue, and duplicate-name evidence. It also publishes and packages the
-complete draft 2020-12 version-1 JSON Schema with checked-in compact and indented
-fixtures for all four document kinds. Historical MI01 through MI03 records
-retain their original development versions. Command JSON remains owned by MI05.
-
-MI05 advances the coordinated development version to `1.9.0-Alpha-5` without
-adding reusable public API or changing the version-1 JSON Schema. It composes
-the frozen renderer through `infocmp --json` and `toe --json`, and composes the
-frozen explicit-catalog planner through `infocmp --plan-use
---all-candidates -B directory target`. Historical MI01 through MI04 records
-retain their original development versions. MI06 owns samples, package-only
-consumers, and cross-host hardening.
-
-MI06 advances the coordinated development version to `1.9.0-Alpha-6` without
-adding public API, changing the version-1 JSON Schema, or changing command
-semantics. It adds JSON-producing Toolchain and ToolSuite samples, exact
-package-reference-only rendering evidence, distributed command smoke, and
-culture, process, host, large-input, pathological-input, and UTF-8 boundary
-hardening. Historical MI01 through MI05 records retain their original
-development versions. MI07 owns final API, schema, packaging, and release
-closure.
-
-MI07 advances the coordinated development version to `1.9.0-Alpha-7` without
-adding feature behavior. It freezes the exact 31-type Inspection API, complete
-version-1 JSON Schema, command semantics, package graph, samples, fixtures,
-router and archive topology, release verifiers, and release audit. Historical
-MI01 through MI06 records retain their original development versions. Stable
-`1.9.0` promotes the validated Alpha-7 surface through release metadata and
-documentation changes only, without semantic, public-API, or schema changes.
+The five reusable libraries target `net8.0`, `net9.0`, and `net10.0`. The command
+applications and router follow the repository's separately documented command
+framework/TFM policy. A coordinated minor or patch release advances package and
+reported command identities together even when only one optional layer receives
+new compatible API.
 
 ## Assembly identity
 
-The 1.x line freezes the managed assembly identities:
+The compatible 1.x line freezes reusable managed assembly identities:
 
 ```text
 AssemblyName       Icod.TermInfo
@@ -431,136 +178,77 @@ AssemblyVersion    1.0.0.0
 Strong-name signed no
 ```
 
-Package patch/minor versions do not advance `AssemblyVersion`.
+All five reusable assemblies remain **unsigned** throughout the compatible 1.x
+line. Package minor/patch versions do not advance `AssemblyVersion`. Adding a
+strong name or otherwise changing assembly identity is a major-version design
+decision unless a future compatibility review proves a safe migration.
 
-This is deliberate. Advancing `AssemblyVersion` for a compatible package-minor
-release would create a new binary assembly identity and would weaken the 1.x
-binding contract without providing a semantic-versioning benefit. All five reusable
-assemblies remain unsigned throughout 1.x. Adding a strong name changes assembly
-identity and is treated as a major-version design decision unless a future
-compatibility review demonstrates a safe migration.
+## Public API freezes
 
-## Public API baselines
+The repository keeps independent immutable public API authorities for each
+reusable package and release line. Important current authorities include:
 
-The approved `docs/1.0.0-PUBLIC-API-BASELINE.txt` is the exhaustive
-machine-readable runtime contract established by 1.0 and retained throughout
-1.x.
+- `1.0.0-PUBLIC-API-BASELINE.txt` — Runtime;
+- `1.1.0-SOURCE-PUBLIC-API-BASELINE.txt` — Source;
+- `1.2.0-COMPILER-PUBLIC-API-BASELINE.txt` — Compiler;
+- `1.6.0-TERMCAP-PUBLIC-API-BASELINE.txt` — Termcap;
+- `1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt` — frozen pre-raster Inspection
+  authority;
+- `1.11.0-INSPECTION-PUBLIC-API-FREEZE.md` — composite 1.11 freeze;
+- `1.12.0-INSPECTION-PUBLIC-API-FREEZE.md` — composite 1.12 freeze;
+- `1.13.0-INSPECTION-PUBLIC-API-FREEZE.md` — composite 1.13 freeze; and
+- `1.14.0-INSPECTION-PUBLIC-API-FREEZE.md` — current composite 1.14 freeze.
 
-The approved `docs/1.1.0-SOURCE-PUBLIC-API-BASELINE.txt` is the independent
-machine-readable public contract for `Icod.TermInfo.Source`.
+Routine validation must require equivalent public API across `net8.0`, `net9.0`,
+and `net10.0` for reusable libraries. A baseline/fingerprint must never be
+regenerated merely to accept an unintended API change.
 
-Beginning with C01, `docs/1.2.0-COMPILER-PUBLIC-API-BASELINE.txt` records the
-developing public contract for `Icod.TermInfo.Compiler` and becomes the frozen
-Compiler contract at 1.2 release closure.
+## JSON schema versioning
 
-The approved `docs/1.3.0-INSPECTION-PUBLIC-API-BASELINE.txt` is the independent
-machine-readable public contract for `Icod.TermInfo.Inspection`, frozen at the
-1.3 release closure after the I02-I06 API additions and I07 validation gate.
+Inspection JSON schemas are additive and immutable once released:
 
-`docs/1.4.0-INSPECTION-PUBLIC-API-BASELINE.txt` is the frozen Inspection
-baseline for the 1.4 line. T01 initialized it as an exact copy of the frozen 1.3
-baseline. T02 added reviewed read-only system database-location inspection, T03
-added reviewed conventional database catalog enumeration, and T06 added reviewed
-renderer controls for layout, width, standard-capability ordering, and extended-
-capability filtering. T04, T05, and T07 changed only command-layer composition.
-The reviewed baseline was frozen at the 1.4.0 release and remains byte-for-byte
-unchanged through 1.5.0. The 1.5 distribution/versioning changes add no reusable
-library API. Any later public Inspection surface change requires a new compatible
-minor-release API review rather than changing this historical baseline.
+```text
+v1  effective description/comparison/source plan/catalog
+v2  ordered database-set automation
+v3  persistent-raster lifecycle profile/plan
+v4  persistent-raster placement profile/plan
+v5  runtime observation set/integration
+v6  raster backend profile/selection plan
+```
 
-`docs/1.6.0-TERMCAP-PUBLIC-API-BASELINE.txt` is the frozen Termcap public
-surface established by TC08. The validated Alpha-7 `PublicApiSnapshot/v1` rich
-reflection manifest has SHA-256 `1e24b8a555b506594c58cf58d03bf87b2b60192f6316537cb4200498c6a92ab0`; release verification requires that
-exact fingerprint and net8/net9/net10 equivalence. The same file also records the
-241 sorted packaged XML documentation member IDs as a human-reviewable inventory.
-The baseline must not be regenerated merely to accept an unintended public
-Termcap change.
+Adding a new document kind or incompatible shape requires a new schema version;
+older schema files and renderer behavior remain frozen for their historical
+inputs. Inspection does not provide a generic operational JSON deserializer.
 
-`docs/1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt` is the frozen complete
-Inspection surface for the 1.7 line. It retains every previously released
-Inspection member and adds only `TerminalDescriptionSourceSynthesisParent`,
-`TerminalDescriptionSourceSynthesisOptions`, and
-`TerminalDescriptionSourceSynthesizer`. The historical 1.3 and 1.4 Inspection
-baselines remain immutable. Release verification requires exact net8/net9/net10
-API equivalence and an exact match with the 1.7 baseline.
+## Package dependency direction
 
-`docs/1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt` is the frozen complete
-Inspection surface for the 1.8 line. It retains the entire 1.7 surface and adds
-only `TerminalDescriptionSourcePlan`, `TerminalDescriptionSourcePlanner`,
-`TerminalDescriptionSourcePlanningOptions`, and
-`TerminalDescriptionSourcePlanningScore`. Release verification requires exact
-net8/net9/net10 equivalence and an exact match with the 1.8 manifest. The 1.7
-manifest remains immutable historical evidence and must not be regenerated.
+The supported production dependency graph is intentionally one-way:
 
-`docs/1.9.0-INSPECTION-PUBLIC-API-BASELINE.txt` is the frozen complete
-Inspection surface for the 1.9 line. It retains the entire 1.8 surface and adds
-only `TermInfoJsonRenderer` and `TermInfoJsonRendererOptions`. Alpha-7 and
-stable 1.9 validation require exact net8/net9/net10 equivalence and an exact
-match with the 1.9 manifest. The 1.7 and 1.8 manifests remain immutable
-historical evidence and must not be regenerated.
+- `Icod.TermInfo` is dependency-free;
+- Source depends on matching Runtime;
+- Termcap depends only on matching Runtime;
+- Compiler depends on matching Runtime and Source;
+- Inspection depends on matching Runtime and Source;
+- reusable libraries do not depend on command projects or `Icod.CommandFramework`;
+- Inspection does not depend on Compiler, Termcap, `Icod.Terminal`, or
+  `Icod.DCurses` in production.
 
-`docs/1.10.0-INSPECTION-PUBLIC-API-BASELINE.txt` is the frozen complete
-Inspection surface for the 1.10 line. It retains the complete 1.9 surface and
-adds the deterministic ordered database-set inspection, analysis, comparison,
-and planning automation surface. The additive version-2 JSON schema is frozen
-separately from the immutable version-1 schema.
-
-Version 1.11 uses the composite exact freeze documented in
-`docs/1.11.0-INSPECTION-PUBLIC-API-FREEZE.md`: the frozen 1.10 manifest, the
-exact reviewed 1.11 type and renderer-member delta, and the normalized complete
-1.11 manifest SHA-256
-`69c7350d5d44d502ecf1698c8fe1c1336f03d38eb1a36e36219f50ac33585a86`.
-Release verification requires both that whole-manifest hash and exact
-reconstruction of the 1.10 baseline after removing only the reviewed delta.
-
-The baselines record exported types, public/protected members, enum numeric
-values, parameter names/order/defaults, ref/out/in/params shape, generic
-constraints, nullability, and relevant attributes.
-
-Routine release validation must check the applicable baseline and require
-`net8.0` / `net9.0` / `net10.0` API equivalence. Do not regenerate any
-baseline merely because a check fails. A changed baseline must correspond to an
-intentional compatibility decision.
+Tests, samples, and package-only qualification consumers may reference sibling
+packages to prove interoperability without changing that production graph.
 
 ## Deprecation
 
-When practical, an API planned for removal should first be marked obsolete in a
+When practical, API planned for removal should first be marked obsolete in a
 compatible release and documented with its replacement. Removal belongs to a
-major release.
-
-Security or correctness emergencies may require a faster response, but such a
-change must be documented explicitly.
+major release. Security or correctness emergencies may require a faster response,
+but the compatibility impact must be documented explicitly.
 
 ## Package metadata
 
 README, icon, license expression, repository metadata, multi-target managed/XML
-payloads, portable symbols, Source Link, and the intended inter-package
-dependency direction are part of the release-quality contract.
-
-`Icod.TermInfo` remains dependency-free. `Icod.TermInfo.Source` depends on the
-matching `Icod.TermInfo` package; the runtime package never depends on Source.
-
-`Icod.TermInfo.Compiler` depends directly on the matching `Icod.TermInfo` and
-`Icod.TermInfo.Source` packages. Neither Runtime nor Source may acquire a
-dependency on Compiler.
-
-Beginning with I01, `Icod.TermInfo.Inspection` depends directly on the matching
-`Icod.TermInfo` and `Icod.TermInfo.Source` packages. Inspection SHALL NOT depend
-on Compiler, and Runtime, Source, and Compiler SHALL NOT acquire a dependency on
-Inspection. Inspection tests may reference Compiler for differential evidence
-without changing the production package graph. Version 1.11 additionally freezes
-that Inspection SHALL NOT acquire a production dependency on `Icod.Terminal` or
-`Icod.DCurses`; live terminal verification and execution remain consumer-owned.
-
-Beginning with TC01, `Icod.TermInfo.Termcap` depends directly and exclusively on
-the matching `Icod.TermInfo` package. Runtime, Source, Compiler, and Inspection
-SHALL NOT acquire a Termcap dependency. TC08 freezes that Runtime-only package
-graph for the 1.6 release.
-
-Beginning with T01, command projects may depend on `Icod.CommandFramework` and
-on the appropriate TermInfo libraries. Runtime, Source, Compiler, Inspection, and
-Termcap SHALL NOT acquire an `Icod.CommandFramework` or command-project
-dependency. No command project SHALL depend on another command project.
+payloads, portable symbols, Source Link, package dependency direction, and the
+published Inspection schemas are part of the release-quality contract.
 
 See `COMPATIBILITY.md` for target-framework, platform, behavioral, and feature-
-boundary promises.
+boundary promises, and the versioned release audits for exact qualification
+evidence.
