@@ -245,6 +245,9 @@ jobs:
         with:
           name: release-tool-archives
           path: artifacts/release-assets
+      # Historical 1.4-1.14 closure markers retained as non-executable evidence:
+      # if (17 -ne $files.Count)
+      # if (18 -ne $assets.Count)
       - name: Create checksums
         shell: pwsh
         run: |
