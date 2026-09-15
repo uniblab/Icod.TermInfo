@@ -40,3 +40,26 @@ jobs:
       - name: Run HDB00 interoperability probe
         shell: bash
         run: bash tools/hdb00/run-linux.sh
+
+  macos-berkeley-db-5-3:
+    name: macOS / Berkeley DB 5.3 / ncurses hashed store
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+            10.0.x
+
+      - name: Install Berkeley DB 5
+        run: brew install berkeley-db@5
+
+      - name: Run HDB00 interoperability probe
+        shell: bash
+        run: bash tools/hdb00/run-macos.sh
