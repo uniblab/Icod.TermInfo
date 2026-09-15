@@ -3,6 +3,15 @@
 `captoinfo` is the managed Icod.TermInfo termcap-to-terminfo conversion command,
 introduced in version 1.6.0.
 
+## 1.14 release status
+
+Version `1.14.0` carries the frozen termcap-to-terminfo conversion contract
+forward unchanged. Raster-backend evidence and selection are isolated in
+`Icod.TermInfo.Inspection` and do not alter `captoinfo` parsing, inheritance,
+conversion, rendering, options, or dependencies. Standalone `captoinfo` and
+routed `icod-terminfo captoinfo` retain their existing behavior while reporting
+the coordinated `1.14.0` suite version.
+
 TC07 deliberately keeps the executable thin. Conventional termcap text is
 parsed by `Icod.TermInfo.Termcap`, `tc=` inheritance is resolved by the TC03
 resolver, semantic conversion uses TC04, and the resulting immutable
