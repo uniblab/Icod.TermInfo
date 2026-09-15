@@ -97,6 +97,180 @@ public sealed class Hdb02HashReaderTests {
 		}
 	}
 
+	[Theory]
+	[InlineData( false, 0 )]
+	[InlineData( false, 1 )]
+	[InlineData( true, 0 )]
+	[InlineData( true, 1 )]
+	public void TryReadValueRejectsMismatchedPageIdentity(
+		bool isBigEndian,
+		int pageNumber
+	) {
+		byte[] key = Encoding.UTF8.GetBytes( "hdb02-page-identity" );
+		byte[] database = ( isBigEndian )
+			? CreateBigEndianInlineHashV9Database( key, [ 0x42 ] )
+			: CreateInlineHashV9Database( key, [ 0x42 ] )
+		;
+		Span<byte> identity = database.AsSpan( ( pageNumber * 512 ) + 8, 4 );
+		if ( isBigEndian ) {
+			BinaryPrimitives.WriteUInt32BigEndian( identity, 99 );
+		} else {
+			BinaryPrimitives.WriteUInt32LittleEndian( identity, 99 );
+		}
+
+		AssertInvalidDatabase( database, key );
+	}
+
+	[Fact]
+	public void TryReadValueRejectsMismatchedOverflowPageIdentity() {
+		byte[] key = Encoding.UTF8.GetBytes( "hdb02-overflow-identity" );
+		byte[] database = CreateOverflowHashV9Database( key, [ 0x42 ] );
+		BinaryPrimitives.WriteUInt32LittleEndian(
+			database.AsSpan( ( 2 * 512 ) + 8, 4 ),
+			99
+		);
+
+		AssertInvalidDatabase( database, key );
+	}
+
+	[Theory]
+	[InlineData( 12, 4, 0 )]
+	[InlineData( 16, 4, 8 )]
+	[InlineData( 20, 4, 0 )]
+	[InlineData( 20, 4, 511 )]
+	[InlineData( 20, 4, 513 )]
+	[InlineData( 20, 4, 131072 )]
+	[InlineData( 24, 1, 1 )]
+	[InlineData( 25, 1, 9 )]
+	[InlineData( 26, 1, 1 )]
+	[InlineData( 32, 4, 2 )]
+	[InlineData( 532, 2, 1 )]
+	[InlineData( 532, 2, 244 )]
+	[InlineData( 534, 2, 29 )]
+	[InlineData( 534, 2, 513 )]
+	[InlineData( 538, 2, 512 )]
+	[InlineData( 540, 2, 512 )]
+	public void TryReadValueRejectsMalformedGeometry(
+		int offset,
+		int width,
+		uint invalidValue
+	) {
+		byte[] key = Encoding.UTF8.GetBytes( "hdb02-corruption" );
+		byte[] database = CreateInlineHashV9Database( key, [ 0x42 ] );
+		Span<byte> field = database.AsSpan( offset, width );
+		if ( width == 4 ) {
+			BinaryPrimitives.WriteUInt32LittleEndian( field, invalidValue );
+		} else if ( width == 2 ) {
+			BinaryPrimitives.WriteUInt16LittleEndian( field, (ushort)invalidValue );
+		} else {
+			field[0] = (byte)invalidValue;
+		}
+
+		AssertInvalidDatabase( database, key );
+	}
+
+	[Theory]
+	[InlineData( 0 )]
+	[InlineData( 511 )]
+	[InlineData( 1023 )]
+	public void TryReadValueRejectsTruncatedDatabase( int length ) {
+		byte[] key = Encoding.UTF8.GetBytes( "hdb02-truncated" );
+		byte[] database = CreateInlineHashV9Database( key, [ 0x42 ] );
+		Array.Resize( ref database, length );
+
+		AssertInvalidDatabase( database, key );
+	}
+
+	[Theory]
+	[InlineData( 0 )]
+	[InlineData( 1 )]
+	[InlineData( 2 )]
+	[InlineData( 3 )]
+	[InlineData( 4 )]
+	[InlineData( 5 )]
+	public void TryReadValueRejectsMalformedOverflow( int corruption ) {
+		byte[] key = Encoding.UTF8.GetBytes( "hdb02-overflow-corruption" );
+		byte[] database = CreateOverflowHashV9Database( key, [ 0x11, 0x22 ] );
+		int valueOffset = ( 2 * 512 ) - 1 - key.Length - 12;
+		switch ( corruption ) {
+			case 0:
+				// A cycle must fail even after all declared bytes were copied.
+				BinaryPrimitives.WriteUInt32LittleEndian(
+					database.AsSpan( ( 2 * 512 ) + 16, 4 ),
+					2
+				);
+				break;
+			case 1:
+				BinaryPrimitives.WriteUInt32LittleEndian(
+					database.AsSpan( valueOffset + 4, 4 ),
+					3
+				);
+				break;
+			case 2:
+				database[( 2 * 512 ) + 25] = 13;
+				break;
+			case 3:
+				BinaryPrimitives.WriteUInt32LittleEndian(
+					database.AsSpan( valueOffset + 8, 4 ),
+					3
+				);
+				break;
+			case 4:
+				BinaryPrimitives.WriteUInt32LittleEndian(
+					database.AsSpan( valueOffset + 8, 4 ),
+					1
+				);
+				break;
+			case 5:
+				BinaryPrimitives.WriteUInt32LittleEndian(
+					database.AsSpan( valueOffset + 8, 4 ),
+					uint.MaxValue
+				);
+				break;
+		}
+
+		AssertInvalidDatabase( database, key );
+	}
+
+	[Theory]
+	[InlineData( "HDB02-exact" )]
+	[InlineData( "hdb02" )]
+	[InlineData( "hdb02-exact-extra" )]
+	public void TryReadValueReturnsCleanMissForDifferentKey( string requestedName ) {
+		byte[] key = Encoding.UTF8.GetBytes( "hdb02-exact" );
+		byte[] database = CreateInlineHashV9Database( key, [ 0x42 ] );
+		byte[] requestedKey = Encoding.UTF8.GetBytes( requestedName );
+		string path = Path.GetTempFileName();
+		try {
+			File.WriteAllBytes( path, database );
+			bool found = BerkeleyDbHashReader.TryReadValue(
+				path,
+				requestedKey,
+				out byte[] actual
+			);
+
+			Assert.False( found );
+			Assert.Empty( actual );
+		} finally {
+			File.Delete( path );
+		}
+	}
+
+	private static void AssertInvalidDatabase(
+		byte[] database,
+		byte[] key
+	) {
+		string path = Path.GetTempFileName();
+		try {
+			File.WriteAllBytes( path, database );
+			Assert.Throws<InvalidDataException>(
+				() => BerkeleyDbHashReader.TryReadValue( path, key, out _ )
+			);
+		} finally {
+			File.Delete( path );
+		}
+	}
+
 	private static byte[] CreateInlineHashV9Database(
 		byte[] key,
 		byte[] value
@@ -139,6 +313,7 @@ public sealed class Hdb02HashReaderTests {
 
 		Span<byte> page = database.AsSpan( pageSize, pageSize );
 		page[25] = 13;
+		BinaryPrimitives.WriteUInt32BigEndian( page[8..12], 1 );
 		BinaryPrimitives.WriteUInt16BigEndian( page[20..22], 2 );
 		int keyOffset = pageSize - 1 - key.Length;
 		int valueOffset = keyOffset - 1 - value.Length;
@@ -190,6 +365,7 @@ public sealed class Hdb02HashReaderTests {
 
 		Span<byte> overflowPage = database.AsSpan( pageSize * 2, pageSize );
 		overflowPage[25] = 7;
+		BinaryPrimitives.WriteUInt32LittleEndian( overflowPage[8..12], 2 );
 		BinaryPrimitives.WriteUInt32LittleEndian( overflowPage[16..20], 0 );
 		BinaryPrimitives.WriteUInt16LittleEndian(
 			overflowPage[22..24],
@@ -225,6 +401,7 @@ public sealed class Hdb02HashReaderTests {
 
 	private static void WriteHashPageHeader( Span<byte> page ) {
 		page[25] = 13;
+		BinaryPrimitives.WriteUInt32LittleEndian( page[8..12], 1 );
 		BinaryPrimitives.WriteUInt16LittleEndian( page[20..22], 2 );
 	}
 
