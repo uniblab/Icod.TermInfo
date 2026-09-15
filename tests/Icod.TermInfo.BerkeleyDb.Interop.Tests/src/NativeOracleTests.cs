@@ -96,7 +96,8 @@ public sealed class NativeOracleTests {
 			FixturePath( fixtureName + ".db" ),
 			Encoding.UTF8.GetBytes( terminalName ),
 			out byte[] actual
-		) );
+		)
+		);
 
 		Assert.Equal( expected, actual );
 	}

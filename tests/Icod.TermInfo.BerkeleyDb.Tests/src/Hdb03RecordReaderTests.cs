@@ -32,7 +32,8 @@ public sealed class Hdb03RecordReaderTests {
 			path => {
 				Assert.True( NcursesRecordReader.TryReadCompiledEntry(
 					path, new byte[] { 0x6B }, out byte[] actual, maximumIndexHops: 0
-				) );
+				)
+				);
 				Assert.Equal( new byte[] { 0x1A, 1, 0, 0xFF }, actual );
 			}
 		);
@@ -45,7 +46,8 @@ public sealed class Hdb03RecordReaderTests {
 			path => {
 				Assert.True( NcursesRecordReader.TryReadCompiledEntry(
 					path, new byte[] { 0x6B }, out byte[] actual
-				) );
+				)
+				);
 				Assert.Empty( actual );
 			}
 		);
@@ -62,7 +64,8 @@ public sealed class Hdb03RecordReaderTests {
 			path => {
 				Assert.True( NcursesRecordReader.TryReadCompiledEntry(
 					path, new byte[] { 0x6B }, out byte[] actual, maximumIndexHops: 1
-				) );
+				)
+				);
 				Assert.Equal( new byte[] { 0x42 }, actual );
 			}
 		);
@@ -75,7 +78,8 @@ public sealed class Hdb03RecordReaderTests {
 			path => {
 				Assert.True( NcursesRecordReader.TryReadCompiledEntry(
 					path, new byte[] { 0x6B }, out byte[] actual, maximumIndexHops: 2
-				) );
+				)
+				);
 				Assert.Equal( new byte[] { 0x42 }, actual );
 			}
 		);
@@ -104,7 +108,8 @@ public sealed class Hdb03RecordReaderTests {
 			path => {
 				Assert.False( NcursesRecordReader.TryReadCompiledEntry(
 					path, new byte[] { requestedKey }, out byte[] actual
-				) );
+				)
+				);
 				Assert.Empty( actual );
 			}
 		);
@@ -128,7 +133,8 @@ public sealed class Hdb03RecordReaderTests {
 	public void MissingIndexTargetIsMalformedRatherThanACleanMiss() {
 		AssertMalformed( CreateDatabase(
 			( new byte[] { 0x6B }, new byte[] { 2, 0x61 } )
-		) );
+		)
+		);
 	}
 
 	[Theory]
@@ -153,7 +159,8 @@ public sealed class Hdb03RecordReaderTests {
 				Assert.True( NcursesRecordReader.TryReadCompiledEntry(
 					path, new byte[] { 0x6B }, out byte[] actual,
 					maximumDatabaseSize: 1024, maximumItemSize: 4
-				) );
+				)
+				);
 				Assert.Equal( new byte[] { 1, 2, 3 }, actual );
 			}
 		);
@@ -217,7 +224,8 @@ public sealed class Hdb03RecordReaderTests {
 			File.WriteAllBytes( path, CreateDatabase( ( new byte[] { 0x6B }, new byte[] { 0, 0x42 } ) ) );
 			Assert.True( NcursesRecordReader.TryReadCompiledEntry(
 				path, new byte[] { 0x6B }, out byte[] actual
-			) );
+			)
+			);
 			Assert.Equal( new byte[] { 0x42 }, actual );
 		} finally {
 			File.Delete( path );
@@ -242,7 +250,8 @@ public sealed class Hdb03RecordReaderTests {
 				} else {
 					Assert.True( NcursesRecordReader.TryReadCompiledEntry(
 						path, new byte[] { 0x6B }, out _
-					) );
+					)
+					);
 				}
 				using FileStream exclusive = new FileStream(
 					path, FileMode.Open, FileAccess.ReadWrite, FileShare.None
