@@ -11,6 +11,9 @@ work_root="$1"
 database="$work_root/hashed-db.db"
 managed_primary="$work_root/hdb00-managed-primary.bin"
 managed_alias="$work_root/hdb00-managed-alias.bin"
+overflow_database="$work_root/overflow-hashed-db.db"
+overflow_native="$work_root/hdb00-overflow.bin"
+overflow_managed="$work_root/hdb00-managed-overflow.bin"
 project="$repo_root/tools/hdb00/managed/Hdb00.ManagedProbe.csproj"
 
 printf '%s\n' "== HDB00 managed: exact canonical-name lookup =="
@@ -100,5 +103,23 @@ if [[ $random_status -eq 0 ]]; then
     exit 1
 fi
 cat "$work_root/managed-random.err"
+
+printf '%s\n' "== HDB00 managed: reconstruct forced overflow record =="
+test -f "$overflow_database"
+test -f "$overflow_native"
+dotnet run \
+    --project "$project" \
+    -c Release \
+    -- \
+    "$overflow_database" \
+    hdb00-overflow \
+    "$overflow_managed" \
+    | tee "$work_root/managed-overflow-probe.txt"
+cmp "$overflow_managed" "$overflow_native"
+grep -F "Berkeley DB Hash version: 9" "$work_root/managed-overflow-probe.txt"
+python3 \
+    "$repo_root/tools/hdb00/assert-overflow-pages.py" \
+    "$overflow_database" \
+    | tee "$work_root/managed-overflow-pages.txt"
 
 printf '%s\n' "HDB00 managed Hash v9 probe passed."
