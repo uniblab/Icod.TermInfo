@@ -6,18 +6,18 @@
 **Optional compiler package:** `Icod.TermInfo.Compiler`  
 **Optional inspection package:** `Icod.TermInfo.Inspection`  
 **Optional termcap package:** `Icod.TermInfo.Termcap`  
+**Planned optional hashed-store package:** `Icod.TermInfo.BerkeleyDb`  
 **Installable tool package:** `Icod.TermInfo.Tools`  
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`  
 **Frozen runtime contract:** `1.0.0`  
-**Current coordinated version:** `1.14.0`  
+**Latest completed coordinated version:** `1.14.0`  
 **Latest completed line:** `1.14.0` - Raster Backend Capability Evidence, Selection, and Planning  
 **Latest completed prerelease:** `1.14.0-Alpha-8`  
-**Status:** 1.14 feature development is complete; stable `1.14.0` is undergoing final PR qualification before merge/publication  
-**Active release roadmap:** `Icod.TermInfo-1.14.0-Raster-Backend-Capability-Evidence-Selection-and-Planning-Roadmap.md`  
-**Release audit:** `docs/1.14.0-RELEASE-AUDIT.md`  
+**Status:** stable `1.14.0` is merged; `1.15.0` Berkeley DB / hashed terminfo acquisition is the active development line  
+**Active release roadmap:** `Icod.TermInfo-1.15.0-Berkeley-DB-Hashed-Terminfo-Acquisition-Roadmap.md`  
 **Latest completed release audit:** `docs/1.14.0-RELEASE-AUDIT.md`  
-**Next development line:** not yet selected; future work requires a separate design/roadmap decision
+**Next implementation gate:** HDB00 interoperability research and backend decision
 
 ---
 
@@ -41,11 +41,17 @@ enlarging Runtime. Optional layers and the command distribution remain separate:
                  v    v         v    v                      v
           Icod.TermInfo.Source ---> Icod.TermInfo <----------+
                                    stable runtime
+                                        ^
+                                        |
+                           Icod.TermInfo.BerkeleyDb
+                           planned optional provider
 ```
 
 The arrows are production dependency arrows. `Icod.TermInfo` remains
 dependency-free. Source and Termcap depend on Runtime; Compiler and Inspection
-depend on Runtime and Source. Runtime never depends upward on optional layers.
+depend on Runtime and Source. The planned Berkeley DB package depends downward on
+Runtime and must not introduce a reverse Runtime dependency. Runtime never depends
+upward on optional layers.
 
 Live-terminal state, probing, input decoding, PTYs, curses presentation, graphics
 protocol execution, terminal-side raster identities, and terminal emulation remain
@@ -55,7 +61,7 @@ outside this reusable package-family roadmap and belong to sibling systems.
 
 This document is the authoritative high-level roadmap after the frozen 1.0
 Runtime contract. Version-specific roadmaps and release audits are the detailed
-authorities for completed release lines.
+authorities for completed and active release lines.
 
 `docs/FUTURE-WORK-INVENTORY.md` is retained only for historical links. New work,
 ownership decisions, and release sequencing must be recorded here or in a new
@@ -83,10 +89,41 @@ version-specific roadmap.
 | **1.12.0** | Advanced raster placement | Source-rectangle and signed-z-order evidence/planning, JSON v4 |
 | **1.13.0** | Runtime evidence interchange | Caller-owned runtime observations/integration and replanning, JSON v5 |
 | **1.14.0** | Raster backend selection | Backend availability evidence/classification, candidate evaluation, explicit preference selection, JSON v6 |
-| **later** | Explicitly planned deferred work | Additional backends, richer graphics policy, exotic storage/formats, or other justified tracks |
+| **1.15.0** | Berkeley DB / hashed terminfo acquisition | Optional read-only hashed-store provider retrieves compiled entry bytes and delegates semantic parsing to existing Runtime |
+| **later** | Explicitly planned deferred work | Hashed-store writing, additional backends, richer graphics policy, historical formats, or other justified tracks |
 
-No 1.15 theme is implied by completion of 1.14. A later development line starts
-only after a separate design review selects and scopes it.
+### 2.1 Active 1.15 line
+
+Version 1.15 is governed by
+`Icod.TermInfo-1.15.0-Berkeley-DB-Hashed-Terminfo-Acquisition-Roadmap.md`.
+
+The release is acquisition-first and read-only. Its north-star data flow is:
+
+```text
+Berkeley DB / hashed store
+          |
+          v
+optional hashed-store provider
+          |
+          v
+compiled entry bytes
+          |
+          v
+existing Icod.TermInfo parser
+          |
+          v
+TerminalDescription
+```
+
+No production Berkeley DB API is frozen before HDB00 demonstrates the exact
+interoperability boundary against an authoritative ncurses-generated hashed
+store. `Icod.TermInfo` remains dependency-free; the planned optional provider
+package must depend downward on Runtime rather than introducing Berkeley DB into
+the frozen core package.
+
+1.15 deliberately excludes hashed-store writing, `tic` hashed publication,
+database migration, general-purpose Berkeley DB APIs, and bundled contemporary
+Oracle Berkeley DB binaries.
 
 ---
 
@@ -94,7 +131,7 @@ only after a separate design review selects and scopes it.
 
 Version 1.14 is governed by
 `Icod.TermInfo-1.14.0-Raster-Backend-Capability-Evidence-Selection-and-Planning-Roadmap.md`.
-Its RB01-RB08 sequence is complete.
+Its RB01-RB08 sequence is complete and stable `1.14.0` is merged to `main`.
 
 ### RB01 — backend evidence/model foundation
 
@@ -166,8 +203,10 @@ and closes release documentation.
 Accepted Alpha-8 head: `911e8d44428a26b588193a27e07696c2489bcb93`  
 Qualification: workflow #924 / `34903967732`, all 12 jobs green
 
-The stable 1.14.0 transition is version/status/documentation-only and must pass an
-independent complete qualification matrix before merge/publication.
+Stable release-facing closure completed on exact PR head
+`04a3b3047850ccf48fbd09ba9edf6ef474fa6087`; workflow #966 /
+`34981127836` passed all 12 jobs before PR #44 was merged to `main` as
+`84c0fffa9ff49fd7dc891e048c2b994ce5d98a73`.
 
 ---
 
@@ -206,9 +245,9 @@ unchanged.
 ### `Icod.TermInfo`
 
 Owns immutable terminal descriptions, capability metadata/semantics, compiled
-terminfo acquisition, provider composition, parameter expansion, padding-aware
-output, color semantics, and built-in terminal profiles. It remains dependency-
-free.
+terminfo parsing and conventional acquisition, provider composition, parameter
+expansion, padding-aware output, color semantics, and built-in terminal profiles.
+It remains dependency-free.
 
 ### `Icod.TermInfo.Source`
 
@@ -235,6 +274,15 @@ have a production dependency on `Icod.Terminal`.
 
 Owns optional bounded termcap parsing, mapping/classification, `tc=` resolution,
 Runtime conversion, reverse rendering, and explicit acquisition.
+
+### Planned `Icod.TermInfo.BerkeleyDb`
+
+Owns optional read-only access to supported ncurses-compatible Berkeley DB /
+hashed terminfo stores. Its responsibility ends after obtaining bounded opaque
+compiled-entry bytes; `CompiledTermInfoParser` remains the only owner of compiled
+terminfo semantics. The package must not become a general-purpose Berkeley DB
+API and must not introduce a production dependency from Runtime back to the
+optional package.
 
 ### Command layer
 
@@ -263,18 +311,24 @@ changes them:
 5. Released JSON schema versions remain immutable.
 6. Live terminal/session ownership does not migrate into TermInfo merely because
    Inspection gains descriptive evidence or advisory planners.
-7. Stable promotion of an accepted prerelease is not an opportunity to add
+7. Optional hashed-store support must not make Berkeley DB a mandatory Runtime
+   dependency.
+8. Stable promotion of an accepted prerelease is not an opportunity to add
    feature/API/schema behavior.
 
 See `docs/VERSIONING.md` and `docs/COMPATIBILITY.md` for the complete policy.
 
 ---
 
-## 7. Deferred work after 1.14
+## 7. Deferred work during and after 1.15
 
-The following remain explicitly outside the completed 1.14 scope and require a
-future design/roadmap before implementation:
+The following remain explicitly outside the approved read-only 1.15 scope and
+require a future design/roadmap before implementation:
 
+- Berkeley DB / hashed terminfo writing;
+- `tic` hashed-database publication;
+- directory-to-hashed or hashed-to-directory migration;
+- bundled Berkeley DB native binaries;
 - additional concrete raster backends;
 - alpha/pixel-format capability planning;
 - performance/latency scoring;
@@ -282,16 +336,17 @@ future design/roadmap before implementation:
 - terminal-brand preference policy;
 - graphics transport or image codecs;
 - generic JSON import/deserialization;
-- Berkeley DB terminfo storage;
 - divergent historical vendor binary formats; and
 - any migration of live-session/protocol execution into TermInfo.
 
-The next release theme should be selected based on downstream needs and API-regret
-analysis rather than inferred automatically from this list.
+The 1.15 HDB00 research gate may reject or narrow a proposed backend approach if
+real interoperability, ABI, licensing, or cross-platform evidence does not
+support it. That evidence-driven narrowing is part of the roadmap rather than a
+failure to follow it.
 
 ---
 
-## 8. Historical authorities
+## 8. Historical and active authorities
 
 Each completed line retains its own version-specific roadmap and/or release audit.
 Those files are the detailed historical record for tranche-level requirements,
@@ -311,7 +366,7 @@ their contract tests use this active roadmap as the historical index:
 - `docs/1.1.0-S08-TERMINAL-DESCRIPTION-MATERIALIZATION.md`
 - `docs/1.1.0-S09-CORPUS-FUZZING-COMPATIBILITY.md`
 
-The current completed line is documented by:
+The latest completed line is documented by:
 
 ```text
 Icod.TermInfo-1.14.0-Raster-Backend-Capability-Evidence-Selection-and-Planning-Roadmap.md
@@ -320,3 +375,12 @@ docs/1.14.0-INSPECTION-PUBLIC-API-FREEZE.md
 docs/1.14.0-RB08-FREEZE-FINGERPRINTS.txt
 docs/1.14.0-RELEASE-AUDIT.md
 ```
+
+The active line is documented by:
+
+```text
+Icod.TermInfo-1.15.0-Berkeley-DB-Hashed-Terminfo-Acquisition-Roadmap.md
+```
+
+HDB00 is responsible for creating the first 1.15 evidence/design records before
+any production Berkeley DB provider API is frozen.
