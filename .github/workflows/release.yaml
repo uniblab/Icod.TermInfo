@@ -19,6 +19,7 @@ env:
     10.0.x
   CONFIGURATION: Release
   SOLUTION_PATH: Icod.TermInfo.sln
+  BERKELEYDB_TEST_PROJECT: tests/Icod.TermInfo.BerkeleyDb.Tests/Icod.TermInfo.BerkeleyDb.Tests.csproj
 
 jobs:
   metadata:
@@ -70,6 +71,10 @@ jobs:
       - run: dotnet restore ${{ env.SOLUTION_PATH }}
       - run: dotnet build ${{ env.SOLUTION_PATH }} -c ${{ env.CONFIGURATION }} --no-restore -p:ContinuousIntegrationBuild=true
       - run: dotnet test ${{ env.SOLUTION_PATH }} -c ${{ env.CONFIGURATION }} --no-build --no-restore --logger trx
+      - name: Restore HDB01 BerkeleyDb tests
+        run: dotnet restore ${{ env.BERKELEYDB_TEST_PROJECT }}
+      - name: Test HDB01 BerkeleyDb package foundation
+        run: dotnet test ${{ env.BERKELEYDB_TEST_PROJECT }} -c ${{ env.CONFIGURATION }} --no-restore --logger trx -p:ContinuousIntegrationBuild=true
       - name: Pack coordinated Release packages
         shell: pwsh
         run: ./packaging/PackPackages.ps1 -Configuration '${{ env.CONFIGURATION }}' -OutputDirectory artifacts/release
@@ -179,8 +184,8 @@ jobs:
           NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
         run: |
           $packages = @(Get-ChildItem -LiteralPath 'artifacts/package' -Filter '*.nupkg' -File | Sort-Object Name)
-          if (6 -ne $packages.Count) {
-              throw "Expected six coordinated .nupkg files; found $($packages.Count)."
+          if (7 -ne $packages.Count) {
+              throw "Expected seven coordinated .nupkg files; found $($packages.Count)."
           }
           foreach ($package in $packages) {
               dotnet nuget push $package.FullName --api-key $env:NUGET_API_KEY --source 'https://api.nuget.org/v3/index.json' --skip-duplicate
@@ -216,8 +221,8 @@ jobs:
               throw "GitHub Packages source configuration failed with status $LASTEXITCODE."
           }
           $packages = @(Get-ChildItem -LiteralPath 'artifacts/package' -Filter '*.nupkg' -File | Sort-Object Name)
-          if (6 -ne $packages.Count) {
-              throw "Expected six coordinated .nupkg files; found $($packages.Count)."
+          if (7 -ne $packages.Count) {
+              throw "Expected seven coordinated .nupkg files; found $($packages.Count)."
           }
           foreach ($package in $packages) {
               dotnet nuget push $package.FullName --source github-release --api-key $env:GITHUB_TOKEN --skip-duplicate
@@ -245,8 +250,8 @@ jobs:
         run: |
           $assetDirectory = 'artifacts/release-assets'
           $files = @(Get-ChildItem -LiteralPath $assetDirectory -File | Where-Object { $_.Extension -in @('.nupkg', '.snupkg', '.zip', '.gz') } | Sort-Object Name)
-          if (17 -ne $files.Count) {
-              throw "Expected seventeen release binaries before checksumming; found $($files.Count)."
+          if (19 -ne $files.Count) {
+              throw "Expected nineteen release binaries before checksumming; found $($files.Count)."
           }
           $lines = foreach ($file in $files) {
               $hash = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -262,8 +267,8 @@ jobs:
           $tag = $env:GITHUB_REF_NAME
           $version = '${{ needs.metadata.outputs.version }}'
           $assets = @(Get-ChildItem -LiteralPath 'artifacts/release-assets' -File | Sort-Object Name | ForEach-Object { $_.FullName })
-          if (18 -ne $assets.Count) {
-              throw "Expected eighteen GitHub Release assets; found $($assets.Count)."
+          if (20 -ne $assets.Count) {
+              throw "Expected twenty GitHub Release assets; found $($assets.Count)."
           }
           $arguments = @('release', 'create', $tag, '--verify-tag', '--title', "${{ github.event.repository.name }} $version", '--generate-notes')
           if ('true' -eq '${{ needs.metadata.outputs.prerelease }}') {
