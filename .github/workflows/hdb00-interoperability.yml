@@ -37,9 +37,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install --yes libdb5.3-dev db5.3-util
 
-      - name: Run HDB00 interoperability probe
+      - name: Run native HDB00 interoperability probe
         shell: bash
         run: bash tools/hdb00/run-linux.sh
+
+      - name: Verify managed Hash v9 reader
+        shell: bash
+        run: bash tools/hdb00/verify-managed.sh "$RUNNER_TEMP/icod-terminfo-hdb00"
 
   macos-berkeley-db-5-3:
     name: macOS / Berkeley DB 5.3 / ncurses hashed store
@@ -60,6 +64,10 @@ jobs:
       - name: Install Berkeley DB 5
         run: brew install berkeley-db@5
 
-      - name: Run HDB00 interoperability probe
+      - name: Run native HDB00 interoperability probe
         shell: bash
         run: bash tools/hdb00/run-macos.sh
+
+      - name: Verify managed Hash v9 reader
+        shell: bash
+        run: bash tools/hdb00/verify-managed.sh "$RUNNER_TEMP/icod-terminfo-hdb00-macos"
