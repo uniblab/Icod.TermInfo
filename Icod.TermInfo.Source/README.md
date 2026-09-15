@@ -1,114 +1,83 @@
 # Icod.TermInfo.Source
 
-`Icod.TermInfo.Source` is the optional managed terminfo source-language layer
-for `Icod.TermInfo`.
+`Icod.TermInfo.Source` is the optional managed terminfo source-language layer for
+`Icod.TermInfo`.
 
-The package is intentionally separate from the stable runtime package. Ordinary
-applications that only load compiled terminfo or use `TerminalDescription`
-values continue to reference `Icod.TermInfo` alone.
+The package is intentionally separate from Runtime. Applications that only load
+compiled terminfo or consume `TerminalDescription` values continue to reference
+`Icod.TermInfo` alone.
 
-## 1.9 release status
+## 1.14 release status
 
-Version `1.9.0` preserves the frozen Source 1.1 API, semantics, Runtime-only
-dependency, and assembly identity. The stable release promotes the validated
-Alpha-7 contract; Source adds no Inspection or JSON dependency.
-
-## 1.8 release status
-
-Version 1.8.0 carries Source unchanged into the stable 1.8 contract. Its frozen
-1.1 API, parser/resolver semantics, Runtime-only dependency, three target
-frameworks, and assembly identity remain unchanged while Inspection consumes
-Source to validate planned relative representations.
-
-## 1.7 release status
-
-Version 1.7.0 carries Source unchanged into the stable 1.7 release. The
-frozen 1.1 API, parser/resolver semantics, right-to-left `use=` processing, and
-one-way Runtime dependency remain unchanged. Source is used by Inspection to
-verify synthesized relative source, but it does not depend on Inspection.
+Version `1.14.0` preserves the frozen Source 1.1 public API, parser/resolver
+semantics, Runtime-only dependency, `net8.0` / `net9.0` / `net10.0` support, and
+assembly identity `1.0.0.0`. The coordinated 1.14 feature work is isolated to
+`Icod.TermInfo.Inspection`; Source does not acquire Inspection, Terminal, Termcap,
+or command-layer dependencies.
 
 ## Install
 
-For the 1.9.0 release:
-
 ```text
-dotnet add package Icod.TermInfo.Source --version 1.9.0
+dotnet add package Icod.TermInfo.Source --version 1.14.0
 ```
 
-The package depends on the matching `Icod.TermInfo` version and targets
-`net8.0`, `net9.0`, and `net10.0`.
+The package depends on the matching `Icod.TermInfo` version.
 
-Version 1.9.0 preserves the frozen 1.1 source-language public API and semantics.
-Inspection uses Source to validate relative-source synthesis and planning;
-Source does not acquire an Inspection dependency. The `infotocap` command
-continues to consume Source only at the executable-composition layer, and Source
-does not acquire a Termcap dependency.
+## What Source provides
 
-## What the 1.1 line provides
-
-The completed 1.1 source-language path includes:
+The frozen 1.1 source-language contract includes:
 
 - deterministic `.ti` lexical analysis with source spans and diagnostics;
 - terminfo string and numeric source-value semantics;
 - unresolved documents, entries, fields, aliases, and descriptions;
-- standard and extended capability classification against the runtime catalog;
+- standard and extended capability classification against Runtime metadata;
 - cancellation and `use=` inheritance;
-- bounded inheritance-depth and source-size handling;
-- materialization into the same immutable `TerminalDescription` model used by
-  compiled acquisition;
-- duplicate source-name and alias warnings with deterministic first-source-order
-  lookup;
-- a checked-in System V/ncurses-oriented source corpus, deterministic mutation
-  fuzzing, and offline T29 source/compiled compatibility fixtures.
+- bounded source size and inheritance depth;
+- materialization into immutable `TerminalDescription` values;
+- deterministic duplicate source-name and alias diagnostics; and
+- checked-in source/compiled compatibility and mutation coverage.
 
-No host `tic`, `infocmp`, ncurses library, or native payload is required at
-runtime or by normal CI.
+No host `tic`, `infocmp`, ncurses library, or native payload is required by the
+package or normal CI.
 
 ## Typical flow
-
-Parse source, resolve a named entry, and materialize it into the runtime model:
 
 ```csharp
 using Icod.TermInfo;
 using Icod.TermInfo.Source;
 
 TermInfoSourceParseResult parsed = TermInfoSourceParser.Parse(
-    source,
-    "example.ti"
+	 source,
+	 "example.ti"
 );
 
 if ( parsed.HasErrors ) {
-    throw new InvalidOperationException(
-        "The terminfo source contains errors."
-    );
+	foreach ( TermInfoSourceDiagnostic diagnostic in parsed.Diagnostics ) {
+		Console.Error.WriteLine( diagnostic );
+	}
+	return;
 }
 
 TermInfoSourceResolveResult resolved = TermInfoSourceResolver.Resolve(
-    parsed.Document,
-    "example"
+	parsed.Document,
+	"example"
 );
 
-if ( resolved.Entry is null ) {
-    throw new InvalidOperationException(
-        "The terminfo entry could not be resolved."
-    );
+if ( resolved.Description is not null ) {
+	TerminalDescription terminal = resolved.Description;
+	Console.WriteLine( terminal.Name );
 }
-
-TerminalDescription terminal = resolved.Entry.ToTerminalDescription();
 ```
 
-For source sets that are not already held in one parsed document, use the
-`ITermInfoSourceEntryProvider` resolver overload. Provider misses become source
-diagnostics; provider failures propagate rather than being collapsed into clean
-misses.
+Source owns parsing and inheritance resolution only. Compiled output belongs to
+`Icod.TermInfo.Compiler`; canonical rendering/comparison/planning belongs to
+`Icod.TermInfo.Inspection`; termcap syntax belongs to `Icod.TermInfo.Termcap`.
 
-The runtime dependency direction is one-way:
+## Compatibility
 
-```text
-Icod.TermInfo.Source
-        |
-        v
-  Icod.TermInfo
-```
+The Source public contract was frozen at 1.1 and remains compatible throughout
+the coordinated 1.x line. Version 1.14 changes package/release identity only for
+Source; it does not change Source semantics or public API.
 
-`Icod.TermInfo` does not depend on this package.
+See `../docs/VERSIONING.md`, `../docs/COMPATIBILITY.md`, and the root
+`../README.md` for the coordinated release contract.
