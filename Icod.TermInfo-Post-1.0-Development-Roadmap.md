@@ -156,7 +156,7 @@ Composes backend availability with the frozen 1.11 lifecycle and 1.12 placement
 planners without duplicating their semantics.
 
 Accepted head: `22f38e9c6516bec9d5f6b8662f00e9b5bace7c2b`  
-Qualification: workflow #885 / `34865731077`
+Qualification: workflow #885 / `34871582203`
 
 ### RB04 — explicit preference-aware selection
 
