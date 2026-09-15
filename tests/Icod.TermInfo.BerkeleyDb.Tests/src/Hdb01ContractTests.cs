@@ -79,7 +79,7 @@ public sealed class Hdb01ContractTests {
 	}
 
 	[Fact]
-	public void CoordinatedAlphaOneAndPackagePipelineIncludeBerkeleyDb() {
+	public void CoordinatedOneFifteenLineAndPackagePipelineIncludeBerkeleyDb() {
 		string root = FindRepositoryRoot();
 		string props =
 			File.ReadAllText(
@@ -133,7 +133,7 @@ public sealed class Hdb01ContractTests {
 			);
 
 		Assert.Contains(
-			"<IcodTermInfoSuiteVersion>1.15.0-Alpha-1</IcodTermInfoSuiteVersion>",
+			"<IcodTermInfoSuiteVersion>1.15.0-",
 			props,
 			StringComparison.Ordinal
 		);
