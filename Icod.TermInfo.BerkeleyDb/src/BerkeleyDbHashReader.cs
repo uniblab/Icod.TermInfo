@@ -392,7 +392,7 @@ internal static class BerkeleyDbHashReader {
 			offset,
 			sizeof( ushort )
 		);
-		return isBigEndian
+		return ( isBigEndian )
 			? BinaryPrimitives.ReadUInt16BigEndian( value )
 			: BinaryPrimitives.ReadUInt16LittleEndian( value )
 		;
@@ -407,7 +407,7 @@ internal static class BerkeleyDbHashReader {
 			offset,
 			sizeof( uint )
 		);
-		return isBigEndian
+		return ( isBigEndian )
 			? BinaryPrimitives.ReadUInt32BigEndian( value )
 			: BinaryPrimitives.ReadUInt32LittleEndian( value )
 		;
