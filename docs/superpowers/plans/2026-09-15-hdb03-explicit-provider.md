@@ -63,10 +63,18 @@ bound rather than a per-record storage limit.
 
 Keep existing HDB02 and record-resolution tests unchanged. Require public API
 equivalence across all TFMs, package-only consumer validation, 12 normal CI jobs,
-3 interoperability jobs, and independent review. GREEN qualification is pending.
+3 interoperability jobs, and independent review. The implementation commit `f704454a7280eb8c20ef713386b490c66d5699f4` passed 234 BerkeleyDb tests per target framework on macOS and Windows and the original 9 native-oracle cases per target framework on Linux, macOS, and Windows; exact-head qualification remains pending.
 
 ## Remaining HDB03 closure work
 
-After this checkpoint, review native-fixture provider parsing and package-only
-consumer coverage, then complete HDB03 documentation and acceptance. System
-discovery remains HDB04.
+The qualification checkpoint exercises the public provider against canonical,
+alias, overflow, clean-miss, and unsupported native inputs, raising the native
+oracle suite from 9 to 15 cases per target framework. An isolated consumer
+restores only the packed BerkeleyDb package and verifies provider construction,
+options snapshotting, alias parsing, successful caching, and a clean miss on
+net8.0, net9.0, and net10.0. Native fixtures use ASCII identities; UTF-8 database
+keys with non-ASCII producer identities remain outside the qualified
+interoperability claim.
+
+Complete exact-head CI, documentation, and acceptance. System discovery remains
+HDB04.

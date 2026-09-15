@@ -25,6 +25,6 @@ The package:
 
 The reviewed subset supports unencrypted, non-checksummed Hash-v9 files with sorted Hash pages (type 13), inline items, and overflow items. Other access methods, revisions, duplicate/subdatabase features, and legacy type-2 Hash pages are unsupported. Validation covers encountered records and does not guarantee an atomic snapshot during external writes.
 
-Dedicated CI compares the production reader directly with native Berkeley DB dumps on Linux and macOS; Windows reads Linux-generated fixtures without Berkeley DB installed. Big-endian coverage uses synthetic fixtures.
+Dedicated CI compares the production reader and public provider with native Berkeley DB stores on Linux and macOS; Windows reads Linux-generated fixtures without Berkeley DB installed. Big-endian coverage uses synthetic fixtures. Lookup keys are encoded as UTF-8, while compiled identity fields retain Runtime's byte-preserving Latin-1 interpretation. Qualified native fixtures use ASCII terminal names; broader non-ASCII producer compatibility is not claimed.
 
-HDB03 qualification continues with native-fixture provider parsing and package-only consumer coverage.
+HDB03 qualification includes native-fixture provider parsing on all supported target frameworks and an isolated package-only consumer on `net8.0`, `net9.0`, and `net10.0`.

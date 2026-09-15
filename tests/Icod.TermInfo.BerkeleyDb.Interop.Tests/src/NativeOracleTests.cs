@@ -102,6 +102,62 @@ public sealed class NativeOracleTests {
 		Assert.Equal( expected, actual );
 	}
 
+	[Theory]
+	[InlineData( "hashed-db", "hdb00-primary", "hdb00-primary", "hdb00-alias" )]
+	[InlineData( "hashed-db", "hdb00-alias", "hdb00-primary", "hdb00-alias" )]
+	[InlineData( "overflow-hashed-db", "hdb00-overflow", "hdb00-overflow", null )]
+	public void PublicProviderParsesNativeStore(
+		string fixtureName,
+		string requestedName,
+		string expectedCanonicalName,
+		string? expectedAlias
+	) {
+		BerkeleyDbTerminalDescriptionProvider provider =
+			new( FixturePath( fixtureName + ".db" ) );
+
+		Assert.True(
+			provider.TryLoad(
+				requestedName,
+				out TerminalDescription? terminal
+			)
+		);
+		Assert.Equal( expectedCanonicalName, terminal.Name );
+
+		if ( expectedAlias is null ) {
+			Assert.Empty( terminal.Aliases );
+		} else {
+			Assert.Contains( expectedAlias, terminal.Aliases );
+		}
+	}
+
+	[Fact]
+	public void PublicProviderReturnsCleanMissForAbsentNativeKey() {
+		BerkeleyDbTerminalDescriptionProvider provider =
+			new( FixturePath( "hashed-db.db" ) );
+
+		Assert.False(
+			provider.TryLoad(
+				"hdb00-missing",
+				out TerminalDescription? terminal
+			)
+		);
+		Assert.Null( terminal );
+	}
+
+	[Theory]
+	[InlineData( "not-hash.db" )]
+	[InlineData( "random.db" )]
+	public void PublicProviderMapsUnsupportedNativeInput( string fixtureName ) {
+		BerkeleyDbTerminalDescriptionProvider provider =
+			new( FixturePath( fixtureName ) );
+
+		BerkeleyDbDatabaseFormatException exception =
+			Assert.Throws<BerkeleyDbDatabaseFormatException>(
+				() => provider.TryLoad( "key", out _ )
+			);
+		Assert.IsType<InvalidDataException>( exception.InnerException );
+	}
+
 	private static List<( byte[] Key, byte[] Value )> ReadNativeRecords( string fixtureName ) {
 		string[] lines = File.ReadAllLines( FixturePath( fixtureName + ".dump" ) );
 		int headerEnd = Array.IndexOf( lines, "HEADER=END" );
