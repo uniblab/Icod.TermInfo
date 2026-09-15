@@ -36,7 +36,9 @@ internal static class BerkeleyDbHashReader {
 	internal static bool TryReadValue(
 		string databasePath,
 		ReadOnlySpan<byte> requestedKey,
-		out byte[] value
+		out byte[] value,
+		int maximumDatabaseSize = 64 * 1024 * 1024,
+		int maximumItemSize = 1024 * 1024
 	) {
 		ArgumentException.ThrowIfNullOrWhiteSpace( databasePath );
 
