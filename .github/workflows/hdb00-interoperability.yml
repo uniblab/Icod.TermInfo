@@ -45,6 +45,18 @@ jobs:
         shell: bash
         run: bash tools/hdb00/verify-managed.sh "$RUNNER_TEMP/icod-terminfo-hdb00"
 
+      - name: Upload Linux Hash v9 fixtures
+        uses: actions/upload-artifact@v4
+        with:
+          name: hdb00-linux-hash-v9
+          if-no-files-found: error
+          retention-days: 7
+          path: |
+            ${{ runner.temp }}/icod-terminfo-hdb00/hashed-db.db
+            ${{ runner.temp }}/icod-terminfo-hdb00/hdb00-primary.bin
+            ${{ runner.temp }}/icod-terminfo-hdb00/overflow-hashed-db.db
+            ${{ runner.temp }}/icod-terminfo-hdb00/hdb00-overflow.bin
+
   macos-berkeley-db-5-3:
     name: macOS / Berkeley DB 5.3 / ncurses hashed store
     runs-on: macos-latest
@@ -71,3 +83,51 @@ jobs:
       - name: Verify managed Hash v9 reader
         shell: bash
         run: bash tools/hdb00/verify-managed.sh "$RUNNER_TEMP/icod-terminfo-hdb00-macos"
+
+  windows-managed-cross-host:
+    name: Windows / managed-only Linux Hash v9 fixture
+    runs-on: windows-latest
+    needs:
+      - linux-berkeley-db-5-3
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Download Linux Hash v9 fixtures
+        uses: actions/download-artifact@v4
+        with:
+          name: hdb00-linux-hash-v9
+          path: ${{ runner.temp }}/hdb00-linux-hash-v9
+
+      - name: Read Linux-generated Hash v9 store without Berkeley DB
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $fixtureRoot = Join-Path $env:RUNNER_TEMP 'hdb00-linux-hash-v9'
+          $project = Join-Path $env:GITHUB_WORKSPACE 'tools/hdb00/managed/Hdb00.ManagedProbe.csproj'
+
+          $database = Join-Path $fixtureRoot 'hashed-db.db'
+          $expected = Join-Path $fixtureRoot 'hdb00-primary.bin'
+          $actual = Join-Path $fixtureRoot 'windows-alias.bin'
+
+          dotnet run --project $project -c Release -- $database hdb00-alias $actual
+          if ((Get-FileHash $actual -Algorithm SHA256).Hash -ne (Get-FileHash $expected -Algorithm SHA256).Hash) {
+              throw 'Windows managed alias extraction differs from the Linux native oracle.'
+          }
+
+          $overflowDatabase = Join-Path $fixtureRoot 'overflow-hashed-db.db'
+          $overflowExpected = Join-Path $fixtureRoot 'hdb00-overflow.bin'
+          $overflowActual = Join-Path $fixtureRoot 'windows-overflow.bin'
+
+          dotnet run --project $project -c Release -- $overflowDatabase hdb00-overflow $overflowActual
+          if ((Get-FileHash $overflowActual -Algorithm SHA256).Hash -ne (Get-FileHash $overflowExpected -Algorithm SHA256).Hash) {
+              throw 'Windows managed overflow extraction differs from the Linux native oracle.'
+          }
+
+          Write-Host 'HDB00 Windows managed-only cross-host probe passed.'
