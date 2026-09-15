@@ -236,10 +236,15 @@ public sealed class Hdb03ProviderTests {
 			path => {
 				TerminalDescription first =
 					Load( new BerkeleyDbTerminalDescriptionProvider( path ), "sample" );
-				File.WriteAllBytes( path, CreateStore( "sample" ) );
+				File.WriteAllBytes(
+					path,
+					CreateStore( "sample", description: "changed terminal" )
+				);
 				TerminalDescription second =
 					Load( new BerkeleyDbTerminalDescriptionProvider( path ), "sample" );
 				Assert.NotSame( first, second );
+				Assert.Equal( "test terminal", first.Description );
+				Assert.Equal( "changed terminal", second.Description );
 			}
 		);
 	}
@@ -298,6 +303,46 @@ public sealed class Hdb03ProviderTests {
 	}
 
 	[Fact]
+	public void SurrogateTerminalNameFailsBeforeOpening() {
+		string path = Path.Combine( Path.GetTempPath(), Guid.NewGuid().ToString( "N" ) + ".db" );
+		BerkeleyDbTerminalDescriptionProvider provider = new( path );
+		Assert.Throws<ArgumentException>(
+			() => provider.TryLoad( "bad\uD800name", out _ )
+		);
+	}
+
+	[Fact]
+	public void IoFailureIsRetryable() {
+		string path = Path.Combine( Path.GetTempPath(), Guid.NewGuid().ToString( "N" ) + ".db" );
+		try {
+			BerkeleyDbTerminalDescriptionProvider provider = new( path );
+			Assert.Throws<FileNotFoundException>(
+				() => provider.TryLoad( "sample", out _ )
+			);
+			File.WriteAllBytes( path, CreateStore( "sample" ) );
+			Assert.Equal( "sample", Load( provider, "sample" ).Name );
+		} finally {
+			File.Delete( path );
+		}
+	}
+
+	[Fact]
+	public void ExactParserMaximumEntrySizeIsAccepted() {
+		byte[] entry = CreateCompiledEntry( "sample" );
+		BerkeleyDbTerminalDescriptionProviderOptions options =
+			new( new CompiledTermInfoParserOptions( entry.Length ) );
+		WithDatabase(
+			CreateDatabase(
+				( Encoding.UTF8.GetBytes( "sample" ), PrependMarker( entry ) )
+			),
+			path => Assert.Equal(
+				"sample",
+				Load( new BerkeleyDbTerminalDescriptionProvider( path, options ), "sample" ).Name
+			)
+		);
+	}
+
+	[Fact]
 	public void VeryLongAbsentNameIsACleanMiss() {
 		WithDatabase(
 			CreateStore( "sample" ),
@@ -342,8 +387,12 @@ public sealed class Hdb03ProviderTests {
 		return Assert.IsType<TerminalDescription>( terminal );
 	}
 
-	private static byte[] CreateStore( string canonical, string? alias = null ) {
-		byte[] entry = CreateCompiledEntry( canonical, alias );
+	private static byte[] CreateStore(
+		string canonical,
+		string? alias = null,
+		string description = "test terminal"
+	) {
+		byte[] entry = CreateCompiledEntry( canonical, alias, description );
 		if ( alias is null ) {
 			return CreateDatabase(
 				( Encoding.UTF8.GetBytes( canonical ), PrependMarker( entry ) )
@@ -358,10 +407,14 @@ public sealed class Hdb03ProviderTests {
 		);
 	}
 
-	private static byte[] CreateCompiledEntry( string canonical, string? alias = null ) {
+	private static byte[] CreateCompiledEntry(
+		string canonical,
+		string? alias = null,
+		string description = "test terminal"
+	) {
 		string identity = ( alias is null )
-			? canonical + "|test terminal\0"
-			: canonical + "|" + alias + "|test terminal\0"
+			? canonical + "|" + description + "\0"
+			: canonical + "|" + alias + "|" + description + "\0"
 		;
 		byte[] names = Encoding.Latin1.GetBytes( identity );
 		int length = 12 + names.Length;
