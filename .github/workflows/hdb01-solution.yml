@@ -1,0 +1,42 @@
+name: hdb01-solution-generation
+
+on:
+  push:
+    branches:
+      - 1.15.0-berkeley-db-hashed-acquisition
+    paths:
+      - '.github/workflows/hdb01-solution.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    name: Generate solution wiring
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Add HDB01 projects to solution
+        shell: bash
+        run: |
+          dotnet sln Icod.TermInfo.sln add Icod.TermInfo.BerkeleyDb/Icod.TermInfo.BerkeleyDb.csproj
+          dotnet sln Icod.TermInfo.sln add tests/Icod.TermInfo.BerkeleyDb.Tests/Icod.TermInfo.BerkeleyDb.Tests.csproj --solution-folder tests
+          grep -F 'Icod.TermInfo.BerkeleyDb' Icod.TermInfo.sln
+          grep -F 'Icod.TermInfo.BerkeleyDb.Tests' Icod.TermInfo.sln
+
+      - name: Upload generated solution
+        uses: actions/upload-artifact@v4
+        with:
+          name: hdb01-solution
+          path: Icod.TermInfo.sln
+          if-no-files-found: error
+          retention-days: 1
