@@ -15,6 +15,7 @@
 **Latest completed prerelease:** `1.14.0-Alpha-8`  
 **Status:** 1.14 feature development is complete; stable `1.14.0` is undergoing final PR qualification before merge/publication  
 **Active release roadmap:** `Icod.TermInfo-1.14.0-Raster-Backend-Capability-Evidence-Selection-and-Planning-Roadmap.md`  
+**Release audit:** `docs/1.14.0-RELEASE-AUDIT.md`  
 **Latest completed release audit:** `docs/1.14.0-RELEASE-AUDIT.md`  
 **Next development line:** not yet selected; future work requires a separate design/roadmap decision
 
@@ -296,6 +297,19 @@ Each completed line retains its own version-specific roadmap and/or release audi
 Those files are the detailed historical record for tranche-level requirements,
 accepted exact heads, public API freezes, schema fingerprints, and qualification
 evidence.
+
+The 1.1 Source tranche implementation records remain explicitly linked because
+their contract tests use this active roadmap as the historical index:
+
+- `docs/1.1.0-S01-SOURCE-PACKAGE-FOUNDATION.md`
+- `docs/1.1.0-S02-LEXICAL-SOURCE-LOCATION.md`
+- `docs/1.1.0-S03-STRING-NUMERIC-SOURCE-SEMANTICS.md`
+- `docs/1.1.0-S04-UNRESOLVED-SOURCE-ENTRY-MODEL.md`
+- `docs/1.1.0-S05-CAPABILITY-CLASSIFICATION.md`
+- `docs/1.1.0-S06-CANCELLATION-SEMANTICS.md`
+- `docs/1.1.0-S07-USE-INHERITANCE-RESOLVER.md`
+- `docs/1.1.0-S08-TERMINAL-DESCRIPTION-MATERIALIZATION.md`
+- `docs/1.1.0-S09-CORPUS-FUZZING-COMPATIBILITY.md`
 
 The current completed line is documented by:
 
