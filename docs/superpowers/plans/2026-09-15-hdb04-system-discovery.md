@@ -30,8 +30,8 @@ At a logical location, an existing directory uses the Runtime directory provider
 
 ## RED
 
-Add declaration stubs and behavioral tests for options snapshot/validation, encoded precedence, exact hashed files, directory-versus-companion precedence, user companions, mixed TERMINFO_DIRS order, in-place defaults, policy controls, malformed-source propagation, retryable misses, and successful caching. Observe the behavioral RED across supported TFMs before implementation.
+Declaration/test head `798ae5694f69a6187e8f62818f1cdad16cdf86f4` produced 15 expected failures and 235 passes, 250 total per target framework, on Linux and macOS in PR run 35033288142. Provider behaviors failed with the declaration-only `NotImplementedException`; options snapshot and limit-validation cases failed because the stubs retained references and accepted invalid bounds. No discovery behavior was implemented before this RED was observed.
 
 ## GREEN
 
-Implement the smallest adapter over Runtime's internal discovery policy. Preserve exact Lazy removal and successful-only caching. Keep Runtime's public API and existing `SystemTerminalDescriptionProvider` behavior unchanged. Then add concurrency, location deduplication, native system-provider fixtures, and package-only consumer qualification before HDB04 acceptance.
+Implement the smallest adapter over Runtime's internal discovery policy. Exact locations are inspected at lookup time so later-created sources remain retryable; an existing exact directory or file wins before its `.db` companion. Preserve exact Lazy removal and successful-only caching. Keep Runtime's public API and existing `SystemTerminalDescriptionProvider` behavior unchanged. Then add concurrency, location deduplication, native system-provider fixtures, and package-only consumer qualification before HDB04 acceptance.

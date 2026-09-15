@@ -34,12 +34,19 @@ public sealed class BerkeleyDbSystemTerminalDescriptionProviderOptions {
 		int maximumIndexHops =
 			BerkeleyDbTerminalDescriptionProviderOptions.DefaultMaximumIndexHops
 	) {
+		BerkeleyDbTerminalDescriptionProviderOptions providerOptions =
+			new(
+				parserOptions,
+				maximumDatabaseSize,
+				maximumIndexHops
+			);
+
 		UseEnvironment = useEnvironment;
 		UseUserDatabase = useUserDatabase;
 		UseSystemDatabases = useSystemDatabases;
-		ParserOptions = parserOptions ?? new CompiledTermInfoParserOptions();
-		MaximumDatabaseSize = maximumDatabaseSize;
-		MaximumIndexHops = maximumIndexHops;
+		ParserOptions = providerOptions.ParserOptions;
+		MaximumDatabaseSize = providerOptions.MaximumDatabaseSize;
+		MaximumIndexHops = providerOptions.MaximumIndexHops;
 	}
 
 	/// <summary>Gets whether environment-controlled discovery inputs may be consulted.</summary>
@@ -48,7 +55,7 @@ public sealed class BerkeleyDbSystemTerminalDescriptionProviderOptions {
 	public bool UseUserDatabase { get; }
 	/// <summary>Gets whether platform system databases may be consulted.</summary>
 	public bool UseSystemDatabases { get; }
-	/// <summary>Gets compiled-entry parser options.</summary>
+	/// <summary>Gets the immutable compiled-entry parser options snapshot.</summary>
 	public CompiledTermInfoParserOptions ParserOptions { get; }
 	/// <summary>Gets the maximum hashed-database size.</summary>
 	public int MaximumDatabaseSize { get; }
