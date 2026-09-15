@@ -3,6 +3,15 @@
 `infotocap` is the managed Icod.TermInfo terminfo-to-termcap conversion command,
 introduced in version 1.6.0.
 
+## 1.14 release status
+
+Version `1.14.0` carries the frozen terminfo-to-termcap conversion contract
+forward unchanged. Raster-backend evidence and selection are isolated in
+`Icod.TermInfo.Inspection` and do not alter `infotocap` source resolution,
+representability checks, rendering, options, or dependencies. Standalone
+`infotocap` and routed `icod-terminfo infotocap` retain their existing behavior
+while reporting the coordinated `1.14.0` suite version.
+
 TC07 composes the existing Source parser/resolver with the TC05 termcap
 representability and rendering engine. It does not add another termcap semantic
 model or conversion table. TC08 freezes that composition for the stable 1.6.0
