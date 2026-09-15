@@ -103,15 +103,31 @@ try {
             throw "Unexpected package license '$($metadata.license.'#text')'."
         }
 
-        $dependencies = @($metadata.dependencies.group.dependency)
-        if (1 -ne $dependencies.Count) {
-            throw "Expected exactly one package dependency, found $($dependencies.Count)."
+        $dependencyGroups = @($metadata.dependencies.group)
+        if (3 -ne $dependencyGroups.Count) {
+            throw "Expected exactly three target-framework dependency groups, found $($dependencyGroups.Count)."
         }
-        if ([string]$dependencies[0].id -cne 'Icod.TermInfo') {
-            throw "Unexpected HDB01 package dependency '$($dependencies[0].id)'."
-        }
-        if (-not ([string]$dependencies[0].version).Contains($runtimeVersion, [System.StringComparison]::Ordinal)) {
-            throw "Runtime dependency version '$($dependencies[0].version)' does not reference '$runtimeVersion'."
+
+        $seenTargetFrameworks = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+        foreach ($group in $dependencyGroups) {
+            $targetFramework = [string]$group.targetFramework
+            if ([string]::IsNullOrWhiteSpace($targetFramework)) {
+                throw 'HDB01 package contains a dependency group without a target framework.'
+            }
+            if (-not $seenTargetFrameworks.Add($targetFramework)) {
+                throw "HDB01 package contains duplicate dependency group '$targetFramework'."
+            }
+
+            $dependencies = @($group.dependency)
+            if (1 -ne $dependencies.Count) {
+                throw "Expected exactly one package dependency for '$targetFramework', found $($dependencies.Count)."
+            }
+            if ([string]$dependencies[0].id -cne 'Icod.TermInfo') {
+                throw "Unexpected HDB01 package dependency '$($dependencies[0].id)' for '$targetFramework'."
+            }
+            if (-not ([string]$dependencies[0].version).Contains($runtimeVersion, [System.StringComparison]::Ordinal)) {
+                throw "Runtime dependency version '$($dependencies[0].version)' for '$targetFramework' does not reference '$runtimeVersion'."
+            }
         }
     } finally {
         $archive.Dispose()
