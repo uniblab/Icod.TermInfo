@@ -25,8 +25,8 @@
 ## 1. Purpose
 
 `Icod.TermInfo 1.0.0` froze the managed runtime foundation: immutable terminal
-descriptions, standard/extended capability metadata/semantics, compiled terminfo
-parsing and conventional acquisition, provider composition, parameter expansion,
+descriptions, standard/extended capability metadata, compiled terminfo parsing,
+database discovery/provider composition, built-in profiles, parameter expansion,
 padding-aware output, color semantics, and stable reusable assembly identity.
 
 Post-1.0 development builds outward from that foundation rather than repeatedly
