@@ -3,27 +3,33 @@
 **Development line:** `1.15.0`  
 **Theme:** Berkeley DB / Hashed Terminfo Acquisition  
 **Primary package family:** `Icod.TermInfo`  
-**Proposed optional package:** `Icod.TermInfo.BerkeleyDb`  
+**Optional package:** `Icod.TermInfo.BerkeleyDb`  
 **Language:** C# 13  
 **Reusable target frameworks:** `net8.0`; `net9.0`; `net10.0`  
-**Status:** Approved for development; HDB00 interoperability research is the first implementation gate
+**Status:** HDB00 accepted; HDB01 optional-package foundation in progress  
+**Current coordinated prerelease:** `1.15.0-Alpha-1`
 
 ---
 
 ## 1. Release definition
 
-Icod.TermInfo 1.15 closes the principal remaining acquisition-format gap in the
-runtime package family: ncurses-compatible hashed terminfo databases backed by
-Berkeley DB.
+Icod.TermInfo 1.15 closes the principal remaining modern acquisition-format gap
+in the runtime package family: ncurses-compatible hashed terminfo databases
+stored in the Berkeley DB Hash on-disk format used by current ncurses hashed
+terminfo configurations.
 
-The release is deliberately **acquisition-first and read-only**. It does not add
-a second compiled-term parser, a general-purpose Berkeley DB implementation, or
-hashed-database writing to `tic`.
+The release is deliberately **acquisition-first, read-only, and managed**.
+It does not add a second compiled-term parser, a general-purpose Berkeley DB
+engine, a native Berkeley DB runtime dependency, or hashed-database writing to
+`tic`.
 
 The governing architecture is:
 
 ```text
 Berkeley DB / hashed store
+          |
+          v
+managed Hash-v9 reader
           |
           v
 optional hashed-store provider
@@ -38,14 +44,15 @@ existing Icod.TermInfo parser
 TerminalDescription
 ```
 
-The most important architectural requirement is that the hashed-store layer
-stops at **compiled entry bytes**. Everything after that boundary remains owned
-by the existing `Icod.TermInfo` runtime.
+The most important architectural requirement remains unchanged: the hashed-store
+layer stops at **compiled entry bytes**. Everything after that boundary remains
+owned by the existing `Icod.TermInfo` runtime.
 
-Current ncurses documentation explicitly permits terminal databases to be
-configured as directory trees or hashed databases, and a hashed configuration
-may use a path such as `/usr/share/terminfo.db`. 1.15 targets that storage shape
-without changing the existing terminfo semantic model.
+The HDB00 interoperability gate proved that this boundary is real rather than
+aspirational. A managed reader can recover the exact compiled bytes produced by
+ncurses from Berkeley DB Hash-v9 stores, including alias indirection and actual
+overflow-page records, and those bytes are accepted unchanged by the existing
+`CompiledTermInfoParser`.
 
 ---
 
@@ -54,28 +61,30 @@ without changing the existing terminfo semantic model.
 Icod.TermInfo 1.15 shall:
 
 1. acquire compiled terminfo entries from supported ncurses-compatible Berkeley
-   DB / hashed stores;
+   DB Hash-v9 stores;
 2. preserve the existing `TerminalDescription` semantic model unchanged;
 3. reuse `CompiledTermInfoParser` as the only compiled-entry semantic parser;
-4. keep the base `Icod.TermInfo` package free of a mandatory Berkeley DB package
-   or native-library dependency;
-5. expose an explicit reusable provider for caller-selected hashed databases;
-6. provide an opt-in system-discovery provider capable of recognizing both
+4. keep the base `Icod.TermInfo` package free of Berkeley DB-specific code and
+   dependencies;
+5. keep `Icod.TermInfo.BerkeleyDb` free of native Berkeley DB runtime binaries,
+   P/Invoke bindings, or a mandatory third-party database package;
+6. expose an explicit reusable provider for caller-selected hashed databases;
+7. provide an opt-in system-discovery provider capable of recognizing both
    conventional directory databases and supported hashed stores;
-7. preserve existing provider caching, retry, identity-validation,
+8. preserve existing provider caching, retry, identity-validation,
    resource-bound, and error semantics wherever applicable;
-8. distinguish clean misses, malformed terminfo data, malformed or unsupported
-   database containers, I/O failures, and unavailable Berkeley DB backends;
-9. remain deterministic and safe under hostile database contents;
-10. support the existing reusable target matrix: `net8.0`, `net9.0`, and
-    `net10.0`;
-11. integrate naturally with `TerminalDatabase` and existing provider
+9. distinguish clean misses, malformed terminfo data, malformed database
+   containers, unsupported Berkeley DB access methods or revisions, and ordinary
+   filesystem/I/O failures;
+10. remain deterministic and safe under hostile database contents;
+11. support `net8.0`, `net9.0`, and `net10.0` with the same public API;
+12. integrate naturally with `TerminalDatabase` and existing provider
     composition;
-12. provide fixture-based interoperability tests against authoritative
-    ncurses/Berkeley DB-generated databases; and
-13. preserve all previously frozen Runtime, Source, Compiler, Termcap, and
-    Inspection contracts unless an additive 1.15 API is explicitly reviewed and
-    frozen.
+13. maintain fixture-based differential interoperability tests against real
+    ncurses/Berkeley DB-produced stores; and
+14. preserve all previously frozen Runtime, Source, Compiler, Termcap,
+    Inspection, JSON, command, package, and archive contracts unless an additive
+    1.15 change is explicitly reviewed and frozen.
 
 ---
 
@@ -84,7 +93,13 @@ Icod.TermInfo 1.15 shall:
 Version 1.15 does **not** include:
 
 - a general-purpose Berkeley DB API;
+- a general-purpose Berkeley DB database engine;
 - arbitrary Berkeley DB application tables unrelated to terminfo;
+- Btree, Recno, Queue, Heap, or other access methods except enough recognition
+  to reject them safely;
+- native Berkeley DB runtime loading;
+- bundled Oracle Berkeley DB binaries;
+- runtime dependence on an installed Berkeley DB library;
 - transactional database mutation;
 - Berkeley DB environment administration;
 - database recovery or repair;
@@ -95,46 +110,45 @@ Version 1.15 does **not** include:
 - generic JSON import/deserialization;
 - live terminal probing;
 - graphics transport;
-- terminal/session ownership;
-- bundled contemporary Oracle Berkeley DB binaries; or
+- terminal/session ownership; or
 - silent fallback from malformed hashed data to an unrelated storage format.
 
-A successful 1.15 release should make future hashed-database writing easier, but
-writing remains a separate design problem with different atomicity, locking,
-transaction, and distribution concerns.
+A successful 1.15 release establishes a trustworthy reader foundation that may
+support hashed writing in a later release, but writing is a separate project
+with different atomicity, locking, transaction, crash-recovery, alias-publication,
+and compatibility requirements.
 
 ---
 
-## 4. Architectural principles
+## 4. Frozen architectural principles
 
 ### 4.1 The existing parser remains authoritative
 
-The hashed-store implementation SHALL NOT parse terminfo capability tables.
+The Berkeley DB package SHALL NOT parse terminfo capability tables.
 
-It may understand only enough of the database container to locate the value
-associated with a requested terminal name. That value is then passed unchanged
-to:
+It may understand only enough of the Berkeley DB container and ncurses record
+envelope to recover the opaque compiled entry bytes associated with a requested
+terminal identity.
 
-```text
-CompiledTermInfoParser.Parse(...)
-```
-
-The data flow is therefore:
+The semantic pipeline is:
 
 ```text
 requested terminal name
           |
           v
-hashed-store exact-key lookup
+Hash-v9 exact-key search
           |
           v
-opaque stored value
+ncurses index record(s), marker 2
           |
           v
-compiled-entry size/bounds validation
+ncurses data record, marker 0
           |
           v
-CompiledTermInfoParser
+opaque compiled-entry bytes
+          |
+          v
+CompiledTermInfoParser.Parse(...)
           |
           v
 TerminalDescription
@@ -145,9 +159,9 @@ canonical-name / alias identity verification
 
 No second terminfo parser is permitted.
 
-### 4.2 Berkeley DB support is optional
+### 4.2 The package remains optional
 
-The preferred package structure is:
+The dependency direction is:
 
 ```text
 Icod.TermInfo.BerkeleyDb
@@ -156,168 +170,174 @@ Icod.TermInfo.BerkeleyDb
 Icod.TermInfo
 ```
 
-`Icod.TermInfo` remains dependency-free. Consumers which do not need hashed
-stores do not acquire Berkeley DB-specific code or dependencies.
-
 The reverse dependency is forbidden:
 
 ```text
 Icod.TermInfo
+      X
       |
       v
 Icod.TermInfo.BerkeleyDb
 ```
 
-### 4.3 Read-only first
+Consumers which do not need hashed-store acquisition remain unaffected.
 
-The 1.15 provider opens databases read-only. There is no mutation path.
+### 4.3 Production support is pure managed
 
-This intentionally avoids write locking, transaction, crash-consistency,
-recovery, alias-publication, and atomic replacement questions until the storage
-reader contract is proven.
+HDB00 selected a narrowly scoped managed reader for the reviewed Berkeley DB
+Hash on-disk format v9 subset required by ncurses.
 
-### 4.4 Explicit backend availability
+Production 1.15 therefore has:
 
-Installing the optional package must not imply that a compatible native Berkeley
-DB backend is present on the host.
+- no native Berkeley DB loader;
+- no native handles;
+- no ABI probing;
+- no host-library discovery;
+- no `runtimes/<rid>/native` package assets;
+- no runtime "backend unavailable" state caused by an absent native library.
 
-Backend absence becomes observable only when a hashed store is explicitly
-requested or encountered by the hashed-aware provider.
+Native Berkeley DB 5.3 remains useful only as a **development and CI oracle**
+for producing authoritative fixtures and performing differential comparisons.
 
-### 4.5 Public API follows interoperability evidence
+### 4.4 Read-only first
 
-No production provider API is frozen before HDB00 demonstrates the exact
-ncurses/Berkeley DB interoperability contract. Public type names in this roadmap
-are provisional until that gate is accepted.
+The package reads existing database files only.
 
----
+It does not mutate pages, update hash metadata, allocate pages, acquire write
+locks, create database environments, or attempt recovery.
 
-## 5. Backend strategy
+### 4.5 Public API follows validated internals
 
-Berkeley DB support presents three broad implementation strategies.
+HDB00 froze the storage strategy, but it did not freeze public provider names or
+options.
 
-### Approach A — dynamic Berkeley DB compatibility API
-
-Use an installed Berkeley DB compatibility API through a small native interop
-layer and bind it dynamically at runtime.
-
-Advantages:
-
-- delegates Berkeley DB file-version details to Berkeley DB itself;
-- keeps terminfo-specific code small;
-- matches the architecture historically used by ncurses hashed-database support;
-- preserves a clean `key -> value bytes` boundary.
-
-Disadvantages:
-
-- compatible library availability varies by platform;
-- library names and ABI details require qualification;
-- Windows and macOS cannot assume a suitable backend exists.
-
-**This is the preferred initial strategy, subject to HDB00 evidence.**
-
-### Approach B — pure managed hashed-database reader
-
-Implement only the Berkeley DB hash-file subset needed for read-only exact-key
-lookup.
-
-Advantages:
-
-- no native dependency;
-- strongest deterministic deployment story;
-- all resource controls remain managed.
-
-Disadvantages:
-
-- much larger implementation and attack surface;
-- multiple Berkeley DB revisions and byte-order details;
-- substantial risk of accidentally becoming a general Berkeley DB project;
-- greater long-term maintenance burden than the terminfo feature warrants.
-
-This remains a fallback or future direction, not the default 1.15 assumption.
-
-### Approach C — bundle Berkeley DB native binaries
-
-Advantages:
-
-- predictable backend availability.
-
-Disadvantages:
-
-- per-RID native packaging;
-- larger artifacts;
-- security-update responsibility;
-- licensing and redistribution complexity;
-- undesirable coupling of Icod release cadence to third-party native binaries.
-
-This approach is **not planned for 1.15**.
+HDB01 establishes the package with no new public acquisition surface.
+HDB02 productionizes the internal reader under tests.
+HDB03 is the first tranche allowed to freeze the public provider API.
 
 ---
 
-## 6. HDB00 decision gate
+## 5. Backend decision
 
-HDB00 must answer, with executable evidence:
+HDB00 evaluated three strategies.
 
-- which Berkeley DB implementations/releases can open the selected current
-  ncurses hashed terminfo fixture;
-- which library names and ABI shapes are required on Linux;
-- what support is practical on macOS;
-- what support is practical on Windows;
-- how canonical names and aliases are represented as keys;
-- exactly what bytes are returned for a terminal record;
-- whether any ncurses-specific wrapper bytes exist around the compiled entry;
-- how a clean missing key is represented;
-- how the backend reports wrong access method or unsupported file revision;
-- whether read-only access can avoid Berkeley DB environment/transaction
-  infrastructure; and
-- what native resources must be closed after lookup.
+### Approach A — dynamically load Berkeley DB
 
-If those questions cannot be answered reliably, public API work stops after
-HDB00 rather than freezing an assumed ABI.
+This was the provisional roadmap preference before experimentation.
 
-The decisive acceptance proof is:
+It was rejected for production because it would introduce platform-dependent
+library discovery, ABI/version qualification, native lifetime management,
+distribution complications, and undesirable licensing/deployment coupling for a
+feature that only needs bounded read-only record extraction.
+
+Native Berkeley DB remains an interoperability oracle in CI, not a runtime
+backend.
+
+### Approach B — managed read-only Hash-v9 reader
+
+**Selected by HDB00.**
+
+The managed implementation is intentionally narrower than Berkeley DB itself.
+It supports only the reviewed on-disk structures required to recover ncurses
+terminfo records:
+
+- generic Berkeley DB metadata fields needed for safe recognition;
+- Hash metadata version/access-method validation;
+- Hash page headers and paired key/data offsets;
+- inline Hash key/data items;
+- off-page key/data references;
+- overflow-page chains;
+- byte-order handling where the format permits it;
+- ncurses marker-2 index records;
+- ncurses marker-0 compiled-entry records;
+- deterministic exact-key matching;
+- bounded scanning/enumeration sufficient for terminfo acquisition.
+
+It does **not** implement Berkeley DB's write path, transactions, environments,
+recovery, locking, hash-table growth, page allocation, general duplicate-record
+semantics, or arbitrary access methods.
+
+HDB00 demonstrated that the reader need not reimplement Berkeley DB's hash
+function in order to satisfy our read-only use case: a bounded validated page
+scan/index can find exact records deterministically.
+
+### Approach C — bundle Berkeley DB binaries
+
+Rejected for 1.15.
+
+Bundling would add RID-specific native packaging, third-party security-update
+responsibility, larger artifacts, licensing/redistribution complexity, and an
+unnecessary runtime dependency.
+
+---
+
+## 6. HDB00 — accepted interoperability decision
+
+**Status:** COMPLETE / ACCEPTED
+
+**Accepted exact head:**
 
 ```text
-ncurses-generated hashed database
-          |
-          v
-exact terminal-name lookup
-          |
-          v
-returned value bytes
-          |
-          v
-existing CompiledTermInfoParser
-          |
-          v
-expected TerminalDescription
+15fd7dab601c6b8d0d69fe973d1faa5404c32c88
+```
+
+**Accepted qualification:**
+
+- HDB00 interoperability workflow run `34997185592` — all three jobs green;
+- normal PR workflow run `34997185765` — all twelve jobs green.
+
+The accepted experiment uses pinned ncurses source and Berkeley DB 5.3 as the
+external oracle and proves:
+
+1. ncurses canonical/alias keys resolve through marker `2` index records;
+2. marker `2` ultimately reaches a marker `0` compiled-data record;
+3. canonical and alias requests reach the same compiled entry;
+4. the marker-0 payload is byte-for-byte identical to conventional-directory
+   `tic` output;
+5. `CompiledTermInfoParser` accepts those bytes unchanged;
+6. clean missing keys are distinguishable from malformed/wrong database
+   containers;
+7. a deliberately large valid entry forces an actual Berkeley DB overflow page;
+8. the managed reader reconstructs that overflow value byte-for-byte identically
+   to the native Berkeley DB oracle;
+9. Linux and macOS managed extraction match Berkeley DB 5.3; and
+10. Windows reads the Linux-generated Hash-v9 store, including the overflow
+    case, with only .NET installed and no Berkeley DB runtime library.
+
+The full evidence and rationale are recorded in:
+
+```text
+docs/1.15.0-HDB00-BERKELEY-DB-INTEROPERABILITY-AND-BACKEND-DECISION.md
 ```
 
 ---
 
-## 7. Proposed package and API shape
+## 7. Package and public API direction
 
-Subject to HDB00, the intended package is:
+The optional package is:
 
 ```text
 Icod.TermInfo.BerkeleyDb
 ```
 
-Likely public concepts are:
+HDB01 deliberately exports no acquisition API. The likely HDB03 public concepts
+remain provisional and are limited to terminfo acquisition, for example:
 
 ```text
 BerkeleyDbTerminalDescriptionProvider
 BerkeleyDbTerminalDescriptionProviderOptions
 BerkeleyDbSystemTerminalDescriptionProvider
 BerkeleyDbSystemTerminalDescriptionProviderOptions
-BerkeleyDbBackendAvailability
-BerkeleyDbBackendUnavailableException
 BerkeleyDbDatabaseFormatException
 ```
 
-The package exposes **terminfo acquisition concepts**, not a general Berkeley DB
-wrapper. Raw database handles, cursors, transactions, pages, hash tables, and
-native ABI structures remain internal.
+There is intentionally no `BerkeleyDbBackendAvailability` or
+`BerkeleyDbBackendUnavailableException`: production acquisition has no native
+backend to discover.
+
+The package must not expose raw pages, hash buckets, database cursors,
+environments, transactions, Berkeley DB handles, or other general database
+concepts.
 
 ### 7.1 Explicit provider
 
@@ -333,10 +353,10 @@ ITerminalDescriptionProvider provider =
 It owns:
 
 - one canonical database path;
-- snapshotted parser options;
-- backend-selection policy;
+- snapshotted parser/resource options;
 - successful-description caching;
 - exact-name lookup;
+- ncurses record-envelope resolution;
 - compiled-entry parsing; and
 - requested-name identity verification.
 
@@ -345,7 +365,8 @@ It does not inspect environment variables or platform search paths.
 ### 7.2 System provider
 
 The optional package should also provide a hashed-aware system provider for
-callers that want ncurses-like discovery across both storage shapes.
+callers that want ncurses-like discovery across both conventional and hashed
+storage shapes.
 
 Its conceptual search model is:
 
@@ -368,9 +389,11 @@ platform defaults
 clean miss
 ```
 
-It preserves the existing snapshot-at-construction philosophy and reuses the
-existing discovery policy instead of creating a second independent precedence
-implementation.
+It preserves the existing snapshot-at-construction philosophy and should reuse
+existing discovery policy rather than creating a second precedence model.
+
+The frozen existing `SystemTerminalDescriptionProvider` does not silently gain
+new file-valued path semantics during 1.x.
 
 ---
 
@@ -378,86 +401,75 @@ implementation.
 
 ### 8.1 Exact-name lookup
 
-Lookups are ordinal. A request for `xterm-256color` must not match a case-folded,
-normalized, truncated, or approximate key.
+Lookups are ordinal.
 
-### 8.2 Identity validation
+A request for `xterm-256color` must not match a case-folded, normalized,
+truncated, or approximate key.
 
-After the store returns a value:
+### 8.2 Ncurses record-envelope resolution
 
-1. parse it with `CompiledTermInfoParser`;
-2. compare the requested name with `TerminalDescription.Name`;
-3. if unequal, compare against `TerminalDescription.Aliases`; and
-4. reject the result if neither matches.
+HDB00 observed two record classes relevant to terminfo:
+
+```text
+marker 2 -> index/alias target key
+marker 0 -> compiled terminfo bytes
+```
+
+Index resolution must be bounded. Cycles, empty targets, unexpected markers, and
+excessive hop counts are malformed data, not clean misses.
+
+### 8.3 Identity validation
+
+After marker-0 bytes are parsed:
+
+1. compare the requested name with `TerminalDescription.Name`;
+2. if unequal, compare against `TerminalDescription.Aliases`; and
+3. reject the result if neither matches.
 
 A database key alone is not sufficient proof of terminal identity.
 
-### 8.3 Caching
+### 8.4 Caching
 
 The provider should retain the established Icod model:
 
 - successful descriptions are cached per exact requested name;
 - clean misses are retryable;
-- malformed-data failures are retryable;
-- I/O failures are retryable;
-- backend-unavailable failures are retryable; and
+- malformed-container failures are retryable;
+- malformed compiled-entry failures are retryable;
+- I/O failures are retryable; and
 - a new provider deliberately refreshes previously successful cached entries.
 
-### 8.4 Native handle lifetime
+### 8.5 Managed file lifetime
 
-The first implementation should prefer bounded native handle lifetime over
-connection caching:
+The initial production reader should prefer simple bounded managed ownership:
 
 ```text
 lookup
   |
-open DB read-only
+read/open database read-only
   |
-get key
+validate metadata/pages under resource bounds
   |
-copy bounded value to managed memory
+find exact key and reconstruct bounded value
   |
-close DB
+resolve ncurses record envelope
   |
-parse value
+parse compiled entry
 ```
 
-Long-lived native connection caching may be revisited only if profiling proves
-it necessary.
+The implementation may later optimize file access if profiling demonstrates a
+need, but HDB02 correctness is more important than persistent file handles or
+memory mapping.
 
 ---
 
-## 9. Discovery and compatibility semantics
+## 9. Error model
 
-The existing `SystemTerminalDescriptionProvider` explicitly treats reached
-non-directory/hashed paths as unsupported. That is part of its frozen 1.x
-behavior.
-
-Version 1.15 therefore introduces a separate hashed-aware provider rather than
-silently redefining the existing provider:
-
-```text
-SystemTerminalDescriptionProvider
-    existing 1.x behavior
-
-BerkeleyDbSystemTerminalDescriptionProvider
-    encoded + directory + supported hashed-store behavior
-```
-
-Consumers explicitly opt into the new capability.
-
-A future major version may reconsider whether hashed support should become
-intrinsic to the default system provider.
-
----
-
-## 10. Error model
-
-The provider must distinguish at least these states.
+The public provider must distinguish at least these states.
 
 ### Clean miss
 
-A valid readable database contains no matching key.
+A valid readable supported database contains no requested key.
 
 ```text
 TryLoad(...) == false
@@ -465,30 +477,25 @@ TryLoad(...) == false
 
 No exception.
 
-### Backend unavailable
+### Unsupported database access method or revision
 
-A hashed store is requested but no compatible backend can be loaded.
+The file is a recognizable Berkeley DB container but is not the supported
+Hash-v9 shape required by 1.15.
 
-Provisional result:
+This is a format/compatibility failure, not a clean miss.
 
-```text
-BerkeleyDbBackendUnavailableException
-```
+### Malformed database container
 
-### Unsupported or malformed database container
+Metadata, page structure, item offsets, off-page references, overflow chains, or
+record envelopes violate the validated format and safety rules.
 
-The path is not a supported readable hashed terminfo database.
-
-Provisional result:
-
-```text
-BerkeleyDbDatabaseFormatException
-```
+The reviewed HDB03 public API should expose an acquisition-specific format
+exception rather than leaking internal page-parser details.
 
 ### Malformed terminfo value
 
-Lookup succeeds but the returned value is not a valid supported compiled terminfo
-entry.
+The database lookup succeeds and resolves to marker-0 bytes, but those bytes are
+not a valid supported compiled terminfo entry.
 
 The existing `CompiledTermInfoFormatException` remains authoritative.
 
@@ -497,56 +504,73 @@ The existing `CompiledTermInfoFormatException` remains authoritative.
 The key returns a valid compiled entry that does not identify the requested
 canonical name or alias.
 
-The result uses the existing directory-provider identity-failure semantics.
+The result uses the established directory-provider identity-failure semantics.
 
-### Filesystem/native I/O failure
+### Filesystem/I/O failure
 
-Permission failures, sharing failures, corruption reported by the backend, and
-other operational failures propagate as failures and are never converted into a
-clean miss.
+Missing files where an explicit path is required, permissions, sharing failures,
+short reads caused by concurrent replacement, and other operational failures are
+failures and are never converted into clean misses unless an existing provider
+contract explicitly defines otherwise.
 
 ---
 
-## 11. Resource and security bounds
+## 10. Resource and security bounds
 
-Hashed database support creates a new hostile-input boundary.
+Hashed database support creates a hostile-input boundary.
 
 Mandatory rules are:
 
-1. `CompiledTermInfoParserOptions.MaximumEntrySize` remains authoritative.
-2. Native result lengths are validated before managed allocation/copy.
-3. Negative, overflowing, impossible, or excessive lengths are fatal failures.
-4. Terminal names are database keys, never filesystem paths in the hashed
+1. `CompiledTermInfoParserOptions.MaximumEntrySize` remains authoritative for
+   recovered compiled entries.
+2. Database file size, page size, page count, item offsets, off-page declared
+   lengths, and overflow-chain lengths are validated before allocation/copy.
+3. Arithmetic uses overflow-safe checks before offsets are converted to managed
+   indices.
+4. Page references outside the validated file are rejected.
+5. Overflow chains are cycle-detected and bounded.
+6. Unsupported encryption/checksum/layout features are rejected unless separately
+   implemented and qualified.
+7. Terminal names are database keys, never filesystem paths in the hashed
    provider.
-5. A malformed hashed database is never reinterpreted as termcap, terminfo
+8. A malformed hashed database is never reinterpreted as termcap, terminfo
    source, a conventional directory, encoded `TERMINFO`, or another database
    type.
-6. Every retrieved value is reparsed and identity-checked before it is returned.
+9. Every recovered marker-0 value is parsed and identity-checked before it is
+   returned.
+10. Physical Hash page order is never exposed as a stable public ordering
+    contract.
 
 Permanent adversarial coverage must include:
 
 - random database bytes;
-- truncated headers/pages;
-- oversized records;
-- invalid page references;
-- wrong database access method;
-- unsupported versions;
-- malformed keys;
+- truncated metadata and data pages;
+- invalid page sizes;
+- impossible page counts;
+- invalid item-offset tables;
+- unsupported access methods;
+- unsupported Hash revisions;
+- inline records;
+- off-page records;
+- truncated overflow chains;
+- overflow cycles;
+- oversized declared values;
+- malformed ncurses markers;
+- excessive index chains;
 - malformed terminfo values;
 - valid terminfo under the wrong key;
 - aliases;
 - very long requested names;
-- unusual byte order where applicable;
+- supported byte-order variants where fixtures can be established;
 - concurrent lookups;
-- backend absence;
 - permission failures; and
 - file replacement during acquisition.
 
 ---
 
-## 12. Tool-suite impact
+## 11. Tool-suite impact
 
-The 1.15 focus is reusable acquisition. Tool changes are thin consequences of
+The 1.15 focus is reusable acquisition. Tool changes remain thin consequences of
 that capability.
 
 ### `infocmp`
@@ -554,7 +578,7 @@ that capability.
 `infocmp` should be able to inspect a terminal from an explicitly selected
 supported hashed store once provider integration is accepted.
 
-The command must not contain Berkeley DB parsing logic.
+The command must not contain Berkeley DB page parsing logic.
 
 ### `toe`
 
@@ -579,36 +603,35 @@ No semantic changes are required.
 ### `Icod.TermInfo.Tools`
 
 The router owns no Berkeley DB semantics. It routes any accepted `infocmp`/`toe`
-additions exactly as it routes their existing command behavior.
+additions exactly as it routes current commands.
 
 ---
 
-## 13. Tranche plan
+## 12. Tranche plan
 
 ### HDB00 — Interoperability Research and Backend Decision
 
-**Purpose:** remove format/ABI uncertainty before public API design.
+**Status:** COMPLETE / ACCEPTED
 
-Deliverables:
+Deliverables completed:
 
-- authoritative ncurses hashed-store fixture corpus;
-- Berkeley DB compatibility/version matrix;
-- platform/backend availability matrix;
-- exact key/value observations;
-- canonical-name and alias observations;
-- read-only exact-key prototype;
-- iteration prototype;
-- malformed/wrong-format behavior report;
-- licensing/distribution decision record; and
-- selected backend strategy.
+- authoritative ncurses hashed-store fixture generation;
+- Berkeley DB 5.3 oracle qualification;
+- Linux/macOS native-vs-managed comparison;
+- Windows managed-only cross-host comparison;
+- canonical/alias and marker-envelope observations;
+- actual overflow-page proof;
+- clean-miss/wrong-container differentiation;
+- licensing/deployment analysis; and
+- managed Hash-v9 production decision.
 
-Acceptance gate: at least one authoritative ncurses-generated hashed database can
-be opened and its retrieved compiled bytes are accepted unchanged by the existing
-`CompiledTermInfoParser`.
+Acceptance evidence is frozen in the HDB00 decision record and PR history.
 
 ### HDB01 — Optional Package Foundation
 
-Create:
+**Status:** IN PROGRESS
+
+Create and qualify:
 
 ```text
 Icod.TermInfo.BerkeleyDb
@@ -619,53 +642,73 @@ Requirements:
 
 - `net8.0;net9.0;net10.0`;
 - C# 13;
-- coordinated 1.15 prerelease version;
+- coordinated `1.15.0-Alpha-1` version;
 - reusable assembly identity `1.0.0.0`;
-- LGPL-3.0-or-later licensing consistent with reusable library packages;
+- LGPL-3.0-or-later licensing consistent with reusable Icod library packages;
 - direct dependency on `Icod.TermInfo` only;
-- no dependency from Runtime back to this package;
-- no bundled Berkeley DB native binary;
-- complete public XML documentation;
-- API/package baseline infrastructure; and
-- basic backend-availability reporting.
+- no third-party runtime package dependency;
+- no native assets;
+- package README and release metadata;
+- explicit PR testing on Windows, Linux, and macOS;
+- coordinated pack inclusion;
+- exact package artifact verification;
+- cross-TFM public API equivalence; and
+- no exported production acquisition API yet.
 
-No terminal acquisition is required in HDB01.
+HDB01 establishes packaging and dependency boundaries only. It does not expose a
+provider prematurely.
 
-### HDB02 — Read-only Berkeley DB Adapter
+### HDB02 — Managed Read-only Berkeley DB Hash-v9 Reader
 
-Implement the smallest internal primitive needed by terminfo:
+Productionize the HDB00 research findings as internal package code using
+red-green TDD.
+
+The internal reader must cover:
 
 ```text
-open
-get exact key
-copy bounded value
-clean miss
-close
+open/read bounded file
+validate Hash-v9 metadata
+validate page geometry
+scan Hash pages
+read paired key/data items
+read inline items
+follow off-page items
+reconstruct overflow chains
+find exact key
+return bounded opaque value bytes
 ```
 
 Requirements:
 
-- read-only access;
-- no writes or transactions;
-- deterministic backend probing;
-- explicit unavailable-backend behavior;
-- safe native lifetime management;
-- exact cleanup under success and exceptions; and
-- thread-safe independent operations.
+- no native code;
+- no P/Invoke;
+- no Berkeley DB runtime package;
+- no writes;
+- no transactions or environments;
+- no public database API;
+- explicit unsupported-access-method/version failures;
+- overflow-safe arithmetic;
+- cycle/bounds validation;
+- deterministic exact-key behavior;
+- thread-safe independent reads;
+- differential fixtures retained against the HDB00 oracle; and
+- internal implementation only.
 
-The adapter remains internal and is not a general Berkeley DB API.
+The HDB00 exploratory managed probe is not copied blindly into production.
+Production code is re-established from tests and reviewed package conventions.
 
 ### HDB03 — Explicit Hashed Terminal Provider
 
-Implement the reviewed explicit provider.
+Freeze the first reviewed public acquisition API.
 
 Requirements:
 
 - canonical absolute database path;
-- parser-option snapshot;
+- snapshotted parser/resource options;
 - terminal-name validation;
-- exact-key lookup;
-- compiled-size bounds;
+- exact-key lookup through the HDB02 reader;
+- bounded marker-2 index resolution;
+- marker-0 compiled-entry extraction;
 - existing parser reuse;
 - canonical/alias identity verification;
 - successful-result caching;
@@ -676,8 +719,9 @@ Requirements:
 This tranche completes the central architecture:
 
 ```text
-Berkeley DB
-   -> bytes
+Hash-v9 store
+   -> ncurses record envelope
+   -> compiled bytes
    -> CompiledTermInfoParser
    -> TerminalDescription
 ```
@@ -694,7 +738,7 @@ Requirements:
 - deduplicate equivalent locations;
 - preserve clean-miss semantics;
 - never alter the frozen behavior of `SystemTerminalDescriptionProvider`; and
-- reuse existing discovery-policy implementation instead of duplicating it.
+- reuse existing discovery-policy implementation rather than duplicating it.
 
 Any Runtime refactor needed for this should remain internal unless a separate
 public API addition is independently justified.
@@ -706,13 +750,13 @@ Add deterministic read-only enumeration needed by tooling and diagnostics.
 Requirements:
 
 - enumerate logical terminal records safely;
-- distinguish canonical entries and aliases where the authoritative store format
-  permits;
-- validate every emitted compiled entry through Runtime;
-- bound record counts and record sizes; and
-- impose deterministic ordering independent of physical Berkeley DB hash order.
+- distinguish canonical entries and aliases where the ncurses envelope permits;
+- validate emitted compiled entries through Runtime;
+- bound record counts and record sizes;
+- reject malformed records deterministically; and
+- impose deterministic ordering independent of physical Hash-page order.
 
-Physical database iteration order is not an Icod API contract.
+Physical database order is not an Icod API contract.
 
 ### HDB06 — Inspection and Tool Integration
 
@@ -724,23 +768,24 @@ Requirements:
 
 - direct and routed command equivalence;
 - existing directory behavior unchanged;
-- no duplicated database parser;
-- no command-owned Berkeley DB interop;
+- no duplicated database reader;
+- no command-owned Berkeley DB page parsing;
 - deterministic stdout/stderr;
-- clear backend-unavailable diagnostics; and
+- clear unsupported/malformed-store diagnostics; and
 - existing exit-status conventions retained.
 
 `tic` remains directory-write-only.
 
 ### HDB07 — Adversarial and Compatibility Hardening
 
-Permanent tests shall cover valid stores, aliases, missing terminals, malformed
-containers, unsupported access methods, truncated files, corrupt records,
-malformed compiled values, wrong-key valid entries, oversized values, culture
-independence, repeated/concurrent lookup, failure retry, provider refresh, file
-replacement, permission failures, and backend absence.
+Permanent tests shall cover valid stores, aliases, misses, unsupported access
+methods, unsupported revisions, malformed metadata, truncated files, invalid
+page/item geometry, off-page records, overflow chains/cycles, malformed compiled
+values, wrong-key valid entries, oversized values, culture independence,
+repeated/concurrent lookup, failure retry, provider refresh, file replacement,
+and permission failures.
 
-Differential fixtures should compare equivalent directory and hashed acquisition:
+Differential fixtures continue to prove:
 
 ```text
 ncurses hashed record
@@ -748,38 +793,41 @@ ncurses hashed record
 conventional compiled entry
         |
         v
+same compiled bytes
+        |
+        v
 same TerminalDescription semantics
 ```
 
 ### HDB08 — Packaging and Cross-platform Qualification
 
-Qualification must cover Windows, Linux, and macOS while clearly distinguishing:
+Qualification covers:
 
 ```text
-managed package supported
+Windows
+Linux
+macOS
 ```
 
-from:
+Production qualification must not require Berkeley DB to be installed.
 
-```text
-compatible native Berkeley DB backend present
-```
+Native Berkeley DB may remain in the dedicated HDB interoperability workflow as
+a fixture producer/oracle on qualified Unix hosts, but ordinary consumers and
+ordinary package validation use only managed .NET artifacts.
 
 CI must include:
 
-1. at least one host with a real compatible backend and real hashed-store
-   interoperability;
-2. backend-absent hosts verifying deterministic unavailable-backend behavior;
-3. package-only consumers for `net8.0`, `net9.0`, and `net10.0`;
-4. coordinated package validation;
-5. installed `Icod.TermInfo.Tools` smoke where applicable; and
-6. all six existing standalone tool archive RIDs.
-
-No Berkeley DB binary may accidentally leak into an artifact.
+1. exact package dependency verification;
+2. no native runtime assets;
+3. package-only consumers on net8/net9/net10;
+4. normal coordinated package verification;
+5. installed `Icod.TermInfo.Tools` smoke where applicable;
+6. all six standalone tool archive RIDs; and
+7. the existing complete Windows/Linux/macOS PR matrix.
 
 ### HDB09 — API Freeze, Documentation, and Stable Promotion
 
-Final closure includes:
+Final release closure includes:
 
 - exact public API manifest;
 - package dependency verification;
@@ -787,27 +835,83 @@ Final closure includes:
 - Runtime frozen-API reconstruction;
 - dependency-direction tests;
 - acquisition guide;
-- backend compatibility guide;
+- Hash-v9 compatibility documentation;
 - security/resource-bound audit;
+- ecosystem/dependency audit;
 - release audit;
-- root README and sample-index updates;
+- README feature-inventory update;
+- samples update;
 - CHANGELOG entry; and
 - exact complete CI qualification.
 
-Stable `1.15.0` promotion adds no new behavior beyond the accepted final
-prerelease contract.
+Stable `1.15.0` promotion adds no behavior beyond the accepted final prerelease
+contract.
 
 ---
 
-## 14. Sample
+## 13. Fixture and interoperability policy
 
-Add a deterministic non-interactive reusable sample:
+The production package contains no Berkeley DB binary and need not contain large
+opaque test databases merely for convenience.
+
+The test strategy distinguishes:
+
+### Authoritative generated fixtures
+
+The dedicated HDB interoperability workflow may build/use qualified Berkeley DB
+and ncurses versions to generate real hashed stores and compare native and
+managed extraction.
+
+### Checked-in minimal fixtures
+
+Small reviewed binary fixtures may be checked in when they materially improve
+unit/adversarial coverage and have clear provenance.
+
+### Synthetic malformed fixtures
+
+Tests may construct minimal malformed page images for precise bounds/error
+coverage, but synthetic fixtures do not replace real ncurses differential
+qualification.
+
+---
+
+## 14. Package policy
+
+`Icod.TermInfo.BerkeleyDb` is an Icod implementation of a narrowly scoped
+read-only file-format reader. It is **not** a redistribution or managed wrapper
+of Oracle Berkeley DB.
+
+The package should therefore contain only:
+
+- Icod-managed assemblies;
+- XML documentation;
+- package metadata/README/icon/license;
+- symbols and Source Link artifacts consistent with the coordinated family.
+
+It must not contain:
+
+- Oracle Berkeley DB binaries;
+- Berkeley DB headers/source copied into the package;
+- RID-specific native libraries;
+- hidden runtime downloads;
+- dynamic library probing code.
+
+The package's LGPL license applies to Icod's own implementation. Third-party
+Berkeley DB licensing remains relevant to CI/oracle use and to any future design
+that would redistribute or link Berkeley DB itself, but not because the 1.15
+production package embeds that library.
+
+---
+
+## 15. Samples
+
+Once HDB03 is accepted, add a deterministic non-interactive sample such as:
 
 ```text
 samples/Icod.TermInfo.BerkeleyDb.Sample
 ```
 
-It demonstrates:
+It should demonstrate:
 
 ```text
 explicit hashed database path
@@ -822,72 +926,85 @@ TerminalDescription
 selected capability inspection
 ```
 
-It should also demonstrate provider composition with `TerminalDatabase` and a
-built-in fallback. The sample must not depend on the user's ambient host database;
-a checked-in or CI-generated fixture is required.
+The sample must use a controlled fixture rather than depending on the host's
+ambient terminfo database.
+
+It should run on all reusable target frameworks.
 
 ---
 
-## 15. Documentation set
+## 16. Documentation set
 
-The 1.15 line should produce at least:
+The 1.15 line should maintain at least:
 
 ```text
 Icod.TermInfo-1.15.0-Berkeley-DB-Hashed-Terminfo-Acquisition-Roadmap.md
 
+docs/1.15.0-HDB00-BERKELEY-DB-INTEROPERABILITY-AND-BACKEND-DECISION.md
+docs/1.15.0-BERKELEY-DB-ECOSYSTEM-AUDIT.md
 docs/1.15.0-HASHED-DATABASE-ACQUISITION-GUIDE.md
-docs/1.15.0-BERKELEY-DB-BACKEND-COMPATIBILITY.md
+docs/1.15.0-BERKELEY-DB-HASH-V9-COMPATIBILITY.md
 docs/1.15.0-BERKELEY-DB-SECURITY-AND-RESOURCE-AUDIT.md
 docs/1.15.0-RELEASE-AUDIT.md
 ```
 
-The compatibility guide must distinguish Icod API support, operating-system
-support, backend availability, tested Berkeley DB implementations, tested
-ncurses producers, and unsupported database types/versions.
+The compatibility document must distinguish:
+
+- Icod package/API support;
+- supported Berkeley DB on-disk access method/revision;
+- tested ncurses/database producers;
+- byte-order/page-layout coverage;
+- explicitly unsupported database features;
+- operating-system support.
 
 ---
 
-## 16. Compatibility requirements
+## 17. Compatibility requirements
 
 The 1.15 line must preserve:
 
 - Runtime's frozen 1.0 public API unless explicitly exempted;
 - reusable assembly identity `1.0.0.0`;
-- `net8.0`/`net9.0`/`net10.0` API equivalence;
+- net8/net9/net10 API equivalence;
 - dependency direction;
-- existing directory acquisition;
-- existing encoded `TERMINFO` behavior;
+- existing conventional directory acquisition;
+- existing encoded `TERMINFO` acquisition;
 - existing built-in fallback;
-- existing parser semantics;
+- existing compiled parser semantics;
 - existing provider cache semantics;
 - existing Source/Compiler/Termcap/Inspection APIs;
-- all frozen JSON schemas; and
+- all frozen JSON schemas;
 - all current five-command behavior except reviewed additive hashed-store
-  acquisition paths.
+  acquisition features.
 
-A caller which does not install or instantiate the Berkeley DB package should
-observe no semantic change.
+A caller which does not install or instantiate `Icod.TermInfo.BerkeleyDb` should
+observe no semantic change from adding the package family member.
 
 ---
 
-## 17. Success criteria
+## 18. Success criteria
 
 Icod.TermInfo 1.15 is successful when all of the following are true.
 
 ### Acquisition
 
-A real ncurses-generated hashed database can be queried by exact terminal name
-and yields a `TerminalDescription` semantically identical to the corresponding
-conventional compiled entry.
+A real ncurses-generated supported Hash-v9 database can be queried by exact
+terminal name and returns a `TerminalDescription` semantically identical to the
+corresponding conventional compiled entry.
 
 ### Aliases
 
-Canonical and alias requests return the correct immutable semantic description
-when the authoritative fixture declares those identities.
+Canonical and alias requests resolve correctly and identity validation prevents a
+valid-but-wrong compiled entry from being accepted under an unrelated key.
 
 ### Isolation
 
-`Icod.TermInfo` remains free of a mandatory Berkeley DB dependency.
+`Icod.TermInfo` remains free of any Berkeley DB dependency.
+
+### Managed deployment
+
+`Icod.TermInfo.BerkeleyDb` runs on qualified Windows/Linux/macOS hosts without an
+installed Berkeley DB library and ships no native database assets.
 
 ### Parser reuse
 
@@ -895,17 +1012,18 @@ No Berkeley DB code parses terminfo capability tables.
 
 ### Safety
 
-Malformed databases, malformed values, identity mismatches, unsupported
-containers, backend absence, and ordinary clean misses remain distinguishable.
+Malformed database metadata/pages, malformed ncurses envelopes, malformed
+compiled values, identity mismatches, unsupported database containers, and clean
+misses remain distinguishable.
 
 ### Determinism
 
-Lookup, diagnostics, catalog output, and command behavior are deterministic.
+Lookup, diagnostics, catalog output, and tool behavior are deterministic.
 
 ### Portability
 
-All managed projects build and test on Windows, Linux, and macOS; backend-specific
-support is explicitly qualified rather than guessed.
+Reusable projects build/test on net8/net9/net10 across the established platform
+matrix.
 
 ### Distribution
 
@@ -918,14 +1036,16 @@ All previously frozen 1.x contracts remain green.
 
 ---
 
-## 18. Explicit deferred work after 1.15
+## 19. Explicit deferred work after 1.15
 
-Successful read-only acquisition establishes a foundation for later work:
+Successful read-only acquisition may establish the foundation for later work:
 
 ```text
-1.15 hashed acquisition
+1.15 managed hashed acquisition
       |
-      +--> future hashed catalog/tooling expansion
+      +--> future broader historical Berkeley DB read compatibility, if demanded
+      |
+      +--> future hashed catalog tooling expansion
       |
       +--> future hashed database writer
       |
@@ -934,31 +1054,42 @@ Successful read-only acquisition establishes a foundation for later work:
       +--> future directory <-> hashed migration
 ```
 
-A future writer release must independently design overwrite policy, atomicity,
-locking, transactions, crash recovery, alias publication, concurrent
-readers/writers, file replacement, backup policy, destination selection, and
-license/distribution implications.
+Any future writer must independently design and test:
+
+- hash placement/growth rules;
+- metadata mutation;
+- overwrite policy;
+- alias publication;
+- atomicity;
+- file locking;
+- concurrent readers/writers;
+- transactions or equivalent crash safety;
+- recovery behavior;
+- backup/replacement policy;
+- `tic` destination selection; and
+- licensing/distribution implications if any third-party implementation is
+  introduced.
+
+These concerns are intentionally excluded from 1.15.
 
 ---
 
-## 19. North-star rule
+## 20. Release north star
 
-The release definition is:
-
-> **Icod.TermInfo 1.15.0 adds optional, read-only acquisition of supported
-> ncurses-compatible Berkeley DB / hashed terminfo stores. The optional provider
-> retrieves opaque compiled-entry bytes and delegates all terminfo interpretation
-> to the existing frozen Runtime parser. The release preserves the
-> dependency-free core runtime, conventional directory acquisition, provider
-> semantics, and package-family boundaries while establishing the
-> interoperability and safety foundation required for possible future
-> hashed-store writing.**
+> **Icod.TermInfo 1.15.0 adds optional, read-only, pure-managed acquisition of
+> supported ncurses-compatible Berkeley DB Hash-v9 terminfo stores. The optional
+> package recovers opaque compiled-entry bytes and delegates all terminfo
+> semantics to the existing frozen Runtime parser. The release preserves the
+> dependency-free Runtime, avoids native Berkeley DB deployment, and establishes
+> a bounded, deterministic, cross-platform foundation for hashed terminfo
+> interoperability.**
 
 If a proposed 1.15 feature does not directly improve:
 
 ```text
-hashed store
-    -> compiled bytes
+Hash-v9 store
+    -> bounded managed record recovery
+    -> compiled terminfo bytes
     -> existing parser
     -> TerminalDescription
 ```
