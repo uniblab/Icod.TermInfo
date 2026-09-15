@@ -1,12 +1,12 @@
 # Icod.TermInfo Samples
 
-The repository contains **eight executable API samples** plus one command-suite
+The repository contains **nine executable API samples** plus one command-suite
 walkthrough. The samples stay separate so acquisition, reusable toolchain,
 multi-database automation, persistent-raster semantics, runtime-evidence
 integration, and raster-backend selection can be copied without mixing unrelated
 concerns.
 
-All eight executable API sample projects target `net8.0`, `net9.0`, and
+All nine executable API sample projects target `net8.0`, `net9.0`, and
 `net10.0`; every `dotnet run` example therefore specifies a framework. Substitute
 `-f net8.0` or `-f net9.0` when exercising those consumer targets.
 
@@ -137,6 +137,22 @@ dotnet run --project samples/Icod.TermInfo.Toolchain.Sample/Icod.TermInfo.Toolch
 
 See `Icod.TermInfo.Toolchain.Sample/README.md`.
 
+## Icod.TermInfo.Termcap.Sample
+
+`Icod.TermInfo.Termcap.Sample` is the focused reusable-API example for managed
+termcap interoperability. It demonstrates parsing, standard-capability
+classification, `tc=` inheritance resolution, conversion into an immutable
+Runtime `TerminalDescription`, deterministic reverse termcap rendering, and
+explicit inline acquisition without consulting ambient host termcap state.
+
+```text
+dotnet run --project samples/Icod.TermInfo.Termcap.Sample/Icod.TermInfo.Termcap.Sample.csproj -f net10.0
+```
+
+The project references only `Icod.TermInfo.Termcap`; Runtime arrives through the
+package's normal transitive dependency. See
+`Icod.TermInfo.Termcap.Sample/README.md`.
+
 ## Icod.TermInfo.Acquisition.Sample
 
 `Icod.TermInfo.Acquisition.Sample` is the focused compiled-database acquisition
@@ -203,7 +219,8 @@ See `ToolSuite/README.md`.
 ## Release validation
 
 The release pipeline executes the deterministic reusable samples and package-only
-consumers on their supported target frameworks. The 1.14 qualification adds the
+consumers on their supported target frameworks. The reusable Termcap sample runs
+on `net8.0`, `net9.0`, and `net10.0` as part of exact package verification. The 1.14 qualification adds the
 raster-backend selection sample and a package-reference-only consumer that uses a
 freshly packed `Icod.TermInfo.Inspection` candidate beside published
 `Icod.Terminal 1.13.0`.

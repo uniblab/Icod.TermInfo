@@ -1,4 +1,4 @@
-# Icod.TermInfo 1.10 Tool-Suite Sample
+# Icod.TermInfo Tool-Suite Sample
 
 This sample exercises the coordinated `tic`, `infocmp`, `toe`, `captoinfo`, and
 `infotocap` command suite against controlled terminfo and termcap source. It uses
@@ -10,12 +10,10 @@ The commands below use the standalone release-archive launchers. When
 with `icod-terminfo`, for example `icod-terminfo tic -c -x example.ti`. Run them
 from this directory, or adjust the paths as appropriate.
 
-The existing 1.9 examples remain the frozen version-1 JSON compatibility path.
-Version 1.10 adds a second controlled walkthrough for ordered database-set
-inspection, set comparison, and multi-database planning without changing those
-1.9 forms.
+The walkthrough includes both the frozen version-1 JSON compatibility forms and
+the additive version-2 database-set inspection, comparison, and planning forms.
 
-## 1.10 controlled database-set sources
+## Controlled database-set sources
 
 Four small source files isolate the new multi-database examples:
 
@@ -177,7 +175,7 @@ The effective child description should include the inherited base capabilities,
 
 ## Synthesize the child relative to the base
 
-Version 1.7 adds deterministic relative-source synthesis through `infocmp -u`.
+The suite supports deterministic relative-source synthesis through `infocmp -u`.
 Use the same controlled database for the target and parent:
 
 ```text
@@ -198,7 +196,7 @@ rather than silently discarding the child-local extended capability.
 
 ## Plan the child from explicit candidates
 
-Version 1.8 adds bounded deterministic parent selection through
+The suite supports bounded deterministic parent selection through
 `infocmp --plan-use`. Supply the decoy first to demonstrate that candidate order
 is a final tie-break rather than a first-match rule:
 
@@ -237,8 +235,7 @@ comparison fail.
 
 ## Produce frozen version-1 machine-readable documents
 
-Version 1.9 projects the same immutable Inspection values through the frozen
-version-1 JSON envelope. Effective-description and comparison documents are:
+The frozen version-1 JSON envelope projects the same immutable Inspection values. Effective-description and comparison documents are:
 
 ```text
 infocmp --json -A ./terminfo icod-demo-child > description.json

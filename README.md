@@ -9,11 +9,11 @@
 
 ## Status
 
-Current published stable release: `Icod.TermInfo 1.13.0`.
+Current release line: `Icod.TermInfo 1.14.0`.
 
-`Icod.TermInfo 1.14.0` is release-ready in PR #44. It adds raster-backend availability evidence, deterministic candidate evaluation, and explicit caller-preference-aware backend selection in `Icod.TermInfo.Inspection`, while preserving the existing Runtime, Source, Compiler, Termcap, command, package, and archive contracts. Publication remains gated by merge to `main` and the normal immutable-tag release workflow.
+Version `1.14.0` adds raster-backend availability evidence, deterministic candidate evaluation, and explicit caller-preference-aware backend selection in `Icod.TermInfo.Inspection`, while preserving the Runtime, Source, Compiler, Termcap, command, package, and archive contracts.
 
-The 1.14 release candidate has passed the complete Staging qualification matrix on Windows, Linux, and macOS, including package verification, isolated consumers, installed-tool smoke, and all six standalone archive RIDs.
+The 1.14 release contract passed the complete Staging qualification matrix on Windows, Linux, and macOS, including package verification, isolated consumers, installed-tool smoke, and all six standalone archive RIDs.
 
 ## Support the Project
 
@@ -167,7 +167,7 @@ The managed packages contain no native ncurses or system terminfo payload. Runti
 
 ## Samples and Documentation
 
-The [`samples`](samples/README.md) directory contains focused examples for runtime acquisition, the source/compiler toolchain, database-set analysis, persistent-raster lifecycle and placement planning, runtime-evidence integration, raster-backend selection, and command-tool workflows.
+The [`samples`](samples/README.md) directory contains focused examples for runtime acquisition, reusable Termcap parsing/conversion/acquisition, the source/compiler toolchain, database-set analysis, persistent-raster lifecycle and placement planning, runtime-evidence integration, raster-backend selection, and command-tool workflows.
 
 Recommended documentation entry points:
 

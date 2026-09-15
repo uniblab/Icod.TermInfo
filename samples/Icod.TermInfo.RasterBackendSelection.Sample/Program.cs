@@ -50,8 +50,9 @@ RasterBackendCandidate sixelCandidate = new(
 	basePlacementProfile
 );
 
+bool liveMode = args.Contains( "--live", StringComparer.Ordinal );
 PersistentRasterRuntimeObservationOutcome terminalOutcome;
-if ( args.Contains( "--live", StringComparer.Ordinal ) ) {
+if ( liveMode ) {
 	await using TerminalSession session = await TerminalSession.OpenAsync(
 		new TerminalSessionOptions {
 			InputMode = TerminalInputMode.CBreak,
@@ -105,30 +106,44 @@ RasterBackendSelectionRequest request = new(
 		requireAcknowledgedUpload: true
 	)
 );
+RasterBackendCandidate[] candidates = [
+	sixelCandidate,
+	kittyCandidate,
+];
+RasterBackendSelectionPlan noPreferencePlan = RasterBackendPlanner.Plan(
+	candidates,
+	request
+);
 RasterBackendSelectionOptions options = new(
 	new[] {
 		RasterBackendKind.KittyGraphics,
 		RasterBackendKind.Sixel,
 	}
 );
-RasterBackendSelectionPlan plan = RasterBackendPlanner.Plan(
-	new[] {
-		sixelCandidate,
-		kittyCandidate,
-	},
+RasterBackendSelectionPlan preferredPlan = RasterBackendPlanner.Plan(
+	candidates,
 	request,
 	options
 );
 
 Console.WriteLine( "Sixel backend profile:" );
 Console.WriteLine( TermInfoJsonRenderer.Render( sixelBackendProfile ) );
-Console.WriteLine( "Selection plan:" );
-Console.WriteLine( TermInfoJsonRenderer.Render( plan ) );
+Console.WriteLine( $"No-preference status: {noPreferencePlan.Status}." );
+Console.WriteLine( "Selection plan without preference:" );
+Console.WriteLine( TermInfoJsonRenderer.Render( noPreferencePlan ) );
+Console.WriteLine( $"Explicit-preference status: {preferredPlan.Status}; backend: {preferredPlan.SelectedBackend}." );
+Console.WriteLine( "Selection plan with explicit preference:" );
+Console.WriteLine( TermInfoJsonRenderer.Render( preferredPlan ) );
 
 return
 	(
-		plan.Status == RasterBackendSelectionStatus.Selected
-		&& plan.SelectedBackend == RasterBackendKind.KittyGraphics
+		(
+			liveMode
+			|| noPreferencePlan.Status
+				== RasterBackendSelectionStatus.RequiresPreference
+		)
+		&& preferredPlan.Status == RasterBackendSelectionStatus.Selected
+		&& preferredPlan.SelectedBackend == RasterBackendKind.KittyGraphics
 	)
 		? 0
 		: 2

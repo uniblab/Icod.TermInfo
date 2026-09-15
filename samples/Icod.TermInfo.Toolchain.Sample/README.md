@@ -3,9 +3,8 @@
 This sample demonstrates the reusable managed toolchain without invoking
 `tic`, `infocmp`, `toe`, or the `icod-terminfo` router.
 
-MI07 freezes this sample's exact `sourcePlan` fixture and the release verifier's
-two-process byte-equality check. The Alpha-7 to stable 1.9 transition changes no
-sample step or JSON byte.
+The release gate freezes this sample's exact `sourcePlan` fixture and verifies
+byte-for-byte equality across separate process executions.
 
 It composes:
 
@@ -38,7 +37,7 @@ Icod.TermInfo.Inspection
 ```
 
 The source contains a useful base, a decoy candidate, and a child using `use=`
-inheritance. The sample resolves all three entries, asks the 1.8 planner to
+inheritance. The sample resolves all three entries, asks the bounded planner to
 select zero or one parent, requires the useful base to win an exhaustive search,
 and consumes the planner's exact source. It then reparses and resolves that
 source, compiles the planned form, publishes it into a unique temporary
@@ -47,8 +46,8 @@ requires each stage to remain semantically equal to the original resolved
 child.
 
 The sample retains the explicit five-argument
-`TerminalDescriptionSourceSynthesisOptions` constructor which is part of the
-frozen `1.7.0` Inspection API baseline, then composes it through
+`TerminalDescriptionSourceSynthesisOptions` constructor to exercise the preserved
+compatibility surface, then composes it through
 `TerminalDescriptionSourcePlanningOptions` and
 `TerminalDescriptionSourcePlanner.Plan`.
 
@@ -60,9 +59,9 @@ dotnet run --project samples/Icod.TermInfo.Toolchain.Sample/Icod.TermInfo.Toolch
 
 The project also targets `net8.0` and `net9.0`.
 
-MI06 extends the RP08 sample by writing the exact compact `sourcePlan` JSON
-document after the full semantic path succeeds. To verify the checked-in
-cross-host fixture while running the sample:
+After the full semantic path succeeds, the sample writes the exact compact
+`sourcePlan` JSON document. To verify the checked-in cross-host fixture while
+running the sample:
 
 ```text
 dotnet run --project samples/Icod.TermInfo.Toolchain.Sample/Icod.TermInfo.Toolchain.Sample.csproj -f net10.0 -- --verify-fixture samples/Icod.TermInfo.Toolchain.Sample/expected-source-plan.json

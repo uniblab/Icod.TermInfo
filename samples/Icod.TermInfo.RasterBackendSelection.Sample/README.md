@@ -14,8 +14,10 @@ Terminal semantic result
     -> RasterBackendCandidate
 
 Sixel candidate + Kitty candidate
+    -> plan without preference
+    -> RequiresPreference
     -> explicit caller preference
-    -> RasterBackendPlanner.Plan(...)
+    -> selected Kitty Graphics plan
 ```
 
 No terminal name, emulator identity, process ancestry, environment variable, or Terminal-internal backend resolver is inspected.
@@ -26,7 +28,7 @@ No terminal name, emulator identity, process ancestry, environment variable, or 
 dotnet run --project samples/Icod.TermInfo.RasterBackendSelection.Sample -f net10.0
 ```
 
-The deterministic path prefers Kitty Graphics, strengthens its lifecycle profile through the 1.13 integrator, and should produce a selected Kitty plan. Sixel remains independently represented from static capability metadata.
+The deterministic path first submits both viable candidates without a preference order and requires `RequiresPreference`, proving that TermInfo does not rank backends by enum value or input order. It then supplies the explicit preference order Kitty Graphics -> Sixel and requires a selected Kitty plan. Sixel remains independently represented from static capability metadata.
 
 ## Run live mode
 

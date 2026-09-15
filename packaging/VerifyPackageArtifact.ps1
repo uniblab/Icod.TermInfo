@@ -112,6 +112,25 @@ try {
         }
     }
 
+    $termcapSampleProject = Join-Path `
+        $repositoryRoot `
+        'samples/Icod.TermInfo.Termcap.Sample/Icod.TermInfo.Termcap.Sample.csproj'
+    & dotnet restore $termcapSampleProject
+    if (0 -ne $LASTEXITCODE) {
+        throw 'Termcap reusable-API sample restore failed.'
+    }
+
+    foreach ($framework in @('net8.0', 'net9.0', 'net10.0')) {
+        & dotnet run `
+            --project $termcapSampleProject `
+            -c $Configuration `
+            -f $framework `
+            --no-restore
+        if (0 -ne $LASTEXITCODE) {
+            throw "Termcap reusable-API sample failed on $framework."
+        }
+    }
+
     $rasterBackendSampleProject = Join-Path `
         $repositoryRoot `
         'samples/Icod.TermInfo.RasterBackendSelection.Sample/Icod.TermInfo.RasterBackendSelection.Sample.csproj'
