@@ -27,6 +27,7 @@ internal static class BerkeleyDbHashReader {
 	private const uint HashMagic = 0x00061561;
 	private const uint SupportedHashVersion = 9;
 	private const byte HashMetadataPage = 8;
+	private const byte UnusedPage = 0;
 	private const byte OverflowPage = 7;
 	private const byte HashPage = 13;
 	private const byte HashKeyData = 1;
@@ -57,8 +58,13 @@ internal static class BerkeleyDbHashReader {
 				metadata,
 				pageNumber
 			);
-			if ( page[25] != HashPage ) {
+			if ( page[25] == UnusedPage || page[25] == OverflowPage ) {
 				continue;
+			}
+			if ( page[25] != HashPage ) {
+				throw new InvalidDataException(
+					$"Berkeley DB page type {page[25]} at page {pageNumber} is not supported."
+				);
 			}
 
 			ValidatePageIdentity( page, pageNumber, metadata.IsBigEndian );
@@ -207,6 +213,18 @@ internal static class BerkeleyDbHashReader {
 		if ( ( bytes[26] & 0x01 ) != 0 ) {
 			throw new InvalidDataException(
 				"Checksummed Berkeley DB pages are not supported."
+			);
+		}
+
+		if ( bytes[26] != 0 || ReadUInt32( bytes, 36, isBigEndian ) != 0 ) {
+			throw new InvalidDataException(
+				"Berkeley DB metadata feature flags and partitioned files are not supported."
+			);
+		}
+		uint hashFlags = ReadUInt32( bytes, 48, isBigEndian );
+		if ( hashFlags != 0 ) {
+			throw new InvalidDataException(
+				$"Berkeley DB Hash feature flags 0x{hashFlags:X8} are not supported."
 			);
 		}
 
