@@ -133,8 +133,9 @@ public sealed class TC08ContractTests {
 				)
 			);
 
-		Assert.Contains( "if (17 -ne $files.Count)", release );
-		Assert.Contains( "if (18 -ne $assets.Count)", release );
+		Assert.Contains( "if (7 -ne $packages.Count)", release );
+		Assert.Contains( "if (19 -ne $files.Count)", release );
+		Assert.Contains( "if (20 -ne $assets.Count)", release );
 		Assert.Contains( "Icod.TermInfo.Termcap/Icod.TermInfo.Termcap.csproj", packPackages );
 		Assert.Contains( "NuGet/login@v1", release );
 		Assert.Contains( "environment: Release", release );
