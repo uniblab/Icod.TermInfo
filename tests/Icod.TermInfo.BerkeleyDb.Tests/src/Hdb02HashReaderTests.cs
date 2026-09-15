@@ -256,6 +256,270 @@ public sealed class Hdb02HashReaderTests {
 		}
 	}
 
+	[Theory]
+	[InlineData( 1023, false )]
+	[InlineData( 1024, true )]
+	[InlineData( 1025, true )]
+	public void TryReadValueEnforcesInclusiveDatabaseLimit(
+		int maximumDatabaseSize,
+		bool shouldSucceed
+	) {
+		byte[] key = [ 0x6B ];
+		byte[] expected = [ 0x42 ];
+		byte[] database = CreateInlineHashV9Database( key, expected );
+		string path = Path.GetTempFileName();
+		try {
+			File.WriteAllBytes( path, database );
+			if ( shouldSucceed ) {
+				Assert.True(
+					BerkeleyDbHashReader.TryReadValue(
+						path,
+						key,
+						out byte[] actual,
+						maximumDatabaseSize: maximumDatabaseSize
+					)
+				);
+				Assert.Equal( expected, actual );
+			} else {
+				Assert.Throws<InvalidDataException>(
+					() => BerkeleyDbHashReader.TryReadValue(
+						path,
+						key,
+						out _,
+						maximumDatabaseSize: maximumDatabaseSize
+					)
+				);
+			}
+
+			AssertFileCanBeOpenedExclusively( path );
+		} finally {
+			File.Delete( path );
+		}
+	}
+
+	[Theory]
+	[InlineData( false, 1, false )]
+	[InlineData( false, 2, true )]
+	[InlineData( false, 3, true )]
+	[InlineData( true, 95, false )]
+	[InlineData( true, 96, true )]
+	[InlineData( true, 97, true )]
+	public void TryReadValueEnforcesInclusiveValueLimit(
+		bool overflow,
+		int maximumItemSize,
+		bool shouldSucceed
+	) {
+		byte[] key = [ 0x6B ];
+		byte[] expected = ( overflow )
+			? Enumerable.Range( 0, 96 ).Select( index => (byte)index ).ToArray()
+			: [ 0x11, 0x22 ]
+		;
+		byte[] database = ( overflow )
+			? CreateOverflowHashV9Database( key, expected )
+			: CreateInlineHashV9Database( key, expected )
+		;
+		string path = Path.GetTempFileName();
+		try {
+			File.WriteAllBytes( path, database );
+			if ( shouldSucceed ) {
+				Assert.True(
+					BerkeleyDbHashReader.TryReadValue(
+						path,
+						key,
+						out byte[] actual,
+						maximumItemSize: maximumItemSize
+					)
+				);
+				Assert.Equal( expected, actual );
+			} else {
+				Assert.Throws<InvalidDataException>(
+					() => BerkeleyDbHashReader.TryReadValue(
+						path,
+						key,
+						out _,
+						maximumItemSize: maximumItemSize
+					)
+				);
+			}
+
+			AssertFileCanBeOpenedExclusively( path );
+		} finally {
+			File.Delete( path );
+		}
+	}
+
+	[Theory]
+	[InlineData( 1, false )]
+	[InlineData( 2, true )]
+	[InlineData( 3, true )]
+	public void TryReadValueBoundsStoredKeys(
+		int maximumItemSize,
+		bool shouldSucceed
+	) {
+		byte[] key = [ 0x61, 0x62 ];
+		byte[] database = CreateInlineHashV9Database( key, [ 0x42 ] );
+		string path = Path.GetTempFileName();
+		try {
+			File.WriteAllBytes( path, database );
+			if ( shouldSucceed ) {
+				Assert.True(
+					BerkeleyDbHashReader.TryReadValue(
+						path,
+						key,
+						out byte[] actual,
+						maximumItemSize: maximumItemSize
+					)
+				);
+				Assert.Equal( new byte[] { 0x42 }, actual );
+			} else {
+				// Search for a shorter key so the stored-key allocation is tested.
+				Assert.Throws<InvalidDataException>(
+					() => BerkeleyDbHashReader.TryReadValue(
+						path,
+						new byte[] { 0x61 },
+						out _,
+						maximumItemSize: maximumItemSize
+					)
+				);
+			}
+		} finally {
+			File.Delete( path );
+		}
+	}
+
+	[Theory]
+	[InlineData( 0, 1, "maximumDatabaseSize" )]
+	[InlineData( -1, 1, "maximumDatabaseSize" )]
+	[InlineData( 1024, 0, "maximumItemSize" )]
+	[InlineData( 1024, -1, "maximumItemSize" )]
+	public void TryReadValueRejectsInvalidLimitsBeforeOpeningFile(
+		int maximumDatabaseSize,
+		int maximumItemSize,
+		string parameterName
+	) {
+		string path = Path.Combine(
+			Path.GetTempPath(),
+			Guid.NewGuid().ToString( "N" ) + ".db"
+		);
+		ArgumentOutOfRangeException error = Assert.Throws<ArgumentOutOfRangeException>(
+			() => BerkeleyDbHashReader.TryReadValue(
+				path,
+				new byte[] { 0x6B },
+				out _,
+				maximumDatabaseSize: maximumDatabaseSize,
+				maximumItemSize: maximumItemSize
+			)
+		);
+
+		Assert.Equal( parameterName, error.ParamName );
+	}
+
+	[Fact]
+	public void TryReadValueAllowsEmptyValueUnderPositiveLimit() {
+		byte[] key = [ 0x6B ];
+		byte[] database = CreateInlineHashV9Database( key, [] );
+		string path = Path.GetTempFileName();
+		try {
+			File.WriteAllBytes( path, database );
+			Assert.True(
+				BerkeleyDbHashReader.TryReadValue(
+					path,
+					key,
+					out byte[] actual,
+					maximumItemSize: 1
+				)
+			);
+			Assert.Empty( actual );
+		} finally {
+			File.Delete( path );
+		}
+	}
+
+	[Theory]
+	[InlineData( false )]
+	[InlineData( true )]
+	public void TryReadValueReleasesFileAfterMissOrMalformedData( bool malformed ) {
+		byte[] key = [ 0x6B ];
+		byte[] database = CreateInlineHashV9Database( key, [ 0x42 ] );
+		if ( malformed ) {
+			database[12] = 0;
+		}
+
+		string path = Path.GetTempFileName();
+		try {
+			File.WriteAllBytes( path, database );
+			if ( malformed ) {
+				Assert.Throws<InvalidDataException>(
+					() => BerkeleyDbHashReader.TryReadValue( path, key, out _ )
+				);
+			} else {
+				Assert.False(
+					BerkeleyDbHashReader.TryReadValue(
+						path,
+						new byte[] { 0x78 },
+						out byte[] actual
+					)
+				);
+				Assert.Empty( actual );
+			}
+
+			AssertFileCanBeOpenedExclusively( path );
+		} finally {
+			File.Delete( path );
+		}
+	}
+
+	[Fact]
+	public void TryReadValueKeepsLimitsIndependentAcrossConcurrentReads() {
+		byte[] key = [ 0x6B ];
+		byte[] expected = [ 0x11, 0x22 ];
+		byte[] database = CreateInlineHashV9Database( key, expected );
+		string path = Path.GetTempFileName();
+		try {
+			File.WriteAllBytes( path, database );
+			Parallel.For(
+				0,
+				16,
+				index => {
+					if ( ( index & 1 ) == 0 ) {
+						Assert.Throws<InvalidDataException>(
+							() => BerkeleyDbHashReader.TryReadValue(
+								path,
+								key,
+								out _,
+								maximumItemSize: 1
+							)
+						);
+					} else {
+						Assert.True(
+							BerkeleyDbHashReader.TryReadValue(
+								path,
+								key,
+								out byte[] actual,
+								maximumItemSize: 2
+							)
+						);
+						Assert.Equal( expected, actual );
+					}
+				}
+			);
+
+			AssertFileCanBeOpenedExclusively( path );
+		} finally {
+			File.Delete( path );
+		}
+	}
+
+	private static void AssertFileCanBeOpenedExclusively( string path ) {
+		using FileStream reopened = new FileStream(
+			path,
+			FileMode.Open,
+			FileAccess.ReadWrite,
+			FileShare.None
+		);
+		Assert.True( reopened.CanWrite );
+	}
+
 	private static void AssertInvalidDatabase(
 		byte[] database,
 		byte[] key
