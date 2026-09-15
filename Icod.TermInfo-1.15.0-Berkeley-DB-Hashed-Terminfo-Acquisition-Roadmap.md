@@ -6,8 +6,8 @@
 **Optional package:** `Icod.TermInfo.BerkeleyDb`  
 **Language:** C# 13  
 **Reusable target frameworks:** `net8.0`; `net9.0`; `net10.0`  
-**Status:** HDB00 and HDB01 accepted; HDB02 internal reader in progress  
-**Current coordinated prerelease:** `1.15.0-Alpha-2`
+**Status:** HDB00–HDB02 accepted; HDB03 explicit provider in progress  
+**Current coordinated prerelease:** `1.15.0-Alpha-3`
 
 ---
 
@@ -711,6 +711,11 @@ The HDB00 exploratory managed probe is not copied blindly into production.
 Production code is re-established from tests and reviewed package conventions.
 
 ### HDB03 — Explicit Hashed Terminal Provider
+
+**Status:** IN PROGRESS (`1.15.0-Alpha-3`)
+
+First checkpoint: bounded internal ncurses record resolution over one acquired image.
+Plan and progress: `docs/superpowers/plans/2026-09-15-hdb03-record-resolution.md`.
 
 Freeze the first reviewed public acquisition API.
 

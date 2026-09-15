@@ -80,6 +80,27 @@ public sealed class NativeOracleTests {
 		);
 	}
 
+	[Theory]
+	[InlineData( "hashed-db", "hdb00-primary", "hdb00-primary.bin" )]
+	[InlineData( "hashed-db", "hdb00-alias", "hdb00-primary.bin" )]
+	[InlineData( "overflow-hashed-db", "hdb00-overflow", "hdb00-overflow.bin" )]
+	public void ProductionRecordResolverMatchesNativeCompiledEntry(
+		string fixtureName,
+		string terminalName,
+		string expectedFile
+	) {
+		byte[] expected = File.ReadAllBytes( FixturePath( expectedFile ) );
+		Assert.NotEmpty( expected );
+
+		Assert.True( NcursesRecordReader.TryReadCompiledEntry(
+			FixturePath( fixtureName + ".db" ),
+			Encoding.UTF8.GetBytes( terminalName ),
+			out byte[] actual
+		) );
+
+		Assert.Equal( expected, actual );
+	}
+
 	private static List<( byte[] Key, byte[] Value )> ReadNativeRecords( string fixtureName ) {
 		string[] lines = File.ReadAllLines( FixturePath( fixtureName + ".dump" ) );
 		int headerEnd = Array.IndexOf( lines, "HEADER=END" );
