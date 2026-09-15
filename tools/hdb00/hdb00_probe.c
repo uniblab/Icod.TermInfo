@@ -9,6 +9,9 @@
  * authoritative.
  */
 
+#define _DEFAULT_SOURCE 1
+#include <sys/types.h>
+
 #include <db.h>
 #include <errno.h>
 #include <stdint.h>
