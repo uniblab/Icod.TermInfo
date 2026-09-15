@@ -237,7 +237,11 @@ internal static class BerkeleyDbHashReader {
 			);
 		}
 
-		ushort freeOffset = ReadUInt16( page, 22, isBigEndian );
+		int freeOffset = ReadUInt16( page, 22, isBigEndian );
+		if ( pageSize == 64 * 1024 && entryCount == 0 && freeOffset == 0 ) {
+			// P_INIT stores the empty page size in a 16-bit db_indx_t.
+			freeOffset = pageSize;
+		}
 		if ( freeOffset < tableEnd || freeOffset > pageSize ) {
 			throw new InvalidDataException(
 				$"Invalid Berkeley DB hash-page free offset {freeOffset}."
