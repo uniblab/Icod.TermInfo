@@ -6,7 +6,7 @@
 **Optional compiler package:** `Icod.TermInfo.Compiler`  
 **Optional inspection package:** `Icod.TermInfo.Inspection`  
 **Optional termcap package:** `Icod.TermInfo.Termcap`  
-**Planned optional hashed-store package:** `Icod.TermInfo.BerkeleyDb`  
+**Optional hashed-store package:** `Icod.TermInfo.BerkeleyDb`  
 **Installable tool package:** `Icod.TermInfo.Tools`  
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`  
@@ -18,7 +18,7 @@
 **Active release roadmap:** `Icod.TermInfo-1.15.0-Berkeley-DB-Hashed-Terminfo-Acquisition-Roadmap.md`  
 **Release audit:** `docs/1.14.0-RELEASE-AUDIT.md`  
 **Latest completed release audit:** `docs/1.14.0-RELEASE-AUDIT.md`  
-**Next implementation gate:** HDB00 interoperability research and backend decision
+**Next implementation gate:** HDB01 optional package foundation and Alpha-1 qualification
 
 ---
 
@@ -45,14 +45,14 @@ enlarging Runtime. Optional layers and the command distribution remain separate:
                                         ^
                                         |
                            Icod.TermInfo.BerkeleyDb
-                           planned optional provider
+                             optional provider
 ```
 
 The arrows are production dependency arrows. `Icod.TermInfo` remains
 dependency-free. Source and Termcap depend on Runtime; Compiler and Inspection
-depend on Runtime and Source. The planned Berkeley DB package depends downward on
-Runtime and must not introduce a reverse Runtime dependency. Runtime never depends
-upward on optional layers.
+depend on Runtime and Source. The Berkeley DB package depends downward on Runtime
+and must not introduce a reverse Runtime dependency. Runtime never depends upward
+on optional layers.
 
 Live-terminal state, probing, input decoding, PTYs, curses presentation, graphics
 protocol execution, terminal-side raster identities, and terminal emulation remain
@@ -90,7 +90,7 @@ version-specific roadmap.
 | **1.12.0** | Advanced raster placement | Source-rectangle and signed-z-order evidence/planning, JSON v4 |
 | **1.13.0** | Runtime evidence interchange | Caller-owned runtime observations/integration and replanning, JSON v5 |
 | **1.14.0** | Raster backend selection | Backend availability evidence/classification, candidate evaluation, explicit preference selection, JSON v6 |
-| **1.15.0** | Berkeley DB / hashed terminfo acquisition | Optional read-only hashed-store provider retrieves compiled entry bytes and delegates semantic parsing to existing Runtime |
+| **1.15.0** | Berkeley DB / hashed terminfo acquisition | Optional pure-managed read-only Hash-v9 acquisition recovers compiled entry bytes and delegates semantic parsing to existing Runtime |
 | **later** | Explicitly planned deferred work | Hashed-store writing, additional backends, richer graphics policy, historical formats, or other justified tracks |
 
 ### 2.1 Active 1.15 line
@@ -98,10 +98,14 @@ version-specific roadmap.
 Version 1.15 is governed by
 `Icod.TermInfo-1.15.0-Berkeley-DB-Hashed-Terminfo-Acquisition-Roadmap.md`.
 
-The release is acquisition-first and read-only. Its north-star data flow is:
+The release is acquisition-first and read-only. Its accepted north-star data flow
+is:
 
 ```text
 Berkeley DB / hashed store
+          |
+          v
+managed Hash-v9 reader
           |
           v
 optional hashed-store provider
@@ -116,15 +120,21 @@ existing Icod.TermInfo parser
 TerminalDescription
 ```
 
-No production Berkeley DB API is frozen before HDB00 demonstrates the exact
-interoperability boundary against an authoritative ncurses-generated hashed
-store. `Icod.TermInfo` remains dependency-free; the planned optional provider
-package must depend downward on Runtime rather than introducing Berkeley DB into
-the frozen core package.
+HDB00 is complete and accepted. Its Linux/macOS native-oracle and Windows
+managed-only experiments established that production 1.15 can read the required
+ncurses Berkeley DB Hash-v9 subset without an installed or bundled Berkeley DB
+runtime. Native Berkeley DB remains a development/CI fixture producer and
+differential oracle only.
+
+`Icod.TermInfo` remains dependency-free. `Icod.TermInfo.BerkeleyDb` depends
+downward on Runtime, ships no native Berkeley DB binaries, and does not expose a
+general-purpose database API. HDB01 establishes the optional package boundary;
+HDB02 productionizes the internal managed reader; HDB03 is the first tranche
+allowed to freeze the public provider API.
 
 1.15 deliberately excludes hashed-store writing, `tic` hashed publication,
-database migration, general-purpose Berkeley DB APIs, and bundled contemporary
-Oracle Berkeley DB binaries.
+database migration, general-purpose Berkeley DB APIs, and bundled Oracle Berkeley
+DB binaries.
 
 ---
 
@@ -276,14 +286,16 @@ have a production dependency on `Icod.Terminal`.
 Owns optional bounded termcap parsing, mapping/classification, `tc=` resolution,
 Runtime conversion, reverse rendering, and explicit acquisition.
 
-### Planned `Icod.TermInfo.BerkeleyDb`
+### `Icod.TermInfo.BerkeleyDb`
 
-Owns optional read-only access to supported ncurses-compatible Berkeley DB /
-hashed terminfo stores. Its responsibility ends after obtaining bounded opaque
-compiled-entry bytes; `CompiledTermInfoParser` remains the only owner of compiled
-terminfo semantics. The package must not become a general-purpose Berkeley DB
-API and must not introduce a production dependency from Runtime back to the
-optional package.
+Owns optional pure-managed read-only access to the reviewed ncurses-compatible
+Berkeley DB Hash-v9 storage subset. Its responsibility ends after obtaining
+bounded opaque compiled-entry bytes; `CompiledTermInfoParser` remains the only
+owner of compiled terminfo semantics.
+
+The package does not load or redistribute Berkeley DB in production, does not
+become a general-purpose Berkeley DB API, and does not introduce a production
+dependency from Runtime back to the optional package.
 
 ### Command layer
 
@@ -340,10 +352,9 @@ require a future design/roadmap before implementation:
 - divergent historical vendor binary formats; and
 - any migration of live-session/protocol execution into TermInfo.
 
-The 1.15 HDB00 research gate may reject or narrow a proposed backend approach if
-real interoperability, ABI, licensing, or cross-platform evidence does not
-support it. That evidence-driven narrowing is part of the roadmap rather than a
-failure to follow it.
+Any future expansion beyond the HDB00-selected managed Hash-v9 read-only subset
+must be driven by authoritative interoperability evidence and API-regret analysis,
+not inferred automatically from Berkeley DB's broader feature set.
 
 ---
 
@@ -381,7 +392,10 @@ The active line is documented by:
 
 ```text
 Icod.TermInfo-1.15.0-Berkeley-DB-Hashed-Terminfo-Acquisition-Roadmap.md
+docs/1.15.0-HDB00-BERKELEY-DB-INTEROPERABILITY-AND-BACKEND-DECISION.md
+docs/1.15.0-BERKELEY-DB-ECOSYSTEM-AUDIT.md
 ```
 
-HDB00 is responsible for creating the first 1.15 evidence/design records before
-any production Berkeley DB provider API is frozen.
+HDB00 is complete and accepted. HDB01 is responsible for the optional
+`Icod.TermInfo.BerkeleyDb` package/test/package-verification foundation before
+HDB02 begins production managed Hash-v9 reader implementation.
