@@ -606,9 +606,10 @@ internal static class Program {
 				offset,
 				sizeof( ushort )
 			);
-		return bigEndian
+		return ( bigEndian )
 			? BinaryPrimitives.ReadUInt16BigEndian( value )
-			: BinaryPrimitives.ReadUInt16LittleEndian( value );
+			: BinaryPrimitives.ReadUInt16LittleEndian( value )
+		;
 	}
 
 	private static uint ReadUInt32(
@@ -621,9 +622,10 @@ internal static class Program {
 				offset,
 				sizeof( uint )
 			);
-		return bigEndian
+		return ( bigEndian )
 			? BinaryPrimitives.ReadUInt32BigEndian( value )
-			: BinaryPrimitives.ReadUInt32LittleEndian( value );
+			: BinaryPrimitives.ReadUInt32LittleEndian( value )
+		;
 	}
 
 	private readonly record struct DatabaseMetadata(
