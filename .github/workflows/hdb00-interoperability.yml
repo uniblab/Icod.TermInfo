@@ -1,0 +1,42 @@
+name: hdb00-interoperability
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/hdb00-interoperability.yml'
+      - 'tools/hdb00/**'
+      - 'samples/Icod.TermInfo.Acquisition.Sample/**'
+      - 'Icod.TermInfo.csproj'
+      - 'src/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linux-berkeley-db-5-3:
+    name: Linux / Berkeley DB 5.3 / ncurses hashed store
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+            10.0.x
+
+      - name: Install Berkeley DB development tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes libdb5.3-dev db5.3-util
+
+      - name: Run HDB00 interoperability probe
+        shell: bash
+        run: bash tools/hdb00/run-linux.sh
