@@ -7,12 +7,11 @@
 
 `Icod.TermInfo` is a managed, dependency-free .NET implementation of the low-level terminal-capability model traditionally supplied by `libtinfo`.
 
-Version `1.13.0` is the validated coordinated stable release candidate. It
-promotes the persistent-raster runtime-evidence interchange surface without
-changing feature semantics, public API, schemas, dependencies, target frameworks,
-command behavior, package-consumer topology, or archive RIDs. Stable `1.12.0`
-remains the published release until PR #43 is merged and the normal tag-based
-publication flow is performed.
+Version `1.14.0` is the coordinated stable release candidate on PR #44. It adds
+raster-backend availability evidence, deterministic candidate evaluation, and
+explicit preference-aware backend selection above the frozen 1.11 lifecycle,
+1.12 placement, and 1.13 runtime-integration contracts. Publication remains
+gated by merge to `main` and the normal immutable-tag release workflow.
 
 ## Support the Project
 
@@ -22,7 +21,41 @@ publication flow is performed.
 [![Ko-fi](https://img.shields.io/badge/Ko--fi-Support?logo=kofi)](https://ko-fi.com/TimothyBruce)
 [![PayPal](https://img.shields.io/badge/PayPal-Support?logo=paypal)](https://paypal.me/uniblab)
 
-## 1.13 release-ready status
+## 1.14 release status
+
+Version `1.14.0` promotes the validated `1.14.0-Alpha-8` contract without
+changing feature semantics, public API, JSON schemas, production dependencies,
+target frameworks, command behavior, package-consumer topology, or archive RIDs.
+The additive `Icod.TermInfo.Inspection` layer now models Sixel and Kitty Graphics
+backend availability independently from persistent-raster lifecycle and placement
+truth, evaluates candidates by delegating to the frozen planners, and performs
+caller-preference-aware selection without terminal-name heuristics or hidden
+backend ranking. With no explicit preference and multiple viable candidates, the
+planner returns `RequiresPreference` rather than selecting by enum or input order.
+
+The complete 1.14 Inspection surface contains **106 exported public types** with
+normalized-LF SHA-256
+`e9f240a562aec5274d64fb2ec3647862fe4ef5684582af2b442ba3c55e189497`.
+JSON versions 1 through 5 remain frozen; version 6 adds exactly
+`rasterBackendProfile` and `rasterBackendSelectionPlan` and has normalized-LF
+SHA-256 `9d51ec6659f8978c867408881eefb106f3c4976dfcf2da12b23c374a222665c2`.
+Production `Icod.TermInfo.Inspection` still has no `Icod.Terminal` dependency.
+The package-only RB07 qualification remains pinned to published
+`Icod.Terminal 1.13.0`.
+
+The Alpha-8 contract was accepted on exact head
+`911e8d44428a26b588193a27e07696c2489bcb93` by workflow #924 / run
+`34903967732`, with all 12 jobs green. Stable `1.14.0` promotion is being
+validated independently before PR #44 is marked release-ready. See
+`docs/1.14.0-RASTER-BACKEND-SELECTION-GUIDE.md`,
+`docs/1.14.0-INSPECTION-PUBLIC-API-FREEZE.md`, and
+`docs/1.14.0-RELEASE-AUDIT.md`.
+
+The package family targets `net8.0`, `net9.0`, and `net10.0`; packages use C# 13,
+contain no native ncurses/terminfo payload, and are intended to run on Windows,
+Linux, and macOS.
+
+## 1.13 release status
 
 Version `1.13.0` promotes the fully validated `1.13.0-Alpha-8` contract
 without feature, public API, schema, dependency, target-framework,
@@ -40,24 +73,18 @@ normalized-LF SHA-256
 JSON versions 1 through 4 remain unchanged; version 5 contains exactly
 `persistentRasterRuntimeObservationSet` and
 `persistentRasterRuntimeIntegration`. Production `Icod.TermInfo.Inspection`
-still has no `Icod.Terminal` dependency. Downstream qualification remains pinned
-to published `Icod.Terminal 1.12.0`.
+still has no `Icod.Terminal` dependency. Downstream qualification was pinned to
+published `Icod.Terminal 1.12.0`.
 
 The Alpha-8 contract was accepted on exact product head
 `f236c33d8239e80379bf8cf0f1123abd6c93c3cb` by qualification run `34797445315`.
 Stable product head `6e9217b16c3023fb10fa34dbaa74afe48448d858` then passed qualification run
 `34799272472` with all 12 jobs green, including Windows whole-surface/historical
 Inspection compatibility, package verification, three installed-tool smokes, and
-all six archive RIDs. PR #43 remains unmerged; tag and package publication remain
-gated by the normal release workflow. The install commands below target
-`1.13.0`. See
+all six archive RIDs. See
 `docs/1.13.0-PERSISTENT-RASTER-RUNTIME-EVIDENCE-GUIDE.md`,
 `docs/1.13.0-INSPECTION-PUBLIC-API-FREEZE.md`, and
 `docs/1.13.0-RELEASE-AUDIT.md`.
-
-The package family targets `net8.0`, `net9.0`, and `net10.0`; packages use C# 13,
-contain no native ncurses/terminfo payload, and are intended to run on Windows,
-Linux, and macOS.
 
 ## 1.12 release status
 
@@ -147,35 +174,35 @@ The final post-documentation Staging gate is green (`33736812176`, head
 Runtime-only consumers use:
 
 ```text
-dotnet add package Icod.TermInfo --version 1.13.0
+dotnet add package Icod.TermInfo --version 1.14.0
 ```
 
 Applications which need terminfo source-language support use:
 
 ```text
-dotnet add package Icod.TermInfo.Source --version 1.13.0
+dotnet add package Icod.TermInfo.Source --version 1.14.0
 ```
 
 Applications which need opt-in termcap parsing, conversion, rendering, or
 explicit historical termcap acquisition use:
 
 ```text
-dotnet add package Icod.TermInfo.Termcap --version 1.13.0
+dotnet add package Icod.TermInfo.Termcap --version 1.14.0
 ```
 
 Applications which compile terminfo source or write conventional compiled
 terminfo databases use:
 
 ```text
-dotnet add package Icod.TermInfo.Compiler --version 1.13.0
+dotnet add package Icod.TermInfo.Compiler --version 1.14.0
 ```
 
 Applications which need canonical rendering, semantic comparison, provider-aware
 inspection, database-set automation, persistent-raster lifecycle/placement
-planning, or 1.13 runtime-evidence interchange and integration use:
+planning, 1.13 runtime-evidence integration, or 1.14 backend selection use:
 
 ```text
-dotnet add package Icod.TermInfo.Inspection --version 1.13.0
+dotnet add package Icod.TermInfo.Inspection --version 1.14.0
 ```
 
 `Icod.TermInfo.Source` and `Icod.TermInfo.Termcap` each depend on the matching
@@ -187,8 +214,8 @@ Inspection does not depend on Compiler, Termcap, `Icod.Terminal`, or
 
 The same validated package artifacts are published to NuGet.org and GitHub
 Packages. Historical release contracts remain recorded in the versioned release
-audits; the 1.13 promotion and release contract is recorded in
-`docs/1.13.0-RELEASE-AUDIT.md`.
+audits; the 1.14 promotion and release contract is recorded in
+`docs/1.14.0-RELEASE-AUDIT.md`.
 
 ## Tool Suite
 
@@ -215,7 +242,7 @@ distribution-only router package.
 Install the coordinated router as a .NET tool with:
 
 ```text
-dotnet tool install --global Icod.TermInfo.Tools --version 1.13.0
+dotnet tool install --global Icod.TermInfo.Tools --version 1.14.0
 
 icod-terminfo tic -V
 icod-terminfo infocmp -V
@@ -240,7 +267,7 @@ Icod.TermInfo.Tools.<version>.osx-x64.tar.gz
 Icod.TermInfo.Tools.<version>.osx-arm64.tar.gz
 ```
 
-Each 1.13.0 archive contains the traditional `tic`, `infocmp`, `toe`,
+Each 1.14.0 archive contains the traditional `tic`, `infocmp`, `toe`,
 `captoinfo`, and `infotocap` command names and their required managed
 dependencies. The user supplies the .NET 10 runtime and controls where the
 archive is unpacked and whether that location is placed on `PATH`. The archive
@@ -260,7 +287,7 @@ remains unsigned. The frozen 1.0 and 1.1 releases support `net8.0` and
 target-framework policy are documented in `docs/VERSIONING.md` and
 `docs/COMPATIBILITY.md`.
 
-The runtime 1.0 public API remains frozen. Version 1.1 adds source-language functionality in the separate `Icod.TermInfo.Source` package rather than making the runtime package depend on parser/front-end code. The 1.2 line adds deterministic compiled-entry writing in the separate `Icod.TermInfo.Compiler` package. The 1.3 line adds canonical rendering and semantic comparison in the separate `Icod.TermInfo.Inspection` package. The 1.4 line composes those libraries into the separate `tic`, `infocmp`, and `toe` command layer without moving command policy into the reusable packages. Live terminal sessions, input decoding, and active probing belong to the sibling `Icod.Terminal` layer; curses-style screen/window behavior belongs to `Icod.DCurses`. Version 1.11 adds protocol-neutral persistent-raster lifecycle evidence and planning to Inspection while preserving that live-session ownership boundary. Version 1.12 adds protocol-neutral source-rectangle and signed-z-order placement semantics and planning while keeping concrete execution values and live protocol work downstream. Version 1.13 adds protocol-neutral caller-owned runtime observations, deterministic integration into existing verified evidence, and runtime-evidence audit JSON while keeping live verification downstream. PTYs, terminal emulation, and graphics protocol execution remain separate later or sibling work.
+The runtime 1.0 public API remains frozen. Version 1.1 adds source-language functionality in the separate `Icod.TermInfo.Source` package rather than making the runtime package depend on parser/front-end code. The 1.2 line adds deterministic compiled-entry writing in the separate `Icod.TermInfo.Compiler` package. The 1.3 line adds canonical rendering and semantic comparison in the separate `Icod.TermInfo.Inspection` package. The 1.4 line composes those libraries into the separate `tic`, `infocmp`, and `toe` command layer without moving command policy into the reusable packages. Live terminal sessions, input decoding, and active probing belong to the sibling `Icod.Terminal` layer; curses-style screen/window behavior belongs to `Icod.DCurses`. Version 1.11 adds protocol-neutral persistent-raster lifecycle evidence and planning to Inspection while preserving that live-session ownership boundary. Version 1.12 adds protocol-neutral source-rectangle and signed-z-order placement semantics and planning while keeping concrete execution values and live protocol work downstream. Version 1.13 adds protocol-neutral caller-owned runtime observations, deterministic integration into existing verified evidence, and runtime-evidence audit JSON while keeping live verification downstream. Version 1.14 adds concrete raster-backend availability evidence and deterministic caller-preference-aware selection while still leaving probing, protocol execution, resource identity, and presentation lifecycle downstream. PTYs, terminal emulation, and graphics protocol execution remain separate later or sibling work.
 
 ## What 1.0 provides
 
@@ -623,6 +650,30 @@ TermInfo subjects. Those adapter decisions remain explicit consumer policy. See
 `samples/Icod.TermInfo.PersistentRasterRuntimeIntegration.Sample/README.md` and
 `docs/1.13.0-PERSISTENT-RASTER-RUNTIME-EVIDENCE-GUIDE.md`.
 
+## What 1.14 adds
+
+Version 1.14.0 adds advisory concrete raster-backend selection above the frozen
+persistent-raster semantic stack:
+
+- bounded `RasterBackend*` availability evidence and immutable backend profiles;
+- deterministic classification with `Verified > Declared > CapabilityDerived`
+  precedence;
+- conservative static Sixel inspection with no terminal-brand or profile-name
+  heuristic, while Kitty Graphics remains uninferred without caller evidence;
+- candidate evaluation that delegates lifecycle and placement truth to the
+  frozen 1.11 and 1.12 planners;
+- direct composition of backend profiles with backend-scoped frozen 1.13 runtime
+  integration results;
+- deterministic explicit-preference planning with no hidden ranking and an
+  explicit `RequiresPreference` result when multiple candidates remain viable;
+- additive JSON version 6 documents for `rasterBackendProfile` and
+  `rasterBackendSelectionPlan`; and
+- package-only qualification against published `Icod.Terminal 1.13.0` while
+  production Inspection remains free of a Terminal dependency.
+
+See `samples/Icod.TermInfo.RasterBackendSelection.Sample/README.md` and
+`docs/1.14.0-RASTER-BACKEND-SELECTION-GUIDE.md`.
+
 ## Getting started
 
 Terminal resolution remains explicit and conservative. A normal application can
@@ -655,9 +706,9 @@ To select a known modern profile explicitly:
 TerminalDescription xterm = TerminalDatabase.BuiltIn.Load("xterm");
 TerminalDescription xterm256 = TerminalDatabase.BuiltIn.Load("xterm-256color");
 TerminalDescription xtermDirect = TerminalDatabase.BuiltIn.Load("xterm-direct256");
-TerminalDescription winConsole = TerminalDatabase.BuiltIn.Load("winconsole");
-TerminalDescription windowsTerminal = TerminalDatabase.BuiltIn.Load("ms-terminal");
-TerminalDescription windowsTerminalDirect = TerminalDatabase.BuiltIn.Load("ms-terminal-direct");
+TerminalDescription winConsole = TerminalProfiles.WinConsole;
+TerminalDescription windowsTerminal = TerminalProfiles.MsTerminal;
+TerminalDescription windowsTerminalDirect = TerminalProfiles.MsTerminalDirect;
 ```
 
 Aliases remain exact and intentional. For example, `vt100-am` resolves to `vt100`, and `vt200` resolves to `vt220`. Windows identities are not aliases for ANSI or xterm.
@@ -1060,7 +1111,7 @@ The first provider which resolves the requested name wins.
 
 ## Sample applications
 
-The repository contains seven executable API samples plus one command-suite
+The repository contains eight executable API samples plus one command-suite
 walkthrough with deliberately different purposes.
 
 ### General terminal API sample
@@ -1081,7 +1132,7 @@ walkthrough with deliberately different purposes.
 - redirection handling and explicit Windows VT enablement;
 - a custom provider implementation.
 
-All seven executable API sample projects target `net8.0`, `net9.0`, and
+All eight executable API sample projects target `net8.0`, `net9.0`, and
 `net10.0`; `dotnet run` therefore needs an explicit framework. Run the ordinary
 demonstration with:
 
@@ -1159,7 +1210,7 @@ See `samples/Icod.TermInfo.Toolchain.Sample/README.md` for the complete flow.
 ### Multi-database Inspection sample
 
 `samples/Icod.TermInfo.DatabaseSet.Sample` is the focused 1.10 reusable-API
-example. It creates controlled conventional databases through the public
+example. It creates controlled compiled databases through the public
 Compiler API and exercises ordered `InspectSet(...)` construction, conclusive
 lookup precedence, semantic shadow and alias-collision analysis, set comparison,
 conflict-free multi-database parent planning, and all three version-2 JSON
@@ -1257,6 +1308,26 @@ Release verification executes the deterministic form on `net8.0`, `net9.0`, and
 `samples/Icod.TermInfo.PersistentRasterRuntimeIntegration.Sample/README.md` and
 `docs/1.13.0-PERSISTENT-RASTER-RUNTIME-EVIDENCE-GUIDE.md`.
 
+### Raster-backend selection sample
+
+`samples/Icod.TermInfo.RasterBackendSelection.Sample` is the focused 1.14
+consumer-adapter example. It keeps backend availability separate from lifecycle
+and placement evidence, composes backend-local 1.13 integration results into
+Sixel and Kitty Graphics candidates, plans with an explicit preference order,
+and renders the version-6 backend-selection audit. Its default mode is
+deterministic and CI-safe; `--live` uses the published
+`Icod.Terminal 1.13.0` semantic verification API while keeping result mapping in
+consumer code.
+
+Run the deterministic form with:
+
+```text
+dotnet run --project samples/Icod.TermInfo.RasterBackendSelection.Sample/Icod.TermInfo.RasterBackendSelection.Sample.csproj -f net10.0
+```
+
+See `samples/Icod.TermInfo.RasterBackendSelection.Sample/README.md` and
+`docs/1.14.0-RASTER-BACKEND-SELECTION-GUIDE.md`.
+
 ### Managed tool-suite walkthrough
 
 `samples/ToolSuite` is a data-and-command walkthrough for `tic`, `infocmp`, `toe`,
@@ -1277,19 +1348,20 @@ See `samples/README.md`, `samples/ToolSuite/README.md`,
 `samples/Icod.TermInfo.Toolchain.Sample/README.md`,
 `samples/Icod.TermInfo.PersistentRasterLifecycle.Sample/README.md`,
 `samples/Icod.TermInfo.PersistentRasterPlacement.Sample/README.md`,
-`samples/Icod.TermInfo.PersistentRasterRuntimeIntegration.Sample/README.md`, and
+`samples/Icod.TermInfo.PersistentRasterRuntimeIntegration.Sample/README.md`,
+`samples/Icod.TermInfo.RasterBackendSelection.Sample/README.md`, and
 `docs/0.9.0-ACQUISITION-GUIDE.md` for the complete examples.
 
 ## Project-family boundary
 
-`Icod.TermInfo` owns immutable terminal-description data, acquisition of that data, and pure transformations required to interpret, expand, and output terminal capabilities. `Icod.TermInfo.Source` owns optional source-language parsing and inheritance resolution, `Icod.TermInfo.Compiler` owns compiled output, `Icod.TermInfo.Inspection` owns canonical rendering, semantic comparison, database-set automation, protocol-neutral persistent-raster lifecycle and placement evidence/classification/planning, and versioned machine-readable views, and `Icod.TermInfo.Termcap` owns optional termcap interoperability. None of those packages owns a live terminal session, terminal graphics resource identity, a child pseudo-terminal, or a virtual screen.
+`Icod.TermInfo` owns immutable terminal-description data, acquisition of that data, and pure transformations required to interpret, expand, and output terminal capabilities. `Icod.TermInfo.Source` owns optional source-language parsing and inheritance resolution, `Icod.TermInfo.Compiler` owns compiled output, `Icod.TermInfo.Inspection` owns canonical rendering, semantic comparison, database-set automation, protocol-neutral persistent-raster lifecycle and placement evidence/classification/planning, raster-backend availability and selection planning, and versioned machine-readable views, and `Icod.TermInfo.Termcap` owns optional termcap interoperability. None of those packages owns a live terminal session, terminal graphics resource identity, a child pseudo-terminal, or a virtual screen.
 
 The intended family boundary is now explicit:
 
 - **`Icod.TermInfo`** — descriptions, compiled-database acquisition, capability semantics, parameter expansion, and output transformation;
 - **`Icod.TermInfo.Source`** — `.ti` lexical analysis, source diagnostics, unresolved entries, cancellation, `use=` inheritance, and materialization into `TerminalDescription`;
 - **`Icod.TermInfo.Compiler`** — deterministic compiled-entry writing, source compilation, and explicit conventional database-layout publication;
-- **`Icod.TermInfo.Inspection`** — canonical effective/source rendering, relative-source synthesis and parent planning, structured semantic comparison, provider/database-set inspection, persistent-raster lifecycle and advanced-placement evidence/classification/planning, protocol-neutral runtime-evidence interchange/integration, and versioned machine-readable views through JSON version 5;
+- **`Icod.TermInfo.Inspection`** — canonical effective/source rendering, relative-source synthesis and parent planning, structured semantic comparison, provider/database-set inspection, persistent-raster lifecycle and advanced-placement evidence/classification/planning, protocol-neutral runtime-evidence interchange/integration, raster-backend availability/selection planning, and versioned machine-readable views through JSON version 6;
 - **`Icod.TermInfo.Termcap`** — bounded termcap parsing, classification, `tc=` resolution, Runtime conversion, reverse rendering, and explicit termcap acquisition;
 - **`tic`, `infocmp`, `toe`, `captoinfo`, and `infotocap`** — managed command applications which compose the reusable libraries and own command-line policy;
 - **`Icod.TermInfo.Tools` / `icod-terminfo`** — distribution-only .NET tool router which dispatches to the five command applications;
@@ -1330,7 +1402,7 @@ emulation, or graphics protocol execution.
 See `docs/0.9.0-ACQUISITION-GUIDE.md` for the consumer-facing acquisition
 guide, `Icod.TermInfo-Development-Roadmap-0.9.0.md` for the detailed frozen
 tranche contract, `docs/0.9.0-CONTRACT-AUDIT.md` for the final completion
-evidence, `docs/0.9.0-T40-API-PACKAGE-FREEZE.md` for the release-candidate
+evidence, `docs/1.0.0-T44-DOCUMENTATION-PACKAGE-FREEZE.md` for the release-candidate
 API/package freeze.
 
 ## Build, test, and pack
@@ -1379,39 +1451,24 @@ bash .github/scripts/verify-release-package.sh artifacts Release
 Both wrappers retain the coordinated five-library release verifier: generated
 capability metadata, all five public-API baselines, net8/net9/net10 API
 equivalence, package/XML/symbol/dependency validation, isolated package-reference
-consumers including the 1.11 lifecycle consumer, the general sample's non-
-interactive `--describe-only` path, the deterministic reusable toolchain and
-lifecycle samples, and structural validation of the sixth registry package,
-`Icod.TermInfo.Tools`. The separate `smoke-tool-package.ps1` gate installs and
-executes that router package on each supported host family. Windows package
-validation does not require Bash or Python.
+consumers including the persistent-raster lifecycle, placement, runtime-evidence,
+and backend-selection paths, the general sample's non-interactive
+`--describe-only` path, deterministic reusable samples, and structural
+validation of the sixth registry package, `Icod.TermInfo.Tools`. The separate
+`smoke-tool-package.ps1` gate installs and executes that router package on each
+supported host family. Windows package validation does not require Bash or
+Python.
 
 Pull requests use Staging throughout and may upload verified package artifacts,
 but never publish. Pushes to `main` run the non-publishing Release validation
 matrix. Only an immutable `v*` tag matching the coordinated package version may
 start registry publication through `.github/workflows/release.yaml`.
 
-See `RELEASING.md` for the current release procedure,
-`Icod.TermInfo-1.4.0-Tool-Suite-Roadmap.md` for the frozen T01-T11 command
-semantic contract, `docs/1.5.0-RELEASE-AUDIT.md` for the published 1.5
-distribution/versioning gate,
-`docs/1.6.0-TC08-DIFFERENTIAL-VALIDATION-FUZZING-AND-FREEZE.md` for frozen 1.6
-pre-release closure evidence, `docs/1.6.0-RELEASE-AUDIT.md` for the published
-1.6.0 contract and post-publication record, and `docs/1.6.1-RELEASE-AUDIT.md`
-for the release-verifier isolation hotfix and 1.6.1 publication gate. The 1.7
-release contract is defined by
-`Icod.TermInfo 1.7.0 - Relative Terminfo Source Synthesis Roadmap.md`. The 1.8
-planning contract is defined by
-`Icod.TermInfo-1.8.0-Relative-Source-Planning-and-Parent-Selection-Roadmap.md`,
-and its publication gate is recorded in `docs/1.8.0-RELEASE-AUDIT.md`. The 1.9
-machine-readable Inspection contract is defined by
-`Icod.TermInfo-1.9.0-Machine-Readable-Inspection-and-Planning-Automation-Roadmap.md`,
-and its publication gate is recorded in `docs/1.9.0-RELEASE-AUDIT.md`. Version
-1.10 is defined by
-`Icod.TermInfo-1.10.0-Deterministic-Multi-Database-Inspection-Comparison-and-Planning-Automation-Roadmap.md`
-and `docs/1.10.0-RELEASE-AUDIT.md`; version 1.11 is defined by
-`Icod.TermInfo-1.11.0-Persistent-Raster-Lifecycle-Semantics-and-Planning-Roadmap.md`
-and `docs/1.11.0-RELEASE-AUDIT.md`.
+See `RELEASING.md` for the current release procedure and the versioned roadmap
+and release-audit documents for frozen historical contracts. Version 1.14 is
+defined by
+`Icod.TermInfo-1.14.0-Raster-Backend-Capability-Evidence-Selection-and-Planning-Roadmap.md`
+and `docs/1.14.0-RELEASE-AUDIT.md`.
 
 ## Scope
 
@@ -1420,20 +1477,11 @@ and `docs/1.11.0-RELEASE-AUDIT.md`.
 See `Icod.TermInfo-Development-Roadmap-0.9.0.md` for the frozen acquisition
 contract, `Icod.TermInfo-Development-Roadmap-1.0.0.md` for the 1.0 runtime
 stability contract, `Icod.TermInfo-Post-1.0-Development-Roadmap.md` for the
-post-1.0 package-family sequence, `Icod.TermInfo-1.3.0-Inspection-and-Comparison-Roadmap.md`
-for the 1.3 Inspection contract,
-`Icod.TermInfo-1.4.0-Tool-Suite-Roadmap.md` for the frozen 1.4 command contract,
-`docs/1.6.0-RELEASE-AUDIT.md` for the frozen 1.6.0 release contract,
-`docs/1.6.1-RELEASE-AUDIT.md` for the published patch-release contract,
-`Icod.TermInfo 1.7.0 - Relative Terminfo Source Synthesis Roadmap.md` and
-`docs/1.7.0-RELEASE-AUDIT.md` for the frozen 1.7 synthesis contract,
-`Icod.TermInfo-1.8.0-Relative-Source-Planning-and-Parent-Selection-Roadmap.md`
-and `docs/1.8.0-RELEASE-AUDIT.md` for the frozen 1.8 planning contract,
-`Icod.TermInfo-1.9.0-Machine-Readable-Inspection-and-Planning-Automation-Roadmap.md`
-and `docs/1.9.0-RELEASE-AUDIT.md` for the frozen 1.9 machine-readable contract,
-`docs/1.10.0-RELEASE-AUDIT.md` for the frozen multi-database automation
-contract, and `docs/1.11.0-RELEASE-AUDIT.md` for the current stable persistent-
-raster lifecycle contract. See `docs/VERSIONING.md` and
+post-1.0 package-family sequence, and the version-specific release audits for
+frozen contracts. The 1.14 contract is documented by
+`Icod.TermInfo-1.14.0-Raster-Backend-Capability-Evidence-Selection-and-Planning-Roadmap.md`,
+`docs/1.14.0-RASTER-BACKEND-SELECTION-GUIDE.md`, and
+`docs/1.14.0-RELEASE-AUDIT.md`. See `docs/VERSIONING.md` and
 `docs/COMPATIBILITY.md` for the 1.x promises.
 The 0.6.0 through 1.0.0 roadmaps remain historical frozen contracts.
 
