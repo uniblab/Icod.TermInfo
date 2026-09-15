@@ -22,3 +22,5 @@
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo( "Icod.TermInfo.BerkeleyDb.Tests" )]
+
+[assembly: InternalsVisibleTo( "Icod.TermInfo.BerkeleyDb.Interop.Tests" )]
