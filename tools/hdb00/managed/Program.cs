@@ -50,12 +50,18 @@ internal static class Program {
 				File.ReadAllBytes( args[0] );
 			DatabaseMetadata metadata =
 				ReadMetadata( database );
-
 			byte[] key =
 				Encoding.UTF8.GetBytes( args[1] );
 
 			for ( int hop = 1; hop <= MaximumNcursesHops; hop++ ) {
-				if ( !TryFindValue( database, metadata, key, out byte[]? value ) ) {
+				if (
+					!TryFindValue(
+						database,
+						metadata,
+						key,
+						out byte[]? value
+					)
+				) {
 					Console.Error.WriteLine(
 						$"Clean miss for '{args[1]}'."
 					);
@@ -69,13 +75,15 @@ internal static class Program {
 				}
 
 				switch ( value[0] ) {
-				{
 					case NcursesDataRecord:
 						byte[] compiled = value[1..];
 						File.WriteAllBytes( args[2], compiled );
 
 						( int dataRecords, int indexRecords ) =
-							CountNcursesRecords( database, metadata );
+							CountNcursesRecords(
+								database,
+								metadata
+							);
 
 						Console.WriteLine(
 							$"Berkeley DB Hash version: {metadata.Version}"
@@ -229,7 +237,11 @@ internal static class Program {
 		ReadOnlySpan<byte> requestedKey,
 		out byte[]? value
 	) {
-		for ( uint pageNumber = 1; pageNumber <= metadata.LastPageNumber; pageNumber++ ) {
+		for (
+			uint pageNumber = 1;
+			pageNumber <= metadata.LastPageNumber;
+			pageNumber++
+		) {
 			ReadOnlySpan<byte> page =
 				GetPage( database, metadata, pageNumber );
 
@@ -238,14 +250,11 @@ internal static class Program {
 			}
 
 			ushort entryCount =
-				ReadUInt16( page, 20, metadata.BigEndian );
-			if ( ( entryCount & 1 ) != 0 ) {
-				throw new InvalidDataException(
-					$"Hash page {pageNumber} has an odd item count {entryCount}."
+				GetHashEntryCount(
+					page,
+					metadata,
+					pageNumber
 				);
-			}
-
-			ValidateIndexTable( page, entryCount, metadata );
 
 			for ( int index = 0; index < entryCount; index += 2 ) {
 				byte[] key =
@@ -282,7 +291,11 @@ internal static class Program {
 		int dataRecords = 0;
 		int indexRecords = 0;
 
-		for ( uint pageNumber = 1; pageNumber <= metadata.LastPageNumber; pageNumber++ ) {
+		for (
+			uint pageNumber = 1;
+			pageNumber <= metadata.LastPageNumber;
+			pageNumber++
+		) {
 			ReadOnlySpan<byte> page =
 				GetPage( database, metadata, pageNumber );
 
@@ -291,14 +304,11 @@ internal static class Program {
 			}
 
 			ushort entryCount =
-				ReadUInt16( page, 20, metadata.BigEndian );
-			if ( ( entryCount & 1 ) != 0 ) {
-				throw new InvalidDataException(
-					$"Hash page {pageNumber} has an odd item count {entryCount}."
+				GetHashEntryCount(
+					page,
+					metadata,
+					pageNumber
 				);
-			}
-
-			ValidateIndexTable( page, entryCount, metadata );
 
 			for ( int index = 1; index < entryCount; index += 2 ) {
 				byte[] record =
@@ -316,13 +326,14 @@ internal static class Program {
 				}
 
 				switch ( record[0] ) {
-				{
 					case NcursesDataRecord:
 						dataRecords++;
 						break;
+
 					case NcursesIndexRecord:
 						indexRecords++;
 						break;
+
 					default:
 						throw new InvalidDataException(
 							$"Hash page {pageNumber} contains unknown ncurses record marker {record[0]}."
@@ -332,6 +343,32 @@ internal static class Program {
 		}
 
 		return ( dataRecords, indexRecords );
+	}
+
+	private static ushort GetHashEntryCount(
+		ReadOnlySpan<byte> page,
+		DatabaseMetadata metadata,
+		uint pageNumber
+	) {
+		ushort entryCount =
+			ReadUInt16(
+				page,
+				20,
+				metadata.BigEndian
+			);
+
+		if ( ( entryCount & 1 ) != 0 ) {
+			throw new InvalidDataException(
+				$"Hash page {pageNumber} has an odd item count {entryCount}."
+			);
+		}
+
+		ValidateIndexTable(
+			page,
+			entryCount,
+			metadata
+		);
+		return entryCount;
 	}
 
 	private static void ValidateIndexTable(
@@ -348,8 +385,15 @@ internal static class Program {
 		}
 
 		ushort freeOffset =
-			ReadUInt16( page, 22, metadata.BigEndian );
-		if ( freeOffset < tableEnd || freeOffset > metadata.PageSize ) {
+			ReadUInt16(
+				page,
+				22,
+				metadata.BigEndian
+			);
+		if (
+			freeOffset < tableEnd
+			|| freeOffset > metadata.PageSize
+		) {
 			throw new InvalidDataException(
 				$"Invalid Berkeley DB hash-page free offset {freeOffset}."
 			);
@@ -408,10 +452,12 @@ internal static class Program {
 		}
 
 		byte itemType = page[offset];
-		switch ( itemType )
-		{
+		switch ( itemType ) {
 			case HashKeyData:
-				return page.Slice( offset + 1, itemLength - 1 ).ToArray();
+				return page.Slice(
+					offset + 1,
+					itemLength - 1
+				).ToArray();
 
 			case HashOffPage:
 				if ( itemLength < 12 ) {
@@ -421,9 +467,17 @@ internal static class Program {
 				}
 
 				uint overflowPage =
-					ReadUInt32( page, offset + 4, metadata.BigEndian );
+					ReadUInt32(
+						page,
+						offset + 4,
+						metadata.BigEndian
+					);
 				uint totalLength =
-					ReadUInt32( page, offset + 8, metadata.BigEndian );
+					ReadUInt32(
+						page,
+						offset + 8,
+						metadata.BigEndian
+					);
 				return ReadOverflow(
 					database,
 					metadata,
@@ -444,7 +498,10 @@ internal static class Program {
 		uint firstPage,
 		uint totalLength
 	) {
-		if ( totalLength > int.MaxValue || totalLength > database.Length ) {
+		if (
+			totalLength > int.MaxValue
+			|| totalLength > database.Length
+		) {
 			throw new InvalidDataException(
 				$"Invalid Berkeley DB overflow length {totalLength}."
 			);
@@ -464,7 +521,11 @@ internal static class Program {
 			}
 
 			ReadOnlySpan<byte> page =
-				GetPage( database, metadata, pageNumber );
+				GetPage(
+					database,
+					metadata,
+					pageNumber
+				);
 			if ( page[25] != OverflowPage ) {
 				throw new InvalidDataException(
 					$"Expected overflow page {pageNumber}, found page type {page[25]}."
@@ -472,7 +533,11 @@ internal static class Program {
 			}
 
 			ushort chunkLength =
-				ReadUInt16( page, 22, metadata.BigEndian );
+				ReadUInt16(
+					page,
+					22,
+					metadata.BigEndian
+				);
 			if (
 				chunkLength > metadata.PageSize - PageHeaderSize
 				|| written > result.Length - chunkLength
@@ -482,12 +547,19 @@ internal static class Program {
 				);
 			}
 
-			page.Slice( PageHeaderSize, chunkLength ).CopyTo(
+			page.Slice(
+				PageHeaderSize,
+				chunkLength
+			).CopyTo(
 				result.AsSpan( written )
 			);
 			written += chunkLength;
 			pageNumber =
-				ReadUInt32( page, 16, metadata.BigEndian );
+				ReadUInt32(
+					page,
+					16,
+					metadata.BigEndian
+				);
 		}
 
 		if ( written != result.Length ) {
@@ -530,7 +602,10 @@ internal static class Program {
 		bool bigEndian
 	) {
 		ReadOnlySpan<byte> value =
-			bytes.Slice( offset, sizeof( ushort ) );
+			bytes.Slice(
+				offset,
+				sizeof( ushort )
+			);
 		return bigEndian
 			? BinaryPrimitives.ReadUInt16BigEndian( value )
 			: BinaryPrimitives.ReadUInt16LittleEndian( value );
@@ -542,7 +617,10 @@ internal static class Program {
 		bool bigEndian
 	) {
 		ReadOnlySpan<byte> value =
-			bytes.Slice( offset, sizeof( uint ) );
+			bytes.Slice(
+				offset,
+				sizeof( uint )
+			);
 		return bigEndian
 			? BinaryPrimitives.ReadUInt32BigEndian( value )
 			: BinaryPrimitives.ReadUInt32LittleEndian( value );
