@@ -49,19 +49,24 @@ resolution semantics:
 ```csharp
 using Icod.TermInfo.Compiler;
 
-TermInfoCompilationResult result = TermInfoCompiler.Compile(
+TermInfoSourceCompilationResult result = TermInfoSourceCompiler.Compile(
 	source,
-	"example-child"
+	"example.ti"
 );
 
-if ( result.Succeeded ) {
-	byte[] compiled = result.Bytes;
-	Console.WriteLine( $"Compiled {compiled.Length} bytes." );
+if ( !result.HasErrors ) {
+	foreach ( CompiledTermInfoSourceEntry entry in result.Entries ) {
+		byte[] compiled = entry.Data;
+		Console.WriteLine(
+			$"{entry.CanonicalName}: {compiled.Length} compiled bytes"
+		);
+	}
 }
 ```
 
-Use the public overloads appropriate to the caller's source/document or resolved
-`TerminalDescription`; diagnostics and representation failures remain explicit.
+`TermInfoSourceCompilationResult.Diagnostics` preserves Source parser/resolver
+diagnostics. Each `CompiledTermInfoSourceEntry.Data` access returns an independent
+copy of that entry's complete compiled bytes.
 
 ## Database publication
 
