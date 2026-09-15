@@ -126,6 +126,18 @@ internal static class BerkeleyDbHashReader {
 			4096,
 			FileOptions.SequentialScan
 		);
+		return ReadDatabase( stream, maximumDatabaseSize );
+	}
+
+	// Borrows a readable, length-reporting stream positioned at byte zero.
+	// The path wrapper supplies a fresh FileStream and retains sole ownership.
+	internal static byte[] ReadDatabase(
+		Stream stream,
+		int maximumDatabaseSize
+	) {
+		ArgumentNullException.ThrowIfNull( stream );
+		ArgumentOutOfRangeException.ThrowIfNegativeOrZero( maximumDatabaseSize );
+
 		long length = stream.Length;
 		if ( length > maximumDatabaseSize || length > Array.MaxLength ) {
 			throw new InvalidDataException(
