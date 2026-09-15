@@ -73,6 +73,13 @@ Source owns parsing and inheritance resolution only. Compiled output belongs to
 `Icod.TermInfo.Compiler`; canonical rendering/comparison/planning belongs to
 `Icod.TermInfo.Inspection`; termcap syntax belongs to `Icod.TermInfo.Termcap`.
 
+## Historical release record
+
+Version `1.9.0` was the first coordinated line whose machine-readable Inspection
+release closure required package-facing documentation across the full suite. That
+historical marker is retained here for the corresponding release-closure gate; it
+does not change the current install version above.
+
 ## Compatibility
 
 The Source public contract was frozen at 1.1 and remains compatible throughout
