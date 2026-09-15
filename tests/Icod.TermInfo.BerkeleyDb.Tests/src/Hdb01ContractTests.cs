@@ -26,7 +26,7 @@ namespace Icod.TermInfo.BerkeleyDb.Tests;
 
 public sealed class Hdb01ContractTests {
 	[Fact]
-	public void PackageFoundationHasNoPublicApiYet() {
+	public void Hdb03ExportsOnlyTheReviewedProviderContract() {
 		string assemblyPath =
 			Path.Combine(
 				AppContext.BaseDirectory,
@@ -37,7 +37,17 @@ public sealed class Hdb01ContractTests {
 		Assembly assembly =
 			Assembly.LoadFrom( assemblyPath );
 
-		Assert.Empty( assembly.GetExportedTypes() );
+		Assert.Equal(
+			new[] {
+				"Icod.TermInfo.BerkeleyDb.BerkeleyDbDatabaseFormatException",
+				"Icod.TermInfo.BerkeleyDb.BerkeleyDbTerminalDescriptionProvider",
+				"Icod.TermInfo.BerkeleyDb.BerkeleyDbTerminalDescriptionProviderOptions",
+			},
+			assembly.GetExportedTypes()
+				.Select( type => type.FullName )
+				.OrderBy( name => name, StringComparer.Ordinal )
+				.ToArray()
+		);
 	}
 
 	[Fact]
