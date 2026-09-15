@@ -113,6 +113,24 @@ public sealed class Hdb01ContractTests {
 					"pull-request.yaml"
 				)
 			);
+		string mainWorkflow =
+			File.ReadAllText(
+				Path.Combine(
+					root,
+					".github",
+					"workflows",
+					"main.yaml"
+				)
+			);
+		string releaseWorkflow =
+			File.ReadAllText(
+				Path.Combine(
+					root,
+					".github",
+					"workflows",
+					"release.yaml"
+				)
+			);
 
 		Assert.Contains(
 			"<IcodTermInfoSuiteVersion>1.15.0-Alpha-1</IcodTermInfoSuiteVersion>",
@@ -132,6 +150,31 @@ public sealed class Hdb01ContractTests {
 		Assert.Contains(
 			"Icod.TermInfo.BerkeleyDb.Tests.csproj",
 			pullRequestWorkflow,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"Icod.TermInfo.BerkeleyDb.Tests.csproj",
+			mainWorkflow,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"Icod.TermInfo.BerkeleyDb.Tests.csproj",
+			releaseWorkflow,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"if (7 -ne $packages.Count)",
+			releaseWorkflow,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"if (19 -ne $files.Count)",
+			releaseWorkflow,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"if (20 -ne $assets.Count)",
+			releaseWorkflow,
 			StringComparison.Ordinal
 		);
 	}
