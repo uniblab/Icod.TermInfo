@@ -16,6 +16,7 @@
 **Latest completed prerelease:** `1.14.0-Alpha-8`  
 **Status:** stable `1.14.0` is merged; `1.15.0` Berkeley DB / hashed terminfo acquisition is the active development line  
 **Active release roadmap:** `Icod.TermInfo-1.15.0-Berkeley-DB-Hashed-Terminfo-Acquisition-Roadmap.md`  
+**Release audit:** `docs/1.14.0-RELEASE-AUDIT.md`  
 **Latest completed release audit:** `docs/1.14.0-RELEASE-AUDIT.md`  
 **Next implementation gate:** HDB00 interoperability research and backend decision
 
@@ -24,8 +25,8 @@
 ## 1. Purpose
 
 `Icod.TermInfo 1.0.0` froze the managed runtime foundation: immutable terminal
-descriptions, standard/extended capability metadata, compiled terminfo parsing,
-database discovery/provider composition, built-in profiles, parameter expansion,
+descriptions, standard/extended capability metadata/semantics, compiled terminfo
+parsing and conventional acquisition, provider composition, parameter expansion,
 padding-aware output, color semantics, and stable reusable assembly identity.
 
 Post-1.0 development builds outward from that foundation rather than repeatedly
