@@ -82,7 +82,7 @@ NotImplementedException; it implements no envelope behavior.
   dangling links, file/item bounds, argument validation, I/O retry, and file ownership.
 - [x] Add three direct production-resolution comparisons with native compiled files:
   hdb00-primary, hdb00-alias, and hdb00-overflow.
-- [ ] Commit tests plus the declaration and observe behavioral failure.
+- [x] Commit tests plus the declaration and observe behavioral failure.
 
 Representative assertion:
 
@@ -117,10 +117,10 @@ setup failures do not count as behavioral RED.
 Make existing `ReadDatabase(string databasePath, int maximumDatabaseSize)` internal.
 Both are used by production, with no testing callbacks or storage mocks.
 
-- [ ] Extract byte-array lookup without altering the validated Hash algorithm.
-- [ ] Validate resolver arguments before acquisition.
-- [ ] Read one image; track byte-content visited keys and followed index links.
-- [ ] Handle clean initial miss, marker 0, marker 2, and each malformed outcome
+- [x] Extract byte-array lookup without altering the validated Hash algorithm.
+- [x] Validate resolver arguments before acquisition.
+- [x] Read one image; track byte-content visited keys and followed index links.
+- [x] Handle clean initial miss, marker 0, marker 2, and each malformed outcome
   exactly as specified above.
 - [ ] Run the unchanged tests and require 196/196 unit cases and 9/9
   interoperability cases per TFM on all three hosts.
@@ -134,3 +134,34 @@ parser-limit enforcement and parser reuse, canonical/alias identity validation,
 successful-result caching, retryable misses/failures, concurrency, and package-only
 provider consumer validation remain required before HDB03 acceptance. HDB04 discovery
 and HDB05 enumeration are separate tranches.
+
+
+## Observed RED and implementation checkpoint
+
+Initial declaration/test head: `0c260fd71a770f7fd817cc9164b3cc81351921ea`.
+[HDB00 #80 / 35027878618](https://github.com/uniblab/Icod.TermInfo/actions/runs/35027878618)
+proved 3 failed / 6 passed per TFM on Linux and macOS, with the new resolver
+calls throwing NotImplementedException. The normal run stopped on multiline
+closing-parenthesis formatting in the new tests; it did not establish unit RED.
+
+Formatting-only correction: `b4fecd86ab123849693df08796056d311590dc77`.
+[PR #1052 / 35028232741](https://github.com/uniblab/Icod.TermInfo/actions/runs/35028232741)
+then proved behavioral RED on Linux across all TFMs: 31 failed / 165 passed,
+196 total. The new failures were the declaration's NotImplementedException.
+Assertions and fixtures were unchanged by the formatting correction.
+Production resolution was implemented only after this unit RED was observed.
+
+The implementation borrows the initial requested-key span without copying.
+After a key is found under the stored-item bound, an ordinal hexadecimal
+representation records its byte content for cycle detection. No key is decoded
+as text. Every Hash lookup receives the same acquired byte array; no later hop
+reopens the path. File ownership remains in the existing acquisition helper.
+
+Independent test/design review found no blocking issues. Cycle tests establish
+rejection but do not independently distinguish cycle detection from hop exhaustion;
+content-based tracking is additionally reviewed in source. One-image reuse is
+also source-reviewed, rather than claimed as an operating-system race test.
+
+GREEN qualification is pending for the implementation commit. Acceptance of this
+checkpoint requires exact-head 196/196 unit cases and 9/9 interoperability cases per
+TFM on Windows/Linux/macOS, all 15 CI jobs, and independent implementation review.

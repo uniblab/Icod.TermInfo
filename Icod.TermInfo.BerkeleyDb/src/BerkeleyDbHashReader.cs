@@ -46,6 +46,19 @@ internal static class BerkeleyDbHashReader {
 		ArgumentOutOfRangeException.ThrowIfNegativeOrZero( maximumItemSize );
 
 		byte[] database = ReadDatabase( databasePath, maximumDatabaseSize );
+		return TryReadValue( database, requestedKey, out value, maximumItemSize );
+	}
+
+	// The caller owns this acquired image and keeps it unchanged during lookup.
+	internal static bool TryReadValue(
+		byte[] database,
+		ReadOnlySpan<byte> requestedKey,
+		out byte[] value,
+		int maximumItemSize
+	) {
+		ArgumentNullException.ThrowIfNull( database );
+		ArgumentOutOfRangeException.ThrowIfNegativeOrZero( maximumItemSize );
+
 		DatabaseMetadata metadata = ReadMetadata( database );
 
 		for (
@@ -114,7 +127,7 @@ internal static class BerkeleyDbHashReader {
 		return false;
 	}
 
-	private static byte[] ReadDatabase(
+	internal static byte[] ReadDatabase(
 		string databasePath,
 		int maximumDatabaseSize
 	) {

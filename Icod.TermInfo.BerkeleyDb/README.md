@@ -4,11 +4,13 @@
 
 ## 1.15 development status
 
-`1.15.0-Alpha-2` adds an internal managed Hash-v9 reader. It supports bounded exact-key lookup with inline and off-page records, overflow reconstruction, and both byte orders. No public hashed-store provider API is exposed yet.
+`1.15.0-Alpha-3` builds on the accepted internal managed Hash-v9 reader. It supports bounded exact-key lookup with inline and off-page records, overflow reconstruction, and both byte orders. No public hashed-store provider API is exposed yet.
 
 HDB00 selected a dependency-free managed reader for the reviewed Berkeley DB **Hash on-disk format version 9** subset required by ncurses acquisition. Native Berkeley DB remains a CI interoperability oracle and is not a production dependency.
 
-The internal reader returns opaque record bytes. HDB03 will add ncurses record-envelope resolution and pass recovered compiled entries to the existing `Icod.TermInfo.CompiledTermInfoParser`.
+The internal ncurses resolver follows bounded marker-2 index chains over one acquired database image and extracts opaque marker-0 payloads. Empty records, unsupported markers, dangling targets, cycles, and excessive hops fail explicitly. Only an absent initial key is a clean miss.
+
+HDB03 remains in progress. Its public provider will enforce compiled-entry parser limits, reuse `Icod.TermInfo.CompiledTermInfoParser`, validate requested identity, and implement successful-result caching and retry semantics.
 
 ## Package boundary
 

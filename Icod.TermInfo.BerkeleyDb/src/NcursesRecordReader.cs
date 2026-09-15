@@ -30,6 +30,71 @@ internal static class NcursesRecordReader {
 		int maximumItemSize = 1024 * 1024,
 		int maximumIndexHops = 16
 	) {
-		throw new NotImplementedException();
+		ArgumentException.ThrowIfNullOrWhiteSpace( databasePath );
+		ArgumentOutOfRangeException.ThrowIfNegativeOrZero( maximumDatabaseSize );
+		ArgumentOutOfRangeException.ThrowIfNegativeOrZero( maximumItemSize );
+		ArgumentOutOfRangeException.ThrowIfNegative( maximumIndexHops );
+
+		byte[] database = BerkeleyDbHashReader.ReadDatabase(
+			databasePath,
+			maximumDatabaseSize
+		);
+		ReadOnlySpan<byte> key = requestedKey;
+		HashSet<string> visited = new HashSet<string>( StringComparer.Ordinal );
+		int followedLinks = 0;
+
+		while ( true ) {
+			if ( !BerkeleyDbHashReader.TryReadValue(
+				database,
+				key,
+				out byte[] value,
+				maximumItemSize
+			)
+			) {
+				if ( followedLinks == 0 ) {
+					compiledEntry = [];
+					return false;
+				}
+				throw new InvalidDataException(
+					"The ncurses index record references a missing key."
+				);
+			}
+
+			// A found key has passed the stored-item size bound. Encode only then,
+			// so an arbitrarily long absent requested key causes no tracking copy.
+			if ( !visited.Add( Convert.ToHexString( key ) ) ) {
+				throw new InvalidDataException(
+					"The ncurses index chain contains a cycle."
+				);
+			}
+			if ( value.Length == 0 ) {
+				throw new InvalidDataException(
+					"The ncurses hashed-term record is empty."
+				);
+			}
+
+			if ( value[0] == 0 ) {
+				compiledEntry = value[1..];
+				return true;
+			}
+			if ( value[0] != 2 ) {
+				throw new InvalidDataException(
+					$"Ncurses hashed-term marker {value[0]} is not supported."
+				);
+			}
+			if ( value.Length == 1 ) {
+				throw new InvalidDataException(
+					"The ncurses index record has an empty target."
+				);
+			}
+			if ( followedLinks >= maximumIndexHops ) {
+				throw new InvalidDataException(
+					"The ncurses index chain exceeds the configured hop limit."
+				);
+			}
+
+			followedLinks++;
+			key = value.AsSpan( 1 );
+		}
 	}
 }
