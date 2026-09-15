@@ -41,17 +41,29 @@ No raw database API becomes public.
 
 ## RED
 
-Create public declaration stubs and 22 behavioral tests, including 39 theory/fact
-executions. The declarations compile and expose the intended API, while provider
-behavior throws NotImplementedException and options omit validation/snapshotting.
-Observe failures before implementing.
+The initial declaration-only commit `7dae422925b17d05c5d958eb94d876c5093549f7`
+produced 32 expected provider failures with 199 existing passes (231 total) per
+target framework on Linux in PR run 35029787548. The strengthened test-only
+commit `2100a83c0c639eefba302cb1fe809afd6afacc77` added changed-content refresh,
+surrogate rejection, I/O retry, and the exact parser-limit boundary. It produced
+35 expected failures with 199 existing passes (234 total) per target framework
+on both Linux and macOS in PR run 35030136042. No production implementation was
+written before these behavioral failures were observed.
 
 ## GREEN
 
 Implement the smallest provider/options/exception behavior satisfying the tests.
+Failed Lazy instances are removed only by exact key/value pair. Exception mapping
+is limited to InvalidDataException from record resolution; parser, identity, and
+I/O failures retain their types. Key validation is platform-independent because
+the requested name is a database key. The reader item cap is the Runtime parser's
+maximum supported entry size plus the ncurses marker byte; the parser's configured
+limit remains authoritative. The database-size limit is an aggregate acquisition
+bound rather than a per-record storage limit.
+
 Keep existing HDB02 and record-resolution tests unchanged. Require public API
 equivalence across all TFMs, package-only consumer validation, 12 normal CI jobs,
-3 interoperability jobs, and independent review.
+3 interoperability jobs, and independent review. GREEN qualification is pending.
 
 ## Remaining HDB03 closure work
 

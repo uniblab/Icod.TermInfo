@@ -42,7 +42,7 @@
 		<Title>Icod.TermInfo.BerkeleyDb</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed read-only acquisition support for ncurses-compatible Berkeley DB Hash-v9 terminfo stores.</Description>
-		<PackageReleaseNotes>1.15.0-Alpha-3 adds internal bounded ncurses marker-0/marker-2 record resolution over the accepted managed Hash-v9 reader. HDB03 remains in progress: the public provider, compiled parser integration, identity validation, and caching follow in subsequent checkpoints. No public acquisition API or native runtime dependency is introduced.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.15.0-Alpha-3 adds the explicit BerkeleyDbTerminalDescriptionProvider with bounded Hash-v9 and ncurses record resolution, Runtime parser integration, exact identity validation, immutable limits, successful-result caching, and retryable misses and failures. The optional package remains pure managed, read-only, and free of native runtime dependencies.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>

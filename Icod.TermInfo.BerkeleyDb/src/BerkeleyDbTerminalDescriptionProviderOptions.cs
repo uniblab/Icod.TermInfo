@@ -36,15 +36,38 @@ public sealed class BerkeleyDbTerminalDescriptionProviderOptions {
 		int maximumDatabaseSize = DefaultMaximumDatabaseSize,
 		int maximumIndexHops = DefaultMaximumIndexHops
 	) {
-		ParserOptions = parserOptions ?? new CompiledTermInfoParserOptions();
+		if ( maximumDatabaseSize <= 0 ) {
+			throw new ArgumentOutOfRangeException(
+				nameof( maximumDatabaseSize ),
+				maximumDatabaseSize,
+				"The maximum database size must be greater than zero."
+			);
+		}
+		if (
+			maximumIndexHops < 0
+			|| maximumIndexHops > MaximumSupportedIndexHops
+		) {
+			throw new ArgumentOutOfRangeException(
+				nameof( maximumIndexHops ),
+				maximumIndexHops,
+				$"The maximum index-hop count must be between 0 and {MaximumSupportedIndexHops}."
+			);
+		}
+
+		CompiledTermInfoParserOptions effectiveParserOptions =
+			parserOptions ?? new CompiledTermInfoParserOptions();
+		ParserOptions =
+			new CompiledTermInfoParserOptions(
+				effectiveParserOptions.MaximumEntrySize
+			);
 		MaximumDatabaseSize = maximumDatabaseSize;
 		MaximumIndexHops = maximumIndexHops;
 	}
 
-	/// <summary>Gets the compiled-entry parser options.</summary>
+	/// <summary>Gets the compiled-entry parser options snapshot.</summary>
 	public CompiledTermInfoParserOptions ParserOptions { get; }
 	/// <summary>Gets the maximum database size in bytes.</summary>
 	public int MaximumDatabaseSize { get; }
-	/// <summary>Gets the maximum number of followed index links.</summary>
+	/// <summary>Gets the maximum number of followed ncurses index links.</summary>
 	public int MaximumIndexHops { get; }
 }
