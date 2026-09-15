@@ -29,7 +29,7 @@
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-		<PackageReleaseNotes>1.11.0 preserves the frozen routed command contract, installed-tool validation, and six-RID archive topology while the coordinated reusable Inspection package adds persistent-raster lifecycle semantics and planning; command semantics remain unchanged.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.14.0 preserves the frozen five-command router contract, installed-tool validation, and six-RID archive topology while the coordinated reusable Inspection package adds raster-backend capability evidence, explicit preference-aware selection, and JSON v6; command semantics remain unchanged.</PackageReleaseNotes>
 		<PackageTags>captoinfo;cli;command-line;console;cross-platform;csharp;dotnet;icod;infocmp;infotocap;libtinfo;termcap;terminal;termcaps;terminal-capabilities;terminfo;tic;toe;tool;tui;text-ui</PackageTags>
 	</PropertyGroup>
 
