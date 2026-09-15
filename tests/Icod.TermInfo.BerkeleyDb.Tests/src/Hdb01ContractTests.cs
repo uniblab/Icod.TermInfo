@@ -96,20 +96,21 @@ public sealed class Hdb01ContractTests {
 					"PackPackages.ps1"
 				)
 			);
-		string verifier =
+		string artifactVerifier =
+			File.ReadAllText(
+				Path.Combine(
+					root,
+					"packaging",
+					"VerifyPackageArtifact.ps1"
+				)
+			);
+		string pullRequestWorkflow =
 			File.ReadAllText(
 				Path.Combine(
 					root,
 					".github",
-					"scripts",
-					"verify-release-package.sh"
-				)
-			);
-		string solution =
-			File.ReadAllText(
-				Path.Combine(
-					root,
-					"Icod.TermInfo.sln"
+					"workflows",
+					"pull-request.yaml"
 				)
 			);
 
@@ -124,18 +125,13 @@ public sealed class Hdb01ContractTests {
 			StringComparison.Ordinal
 		);
 		Assert.Contains(
-			"Icod.TermInfo.BerkeleyDb",
-			verifier,
+			"verify-berkeleydb-package.ps1",
+			artifactVerifier,
 			StringComparison.Ordinal
 		);
 		Assert.Contains(
-			"Icod.TermInfo.BerkeleyDb",
-			solution,
-			StringComparison.Ordinal
-		);
-		Assert.Contains(
-			"Icod.TermInfo.BerkeleyDb.Tests",
-			solution,
+			"Icod.TermInfo.BerkeleyDb.Tests.csproj",
+			pullRequestWorkflow,
 			StringComparison.Ordinal
 		);
 	}
