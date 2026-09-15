@@ -78,6 +78,13 @@ Compiler owns output bytes and database publication only. Inspection may use
 Compiler in tests/samples for semantic round trips, but production
 `Icod.TermInfo.Inspection` deliberately has no Compiler dependency.
 
+## Historical release record
+
+Version `1.9.0` was the first coordinated line whose machine-readable Inspection
+release closure required package-facing documentation across the full suite. That
+historical marker remains part of the release-closure compatibility record; the
+current install version is `1.14.0`.
+
 ## Compatibility
 
 The Compiler public contract was frozen at 1.2 and remains compatible throughout
