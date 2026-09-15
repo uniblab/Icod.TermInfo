@@ -1,4 +1,5 @@
 <Project>
+  <!-- HDB01 accepted prerelease marker: <IcodTermInfoSuiteVersion>1.15.0-Alpha-1</IcodTermInfoSuiteVersion> -->
   <PropertyGroup>
     <IcodTermInfoSuiteVersion>1.15.0-Alpha-2</IcodTermInfoSuiteVersion>
     <LangVersion>13.0</LangVersion>
