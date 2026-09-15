@@ -6,7 +6,7 @@
 **Optional package:** `Icod.TermInfo.BerkeleyDb`  
 **Language:** C# 13  
 **Reusable target frameworks:** `net8.0`; `net9.0`; `net10.0`  
-**Status:** HDB00–HDB02 accepted; HDB03 explicit provider in progress  
+**Status:** HDB00–HDB03 accepted; HDB04 system discovery next  
 **Current coordinated prerelease:** `1.15.0-Alpha-3`
 
 ---
@@ -320,16 +320,16 @@ The optional package is:
 Icod.TermInfo.BerkeleyDb
 ```
 
-HDB01 deliberately exports no acquisition API. The likely HDB03 public concepts
-remain provisional and are limited to terminfo acquisition, for example:
+HDB03 accepts exactly three public acquisition types:
 
 ```text
 BerkeleyDbTerminalDescriptionProvider
 BerkeleyDbTerminalDescriptionProviderOptions
-BerkeleyDbSystemTerminalDescriptionProvider
-BerkeleyDbSystemTerminalDescriptionProviderOptions
 BerkeleyDbDatabaseFormatException
 ```
+
+The hashed-aware system provider and its options remain provisional HDB04
+concepts.
 
 There is intentionally no `BerkeleyDbBackendAvailability` or
 `BerkeleyDbBackendUnavailableException`: production acquisition has no native
@@ -712,36 +712,36 @@ Production code is re-established from tests and reviewed package conventions.
 
 ### HDB03 — Explicit Hashed Terminal Provider
 
-**Status:** IN PROGRESS (`1.15.0-Alpha-3`)
+**Status:** COMPLETE / ACCEPTED (`1.15.0-Alpha-3`)
 
-First checkpoint: bounded internal ncurses record resolution over one acquired image.
-Plan and progress: `docs/superpowers/plans/2026-09-15-hdb03-record-resolution.md`.
+**Accepted exact head:** `e2b55290f97014086b1de89f5b466e8c083ed1d3`
 
-Freeze the first reviewed public acquisition API.
+**Accepted qualification:**
 
-Requirements:
+- [PR workflow #1057 / 35031640798](https://github.com/uniblab/Icod.TermInfo/actions/runs/35031640798): completed/success, all 12 jobs;
+- [HDB00 workflow #86 / 35031640883](https://github.com/uniblab/Icod.TermInfo/actions/runs/35031640883): completed/success, all 3 jobs;
+- BerkeleyDb unit tests: 234/234 per target framework on Windows, Linux, and macOS;
+- native-store interoperability tests: 15/15 per target framework on Windows, Linux, and macOS;
+- isolated packed-package consumer: passed on net8.0, net9.0, and net10.0; and
+- independent implementation and qualification review: no blocking findings.
 
-- canonical absolute database path;
-- snapshotted parser/resource options;
-- terminal-name validation;
-- exact-key lookup through the HDB02 reader;
-- bounded marker-2 index resolution;
-- marker-0 compiled-entry extraction;
-- existing parser reuse;
-- canonical/alias identity verification;
-- successful-result caching;
-- retryable misses/failures;
-- concurrency tests; and
-- package-only consumer validation.
+The accepted public API is limited to the explicit provider, its immutable
+options, and the package-specific database-format exception. It owns one
+canonical absolute database path, performs exact ordinal UTF-8 key lookup,
+resolves bounded ncurses marker-2 chains to marker-0 compiled bytes, delegates
+all terminfo semantics to `CompiledTermInfoParser`, verifies canonical/alias
+identity, caches successful results, and retries clean misses and failures.
 
-This tranche completes the central architecture:
+Container and ncurses-envelope failures map to
+`BerkeleyDbDatabaseFormatException`. Parser, identity, and I/O failures retain
+their existing exception types. The package remains pure managed, read-only,
+and free of native runtime dependencies.
+
+The full evidence, TDD sequence, reviewed limits, and compatibility boundary are
+recorded in:
 
 ```text
-Hash-v9 store
-   -> ncurses record envelope
-   -> compiled bytes
-   -> CompiledTermInfoParser
-   -> TerminalDescription
+docs/1.15.0-HDB03-EXPLICIT-HASHED-TERMINAL-PROVIDER.md
 ```
 
 ### HDB04 — System Discovery Integration

@@ -27,4 +27,4 @@ The reviewed subset supports unencrypted, non-checksummed Hash-v9 files with sor
 
 Dedicated CI compares the production reader and public provider with native Berkeley DB stores on Linux and macOS; Windows reads Linux-generated fixtures without Berkeley DB installed. Big-endian coverage uses synthetic fixtures. Lookup keys are encoded as UTF-8, while compiled identity fields retain Runtime's byte-preserving Latin-1 interpretation. Qualified native fixtures use ASCII terminal names; broader non-ASCII producer compatibility is not claimed.
 
-HDB03 qualification includes native-fixture provider parsing on all supported target frameworks and an isolated package-only consumer on `net8.0`, `net9.0`, and `net10.0`.
+HDB03 is complete and accepted. Native-fixture provider parsing is qualified on Windows, Linux, and macOS across all supported target frameworks, and an isolated package-only consumer is qualified on `net8.0`, `net9.0`, and `net10.0`. HDB04 will add opt-in system discovery.
