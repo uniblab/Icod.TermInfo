@@ -27,8 +27,10 @@ internal static class BerkeleyDbHashReader {
 	private const uint HashMagic = 0x00061561;
 	private const uint SupportedHashVersion = 9;
 	private const byte HashMetadataPage = 8;
+	private const byte OverflowPage = 7;
 	private const byte HashPage = 13;
 	private const byte HashKeyData = 1;
+	private const byte HashOffPage = 3;
 	private const int PageHeaderSize = 26;
 
 	internal static bool TryReadValue(
@@ -65,19 +67,21 @@ internal static class BerkeleyDbHashReader {
 			ValidateIndexTable( page, entryCount, metadata.PageSize );
 
 			for ( int index = 0; index < entryCount; index += 2 ) {
-				byte[] key = ReadInlineItem(
+				byte[] key = ReadHashItem(
+					database,
+					metadata,
 					page,
-					index,
-					metadata.PageSize
+					index
 				);
 				if ( !requestedKey.SequenceEqual( key ) ) {
 					continue;
 				}
 
-				value = ReadInlineItem(
+				value = ReadHashItem(
+					database,
+					metadata,
 					page,
-					index + 1,
-					metadata.PageSize
+					index + 1
 				);
 				return true;
 			}
@@ -196,16 +200,17 @@ internal static class BerkeleyDbHashReader {
 		}
 	}
 
-	private static byte[] ReadInlineItem(
+	private static byte[] ReadHashItem(
+		byte[] database,
+		DatabaseMetadata metadata,
 		ReadOnlySpan<byte> page,
-		int index,
-		int pageSize
+		int index
 	) {
 		ushort offset = ReadUInt16(
 			page,
 			PageHeaderSize + ( index * sizeof( ushort ) )
 		);
-		int upperOffset = pageSize;
+		int upperOffset = metadata.PageSize;
 		if ( index > 0 ) {
 			upperOffset = ReadUInt16(
 				page,
@@ -219,16 +224,108 @@ internal static class BerkeleyDbHashReader {
 				$"Invalid Berkeley DB hash item length {itemLength}."
 			);
 		}
-		if ( page[offset] != HashKeyData ) {
+
+		switch ( page[offset] ) {
+			case HashKeyData:
+				return page.Slice(
+					offset + 1,
+					itemLength - 1
+				).ToArray();
+
+			case HashOffPage:
+				if ( itemLength < 12 ) {
+					throw new InvalidDataException(
+						"A Berkeley DB off-page item is shorter than its header."
+					);
+				}
+
+				uint overflowPage = ReadUInt32(
+					page,
+					offset + 4
+				);
+				uint totalLength = ReadUInt32(
+					page,
+					offset + 8
+				);
+				return ReadOverflow(
+					database,
+					metadata,
+					overflowPage,
+					totalLength
+				);
+
+			default:
+				throw new InvalidDataException(
+					$"Berkeley DB hash item type {page[offset]} is not supported yet."
+				);
+		}
+	}
+
+	private static byte[] ReadOverflow(
+		byte[] database,
+		DatabaseMetadata metadata,
+		uint firstPage,
+		uint totalLength
+	) {
+		if (
+			totalLength > int.MaxValue
+			|| totalLength > database.Length
+		) {
 			throw new InvalidDataException(
-				$"Berkeley DB hash item type {page[offset]} is not supported yet."
+				$"Invalid Berkeley DB overflow length {totalLength}."
 			);
 		}
 
-		return page.Slice(
-			offset + 1,
-			itemLength - 1
-		).ToArray();
+		byte[] result = new byte[(int)totalLength];
+		int written = 0;
+		uint pageNumber = firstPage;
+		HashSet<uint> visited = [];
+
+		while ( pageNumber != 0 ) {
+			if ( !visited.Add( pageNumber ) ) {
+				throw new InvalidDataException(
+					"The Berkeley DB overflow chain contains a cycle."
+				);
+			}
+
+			ReadOnlySpan<byte> page = GetPage(
+				database,
+				metadata,
+				pageNumber
+			);
+			if ( page[25] != OverflowPage ) {
+				throw new InvalidDataException(
+					$"Expected overflow page {pageNumber}, found page type {page[25]}."
+				);
+			}
+
+			ushort chunkLength = ReadUInt16( page, 22 );
+			if (
+				chunkLength > metadata.PageSize - PageHeaderSize
+				|| chunkLength > result.Length - written
+			) {
+				throw new InvalidDataException(
+					"The Berkeley DB overflow chain exceeds its declared length."
+				);
+			}
+
+			page.Slice(
+				PageHeaderSize,
+				chunkLength
+			).CopyTo(
+				result.AsSpan( written )
+			);
+			written += chunkLength;
+			pageNumber = ReadUInt32( page, 16 );
+		}
+
+		if ( written != result.Length ) {
+			throw new InvalidDataException(
+				$"The Berkeley DB overflow chain supplied {written} bytes but declared {result.Length}."
+			);
+		}
+
+		return result;
 	}
 
 	private static ReadOnlySpan<byte> GetPage(
@@ -263,6 +360,18 @@ internal static class BerkeleyDbHashReader {
 			bytes.Slice(
 				offset,
 				sizeof( ushort )
+			)
+		);
+	}
+
+	private static uint ReadUInt32(
+		ReadOnlySpan<byte> bytes,
+		int offset
+	) {
+		return BinaryPrimitives.ReadUInt32LittleEndian(
+			bytes.Slice(
+				offset,
+				sizeof( uint )
 			)
 		);
 	}
