@@ -74,6 +74,29 @@ public sealed class Hdb02HashReaderTests {
 		}
 	}
 
+	[Fact]
+	public void TryReadValueFindsBigEndianInlineValue() {
+		byte[] key = Encoding.UTF8.GetBytes( "xterm-hdb02-big-endian" );
+		byte[] expected = [ 0x55, 0x66, 0x77 ];
+		byte[] database = CreateBigEndianInlineHashV9Database( key, expected );
+		string path = Path.GetTempFileName();
+
+		try {
+			File.WriteAllBytes( path, database );
+
+			bool found = BerkeleyDbHashReader.TryReadValue(
+				path,
+				key,
+				out byte[] actual
+			);
+
+			Assert.True( found );
+			Assert.Equal( expected, actual );
+		} finally {
+			File.Delete( path );
+		}
+	}
+
 	private static byte[] CreateInlineHashV9Database(
 		byte[] key,
 		byte[] value
@@ -87,6 +110,50 @@ public sealed class Hdb02HashReaderTests {
 		int valueOffset = keyOffset - 1 - value.Length;
 		WriteHashOffsets( page, keyOffset, valueOffset );
 
+		page[keyOffset] = 1;
+		key.CopyTo( page[( keyOffset + 1 )..] );
+		page[valueOffset] = 1;
+		value.CopyTo( page[( valueOffset + 1 )..keyOffset] );
+
+		return database;
+	}
+
+	private static byte[] CreateBigEndianInlineHashV9Database(
+		byte[] key,
+		byte[] value
+	) {
+		const int pageSize = 512;
+		const int pageHeaderSize = 26;
+		const uint hashMagic = 0x00061561;
+		const uint hashVersion = 9;
+
+		byte[] database = new byte[pageSize * 2];
+		Span<byte> metadata = database.AsSpan( 0, pageSize );
+		BinaryPrimitives.WriteUInt32BigEndian( metadata[12..16], hashMagic );
+		BinaryPrimitives.WriteUInt32BigEndian( metadata[16..20], hashVersion );
+		BinaryPrimitives.WriteUInt32BigEndian( metadata[20..24], pageSize );
+		metadata[24] = 0;
+		metadata[25] = 8;
+		metadata[26] = 0;
+		BinaryPrimitives.WriteUInt32BigEndian( metadata[32..36], 1 );
+
+		Span<byte> page = database.AsSpan( pageSize, pageSize );
+		page[25] = 13;
+		BinaryPrimitives.WriteUInt16BigEndian( page[20..22], 2 );
+		int keyOffset = pageSize - 1 - key.Length;
+		int valueOffset = keyOffset - 1 - value.Length;
+		BinaryPrimitives.WriteUInt16BigEndian(
+			page[pageHeaderSize..( pageHeaderSize + 2 )],
+			(ushort)keyOffset
+		);
+		BinaryPrimitives.WriteUInt16BigEndian(
+			page[( pageHeaderSize + 2 )..( pageHeaderSize + 4 )],
+			(ushort)valueOffset
+		);
+		BinaryPrimitives.WriteUInt16BigEndian(
+			page[22..24],
+			(ushort)valueOffset
+		);
 		page[keyOffset] = 1;
 		key.CopyTo( page[( keyOffset + 1 )..] );
 		page[valueOffset] = 1;
