@@ -14,9 +14,20 @@ fixture="$work_root/hdb00.src"
 probe="$work_root/hdb00-probe"
 primary_payload="$work_root/hdb00-primary.bin"
 alias_payload="$work_root/hdb00-alias.bin"
+overflow_directory_db="$work_root/overflow-directory-db"
+overflow_hashed_base="$work_root/overflow-hashed-db"
+overflow_hashed_db="$overflow_hashed_base.db"
+overflow_fixture="$work_root/hdb00-overflow.src"
+overflow_payload="$work_root/hdb00-overflow.bin"
 
 rm -rf "$work_root"
-mkdir -p "$work_root" "$source_root" "$directory_source" "$hashed_source" "$directory_db"
+mkdir -p \
+    "$work_root" \
+    "$source_root" \
+    "$directory_source" \
+    "$hashed_source" \
+    "$directory_db" \
+    "$overflow_directory_db"
 
 printf '%s\n' "== HDB00: fetch pinned ncurses source =="
 git -C "$source_root" init -q
@@ -60,6 +71,24 @@ hdb00-primary|hdb00-alias|Icod HDB00 hashed terminfo fixture,
     setaf=\E[3%p1%dm,
     setab=\E[4%p1%dm,
 EOF
+
+python3 - "$overflow_fixture" <<'PY'
+from pathlib import Path
+import sys
+
+blob = "A" * 2800
+Path(sys.argv[1]).write_text(
+    "hdb00-overflow|Icod HDB00 overflow terminfo fixture,\n"
+    "    am,\n"
+    "    cols#80,\n"
+    "    lines#24,\n"
+    "    colors#8,\n"
+    "    clear=\\E[H\\E[2J,\n"
+    "    cup=\\E[%i%p1%d;%p2%dH,\n"
+    f"    hdb00blob={blob},\n",
+    encoding="utf-8",
+)
+PY
 
 printf '%s\n' "== HDB00: compile identical source into directory and hashed stores =="
 "$directory_source/progs/tic" -x -o "$directory_db" "$fixture"
@@ -140,9 +169,43 @@ if [[ $random_status -eq 0 ]]; then
 fi
 cat "$work_root/random.err"
 
+printf '%s\n' "== HDB00: force and verify Berkeley DB overflow pages =="
+"$directory_source/progs/tic" -x -o "$overflow_directory_db" "$overflow_fixture"
+"$hashed_source/progs/tic" -x -o "$overflow_hashed_base" "$overflow_fixture"
+test -f "$overflow_hashed_db"
+overflow_directory_entry="$(find "$overflow_directory_db" -type f -name hdb00-overflow -print -quit)"
+test -n "$overflow_directory_entry"
+"$probe" \
+    "$overflow_hashed_db" \
+    hdb00-overflow \
+    "$overflow_payload" \
+    | tee "$work_root/overflow-native-probe.txt"
+cmp "$overflow_payload" "$overflow_directory_entry"
+python3 \
+    "$repo_root/tools/hdb00/assert-overflow-pages.py" \
+    "$overflow_hashed_db" \
+    | tee "$work_root/overflow-pages.txt"
+dotnet run \
+    --project "$repo_root/samples/Icod.TermInfo.Acquisition.Sample/Icod.TermInfo.Acquisition.Sample.csproj" \
+    -c Release \
+    -f net10.0 \
+    -- \
+    parse "$overflow_payload" \
+    | tee "$work_root/overflow-managed-parse.txt"
+grep -F "Name: hdb00-overflow" "$work_root/overflow-managed-parse.txt"
+
 printf '%s\n' "== HDB00: evidence summary =="
 printf 'ncurses commit: %s\n' "$ncurses_commit"
 printf 'hashed store: %s\n' "$hashed_db"
 printf 'conventional entry: %s\n' "$directory_entry"
-sha256sum "$hashed_db" "$directory_entry" "$primary_payload" "$alias_payload"
+printf 'overflow hashed store: %s\n' "$overflow_hashed_db"
+printf 'overflow conventional entry: %s\n' "$overflow_directory_entry"
+sha256sum \
+    "$hashed_db" \
+    "$directory_entry" \
+    "$primary_payload" \
+    "$alias_payload" \
+    "$overflow_hashed_db" \
+    "$overflow_directory_entry" \
+    "$overflow_payload"
 printf '%s\n' "HDB00 Linux interoperability probe passed."
