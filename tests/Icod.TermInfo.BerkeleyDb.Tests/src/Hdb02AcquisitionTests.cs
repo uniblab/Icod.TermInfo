@@ -119,7 +119,8 @@ public sealed class Hdb02AcquisitionTests {
 
 	// Models observed length and deterministic read outcomes without filesystem timing.
 	// Both synchronous read paths and the trailing-byte probe use the same behavior.
-	private sealed class AcquisitionStream : MemoryStream {
+	private sealed class AcquisitionStream : Stream {
+		private readonly MemoryStream source;
 		private readonly long reportedLength;
 		private readonly int chunkSize;
 		private readonly int failureOffset;
@@ -131,14 +132,22 @@ public sealed class Hdb02AcquisitionTests {
 			int chunkSize,
 			int failureOffset = int.MaxValue,
 			IOException? failure = null
-		) : base( bytes, writable: false ) {
+		) {
+			source = new MemoryStream( bytes, writable: false );
 			this.reportedLength = reportedLength;
 			this.chunkSize = chunkSize;
 			this.failureOffset = failureOffset;
 			this.failure = failure;
 		}
 
+		public override bool CanRead => source.CanRead;
+		public override bool CanSeek => false;
+		public override bool CanWrite => false;
 		public override long Length => reportedLength;
+		public override long Position {
+			get => source.Position;
+			set => throw new NotSupportedException();
+		}
 
 		public override int Read( Span<byte> buffer ) {
 			if ( Position >= failureOffset && failure is not null ) {
@@ -147,11 +156,34 @@ public sealed class Hdb02AcquisitionTests {
 
 			int count = Math.Min( buffer.Length, chunkSize );
 			count = Math.Min( count, (int)Math.Max( 0, failureOffset - Position ) );
-			return base.Read( buffer[..count] );
+			return source.Read( buffer[..count] );
 		}
 
 		public override int Read( byte[] buffer, int offset, int count ) {
 			return Read( buffer.AsSpan( offset, count ) );
+		}
+
+		public override void Flush() {
+			throw new NotSupportedException();
+		}
+
+		public override long Seek( long offset, SeekOrigin origin ) {
+			throw new NotSupportedException();
+		}
+
+		public override void SetLength( long value ) {
+			throw new NotSupportedException();
+		}
+
+		public override void Write( byte[] buffer, int offset, int count ) {
+			throw new NotSupportedException();
+		}
+
+		protected override void Dispose( bool disposing ) {
+			if ( disposing ) {
+				source.Dispose();
+			}
+			base.Dispose( disposing );
 		}
 
 		public override int ReadByte() {
