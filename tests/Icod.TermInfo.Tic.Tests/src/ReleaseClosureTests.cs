@@ -4,7 +4,7 @@ using Xunit;
 namespace Icod.TermInfo.Tic.Tests;
 
 public sealed class ReleaseClosureTests {
-	private const string StableReleaseVersion = "1.9.0";
+	private const string StableReleaseVersion = "1.14.0";
 	private const string DevelopmentVersion = "1.14.0";
 	private const string VersionReference = "$(IcodTermInfoSuiteVersion)";
 	private const string StableAssemblyVersion = "1.0.0.0";
@@ -316,7 +316,6 @@ public sealed class ReleaseClosureTests {
 						current.FullName,
 						"Icod.TermInfo.sln"
 					)
-				)
 			) {
 				return current.FullName;
 			}
