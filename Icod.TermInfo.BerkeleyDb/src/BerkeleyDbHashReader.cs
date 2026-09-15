@@ -57,14 +57,23 @@ internal static class BerkeleyDbHashReader {
 				continue;
 			}
 
-			ushort entryCount = ReadUInt16( page, 20 );
+			ushort entryCount = ReadUInt16(
+				page,
+				20,
+				metadata.IsBigEndian
+			);
 			if ( ( entryCount & 1 ) != 0 ) {
 				throw new InvalidDataException(
 					$"Hash page {pageNumber} has an odd item count {entryCount}."
 				);
 			}
 
-			ValidateIndexTable( page, entryCount, metadata.PageSize );
+			ValidateIndexTable(
+				page,
+				entryCount,
+				metadata.PageSize,
+				metadata.IsBigEndian
+			);
 
 			for ( int index = 0; index < entryCount; index += 2 ) {
 				byte[] key = ReadHashItem(
@@ -101,21 +110,28 @@ internal static class BerkeleyDbHashReader {
 		}
 
 		ReadOnlySpan<byte> bytes = database;
+		bool isBigEndian;
 		uint magic = BinaryPrimitives.ReadUInt32LittleEndian( bytes[12..16] );
-		if ( magic != HashMagic ) {
+		if ( magic == HashMagic ) {
+			isBigEndian = false;
+		} else if (
+			BinaryPrimitives.ReadUInt32BigEndian( bytes[12..16] ) == HashMagic
+		) {
+			isBigEndian = true;
+		} else {
 			throw new InvalidDataException(
-				"The file is not a supported little-endian Berkeley DB Hash database."
+				"The file is not a supported Berkeley DB Hash database."
 			);
 		}
 
-		uint version = BinaryPrimitives.ReadUInt32LittleEndian( bytes[16..20] );
+		uint version = ReadUInt32( bytes, 16, isBigEndian );
 		if ( version != SupportedHashVersion ) {
 			throw new InvalidDataException(
 				$"Berkeley DB Hash version {version} is not supported."
 			);
 		}
 
-		uint pageSizeValue = BinaryPrimitives.ReadUInt32LittleEndian( bytes[20..24] );
+		uint pageSizeValue = ReadUInt32( bytes, 20, isBigEndian );
 		if (
 			pageSizeValue < 512
 			|| pageSizeValue > 64 * 1024
@@ -149,7 +165,7 @@ internal static class BerkeleyDbHashReader {
 			);
 		}
 
-		uint lastPageNumber = BinaryPrimitives.ReadUInt32LittleEndian( bytes[32..36] );
+		uint lastPageNumber = ReadUInt32( bytes, 32, isBigEndian );
 		if ( lastPageNumber >= database.Length / pageSize ) {
 			throw new InvalidDataException(
 				"The Berkeley DB metadata references a page beyond the file."
@@ -158,14 +174,16 @@ internal static class BerkeleyDbHashReader {
 
 		return new DatabaseMetadata(
 			pageSize,
-			lastPageNumber
+			lastPageNumber,
+			isBigEndian
 		);
 	}
 
 	private static void ValidateIndexTable(
 		ReadOnlySpan<byte> page,
 		ushort entryCount,
-		int pageSize
+		int pageSize,
+		bool isBigEndian
 	) {
 		int tableEnd = PageHeaderSize + ( entryCount * sizeof( ushort ) );
 		if ( tableEnd > pageSize ) {
@@ -174,7 +192,7 @@ internal static class BerkeleyDbHashReader {
 			);
 		}
 
-		ushort freeOffset = ReadUInt16( page, 22 );
+		ushort freeOffset = ReadUInt16( page, 22, isBigEndian );
 		if ( freeOffset < tableEnd || freeOffset > pageSize ) {
 			throw new InvalidDataException(
 				$"Invalid Berkeley DB hash-page free offset {freeOffset}."
@@ -185,7 +203,8 @@ internal static class BerkeleyDbHashReader {
 		for ( int index = 0; index < entryCount; index++ ) {
 			ushort offset = ReadUInt16(
 				page,
-				PageHeaderSize + ( index * sizeof( ushort ) )
+				PageHeaderSize + ( index * sizeof( ushort ) ),
+				isBigEndian
 			);
 			if (
 				offset < freeOffset
@@ -208,13 +227,15 @@ internal static class BerkeleyDbHashReader {
 	) {
 		ushort offset = ReadUInt16(
 			page,
-			PageHeaderSize + ( index * sizeof( ushort ) )
+			PageHeaderSize + ( index * sizeof( ushort ) ),
+			metadata.IsBigEndian
 		);
 		int upperOffset = metadata.PageSize;
 		if ( index > 0 ) {
 			upperOffset = ReadUInt16(
 				page,
-				PageHeaderSize + ( ( index - 1 ) * sizeof( ushort ) )
+				PageHeaderSize + ( ( index - 1 ) * sizeof( ushort ) ),
+				metadata.IsBigEndian
 			);
 		}
 
@@ -241,11 +262,13 @@ internal static class BerkeleyDbHashReader {
 
 				uint overflowPage = ReadUInt32(
 					page,
-					offset + 4
+					offset + 4,
+					metadata.IsBigEndian
 				);
 				uint totalLength = ReadUInt32(
 					page,
-					offset + 8
+					offset + 8,
+					metadata.IsBigEndian
 				);
 				return ReadOverflow(
 					database,
@@ -299,7 +322,11 @@ internal static class BerkeleyDbHashReader {
 				);
 			}
 
-			ushort chunkLength = ReadUInt16( page, 22 );
+			ushort chunkLength = ReadUInt16(
+				page,
+				22,
+				metadata.IsBigEndian
+			);
 			if (
 				chunkLength > metadata.PageSize - PageHeaderSize
 				|| chunkLength > result.Length - written
@@ -316,7 +343,11 @@ internal static class BerkeleyDbHashReader {
 				result.AsSpan( written )
 			);
 			written += chunkLength;
-			pageNumber = ReadUInt32( page, 16 );
+			pageNumber = ReadUInt32(
+				page,
+				16,
+				metadata.IsBigEndian
+			);
 		}
 
 		if ( written != result.Length ) {
@@ -354,30 +385,37 @@ internal static class BerkeleyDbHashReader {
 
 	private static ushort ReadUInt16(
 		ReadOnlySpan<byte> bytes,
-		int offset
+		int offset,
+		bool isBigEndian
 	) {
-		return BinaryPrimitives.ReadUInt16LittleEndian(
-			bytes.Slice(
-				offset,
-				sizeof( ushort )
-			)
+		ReadOnlySpan<byte> value = bytes.Slice(
+			offset,
+			sizeof( ushort )
 		);
+		return isBigEndian
+			? BinaryPrimitives.ReadUInt16BigEndian( value )
+			: BinaryPrimitives.ReadUInt16LittleEndian( value )
+		;
 	}
 
 	private static uint ReadUInt32(
 		ReadOnlySpan<byte> bytes,
-		int offset
+		int offset,
+		bool isBigEndian
 	) {
-		return BinaryPrimitives.ReadUInt32LittleEndian(
-			bytes.Slice(
-				offset,
-				sizeof( uint )
-			)
+		ReadOnlySpan<byte> value = bytes.Slice(
+			offset,
+			sizeof( uint )
 		);
+		return isBigEndian
+			? BinaryPrimitives.ReadUInt32BigEndian( value )
+			: BinaryPrimitives.ReadUInt32LittleEndian( value )
+		;
 	}
 
 	private readonly record struct DatabaseMetadata(
 		int PageSize,
-		uint LastPageNumber
+		uint LastPageNumber,
+		bool IsBigEndian
 	);
 }
