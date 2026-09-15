@@ -1,173 +1,83 @@
 # Icod.TermInfo.Compiler
 
 `Icod.TermInfo.Compiler` is the optional managed compiled-terminfo writing and
-database-layout layer for `Icod.TermInfo`.
+explicit database-publication layer for `Icod.TermInfo`.
 
-C01 establishes the package and pure writer contract. C02 completes standard
-capability emission, C03 adds the supported ncurses extended section, and C04
-adds deterministic automatic and explicit `0432` / `01036` format selection.
-C05 composes the 1.1 Source parser/resolver with that writer. C06 adds
-controlled publication into an explicit conventional terminfo directory root.
-C07 closes the implementation program with round-trip, determinism, and pinned
-ncurses/`tic` differential validation.
+## 1.14 release status
 
-## 1.9 release status
-
-Version `1.9.0` preserves the frozen Compiler 1.2 API, semantics,
-Runtime-and-Source dependency graph, and assembly identity. The stable release
-promotes the validated Alpha-7 contract; Compiler adds no Inspection or JSON
-dependency.
-
-## 1.8 release status
-
-Version 1.8.0 carries Compiler unchanged into the stable 1.8 contract. Its
-frozen 1.2 API, Runtime-and-Source dependency graph, three target frameworks,
-and assembly identity remain unchanged. Compiler remains test and sample
-infrastructure for planned-source round trips; Inspection does not gain a
-production Compiler dependency.
-
-## 1.7 release status
-
-Version 1.7.0 carries Compiler unchanged into the stable 1.7 release. The
-frozen 1.2 API and Runtime/Source dependency graph remain unchanged. Compiler is
-used only by tests and samples to validate synthesized source; Inspection does
-not acquire a production Compiler dependency.
+Version `1.14.0` preserves the frozen Compiler 1.2 public API, deterministic
+compiled-entry and database-publication semantics, Runtime-and-Source dependency
+graph, `net8.0` / `net9.0` / `net10.0` support, and assembly identity
+`1.0.0.0`. The coordinated 1.14 feature work is isolated to
+`Icod.TermInfo.Inspection`; Compiler does not acquire an Inspection, Termcap,
+Terminal, or command-layer dependency.
 
 ## Install
 
-For the 1.9.0 release:
-
 ```text
-dotnet add package Icod.TermInfo.Compiler --version 1.9.0
+dotnet add package Icod.TermInfo.Compiler --version 1.14.0
 ```
 
-The package targets `net8.0`, `net9.0`, and `net10.0` and depends on the matching
-`Icod.TermInfo` and `Icod.TermInfo.Source` packages. Version 1.9.0 preserves the
-frozen 1.2 Compiler public API and semantics. The dependency remains one-way;
-neither Source nor Runtime depends on Compiler, and Compiler does not acquire an
-Inspection or Termcap dependency.
+The package depends on matching `Icod.TermInfo` and `Icod.TermInfo.Source`
+versions.
 
-C06 adds `CompiledTermInfoDatabaseWriter`. It never discovers a system database
-or installs globally: callers must supply the output root explicitly. It can
-publish a successful C05 compilation result or compile resolved
-`TerminalDescription` values before publication. The writer publishes canonical
-names and aliases in lowercase hexadecimal first-byte directories compatible
-with `DirectoryTerminalDescriptionProvider`. Existing files are rejected by
-default; replacement requires an explicit
-`CompiledTermInfoDatabaseWriterOptions` opt-in.
+## What Compiler provides
 
-C07 adds no new public production API. Its validation suite reuses the checked-in
-T29 corpus generated with pinned ncurses `tic`, compares Compiler output and the
-reference binaries at the semantic `TerminalDescription` level, verifies
-byte-for-byte determinism across extended-capability insertion order and culture,
-and exercises temporary database output through the existing directory provider.
-Normal CI remains independent of a host ncurses installation.
+The frozen 1.2 contract includes:
+
+- deterministic conventional compiled terminfo writing;
+- legacy `0432` and wide `01036` output;
+- standard and ncurses extended-capability sections;
+- deterministic automatic or explicit format selection;
+- strict representation validation rather than silent narrowing;
+- direct compilation from immutable `TerminalDescription` values;
+- `.ti` source compilation through the existing Source parser/resolver;
+- explicit publication into caller-selected conventional database roots;
+- canonical-name and alias publication in compatible first-byte layouts;
+- explicit overwrite policy; and
+- semantic round-trip, byte-determinism, and pinned ncurses/`tic` differential
+  validation.
+
+Compiler never discovers or modifies an implicit system terminfo database.
+Callers must provide any publication root explicitly.
 
 ## Source compilation
 
-C05 compiles a complete `.ti` source document without duplicating Source
-semantics:
+Compiler composes the Source package rather than duplicating parser or `use=`
+resolution semantics:
 
 ```csharp
 using Icod.TermInfo.Compiler;
 
-const string source =
-	"""
-	example-child|Example child,
-		cols#132,
-		use=example-base,
-
-	example-base|Example base,
-		am,
-		lines#40,
-	""";
-
-TermInfoSourceCompilationResult result = TermInfoSourceCompiler.Compile(
+TermInfoCompilationResult result = TermInfoCompiler.Compile(
 	source,
-	"example.ti"
+	"example-child"
 );
 
-foreach ( CompiledTermInfoSourceEntry entry in result.Entries ) {
-	byte[] compiled = entry.Data;
-	// Store or load this independently as appropriate for the caller.
+if ( result.Succeeded ) {
+	byte[] compiled = result.Bytes;
+	Console.WriteLine( $"Compiled {compiled.Length} bytes." );
 }
 ```
 
-Entries are returned in source-document order. `use=` dependencies may appear
-before or after their parents because resolution is delegated to the existing
-Source resolver. Parser and resolver diagnostics are returned as the original
-`TermInfoSourceDiagnostic` objects, preserving source names, lines, columns,
-offsets, and spans.
+Use the public overloads appropriate to the caller's source/document or resolved
+`TerminalDescription`; diagnostics and representation failures remain explicit.
 
-Source cancellation remains source-only state. After inheritance resolution it
-materializes as effective absence in `TerminalDescription`; C05 does not invent
-compiled cancellation tombstones.
+## Database publication
 
-`CompiledTermInfoWriterOptions` can be supplied to `Compile` to retain the C04
-automatic/Legacy/Wide and extended-section policies. If a resolved description
-cannot be represented by the requested writer policy, the established C04
-`InvalidOperationException` contract is preserved.
+`CompiledTermInfoDatabaseWriter` writes only to an explicit root. Existing files
+are rejected by default; replacement requires an explicit options opt-in. The
+resulting layout is compatible with `DirectoryTerminalDescriptionProvider`.
 
-## Automatic format selection
+Compiler owns output bytes and database publication only. Inspection may use
+Compiler in tests/samples for semantic round trips, but production
+`Icod.TermInfo.Inspection` deliberately has no Compiler dependency.
 
-The original writer operation now selects the narrowest representation which can
-encode the description exactly:
+## Compatibility
 
-```csharp
-using Icod.TermInfo;
-using Icod.TermInfo.Compiler;
+The Compiler public contract was frozen at 1.2 and remains compatible throughout
+the coordinated 1.x line. Version 1.14 changes package/release identity only for
+Compiler; it does not change Compiler semantics or public API.
 
-TerminalDescription description = new TerminalDescriptionBuilder( "example" )
-	.SetDescription( "Example terminal" )
-	.SetNumber( NumericCapability.Colors, 16_777_216 )
-	.SetExtendedBoolean( "AX" )
-	.SetExtendedNumber( "RGB", 16_777_216 )
-	.Build();
-
-byte[] compiled = CompiledTermInfoWriter.Write(
-	description
-);
-```
-
-When every present standard and extended numeric value is in `0..32767`, the
-writer emits legacy `0432`. A representable value greater than `32767` selects
-wide `01036`, where both standard and extended numeric tables use signed 32-bit
-little-endian values. Negative present values remain unrepresentable because
-they collide with compiled absent/canceled sentinel semantics.
-
-## Explicit format policy
-
-Use `CompiledTermInfoWriterOptions` when the output representation is part of the
-caller's contract:
-
-```csharp
-byte[] wide = CompiledTermInfoWriter.Write(
-	description,
-	new CompiledTermInfoWriterOptions(
-		CompiledTermInfoFormat.Wide
-	)
-);
-```
-
-`CompiledTermInfoFormat.Legacy` emits `0432` exactly or fails if any numeric
-requires the wide form. `CompiledTermInfoFormat.Wide` emits `01036` exactly even
-when legacy would suffice. `Automatic` prefers legacy and upgrades only when
-required.
-
-The options also expose `IncludeExtendedCapabilities`. Setting it to `false` is
-a representation constraint, not a request to discard data: a description
-containing extended capabilities fails rather than being silently truncated.
-
-All identity, capability-name, and capability-string data retain the strict
-reversible Latin-1 and NUL-termination rules established by C01-C03. Standard
-and extended string/name offsets remain signed 16-bit fields, section counts and
-sizes remain checked, and total-entry arithmetic is checked before allocation.
-
-Invalid arguments use normal argument exceptions. A valid `TerminalDescription`
-which cannot be represented by the requested policy throws
-`InvalidOperationException`. C04 freezes that distinction for the low-level
-writer surface.
-
-`CompiledTermInfoWriter` remains pure: it does not inspect environment variables,
-access terminfo directories, invoke native `tic`/ncurses, or write database
-layouts.
+See `../docs/VERSIONING.md`, `../docs/COMPATIBILITY.md`, and the root
+`../README.md` for the coordinated release contract.
