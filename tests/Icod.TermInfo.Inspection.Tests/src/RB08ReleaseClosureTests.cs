@@ -251,7 +251,7 @@ public sealed class RB08ReleaseClosureTests {
 		);
 
 		Assert.Contains(
-			"<IcodTermInfoSuiteVersion>1.14.0</IcodTermInfoSuiteVersion>",
+			"<IcodTermInfoSuiteVersion>1.15.0-Alpha-1</IcodTermInfoSuiteVersion>",
 			buildProperties,
 			StringComparison.Ordinal
 		);
