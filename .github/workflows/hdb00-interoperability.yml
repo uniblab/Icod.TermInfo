@@ -7,6 +7,11 @@ on:
     paths:
       - '.github/workflows/hdb00-interoperability.yml'
       - 'tools/hdb00/**'
+      - 'Icod.TermInfo.BerkeleyDb/**'
+      - 'tests/Icod.TermInfo.BerkeleyDb.Tests/**'
+      - 'tests/Icod.TermInfo.BerkeleyDb.Interop.Tests/**'
+      - 'Directory.Build.props'
+      - 'Directory.Build.targets'
       - 'samples/Icod.TermInfo.Acquisition.Sample/**'
       - 'Icod.TermInfo.csproj'
       - 'src/**'
@@ -45,6 +50,15 @@ jobs:
         shell: bash
         run: bash tools/hdb00/verify-managed.sh "$RUNNER_TEMP/icod-terminfo-hdb00"
 
+      - name: Compare production reader with native Berkeley DB records
+        shell: bash
+        env:
+          ICOD_HDB02_FIXTURE_ROOT: ${{ runner.temp }}/icod-terminfo-hdb00
+        run: |
+          db5.3_dump -k -f "$ICOD_HDB02_FIXTURE_ROOT/hashed-db.dump" "$ICOD_HDB02_FIXTURE_ROOT/hashed-db.db"
+          db5.3_dump -k -f "$ICOD_HDB02_FIXTURE_ROOT/overflow-hashed-db.dump" "$ICOD_HDB02_FIXTURE_ROOT/overflow-hashed-db.db"
+          dotnet test tests/Icod.TermInfo.BerkeleyDb.Interop.Tests/Icod.TermInfo.BerkeleyDb.Interop.Tests.csproj -c Release
+
       - name: Upload Linux Hash v9 fixtures
         uses: actions/upload-artifact@v4
         with:
@@ -56,6 +70,10 @@ jobs:
             ${{ runner.temp }}/icod-terminfo-hdb00/hdb00-primary.bin
             ${{ runner.temp }}/icod-terminfo-hdb00/overflow-hashed-db.db
             ${{ runner.temp }}/icod-terminfo-hdb00/hdb00-overflow.bin
+            ${{ runner.temp }}/icod-terminfo-hdb00/hashed-db.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00/overflow-hashed-db.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00/not-hash.db
+            ${{ runner.temp }}/icod-terminfo-hdb00/random.db
 
   macos-berkeley-db-5-3:
     name: macOS / Berkeley DB 5.3 / ncurses hashed store
@@ -84,6 +102,33 @@ jobs:
         shell: bash
         run: bash tools/hdb00/verify-managed.sh "$RUNNER_TEMP/icod-terminfo-hdb00-macos"
 
+      - name: Compare production reader with native Berkeley DB records
+        shell: bash
+        env:
+          ICOD_HDB02_FIXTURE_ROOT: ${{ runner.temp }}/icod-terminfo-hdb00-macos
+        run: |
+          db_prefix="$(brew --prefix berkeley-db@5)"
+          export DYLD_LIBRARY_PATH="$db_prefix/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}"
+          "$db_prefix/bin/db_dump" -k -f "$ICOD_HDB02_FIXTURE_ROOT/hashed-db.dump" "$ICOD_HDB02_FIXTURE_ROOT/hashed-db.db"
+          "$db_prefix/bin/db_dump" -k -f "$ICOD_HDB02_FIXTURE_ROOT/overflow-hashed-db.dump" "$ICOD_HDB02_FIXTURE_ROOT/overflow-hashed-db.db"
+          dotnet test tests/Icod.TermInfo.BerkeleyDb.Interop.Tests/Icod.TermInfo.BerkeleyDb.Interop.Tests.csproj -c Release
+
+      - name: Upload macOS native oracle fixtures
+        uses: actions/upload-artifact@v4
+        with:
+          name: hdb02-macos-native-oracle
+          if-no-files-found: error
+          retention-days: 7
+          path: |
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hashed-db.db
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/overflow-hashed-db.db
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hashed-db.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/overflow-hashed-db.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/not-hash.db
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/random.db
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hdb00-primary.bin
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hdb00-overflow.bin
+
   windows-managed-cross-host:
     name: Windows / managed-only Linux Hash v9 fixture
     runs-on: windows-latest
@@ -97,7 +142,10 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 10.0.x
+          dotnet-version: |
+            8.0.x
+            9.0.x
+            10.0.x
 
       - name: Download Linux Hash v9 fixtures
         uses: actions/download-artifact@v4
@@ -131,3 +179,13 @@ jobs:
           }
 
           Write-Host 'HDB00 Windows managed-only cross-host probe passed.'
+
+      - name: Compare production reader with Linux native oracle records
+        shell: pwsh
+        env:
+          ICOD_HDB02_FIXTURE_ROOT: ${{ runner.temp }}/hdb00-linux-hash-v9
+        run: |
+          dotnet test tests/Icod.TermInfo.BerkeleyDb.Interop.Tests/Icod.TermInfo.BerkeleyDb.Interop.Tests.csproj -c Release
+          if ($LASTEXITCODE -ne 0) {
+              throw "Production reader native-oracle tests failed with exit code $LASTEXITCODE."
+          }
