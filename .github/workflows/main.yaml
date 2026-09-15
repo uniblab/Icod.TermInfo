@@ -19,6 +19,7 @@ env:
     10.0.x
   CONFIGURATION: Release
   SOLUTION_PATH: Icod.TermInfo.sln
+  BERKELEYDB_TEST_PROJECT: tests/Icod.TermInfo.BerkeleyDb.Tests/Icod.TermInfo.BerkeleyDb.Tests.csproj
 
 jobs:
   build:
@@ -57,6 +58,10 @@ jobs:
         run: dotnet build ${{ env.SOLUTION_PATH }} -c ${{ env.CONFIGURATION }} --no-restore -p:ContinuousIntegrationBuild=true
       - name: Test
         run: dotnet test ${{ env.SOLUTION_PATH }} -c ${{ env.CONFIGURATION }} --no-build --no-restore --logger trx
+      - name: Restore HDB01 BerkeleyDb tests
+        run: dotnet restore ${{ env.BERKELEYDB_TEST_PROJECT }}
+      - name: Test HDB01 BerkeleyDb package foundation
+        run: dotnet test ${{ env.BERKELEYDB_TEST_PROJECT }} -c ${{ env.CONFIGURATION }} --no-restore --logger trx -p:ContinuousIntegrationBuild=true
       - name: Pack coordinated Release packages
         if: matrix.distribution_host
         shell: pwsh
