@@ -4,7 +4,7 @@
 
 ## 1.15 development status
 
-`1.15.0-Alpha-3` adds an explicit public terminal-description provider on the accepted managed Hash-v9 reader. It supports bounded exact-key lookup with inline and off-page records, overflow reconstruction, both byte orders, ncurses marker resolution, compiled-entry parsing, exact identity validation, and successful-result caching.
+`1.15.0-Alpha-4` builds on the accepted explicit public terminal-description provider on the accepted managed Hash-v9 reader. It supports bounded exact-key lookup with inline and off-page records, overflow reconstruction, both byte orders, ncurses marker resolution, compiled-entry parsing, exact identity validation, and successful-result caching.
 
 HDB00 selected a dependency-free managed reader for the reviewed Berkeley DB **Hash on-disk format version 9** subset required by ncurses acquisition. Native Berkeley DB remains a CI interoperability oracle and is not a production dependency.
 
@@ -27,4 +27,4 @@ The reviewed subset supports unencrypted, non-checksummed Hash-v9 files with sor
 
 Dedicated CI compares the production reader and public provider with native Berkeley DB stores on Linux and macOS; Windows reads Linux-generated fixtures without Berkeley DB installed. Big-endian coverage uses synthetic fixtures. Lookup keys are encoded as UTF-8, while compiled identity fields retain Runtime's byte-preserving Latin-1 interpretation. Qualified native fixtures use ASCII terminal names; broader non-ASCII producer compatibility is not claimed.
 
-HDB03 is complete and accepted. Native-fixture provider parsing is qualified on Windows, Linux, and macOS across all supported target frameworks, and an isolated package-only consumer is qualified on `net8.0`, `net9.0`, and `net10.0`. HDB04 will add opt-in system discovery.
+HDB03 qualification includes native-fixture provider parsing on all supported target frameworks and an isolated package-only consumer on `net8.0`, `net9.0`, and `net10.0`.
