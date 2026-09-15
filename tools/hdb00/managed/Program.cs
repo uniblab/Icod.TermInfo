@@ -59,7 +59,7 @@ internal static class Program {
 						database,
 						metadata,
 						key,
-						out byte[]? value
+						out byte[] value
 					)
 				) {
 					Console.Error.WriteLine(
@@ -235,7 +235,7 @@ internal static class Program {
 		byte[] database,
 		DatabaseMetadata metadata,
 		ReadOnlySpan<byte> requestedKey,
-		out byte[]? value
+		out byte[] value
 	) {
 		for (
 			uint pageNumber = 1;
@@ -280,7 +280,7 @@ internal static class Program {
 			}
 		}
 
-		value = null;
+		value = [];
 		return false;
 	}
 
