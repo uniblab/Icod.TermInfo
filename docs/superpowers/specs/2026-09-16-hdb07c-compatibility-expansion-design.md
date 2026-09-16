@@ -1,6 +1,6 @@
 # HDB07C Compatibility Expansion Design
 
-**Status:** DESIGN APPROVED / SPEC REVIEW  
+**Status:** SPECIFICATION APPROVED / IMPLEMENTATION PLANNING
 **Target prerelease:** `1.15.0-Alpha-7`  
 **Accepted HDB07 implementation head:**
 `ab059acf27a5bc7fb1e8cef390d47085be33b5af`  
