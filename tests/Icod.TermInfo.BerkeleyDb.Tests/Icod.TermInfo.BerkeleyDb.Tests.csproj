@@ -29,6 +29,11 @@
 		<ProjectReference Include="..\..\Icod.TermInfo.Inspection\Icod.TermInfo.Inspection.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<Compile Include="..\Shared\Hdb07HashV9FixtureBuilder.cs"
+			Link="Shared\Hdb07HashV9FixtureBuilder.cs" />
+	</ItemGroup>
+
 	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
 		<ErrorReport>prompt</ErrorReport>
 		<WarningLevel>2</WarningLevel>
