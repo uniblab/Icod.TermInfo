@@ -23,7 +23,6 @@ multi_hashed_base="$work_root/multi-hashed-db"
 multi_hashed_db="$multi_hashed_base.db"
 multi_fixture="$work_root/hdb07-multi.src"
 multi_dump="$work_root/multi-hashed-db.dump"
-repacker="$work_root/hdb07c-repack"
 big_endian_db="$work_root/big-endian-hashed-db.db"
 big_endian_dump="$work_root/big-endian-hashed-db.dump"
 source_dump="$work_root/hashed-db.dump"
@@ -139,16 +138,6 @@ cc \
     -ldb \
     -o "$probe"
 
-printf '%s\n' "== HDB07C: build CI-only Berkeley DB repacker =="
-cc \
-    -std=c11 \
-    -Wall \
-    -Wextra \
-    -Werror \
-    "$repo_root/tools/hdb00/hdb07c_repack.c" \
-    -ldb \
-    -o "$repacker"
-
 printf '%s\n' "== HDB00: exact canonical-name lookup =="
 "$probe" "$hashed_db" hdb00-primary "$primary_payload" | tee "$work_root/primary-probe.txt"
 
@@ -162,8 +151,11 @@ printf '%s\n' "== HDB00: prove hashed payload equals same-source conventional co
 cmp "$primary_payload" "$directory_entry"
 
 printf '%s\n' "== HDB07C: produce and verify native big-endian Hash container =="
-"$repacker" "$hashed_db" "$big_endian_db" 4321
 db5.3_dump -k -f "$source_dump" "$hashed_db"
+db5.3_load \
+    -c db_lorder=4321 \
+    -f "$source_dump" \
+    "$big_endian_db"
 db5.3_dump -k -f "$big_endian_dump" "$big_endian_db"
 dotnet run \
     --project "$native_verifier_project" \

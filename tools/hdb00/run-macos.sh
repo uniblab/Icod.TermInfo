@@ -23,7 +23,6 @@ multi_hashed_base="$work_root/multi-hashed-db"
 multi_hashed_db="$multi_hashed_base.db"
 multi_fixture="$work_root/hdb07-multi.src"
 multi_dump="$work_root/multi-hashed-db.dump"
-repacker="$work_root/hdb07c-repack"
 big_endian_db="$work_root/big-endian-hashed-db.db"
 big_endian_dump="$work_root/big-endian-hashed-db.dump"
 source_dump="$work_root/hashed-db.dump"
@@ -148,18 +147,6 @@ cc \
     -ldb \
     -o "$probe"
 
-printf '%s\n' "== HDB07C macOS: build CI-only Berkeley DB repacker =="
-cc \
-    -std=c11 \
-    -Wall \
-    -Wextra \
-    -Werror \
-    -I"$db_prefix/include" \
-    "$repo_root/tools/hdb00/hdb07c_repack.c" \
-    -L"$db_prefix/lib" \
-    -ldb \
-    -o "$repacker"
-
 run_probe() {
     DYLD_LIBRARY_PATH="$db_prefix/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}" \
         "$probe" "$@"
@@ -168,11 +155,6 @@ run_probe() {
 run_hashed_tic() {
     DYLD_LIBRARY_PATH="$db_prefix/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}" \
         "$hashed_source/progs/tic" "$@"
-}
-
-run_repacker() {
-    DYLD_LIBRARY_PATH="$db_prefix/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}" \
-        "$repacker" "$@"
 }
 
 printf '%s\n' "== HDB00 macOS: exact canonical-name lookup =="
@@ -188,9 +170,13 @@ printf '%s\n' "== HDB00 macOS: prove hashed payload equals same-source conventio
 cmp "$primary_payload" "$directory_entry"
 
 printf '%s\n' "== HDB07C macOS: produce and verify native big-endian Hash container =="
-run_repacker "$hashed_db" "$big_endian_db" 4321
 DYLD_LIBRARY_PATH="$db_prefix/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}" \
     "$db_prefix/bin/db_dump" -k -f "$source_dump" "$hashed_db"
+DYLD_LIBRARY_PATH="$db_prefix/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}" \
+    "$db_prefix/bin/db_load" \
+        -c db_lorder=4321 \
+        -f "$source_dump" \
+        "$big_endian_db"
 DYLD_LIBRARY_PATH="$db_prefix/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}" \
     "$db_prefix/bin/db_dump" -k -f "$big_endian_dump" "$big_endian_db"
 dotnet run \

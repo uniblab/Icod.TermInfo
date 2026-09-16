@@ -4,9 +4,9 @@
 
 **Goal:** Add detected-mutation rejection, native big-endian Hash-v9 evidence, and a bounded exact Latin-1 ncurses producer fallback without changing the public API or production dependency/write boundaries.
 
-**Architecture:** Production path acquisition verifies two complete byte-identical observations through one open handle while the borrowed stream helper remains single-pass. Native CI repacks ncurses-produced records through Berkeley DB's C API into a big-endian Hash container, and terminal-name handling uses strict UTF-8 first with a Latin-1 candidate only after a clean miss or invalid UTF-8 publication key. Each workstream has an independently committed RED, narrow GREEN, and exact CI checkpoint.
+**Architecture:** Production path acquisition verifies two complete byte-identical observations through one open handle while the borrowed stream helper remains single-pass. Native CI repacks ncurses-produced records with Berkeley DB's installed `db_dump` and `db_load` utilities into a big-endian Hash container, and terminal-name handling uses strict UTF-8 first with a Latin-1 candidate only after a clean miss or invalid UTF-8 publication key. Each workstream has an independently committed RED, narrow GREEN, and exact CI checkpoint.
 
-**Tech Stack:** C# 13; .NET 8/9/10; xUnit 2.9; Berkeley DB 5.3 C API; pinned ncurses `tic`; Bash; PowerShell; GitHub Actions.
+**Tech Stack:** C# 13; .NET 8/9/10; xUnit 2.9; Berkeley DB 5.3 command-line utilities; pinned ncurses `tic`; cmd/sh; Windows PowerShell 5.1-compatible PowerShell; GitHub Actions.
 
 **Spec:** `docs/superpowers/specs/2026-09-16-hdb07c-compatibility-expansion-design.md`
 
@@ -21,7 +21,7 @@
 - Do not add retry, encoding normalization, culture/code-page inference, case folding, transliteration, or best-fit mapping.
 - A UTF-8 record that is found but malformed or identity-invalid must fail; Latin-1 fallback occurs only after a clean UTF-8 miss.
 - Generated native databases remain short-lived workflow artifacts and are not committed.
-- Add no Python source, script, inline program, or Python-dependent verification step.
+- New work is limited to C#, cmd/sh, and Windows PowerShell 5.1-compatible PowerShell; add no Python, C, or C++ source, inline program, or dependency.
 - Run the ordinary PR workflow for every pushed checkpoint. Let the existing synchronize-delta classifier decide whether HDB00 performs expensive work.
 - Run complete normal 12-job and HDB00 3-job qualification on the exact final implementation head.
 - Keep PR #45 open, draft, and unmerged.
@@ -38,9 +38,7 @@
 | `tests/Icod.TermInfo.BerkeleyDb.Tests/src/Hdb07cAcquisitionStabilityTests.cs` | Deterministic two-observation acquisition and ownership tests. |
 | `tests/Icod.TermInfo.BerkeleyDb.Tests/src/Hdb07cEncodingCompatibilityTests.cs` | Synthetic provider/catalog encoding, precedence, ambiguity, and system-provider tests. |
 | `tests/Icod.TermInfo.BerkeleyDb.Interop.Tests/src/NativeOracleTests.cs` | Native dump, big-endian, Latin-1, provider, system-provider, and catalog comparisons. |
-| `tools/hdb00/hdb07c_repack.c` | CI-only byte-exact record copier with selectable Berkeley DB metadata order. |
 | `tools/hdb00/native-verifier/` | Managed metadata-magic, dump-parity, and Latin-1 native-evidence verification. |
-| `tools/hdb00/hdb00_probe.c` | Native probe with exact text-key and explicit hex-key lookup modes. |
 | `tools/hdb00/run-linux.sh` | Linux native big-endian and Latin-1 fixture generation/evidence. |
 | `tools/hdb00/run-macos.sh` | macOS native big-endian and Latin-1 fixture generation/evidence. |
 | `tools/hdb00/verify-managed.sh` | Managed probe verification for generated big-endian fixtures. |
@@ -254,7 +252,6 @@ Push and require normal CI 12/12 plus HDB00 3/3 because production acquisition c
 ### Task 2: Native big-endian Berkeley DB container
 
 **Files:**
-- Create: `tools/hdb00/hdb07c_repack.c`
 - Create: `tools/hdb00/native-verifier/Hdb07c.NativeVerifier.csproj`
 - Create: `tools/hdb00/native-verifier/Program.cs`
 - Modify: `tests/Icod.TermInfo.BerkeleyDb.Interop.Tests/src/NativeOracleTests.cs`
@@ -267,7 +264,7 @@ Push and require normal CI 12/12 plus HDB00 3/3 because production acquisition c
 **Interfaces:**
 - Consumes: `hashed-db.db`, the three-record ncurses native source store.
 - Produces: `big-endian-hashed-db.db` and `big-endian-hashed-db.dump` with identical application records and big-endian Berkeley DB metadata.
-- Produces: CI-only executable interface `hdb07c_repack SOURCE_DATABASE DESTINATION_DATABASE 4321`.
+- Uses: installed `db_dump -k` plus `db_load -c db_lorder=4321` to preserve exact dump records while selecting destination metadata order.
 
 - [ ] **Step 1: Add fixture expectations before generation**
 
@@ -301,84 +298,17 @@ git commit -m "test: require native HDB07C big-endian evidence"
 
 Expected HDB00 result: Linux and macOS fail on the missing `big-endian-hashed-db.db`; Windows skips because Linux did not publish the required artifact. The ordinary workflow may remain green.
 
-- [ ] **Step 3: Implement the CI-only native repacker**
+- [ ] **Step 3: Repack through installed Berkeley DB utilities**
 
-Create `hdb07c_repack.c` with this exact operating sequence:
+In each native script, dump the ncurses-produced source with `db_dump -k`,
+then load the exact bytevalue dump into the destination with:
 
-```c
-DB *source = NULL;
-DB *destination = NULL;
-DBC *cursor = NULL;
-DBT key;
-DBT value;
-int result = 1;
-
-db_create(&source, NULL, 0);
-source->open(source, NULL, argv[1], NULL, DB_UNKNOWN, DB_RDONLY, 0);
-
-db_create(&destination, NULL, 0);
-destination->set_lorder(destination, atoi(argv[3]));
-destination->open(
-	destination,
-	NULL,
-	argv[2],
-	NULL,
-	DB_HASH,
-	DB_CREATE | DB_TRUNCATE,
-	0600
-);
-
-source->cursor(source, NULL, &cursor, 0);
-memset(&key, 0, sizeof(key));
-memset(&value, 0, sizeof(value));
-while ((status = cursor->get(cursor, &key, &value, DB_NEXT)) == 0) {
-	status = destination->put(destination, NULL, &key, &value, DB_NOOVERWRITE);
-	if (status != 0) {
-		fprintf(stderr, "destination put: %s\n", db_strerror(status));
-		goto cleanup;
-	}
-}
-if (status != DB_NOTFOUND) {
-	fprintf(stderr, "source cursor get: %s\n", db_strerror(status));
-	goto cleanup;
-}
-result = 0;
-
-cleanup:
-if (cursor != NULL) {
-	status = cursor->close(cursor);
-	if (status != 0) {
-		fprintf(stderr, "cursor close: %s\n", db_strerror(status));
-		result = 1;
-	}
-}
-if (destination != NULL) {
-	status = destination->close(destination, 0);
-	if (status != 0) {
-		fprintf(stderr, "destination close: %s\n", db_strerror(status));
-		result = 1;
-	}
-}
-if (source != NULL) {
-	status = source->close(source, 0);
-	if (status != 0) {
-		fprintf(stderr, "source close: %s\n", db_strerror(status));
-		result = 1;
-	}
-}
-return result;
+```text
+db_load -c db_lorder=4321 -f SOURCE_DUMP DESTINATION_DATABASE
 ```
 
-The completed file must:
-
-- require exactly three arguments;
-- accept only `1234` or `4321`;
-- check every `db_create`, method, cursor, and close return value;
-- close cursor before databases;
-- close the destination before source;
-- report failures to stderr with the failing operation and `db_strerror`;
-- print copied record count and selected order; and
-- compile with `-std=c11 -Wall -Wextra -Werror` on Linux and macOS.
+Use the versioned Linux utilities and the Homebrew Berkeley DB 5 utilities on
+macOS. Do not compile or add a native helper.
 
 - [ ] **Step 4: Add an independent managed native-evidence verifier**
 
@@ -404,10 +334,10 @@ HDB07C native big-endian records: 3
 
 In each native script:
 
-1. define the repacker executable and destination paths;
-2. compile `hdb07c_repack.c` with the same Berkeley DB include/library settings as `hdb00_probe.c`;
-3. run `hdb07c_repack "$hashed_db" "$big_endian_db" 4321` under the macOS `DYLD_LIBRARY_PATH` wrapper when required;
-4. dump source and destination with `-k`;
+1. define source-dump and destination paths;
+2. dump the source with `-k`;
+3. load the dump with `db_lorder=4321` under the macOS `DYLD_LIBRARY_PATH` wrapper when required;
+4. dump the destination with `-k`;
 5. run the managed native-evidence verifier to assert metadata order and exact parsed `(key,value)` parity rather than textual header equality;
 6. use the native probe for canonical and alias extraction and compare both with `hdb00-primary.bin`; and
 7. print exactly `HDB07C native big-endian records: 3`.
@@ -427,7 +357,7 @@ On CI, require native creation/dump/probe success on Linux and macOS, managed in
 - [ ] **Step 7: Commit the GREEN**
 
 ```bash
-git add tools/hdb00/hdb07c_repack.c tools/hdb00/native-verifier tools/hdb00/run-linux.sh tools/hdb00/run-macos.sh
+git add tools/hdb00/native-verifier tools/hdb00/run-linux.sh tools/hdb00/run-macos.sh
 git commit -m "test: produce native HDB07C big-endian stores"
 ```
 
@@ -744,7 +674,6 @@ Require the complete normal and HDB00 workflows green.
 ### Task 5: Native Latin-1 ncurses producer evidence
 
 **Files:**
-- Modify: `tools/hdb00/hdb00_probe.c`
 - Modify: `tools/hdb00/native-verifier/Program.cs`
 - Modify: `tests/Icod.TermInfo.BerkeleyDb.Interop.Tests/src/NativeOracleTests.cs`
 - Modify: `tools/hdb00/run-linux.sh`
@@ -793,18 +722,13 @@ git commit -m "test: require native HDB07C Latin-1 evidence"
 
 Expected HDB00 result: Linux/macOS fail because `latin1-hashed-db.db` is missing; Windows skips. This evidence RED is separate from the already observed managed behavior RED.
 
-- [ ] **Step 3: Add explicit arbitrary-byte lookup to the native probe**
+- [ ] **Step 3: Add managed exact-byte dump extraction**
 
-Extend `hdb00_probe.c` without changing its existing interface. Add:
-
-```text
-hdb00_probe DATABASE --key-hex KEY_HEX OUTPUT
-```
-
-The hex mode must require nonempty even-length ASCII hex, reject invalid digits
-and decoded NUL, allocate the exact decoded bytes, use their explicit length for
-Berkeley DB lookup, retain the existing marker/hop behavior, and print the exact
-lookup key hex. Existing text-key calls and output remain unchanged.
+Extend the C# native-evidence verifier with a Latin-1 dump mode. It must accept
+the native `db_dump -k` output, require the exact canonical and alias key bytes,
+follow their marker-2 target in the dump's exact byte records, require one
+marker-0 compiled record and two marker-2 publications, and write canonical and
+alias compiled payloads for byte comparison. Do not modify or add native source.
 
 - [ ] **Step 4: Generate the source as exact bytes and compile it with native tic**
 
@@ -812,9 +736,9 @@ In each Bash native script write the source as exact bytes without a new
 language dependency: emit the ASCII fragments with `printf '%s'` and the two
 Latin-1 bytes with `printf '\351'`, then emit the remaining capability lines as
 ASCII. Compile it with the already built hashed `tic` into
-`latin1-hashed-db.db`. Use the native probe's `--key-hex` mode with the
-canonical and alias hex keys, compare both payloads, and save the canonical
-output as `hdb07c-latin1.bin`.
+`latin1-hashed-db.db`. Dump it with the installed native Berkeley DB utility,
+use the C# verifier's Latin-1 mode to extract the canonical and alias payloads,
+compare both payloads, and save the canonical output as `hdb07c-latin1.bin`.
 
 Dump the database with `db_dump -k`. Extend the managed native-evidence verifier
 with a Latin-1 dump mode and require:
@@ -844,7 +768,7 @@ Require Linux/macOS native creation, byte-key probe, dump, and managed interop s
 - [ ] **Step 6: Commit the native Latin-1 GREEN**
 
 ```bash
-git add tools/hdb00/hdb00_probe.c tools/hdb00/native-verifier/Program.cs tools/hdb00/run-linux.sh tools/hdb00/run-macos.sh
+git add tools/hdb00/native-verifier/Program.cs tools/hdb00/run-linux.sh tools/hdb00/run-macos.sh
 git commit -m "test: produce native HDB07C Latin-1 stores"
 ```
 
