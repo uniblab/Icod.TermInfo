@@ -29,6 +29,11 @@
 		<ProjectReference Include="..\..\infocmp\Icod.TermInfo.InfoCmp.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<Compile Include="..\Shared\BerkeleyDbHashV9TestStore.cs"
+			Link="Shared\BerkeleyDbHashV9TestStore.cs" />
+	</ItemGroup>
+
 	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
 		<ErrorReport>prompt</ErrorReport>
 		<WarningLevel>2</WarningLevel>
