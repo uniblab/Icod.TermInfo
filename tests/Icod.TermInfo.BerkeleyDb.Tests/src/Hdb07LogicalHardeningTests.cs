@@ -197,11 +197,11 @@ public sealed class Hdb07LogicalHardeningTests {
 	}
 
 	[Fact]
-	public void CatalogRejectsInvalidUtf8PublicationKey() {
+	public void CatalogRejectsUnsafeLatin1FallbackPublicationKey() {
 		byte[] storageKey = Encoding.UTF8.GetBytes( "storage" );
 		byte[] database = CreateDatabase(
 			CreateRecord(
-				[ 0xC3, 0x28 ],
+				[ 0xE9, 0x00 ],
 				Hdb07HashV9FixtureBuilder.NcursesIndex( storageKey )
 			),
 			CreateStorageRecord( storageKey, "sample" )
@@ -542,7 +542,7 @@ public sealed class Hdb07LogicalHardeningTests {
 						).Read()
 					);
 				Assert.Equal(
-					"The ncurses publication key is not a safe exact UTF-8 terminal name.",
+					"The ncurses publication key is not a safe exact UTF-8 or Latin-1 terminal name.",
 					error.Message
 				);
 			}

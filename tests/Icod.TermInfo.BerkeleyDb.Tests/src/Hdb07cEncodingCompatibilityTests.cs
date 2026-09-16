@@ -154,6 +154,106 @@ public sealed class Hdb07cEncodingCompatibilityTests {
 		);
 	}
 
+	[Fact]
+	public void CatalogEnumeratesExactLatin1CanonicalAndAlias() {
+		WithDatabase(
+			CreateLatin1Store(),
+			path => {
+				IReadOnlyList<BerkeleyDbTerminalCatalogEntry> entries =
+					new BerkeleyDbTerminalCatalogReader( path ).Read();
+
+				Assert.Collection(
+					entries,
+					entry => {
+						Assert.Equal( Alias, entry.Name );
+						Assert.Equal(
+							BerkeleyDbTerminalCatalogEntryKind.Alias,
+							entry.Kind
+						);
+					},
+					entry => {
+						Assert.Equal( Canonical, entry.Name );
+						Assert.Equal(
+							BerkeleyDbTerminalCatalogEntryKind.Canonical,
+							entry.Kind
+						);
+					}
+				);
+				Assert.Same( entries[0].Terminal, entries[1].Terminal );
+			}
+		);
+	}
+
+	[Fact]
+	public void CatalogRejectsDistinctRawKeysWithOneDecodedLogicalName() {
+		byte[] storageKey = Encoding.ASCII.GetBytes( "hdb07c-storage" );
+		byte[] compiled = Hdb07HashV9FixtureBuilder.CreateCompiledEntry(
+			Canonical,
+			"HDB07C ambiguity fixture"
+		);
+		WithDatabase(
+			CreateDatabase(
+				CreateRecord(
+					Encoding.UTF8.GetBytes( Canonical ),
+					Hdb07HashV9FixtureBuilder.NcursesIndex( storageKey )
+				),
+				CreateRecord(
+					Encoding.Latin1.GetBytes( Canonical ),
+					Hdb07HashV9FixtureBuilder.NcursesIndex( storageKey )
+				),
+				CreateRecord(
+					storageKey,
+					Hdb07HashV9FixtureBuilder.NcursesData( compiled )
+				)
+			),
+			path => {
+				BerkeleyDbDatabaseFormatException error =
+					Assert.Throws<BerkeleyDbDatabaseFormatException>(
+						() => new BerkeleyDbTerminalCatalogReader(
+							path
+						).Read()
+					);
+				Assert.Equal(
+					"The ncurses catalog contains more than one exact byte key for logical publication 'hdb07c-caf\u00E9'.",
+					error.Message
+				);
+			}
+		);
+	}
+
+	[Fact]
+	public void CatalogRejectsUnsafeNameAfterLatin1Fallback() {
+		byte[] storageKey = Encoding.ASCII.GetBytes( "hdb07c-storage" );
+		byte[] compiled = Hdb07HashV9FixtureBuilder.CreateCompiledEntry(
+			"hdb07c-storage",
+			"HDB07C unsafe-name fixture"
+		);
+		WithDatabase(
+			CreateDatabase(
+				CreateRecord(
+					[ 0xE9, 0x00 ],
+					Hdb07HashV9FixtureBuilder.NcursesIndex( storageKey )
+				),
+				CreateRecord(
+					storageKey,
+					Hdb07HashV9FixtureBuilder.NcursesData( compiled )
+				)
+			),
+			path => {
+				BerkeleyDbDatabaseFormatException error =
+					Assert.Throws<BerkeleyDbDatabaseFormatException>(
+						() => new BerkeleyDbTerminalCatalogReader(
+							path
+						).Read()
+					);
+				Assert.Equal(
+					"The ncurses publication key is not a safe exact UTF-8 or Latin-1 terminal name.",
+					error.Message
+				);
+			}
+		);
+	}
+
 	private static byte[] CreateLatin1Store() {
 		byte[] canonical = Encoding.Latin1.GetBytes( Canonical );
 		byte[] alias = Encoding.Latin1.GetBytes( Alias );
