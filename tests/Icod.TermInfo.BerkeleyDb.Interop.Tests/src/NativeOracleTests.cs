@@ -25,9 +25,13 @@ using Xunit;
 namespace Icod.TermInfo.BerkeleyDb.Interop.Tests;
 
 public sealed class NativeOracleTests {
+	private const string Latin1Canonical = "hdb07c-caf\u00E9";
+	private const string Latin1Alias = "hdb07c-ali\u00E9";
+
 	[Theory]
 	[InlineData( "hashed-db", 3 )]
 	[InlineData( "big-endian-hashed-db", 3 )]
+	[InlineData( "latin1-hashed-db", 3 )]
 	[InlineData( "overflow-hashed-db", 2 )]
 	[InlineData( "multi-hashed-db", 192 )]
 	public void ProductionReaderMatchesEveryNativeRecord(
@@ -45,6 +49,25 @@ public sealed class NativeOracleTests {
 			);
 			Assert.Equal( expected, actual );
 		}
+	}
+
+	[Fact]
+	public void NativeLatin1DumpContainsExactPublicationKeyBytes() {
+		List<( byte[] Key, byte[] Value )> records =
+			ReadNativeRecords( "latin1-hashed-db" );
+
+		Assert.Contains(
+			records,
+			record => record.Key.AsSpan().SequenceEqual(
+				Convert.FromHexString( "6864623037632D636166E9" )
+			)
+		);
+		Assert.Contains(
+			records,
+			record => record.Key.AsSpan().SequenceEqual(
+				Convert.FromHexString( "6864623037632D616C69E9" )
+			)
+		);
 	}
 
 	[Theory]
@@ -112,6 +135,8 @@ public sealed class NativeOracleTests {
 	[InlineData( "hashed-db", "hdb00-alias", "hdb00-primary", "hdb00-alias" )]
 	[InlineData( "big-endian-hashed-db", "hdb00-primary", "hdb00-primary", "hdb00-alias" )]
 	[InlineData( "big-endian-hashed-db", "hdb00-alias", "hdb00-primary", "hdb00-alias" )]
+	[InlineData( "latin1-hashed-db", Latin1Canonical, Latin1Canonical, Latin1Alias )]
+	[InlineData( "latin1-hashed-db", Latin1Alias, Latin1Canonical, Latin1Alias )]
 	[InlineData( "overflow-hashed-db", "hdb00-overflow", "hdb00-overflow", null )]
 	public void PublicProviderParsesNativeStore(
 		string fixtureName,
@@ -170,6 +195,8 @@ public sealed class NativeOracleTests {
 	[InlineData( "hashed-db", "hdb00-alias", "hdb00-primary" )]
 	[InlineData( "big-endian-hashed-db", "hdb00-primary", "hdb00-primary" )]
 	[InlineData( "big-endian-hashed-db", "hdb00-alias", "hdb00-primary" )]
+	[InlineData( "latin1-hashed-db", Latin1Canonical, Latin1Canonical )]
+	[InlineData( "latin1-hashed-db", Latin1Alias, Latin1Canonical )]
 	[InlineData( "overflow-hashed-db", "hdb00-overflow", "hdb00-overflow" )]
 	public void PublicSystemProviderParsesNativeStore(
 		string fixtureName,
@@ -259,6 +286,36 @@ public sealed class NativeOracleTests {
 			"hdb00-alias",
 			entries[0].Terminal.Aliases
 		);
+	}
+
+	[Fact]
+	public void PublicCatalogEnumeratesNativeLatin1Publications() {
+		BerkeleyDbTerminalCatalogReader reader =
+			new( FixturePath( "latin1-hashed-db.db" ) );
+
+		IReadOnlyList<BerkeleyDbTerminalCatalogEntry> entries =
+			reader.Read();
+
+		Assert.Collection(
+			entries,
+			entry => {
+				Assert.Equal( Latin1Alias, entry.Name );
+				Assert.Equal(
+					BerkeleyDbTerminalCatalogEntryKind.Alias,
+					entry.Kind
+				);
+			},
+			entry => {
+				Assert.Equal( Latin1Canonical, entry.Name );
+				Assert.Equal(
+					BerkeleyDbTerminalCatalogEntryKind.Canonical,
+					entry.Kind
+				);
+			}
+		);
+		Assert.Same( entries[0].Terminal, entries[1].Terminal );
+		Assert.Equal( Latin1Canonical, entries[0].Terminal.Name );
+		Assert.Contains( Latin1Alias, entries[0].Terminal.Aliases );
 	}
 
 	[Fact]

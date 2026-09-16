@@ -16,6 +16,7 @@ $repositoryRoot = [System.IO.Path]::GetFullPath(
 $fixturePath = [System.IO.Path]::GetFullPath( $FixtureRoot )
 $primaryDatabase = Join-Path $fixturePath 'hashed-db.db'
 $bigEndianDatabase = Join-Path $fixturePath 'big-endian-hashed-db.db'
+$latin1Database = Join-Path $fixturePath 'latin1-hashed-db.db'
 $overflowDatabase = Join-Path $fixturePath 'overflow-hashed-db.db'
 $multiDatabase = Join-Path $fixturePath 'multi-hashed-db.db'
 $malformedDatabase = Join-Path $fixturePath 'random.db'
@@ -24,6 +25,7 @@ $wrongTypeDatabase = Join-Path $fixturePath 'not-hash.db'
 foreach ( $requiredPath in @(
 	$primaryDatabase,
 	$bigEndianDatabase,
+	$latin1Database,
 	$overflowDatabase,
 	$multiDatabase,
 	$malformedDatabase,
@@ -222,6 +224,38 @@ try {
 		-RequireEmptyStderr
 	if ( $primaryToeOutput -cne $bigEndianToe.Stdout ) {
 		throw 'Big-endian toe output differs from the primary little-endian store.'
+	}
+
+	$latin1Canonical = 'hdb07c-caf' + [char]0x00E9
+	$latin1Alias = 'hdb07c-ali' + [char]0x00E9
+	foreach ( $name in @( $latin1Canonical, $latin1Alias ) ) {
+		$result = Invoke-TermInfoCommand infocmp @(
+			'-A', $latin1Database, $name
+		)
+		Assert-CommandResult `
+			-Result $result `
+			-ExpectedStatus 0 `
+			-StdoutContains "$latin1Canonical|$latin1Alias|Icod HDB07C Latin-1 fixture," `
+			-RequireEmptyStderr
+	}
+
+	$result = Invoke-TermInfoCommand toe @( '-s', $latin1Database )
+	Assert-CommandResult -Result $result -ExpectedStatus 0 -RequireEmptyStderr
+	$latin1Lines = @(
+		$result.Stdout -split '\r?\n' |
+			Where-Object { 0 -ne $_.Length }
+	)
+	$latin1ExpectedLines = @(
+		"$latin1Alias`tIcod HDB07C Latin-1 fixture",
+		"$latin1Canonical`tIcod HDB07C Latin-1 fixture"
+	)
+	if ( 2 -ne $latin1Lines.Count ) {
+		throw "Expected two Latin-1 toe publications, got $($latin1Lines.Count).`n$($result.Stdout)"
+	}
+	for ( $index = 0; $index -lt $latin1ExpectedLines.Count; $index++ ) {
+		if ( $latin1ExpectedLines[$index] -cne $latin1Lines[$index] ) {
+			throw "Unexpected Latin-1 toe entry '$($latin1Lines[$index])'; expected '$($latin1ExpectedLines[$index])'."
+		}
 	}
 
 	$result = Invoke-TermInfoCommand infocmp @(

@@ -114,6 +114,7 @@ jobs:
         run: |
           db5.3_dump -k -f "$ICOD_HDB02_FIXTURE_ROOT/hashed-db.dump" "$ICOD_HDB02_FIXTURE_ROOT/hashed-db.db"
           db5.3_dump -k -f "$ICOD_HDB02_FIXTURE_ROOT/big-endian-hashed-db.dump" "$ICOD_HDB02_FIXTURE_ROOT/big-endian-hashed-db.db"
+          db5.3_dump -k -f "$ICOD_HDB02_FIXTURE_ROOT/latin1-hashed-db.dump" "$ICOD_HDB02_FIXTURE_ROOT/latin1-hashed-db.db"
           db5.3_dump -k -f "$ICOD_HDB02_FIXTURE_ROOT/overflow-hashed-db.dump" "$ICOD_HDB02_FIXTURE_ROOT/overflow-hashed-db.db"
           dotnet test tests/Icod.TermInfo.BerkeleyDb.Interop.Tests/Icod.TermInfo.BerkeleyDb.Interop.Tests.csproj -c Release
 
@@ -134,11 +135,14 @@ jobs:
           path: |
             ${{ runner.temp }}/icod-terminfo-hdb00/hashed-db.db
             ${{ runner.temp }}/icod-terminfo-hdb00/big-endian-hashed-db.db
+            ${{ runner.temp }}/icod-terminfo-hdb00/latin1-hashed-db.db
+            ${{ runner.temp }}/icod-terminfo-hdb00/hdb07c-latin1.bin
             ${{ runner.temp }}/icod-terminfo-hdb00/hdb00-primary.bin
             ${{ runner.temp }}/icod-terminfo-hdb00/overflow-hashed-db.db
             ${{ runner.temp }}/icod-terminfo-hdb00/hdb00-overflow.bin
             ${{ runner.temp }}/icod-terminfo-hdb00/hashed-db.dump
             ${{ runner.temp }}/icod-terminfo-hdb00/big-endian-hashed-db.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00/latin1-hashed-db.dump
             ${{ runner.temp }}/icod-terminfo-hdb00/overflow-hashed-db.dump
             ${{ runner.temp }}/icod-terminfo-hdb00/multi-hashed-db.db
             ${{ runner.temp }}/icod-terminfo-hdb00/multi-hashed-db.dump
@@ -213,6 +217,7 @@ jobs:
           export DYLD_LIBRARY_PATH="$db_prefix/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}"
           "$db_prefix/bin/db_dump" -k -f "$ICOD_HDB02_FIXTURE_ROOT/hashed-db.dump" "$ICOD_HDB02_FIXTURE_ROOT/hashed-db.db"
           "$db_prefix/bin/db_dump" -k -f "$ICOD_HDB02_FIXTURE_ROOT/big-endian-hashed-db.dump" "$ICOD_HDB02_FIXTURE_ROOT/big-endian-hashed-db.db"
+          "$db_prefix/bin/db_dump" -k -f "$ICOD_HDB02_FIXTURE_ROOT/latin1-hashed-db.dump" "$ICOD_HDB02_FIXTURE_ROOT/latin1-hashed-db.db"
           "$db_prefix/bin/db_dump" -k -f "$ICOD_HDB02_FIXTURE_ROOT/overflow-hashed-db.dump" "$ICOD_HDB02_FIXTURE_ROOT/overflow-hashed-db.db"
           dotnet test tests/Icod.TermInfo.BerkeleyDb.Interop.Tests/Icod.TermInfo.BerkeleyDb.Interop.Tests.csproj -c Release
 
@@ -233,15 +238,18 @@ jobs:
           path: |
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/hashed-db.db
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/big-endian-hashed-db.db
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/latin1-hashed-db.db
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/overflow-hashed-db.db
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/hashed-db.dump
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/big-endian-hashed-db.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/latin1-hashed-db.dump
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/overflow-hashed-db.dump
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/multi-hashed-db.db
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/multi-hashed-db.dump
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/not-hash.db
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/random.db
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/hdb00-primary.bin
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hdb07c-latin1.bin
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/hdb00-overflow.bin
 
   windows-managed-cross-host:
@@ -287,6 +295,14 @@ jobs:
 
           $database = Join-Path $fixtureRoot 'hashed-db.db'
           $bigEndianDatabase = Join-Path $fixtureRoot 'big-endian-hashed-db.db'
+          $latin1Database = Join-Path $fixtureRoot 'latin1-hashed-db.db'
+          $latin1Dump = Join-Path $fixtureRoot 'latin1-hashed-db.dump'
+          $latin1Expected = Join-Path $fixtureRoot 'hdb07c-latin1.bin'
+          foreach ($requiredPath in @($latin1Database, $latin1Dump, $latin1Expected)) {
+              if (-not (Test-Path -LiteralPath $requiredPath -PathType Leaf)) {
+                  throw "Required transported HDB07C Latin-1 fixture '$requiredPath' was not found."
+              }
+          }
           $expected = Join-Path $fixtureRoot 'hdb00-primary.bin'
           $actual = Join-Path $fixtureRoot 'windows-alias.bin'
 
