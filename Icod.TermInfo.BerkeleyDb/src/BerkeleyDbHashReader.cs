@@ -450,9 +450,9 @@ internal static class BerkeleyDbHashReader {
 				).ToArray();
 
 			case HashOffPage:
-				if ( itemLength < 12 ) {
+				if ( itemLength != 12 ) {
 					throw new InvalidDataException(
-						"A Berkeley DB off-page item is shorter than its header."
+						"A Berkeley DB off-page item must contain exactly its 12-byte header."
 					);
 				}
 
@@ -502,6 +502,11 @@ internal static class BerkeleyDbHashReader {
 		int written = 0;
 		uint pageNumber = firstPage;
 		HashSet<uint> visited = [];
+		if ( result.Length == 0 && pageNumber != 0 ) {
+			throw new InvalidDataException(
+				"The Berkeley DB overflow chain continues after its declared length."
+			);
+		}
 
 		while ( pageNumber != 0 ) {
 			if ( !visited.Add( pageNumber ) ) {
@@ -544,11 +549,17 @@ internal static class BerkeleyDbHashReader {
 				result.AsSpan( written )
 			);
 			written += chunkLength;
-			pageNumber = ReadUInt32(
+			uint nextPageNumber = ReadUInt32(
 				page,
 				16,
 				metadata.IsBigEndian
 			);
+			if ( written == result.Length && nextPageNumber != 0 ) {
+				throw new InvalidDataException(
+					"The Berkeley DB overflow chain continues after its declared length."
+				);
+			}
+			pageNumber = nextPageNumber;
 		}
 
 		if ( written != result.Length ) {
