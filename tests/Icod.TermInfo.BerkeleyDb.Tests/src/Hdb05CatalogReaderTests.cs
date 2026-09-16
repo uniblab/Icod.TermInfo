@@ -782,6 +782,84 @@ public sealed class Hdb05CatalogReaderTests {
 		Assert.True( stream.CanWrite );
 	}
 
+
+	[Fact]
+	public void CatalogReadObservesCancellationBetweenLogicalRecords() {
+		using CancellationTokenSource cancellation = new();
+		BerkeleyDbHashRecord[] records = [
+			new BerkeleyDbHashRecord(
+				Encoding.UTF8.GetBytes( "a-storage" ),
+				PrependMarker(
+					CreateCompiledEntry( "a", [] )
+				)
+			),
+			new BerkeleyDbHashRecord(
+				Encoding.UTF8.GetBytes( "b-storage" ),
+				PrependMarker(
+					CreateCompiledEntry( "b", [] )
+				)
+			),
+		];
+		var cancelingRecords =
+			new CancelingRecordList(
+				records,
+				cancellation
+			);
+
+		Assert.Throws<OperationCanceledException>(
+			() => NcursesCatalogReader.Read(
+				cancelingRecords,
+				new CompiledTermInfoParserOptions(),
+				maximumIndexHops: 16,
+				cancellation.Token
+			)
+		);
+	}
+
+
+	private sealed class CancelingRecordList
+		: IReadOnlyList<BerkeleyDbHashRecord> {
+		private readonly CancellationTokenSource _cancellation;
+		private readonly BerkeleyDbHashRecord[] _records;
+		private int _enumerationCount;
+
+		internal CancelingRecordList(
+			BerkeleyDbHashRecord[] records,
+			CancellationTokenSource cancellation
+		) {
+			_records = records;
+			_cancellation = cancellation;
+		}
+
+		public int Count =>
+			_records.Length;
+
+		public BerkeleyDbHashRecord this[int index] =>
+			_records[index];
+
+		public IEnumerator<BerkeleyDbHashRecord> GetEnumerator() {
+			int enumeration =
+				Interlocked.Increment( ref _enumerationCount );
+			return Enumerate( enumeration ).GetEnumerator();
+		}
+
+		System.Collections.IEnumerator
+			System.Collections.IEnumerable.GetEnumerator() {
+			return GetEnumerator();
+		}
+
+		private IEnumerable<BerkeleyDbHashRecord> Enumerate(
+			int enumeration
+		) {
+			for ( int index = 0; index < _records.Length; index++ ) {
+				if ( enumeration == 2 && index == 1 ) {
+					_cancellation.Cancel();
+				}
+				yield return _records[index];
+			}
+		}
+	}
+
 	private static byte[] CreateCatalogStore(
 		string canonical,
 		params string[] aliases

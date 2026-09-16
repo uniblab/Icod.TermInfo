@@ -245,45 +245,6 @@ public sealed class Hdb05HashEnumerationTests {
 	}
 
 
-	[Fact]
-	public void ReadRecordsObservesCancellationDuringLongEnumeration() {
-		const int recordCount = 50_000;
-		var records =
-			new ( byte[] Key, byte[] Value )[recordCount];
-		for ( int index = 0; index < records.Length; index++ ) {
-			records[index] = (
-				BitConverter.GetBytes( index ),
-				new byte[] { checked( (byte)( index % 251 ) ) }
-			);
-		}
-		byte[] database = CreateInlineDatabase(
-			isBigEndian: false,
-			separatePages: true,
-			records
-		);
-		using CancellationTokenSource cancellation = new();
-		using ManualResetEventSlim started = new();
-		Task<IReadOnlyList<BerkeleyDbHashRecord>> enumeration =
-			Task.Run(
-				() => {
-					started.Set();
-					return BerkeleyDbHashReader.ReadRecords(
-						database,
-						maximumItemSize: 16,
-						maximumRecordCount: recordCount,
-						cancellation.Token
-					);
-				}
-			);
-		Assert.True( started.Wait( TimeSpan.FromSeconds( 5 ) ) );
-		Thread.Sleep( TimeSpan.FromMilliseconds( 5 ) );
-		cancellation.Cancel();
-
-		Assert.Throws<OperationCanceledException>(
-			() => enumeration.GetAwaiter().GetResult()
-		);
-	}
-
 	private const int PageSize = 512;
 	private const int PageHeaderSize = 26;
 
