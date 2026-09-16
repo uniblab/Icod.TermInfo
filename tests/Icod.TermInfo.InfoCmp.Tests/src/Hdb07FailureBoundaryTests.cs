@@ -243,7 +243,7 @@ public sealed class Hdb07FailureBoundaryTests {
 		byte[] store,
 		Func<string, Task> assertion
 	) {
-		string path = Path.GetTempFileName();
+		string path = System.IO.Path.GetTempFileName();
 		try {
 			await File.WriteAllBytesAsync( path, store );
 			await assertion( path );
@@ -257,8 +257,8 @@ public sealed class Hdb07FailureBoundaryTests {
 		byte[] second,
 		Func<string, string, Task> assertion
 	) {
-		string firstPath = Path.GetTempFileName();
-		string secondPath = Path.GetTempFileName();
+		string firstPath = System.IO.Path.GetTempFileName();
+		string secondPath = System.IO.Path.GetTempFileName();
 		try {
 			await File.WriteAllBytesAsync( firstPath, first );
 			await File.WriteAllBytesAsync( secondPath, second );

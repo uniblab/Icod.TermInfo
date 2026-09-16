@@ -195,13 +195,13 @@ public sealed class Hdb07RouterFailureBoundaryTests {
 		string name,
 		string description
 	) {
-		string directory = Path.Combine(
+		string directory = System.IO.Path.Combine(
 			root,
 			name[0].ToString()
 		);
 		Directory.CreateDirectory( directory );
 		File.WriteAllBytes(
-			Path.Combine( directory, name ),
+			System.IO.Path.Combine( directory, name ),
 			Hdb07HashV9FixtureBuilder.CreateCompiledEntry(
 				name,
 				description
@@ -211,8 +211,8 @@ public sealed class Hdb07RouterFailureBoundaryTests {
 
 	private sealed class TemporaryRoot : IDisposable {
 		internal TemporaryRoot() {
-			Root = Path.Combine(
-				Path.GetTempPath(),
+			Root = System.IO.Path.Combine(
+				System.IO.Path.GetTempPath(),
 				$"icod-terminfo-router-hdb07-{Guid.NewGuid():N}"
 			);
 			Directory.CreateDirectory( Root );
@@ -221,13 +221,13 @@ public sealed class Hdb07RouterFailureBoundaryTests {
 		internal string Root { get; }
 
 		internal string CreateDirectory( string name ) {
-			string path = Path.Combine( Root, name );
+			string path = System.IO.Path.Combine( Root, name );
 			Directory.CreateDirectory( path );
 			return path;
 		}
 
 		internal string Write( string name, byte[] data ) {
-			string path = Path.Combine( Root, name );
+			string path = System.IO.Path.Combine( Root, name );
 			File.WriteAllBytes( path, data );
 			return path;
 		}

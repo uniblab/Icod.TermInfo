@@ -207,8 +207,8 @@ public sealed class Hdb07FailureBoundaryTests {
 
 	private sealed class TemporaryRoot : IDisposable {
 		internal TemporaryRoot() {
-			Root = Path.Combine(
-				Path.GetTempPath(),
+			Root = System.IO.Path.Combine(
+				System.IO.Path.GetTempPath(),
 				$"icod-terminfo-toe-hdb07-{Guid.NewGuid():N}"
 			);
 			Directory.CreateDirectory( Root );
@@ -217,7 +217,7 @@ public sealed class Hdb07FailureBoundaryTests {
 		internal string Root { get; }
 
 		internal string Write( string name, byte[] data ) {
-			string path = Path.Combine( Root, name );
+			string path = System.IO.Path.Combine( Root, name );
 			File.WriteAllBytes( path, data );
 			return path;
 		}
