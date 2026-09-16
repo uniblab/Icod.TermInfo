@@ -15,6 +15,7 @@ overflow_database="$work_root/overflow-hashed-db.db"
 overflow_native="$work_root/hdb00-overflow.bin"
 overflow_managed="$work_root/hdb00-managed-overflow.bin"
 project="$repo_root/tools/hdb00/managed/Hdb00.ManagedProbe.csproj"
+multi_database="$work_root/multi-hashed-db.db"
 
 printf '%s\n' "== HDB00 managed: exact canonical-name lookup =="
 dotnet run \
@@ -121,5 +122,43 @@ python3 \
     "$repo_root/tools/hdb00/assert-overflow-pages.py" \
     "$overflow_database" \
     | tee "$work_root/managed-overflow-pages.txt"
+
+printf '%s\n' "== HDB07 managed: verify multi-record edge lookups =="
+test -f "$multi_database"
+for index in 000 032 063; do
+    canonical="hdb07-multi-$index"
+    alias="$canonical-alias"
+    managed_primary="$work_root/managed-$canonical.bin"
+    managed_alias="$work_root/managed-$alias.bin"
+    primary_log="$work_root/managed-$canonical.txt"
+    alias_log="$work_root/managed-$alias.txt"
+
+    dotnet run \
+        --project "$project" \
+        -c Release \
+        -- \
+        "$multi_database" \
+        "$canonical" \
+        "$managed_primary" \
+        | tee "$primary_log"
+    dotnet run \
+        --project "$project" \
+        -c Release \
+        -- \
+        "$multi_database" \
+        "$alias" \
+        "$managed_alias" \
+        | tee "$alias_log"
+
+    cmp "$managed_primary" "$managed_alias"
+    cmp "$managed_primary" "$work_root/$canonical.bin"
+    cmp "$managed_alias" "$work_root/$alias.bin"
+    grep -F "Lookup: $canonical" "$primary_log"
+    grep -F "Lookup: $alias" "$alias_log"
+    grep -F "Data records: 64" "$primary_log"
+    grep -F "Index records: 128" "$primary_log"
+done
+printf '%s\n' "HDB07 multi managed records: 192"
+printf '%s\n' "HDB07 multi catalog publications: 128"
 
 printf '%s\n' "HDB00 managed Hash v9 probe passed."

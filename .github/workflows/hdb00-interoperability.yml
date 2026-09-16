@@ -137,6 +137,8 @@ jobs:
             ${{ runner.temp }}/icod-terminfo-hdb00/hdb00-overflow.bin
             ${{ runner.temp }}/icod-terminfo-hdb00/hashed-db.dump
             ${{ runner.temp }}/icod-terminfo-hdb00/overflow-hashed-db.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00/multi-hashed-db.db
+            ${{ runner.temp }}/icod-terminfo-hdb00/multi-hashed-db.dump
             ${{ runner.temp }}/icod-terminfo-hdb00/not-hash.db
             ${{ runner.temp }}/icod-terminfo-hdb00/random.db
 
@@ -229,6 +231,8 @@ jobs:
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/overflow-hashed-db.db
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/hashed-db.dump
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/overflow-hashed-db.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/multi-hashed-db.db
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/multi-hashed-db.dump
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/not-hash.db
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/random.db
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/hdb00-primary.bin
@@ -292,6 +296,39 @@ jobs:
           if ((Get-FileHash $overflowActual -Algorithm SHA256).Hash -ne (Get-FileHash $overflowExpected -Algorithm SHA256).Hash) {
               throw 'Windows managed overflow extraction differs from the Linux native oracle.'
           }
+
+          $multiDatabase = Join-Path $fixtureRoot 'multi-hashed-db.db'
+          foreach ($index in @(0, 32, 63)) {
+              $number = $index.ToString('D3')
+              $canonical = "hdb07-multi-$number"
+              $alias = "$canonical-alias"
+              $canonicalOutput = Join-Path $fixtureRoot "windows-$canonical.bin"
+              $aliasOutput = Join-Path $fixtureRoot "windows-$alias.bin"
+
+              $probeOutput = dotnet run --project $project -c Release -- $multiDatabase $canonical $canonicalOutput
+              if ($LASTEXITCODE -ne 0) {
+                  throw "Windows managed lookup for '$canonical' failed with exit code $LASTEXITCODE."
+              }
+              $probeOutput | Write-Host
+              $aliasProbeOutput = dotnet run --project $project -c Release -- $multiDatabase $alias $aliasOutput
+              if ($LASTEXITCODE -ne 0) {
+                  throw "Windows managed lookup for '$alias' failed with exit code $LASTEXITCODE."
+              }
+              $aliasProbeOutput | Write-Host
+
+              if ((Get-FileHash $canonicalOutput -Algorithm SHA256).Hash -ne (Get-FileHash $aliasOutput -Algorithm SHA256).Hash) {
+                  throw "Windows managed primary and alias extraction differ for '$canonical'."
+              }
+              if ('Data records: 64' -cnotin $probeOutput) {
+                  throw "Windows managed probe did not report 64 data records for '$canonical'."
+              }
+              if ('Index records: 128' -cnotin $probeOutput) {
+                  throw "Windows managed probe did not report 128 index records for '$canonical'."
+              }
+          }
+
+          Write-Host 'HDB07 multi managed records: 192'
+          Write-Host 'HDB07 multi catalog publications: 128'
 
           Write-Host 'HDB00 Windows managed-only cross-host probe passed.'
 

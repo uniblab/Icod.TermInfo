@@ -19,6 +19,10 @@ overflow_hashed_base="$work_root/overflow-hashed-db"
 overflow_hashed_db="$overflow_hashed_base.db"
 overflow_fixture="$work_root/hdb00-overflow.src"
 overflow_payload="$work_root/hdb00-overflow.bin"
+multi_hashed_base="$work_root/multi-hashed-db"
+multi_hashed_db="$multi_hashed_base.db"
+multi_fixture="$work_root/hdb07-multi.src"
+multi_dump="$work_root/multi-hashed-db.dump"
 db_prefix="$(brew --prefix berkeley-db@5)"
 
 rm -rf "$work_root"
@@ -94,6 +98,26 @@ Path(sys.argv[1]).write_text(
     f"    hdb00blob={blob},\n",
     encoding="utf-8",
 )
+PY
+
+python3 - "$multi_fixture" <<'PY'
+from pathlib import Path
+import sys
+
+entries = []
+for index in range(64):
+    number = f"{index:03d}"
+    canonical = f"hdb07-multi-{number}"
+    alias = f"{canonical}-alias"
+    entries.append(
+        f"{canonical}|{alias}|Icod HDB07 multi {number} fixture,\n"
+        "    am,\n"
+        f"    cols#{80 + index},\n"
+        "    lines#24,\n"
+        "    clear=\\E[H\\E[2J,\n"
+    )
+
+Path(sys.argv[1]).write_text("".join(entries), encoding="ascii")
 PY
 
 printf '%s\n' "== HDB00 macOS: compile identical source into directory and hashed stores =="
@@ -213,6 +237,42 @@ dotnet run \
     | tee "$work_root/overflow-managed-parse.txt"
 grep -F "Name: hdb00-overflow" "$work_root/overflow-managed-parse.txt"
 
+printf '%s\n' "== HDB07 macOS: generate native 64-entry Hash-v9 matrix =="
+run_hashed_tic -x -o "$multi_hashed_base" "$multi_fixture"
+test -f "$multi_hashed_db"
+DYLD_LIBRARY_PATH="$db_prefix/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}" \
+    "$db_prefix/bin/db_dump" -k -f "$multi_dump" "$multi_hashed_db"
+
+multi_record_count="$(python3 - "$multi_dump" <<'PY'
+from pathlib import Path
+import sys
+
+lines = Path(sys.argv[1]).read_text(encoding="ascii").splitlines()
+header_end = lines.index("HEADER=END")
+if lines[-1] != "DATA=END":
+    raise SystemExit("The native multi-record dump is missing DATA=END.")
+data_lines = lines[header_end + 1:-1]
+if not data_lines or len(data_lines) % 2:
+    raise SystemExit("The native multi-record dump has malformed key/value lines.")
+print(len(data_lines) // 2)
+PY
+)"
+if [[ "$multi_record_count" -ne 192 ]]; then
+    echo "Expected 192 native multi-record entries, got $multi_record_count." >&2
+    exit 1
+fi
+printf 'HDB07 multi native records: %s\n' "$multi_record_count"
+
+for index in 000 032 063; do
+    canonical="hdb07-multi-$index"
+    alias="$canonical-alias"
+    primary_output="$work_root/$canonical.bin"
+    alias_output="$work_root/$alias.bin"
+    run_probe "$multi_hashed_db" "$canonical" "$primary_output"
+    run_probe "$multi_hashed_db" "$alias" "$alias_output"
+    cmp "$primary_output" "$alias_output"
+done
+
 printf '%s\n' "== HDB00 macOS: evidence summary =="
 printf 'ncurses commit: %s\n' "$ncurses_commit"
 printf 'Berkeley DB prefix: %s\n' "$db_prefix"
@@ -220,6 +280,7 @@ printf 'hashed store: %s\n' "$hashed_db"
 printf 'conventional entry: %s\n' "$directory_entry"
 printf 'overflow hashed store: %s\n' "$overflow_hashed_db"
 printf 'overflow conventional entry: %s\n' "$overflow_directory_entry"
+printf 'multi-record hashed store: %s\n' "$multi_hashed_db"
 shasum -a 256 \
     "$hashed_db" \
     "$directory_entry" \
@@ -227,5 +288,7 @@ shasum -a 256 \
     "$alias_payload" \
     "$overflow_hashed_db" \
     "$overflow_directory_entry" \
-    "$overflow_payload"
+    "$overflow_payload" \
+    "$multi_hashed_db" \
+    "$multi_dump"
 printf '%s\n' "HDB00 macOS interoperability probe passed."
