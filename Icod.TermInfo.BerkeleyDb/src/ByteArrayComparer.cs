@@ -57,6 +57,24 @@ internal sealed class ByteArrayComparer
 		return left.Length.CompareTo( right.Length );
 	}
 
+	internal int Compare(
+		ReadOnlySpan<byte> left,
+		ReadOnlySpan<byte> right
+	) {
+		int sharedLength = Math.Min(
+			left.Length,
+			right.Length
+		);
+		for ( int index = 0; index < sharedLength; index++ ) {
+			int comparison = left[index].CompareTo( right[index] );
+			if ( comparison != 0 ) {
+				return comparison;
+			}
+		}
+
+		return left.Length.CompareTo( right.Length );
+	}
+
 	public bool Equals(
 		byte[]? left,
 		byte[]? right

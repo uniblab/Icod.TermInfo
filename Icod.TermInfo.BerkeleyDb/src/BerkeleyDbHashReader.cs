@@ -133,7 +133,96 @@ internal static class BerkeleyDbHashReader {
 		int maximumRecordCount,
 		CancellationToken cancellationToken
 	) {
-		throw new NotImplementedException();
+		ArgumentNullException.ThrowIfNull( database );
+		ArgumentOutOfRangeException.ThrowIfNegativeOrZero( maximumItemSize );
+		ArgumentOutOfRangeException.ThrowIfNegativeOrZero( maximumRecordCount );
+		cancellationToken.ThrowIfCancellationRequested();
+
+		DatabaseMetadata metadata = ReadMetadata( database );
+		var records = new List<BerkeleyDbHashRecord>();
+		var keys = new HashSet<byte[]>( ByteArrayComparer.Instance );
+
+		for (
+			uint pageNumber = 1;
+			pageNumber <= metadata.LastPageNumber;
+			pageNumber++
+		) {
+			cancellationToken.ThrowIfCancellationRequested();
+
+			ReadOnlySpan<byte> page = GetPage(
+				database,
+				metadata,
+				pageNumber
+			);
+			if ( page[25] == UnusedPage || page[25] == OverflowPage ) {
+				continue;
+			}
+			if ( page[25] != HashPage ) {
+				throw new InvalidDataException(
+					$"Berkeley DB page type {page[25]} at page {pageNumber} is not supported."
+				);
+			}
+
+			ValidatePageIdentity( page, pageNumber, metadata.IsBigEndian );
+
+			ushort entryCount = ReadUInt16(
+				page,
+				20,
+				metadata.IsBigEndian
+			);
+			if ( ( entryCount & 1 ) != 0 ) {
+				throw new InvalidDataException(
+					$"Hash page {pageNumber} has an odd item count {entryCount}."
+				);
+			}
+
+			ValidateIndexTable(
+				page,
+				entryCount,
+				metadata.PageSize,
+				metadata.IsBigEndian
+			);
+
+			for ( int index = 0; index < entryCount; index += 2 ) {
+				cancellationToken.ThrowIfCancellationRequested();
+				if ( records.Count >= maximumRecordCount ) {
+					throw new InvalidDataException(
+						$"The Berkeley DB contains more than {maximumRecordCount} records."
+					);
+				}
+
+				byte[] key = ReadHashItem(
+					database,
+					metadata,
+					page,
+					index,
+					maximumItemSize
+				);
+				if ( !keys.Add( key ) ) {
+					throw new InvalidDataException(
+						"The Berkeley DB contains a duplicate exact byte key."
+					);
+				}
+
+				byte[] value = ReadHashItem(
+					database,
+					metadata,
+					page,
+					index + 1,
+					maximumItemSize
+				);
+				records.Add( new BerkeleyDbHashRecord( key, value ) );
+			}
+		}
+
+		records.Sort(
+			static ( left, right ) =>
+				ByteArrayComparer.Instance.Compare(
+					left.Key.Span,
+					right.Key.Span
+				)
+		);
+		return records.AsReadOnly();
 	}
 
 	internal static byte[] ReadDatabase(
