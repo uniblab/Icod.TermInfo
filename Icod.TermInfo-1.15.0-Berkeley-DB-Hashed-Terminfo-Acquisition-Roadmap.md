@@ -6,8 +6,8 @@
 **Optional package:** `Icod.TermInfo.BerkeleyDb`  
 **Language:** C# 13  
 **Reusable target frameworks:** `net8.0`; `net9.0`; `net10.0`  
-**Status:** HDB00–HDB06 accepted; HDB07 adversarial and compatibility hardening next  
-**Current coordinated prerelease:** `1.15.0-Alpha-6`
+**Status:** HDB00–HDB07 accepted; approved compatibility expansion next
+**Current coordinated prerelease:** `1.15.0-Alpha-7`
 
 ---
 
@@ -848,12 +848,17 @@ managed and contains no native Berkeley DB asset or dependency.
 Closure record:
 `docs/1.15.0-HDB06-INSPECTION-AND-TOOL-INTEGRATION.md`.
 
-HDB07 adversarial and compatibility hardening is next. PR #45 remains open,
-draft, and unmerged.
+HDB07 adversarial and compatibility hardening was subsequently accepted under
+`1.15.0-Alpha-7`. PR #45 remains open, draft, and unmerged.
 
-### HDB07 — Adversarial and Compatibility Hardening
+### HDB07 — Adversarial and Compatibility Hardening — COMPLETE / ACCEPTED
 
-Permanent tests shall cover valid stores, aliases, misses, unsupported access
+Accepted implementation/qualification head:
+`ab059acf27a5bc7fb1e8cef390d47085be33b5af`.
+
+Coordinated prerelease: `1.15.0-Alpha-7`.
+
+Permanent tests cover valid stores, aliases, misses, unsupported access
 methods, unsupported revisions, malformed metadata, truncated files, invalid
 page/item geometry, off-page records, overflow chains/cycles, malformed compiled
 values, wrong-key valid entries, oversized values, culture independence,
@@ -873,6 +878,26 @@ same compiled bytes
         v
 same TerminalDescription semantics
 ```
+
+Qualification passed normal run `35145593802` with 12/12 jobs and HDB00 run
+`35145593852` with 3/3 jobs. The exact head passed 404 BerkeleyDb unit cases
+and 34 native-store interoperability cases per TFM on all three hosts, 115
+`infocmp` cases, 66 `toe` cases, and 47 router cases per host. Linux and macOS
+each generated a native 64-entry ASCII matrix containing 192 database records
+and 128 logical publications; Windows verified the transported Linux fixture
+without Berkeley DB installed. Real permission denial and restoration passed on
+all three hosts, as did installed-package and all six archive-RID smoke gates.
+
+HDB07 adds no public API, package dependency, JSON schema, native runtime, or
+write path. Native big-endian production, broader non-ASCII producer
+compatibility, and stable reads during arbitrary concurrent replacement remain
+outside its accepted claims.
+
+Closure record:
+`docs/1.15.0-HDB07-ADVERSARIAL-COMPATIBILITY-HARDENING.md`.
+
+The separately approved compatibility-expansion tranche is next, before HDB08.
+PR #45 remains open, draft, and unmerged.
 
 ### HDB08 — Packaging and Cross-platform Qualification
 

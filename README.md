@@ -15,7 +15,7 @@ Version `1.14.0` adds raster-backend availability evidence, deterministic candid
 
 The 1.14 release contract passed the complete Staging qualification matrix on Windows, Linux, and macOS, including package verification, isolated consumers, installed-tool smoke, and all six standalone archive RIDs.
 
-Development prerelease `1.15.0-Alpha-6` adds accepted pure-managed, read-only Berkeley DB Hash-v9 acquisition through the optional `Icod.TermInfo.BerkeleyDb` package. Explicit `infocmp -A/-B` file paths and explicit human `toe` file operands use the hashed provider/catalog; Runtime discovery, frozen JSON schemas, and `tic` directory publication remain unchanged.
+Development prerelease `1.15.0-Alpha-7` adds accepted pure-managed, read-only Berkeley DB Hash-v9 acquisition through the optional `Icod.TermInfo.BerkeleyDb` package. Explicit `infocmp -A/-B` file paths and explicit human `toe` file operands use the hashed provider/catalog; Runtime discovery, frozen JSON schemas, and `tic` directory publication remain unchanged. HDB07 hardens storage, marker/identity, lifecycle, permission, provider/router, and command boundaries. Native Berkeley DB 5.3 CI verifies a 64-entry ASCII matrix on Linux and macOS; Windows verifies the transported Linux fixture without Berkeley DB installed.
 
 ## Support the Project
 

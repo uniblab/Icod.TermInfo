@@ -39,7 +39,7 @@
 - Consumes: GitHub `pull_request` event fields `action`, `before`, and `after`, or `workflow_dispatch`.
 - Produces: `Get-Hdb00ChangeScope.ps1`, which writes exactly `true` or `false`; Linux job output `hdb00-required`; coordinated suite version `1.15.0-Alpha-7`.
 
-- [ ] **Step 1: write deterministic scope-classifier tests**
+- [x] **Step 1: write deterministic scope-classifier tests**
 
 Create `verify-change-scope.ps1` with literal sensitive and insensitive paths:
 
@@ -67,7 +67,7 @@ foreach ($case in $cases) {
 
 Also assert that a mixed documentation/production list returns `true`, an empty explicit path list returns `false`, `workflow_dispatch` returns `true`, and a non-`synchronize` pull-request action returns `true`.
 
-- [ ] **Step 2: run the scope tests to verify RED**
+- [x] **Step 2: run the scope tests to verify RED**
 
 Run:
 
@@ -77,7 +77,7 @@ pwsh -NoProfile -File tools/hdb00/verify-change-scope.ps1
 
 Expected: FAIL because `Get-Hdb00ChangeScope.ps1` does not exist.
 
-- [ ] **Step 3: implement the scope classifier**
+- [x] **Step 3: implement the scope classifier**
 
 The script accepts either explicit test paths or event commits:
 
@@ -116,7 +116,7 @@ git -C <RepositoryRoot> diff --name-only --diff-filter=ACMR <Before> <After>
 
 Fail on a nonzero Git exit; never convert an invalid range into `false`.
 
-- [ ] **Step 4: wire the gate into all three HDB00 jobs**
+- [x] **Step 4: wire the gate into all three HDB00 jobs**
 
 Set checkout `fetch-depth: 0`. Immediately after checkout, call the classifier
 with the event values and write `required=<true|false>` to
@@ -143,7 +143,7 @@ A sensitive synchronization must still execute exactly the existing three
 qualification jobs. A documentation-only synchronization runs the two cheap
 gate jobs and skips Windows.
 
-- [ ] **Step 5: advance the coordinated version**
+- [x] **Step 5: advance the coordinated version**
 
 Change only the active property:
 
@@ -153,7 +153,7 @@ Change only the active property:
 
 Do not rewrite historical Alpha-1 through Alpha-6 documentation.
 
-- [ ] **Step 6: verify and commit the baseline**
+- [x] **Step 6: verify and commit the baseline**
 
 Run:
 
@@ -185,7 +185,7 @@ ci: gate HDB00 by synchronization delta
 - Consumes: literal Berkeley DB Hash-v9 constants and Runtime compiled-entry layout; no production serializer.
 - Produces: `Hdb07HashV9FixtureBuilder.CreateDatabase`, `Hdb07ItemSpec.Inline`, `Hdb07ItemSpec.OffPage`, `Hdb07RecordSpec`, and compiled ncurses record helpers used by Tasks 3–7.
 
-- [ ] **Step 1: link the absent builder and write compile-RED tests**
+- [x] **Step 1: link the absent builder and write compile-RED tests**
 
 Add:
 
@@ -236,7 +236,7 @@ Tests assert exact magic/version/page-size bytes for both byte orders, every pag
 identity, declared last-page number, exact inline bytes, exact off-page
 first-page/length fields, and requested overflow chunk lengths.
 
-- [ ] **Step 2: run the builder tests to verify compile RED**
+- [x] **Step 2: run the builder tests to verify compile RED**
 
 Run:
 
@@ -246,7 +246,7 @@ dotnet test tests/Icod.TermInfo.BerkeleyDb.Tests/Icod.TermInfo.BerkeleyDb.Tests.
 
 Expected: FAIL to compile because the HDB07 builder types do not exist.
 
-- [ ] **Step 3: implement the independent builder**
+- [x] **Step 3: implement the independent builder**
 
 Use `BinaryPrimitives` directly and literal values:
 
@@ -271,7 +271,7 @@ while building.
 `CreateCompiledEntry` writes only the minimal little-endian compiled terminfo
 header and names section already accepted by Runtime.
 
-- [ ] **Step 4: verify literal and production round trips**
+- [x] **Step 4: verify literal and production round trips**
 
 Run the filtered builder tests, then:
 
@@ -281,7 +281,7 @@ dotnet test tests/Icod.TermInfo.BerkeleyDb.Tests/Icod.TermInfo.BerkeleyDb.Tests.
 
 Expected: builder tests and all existing tests pass on net8/net9/net10.
 
-- [ ] **Step 5: commit the fixture foundation**
+- [x] **Step 5: commit the fixture foundation**
 
 Commit:
 
@@ -304,7 +304,7 @@ HDB00 synchronize-delta gate.
 - Consumes: the HDB07 fixture builder and internal reader.
 - Produces: exact rejection of non-12-byte off-page headers and overflow chains which continue after the declared item length.
 
-- [ ] **Step 1: write the behavioral REDs**
+- [x] **Step 1: write the behavioral REDs**
 
 Add both byte orders for:
 
@@ -346,7 +346,7 @@ Add `TryReadValueRejectsOverflowPagesAfterDeclaredLength` with
 zero-length off-page item with page zero as an already-green boundary and a
 zero-length item with an appended page as the same RED family.
 
-- [ ] **Step 2: run and record the exact RED**
+- [x] **Step 2: run and record the exact RED**
 
 Run:
 
@@ -364,7 +364,7 @@ Commit:
 test: define HDB07 trailing-data rejection
 ```
 
-- [ ] **Step 3: require an exact off-page header**
+- [x] **Step 3: require an exact off-page header**
 
 In `ReadHashItem`:
 
@@ -376,7 +376,7 @@ if ( itemLength != 12 ) {
 }
 ```
 
-- [ ] **Step 4: reject overflow continuation after completion**
+- [x] **Step 4: reject overflow continuation after completion**
 
 After copying the chunk:
 
@@ -396,7 +396,7 @@ pageNumber = nextPageNumber;
 
 Preserve cycle, page-identity, maximum-item, overrun, and undersupply failures.
 
-- [ ] **Step 5: verify GREEN and regressions**
+- [x] **Step 5: verify GREEN and regressions**
 
 Run:
 
@@ -426,7 +426,7 @@ fix: reject trailing Hash-v9 storage data
 - Consumes: the HDB07 builder and accepted internal reader.
 - Produces: deterministic characterization of remaining metadata, geometry, arithmetic, ordering, ownership, and concurrency requirements.
 
-- [ ] **Step 1: add table-driven storage cases**
+- [x] **Step 1: add table-driven storage cases**
 
 Create literal cases for:
 
@@ -467,14 +467,14 @@ public void ReadRecordsRejectsInvalidGeometryInTraversalOrder(
 }
 ```
 
-- [ ] **Step 2: add exact-lookup scope characterization**
+- [x] **Step 2: add exact-lookup scope characterization**
 
 Place a matching record before an unrelated malformed value and assert lookup
 succeeds. Place the malformed key before the match and assert failure. This
 freezes the accepted rule that exact lookup stops on a match and does not
 validate unrelated later values.
 
-- [ ] **Step 3: run as characterization**
+- [x] **Step 3: run as characterization**
 
 Run the complete BerkeleyDb test project in Release.
 
@@ -483,7 +483,7 @@ committed alone, invoke systematic debugging, and add a dedicated RED→GREEN
 task to this plan before editing production. Do not weaken the fixture or
 change failure precedence.
 
-- [ ] **Step 4: verify cross-host CI and commit**
+- [x] **Step 4: verify cross-host CI and commit**
 
 Push the already-green characterization. Require normal 12/12. The HDB00
 synchronize-delta gate should skip expensive work because only unit-test code
@@ -507,7 +507,7 @@ test: characterize HDB07 storage boundaries
 - Consumes: public provider/catalog APIs, the HDB07 builder, Runtime parser, and ordinal accepted semantics.
 - Produces: deterministic marker, wrong-key, parser, publication, and culture evidence with no global test leakage.
 
-- [ ] **Step 1: isolate culture-changing tests**
+- [x] **Step 1: isolate culture-changing tests**
 
 Create:
 
@@ -539,7 +539,7 @@ private sealed class CultureScope : IDisposable {
 }
 ```
 
-- [ ] **Step 2: add logical matrix tests**
+- [x] **Step 2: add logical matrix tests**
 
 Add deterministic tests for marker-0 direct records; marker-2 chains at the
 inclusive limit; empty/unsupported markers; dangling targets; repeated-key and
@@ -564,7 +564,7 @@ Assert.Equal(
 These are strict UTF-8 synthetic keys only; they do not claim native non-ASCII
 producer interoperability.
 
-- [ ] **Step 3: run as characterization**
+- [x] **Step 3: run as characterization**
 
 Run:
 
@@ -577,7 +577,7 @@ Expected: all cases pass and both culture properties are restored. If a case
 fails, stop with the test-only RED and add a narrow corrective task before any
 production edit.
 
-- [ ] **Step 4: commit logical evidence**
+- [x] **Step 4: commit logical evidence**
 
 Commit:
 
@@ -605,7 +605,7 @@ Require normal 12/12; HDB00 expensive steps should be gated off.
 The permission probe is test infrastructure only and returns success exclusively
 when the public acquisition path propagates `UnauthorizedAccessException`.
 
-- [ ] **Step 1: add lifecycle characterization cases**
+- [x] **Step 1: add lifecycle characterization cases**
 
 Add tests covering:
 
@@ -631,7 +631,7 @@ dotnet test tests/Icod.TermInfo.BerkeleyDb.Tests/Icod.TermInfo.BerkeleyDb.Tests.
 Expected: all characterization cases pass. If a case fails, preserve that
 test-only RED and add a dedicated corrective task before editing production.
 
-- [ ] **Step 2: add a framework-independent permission probe**
+- [x] **Step 2: add a framework-independent permission probe**
 
 Create a `net10.0` console application with a direct project reference to
 `Icod.TermInfo.BerkeleyDb`. Keep its contract small:
@@ -657,7 +657,7 @@ catch ( Exception exception )
 Return `64` for invalid arguments. Do not add the probe to the shipped solution
 or package graph.
 
-- [ ] **Step 3: add the cross-platform permission harness**
+- [x] **Step 3: add the cross-platform permission harness**
 
 In `verify-hdb07-permissions.ps1`:
 
@@ -672,7 +672,7 @@ In `verify-hdb07-permissions.ps1`:
 
 Any inability to establish the denial is a failure, not a skip.
 
-- [ ] **Step 4: wire the harness into all three HDB00 jobs**
+- [x] **Step 4: wire the harness into all three HDB00 jobs**
 
 Add a gated permission step after native fixture generation and before managed
 verification in Linux, macOS, and Windows:
@@ -687,7 +687,7 @@ verification in Linux, macOS, and Windows:
 Use the equivalent Linux output reference already established in Task 1 for
 macOS and Windows job-level gating. Do not create another workflow.
 
-- [ ] **Step 5: verify locally and in CI**
+- [x] **Step 5: verify locally and in CI**
 
 Run:
 
@@ -707,7 +707,7 @@ Push the test-only commit and require:
 If any host cannot produce a real access denial, stop and retain the evidence;
 do not replace the test with a mocked exception.
 
-- [ ] **Step 6: commit lifecycle and permission evidence**
+- [x] **Step 6: commit lifecycle and permission evidence**
 
 Commit:
 
@@ -735,7 +735,7 @@ test: harden HDB07 lifecycle and permissions
 Berkeley DB providers, and the `TerminalDescriptionProvider` router. No new
 production seam is permitted.
 
-- [ ] **Step 1: characterize InfoCmp failures**
+- [x] **Step 1: characterize InfoCmp failures**
 
 Create deterministic cases proving:
 
@@ -751,7 +751,7 @@ Create deterministic cases proving:
 Use literal diagnostic codes and assert stderr structure instead of local OS
 exception prose.
 
-- [ ] **Step 2: characterize Toe isolation and ordering**
+- [x] **Step 2: characterize Toe isolation and ordering**
 
 Create a root sequence containing valid, corrupt, and valid databases. Assert:
 
@@ -762,14 +762,14 @@ Create a root sequence containing valid, corrupt, and valid databases. Assert:
 - `-h`, `-s`, and culture changes do not change isolation semantics;
 - JSON output and ambient-root behavior remain unchanged.
 
-- [ ] **Step 3: characterize direct and routed providers**
+- [x] **Step 3: characterize direct and routed providers**
 
 For both direct and routed acquisition, cover valid, missing, malformed, and
 mixed-directory cases. Assert the same accepted result, miss, or public
 exception category as the corresponding direct provider call, with no
 Berkeley-DB-specific public API added to the router.
 
-- [ ] **Step 4: run the focused and full suites**
+- [x] **Step 4: run the focused and full suites**
 
 Run:
 
@@ -783,7 +783,7 @@ dotnet test Icod.TermInfo.sln -c Release
 Expected: all cases pass after Task 3. If any case fails, stop with the smallest
 reproducer and add a corrective RED→GREEN task before changing production.
 
-- [ ] **Step 5: commit command-boundary evidence**
+- [x] **Step 5: commit command-boundary evidence**
 
 Commit:
 
@@ -810,7 +810,7 @@ commit changes only test projects and shared test fixtures.
 managed exact lookup/catalog paths, InfoCmp, Toe, router, and packed-package
 smoke paths.
 
-- [ ] **Step 1: generate the deterministic multi-record native fixture**
+- [x] **Step 1: generate the deterministic multi-record native fixture**
 
 Extend both native scripts to compile 64 entries named
 `hdb07-multi-000` through `hdb07-multi-063`. Give each entry one distinct alias,
@@ -826,7 +826,7 @@ The result is exactly:
 Produce `multi-hashed-db` plus its native `db_dump` oracle. Keep byte-order
 selection native to each host.
 
-- [ ] **Step 2: extend managed-oracle assertions**
+- [x] **Step 2: extend managed-oracle assertions**
 
 Add literal count and edge-position assertions:
 
@@ -849,14 +849,14 @@ middle, and last generated entries through:
 Compare exact key bytes and opaque value bytes with the native dump before
 parsing terminal descriptions.
 
-- [ ] **Step 3: preserve artifact transport and Windows verification**
+- [x] **Step 3: preserve artifact transport and Windows verification**
 
 Publish the new database and dump in the Linux artifact without renaming the
 accepted fixtures. Download it in the Windows HDB00 job and run the same managed
 verification there. Windows is a consumer of the Linux-native fixture, not a
 claim that Windows generated Berkeley DB output.
 
-- [ ] **Step 4: run local structural checks**
+- [x] **Step 4: run local structural checks**
 
 Run:
 
@@ -871,7 +871,7 @@ Expected: shell syntax passes. The native-oracle test may require CI fixtures;
 when they are absent locally it must use the existing explicit fixture guard,
 not silently lower its assertions.
 
-- [ ] **Step 5: push and qualify the expanded native matrix**
+- [x] **Step 5: push and qualify the expanded native matrix**
 
 Require:
 
@@ -884,7 +884,7 @@ Require:
 If a differential fails, minimize it into one deterministic fixture-builder
 case before considering production changes.
 
-- [ ] **Step 6: commit native-valid evidence**
+- [x] **Step 6: commit native-valid evidence**
 
 Commit:
 
@@ -907,7 +907,7 @@ test: expand HDB07 native Hash-v9 matrix
 - Modify: `docs/superpowers/plans/2026-09-16-hdb07-adversarial-compatibility-hardening.md`
 - Update: PR #45 description
 
-- [ ] **Step 1: run final implementation qualification**
+- [x] **Step 1: run final implementation qualification**
 
 At the exact implementation head, run or require:
 
@@ -918,7 +918,7 @@ dotnet test Icod.TermInfo.sln -c Release
 Then require one normal PR workflow with all 12 jobs green and one full HDB00
 workflow with Linux, macOS, and Windows green. Record exact commit and run IDs.
 
-- [ ] **Step 2: inspect qualification logs and artifacts**
+- [x] **Step 2: inspect qualification logs and artifacts**
 
 Record and verify:
 
@@ -931,7 +931,7 @@ Record and verify:
 
 No count or artifact may be inferred only from a green job badge.
 
-- [ ] **Step 3: write the closure record**
+- [x] **Step 3: write the closure record**
 
 In `docs/1.15.0-HDB07-ADVERSARIAL-COMPATIBILITY-HARDENING.md`, record:
 
@@ -947,7 +947,7 @@ In `docs/1.15.0-HDB07-ADVERSARIAL-COMPATIBILITY-HARDENING.md`, record:
   compatibility, and stable reads during arbitrary concurrent replacement remain
   outside HDB07.
 
-- [ ] **Step 4: update roadmap and package documentation**
+- [x] **Step 4: update roadmap and package documentation**
 
 Mark HDB07 complete at `1.15.0-Alpha-7`. State that the separately approved
 compatibility-expansion tranche is next before HDB08. Update all referenced
@@ -956,7 +956,7 @@ coverage as native producer compatibility.
 
 Mark every completed checkbox in this plan.
 
-- [ ] **Step 5: update PR #45 while preserving state**
+- [x] **Step 5: update PR #45 while preserving state**
 
 Update the PR description with:
 
@@ -967,7 +967,7 @@ Update the PR description with:
 
 Verify the PR remains open, draft, and unmerged.
 
-- [ ] **Step 6: commit the documentation closure**
+- [x] **Step 6: commit the documentation closure**
 
 Commit:
 
@@ -980,7 +980,7 @@ HDB00 workflow may launch because of GitHub event filtering, but its expensive
 steps must be gated off and it is not a substitute for the recorded
 implementation-head HDB00 qualification.
 
-- [ ] **Step 7: perform the final state check**
+- [x] **Step 7: perform the final state check**
 
 Fetch the committed files and PR metadata from GitHub. Verify:
 

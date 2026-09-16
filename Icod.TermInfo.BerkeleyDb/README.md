@@ -4,7 +4,7 @@
 
 ## 1.15 development status
 
-`1.15.0-Alpha-6` adds accepted Inspection/tool integration to the explicit and opt-in system terminal-description providers and hashed terminal catalog on the managed Hash-v9 reader. It supports bounded exact-key lookup and complete record enumeration with inline and off-page records, overflow reconstruction, both byte orders, ncurses marker resolution, Runtime-owned compiled-entry parsing, exact identity validation, and deterministic logical publication ordering.
+`1.15.0-Alpha-7` adds accepted adversarial and compatibility hardening to the explicit and opt-in system terminal-description providers and hashed terminal catalog on the managed Hash-v9 reader. It supports bounded exact-key lookup and complete record enumeration with inline and off-page records, overflow reconstruction, both byte orders, ncurses marker resolution, Runtime-owned compiled-entry parsing, exact identity validation, and deterministic logical publication ordering.
 
 HDB00 selected a dependency-free managed reader for the reviewed Berkeley DB **Hash on-disk format version 9** subset required by ncurses acquisition. Native Berkeley DB remains a CI interoperability oracle and is not a production dependency.
 
@@ -69,12 +69,18 @@ matching ncurses discovery behavior. Missing sources continue; malformed reached
 sources fail explicitly. Successful results are cached, while misses and
 failures remain retryable.
 
-HDB06 qualification passed 312 BerkeleyDb unit cases and 20 native-store
-interoperability cases per target framework on Windows, Linux, and macOS. The
+HDB07 qualification passed 404 BerkeleyDb unit cases and 34 native-store
+interoperability cases per target framework on Windows, Linux, and macOS. Linux
+and macOS independently generated a native 64-entry ASCII matrix with 192
+database records and 128 logical publications; Windows consumed the Linux
+fixture without Berkeley DB installed. Real permission denial and restoration
+also passed on all three hosts. The
 optional package's public API remains unchanged: command executables classify
 explicit paths and then call the accepted provider or catalog reader. Explicit
 `infocmp -A/-B` files and explicit human `toe` file operands are supported;
 Inspection stays provider-neutral, ambient `toe` discovery and JSON stay
 conventional, and `tic` remains directory-write-only. Installed-tool smoke
 passed on all three hosts and direct-command smoke passed for all six archive
-RIDs. HDB07 adversarial and compatibility hardening is next.
+RIDs. The separately approved compatibility-expansion tranche is next before
+HDB08. Native big-endian production, broader non-ASCII producer compatibility,
+and stable reads during arbitrary concurrent replacement are not yet claimed.

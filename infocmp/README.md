@@ -2,7 +2,7 @@
 
 ## 1.15 development status
 
-`1.15.0-Alpha-6` accepts pure-managed hashed acquisition for explicit
+`1.15.0-Alpha-7` accepts pure-managed hashed acquisition for explicit
 `-A` and `-B` paths. An existing file uses
 `BerkeleyDbTerminalDescriptionProvider`; an existing directory or
 unclassified path retains the conventional provider. Rendering, comparison,
@@ -13,6 +13,12 @@ The catalog-wide `--plan-use --all-candidates` forms remain
 conventional-directory-only. A BerkeleyDb file in that mode is rejected before
 output. Direct `infocmp` and routed `icod-terminfo infocmp` are qualified as
 equivalent, and no Inspection public API or dependency changes.
+
+HDB07 adds no command option or output-contract change. It hardens direct and
+routed failure boundaries and verifies first, middle, and last primary/alias
+lookups in a 64-entry native ASCII Hash-v9 matrix on Linux and macOS, with the
+Linux fixture transported to Windows. The accepted suite passes 115 `infocmp`
+cases on every host; frozen JSON documents remain unchanged.
 
 ## 1.14 release status
 

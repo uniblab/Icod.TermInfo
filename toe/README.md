@@ -5,7 +5,7 @@
 
 ## 1.15 development status
 
-`1.15.0-Alpha-6` accepts hashed files for explicit human listing. Each
+`1.15.0-Alpha-7` accepts hashed files for explicit human listing. Each
 existing file operand is read through `BerkeleyDbTerminalCatalogReader`; each
 directory or unclassified operand retains conventional behavior. Mixed roots
 preserve caller order, hashed aliases are printed as distinct logical
@@ -16,6 +16,12 @@ Operand-free discovery (`toe`, `toe -a`, and `toe -D`) remains
 conventional. Frozen JSON routes and schemas are unchanged, so a file supplied
 to `toe --json` retains the existing `UnsupportedStore` catalog state.
 Direct `toe` and routed `icod-terminfo toe` are qualified as equivalent.
+
+HDB07 adds no listing option or output-contract change. It verifies exactly 128
+logical publications from a native 64-entry ASCII Hash-v9 matrix, including
+first, middle, and last primary/alias names, through direct and routed commands
+on Linux, macOS, and transported-fixture Windows. The accepted suite passes 66
+`toe` cases on every host; frozen JSON routes remain unchanged.
 
 ## 1.14 release status
 
@@ -248,6 +254,6 @@ managed Source parser/resolver. Unsupported switches are explicit usage errors.
 
 ## Non-goals
 
-HDB06 does not add hashed ambient discovery, hashed JSON schemas, hashed writes,
+HDB07 does not add hashed ambient discovery, hashed JSON schemas, hashed writes,
 termcap `tc=` analysis, arbitrary recursive traversal, native ncurses/Berkeley
 DB dependencies, trace internals, or candidate verbose `-v[n]` output.
