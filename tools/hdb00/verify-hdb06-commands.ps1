@@ -238,7 +238,7 @@ try {
 	foreach ( $index in @( 0, 32, 63 ) ) {
 		$canonical = 'hdb07-multi-{0:D3}' -f $index
 		$description = "Icod HDB07 multi $($index.ToString( 'D3' )) fixture"
-		foreach ( $name in @( $canonical, $canonical + '-alias' ) ) {
+		foreach ( $name in @( $canonical, ( $canonical + '-alias' ) ) ) {
 			$expected = "$name`t$description"
 			if ( $expected -cnotin $multiLines ) {
 				throw "Expected toe publication '$expected'."
