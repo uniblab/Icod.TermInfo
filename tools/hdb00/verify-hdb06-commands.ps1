@@ -16,12 +16,14 @@ $repositoryRoot = [System.IO.Path]::GetFullPath(
 $fixturePath = [System.IO.Path]::GetFullPath( $FixtureRoot )
 $primaryDatabase = Join-Path $fixturePath 'hashed-db.db'
 $overflowDatabase = Join-Path $fixturePath 'overflow-hashed-db.db'
+$multiDatabase = Join-Path $fixturePath 'multi-hashed-db.db'
 $malformedDatabase = Join-Path $fixturePath 'random.db'
 $wrongTypeDatabase = Join-Path $fixturePath 'not-hash.db'
 
 foreach ( $requiredPath in @(
 	$primaryDatabase,
 	$overflowDatabase,
+	$multiDatabase,
 	$malformedDatabase,
 	$wrongTypeDatabase
 ) ) {
@@ -208,6 +210,42 @@ try {
 		-ExpectedStatus 0 `
 		-StdoutContains "hdb00-overflow`tIcod HDB00 overflow terminfo fixture" `
 		-RequireEmptyStderr
+
+	foreach ( $index in @( 0, 32, 63 ) ) {
+		$canonical = 'hdb07-multi-{0:D3}' -f $index
+		$alias = $canonical + '-alias'
+		foreach ( $name in @( $canonical, $alias ) ) {
+			$result = Invoke-TermInfoCommand infocmp @(
+				'-A', $multiDatabase, $name
+			)
+			Assert-CommandResult `
+				-Result $result `
+				-ExpectedStatus 0 `
+				-StdoutContains "$canonical|$alias|Icod HDB07 multi $($index.ToString( 'D3' )) fixture," `
+				-RequireEmptyStderr
+		}
+	}
+
+	$result = Invoke-TermInfoCommand toe @( '-s', $multiDatabase )
+	Assert-CommandResult -Result $result -ExpectedStatus 0 -RequireEmptyStderr
+	$multiLines = @(
+		$result.Stdout -split '\r?\n' |
+			Where-Object { 0 -ne $_.Length }
+	)
+	if ( 128 -ne $multiLines.Count ) {
+		throw "Expected 128 multi-record toe publications, got $($multiLines.Count).`n$($result.Stdout)"
+	}
+	foreach ( $index in @( 0, 32, 63 ) ) {
+		$canonical = 'hdb07-multi-{0:D3}' -f $index
+		$description = "Icod HDB07 multi $($index.ToString( 'D3' )) fixture"
+		foreach ( $name in @( $canonical, $canonical + '-alias' ) ) {
+			$expected = "$name`t$description"
+			if ( $expected -cnotin $multiLines ) {
+				throw "Expected toe publication '$expected'."
+			}
+		}
+	}
+	Write-Host "HDB07 multi command publications: $($multiLines.Count)"
 
 	$result = Invoke-TermInfoCommand infocmp @(
 		'-A', $primaryDatabase, 'hdb00-missing'

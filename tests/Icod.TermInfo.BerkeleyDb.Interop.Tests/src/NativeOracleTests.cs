@@ -28,6 +28,7 @@ public sealed class NativeOracleTests {
 	[Theory]
 	[InlineData( "hashed-db", 3 )]
 	[InlineData( "overflow-hashed-db", 2 )]
+	[InlineData( "multi-hashed-db", 192 )]
 	public void ProductionReaderMatchesEveryNativeRecord(
 		string fixtureName,
 		int expectedRecordCount
@@ -262,6 +263,109 @@ public sealed class NativeOracleTests {
 			entry.Kind
 		);
 		Assert.Equal( "hdb00-overflow", entry.Terminal.Name );
+	}
+
+	[Theory]
+	[InlineData( "hdb07-multi-000", "hdb07-multi-000" )]
+	[InlineData( "hdb07-multi-000-alias", "hdb07-multi-000" )]
+	[InlineData( "hdb07-multi-032", "hdb07-multi-032" )]
+	[InlineData( "hdb07-multi-032-alias", "hdb07-multi-032" )]
+	[InlineData( "hdb07-multi-063", "hdb07-multi-063" )]
+	[InlineData( "hdb07-multi-063-alias", "hdb07-multi-063" )]
+	public void MultiRecordNativeStoreLoadsThroughDirectAndExplicitRouter(
+		string requestedName,
+		string expectedCanonicalName
+	) {
+		BerkeleyDbTerminalDescriptionProvider provider =
+			new( FixturePath( "multi-hashed-db.db" ) );
+		TerminalDatabase router = new( [ provider ] );
+
+		Assert.True( provider.TryLoad( requestedName, out TerminalDescription? direct ) );
+		Assert.Equal( expectedCanonicalName, direct.Name );
+		Assert.Contains( expectedCanonicalName + "-alias", direct.Aliases );
+
+		Assert.True( router.TryLoad( requestedName, out TerminalDescription? routed ) );
+		Assert.Equal( expectedCanonicalName, routed.Name );
+		Assert.Contains( expectedCanonicalName + "-alias", routed.Aliases );
+	}
+
+	[Theory]
+	[InlineData( "hdb07-multi-000", "hdb07-multi-000" )]
+	[InlineData( "hdb07-multi-000-alias", "hdb07-multi-000" )]
+	[InlineData( "hdb07-multi-032", "hdb07-multi-032" )]
+	[InlineData( "hdb07-multi-032-alias", "hdb07-multi-032" )]
+	[InlineData( "hdb07-multi-063", "hdb07-multi-063" )]
+	[InlineData( "hdb07-multi-063-alias", "hdb07-multi-063" )]
+	public void MultiRecordNativeStoreLoadsThroughSystemRouter(
+		string requestedName,
+		string expectedCanonicalName
+	) {
+		string? previousTermInfo =
+			Environment.GetEnvironmentVariable( "TERMINFO" );
+		string? previousTermInfoDirs =
+			Environment.GetEnvironmentVariable( "TERMINFO_DIRS" );
+
+		try {
+			Environment.SetEnvironmentVariable(
+				"TERMINFO",
+				FixturePath( "multi-hashed-db.db" )
+			);
+			Environment.SetEnvironmentVariable( "TERMINFO_DIRS", null );
+			BerkeleyDbSystemTerminalDescriptionProvider provider =
+				new(
+					new BerkeleyDbSystemTerminalDescriptionProviderOptions(
+						useEnvironment: true,
+						useUserDatabase: false,
+						useSystemDatabases: false
+					)
+				);
+
+			Assert.True(
+				provider.TryLoad(
+					requestedName,
+					out TerminalDescription? terminal
+				)
+			);
+			Assert.Equal( expectedCanonicalName, terminal.Name );
+		} finally {
+			Environment.SetEnvironmentVariable( "TERMINFO", previousTermInfo );
+			Environment.SetEnvironmentVariable(
+				"TERMINFO_DIRS",
+				previousTermInfoDirs
+			);
+		}
+	}
+
+	[Fact]
+	public void MultiRecordNativeCatalogHasExactPublicationsAndEdgeEntries() {
+		BerkeleyDbTerminalCatalogReader reader =
+			new( FixturePath( "multi-hashed-db.db" ) );
+
+		IReadOnlyList<BerkeleyDbTerminalCatalogEntry> entries = reader.Read();
+
+		Assert.Equal( 128, entries.Count );
+		foreach ( int index in new[] { 0, 32, 63 } ) {
+			string canonical = $"hdb07-multi-{index:D3}";
+			BerkeleyDbTerminalCatalogEntry primary = Assert.Single(
+				entries,
+				entry => entry.Name == canonical
+			);
+			BerkeleyDbTerminalCatalogEntry alias = Assert.Single(
+				entries,
+				entry => entry.Name == canonical + "-alias"
+			);
+
+			Assert.Equal(
+				BerkeleyDbTerminalCatalogEntryKind.Canonical,
+				primary.Kind
+			);
+			Assert.Equal(
+				BerkeleyDbTerminalCatalogEntryKind.Alias,
+				alias.Kind
+			);
+			Assert.Same( primary.Terminal, alias.Terminal );
+			Assert.Equal( canonical, primary.Terminal.Name );
+		}
 	}
 
 	private static List<( byte[] Key, byte[] Value )> ReadNativeRecords( string fixtureName ) {
