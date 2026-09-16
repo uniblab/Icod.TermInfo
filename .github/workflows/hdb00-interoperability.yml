@@ -41,16 +41,38 @@ jobs:
   linux-berkeley-db-5-3:
     name: Linux / Berkeley DB 5.3 / ncurses hashed store
     runs-on: ubuntu-24.04
+    outputs:
+      hdb00-required: ${{ steps.hdb00-scope.outputs.required }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Verify HDB00 change-scope classifier
         shell: pwsh
         run: ./tools/hdb00/verify-change-scope.ps1
 
+      - name: Determine HDB00 change scope
+        id: hdb00-scope
+        shell: pwsh
+        env:
+          HDB00_EVENT_NAME: ${{ github.event_name }}
+          HDB00_ACTION: ${{ github.event.action }}
+          HDB00_BEFORE: ${{ github.event.before }}
+          HDB00_AFTER: ${{ github.event.after }}
+        run: |
+          $required = ./tools/hdb00/Get-Hdb00ChangeScope.ps1 `
+              -EventName $env:HDB00_EVENT_NAME `
+              -Action $env:HDB00_ACTION `
+              -Before $env:HDB00_BEFORE `
+              -After $env:HDB00_AFTER `
+              -RepositoryRoot $env:GITHUB_WORKSPACE
+          "required=$required" >> $env:GITHUB_OUTPUT
+
       - name: Set up .NET
+        if: steps.hdb00-scope.outputs.required == 'true'
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
@@ -59,19 +81,23 @@ jobs:
             10.0.x
 
       - name: Install Berkeley DB development tools
+        if: steps.hdb00-scope.outputs.required == 'true'
         run: |
           sudo apt-get update
           sudo apt-get install --yes libdb5.3-dev db5.3-util
 
       - name: Run native HDB00 interoperability probe
+        if: steps.hdb00-scope.outputs.required == 'true'
         shell: bash
         run: bash tools/hdb00/run-linux.sh
 
       - name: Verify managed Hash v9 reader
+        if: steps.hdb00-scope.outputs.required == 'true'
         shell: bash
         run: bash tools/hdb00/verify-managed.sh "$RUNNER_TEMP/icod-terminfo-hdb00"
 
       - name: Compare production reader with native Berkeley DB records
+        if: steps.hdb00-scope.outputs.required == 'true'
         shell: bash
         env:
           ICOD_HDB02_FIXTURE_ROOT: ${{ runner.temp }}/icod-terminfo-hdb00
@@ -81,12 +107,14 @@ jobs:
           dotnet test tests/Icod.TermInfo.BerkeleyDb.Interop.Tests/Icod.TermInfo.BerkeleyDb.Interop.Tests.csproj -c Release
 
       - name: Verify HDB06 direct and routed commands
+        if: steps.hdb00-scope.outputs.required == 'true'
         shell: pwsh
         run: |
           ./tools/hdb00/verify-hdb06-commands.ps1 -FixtureRoot "${{ runner.temp }}/icod-terminfo-hdb00" -LaunchMode Direct
           ./tools/hdb00/verify-hdb06-commands.ps1 -FixtureRoot "${{ runner.temp }}/icod-terminfo-hdb00" -LaunchMode Routed
 
       - name: Upload Linux Hash v9 fixtures
+        if: steps.hdb00-scope.outputs.required == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: hdb00-linux-hash-v9
@@ -109,8 +137,28 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine HDB00 change scope
+        id: hdb00-scope
+        shell: pwsh
+        env:
+          HDB00_EVENT_NAME: ${{ github.event_name }}
+          HDB00_ACTION: ${{ github.event.action }}
+          HDB00_BEFORE: ${{ github.event.before }}
+          HDB00_AFTER: ${{ github.event.after }}
+        run: |
+          $required = ./tools/hdb00/Get-Hdb00ChangeScope.ps1 `
+              -EventName $env:HDB00_EVENT_NAME `
+              -Action $env:HDB00_ACTION `
+              -Before $env:HDB00_BEFORE `
+              -After $env:HDB00_AFTER `
+              -RepositoryRoot $env:GITHUB_WORKSPACE
+          "required=$required" >> $env:GITHUB_OUTPUT
 
       - name: Set up .NET
+        if: steps.hdb00-scope.outputs.required == 'true'
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
@@ -119,17 +167,21 @@ jobs:
             10.0.x
 
       - name: Install Berkeley DB 5
+        if: steps.hdb00-scope.outputs.required == 'true'
         run: brew install berkeley-db@5
 
       - name: Run native HDB00 interoperability probe
+        if: steps.hdb00-scope.outputs.required == 'true'
         shell: bash
         run: bash tools/hdb00/run-macos.sh
 
       - name: Verify managed Hash v9 reader
+        if: steps.hdb00-scope.outputs.required == 'true'
         shell: bash
         run: bash tools/hdb00/verify-managed.sh "$RUNNER_TEMP/icod-terminfo-hdb00-macos"
 
       - name: Compare production reader with native Berkeley DB records
+        if: steps.hdb00-scope.outputs.required == 'true'
         shell: bash
         env:
           ICOD_HDB02_FIXTURE_ROOT: ${{ runner.temp }}/icod-terminfo-hdb00-macos
@@ -141,12 +193,14 @@ jobs:
           dotnet test tests/Icod.TermInfo.BerkeleyDb.Interop.Tests/Icod.TermInfo.BerkeleyDb.Interop.Tests.csproj -c Release
 
       - name: Verify HDB06 direct and routed commands
+        if: steps.hdb00-scope.outputs.required == 'true'
         shell: pwsh
         run: |
           ./tools/hdb00/verify-hdb06-commands.ps1 -FixtureRoot "${{ runner.temp }}/icod-terminfo-hdb00-macos" -LaunchMode Direct
           ./tools/hdb00/verify-hdb06-commands.ps1 -FixtureRoot "${{ runner.temp }}/icod-terminfo-hdb00-macos" -LaunchMode Routed
 
       - name: Upload macOS native oracle fixtures
+        if: steps.hdb00-scope.outputs.required == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: hdb02-macos-native-oracle
@@ -167,10 +221,13 @@ jobs:
     runs-on: windows-latest
     needs:
       - linux-berkeley-db-5-3
+    if: needs.linux-berkeley-db-5-3.outputs.hdb00-required == 'true'
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
