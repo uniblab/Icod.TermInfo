@@ -132,6 +132,47 @@ try {
 		}
 	}
 
+
+	$hdb06Store = Join-Path $workRoot 'hdb06-hash-v9.db'
+	& ( Join-Path $scriptDirectory 'new-hdb06-test-store.ps1' ) `
+		-OutputPath $hdb06Store
+
+	$hdb06InfocmpOutput = Invoke-Router -Arguments @(
+		'infocmp',
+		'-A',
+		$hdb06Store,
+		'hdb06-distribution-alias'
+	)
+	if (
+		-not $hdb06InfocmpOutput.Contains(
+			'hdb06-distribution-main|hdb06-distribution-alias|HDB06 distribution terminal,'
+		)
+	) {
+		throw 'Installed routed infocmp did not acquire the controlled Hash-v9 alias.'
+	}
+
+	$hdb06ToeOutput = Invoke-Router -Arguments @(
+		'toe',
+		'-s',
+		$hdb06Store
+	)
+	$hdb06ToeLines = @(
+		$hdb06ToeOutput -split '\r?\n' |
+			Where-Object { 0 -ne $_.Length }
+	)
+	$expectedHdb06ToeLines = @(
+		"hdb06-distribution-alias`tHDB06 distribution terminal",
+		"hdb06-distribution-main`tHDB06 distribution terminal"
+	)
+	if ( $expectedHdb06ToeLines.Count -ne $hdb06ToeLines.Count ) {
+		throw 'Installed routed toe did not emit exactly two controlled Hash-v9 publications.'
+	}
+	for ( $index = 0; $index -lt $expectedHdb06ToeLines.Count; $index++ ) {
+		if ( $expectedHdb06ToeLines[$index] -cne $hdb06ToeLines[$index] ) {
+			throw "Installed routed toe emitted unexpected Hash-v9 publication '$($hdb06ToeLines[$index])'."
+		}
+	}
+
 	$sourcePath = Join-Path $workRoot 'release-smoke.ti'
 	$databaseRoot = Join-Path $workRoot 'terminfo'
 	[System.IO.Directory]::CreateDirectory( $databaseRoot ) | Out-Null
