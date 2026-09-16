@@ -239,12 +239,12 @@ public sealed class Hdb05CatalogReaderTests {
 	}
 
 	[Fact]
-	public void InvalidUtf8PublicationKeyIsDatabaseFormatFailure() {
+	public void UnsafeLatin1FallbackPublicationKeyIsDatabaseFormatFailure() {
 		byte[] storageKey = Encoding.UTF8.GetBytes( "sample|test terminal" );
 		WithDatabase(
 			CreateDatabase(
 				(
-					new byte[] { 0xC3, 0x28 },
+					new byte[] { 0xE9, 0x00 },
 					PrependMarker( storageKey, 2 )
 				),
 				(
