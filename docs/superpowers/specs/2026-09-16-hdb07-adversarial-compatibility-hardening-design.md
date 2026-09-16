@@ -324,22 +324,35 @@ per-host/TFM test counts.
 
 The normal PR workflow runs for every pushed HDB07 checkpoint.
 
-HDB00 runs when a change can affect interoperability evidence:
+GitHub evaluates a pull request workflow's top-level `paths` filter against
+the cumulative PR diff. Because PR #45 already contains
+interoperability-sensitive files, later documentation-only synchronizations
+still invoke the HDB00 workflow. HDB07 therefore adds an in-workflow
+synchronize-delta gate based on the event's `before` and `after` commits.
+
+The gate enables expensive HDB00 work when the latest synchronization changes:
 
 - BerkeleyDb production code;
 - interop tests;
 - native generation or verification scripts;
 - shared fixtures consumed by interoperability;
 - package/distribution composition relevant to BerkeleyDb; or
-- the HDB00 workflow itself.
+- the HDB00 workflow or gate itself.
+
+For `workflow_dispatch` and non-`synchronize` pull request actions, the gate
+defaults to enabled. Missing or invalid synchronize commit identifiers fail the
+gate rather than silently skipping qualification.
 
 BerkeleyDb unit-test-only, design/plan, closure-document, README, and PR-body
-changes do not trigger HDB00 unless they also change one of the categories
-above. HDB00 runs once more on the final implementation/qualification head.
-The documentation-only closure head does not require a second HDB00 run.
+deltas produce only the inexpensive gate jobs. Linux and macOS skip native
+installation and test steps, and Windows is skipped when the Linux gate output
+is false. HDB00 runs all three qualification jobs once more on the final
+implementation head. A documentation-only closure synchronization may create a
+cheap gated workflow run, but it is not a second interoperability
+qualification.
 
-Changing the HDB00 path filters is itself an HDB00 workflow change and therefore
-receives one qualifying run.
+Changing the HDB00 workflow or gate is itself sensitive and therefore receives
+one full qualifying run.
 
 ## 15. Acceptance criteria
 
