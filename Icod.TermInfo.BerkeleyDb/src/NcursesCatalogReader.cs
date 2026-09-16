@@ -19,17 +19,9 @@
 	along with this library.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-using System.Text;
-
 namespace Icod.TermInfo.BerkeleyDb;
 
 internal static class NcursesCatalogReader {
-	private static readonly UTF8Encoding StrictUtf8 =
-		new(
-			encoderShouldEmitUTF8Identifier: false,
-			throwOnInvalidBytes: true
-		);
-
 	internal static IReadOnlyList<BerkeleyDbTerminalCatalogEntry> Read(
 		IReadOnlyList<BerkeleyDbHashRecord> records,
 		CompiledTermInfoParserOptions parserOptions,
@@ -52,6 +44,37 @@ internal static class NcursesCatalogReader {
 					"The Berkeley DB contains a duplicate exact byte key."
 				);
 			}
+		}
+
+		var publicationNames =
+			new Dictionary<BerkeleyDbHashRecord, string>();
+		var publicationKeysByName =
+			new Dictionary<string, byte[]>( StringComparer.Ordinal );
+		foreach ( BerkeleyDbHashRecord record in records ) {
+			ReadOnlySpan<byte> value = record.Value.Span;
+			if (
+				value.Length == 0
+				|| value[0] != 2
+			) {
+				continue;
+			}
+
+			string name = DecodePublicationName( record.Key.Span );
+			byte[] key = record.Key.ToArray();
+			if (
+				publicationKeysByName.TryGetValue(
+					name,
+					out byte[]? existingKey
+				)
+				&& !existingKey.AsSpan().SequenceEqual( key )
+			) {
+				throw CreateFormatException(
+					$"The ncurses catalog contains more than one exact byte key for logical publication '{name}'."
+				);
+			}
+
+			publicationKeysByName.TryAdd( name, key );
+			publicationNames.Add( record, name );
 		}
 
 		var terminalsByStorageKey =
@@ -80,7 +103,7 @@ internal static class NcursesCatalogReader {
 					break;
 
 				case 2:
-					string name = DecodePublicationName( record.Key.Span );
+					string name = publicationNames[record];
 					TerminalDescription terminal = ResolvePublication(
 						record,
 						recordsByKey,
@@ -135,12 +158,14 @@ internal static class NcursesCatalogReader {
 		ReadOnlySpan<byte> bytes
 	) {
 		try {
-			string name = StrictUtf8.GetString( bytes );
+			string name = TerminalNameEncoding.DecodePublicationName(
+				bytes
+			);
 			TerminalNameValidator.Validate( name );
 			return name;
 		} catch ( ArgumentException exception ) {
 			throw CreateFormatException(
-				"The ncurses publication key is not a safe exact UTF-8 terminal name.",
+				"The ncurses publication key is not a safe exact UTF-8 or Latin-1 terminal name.",
 				exception
 			);
 		}

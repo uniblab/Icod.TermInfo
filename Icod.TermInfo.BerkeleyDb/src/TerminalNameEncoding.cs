@@ -35,6 +35,16 @@ internal static class TerminalNameEncoding {
 		return StrictUtf8.GetBytes( name );
 	}
 
+	internal static string DecodePublicationName(
+		ReadOnlySpan<byte> bytes
+	) {
+		try {
+			return StrictUtf8.GetString( bytes );
+		} catch ( DecoderFallbackException ) {
+			return Encoding.Latin1.GetString( bytes );
+		}
+	}
+
 	internal static bool TryEncodeDistinctLatin1(
 		string name,
 		ReadOnlySpan<byte> utf8,
