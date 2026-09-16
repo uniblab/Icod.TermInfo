@@ -160,7 +160,7 @@ public sealed class Hdb05CatalogReaderTests {
 	[Fact]
 	public void ReadFollowsMarkerTwoChainsWithinTheHopLimit() {
 		byte[] storageKey =
-			Encoding.UTF8.GetBytes( "sample|sample-link" );
+			Encoding.UTF8.GetBytes( "sample|sample-link|test terminal" );
 		WithDatabase(
 			CreateDatabase(
 				(
@@ -240,7 +240,7 @@ public sealed class Hdb05CatalogReaderTests {
 
 	[Fact]
 	public void InvalidUtf8PublicationKeyIsDatabaseFormatFailure() {
-		byte[] storageKey = Encoding.UTF8.GetBytes( "sample" );
+		byte[] storageKey = Encoding.UTF8.GetBytes( "sample|test terminal" );
 		WithDatabase(
 			CreateDatabase(
 				(
@@ -262,7 +262,7 @@ public sealed class Hdb05CatalogReaderTests {
 
 	[Fact]
 	public void UnsafePublicationNameIsDatabaseFormatFailure() {
-		byte[] storageKey = Encoding.UTF8.GetBytes( "sample" );
+		byte[] storageKey = Encoding.UTF8.GetBytes( "sample|test terminal" );
 		WithDatabase(
 			CreateDatabase(
 				(
@@ -366,7 +366,7 @@ public sealed class Hdb05CatalogReaderTests {
 
 	[Fact]
 	public void CompiledFailureRetainsCompiledFormatException() {
-		byte[] storageKey = Encoding.UTF8.GetBytes( "sample" );
+		byte[] storageKey = Encoding.UTF8.GetBytes( "sample|test terminal" );
 		WithDatabase(
 			CreateDatabase(
 				(
@@ -516,7 +516,7 @@ public sealed class Hdb05CatalogReaderTests {
 		var names = new List<string> { canonical };
 		names.AddRange( aliases );
 		byte[] storageKey =
-			Encoding.UTF8.GetBytes( string.Join( "|", names ) );
+			Encoding.UTF8.GetBytes( string.Join( "|", names ) + "|test terminal" );
 		var records =
 			new List<( byte[] Key, byte[] Value )>();
 
