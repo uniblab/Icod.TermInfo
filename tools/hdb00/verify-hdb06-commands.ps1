@@ -237,6 +237,7 @@ try {
 	}
 
 	Write-Host "HDB06 $LaunchMode command verification passed for '$fixturePath'."
+	$global:LASTEXITCODE = 0
 }
 finally {
 	if ( Test-Path -LiteralPath $captureRoot ) {
