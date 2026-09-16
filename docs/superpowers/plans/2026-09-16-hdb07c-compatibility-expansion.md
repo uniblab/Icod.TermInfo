@@ -1,5 +1,13 @@
 # HDB07C Compatibility Expansion Implementation Plan
 
+**Status:** IMPLEMENTATION ACCEPTED / CLOSURE IN PROGRESS
+
+**Accepted implementation/qualification head:**
+`2c122abd7e4e63397b474f248d51273a1b7fc006`
+
+**Accepted qualification runs:** normal `35161853347` (12/12), HDB00
+`35161853443` (3/3)
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Add detected-mutation rejection, native big-endian Hash-v9 evidence, and a bounded exact Latin-1 ncurses producer fallback without changing the public API or production dependency/write boundaries.
@@ -60,7 +68,7 @@
 - Produces: `internal static byte[] ReadStableDatabase(Stream stream, int maximumDatabaseSize)` for a seekable borrowed stream; production `ReadDatabase(string, int)` delegates to it.
 - Preserves: `ReadDatabase(Stream, int)` remains single-pass, non-owning, and usable with non-seekable streams.
 
-- [ ] **Step 1: Add the behavior-neutral stable-acquisition seam and path routing**
+- [x] **Step 1: Add the behavior-neutral stable-acquisition seam and path routing**
 
 In `BerkeleyDbHashReader.cs`, change only the path wrapper and add this temporary behavior-neutral seam:
 
@@ -90,7 +98,7 @@ internal static byte[] ReadStableDatabase(
 
 Do not alter the existing stream overload. This seam makes the behavioral RED deterministic without requiring a filesystem race.
 
-- [ ] **Step 2: Add deterministic two-observation tests**
+- [x] **Step 2: Add deterministic two-observation tests**
 
 Create `Hdb07cAcquisitionStabilityTests.cs` with a private seekable `ObservationStream` that:
 
@@ -146,7 +154,7 @@ Assert.True( stream.CanRead );
 
 For the injected I/O case use `Assert.Same( expected, actual )`. For the borrowed stream case call the existing `ReadDatabase(Stream, int)` and assert only one observation was consumed.
 
-- [ ] **Step 3: Run the focused test and verify the behavioral RED**
+- [x] **Step 3: Run the focused test and verify the behavioral RED**
 
 Run when a local SDK is available:
 
@@ -158,7 +166,7 @@ Expected: the identical-observation cases fail because only one observation occu
 
 In this environment, push the test/seam commit and require the same focused failures on all three TFMs before implementation.
 
-- [ ] **Step 4: Commit the RED**
+- [x] **Step 4: Commit the RED**
 
 ```bash
 git add Icod.TermInfo.BerkeleyDb/src/BerkeleyDbHashReader.cs tests/Icod.TermInfo.BerkeleyDb.Tests/src/Hdb07cAcquisitionStabilityTests.cs
@@ -167,7 +175,7 @@ git commit -m "test: require HDB07C stable acquisition"
 
 Record the exact commit, workflow run, per-TFM failure count, and exception mismatch. Do not edit implementation until the Linux RED is observed.
 
-- [ ] **Step 5: Implement bounded verification without a second database-sized array**
+- [x] **Step 5: Implement bounded verification without a second database-sized array**
 
 Replace the seam body with validation plus a private verifier:
 
@@ -229,7 +237,7 @@ private static IOException CreateChangedWhileReadingException() {
 
 If `expected.Length` could be zero, the existing minimum-length validation already rejects it before verification. Do not catch an `IOException` thrown by `Read`; it must retain identity. Do not change `FileShare.Read` or add retry.
 
-- [ ] **Step 6: Run focused and complete BerkeleyDb tests**
+- [x] **Step 6: Run focused and complete BerkeleyDb tests**
 
 ```bash
 dotnet test tests/Icod.TermInfo.BerkeleyDb.Tests/Icod.TermInfo.BerkeleyDb.Tests.csproj -c Release --filter FullyQualifiedName~Hdb07cAcquisitionStabilityTests
@@ -238,7 +246,7 @@ dotnet test tests/Icod.TermInfo.BerkeleyDb.Tests/Icod.TermInfo.BerkeleyDb.Tests.
 
 Expected: PASS on net8/net9/net10. Existing HDB02 non-seekable borrowed-stream tests remain green.
 
-- [ ] **Step 7: Commit the GREEN and qualify the checkpoint**
+- [x] **Step 7: Commit the GREEN and qualify the checkpoint**
 
 ```bash
 git add Icod.TermInfo.BerkeleyDb/src/BerkeleyDbHashReader.cs
@@ -266,7 +274,7 @@ Push and require normal CI 12/12 plus HDB00 3/3 because production acquisition c
 - Produces: `big-endian-hashed-db.db` and `big-endian-hashed-db.dump` with identical application records and big-endian Berkeley DB metadata.
 - Uses: installed `db_dump -k` plus `db_load -c db_lorder=4321` to preserve exact dump records while selecting destination metadata order.
 
-- [ ] **Step 1: Add fixture expectations before generation**
+- [x] **Step 1: Add fixture expectations before generation**
 
 Extend `NativeOracleTests.ProductionReaderMatchesEveryNativeRecord`:
 
@@ -289,7 +297,7 @@ In `verify-hdb06-commands.ps1`, require the new database and add direct/routed `
 
 Do not generate the file in this step.
 
-- [ ] **Step 2: Commit and observe the native-evidence RED**
+- [x] **Step 2: Commit and observe the native-evidence RED**
 
 ```bash
 git add tests/Icod.TermInfo.BerkeleyDb.Interop.Tests/src/NativeOracleTests.cs tools/hdb00/verify-managed.sh tools/hdb00/verify-hdb06-commands.ps1 .github/workflows/hdb00-interoperability.yml
@@ -298,7 +306,7 @@ git commit -m "test: require native HDB07C big-endian evidence"
 
 Expected HDB00 result: Linux and macOS fail on the missing `big-endian-hashed-db.db`; Windows skips because Linux did not publish the required artifact. The ordinary workflow may remain green.
 
-- [ ] **Step 3: Repack through installed Berkeley DB utilities**
+- [x] **Step 3: Repack through installed Berkeley DB utilities**
 
 In each native script, dump the ncurses-produced source with `db_dump -k`,
 then load the exact bytevalue dump into the destination with:
@@ -310,7 +318,7 @@ db_load -c db_lorder=4321 -f SOURCE_DUMP DESTINATION_DATABASE
 Use the versioned Linux utilities and the Homebrew Berkeley DB 5 utilities on
 macOS. Do not compile or add a native helper.
 
-- [ ] **Step 4: Add an independent managed native-evidence verifier**
+- [x] **Step 4: Add an independent managed native-evidence verifier**
 
 Create a package-free net8.0 console project under `tools/hdb00/native-verifier`.
 Its initial interface is:
@@ -330,7 +338,7 @@ HDB07C byte order: big-endian
 HDB07C native big-endian records: 3
 ```
 
-- [ ] **Step 5: Generate and verify the big-endian database on Linux and macOS**
+- [x] **Step 5: Generate and verify the big-endian database on Linux and macOS**
 
 In each native script:
 
@@ -344,7 +352,7 @@ In each native script:
 
 The record comparator must parse the bytevalue dump lines after `HEADER=END`, require `DATA=END`, build sorted `(key,value)` byte tuples, and fail unless the tuples are exactly equal.
 
-- [ ] **Step 6: Run static and native checks**
+- [x] **Step 6: Run static and native checks**
 
 ```bash
 bash -n tools/hdb00/run-linux.sh
@@ -354,7 +362,7 @@ dotnet build tools/hdb00/native-verifier/Hdb07c.NativeVerifier.csproj -c Release
 
 On CI, require native creation/dump/probe success on Linux and macOS, managed interop tests on all three TFMs/hosts, command verification on all hosts, and Windows reading the transported Linux fixture.
 
-- [ ] **Step 7: Commit the GREEN**
+- [x] **Step 7: Commit the GREEN**
 
 ```bash
 git add tools/hdb00/native-verifier tools/hdb00/run-linux.sh tools/hdb00/run-macos.sh
@@ -379,7 +387,7 @@ Record the exact HDB00 and normal workflow results. If native evidence exposes a
 - Produces: `NcursesRecordReader.TryReadCompiledEntry(byte[] database, ReadOnlySpan<byte> requestedKey, out byte[] compiledEntry, int maximumItemSize, int maximumIndexHops) -> bool`.
 - Preserves: the path overload and every existing default/limit/exception boundary.
 
-- [ ] **Step 1: Add provider and precedence RED tests**
+- [x] **Step 1: Add provider and precedence RED tests**
 
 Use `Hdb07HashV9FixtureBuilder` to create exact Latin-1 key bytes and compiled names for:
 
@@ -419,7 +427,7 @@ For the precedence test, create a marker-7 value under `Encoding.UTF8.GetBytes(C
 
 The clean-miss and non-Latin-1 tests remain characterization; canonical/alias provider and system-provider cases are the expected RED.
 
-- [ ] **Step 2: Run and commit the provider RED**
+- [x] **Step 2: Run and commit the provider RED**
 
 ```bash
 dotnet test tests/Icod.TermInfo.BerkeleyDb.Tests/Icod.TermInfo.BerkeleyDb.Tests.csproj -c Release --filter FullyQualifiedName~Hdb07cEncodingCompatibilityTests
@@ -429,7 +437,7 @@ git commit -m "test: require HDB07C Latin-1 provider fallback"
 
 Expected: exact Latin-1 provider and system-provider cases return clean misses. Precedence and clean-miss controls pass. Observe the RED on Linux before production edits.
 
-- [ ] **Step 3: Add the internal encoding policy**
+- [x] **Step 3: Add the internal encoding policy**
 
 Create `TerminalNameEncoding.cs` with a private strict UTF-8 encoder:
 
@@ -470,7 +478,7 @@ internal static bool TryEncodeDistinctLatin1(
 
 The validator already rejects surrogate code units before encoding. Do not use `Encoding.Latin1.GetBytes` with replacement for candidate eligibility.
 
-- [ ] **Step 4: Extract one-image record resolution**
+- [x] **Step 4: Extract one-image record resolution**
 
 Move the existing marker loop into the new `byte[] database` overload. Keep the path overload as:
 
@@ -490,7 +498,7 @@ return TryReadCompiledEntry(
 
 The array overload validates null/positive limits exactly as the path overload does and does not copy the database. Preserve cycle tracking, clean initial miss, hop limits, and marker errors byte-for-byte.
 
-- [ ] **Step 5: Implement one-acquisition UTF-8-first provider lookup**
+- [x] **Step 5: Implement one-acquisition UTF-8-first provider lookup**
 
 In `LoadUncached`:
 
@@ -539,7 +547,7 @@ if ( !found ) {
 
 Keep acquisition and resolver `InvalidDataException` wrapping unchanged. Update the XML remarks to say exact ordinal UTF-8 first and exact Latin-1 after a clean miss.
 
-- [ ] **Step 6: Run provider, resolver, and full BerkeleyDb tests**
+- [x] **Step 6: Run provider, resolver, and full BerkeleyDb tests**
 
 ```bash
 dotnet test tests/Icod.TermInfo.BerkeleyDb.Tests/Icod.TermInfo.BerkeleyDb.Tests.csproj -c Release --filter "FullyQualifiedName~Hdb07cEncodingCompatibilityTests|FullyQualifiedName~Hdb03|FullyQualifiedName~Hdb07LogicalHardeningTests"
@@ -548,7 +556,7 @@ dotnet test tests/Icod.TermInfo.BerkeleyDb.Tests/Icod.TermInfo.BerkeleyDb.Tests.
 
 Expected: all net8/net9/net10 tests pass; found UTF-8 failures do not fall through; one acquired image serves both candidates.
 
-- [ ] **Step 7: Commit the provider GREEN**
+- [x] **Step 7: Commit the provider GREEN**
 
 ```bash
 git add Icod.TermInfo.BerkeleyDb/src/TerminalNameEncoding.cs Icod.TermInfo.BerkeleyDb/src/NcursesRecordReader.cs Icod.TermInfo.BerkeleyDb/src/BerkeleyDbTerminalDescriptionProvider.cs
@@ -572,7 +580,7 @@ Require normal 12/12 and HDB00 3/3 because BerkeleyDb production changed.
 - Produces: a preflight map from each marker-2 `BerkeleyDbHashRecord` to one validated logical name.
 - Preserves: raw-byte structural order and final ordinal name/kind/canonical ordering.
 
-- [ ] **Step 1: Add catalog RED cases**
+- [x] **Step 1: Add catalog RED cases**
 
 Add:
 
@@ -609,7 +617,7 @@ The ncurses publication key is not a safe exact UTF-8 or Latin-1 terminal name.
 
 Update HDB07's prior invalid-UTF-8 case to this new unsafe control. Do not retain `[ 0xC3, 0x28 ]` as categorically invalid: under the approved policy it is valid Latin-1 text and must proceed to identity checking.
 
-- [ ] **Step 2: Run and commit the catalog RED**
+- [x] **Step 2: Run and commit the catalog RED**
 
 ```bash
 dotnet test tests/Icod.TermInfo.BerkeleyDb.Tests/Icod.TermInfo.BerkeleyDb.Tests.csproj -c Release --filter "FullyQualifiedName~Hdb07cEncodingCompatibilityTests|FullyQualifiedName~Hdb07LogicalHardeningTests"
@@ -619,7 +627,7 @@ git commit -m "test: require HDB07C Latin-1 catalogs"
 
 Expected: Latin-1 catalog success and ambiguity cases fail; unsafe-name control may fail by message. Observe the Linux RED before implementation.
 
-- [ ] **Step 3: Implement strict UTF-8-first decoding**
+- [x] **Step 3: Implement strict UTF-8-first decoding**
 
 In `TerminalNameEncoding` add:
 
@@ -637,7 +645,7 @@ internal static string DecodePublicationName(
 
 Catch only `DecoderFallbackException`; safety validation remains the catalog's responsibility.
 
-- [ ] **Step 4: Preflight publication names and reject ambiguity**
+- [x] **Step 4: Preflight publication names and reject ambiguity**
 
 Before logical resolution, scan records in their existing raw-byte order. For each nonempty marker-2 value:
 
@@ -651,7 +659,7 @@ Store the validated name in `Dictionary<BerkeleyDbHashRecord, string>` and use t
 
 Remove the private strict UTF-8 field and decoder from `NcursesCatalogReader`; the encoding policy has one owner.
 
-- [ ] **Step 5: Run focused and complete tests**
+- [x] **Step 5: Run focused and complete tests**
 
 ```bash
 dotnet test tests/Icod.TermInfo.BerkeleyDb.Tests/Icod.TermInfo.BerkeleyDb.Tests.csproj -c Release --filter "FullyQualifiedName~Hdb07cEncodingCompatibilityTests|FullyQualifiedName~Hdb07LogicalHardeningTests|FullyQualifiedName~Hdb05CatalogReaderTests"
@@ -660,7 +668,7 @@ dotnet test tests/Icod.TermInfo.BerkeleyDb.Tests/Icod.TermInfo.BerkeleyDb.Tests.
 
 Expected: all pass across net8/net9/net10. Existing culture-order tests remain ordinal and restored.
 
-- [ ] **Step 6: Commit the catalog GREEN**
+- [x] **Step 6: Commit the catalog GREEN**
 
 ```bash
 git add Icod.TermInfo.BerkeleyDb/src/TerminalNameEncoding.cs Icod.TermInfo.BerkeleyDb/src/NcursesCatalogReader.cs
@@ -686,7 +694,7 @@ Require the complete normal and HDB00 workflows green.
 - Uses exact canonical bytes `6864623037632d636166e9` (`hdb07c-caf` + `E9`).
 - Uses exact alias bytes `6864623037632d616c69e9` (`hdb07c-ali` + `E9`).
 
-- [ ] **Step 1: Add native fixture expectations before generation**
+- [x] **Step 1: Add native fixture expectations before generation**
 
 Extend interop tests with:
 
@@ -713,7 +721,7 @@ Assert direct/routed `infocmp` succeeds for both and `toe -s` emits exactly both
 
 Do not generate the fixture in this step.
 
-- [ ] **Step 2: Commit and observe the native Latin-1 evidence RED**
+- [x] **Step 2: Commit and observe the native Latin-1 evidence RED**
 
 ```bash
 git add tests/Icod.TermInfo.BerkeleyDb.Interop.Tests/src/NativeOracleTests.cs tools/hdb00/verify-hdb06-commands.ps1 .github/workflows/hdb00-interoperability.yml
@@ -722,7 +730,7 @@ git commit -m "test: require native HDB07C Latin-1 evidence"
 
 Expected HDB00 result: Linux/macOS fail because `latin1-hashed-db.db` is missing; Windows skips. This evidence RED is separate from the already observed managed behavior RED.
 
-- [ ] **Step 3: Add managed exact-byte dump extraction**
+- [x] **Step 3: Add managed exact-byte dump extraction**
 
 Extend the C# native-evidence verifier with a Latin-1 dump mode. It must accept
 the native `db_dump -k` output, require the exact canonical and alias key bytes,
@@ -730,7 +738,7 @@ follow their marker-2 target in the dump's exact byte records, require one
 marker-0 compiled record and two marker-2 publications, and write canonical and
 alias compiled payloads for byte comparison. Do not modify or add native source.
 
-- [ ] **Step 4: Generate the source as exact bytes and compile it with native tic**
+- [x] **Step 4: Generate the source as exact bytes and compile it with native tic**
 
 In each Bash native script write the source as exact bytes without a new
 language dependency: emit the ASCII fragments with `printf '%s'` and the two
@@ -755,7 +763,7 @@ HDB07C native Latin-1 records: 3
 HDB07C native Latin-1 publications: 2
 ```
 
-- [ ] **Step 5: Run static checks and qualify all hosts**
+- [x] **Step 5: Run static checks and qualify all hosts**
 
 ```bash
 bash -n tools/hdb00/run-linux.sh
@@ -765,7 +773,7 @@ dotnet build tools/hdb00/native-verifier/Hdb07c.NativeVerifier.csproj -c Release
 
 Require Linux/macOS native creation, byte-key probe, dump, and managed interop success. Require Windows provider/system-provider/catalog/command success against the Linux artifact without Berkeley DB installed.
 
-- [ ] **Step 6: Commit the native Latin-1 GREEN**
+- [x] **Step 6: Commit the native Latin-1 GREEN**
 
 ```bash
 git add tools/hdb00/native-verifier/Program.cs tools/hdb00/run-linux.sh tools/hdb00/run-macos.sh
@@ -788,7 +796,7 @@ Record exact test counts, key hex, workflow IDs, and heads.
 - Produces: package-only Latin-1 provider/catalog/system-provider evidence on net8/net9/net10.
 - Preserves: no native package asset and unchanged public API/dependency graph.
 
-- [ ] **Step 1: Extend the package smoke with a synthetic Latin-1 store**
+- [x] **Step 1: Extend the package smoke with a synthetic Latin-1 store**
 
 Change `CreateStore` to accept an exact key encoding:
 
@@ -818,7 +826,7 @@ and `Encoding.Latin1`. Prove:
 - the opt-in system provider resolves the alias; and
 - the file can be deleted in `finally`.
 
-- [ ] **Step 2: Update package-facing descriptions precisely**
+- [x] **Step 2: Update package-facing descriptions precisely**
 
 Update provider remarks, package README, and package release notes to state:
 
@@ -830,7 +838,7 @@ Update provider remarks, package README, and package release notes to state:
 
 Do not claim universal non-ASCII support or execution on a big-endian host.
 
-- [ ] **Step 3: Run package and structural verification**
+- [x] **Step 3: Run package and structural verification**
 
 Use the repository's ordinary PR pipeline to run:
 
@@ -844,7 +852,7 @@ Use the repository's ordinary PR pipeline to run:
 
 Expected: no public API or dependency delta, no `runtimes/*/native` asset, and package consumer success on every TFM.
 
-- [ ] **Step 4: Commit distribution evidence**
+- [x] **Step 4: Commit distribution evidence**
 
 ```bash
 git add tools/berkeleydb-package-smoke/Program.cs Icod.TermInfo.BerkeleyDb/README.md Icod.TermInfo.BerkeleyDb/Icod.TermInfo.BerkeleyDb.csproj
@@ -873,7 +881,7 @@ Require normal 12/12. HDB00 runs because package/README paths are interoperabili
 - Consumes: exact accepted heads and workflow evidence from Tasks 1–6.
 - Produces: auditable HDB07C acceptance and HDB08 / Alpha-8 as the next tranche.
 
-- [ ] **Step 1: Run final implementation qualification**
+- [x] **Step 1: Run final implementation qualification**
 
 On the exact implementation head run or observe:
 
@@ -898,7 +906,7 @@ Capture:
 
 Do not begin closure edits until both workflows are green on the same exact implementation head.
 
-- [ ] **Step 2: Write the closure record**
+- [x] **Step 2: Write the closure record**
 
 Create `docs/1.15.0-HDB07C-COMPATIBILITY-EXPANSION.md` with:
 
@@ -913,7 +921,7 @@ Create `docs/1.15.0-HDB07C-COMPATIBILITY-EXPANSION.md` with:
 - accepted implementation head; and
 - HDB08 as next.
 
-- [ ] **Step 3: Synchronize roadmap and READMEs**
+- [x] **Step 3: Synchronize roadmap and READMEs**
 
 Mark HDB07C complete without rewriting HDB07's accepted head. Replace only the residual limitations actually closed:
 
@@ -924,7 +932,7 @@ Mark HDB07C complete without rewriting HDB07's accepted head. Replace only the r
 
 State that the suite remains `1.15.0-Alpha-7` and HDB08 advances to Alpha-8.
 
-- [ ] **Step 4: Mark plan/spec acceptance and commit closure**
+- [x] **Step 4: Mark plan/spec acceptance and commit closure**
 
 Mark completed plan checkboxes `[x]`, change the design status to accepted, and commit:
 

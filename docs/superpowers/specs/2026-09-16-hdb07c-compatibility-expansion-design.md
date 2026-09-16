@@ -1,11 +1,17 @@
 # HDB07C Compatibility Expansion Design
 
-**Status:** SPECIFICATION APPROVED / IMPLEMENTATION PLANNING
+**Status:** COMPLETE / ACCEPTED
 **Target prerelease:** `1.15.0-Alpha-7`  
 **Accepted HDB07 implementation head:**
 `ab059acf27a5bc7fb1e8cef390d47085be33b5af`  
 **Accepted HDB07 documentation head:**
 `3b113450f1c17b349bd9f470da5f48e4d9c9387a`
+
+**Accepted HDB07C implementation/qualification head:**
+`2c122abd7e4e63397b474f248d51273a1b7fc006`
+
+**Accepted qualification runs:** normal `35161853347` (12/12), HDB00
+`35161853443` (3/3)
 
 ## 1. Purpose
 
@@ -187,15 +193,17 @@ Existing command mappings therefore remain authoritative:
 
 ### 7.1 Producer definition
 
-The HDB07C native fixture is produced in two stages:
+The HDB07C native fixture is produced in three stages:
 
 1. the pinned ncurses `tic` build creates a normal hashed terminfo database;
-2. a focused native Berkeley DB 5.3 C helper enumerates its records and writes
-   the exact key/value bytes to a newly created Hash database after calling
-   `DB->set_lorder(4321)` before `DB->open()`.
+2. installed Berkeley DB 5.3 `db_dump -k` exports its exact application
+   records and `db_load -c db_lorder=4321` reloads those records into a newly
+   created big-endian Hash database; and
+3. a package-free C# verifier checks the metadata magic and exact record-dump
+   parity independently of the production reader.
 
-The helper is development and CI evidence only. It is never compiled into,
-loaded by, or distributed with a production package.
+The Berkeley DB utilities and verifier are development and CI evidence only.
+They are never loaded by or distributed with a production package.
 
 ### 7.2 Required evidence
 
@@ -370,9 +378,10 @@ and concurrency outcomes.
 HDB07C extends `tools/hdb00` for native generation and verification rather than
 adding a second interoperability harness.
 
-The big-endian C helper is narrowly limited to opening a source database,
-copying exact records, selecting destination byte order, and closing both
-databases with checked errors. It does not become a reusable product library.
+The installed Berkeley DB utilities are narrowly limited to dumping exact
+source records and reloading them with the selected destination byte order.
+The package-free C# verifier checks magic and dump parity; it does not become a
+reusable product library.
 
 Non-ASCII source generation uses an existing repository scripting language or
 a focused helper capable of explicit byte output. Locale-sensitive shell text

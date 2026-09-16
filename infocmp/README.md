@@ -20,6 +20,13 @@ lookups in a 64-entry native ASCII Hash-v9 matrix on Linux and macOS, with the
 Linux fixture transported to Windows. The accepted suite passes 115 `infocmp`
 cases on every host; frozen JSON documents remain unchanged.
 
+HDB07C likewise adds no command or JSON contract. Exact hashed lookup is
+UTF-8-first and tries one representable Latin-1 key only after a clean miss.
+Direct and routed `infocmp` consume the qualified native big-endian container
+and Latin-1 canonical/alias fixtures on Linux and macOS, and the transported
+Linux fixtures on Windows. Unequal two-observation database reads fail as I/O;
+this detection is not an atomic snapshot or arbitrary writer coordination.
+
 ## 1.14 release status
 
 Version `1.14.0` carries the existing `infocmp` rendering, comparison,

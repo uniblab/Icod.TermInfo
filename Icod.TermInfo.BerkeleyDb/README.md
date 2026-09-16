@@ -73,18 +73,20 @@ matching ncurses discovery behavior. Missing sources continue; malformed reached
 sources fail explicitly. Successful results are cached, while misses and
 failures remain retryable.
 
-HDB07 qualification passed 404 BerkeleyDb unit cases and 34 native-store
-interoperability cases per target framework on Windows, Linux, and macOS. Linux
-and macOS independently generated a native 64-entry ASCII matrix with 192
-database records and 128 logical publications; Windows consumed the Linux
-fixture without Berkeley DB installed. Real permission denial and restoration
-also passed on all three hosts. The
+HDB07C qualification passed 422 BerkeleyDb unit cases and 50 native-store
+interoperability cases per target framework on Windows, Linux, and macOS. In
+addition to HDB07's native 64-entry ASCII matrix, Linux and macOS independently
+verified a big-endian Hash-v9 container with byte-exact ncurses records and an
+exact Latin-1 canonical/alias fixture; Windows consumed the Linux fixtures
+without Berkeley DB installed. Real permission denial and restoration also
+passed on all three hosts. The
 optional package's public API remains unchanged: command executables classify
 explicit paths and then call the accepted provider or catalog reader. Explicit
 `infocmp -A/-B` files and explicit human `toe` file operands are supported;
 Inspection stays provider-neutral, ambient `toe` discovery and JSON stay
 conventional, and `tic` remains directory-write-only. Installed-tool smoke
 passed on all three hosts and direct-command smoke passed for all six archive
-RIDs. HDB08 packaging and cross-platform qualification is next. Atomic snapshots,
-arbitrary writer coordination, and non-UTF-8/non-Latin-1 producer encodings remain
-outside the qualified contract.
+RIDs. The suite remains `1.15.0-Alpha-7`; HDB08 packaging and cross-platform
+qualification advances to Alpha-8. Atomic snapshots, arbitrary writer
+coordination, and non-UTF-8/non-Latin-1 producer encodings remain outside the
+qualified contract.

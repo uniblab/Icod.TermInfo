@@ -6,7 +6,7 @@
 **Optional package:** `Icod.TermInfo.BerkeleyDb`  
 **Language:** C# 13  
 **Reusable target frameworks:** `net8.0`; `net9.0`; `net10.0`  
-**Status:** HDB00–HDB07 accepted; approved compatibility expansion next
+**Status:** HDB00–HDB07C accepted; HDB08 next
 **Current coordinated prerelease:** `1.15.0-Alpha-7`
 
 ---
@@ -896,8 +896,46 @@ outside its accepted claims.
 Closure record:
 `docs/1.15.0-HDB07-ADVERSARIAL-COMPATIBILITY-HARDENING.md`.
 
-The separately approved compatibility-expansion tranche is next, before HDB08.
+The separately reviewed HDB07C compatibility-expansion tranche was subsequently
+accepted without changing HDB07's accepted head.
 PR #45 remains open, draft, and unmerged.
+
+### HDB07C — Compatibility Expansion — COMPLETE / ACCEPTED
+
+Accepted implementation/qualification head:
+`2c122abd7e4e63397b474f248d51273a1b7fc006`.
+
+Coordinated prerelease: `1.15.0-Alpha-7`.
+
+HDB07C adds exact evidence and bounded behavior in three areas:
+
+- production path acquisition requires two complete byte-identical
+  observations through one open handle and rejects unequal content or length;
+- Linux and macOS independently build and natively verify a big-endian
+  Berkeley DB Hash-v9 container containing byte-exact ncurses-produced records,
+  while Windows reads the transported Linux fixture without Berkeley DB; and
+- provider lookup and catalog enumeration implement exact UTF-8-first,
+  representable-Latin-1 fallback behavior for the qualified ncurses producer
+  subset, including logical-name ambiguity rejection.
+
+Qualification passed normal run `35161853347` with 12/12 jobs and HDB00 run
+`35161853443` with 3/3 jobs. The exact head passed 422 BerkeleyDb unit cases
+per TFM and host, 50 native-store interoperability cases per TFM and host, 115
+`infocmp` cases, 66 `toe` cases, and 47 router cases per host. Package-only
+net8/net9/net10, installed-tool, six archive-RID, API, dependency, assembly,
+and no-native-asset gates passed.
+
+HDB07C adds no public API, package dependency, JSON schema, native production
+runtime, or write path. Its two observations detect unequal reads but do not
+provide an atomic snapshot or arbitrary writer coordination. The exact
+Latin-1 subset does not imply general encoding detection, normalization, or
+transliteration, and the big-endian claim does not imply a big-endian host.
+
+Closure record:
+`docs/1.15.0-HDB07C-COMPATIBILITY-EXPANSION.md`.
+
+HDB08 is next and advances the coordinated prerelease to Alpha-8. PR #45
+remains open, draft, and unmerged.
 
 ### HDB08 — Packaging and Cross-platform Qualification
 

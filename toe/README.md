@@ -23,6 +23,14 @@ first, middle, and last primary/alias names, through direct and routed commands
 on Linux, macOS, and transported-fixture Windows. The accepted suite passes 66
 `toe` cases on every host; frozen JSON routes remain unchanged.
 
+HDB07C likewise adds no listing or JSON contract. Hashed publication keys use
+strict UTF-8 decoding first and Latin-1 only for invalid UTF-8 bytes; distinct
+raw keys that decode to the same ordinal logical name are rejected. Direct and
+routed `toe` consume the qualified native big-endian container and exact
+Latin-1 canonical/alias fixture on Linux and macOS, and transported Linux
+fixtures on Windows. Unequal two-observation reads fail as I/O without claiming
+an atomic snapshot or arbitrary writer coordination.
+
 ## 1.14 release status
 
 Version `1.14.0` carries the frozen `toe` database-listing, source-dependency,
