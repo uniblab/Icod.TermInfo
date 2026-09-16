@@ -444,15 +444,11 @@ internal static class InfoCmpInspector {
 		ITerminalDescriptionProvider provider;
 		string displayLabel;
 		try {
-			if ( databaseDirectory is not null ) {
-				DirectoryTerminalDescriptionProvider directoryProvider =
-					new( databaseDirectory );
-				provider = directoryProvider;
-				displayLabel = directoryProvider.Root;
-			} else {
-				provider = new SystemTerminalDescriptionProvider();
-				displayLabel = "system terminfo search";
-			}
+			provider =
+				InfoCmpTerminalProviderFactory.Create(
+					databaseDirectory,
+					out displayLabel
+				);
 		} catch ( Exception exception ) when ( IsOperationalException( exception ) ) {
 			await InfoCmpDiagnosticWriter.WriteErrorAsync(
 				stderr,
