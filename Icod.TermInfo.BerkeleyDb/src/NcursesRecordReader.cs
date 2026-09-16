@@ -39,6 +39,26 @@ internal static class NcursesRecordReader {
 			databasePath,
 			maximumDatabaseSize
 		);
+		return TryReadCompiledEntry(
+			database,
+			requestedKey,
+			out compiledEntry,
+			maximumItemSize,
+			maximumIndexHops
+		);
+	}
+
+	internal static bool TryReadCompiledEntry(
+		byte[] database,
+		ReadOnlySpan<byte> requestedKey,
+		out byte[] compiledEntry,
+		int maximumItemSize,
+		int maximumIndexHops
+	) {
+		ArgumentNullException.ThrowIfNull( database );
+		ArgumentOutOfRangeException.ThrowIfNegativeOrZero( maximumItemSize );
+		ArgumentOutOfRangeException.ThrowIfNegative( maximumIndexHops );
+
 		ReadOnlySpan<byte> key = requestedKey;
 		HashSet<string> visited = new HashSet<string>( StringComparer.Ordinal );
 		int followedLinks = 0;

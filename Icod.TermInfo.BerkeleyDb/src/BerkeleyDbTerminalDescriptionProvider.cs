@@ -21,27 +21,22 @@
 
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
 using System.Threading;
 
 namespace Icod.TermInfo.BerkeleyDb;
 
 /// <summary>Loads terminal descriptions from one explicit ncurses-compatible Berkeley DB Hash-v9 file.</summary>
 /// <remarks>
-/// Lookup uses exact ordinal UTF-8 keys. Successful descriptions are cached for
-/// this provider instance; clean misses and failures remain retryable. Construct
-/// a new provider to observe changed content after a successful lookup.
+/// Lookup uses exact ordinal UTF-8 keys first and an exact Latin-1 key only after
+/// a clean miss when the requested name is exactly representable. Successful
+/// descriptions are cached for this provider instance; clean misses and failures
+/// remain retryable. Construct a new provider to observe changed content after a
+/// successful lookup.
 /// </remarks>
 public sealed class BerkeleyDbTerminalDescriptionProvider
 	: ITerminalDescriptionProvider {
 	private const int MaximumStoredItemSize =
 		CompiledTermInfoParserOptions.MaximumSupportedEntrySize + 1;
-
-	private static readonly UTF8Encoding StrictUtf8 =
-		new(
-			encoderShouldEmitUTF8Identifier: false,
-			throwOnInvalidBytes: true
-		);
 
 	private readonly ConcurrentDictionary<string, Lazy<TerminalDescription?>> _cache =
 		new( StringComparer.Ordinal );
@@ -133,16 +128,35 @@ public sealed class BerkeleyDbTerminalDescriptionProvider
 		byte[] compiledEntry;
 
 		try {
+			byte[] database = BerkeleyDbHashReader.ReadDatabase(
+				DatabasePath,
+				_maximumDatabaseSize
+			);
+			byte[] utf8 = TerminalNameEncoding.EncodeUtf8( name );
+			bool found = NcursesRecordReader.TryReadCompiledEntry(
+				database,
+				utf8,
+				out compiledEntry,
+				MaximumStoredItemSize,
+				_maximumIndexHops
+			);
 			if (
-				!NcursesRecordReader.TryReadCompiledEntry(
-					DatabasePath,
-					StrictUtf8.GetBytes( name ),
-					out compiledEntry,
-					_maximumDatabaseSize,
-					MaximumStoredItemSize,
-					_maximumIndexHops
+				!found
+				&& TerminalNameEncoding.TryEncodeDistinctLatin1(
+					name,
+					utf8,
+					out byte[] latin1
 				)
 			) {
+				found = NcursesRecordReader.TryReadCompiledEntry(
+					database,
+					latin1,
+					out compiledEntry,
+					MaximumStoredItemSize,
+					_maximumIndexHops
+				);
+			}
+			if ( !found ) {
 				return null;
 			}
 		} catch ( InvalidDataException exception ) {
