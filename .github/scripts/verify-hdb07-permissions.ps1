@@ -120,3 +120,4 @@ if ([System.OperatingSystem]::IsWindows()) {
 Assert-DatabaseReadable
 Assert-PublicAcquisitionReadable -NoBuild $true
 Write-Host 'HDB07 permission propagation passed.'
+exit 0

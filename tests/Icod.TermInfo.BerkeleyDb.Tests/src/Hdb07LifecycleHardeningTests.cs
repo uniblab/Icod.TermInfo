@@ -261,7 +261,9 @@ public sealed class Hdb07LifecycleHardeningTests {
 	) {
 		switch ( caseName ) {
 			case "missing-database":
-				Assert.False( provider.TryLoad( name, out _ ) );
+				Assert.Throws<FileNotFoundException>(
+					() => provider.TryLoad( name, out _ )
+				);
 				break;
 			case "sharing-violation":
 				using ( FileStream locked = new FileStream(
