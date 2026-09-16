@@ -23,6 +23,12 @@ multi_hashed_base="$work_root/multi-hashed-db"
 multi_hashed_db="$multi_hashed_base.db"
 multi_fixture="$work_root/hdb07-multi.src"
 multi_dump="$work_root/multi-hashed-db.dump"
+repacker="$work_root/hdb07c-repack"
+big_endian_db="$work_root/big-endian-hashed-db.db"
+big_endian_dump="$work_root/big-endian-hashed-db.dump"
+source_dump="$work_root/hashed-db.dump"
+big_endian_primary="$work_root/hdb07c-big-endian-primary.bin"
+big_endian_alias="$work_root/hdb07c-big-endian-alias.bin"
 db_prefix="$(brew --prefix berkeley-db@5)"
 
 rm -rf "$work_root"
@@ -141,6 +147,18 @@ cc \
     -ldb \
     -o "$probe"
 
+printf '%s\n' "== HDB07C macOS: build CI-only Berkeley DB repacker =="
+cc \
+    -std=c11 \
+    -Wall \
+    -Wextra \
+    -Werror \
+    -I"$db_prefix/include" \
+    "$repo_root/tools/hdb00/hdb07c_repack.c" \
+    -L"$db_prefix/lib" \
+    -ldb \
+    -o "$repacker"
+
 run_probe() {
     DYLD_LIBRARY_PATH="$db_prefix/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}" \
         "$probe" "$@"
@@ -149,6 +167,11 @@ run_probe() {
 run_hashed_tic() {
     DYLD_LIBRARY_PATH="$db_prefix/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}" \
         "$hashed_source/progs/tic" "$@"
+}
+
+run_repacker() {
+    DYLD_LIBRARY_PATH="$db_prefix/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}" \
+        "$repacker" "$@"
 }
 
 printf '%s\n' "== HDB00 macOS: exact canonical-name lookup =="
@@ -162,6 +185,66 @@ cmp "$primary_payload" "$alias_payload"
 
 printf '%s\n' "== HDB00 macOS: prove hashed payload equals same-source conventional compiled entry =="
 cmp "$primary_payload" "$directory_entry"
+
+printf '%s\n' "== HDB07C macOS: produce and verify native big-endian Hash container =="
+run_repacker "$hashed_db" "$big_endian_db" 4321
+python3 \
+    "$repo_root/tools/hdb00/assert-byte-order.py" \
+    "$big_endian_db" \
+    big
+DYLD_LIBRARY_PATH="$db_prefix/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}" \
+    "$db_prefix/bin/db_dump" -k -f "$source_dump" "$hashed_db"
+DYLD_LIBRARY_PATH="$db_prefix/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}" \
+    "$db_prefix/bin/db_dump" -k -f "$big_endian_dump" "$big_endian_db"
+python3 - "$source_dump" "$big_endian_dump" <<'PY'
+from pathlib import Path
+import sys
+
+
+def read_records(path):
+    lines = Path(path).read_text(encoding="ascii").splitlines()
+    try:
+        header_end = lines.index("HEADER=END")
+    except ValueError as error:
+        raise SystemExit(f"{path}: missing HEADER=END") from error
+    if lines[-1] != "DATA=END":
+        raise SystemExit(f"{path}: missing DATA=END")
+    header = lines[:header_end]
+    for expected in ("VERSION=3", "format=bytevalue", "type=hash"):
+        if expected not in header:
+            raise SystemExit(f"{path}: missing {expected}")
+    data_lines = lines[header_end + 1:-1]
+    if not data_lines or len(data_lines) % 2:
+        raise SystemExit(f"{path}: malformed key/value lines")
+    if any(not line.startswith(" ") for line in data_lines):
+        raise SystemExit(f"{path}: malformed bytevalue line")
+    return sorted(
+        (
+            bytes.fromhex(data_lines[index][1:]),
+            bytes.fromhex(data_lines[index + 1][1:]),
+        )
+        for index in range(0, len(data_lines), 2)
+    )
+
+
+source = read_records(sys.argv[1])
+destination = read_records(sys.argv[2])
+if source != destination:
+    raise SystemExit("Big-endian repack changed one or more exact records.")
+if len(destination) != 3:
+    raise SystemExit(f"Expected 3 big-endian records, got {len(destination)}.")
+PY
+run_probe \
+    "$big_endian_db" \
+    hdb00-primary \
+    "$big_endian_primary"
+run_probe \
+    "$big_endian_db" \
+    hdb00-alias \
+    "$big_endian_alias"
+cmp "$big_endian_primary" "$primary_payload"
+cmp "$big_endian_alias" "$primary_payload"
+printf '%s\n' "HDB07C native big-endian records: 3"
 
 printf '%s\n' "== HDB00 macOS: prove existing managed parser accepts extracted bytes unchanged =="
 dotnet run \
@@ -281,8 +364,11 @@ printf 'conventional entry: %s\n' "$directory_entry"
 printf 'overflow hashed store: %s\n' "$overflow_hashed_db"
 printf 'overflow conventional entry: %s\n' "$overflow_directory_entry"
 printf 'multi-record hashed store: %s\n' "$multi_hashed_db"
+printf 'big-endian hashed store: %s\n' "$big_endian_db"
 shasum -a 256 \
     "$hashed_db" \
+    "$big_endian_db" \
+    "$big_endian_dump" \
     "$directory_entry" \
     "$primary_payload" \
     "$alias_payload" \
