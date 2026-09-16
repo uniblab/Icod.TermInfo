@@ -15,6 +15,8 @@ Version `1.14.0` adds raster-backend availability evidence, deterministic candid
 
 The 1.14 release contract passed the complete Staging qualification matrix on Windows, Linux, and macOS, including package verification, isolated consumers, installed-tool smoke, and all six standalone archive RIDs.
 
+Development prerelease `1.15.0-Alpha-6` adds accepted pure-managed, read-only Berkeley DB Hash-v9 acquisition through the optional `Icod.TermInfo.BerkeleyDb` package. Explicit `infocmp -A/-B` file paths and explicit human `toe` file operands use the hashed provider/catalog; Runtime discovery, frozen JSON schemas, and `tic` directory publication remain unchanged.
+
 ## Support the Project
 
 `Icod.TermInfo` and its ecosystem packages (`Icod.Terminal` and `Icod.DCurses`) are built and maintained by a solo developer. If these packages save you or your team time, please consider supporting their continued development and maintenance.
@@ -49,13 +51,14 @@ The reusable TermInfo package family is deliberately layered:
 Icod.TermInfo                    runtime / capability authority
 ├── Icod.TermInfo.Source         .ti parsing and resolution
 ├── Icod.TermInfo.Termcap        termcap interoperability
-├── Icod.TermInfo.Compiler       compilation / database writing
-└── Icod.TermInfo.Inspection     inspection / comparison / planning
+├── Icod.TermInfo.Compiler       compilation / conventional database writing
+├── Icod.TermInfo.Inspection     inspection / comparison / planning
+└── Icod.TermInfo.BerkeleyDb     optional read-only hashed acquisition
 
 Icod.TermInfo.Tools              command distribution / routing
 ```
 
-Dependency boundaries are explicit: Runtime has no production package dependencies; Source and Termcap each depend on Runtime; Compiler and Inspection each depend on Runtime and Source. Inspection does not depend on Compiler, Termcap, `Icod.Terminal`, or `Icod.DCurses`.
+Dependency boundaries are explicit: Runtime has no production package dependencies; Source, Termcap, and BerkeleyDb each depend on Runtime; Compiler and Inspection each depend on Runtime and Source. Inspection does not depend on BerkeleyDb, Compiler, Termcap, `Icod.Terminal`, or `Icod.DCurses`. The `infocmp` and `toe` executables reference BerkeleyDb directly for HDB06 path-shape dispatch.
 
 ## Quick Start
 
@@ -115,6 +118,7 @@ The root README describes the current product by capability rather than by the r
 | `Icod.TermInfo.Termcap` | Termcap parsing, conversion, rendering, and explicit acquisition |
 | `Icod.TermInfo.Compiler` | Deterministic compiled terminfo writing and database publication |
 | `Icod.TermInfo.Inspection` | Rendering, comparison, database analysis, planning, and JSON automation |
+| `Icod.TermInfo.BerkeleyDb` | Optional pure-managed, read-only Berkeley DB Hash-v9 acquisition and logical catalog enumeration |
 | `Icod.TermInfo.Tools` | Installable `icod-terminfo` multi-command router |
 
 Install an optional package only when its capability is needed:

@@ -1,5 +1,19 @@
 # infocmp
 
+## 1.15 development status
+
+`1.15.0-Alpha-6` accepts pure-managed hashed acquisition for explicit
+`-A` and `-B` paths. An existing file uses
+`BerkeleyDbTerminalDescriptionProvider`; an existing directory or
+unclassified path retains the conventional provider. Rendering, comparison,
+explicit-parent synthesis, explicit-candidate planning, and the existing
+terminal-description/comparison JSON documents remain storage-neutral.
+
+The catalog-wide `--plan-use --all-candidates` forms remain
+conventional-directory-only. A BerkeleyDb file in that mode is rejected before
+output. Direct `infocmp` and routed `icod-terminfo infocmp` are qualified as
+equivalent, and no Inspection public API or dependency changes.
+
 ## 1.14 release status
 
 Version `1.14.0` carries the existing `infocmp` rendering, comparison,
@@ -191,8 +205,8 @@ command output, not a failure, and therefore return status `0`.
 Database selection is:
 
 ```text
--A <directory>    use this explicit database for the first terminal
--B <directory>    use this explicit database for subsequent terminals
+-A <path>         use this explicit directory or hashed file for the first terminal
+-B <path>         use this explicit directory or hashed file for subsequent terminals
 ```
 
 Neither option mutates `TERMINFO` or other process environment variables. Without
@@ -250,8 +264,8 @@ infocmp --help
 ## Options
 
 ```text
--A directory    explicit database for the first terminal
--B directory    explicit database for subsequent terminals
+-A path         explicit directory or hashed file for the first terminal
+-B path         explicit directory or hashed file for subsequent terminals
 -0              one logical source line
 -1              one capability per line
 -w width        canonical wrapping width
@@ -297,9 +311,11 @@ candidate is selected. Duplicate candidate spellings are usage errors.
 ## Environment
 
 `TERM` is read only for zero-operand one-terminal inspection. `-A` and `-B`
-construct explicit directory providers and do not mutate `TERMINFO` or other
-process environment variables. Without an explicit database for a side, normal
-Runtime system discovery is used.
+classify explicit paths by current filesystem shape: existing files construct
+the BerkeleyDb provider; directories and unclassified paths retain the
+conventional provider. They do not mutate `TERMINFO` or other process
+environment variables. Without an explicit database for a side, normal Runtime
+system discovery is used.
 
 ## Exit statuses
 

@@ -4,7 +4,7 @@
 
 ## 1.15 development status
 
-`1.15.0-Alpha-5` adds the accepted hashed terminal catalog to the explicit and opt-in system terminal-description providers on the managed Hash-v9 reader. It supports bounded exact-key lookup and complete record enumeration with inline and off-page records, overflow reconstruction, both byte orders, ncurses marker resolution, Runtime-owned compiled-entry parsing, exact identity validation, and deterministic logical publication ordering.
+`1.15.0-Alpha-6` adds accepted Inspection/tool integration to the explicit and opt-in system terminal-description providers and hashed terminal catalog on the managed Hash-v9 reader. It supports bounded exact-key lookup and complete record enumeration with inline and off-page records, overflow reconstruction, both byte orders, ncurses marker resolution, Runtime-owned compiled-entry parsing, exact identity validation, and deterministic logical publication ordering.
 
 HDB00 selected a dependency-free managed reader for the reviewed Berkeley DB **Hash on-disk format version 9** subset required by ncurses acquisition. Native Berkeley DB remains a CI interoperability oracle and is not a production dependency.
 
@@ -69,8 +69,12 @@ matching ncurses discovery behavior. Missing sources continue; malformed reached
 sources fail explicitly. Successful results are cached, while misses and
 failures remain retryable.
 
-HDB05 qualification passed 308 unit cases and 20 native-store interoperability
-cases per target framework on Windows, Linux, and macOS. The isolated
-package-only consumer exercised explicit lookup, system discovery, and catalog
-enumeration on net8.0, net9.0, and net10.0. HDB06 Inspection/tool integration
-is next.
+HDB06 qualification passed 312 BerkeleyDb unit cases and 20 native-store
+interoperability cases per target framework on Windows, Linux, and macOS. The
+optional package's public API remains unchanged: command executables classify
+explicit paths and then call the accepted provider or catalog reader. Explicit
+`infocmp -A/-B` files and explicit human `toe` file operands are supported;
+Inspection stays provider-neutral, ambient `toe` discovery and JSON stay
+conventional, and `tic` remains directory-write-only. Installed-tool smoke
+passed on all three hosts and direct-command smoke passed for all six archive
+RIDs. HDB07 adversarial and compatibility hardening is next.

@@ -1,7 +1,21 @@
 # toe
 
-`toe` is the managed conventional terminfo database-listing command in the
+`toe` is the managed terminfo database-listing command in the
 `Icod.TermInfo` tool suite.
+
+## 1.15 development status
+
+`1.15.0-Alpha-6` accepts hashed files for explicit human listing. Each
+existing file operand is read through `BerkeleyDbTerminalCatalogReader`; each
+directory or unclassified operand retains conventional behavior. Mixed roots
+preserve caller order, hashed aliases are printed as distinct logical
+publications, marker-0 storage keys remain hidden, and `-s`, `-h`, and
+duplicate analysis use the existing deterministic presentation contracts.
+
+Operand-free discovery (`toe`, `toe -a`, and `toe -D`) remains
+conventional. Frozen JSON routes and schemas are unchanged, so a file supplied
+to `toe --json` retains the existing `UnsupportedStore` catalog state.
+Direct `toe` and routed `icod-terminfo toe` are qualified as equivalent.
 
 ## 1.14 release status
 
@@ -78,7 +92,7 @@ Supported either as `toe ...` from a release archive or
 `icod-terminfo toe ...` from the .NET tool. Forms are:
 
 ```text
-toe [options] [directory ...]
+toe [options] [path ...]
 toe -u file
 toe -U file
 toe -D
@@ -91,13 +105,14 @@ Supported listing options are:
 
 ```text
 -a    inspect all discovered conventional databases
--h    identify each conventional database before its entries
--s    sort entries by canonical terminal name
+-h    identify each listed database before its entries
+-s    sort entries by displayed publication name
 ```
 
-When `-a` and `-s` expose a canonical name in more than one database, the first
-entry in database order becomes the comparison reference and each later root is
-marked as either semantically equal or semantically different. The marker is
+When `-a` and `-s` expose a displayed publication name in more than one
+database, the first entry in database order becomes the comparison reference
+and each later root is marked as either semantically equal or semantically
+different. The marker is
 explicitly Icod-defined and equality comes from `TerminalDescriptionComparer`,
 not compiled-file byte equality.
 
@@ -112,25 +127,34 @@ Alias references resolve to canonical source identities. Missing parents and
 inheritance cycles are diagnosed through the existing Source resolver; safely
 parsed dependency edges are still emitted before the command returns status 1.
 
-With explicit directory operands, `toe` inspects exactly those roots in operand
-order. `-a` does not change explicit-operand processing.
+With explicit path operands, `toe` inspects exactly those roots in operand
+order. Existing files use the hashed logical catalog; directories and
+unclassified paths retain conventional handling. `-a` does not change
+explicit-operand processing.
 
-Without directory operands, `toe` uses the Runtime discovery snapshot exposed by
+Without explicit operands, `toe` uses the Runtime discovery snapshot exposed by
 `Icod.TermInfo.Inspection`. Encoded `TERMINFO` is not a directory catalog and is
 skipped. By default the first applicable conventional database is listed.
 `-a` lists every applicable conventional directory in discovery order.
 
-Each successfully parsed physical catalog entry is written as:
+Each successfully parsed conventional catalog entry is written as:
 
 ```text
 canonical-name<TAB>description
 ```
 
-No listing identity is inferred from a filename. Alias publications therefore
-retain the canonical name parsed from the compiled entry. Duplicate canonical
-names are not globally collapsed.
+Each hashed logical publication is written as:
 
-With `-h`, each conventional database is introduced by:
+```text
+canonical-or-alias-publication-name<TAB>description
+```
+
+No conventional listing identity is inferred from a filename. Hashed aliases
+retain their exact logical publication names, marker-0 storage keys are never
+printed, and duplicate displayed names are not globally collapsed.
+
+With `-h`, each successfully opened conventional or hashed database is
+introduced by:
 
 ```text
 # <absolute-database-root>
@@ -158,7 +182,7 @@ continues to target `net8.0`, `net9.0`, and `net10.0`.
 ## Synopsis
 
 ```text
-toe [options] [directory ...]
+toe [options] [path ...]
 toe -u file
 toe -U file
 toe -D
@@ -186,15 +210,16 @@ Unambiguous listing switches may be clustered, for example `-ahs`. `-u` and
 
 ## Operands
 
-Listing mode accepts zero or more explicit directory operands. Explicit
-directories remain in operand order. Source-dependency modes accept exactly one
-source file. Use `--` before a directory or source filename beginning with `-`.
+Listing mode accepts zero or more explicit path operands. Existing files are
+hashed catalogs; directories and unclassified paths retain conventional
+handling. Explicit paths remain in operand order. Source-dependency modes
+accept exactly one source file. Use `--` before a path beginning with `-`.
 
 ## Environment
 
-Without explicit listing directories, Runtime discovery determines the
-conventional roots. Encoded `TERMINFO` is skipped because it is not a directory
-catalog. Source dependency analysis does not alter discovery environment state.
+Without explicit listing paths, Runtime discovery determines the conventional
+roots. Encoded `TERMINFO` is skipped because it is not a directory catalog.
+Source dependency analysis does not alter discovery environment state.
 
 ## Exit statuses
 
@@ -223,6 +248,6 @@ managed Source parser/resolver. Unsupported switches are explicit usage errors.
 
 ## Non-goals
 
-T10 does not add termcap `tc=` analysis, hashed/Berkeley DB stores, arbitrary
-recursive traversal, native ncurses dependencies, trace internals, or candidate
-verbose `-v[n]` output.
+HDB06 does not add hashed ambient discovery, hashed JSON schemas, hashed writes,
+termcap `tc=` analysis, arbitrary recursive traversal, native ncurses/Berkeley
+DB dependencies, trace internals, or candidate verbose `-v[n]` output.

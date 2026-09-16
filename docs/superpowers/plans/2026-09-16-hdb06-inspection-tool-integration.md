@@ -1,12 +1,17 @@
 # HDB06 Inspection and Tool Integration Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Integrate the accepted BerkeleyDb provider and catalog with provider-neutral Inspection, `infocmp`, `toe`, the routed tool, and distribution qualification without changing Runtime, Inspection, BerkeleyDb public APIs, or frozen JSON schemas.
 
 **Architecture:** Executable projects classify explicit paths by current filesystem shape and delegate all hashed semantics to `Icod.TermInfo.BerkeleyDb`. Inspection remains provider-neutral; `infocmp` reuses `TermInfoInspectionEngine`, while `toe` projects conventional and hashed entries into one command-private listing record. Each command is established through an independent behavioral RED before production dispatch is added.
 
 **Tech Stack:** C# 13, .NET 8/9/10 reusable libraries, .NET 10 command projects, xUnit 2.9.2, GitHub Actions Windows/Linux/macOS matrix, native ncurses/Berkeley DB 5.3 interoperability oracle.
+
+**Status:** COMPLETE / ACCEPTED  
+**Accepted implementation/qualification head:** `c273b99df920e8a71cd31e0e23bc6700ef9ce456`  
+**Accepted normal workflow:** run `35123554495` — 12/12 jobs passed  
+**Accepted HDB00 workflow:** run `35123554545` — 3/3 jobs passed
 
 **Spec:** `docs/superpowers/specs/2026-09-16-hdb06-inspection-tool-integration-design.md`
 
@@ -36,7 +41,7 @@
 - Consumes: `BerkeleyDbTerminalDescriptionProvider`, `TermInfoInspectionTarget`, `TermInfoInspectionEngine`, and existing HDB test-store builders.
 - Produces: permanent proof that Inspection consumes the hashed provider through the frozen `ITerminalDescriptionProvider` contract without a production dependency change.
 
-- [ ] **Step 1: bump the coordinated version**
+- [x] **Step 1: bump the coordinated version**
 
 Change only:
 
@@ -44,7 +49,7 @@ Change only:
 <IcodTermInfoSuiteVersion>1.15.0-Alpha-6</IcodTermInfoSuiteVersion>
 ```
 
-- [ ] **Step 2: add the test-only Inspection reference**
+- [x] **Step 2: add the test-only Inspection reference**
 
 Add to the BerkeleyDb test project:
 
@@ -54,7 +59,7 @@ Add to the BerkeleyDb test project:
 
 No production project reference changes in this task.
 
-- [ ] **Step 3: add provider-neutral composition tests**
+- [x] **Step 3: add provider-neutral composition tests**
 
 Use a real synthetic Hash-v9 store with literal identities `hdb06-main` and
 `hdb06-alias`. Exercise:
@@ -81,7 +86,7 @@ Also assert a clean miss through `TryInspect`, and exception identity for a
 malformed Hash file. Expectations must be literal and the tests must use the real
 provider and engine.
 
-- [ ] **Step 4: run characterization verification**
+- [x] **Step 4: run characterization verification**
 
 Run:
 
@@ -93,7 +98,7 @@ Expected: all existing HDB tests plus the new Inspection composition cases pass
 on net8.0, net9.0, and net10.0. These are intentionally already-green
 characterization tests; no production behavior is added.
 
-- [ ] **Step 5: commit the baseline**
+- [x] **Step 5: commit the baseline**
 
 Commit:
 
@@ -117,7 +122,7 @@ Record the exact head, run IDs, per-TFM counts, and any warning. Do not begin
 - Consumes: public `InfoCmpCommand.RunAsync` and literal synthetic Hash-v9 files.
 - Produces: failing command-level requirements for file-valued `-A`/`-B`; no production command reference or dispatch.
 
-- [ ] **Step 1: add the shared test-store builder**
+- [x] **Step 1: add the shared test-store builder**
 
 Create a test-only builder included by source link. Its public test interface is:
 
@@ -146,7 +151,7 @@ Link it into the InfoCmp test project:
          Link="Shared\BerkeleyDbHashV9TestStore.cs" />
 ```
 
-- [ ] **Step 2: write real command tests**
+- [x] **Step 2: write real command tests**
 
 Invoke `InfoCmpCommand.RunAsync` with caller-owned streams. Add separate tests
 whose names identify these mutations:
@@ -164,7 +169,7 @@ whose names identify these mutations:
 
 Use literal expected exit codes, stdout fragments/documents, and diagnostic codes.
 
-- [ ] **Step 3: commit and verify behavioral RED**
+- [x] **Step 3: commit and verify behavioral RED**
 
 Commit:
 
@@ -198,7 +203,7 @@ internal static class InfoCmpTerminalProviderFactory {
 }
 ```
 
-- [ ] **Step 1: add the executable dependency**
+- [x] **Step 1: add the executable dependency**
 
 Add:
 
@@ -208,7 +213,7 @@ Add:
 
 to `infocmp` only.
 
-- [ ] **Step 2: implement minimal path dispatch**
+- [x] **Step 2: implement minimal path dispatch**
 
 Implement:
 
@@ -233,7 +238,7 @@ return directory;
 
 Do not inspect extensions or database bytes.
 
-- [ ] **Step 3: route exact-name acquisition through the factory**
+- [x] **Step 3: route exact-name acquisition through the factory**
 
 Replace only provider construction in `InfoCmpInspector.AcquireAsync`. Keep
 `TermInfoInspectionTarget`, `TermInfoInspectionEngine`, diagnostics, rendering,
@@ -243,12 +248,12 @@ Before `--all-candidates` directory enumeration, reject an existing file-valued
 candidate root with a deterministic `INFOCMP0004` operational diagnostic and
 no stdout.
 
-- [ ] **Step 4: verify GREEN**
+- [x] **Step 4: verify GREEN**
 
 Run the dedicated InfoCmp test project, then the full solution. Expected: every
 new HDB06 case and all prior InfoCmp behavior pass with no new warning.
 
-- [ ] **Step 5: commit GREEN and qualify**
+- [x] **Step 5: commit GREEN and qualify**
 
 Commit:
 
@@ -272,11 +277,11 @@ exact head, run IDs, and test counts.
 - Consumes: public `ToeCommand.RunAsync`, the shared independent test fixture, and existing conventional-directory helpers.
 - Produces: failing human-listing requirements without a production BerkeleyDb reference.
 
-- [ ] **Step 1: link the shared fixture**
+- [x] **Step 1: link the shared fixture**
 
 Add the same linked compile item used by InfoCmp.
 
-- [ ] **Step 2: write real human-listing tests**
+- [x] **Step 2: write real human-listing tests**
 
 Add separate tests for:
 
@@ -298,7 +303,7 @@ and assert:
 - conventional human listing is byte-for-byte unchanged; and
 - `toe --json <file>` retains the existing `UnsupportedStore` document.
 
-- [ ] **Step 3: commit and verify behavioral RED**
+- [x] **Step 3: commit and verify behavioral RED**
 
 Commit:
 
@@ -342,11 +347,11 @@ internal static class ToeCatalogAdapter {
 }
 ```
 
-- [ ] **Step 1: add the executable dependency**
+- [x] **Step 1: add the executable dependency**
 
 Add the direct BerkeleyDb project reference to `toe` only.
 
-- [ ] **Step 2: implement the minimal adapter**
+- [x] **Step 2: implement the minimal adapter**
 
 Construct `BerkeleyDbTerminalCatalogReader`, call
 `Read(cancellationToken)`, and project each entry using:
@@ -361,7 +366,7 @@ new ToeCatalogEntry(
 
 No marker or page interpretation is permitted.
 
-- [ ] **Step 3: unify command-private listing projection**
+- [x] **Step 3: unify command-private listing projection**
 
 In human `BuildListing` only:
 
@@ -376,12 +381,12 @@ In human `BuildListing` only:
 Do not alter `RenderCatalogAsync`, `RenderDatabaseSetAsync`,
 `CompareDatabaseSetsAsync`, `GetSystemLocations`, or JSON rendering.
 
-- [ ] **Step 4: verify GREEN**
+- [x] **Step 4: verify GREEN**
 
 Run the dedicated Toe project, Router tests, and full solution. Expected: all new
 human listing tests and every frozen conventional/JSON test pass.
 
-- [ ] **Step 5: commit GREEN and qualify**
+- [x] **Step 5: commit GREEN and qualify**
 
 Commit:
 
@@ -408,7 +413,7 @@ Require normal CI 12/12 and HDB00 3/3. Record exact head, runs, and counts.
 - Consumes: direct command behavior from Tasks 3 and 5 and native HDB00 stores.
 - Produces: exact direct/routed/distributed equivalence without new production behavior.
 
-- [ ] **Step 1: add routed equivalence tests**
+- [x] **Step 1: add routed equivalence tests**
 
 For the same controlled file and literal terminal names, run direct and routed
 commands with independent streams:
@@ -424,7 +429,7 @@ int routed = await RouterCommand.RunAsync(
 Repeat for `toe`. Assert identical status, stdout bytes, and stderr bytes.
 These tests catch argument loss, stream substitution, and exit-status rewriting.
 
-- [ ] **Step 2: add native-store command assertions**
+- [x] **Step 2: add native-store command assertions**
 
 Implement `tools/hdb00/verify-hdb06-commands.ps1` with parameters for the
 native fixture root and command launch mode. Invoke it from each HDB00 job after
@@ -440,7 +445,7 @@ primary and overflow stores, and Windows' downloaded Linux store, assert:
 Commands target net10.0; the reusable provider/catalog remain qualified on
 net8/net9/net10 by the existing interoperability project.
 
-- [ ] **Step 3: extend package-only and installed-tool smoke**
+- [x] **Step 3: extend package-only and installed-tool smoke**
 
 Implement `.github/scripts/new-hdb06-test-store.ps1` as an independent
 PowerShell Hash-v9 fixture writer using literal page fields and compiled
@@ -448,7 +453,7 @@ identity bytes. In `smoke-tool-package.ps1`, use only the installed
 `icod-terminfo` tool against that fixture and assert exact canonical/alias
 output. Ensure the smoke cannot resolve project outputs.
 
-- [ ] **Step 4: extend all archive smoke paths**
+- [x] **Step 4: extend all archive smoke paths**
 
 In `smoke-tool-archive.ps1`, generate the same controlled fixture and for
 every existing archive RID:
@@ -465,7 +470,7 @@ osx-arm64
 run routed `infocmp` and `toe` hashed commands against the controlled fixture
 and compare literal output.
 
-- [ ] **Step 5: commit qualification**
+- [x] **Step 5: commit qualification**
 
 Commit:
 
@@ -494,31 +499,31 @@ archive smoke, normal CI 12/12, and HDB00 3/3.
 - Consumes: exact RED, GREEN, native, package, and distribution evidence.
 - Produces: auditable HDB06 acceptance and HDB07 next-tranche state.
 
-- [ ] **Step 1: run verification-before-completion**
+- [x] **Step 1: run verification-before-completion**
 
 Review exact heads, workflow conclusions, per-host/TFM counts, direct/routed
 output, dependency graphs, public API manifests, JSON regression evidence,
 package assets, installed tool, archives, and native stores. Do not infer a
 complete run from partial green jobs.
 
-- [ ] **Step 2: write the closure record**
+- [x] **Step 2: write the closure record**
 
 Record the accepted implementation head, every RED/GREEN head, exact run IDs,
 test counts, command contracts, diagnostics, dependency direction, JSON and
 ambient-discovery non-changes, platform evidence, and explicit non-goals.
 
-- [ ] **Step 3: update release-facing documentation**
+- [x] **Step 3: update release-facing documentation**
 
 Mark HDB06 complete/accepted at `1.15.0-Alpha-6`, document file-valued
 `infocmp -A/-B` and human `toe` roots, retain `tic` directory-only writes,
 and make HDB07 adversarial/compatibility hardening next.
 
-- [ ] **Step 4: mark this plan complete**
+- [x] **Step 4: mark this plan complete**
 
 Change all completed plan checkboxes to `[x]` and add the accepted exact head,
 workflow IDs, and counts near the header.
 
-- [ ] **Step 5: commit and qualify documentation closure**
+- [x] **Step 5: commit and qualify documentation closure**
 
 Commit:
 
@@ -529,7 +534,7 @@ docs: accept HDB06 inspection and tool integration
 Require a fresh normal 12/12 run and HDB00 3/3 run on the documentation-complete
 head. Re-read their logs for exact unit/native counts.
 
-- [ ] **Step 6: update and verify PR state**
+- [x] **Step 6: update and verify PR state**
 
 Update PR #45 with the accepted evidence and HDB07 next step. Re-fetch it and
 confirm exact head, open state, draft state, and `merged == false`.

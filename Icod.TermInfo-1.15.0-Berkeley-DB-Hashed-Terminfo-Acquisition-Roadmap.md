@@ -6,8 +6,8 @@
 **Optional package:** `Icod.TermInfo.BerkeleyDb`  
 **Language:** C# 13  
 **Reusable target frameworks:** `net8.0`; `net9.0`; `net10.0`  
-**Status:** HDB00–HDB05 accepted; HDB06 Inspection/tool integration next  
-**Current coordinated prerelease:** `1.15.0-Alpha-5`
+**Status:** HDB00–HDB06 accepted; HDB07 adversarial and compatibility hardening next  
+**Current coordinated prerelease:** `1.15.0-Alpha-6`
 
 ---
 
@@ -811,26 +811,45 @@ hops, duplicate keys, cycles, and cancellation are bounded.
 Closure record:
 `docs/1.15.0-HDB05-HASHED-CATALOG-ENUMERATION.md`.
 
-HDB06 Inspection/tool integration is next. PR remains open, draft, and
-unmerged.
+HDB06 Inspection/tool integration was subsequently accepted under
+`1.15.0-Alpha-6`. PR #45 remains open, draft, and unmerged.
 
-### HDB06 — Inspection and Tool Integration
+### HDB06 — Inspection and Tool Integration — COMPLETE / ACCEPTED
 
-At minimum, integrate explicit hashed acquisition with `infocmp`.
+Accepted implementation/qualification head:
+`c273b99df920e8a71cd31e0e23bc6700ef9ce456`.
 
-If HDB05 is accepted, integrate hashed listing/discovery with `toe`.
+Coordinated prerelease: `1.15.0-Alpha-6`.
 
-Requirements:
+HDB06 composes the accepted BerkeleyDb provider with provider-neutral
+Inspection and adds command-owned path-shape dispatch without adding reusable
+public API:
 
-- direct and routed command equivalence;
-- existing directory behavior unchanged;
-- no duplicated database reader;
-- no command-owned Berkeley DB page parsing;
-- deterministic stdout/stderr;
-- clear unsupported/malformed-store diagnostics; and
-- existing exit-status conventions retained.
+- existing-file `infocmp -A/-B` paths use
+  `BerkeleyDbTerminalDescriptionProvider`; existing directories and
+  unclassified paths retain conventional behavior;
+- explicit human `toe` file operands use
+  `BerkeleyDbTerminalCatalogReader` and may be mixed with conventional
+  directories in caller order;
+- direct commands and the installed `icod-terminfo` routes are equivalent;
+- `infocmp --all-candidates` remains conventional-directory-only;
+- operand-free `toe`, `toe -a`, `toe -D`, and all frozen JSON schemas
+  remain unchanged; and
+- `tic` remains conventional-directory-write-only.
 
-`tic` remains directory-write-only.
+Qualification passed the complete 12-job PR workflow and 3-job HDB00 workflow
+on Windows, Linux, and macOS. The exact head passed 108 `infocmp` cases,
+62 `toe` cases, 47 router cases, and 312 BerkeleyDb cases per host/TFM where
+applicable, plus 20 native-store interoperability cases per TFM on all three
+hosts. Installed package smoke passed on Windows/Linux/macOS; direct-command
+smoke passed for all six standalone archive RIDs. Production remains pure
+managed and contains no native Berkeley DB asset or dependency.
+
+Closure record:
+`docs/1.15.0-HDB06-INSPECTION-AND-TOOL-INTEGRATION.md`.
+
+HDB07 adversarial and compatibility hardening is next. PR #45 remains open,
+draft, and unmerged.
 
 ### HDB07 — Adversarial and Compatibility Hardening
 
