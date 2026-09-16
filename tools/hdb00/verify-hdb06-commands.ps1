@@ -143,14 +143,14 @@ function Assert-CommandResult {
 		throw "Expected status $ExpectedStatus, got $($Result.Status).`nstdout:`n$($Result.Stdout)`nstderr:`n$($Result.Stderr)"
 	}
 	if (
-		-not [string]::IsNullOrEmpty( $StdoutContains )
-		-and -not $Result.Stdout.Contains( $StdoutContains )
+		-not [string]::IsNullOrEmpty( $StdoutContains ) -and
+		-not $Result.Stdout.Contains( $StdoutContains )
 	) {
 		throw "stdout did not contain '$StdoutContains'.`n$($Result.Stdout)"
 	}
 	if (
-		-not [string]::IsNullOrEmpty( $StderrContains )
-		-and -not $Result.Stderr.Contains( $StderrContains )
+		-not [string]::IsNullOrEmpty( $StderrContains ) -and
+		-not $Result.Stderr.Contains( $StderrContains )
 	) {
 		throw "stderr did not contain '$StderrContains'.`n$($Result.Stderr)"
 	}
