@@ -28,6 +28,12 @@ big_endian_dump="$work_root/big-endian-hashed-db.dump"
 source_dump="$work_root/hashed-db.dump"
 big_endian_primary="$work_root/hdb07c-big-endian-primary.bin"
 big_endian_alias="$work_root/hdb07c-big-endian-alias.bin"
+latin1_hashed_base="$work_root/latin1-hashed-db"
+latin1_hashed_db="$latin1_hashed_base.db"
+latin1_fixture="$work_root/hdb07c-latin1.src"
+latin1_dump="$work_root/latin1-hashed-db.dump"
+latin1_payload="$work_root/hdb07c-latin1.bin"
+latin1_alias_payload="$work_root/hdb07c-latin1-alias.bin"
 native_verifier_project="$repo_root/tools/hdb00/native-verifier/Hdb07c.NativeVerifier.csproj"
 
 rm -rf "$work_root"
@@ -81,6 +87,20 @@ hdb00-primary|hdb00-alias|Icod HDB00 hashed terminfo fixture,
     setaf=\E[3%p1%dm,
     setab=\E[4%p1%dm,
 EOF
+
+{
+    printf '%s' 'hdb07c-caf'
+    printf '\351'
+    printf '%s' '|hdb07c-ali'
+    printf '\351'
+    printf '%s\n' '|Icod HDB07C Latin-1 fixture,'
+    printf '%s\n' '    am,'
+    printf '%s\n' '    cols#80,'
+    printf '%s\n' '    lines#24,'
+    printf '%s\n' '    colors#8,'
+    printf '%s\n' '    clear=\E[H\E[2J,'
+    printf '%s\n' '    cup=\E[%i%p1%d;%p2%dH,'
+} >"$latin1_fixture"
 
 python3 - "$overflow_fixture" <<'PY'
 from pathlib import Path
@@ -174,6 +194,20 @@ dotnet run \
     "$big_endian_alias"
 cmp "$big_endian_primary" "$primary_payload"
 cmp "$big_endian_alias" "$primary_payload"
+
+printf '%s\n' "== HDB07C: produce and verify native Latin-1 store =="
+"$hashed_source/progs/tic" -x -o "$latin1_hashed_base" "$latin1_fixture"
+test -f "$latin1_hashed_db"
+db5.3_dump -k -f "$latin1_dump" "$latin1_hashed_db"
+dotnet run \
+    --project "$native_verifier_project" \
+    -c Release \
+    -- \
+    latin1 \
+    "$latin1_dump" \
+    "$latin1_payload" \
+    "$latin1_alias_payload"
+cmp "$latin1_payload" "$latin1_alias_payload"
 
 printf '%s\n' "== HDB00: prove existing managed parser accepts extracted bytes unchanged =="
 dotnet run \
@@ -292,10 +326,15 @@ printf 'overflow hashed store: %s\n' "$overflow_hashed_db"
 printf 'overflow conventional entry: %s\n' "$overflow_directory_entry"
 printf 'multi-record hashed store: %s\n' "$multi_hashed_db"
 printf 'big-endian hashed store: %s\n' "$big_endian_db"
+printf 'Latin-1 hashed store: %s\n' "$latin1_hashed_db"
 sha256sum \
     "$hashed_db" \
     "$big_endian_db" \
     "$big_endian_dump" \
+    "$latin1_hashed_db" \
+    "$latin1_dump" \
+    "$latin1_payload" \
+    "$latin1_alias_payload" \
     "$directory_entry" \
     "$primary_payload" \
     "$alias_payload" \
