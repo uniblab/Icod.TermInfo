@@ -1,7 +1,7 @@
 <Project>
   <!-- HDB01 accepted prerelease marker: <IcodTermInfoSuiteVersion>1.15.0-Alpha-1</IcodTermInfoSuiteVersion> -->
   <PropertyGroup>
-    <IcodTermInfoSuiteVersion>1.15.0-Alpha-4</IcodTermInfoSuiteVersion>
+    <IcodTermInfoSuiteVersion>1.15.0-Alpha-5</IcodTermInfoSuiteVersion>
     <LangVersion>13.0</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
