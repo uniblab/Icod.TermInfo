@@ -511,6 +511,36 @@ public static class Command {
 		foreach ( string root in roots ) {
 			cancellationToken.ThrowIfCancellationRequested();
 
+			if ( explicitDirectories && File.Exists( root ) ) {
+				try {
+					IReadOnlyList<ToeListingEntry> hashedEntries =
+						ToeListingAdapter.ReadHashStore(
+							root,
+							options.SortByName,
+							cancellationToken
+						);
+					AppendListingEntries(
+						output,
+						hashedEntries,
+						System.IO.Path.GetFullPath( root ),
+						options.ShowHeadings,
+						duplicateReferences,
+						cancellationToken
+					);
+				} catch ( Exception exception ) when (
+					IsOperationalException( exception )
+				) {
+					AppendDiagnostic(
+						diagnostics,
+						"TOE0005",
+						root,
+						exception.Message
+					);
+					hasOperationalFailure = true;
+				}
+				continue;
+			}
+
 			TermInfoDatabaseCatalog catalog;
 			try {
 				catalog = TermInfoDatabaseInspector.InspectDirectory(
@@ -570,83 +600,19 @@ public static class Command {
 					break;
 
 				case TermInfoDatabaseCatalogKind.ConventionalDirectory:
-					if ( options.ShowHeadings ) {
-						output
-							.Append( "# " )
-							.Append( catalog.Root )
-							.Append( Environment.NewLine );
-					}
-
-					IEnumerable<TermInfoDatabaseCatalogEntry> entries = catalog.Entries;
-					if ( options.SortByName ) {
-						entries = entries
-							.OrderBy(
-								entry => entry.Name,
-								StringComparer.Ordinal
-							)
-							.ThenBy(
-								entry => entry.Path,
-								StringComparer.Ordinal
-							);
-					}
-
-					var namesInCurrentRoot = ( duplicateReferences is null )
-						? null
-						: new HashSet<string>( StringComparer.Ordinal )
-					;
-					foreach ( TermInfoDatabaseCatalogEntry entry in entries ) {
-						cancellationToken.ThrowIfCancellationRequested();
-
-						output
-							.Append( entry.Name )
-							.Append( '\t' )
-							.Append( entry.Description ?? string.Empty )
-							.Append( Environment.NewLine );
-
-						if (
-							duplicateReferences is null
-							|| !(namesInCurrentRoot?.Add( entry.Name ) ?? false)
-						) {
-							continue;
-						}
-
-						if (
-							duplicateReferences.TryGetValue(
-								entry.Name,
-								out ToeDuplicateReference? first
-							)
-						) {
-							if (
-								string.Equals(
-									first.Root,
-									catalog.Root,
-									StringComparison.Ordinal
-								)
-							) {
-								continue;
-							}
-
-							bool areEqual = TerminalDescriptionComparer.Compare(
-								first.Terminal,
-								entry.Terminal
-							).AreEqual;
-							output
-								.Append( "# Icod duplicate " )
-								.Append( entry.Name )
-								.Append( ": semantically " )
-								.Append( areEqual ? "equal to " : "different from " )
-								.Append( first.Root )
-								.Append( Environment.NewLine );
-						} else {
-							duplicateReferences.Add(
-								entry.Name,
-								new ToeDuplicateReference(
-									entry.Terminal,
-									catalog.Root
-								)
-							);
-						}
-					}
+					IReadOnlyList<ToeListingEntry> conventionalEntries =
+						ToeListingAdapter.ReadConventional(
+							catalog,
+							options.SortByName
+						);
+					AppendListingEntries(
+						output,
+						conventionalEntries,
+						catalog.Root,
+						options.ShowHeadings,
+						duplicateReferences,
+						cancellationToken
+					);
 
 					if ( catalog.Issues.Count != 0 ) {
 						AppendCatalogIssues(
@@ -678,6 +644,86 @@ public static class Command {
 			hasOperationalFailure
 		);
 	}
+
+
+	private static void AppendListingEntries(
+		StringBuilder output,
+		IReadOnlyList<ToeListingEntry> entries,
+		string root,
+		bool showHeading,
+		Dictionary<string, ToeDuplicateReference>? duplicateReferences,
+		CancellationToken cancellationToken
+	) {
+		ArgumentNullException.ThrowIfNull( output );
+		ArgumentNullException.ThrowIfNull( entries );
+		ArgumentException.ThrowIfNullOrWhiteSpace( root );
+
+		if ( showHeading ) {
+			output
+				.Append( "# " )
+				.Append( root )
+				.Append( Environment.NewLine );
+		}
+
+		var namesInCurrentRoot = ( duplicateReferences is null )
+			? null
+			: new HashSet<string>( StringComparer.Ordinal )
+		;
+		foreach ( ToeListingEntry entry in entries ) {
+			cancellationToken.ThrowIfCancellationRequested();
+
+			output
+				.Append( entry.PublicationName )
+				.Append( '\t' )
+				.Append( entry.Terminal.Description ?? string.Empty )
+				.Append( Environment.NewLine );
+
+			if (
+				duplicateReferences is null
+				|| !(namesInCurrentRoot?.Add( entry.PublicationName ) ?? false)
+			) {
+				continue;
+			}
+
+			if (
+				duplicateReferences.TryGetValue(
+					entry.PublicationName,
+					out ToeDuplicateReference? first
+				)
+			) {
+				if (
+					string.Equals(
+						first.Root,
+						entry.Root,
+						StringComparison.Ordinal
+					)
+				) {
+					continue;
+				}
+
+				bool areEqual = TerminalDescriptionComparer.Compare(
+					first.Terminal,
+					entry.Terminal
+				).AreEqual;
+				output
+					.Append( "# Icod duplicate " )
+					.Append( entry.PublicationName )
+					.Append( ": semantically " )
+					.Append( areEqual ? "equal to " : "different from " )
+					.Append( first.Root )
+					.Append( Environment.NewLine );
+			} else {
+				duplicateReferences.Add(
+					entry.PublicationName,
+					new ToeDuplicateReference(
+						entry.Terminal,
+						entry.Root
+					)
+				);
+			}
+		}
+	}
+
 
 	private static void AppendCatalogIssues(
 		StringBuilder diagnostics,
