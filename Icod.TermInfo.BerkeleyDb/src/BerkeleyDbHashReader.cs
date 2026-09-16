@@ -244,7 +244,54 @@ internal static class BerkeleyDbHashReader {
 		Stream stream,
 		int maximumDatabaseSize
 	) {
-		return ReadDatabase( stream, maximumDatabaseSize );
+		ArgumentNullException.ThrowIfNull( stream );
+		ArgumentOutOfRangeException.ThrowIfNegativeOrZero( maximumDatabaseSize );
+
+		byte[] database = ReadDatabase( stream, maximumDatabaseSize );
+		VerifyStableObservation( stream, database );
+		return database;
+	}
+
+	private static void VerifyStableObservation(
+		Stream stream,
+		byte[] expected
+	) {
+		stream.Position = 0;
+		if ( stream.Length != expected.LongLength ) {
+			throw CreateChangedWhileReadingException();
+		}
+
+		byte[] buffer = new byte[Math.Min( 81920, expected.Length )];
+		int offset = 0;
+		while ( offset < expected.Length ) {
+			int count = stream.Read(
+				buffer,
+				0,
+				Math.Min( buffer.Length, expected.Length - offset )
+			);
+			if (
+				count == 0
+				|| !expected.AsSpan( offset, count ).SequenceEqual(
+					buffer.AsSpan( 0, count )
+				)
+			) {
+				throw CreateChangedWhileReadingException();
+			}
+			offset += count;
+		}
+
+		if (
+			stream.ReadByte() != -1
+			|| stream.Length != expected.LongLength
+		) {
+			throw CreateChangedWhileReadingException();
+		}
+	}
+
+	private static IOException CreateChangedWhileReadingException() {
+		return new IOException(
+			"The Berkeley DB file changed while it was being read."
+		);
 	}
 
 	// Borrows a readable, length-reporting stream positioned at byte zero.
