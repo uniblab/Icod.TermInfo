@@ -1,12 +1,16 @@
 # HDB07C Compatibility Expansion Implementation Plan
 
-**Status:** IMPLEMENTATION ACCEPTED / CLOSURE IN PROGRESS
+**Status:** COMPLETE / ACCEPTED
 
 **Accepted implementation/qualification head:**
 `2c122abd7e4e63397b474f248d51273a1b7fc006`
 
 **Accepted qualification runs:** normal `35161853347` (12/12), HDB00
 `35161853443` (3/3)
+
+**Documentation closure checkpoint:**
+`a5a29cd1342185a9dca77a98cd17ad29862bc0b3`; normal `35163204383`
+(12/12), HDB00 `35163204381` (3/3)
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -941,7 +945,7 @@ git add docs/1.15.0-HDB07C-COMPATIBILITY-EXPANSION.md docs/superpowers/specs/202
 git commit -m "docs: accept HDB07C compatibility expansion"
 ```
 
-- [ ] **Step 5: Verify the documentation head**
+- [x] **Step 5: Verify the documentation head**
 
 Require the normal PR workflow 12/12. The HDB00 classifier should perform only inexpensive gate jobs for a documentation-only delta; verify that no required gate fails.
 
@@ -954,7 +958,7 @@ git status --short --branch
 
 Expected: no whitespace errors and a clean branch synchronized with origin.
 
-- [ ] **Step 6: Update and verify PR #45**
+- [x] **Step 6: Update and verify PR #45**
 
 Update the PR body with accepted HDB07C scope, exact implementation/documentation heads, RED/GREEN evidence, workflow links, counts, preserved boundaries, residual limitations, and HDB08 next.
 
