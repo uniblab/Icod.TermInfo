@@ -31,7 +31,9 @@ namespace Icod.TermInfo.BerkeleyDb;
 /// a clean miss when the requested name is exactly representable. Successful
 /// descriptions are cached for this provider instance; clean misses and failures
 /// remain retryable. Construct a new provider to observe changed content after a
-/// successful lookup.
+/// successful lookup. Production path acquisition compares two complete
+/// observations through one open handle and rejects unequal reads; this detects
+/// change but does not create an atomic filesystem snapshot.
 /// </remarks>
 public sealed class BerkeleyDbTerminalDescriptionProvider
 	: ITerminalDescriptionProvider {

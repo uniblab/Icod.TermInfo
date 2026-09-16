@@ -4,13 +4,13 @@
 
 ## 1.15 development status
 
-`1.15.0-Alpha-7` adds accepted adversarial and compatibility hardening to the explicit and opt-in system terminal-description providers and hashed terminal catalog on the managed Hash-v9 reader. It supports bounded exact-key lookup and complete record enumeration with inline and off-page records, overflow reconstruction, both byte orders, ncurses marker resolution, Runtime-owned compiled-entry parsing, exact identity validation, and deterministic logical publication ordering.
+`1.15.0-Alpha-7` adds accepted adversarial hardening and the HDB07C compatibility expansion to the explicit and opt-in system terminal-description providers and hashed terminal catalog on the managed Hash-v9 reader. It supports bounded exact-key lookup and complete record enumeration with inline and off-page records, overflow reconstruction, both byte orders, ncurses marker resolution, Runtime-owned compiled-entry parsing, exact identity validation, and deterministic logical publication ordering.
 
 HDB00 selected a dependency-free managed reader for the reviewed Berkeley DB **Hash on-disk format version 9** subset required by ncurses acquisition. Native Berkeley DB remains a CI interoperability oracle and is not a production dependency.
 
 The internal ncurses resolver follows bounded marker-2 index chains over one acquired database image and extracts opaque marker-0 payloads. Empty records, unsupported markers, dangling targets, cycles, and excessive hops fail explicitly. Only an absent initial key is a clean miss.
 
-`BerkeleyDbTerminalDescriptionProvider` reads one caller-selected database path. `BerkeleyDbTerminalDescriptionProviderOptions` snapshots parser, database-size, and index-hop limits. `BerkeleyDbDatabaseFormatException` identifies malformed or unsupported containers and ncurses record envelopes while parser and I/O failures retain their existing exception types.
+`BerkeleyDbTerminalDescriptionProvider` reads one caller-selected database path. Lookup tries the exact ordinal UTF-8 key first and, only after a clean miss, one distinct exact Latin-1 key when every requested character is representable. A found malformed or identity-invalid UTF-8 record never falls through. `BerkeleyDbTerminalDescriptionProviderOptions` snapshots parser, database-size, and index-hop limits. `BerkeleyDbDatabaseFormatException` identifies malformed or unsupported containers and ncurses record envelopes while parser and I/O failures retain their existing exception types.
 
 
 ## Hashed terminal catalog
@@ -20,8 +20,9 @@ a fresh immutable snapshot on every call. Its options snapshot parser,
 database-size, record-count, and index-hop limits.
 
 The catalog emits only marker-2 logical publications. It classifies each
-publication as `Canonical` or `Alias` by comparing the strict UTF-8 key with
-the `TerminalDescription` parsed by Runtime. Entries resolving to the same
+publication as `Canonical` or `Alias` by decoding a valid UTF-8 key first and
+using Latin-1 only when the raw key is not valid UTF-8. Distinct raw keys that
+decode to the same ordinal logical name are rejected. Entries resolving to the same
 marker-0 record share one parsed terminal instance within the snapshot.
 Marker-0 storage records, including unreferenced orphans, are still parsed and
 validated but their internal keys are not emitted.
@@ -30,6 +31,9 @@ Raw records are validated in unsigned byte-key order. Successful entries are
 ordered by ordinal publication name, then kind, then canonical terminal name.
 Physical Hash-page order is never exposed. Reads are uncached, bounded,
 cancellable, independent, and release the database handle before parsing.
+Production path reads compare two complete observations through one open handle
+and reject unequal content or length. This detects mutation between observations
+but does not provide an atomic snapshot or arbitrary writer coordination.
 
 Malformed Berkeley DB structures and ncurses envelopes use
 `BerkeleyDbDatabaseFormatException`. Malformed compiled entries retain
@@ -49,7 +53,7 @@ The package:
 
 The reviewed subset supports unencrypted, non-checksummed Hash-v9 files with sorted Hash pages (type 13), inline items, and overflow items. Other access methods, revisions, duplicate/subdatabase features, and legacy type-2 Hash pages are unsupported. Validation covers encountered records and does not guarantee an atomic snapshot during external writes.
 
-Dedicated CI compares the production reader and public provider with native Berkeley DB stores on Linux and macOS; Windows reads Linux-generated fixtures without Berkeley DB installed. Big-endian coverage uses synthetic fixtures. Lookup keys are encoded as UTF-8, while compiled identity fields retain Runtime's byte-preserving Latin-1 interpretation. Qualified native fixtures use ASCII terminal names; broader non-ASCII producer compatibility is not claimed.
+Dedicated CI compares the production reader, providers, catalog, and tools with native Berkeley DB stores on Linux and macOS; Windows reads Linux-generated fixtures without Berkeley DB installed. Native big-endian Hash-v9 containers are produced by reloading byte-exact ncurses records with big-endian metadata. Native `tic` also produces exact Latin-1 canonical and alias keys. Lookup is UTF-8-first with the bounded clean-miss-only Latin-1 fallback above, while compiled identity fields retain Runtime's byte-preserving Latin-1 interpretation. Universal non-ASCII encodings, normalization, transliteration, and best-fit mapping are not claimed.
 
 HDB03 qualification includes native-fixture provider parsing on all supported target frameworks and an isolated package-only consumer on `net8.0`, `net9.0`, and `net10.0`.
 
@@ -81,6 +85,6 @@ explicit paths and then call the accepted provider or catalog reader. Explicit
 Inspection stays provider-neutral, ambient `toe` discovery and JSON stay
 conventional, and `tic` remains directory-write-only. Installed-tool smoke
 passed on all three hosts and direct-command smoke passed for all six archive
-RIDs. The separately approved compatibility-expansion tranche is next before
-HDB08. Native big-endian production, broader non-ASCII producer compatibility,
-and stable reads during arbitrary concurrent replacement are not yet claimed.
+RIDs. HDB08 packaging and cross-platform qualification is next. Atomic snapshots,
+arbitrary writer coordination, and non-UTF-8/non-Latin-1 producer encodings remain
+outside the qualified contract.

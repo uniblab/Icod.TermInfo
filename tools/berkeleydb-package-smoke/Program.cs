@@ -6,9 +6,15 @@ using Icod.TermInfo.BerkeleyDb;
 const string canonical = "hdb03-package";
 const string alias = "hdb03-package-alias";
 const string description = "HDB03 isolated package consumer";
+const string latin1Canonical = "hdb07c-package-caf\u00E9";
+const string latin1Alias = "hdb07c-package-ali\u00E9";
 string databasePath = Path.Combine(
 	Path.GetTempPath(),
 	"Icod.TermInfo.HDB03PackageSmoke." + Guid.NewGuid().ToString( "N" ) + ".db"
+);
+string latin1DatabasePath = Path.Combine(
+	Path.GetTempPath(),
+	"Icod.TermInfo.HDB07CPackageSmoke." + Guid.NewGuid().ToString( "N" ) + ".db"
 );
 string? previousTermInfo =
 	Environment.GetEnvironmentVariable( "TERMINFO" );
@@ -21,7 +27,8 @@ try {
 		CreateStore(
 			canonical,
 			alias,
-			description
+			description,
+			Encoding.UTF8
 		)
 	);
 
@@ -175,7 +182,8 @@ try {
 		CreateStore(
 			replacementCanonical,
 			replacementAlias,
-			"HDB05 fresh package snapshot"
+			"HDB05 fresh package snapshot",
+			Encoding.UTF8
 		)
 	);
 	IReadOnlyList<BerkeleyDbTerminalCatalogEntry> replacement =
@@ -207,7 +215,8 @@ try {
 		CreateStore(
 			canonical,
 			alias,
-			description
+			description,
+			Encoding.UTF8
 		)
 	);
 
@@ -252,8 +261,106 @@ try {
 		);
 	}
 
+	File.WriteAllBytes(
+		latin1DatabasePath,
+		CreateStore(
+			latin1Canonical,
+			latin1Alias,
+			"HDB07C Latin-1 package fixture",
+			Encoding.Latin1
+		)
+	);
+	BerkeleyDbTerminalDescriptionProvider latin1Provider =
+		new( latin1DatabasePath );
+	TerminalDescription latin1CanonicalTerminal =
+		LoadRequired( latin1Provider, latin1Canonical );
+	TerminalDescription latin1AliasTerminal =
+		LoadRequired( latin1Provider, latin1Alias );
+	if (
+		!string.Equals(
+			latin1Canonical,
+			latin1CanonicalTerminal.Name,
+			StringComparison.Ordinal
+		)
+		|| !string.Equals(
+			latin1Canonical,
+			latin1AliasTerminal.Name,
+			StringComparison.Ordinal
+		)
+		|| !latin1AliasTerminal.Aliases.Contains(
+			latin1Alias,
+			StringComparer.Ordinal
+		)
+	) {
+		throw new InvalidOperationException(
+			"The packaged provider did not preserve the Latin-1 terminal identity."
+		);
+	}
+
+	IReadOnlyList<BerkeleyDbTerminalCatalogEntry> latin1Catalog =
+		new BerkeleyDbTerminalCatalogReader(
+			latin1DatabasePath
+		).Read();
+	BerkeleyDbTerminalCatalogEntry latin1CanonicalEntry =
+		latin1Catalog.Single(
+			entry => string.Equals(
+				entry.Name,
+				latin1Canonical,
+				StringComparison.Ordinal
+			)
+		);
+	BerkeleyDbTerminalCatalogEntry latin1AliasEntry =
+		latin1Catalog.Single(
+			entry => string.Equals(
+				entry.Name,
+				latin1Alias,
+				StringComparison.Ordinal
+			)
+		);
+	if (
+		latin1Catalog.Count != 2
+		|| latin1CanonicalEntry.Kind
+			!= BerkeleyDbTerminalCatalogEntryKind.Canonical
+		|| latin1AliasEntry.Kind
+			!= BerkeleyDbTerminalCatalogEntryKind.Alias
+		|| !ReferenceEquals(
+			latin1CanonicalEntry.Terminal,
+			latin1AliasEntry.Terminal
+		)
+	) {
+		throw new InvalidOperationException(
+			"The packaged catalog did not preserve the Latin-1 publications."
+		);
+	}
+
+	Environment.SetEnvironmentVariable(
+		"TERMINFO",
+		latin1DatabasePath
+	);
+	BerkeleyDbSystemTerminalDescriptionProvider latin1SystemProvider =
+		new(
+			new BerkeleyDbSystemTerminalDescriptionProviderOptions(
+				useEnvironment: true,
+				useUserDatabase: false,
+				useSystemDatabases: false
+			)
+		);
+	TerminalDescription latin1SystemTerminal =
+		LoadRequired( latin1SystemProvider, latin1Alias );
+	if (
+		!string.Equals(
+			latin1Canonical,
+			latin1SystemTerminal.Name,
+			StringComparison.Ordinal
+		)
+	) {
+		throw new InvalidOperationException(
+			"The packaged system provider did not preserve the Latin-1 terminal identity."
+		);
+	}
+
 	Console.WriteLine(
-		$"HDB05 package catalog and system provider loaded {systemTerminal.Name} through alias {alias}."
+		$"HDB07C package provider, catalog, and system provider loaded {latin1SystemTerminal.Name} through alias {latin1Alias}."
 	);
 } finally {
 	Environment.SetEnvironmentVariable(
@@ -265,6 +372,7 @@ try {
 		previousTermInfoDirs
 	);
 	File.Delete( databasePath );
+	File.Delete( latin1DatabasePath );
 }
 
 static TerminalDescription LoadRequired(
@@ -298,8 +406,11 @@ static void AssertReferenceEqual(
 static byte[] CreateStore(
 	string canonical,
 	string alias,
-	string description
+	string description,
+	Encoding keyEncoding
 ) {
+	ArgumentNullException.ThrowIfNull( keyEncoding );
+
 	byte[] entry =
 		CreateCompiledEntry(
 			canonical,
@@ -307,17 +418,17 @@ static byte[] CreateStore(
 			description
 		);
 	byte[] target =
-		Encoding.UTF8.GetBytes(
+		keyEncoding.GetBytes(
 			canonical + "|" + alias
 		);
 
 	return CreateDatabase(
 		(
-			Encoding.UTF8.GetBytes( canonical ),
+			keyEncoding.GetBytes( canonical ),
 			PrependMarker( target, 2 )
 		),
 		(
-			Encoding.UTF8.GetBytes( alias ),
+			keyEncoding.GetBytes( alias ),
 			PrependMarker( target, 2 )
 		),
 		(
