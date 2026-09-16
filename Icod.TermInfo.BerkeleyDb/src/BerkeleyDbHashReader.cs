@@ -127,6 +127,15 @@ internal static class BerkeleyDbHashReader {
 		return false;
 	}
 
+	internal static IReadOnlyList<BerkeleyDbHashRecord> ReadRecords(
+		byte[] database,
+		int maximumItemSize,
+		int maximumRecordCount,
+		CancellationToken cancellationToken
+	) {
+		throw new NotImplementedException();
+	}
+
 	internal static byte[] ReadDatabase(
 		string databasePath,
 		int maximumDatabaseSize
