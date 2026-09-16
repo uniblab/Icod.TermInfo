@@ -262,15 +262,25 @@ public sealed class Hdb05HashEnumerationTests {
 			records
 		);
 		using CancellationTokenSource cancellation = new();
-		cancellation.CancelAfter( TimeSpan.FromMilliseconds( 1 ) );
+		using ManualResetEventSlim started = new();
+		Task<IReadOnlyList<BerkeleyDbHashRecord>> enumeration =
+			Task.Run(
+				() => {
+					started.Set();
+					return BerkeleyDbHashReader.ReadRecords(
+						database,
+						maximumItemSize: 16,
+						maximumRecordCount: recordCount,
+						cancellation.Token
+					);
+				}
+			);
+		Assert.True( started.Wait( TimeSpan.FromSeconds( 5 ) ) );
+		Thread.Sleep( TimeSpan.FromMilliseconds( 5 ) );
+		cancellation.Cancel();
 
 		Assert.Throws<OperationCanceledException>(
-			() => BerkeleyDbHashReader.ReadRecords(
-				database,
-				maximumItemSize: 16,
-				maximumRecordCount: recordCount,
-				cancellation.Token
-			)
+			() => enumeration.GetAwaiter().GetResult()
 		);
 	}
 
