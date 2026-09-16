@@ -113,6 +113,7 @@ jobs:
           ICOD_HDB02_FIXTURE_ROOT: ${{ runner.temp }}/icod-terminfo-hdb00
         run: |
           db5.3_dump -k -f "$ICOD_HDB02_FIXTURE_ROOT/hashed-db.dump" "$ICOD_HDB02_FIXTURE_ROOT/hashed-db.db"
+          db5.3_dump -k -f "$ICOD_HDB02_FIXTURE_ROOT/big-endian-hashed-db.dump" "$ICOD_HDB02_FIXTURE_ROOT/big-endian-hashed-db.db"
           db5.3_dump -k -f "$ICOD_HDB02_FIXTURE_ROOT/overflow-hashed-db.dump" "$ICOD_HDB02_FIXTURE_ROOT/overflow-hashed-db.db"
           dotnet test tests/Icod.TermInfo.BerkeleyDb.Interop.Tests/Icod.TermInfo.BerkeleyDb.Interop.Tests.csproj -c Release
 
@@ -132,10 +133,12 @@ jobs:
           retention-days: 7
           path: |
             ${{ runner.temp }}/icod-terminfo-hdb00/hashed-db.db
+            ${{ runner.temp }}/icod-terminfo-hdb00/big-endian-hashed-db.db
             ${{ runner.temp }}/icod-terminfo-hdb00/hdb00-primary.bin
             ${{ runner.temp }}/icod-terminfo-hdb00/overflow-hashed-db.db
             ${{ runner.temp }}/icod-terminfo-hdb00/hdb00-overflow.bin
             ${{ runner.temp }}/icod-terminfo-hdb00/hashed-db.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00/big-endian-hashed-db.dump
             ${{ runner.temp }}/icod-terminfo-hdb00/overflow-hashed-db.dump
             ${{ runner.temp }}/icod-terminfo-hdb00/multi-hashed-db.db
             ${{ runner.temp }}/icod-terminfo-hdb00/multi-hashed-db.dump
@@ -209,6 +212,7 @@ jobs:
           db_prefix="$(brew --prefix berkeley-db@5)"
           export DYLD_LIBRARY_PATH="$db_prefix/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}"
           "$db_prefix/bin/db_dump" -k -f "$ICOD_HDB02_FIXTURE_ROOT/hashed-db.dump" "$ICOD_HDB02_FIXTURE_ROOT/hashed-db.db"
+          "$db_prefix/bin/db_dump" -k -f "$ICOD_HDB02_FIXTURE_ROOT/big-endian-hashed-db.dump" "$ICOD_HDB02_FIXTURE_ROOT/big-endian-hashed-db.db"
           "$db_prefix/bin/db_dump" -k -f "$ICOD_HDB02_FIXTURE_ROOT/overflow-hashed-db.dump" "$ICOD_HDB02_FIXTURE_ROOT/overflow-hashed-db.db"
           dotnet test tests/Icod.TermInfo.BerkeleyDb.Interop.Tests/Icod.TermInfo.BerkeleyDb.Interop.Tests.csproj -c Release
 
@@ -228,8 +232,10 @@ jobs:
           retention-days: 7
           path: |
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/hashed-db.db
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/big-endian-hashed-db.db
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/overflow-hashed-db.db
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/hashed-db.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/big-endian-hashed-db.dump
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/overflow-hashed-db.dump
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/multi-hashed-db.db
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/multi-hashed-db.dump
@@ -280,12 +286,19 @@ jobs:
           $project = Join-Path $env:GITHUB_WORKSPACE 'tools/hdb00/managed/Hdb00.ManagedProbe.csproj'
 
           $database = Join-Path $fixtureRoot 'hashed-db.db'
+          $bigEndianDatabase = Join-Path $fixtureRoot 'big-endian-hashed-db.db'
           $expected = Join-Path $fixtureRoot 'hdb00-primary.bin'
           $actual = Join-Path $fixtureRoot 'windows-alias.bin'
 
           dotnet run --project $project -c Release -- $database hdb00-alias $actual
           if ((Get-FileHash $actual -Algorithm SHA256).Hash -ne (Get-FileHash $expected -Algorithm SHA256).Hash) {
               throw 'Windows managed alias extraction differs from the Linux native oracle.'
+          }
+
+          $bigEndianActual = Join-Path $fixtureRoot 'windows-big-endian.bin'
+          dotnet run --project $project -c Release -- $bigEndianDatabase hdb00-primary $bigEndianActual
+          if ((Get-FileHash $bigEndianActual -Algorithm SHA256).Hash -ne (Get-FileHash $expected -Algorithm SHA256).Hash) {
+              throw 'Windows managed big-endian extraction differs from the Linux native oracle.'
           }
 
           $overflowDatabase = Join-Path $fixtureRoot 'overflow-hashed-db.db'

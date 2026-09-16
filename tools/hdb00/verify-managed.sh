@@ -9,8 +9,10 @@ fi
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 work_root="$1"
 database="$work_root/hashed-db.db"
+big_endian_database="$work_root/big-endian-hashed-db.db"
 managed_primary="$work_root/hdb00-managed-primary.bin"
 managed_alias="$work_root/hdb00-managed-alias.bin"
+managed_big_endian="$work_root/hdb07c-managed-big-endian.bin"
 overflow_database="$work_root/overflow-hashed-db.db"
 overflow_native="$work_root/hdb00-overflow.bin"
 overflow_managed="$work_root/hdb00-managed-overflow.bin"
@@ -46,6 +48,19 @@ grep -F "Berkeley DB Hash version: 9" "$work_root/managed-primary-probe.txt"
 grep -F "Hops: 2" "$work_root/managed-primary-probe.txt"
 grep -F "Data records: 1" "$work_root/managed-primary-probe.txt"
 grep -F "Index records: 2" "$work_root/managed-primary-probe.txt"
+
+printf '%s\n' "== HDB07C managed: read native big-endian container =="
+test -f "$big_endian_database"
+dotnet run \
+    --project "$project" \
+    -c Release \
+    -- \
+    "$big_endian_database" \
+    hdb00-primary \
+    "$managed_big_endian" \
+    | tee "$work_root/managed-big-endian-probe.txt"
+cmp "$managed_big_endian" "$work_root/hdb00-primary.bin"
+grep -F "Byte order: big-endian" "$work_root/managed-big-endian-probe.txt"
 
 printf '%s\n' "== HDB00 managed: clean miss is distinct =="
 set +e

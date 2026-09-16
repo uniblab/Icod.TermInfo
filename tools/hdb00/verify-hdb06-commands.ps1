@@ -15,6 +15,7 @@ $repositoryRoot = [System.IO.Path]::GetFullPath(
 )
 $fixturePath = [System.IO.Path]::GetFullPath( $FixtureRoot )
 $primaryDatabase = Join-Path $fixturePath 'hashed-db.db'
+$bigEndianDatabase = Join-Path $fixturePath 'big-endian-hashed-db.db'
 $overflowDatabase = Join-Path $fixturePath 'overflow-hashed-db.db'
 $multiDatabase = Join-Path $fixturePath 'multi-hashed-db.db'
 $malformedDatabase = Join-Path $fixturePath 'random.db'
@@ -22,6 +23,7 @@ $wrongTypeDatabase = Join-Path $fixturePath 'not-hash.db'
 
 foreach ( $requiredPath in @(
 	$primaryDatabase,
+	$bigEndianDatabase,
 	$overflowDatabase,
 	$multiDatabase,
 	$malformedDatabase,
@@ -178,6 +180,7 @@ try {
 
 	$result = Invoke-TermInfoCommand toe @( '-s', $primaryDatabase )
 	Assert-CommandResult -Result $result -ExpectedStatus 0 -RequireEmptyStderr
+	$primaryToeOutput = $result.Stdout
 	$logicalLines = @(
 		$result.Stdout -split '\r?\n' |
 			Where-Object { 0 -ne $_.Length }
@@ -193,6 +196,32 @@ try {
 		if ( $expectedLines[$index] -cne $logicalLines[$index] ) {
 			throw "Unexpected toe entry '$($logicalLines[$index])'; expected '$($expectedLines[$index])'."
 		}
+	}
+
+	foreach ( $name in @( 'hdb00-primary', 'hdb00-alias' ) ) {
+		$littleEndian = Invoke-TermInfoCommand infocmp @(
+			'-A', $primaryDatabase, $name
+		)
+		$bigEndian = Invoke-TermInfoCommand infocmp @(
+			'-A', $bigEndianDatabase, $name
+		)
+		Assert-CommandResult `
+			-Result $bigEndian `
+			-ExpectedStatus 0 `
+			-StdoutContains 'hdb00-primary|hdb00-alias|Icod HDB00 hashed terminfo fixture,' `
+			-RequireEmptyStderr
+		if ( $littleEndian.Stdout -cne $bigEndian.Stdout ) {
+			throw "Big-endian infocmp output differs for '$name'."
+		}
+	}
+
+	$bigEndianToe = Invoke-TermInfoCommand toe @( '-s', $bigEndianDatabase )
+	Assert-CommandResult `
+		-Result $bigEndianToe `
+		-ExpectedStatus 0 `
+		-RequireEmptyStderr
+	if ( $primaryToeOutput -cne $bigEndianToe.Stdout ) {
+		throw 'Big-endian toe output differs from the primary little-endian store.'
 	}
 
 	$result = Invoke-TermInfoCommand infocmp @(

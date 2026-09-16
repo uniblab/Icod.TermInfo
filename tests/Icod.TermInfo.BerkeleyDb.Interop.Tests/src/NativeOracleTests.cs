@@ -27,6 +27,7 @@ namespace Icod.TermInfo.BerkeleyDb.Interop.Tests;
 public sealed class NativeOracleTests {
 	[Theory]
 	[InlineData( "hashed-db", 3 )]
+	[InlineData( "big-endian-hashed-db", 3 )]
 	[InlineData( "overflow-hashed-db", 2 )]
 	[InlineData( "multi-hashed-db", 192 )]
 	public void ProductionReaderMatchesEveryNativeRecord(
@@ -48,6 +49,7 @@ public sealed class NativeOracleTests {
 
 	[Theory]
 	[InlineData( "hashed-db" )]
+	[InlineData( "big-endian-hashed-db" )]
 	[InlineData( "overflow-hashed-db" )]
 	public void ProductionReaderReturnsCleanMissForAbsentNativeKey( string fixtureName ) {
 		byte[] key = Encoding.UTF8.GetBytes( "hdb00-missing" );
@@ -84,6 +86,8 @@ public sealed class NativeOracleTests {
 	[Theory]
 	[InlineData( "hashed-db", "hdb00-primary", "hdb00-primary.bin" )]
 	[InlineData( "hashed-db", "hdb00-alias", "hdb00-primary.bin" )]
+	[InlineData( "big-endian-hashed-db", "hdb00-primary", "hdb00-primary.bin" )]
+	[InlineData( "big-endian-hashed-db", "hdb00-alias", "hdb00-primary.bin" )]
 	[InlineData( "overflow-hashed-db", "hdb00-overflow", "hdb00-overflow.bin" )]
 	public void ProductionRecordResolverMatchesNativeCompiledEntry(
 		string fixtureName,
@@ -106,6 +110,8 @@ public sealed class NativeOracleTests {
 	[Theory]
 	[InlineData( "hashed-db", "hdb00-primary", "hdb00-primary", "hdb00-alias" )]
 	[InlineData( "hashed-db", "hdb00-alias", "hdb00-primary", "hdb00-alias" )]
+	[InlineData( "big-endian-hashed-db", "hdb00-primary", "hdb00-primary", "hdb00-alias" )]
+	[InlineData( "big-endian-hashed-db", "hdb00-alias", "hdb00-primary", "hdb00-alias" )]
 	[InlineData( "overflow-hashed-db", "hdb00-overflow", "hdb00-overflow", null )]
 	public void PublicProviderParsesNativeStore(
 		string fixtureName,
@@ -162,6 +168,8 @@ public sealed class NativeOracleTests {
 	[Theory]
 	[InlineData( "hashed-db", "hdb00-primary", "hdb00-primary" )]
 	[InlineData( "hashed-db", "hdb00-alias", "hdb00-primary" )]
+	[InlineData( "big-endian-hashed-db", "hdb00-primary", "hdb00-primary" )]
+	[InlineData( "big-endian-hashed-db", "hdb00-alias", "hdb00-primary" )]
 	[InlineData( "overflow-hashed-db", "hdb00-overflow", "hdb00-overflow" )]
 	public void PublicSystemProviderParsesNativeStore(
 		string fixtureName,
@@ -216,10 +224,14 @@ public sealed class NativeOracleTests {
 	}
 
 
-	[Fact]
-	public void PublicCatalogEnumeratesNativeCanonicalAndAliasPublications() {
+	[Theory]
+	[InlineData( "hashed-db" )]
+	[InlineData( "big-endian-hashed-db" )]
+	public void PublicCatalogEnumeratesNativeCanonicalAndAliasPublications(
+		string fixtureName
+	) {
 		BerkeleyDbTerminalCatalogReader reader =
-			new( FixturePath( "hashed-db.db" ) );
+			new( FixturePath( fixtureName + ".db" ) );
 
 		IReadOnlyList<BerkeleyDbTerminalCatalogEntry> entries =
 			reader.Read();
