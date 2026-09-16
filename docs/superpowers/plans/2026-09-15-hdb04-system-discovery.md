@@ -43,6 +43,19 @@ framework on every host.
 The adapter inspects exact locations at lookup time so later-created sources
 remain retryable; an existing exact directory or file wins before its `.db`
 companion. Exact failed/missed Lazy instances are removed at both system and
-underlying provider layers. Qualification continues with concurrent publication,
-failure replacement, policy deduplication, native system-provider parsing, and
-packed-package system-provider consumption. Preserve exact Lazy removal and successful-only caching. Keep Runtime's public API and existing `SystemTerminalDescriptionProvider` behavior unchanged. Then add concurrency, location deduplication, native system-provider fixtures, and package-only consumer qualification before HDB04 acceptance.
+underlying provider layers.
+
+## ACCEPTED
+
+Qualification head `c6e05caa4cc5158f1200050e3ba3c97e4f7aa486`
+passed PR workflow #1060 / 35041557637 (12/12 jobs) and HDB00 workflow
+#89 / 35041557669 (3/3 jobs). The BerkeleyDb suite passed 253 cases per target
+framework on Windows, Linux, and macOS; the native suite passed 18 cases per
+target framework on every host.
+
+The qualification additions cover concurrent successful publication, retry after
+replacement of a malformed database, Runtime-policy location deduplication,
+native-generated canonical/alias/overflow discovery through the public system
+provider, and isolated package-only consumption on net8/net9/net10. Exact Lazy
+removal, successful-only caching, Runtime's unchanged public API, and the frozen
+existing `SystemTerminalDescriptionProvider` behavior are accepted.

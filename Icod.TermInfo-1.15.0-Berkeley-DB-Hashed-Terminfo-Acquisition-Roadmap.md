@@ -6,8 +6,8 @@
 **Optional package:** `Icod.TermInfo.BerkeleyDb`  
 **Language:** C# 13  
 **Reusable target frameworks:** `net8.0`; `net9.0`; `net10.0`  
-**Status:** HDB00–HDB02 accepted; HDB03 explicit provider in progress  
-**Current coordinated prerelease:** `1.15.0-Alpha-3`
+**Status:** HDB00–HDB04 accepted; HDB05 catalog enumeration next  
+**Current coordinated prerelease:** `1.15.0-Alpha-4`
 
 ---
 
@@ -320,8 +320,8 @@ The optional package is:
 Icod.TermInfo.BerkeleyDb
 ```
 
-HDB01 deliberately exports no acquisition API. The likely HDB03 public concepts
-remain provisional and are limited to terminfo acquisition, for example:
+HDB01 deliberately exports no acquisition API. HDB03 and HDB04 accepted the
+following public surface, limited to terminfo acquisition:
 
 ```text
 BerkeleyDbTerminalDescriptionProvider
@@ -330,6 +330,10 @@ BerkeleyDbSystemTerminalDescriptionProvider
 BerkeleyDbSystemTerminalDescriptionProviderOptions
 BerkeleyDbDatabaseFormatException
 ```
+
+The explicit provider, its immutable options, and the format exception were
+accepted in HDB03. The opt-in system provider and its immutable options were
+accepted in HDB04.
 
 There is intentionally no `BerkeleyDbBackendAvailability` or
 `BerkeleyDbBackendUnavailableException`: production acquisition has no native
@@ -364,7 +368,7 @@ It does not inspect environment variables or platform search paths.
 
 ### 7.2 System provider
 
-The optional package should also provide a hashed-aware system provider for
+The optional package provides the accepted hashed-aware system provider for
 callers that want ncurses-like discovery across both conventional and hashed
 storage shapes.
 
@@ -389,8 +393,9 @@ platform defaults
 clean miss
 ```
 
-It preserves the existing snapshot-at-construction philosophy and should reuse
-existing discovery policy rather than creating a second precedence model.
+It preserves the existing snapshot-at-construction philosophy and reuses
+Runtime's existing internal discovery policy rather than creating a second
+precedence model.
 
 The frozen existing `SystemTerminalDescriptionProvider` does not silently gain
 new file-valued path semantics during 1.x.
@@ -712,27 +717,22 @@ Production code is re-established from tests and reviewed package conventions.
 
 ### HDB03 — Explicit Hashed Terminal Provider
 
-**Status:** IN PROGRESS (`1.15.0-Alpha-3`)
+**Status:** COMPLETE / ACCEPTED (`1.15.0-Alpha-3`)
 
-First checkpoint: bounded internal ncurses record resolution over one acquired image.
-Plan and progress: `docs/superpowers/plans/2026-09-15-hdb03-record-resolution.md`.
+Accepted exact head: `e2b55290f97014086b1de89f5b466e8c083ed1d3`.
+Closure record:
+`docs/1.15.0-HDB03-EXPLICIT-HASHED-TERMINAL-PROVIDER.md`.
 
-Freeze the first reviewed public acquisition API.
+The accepted public explicit provider owns one canonical database path, snapshots
+all parser and resource options, validates requested terminal names, resolves
+bounded marker-2/marker-0 records through the HDB02 reader, reuses
+`CompiledTermInfoParser`, verifies canonical/alias identity, caches successful
+results, and retries misses and failures.
 
-Requirements:
-
-- canonical absolute database path;
-- snapshotted parser/resource options;
-- terminal-name validation;
-- exact-key lookup through the HDB02 reader;
-- bounded marker-2 index resolution;
-- marker-0 compiled-entry extraction;
-- existing parser reuse;
-- canonical/alias identity verification;
-- successful-result caching;
-- retryable misses/failures;
-- concurrency tests; and
-- package-only consumer validation.
+Qualification: PR workflow #1057 / 35031640798, all 12 jobs; HDB00 workflow
+#86 / 35031640883, all 3 jobs. The package passed 234 unit cases and 15 native
+interoperability cases per TFM on Windows, Linux, and macOS, plus package-only
+consumption on net8/net9/net10.
 
 This tranche completes the central architecture:
 
@@ -746,24 +746,32 @@ Hash-v9 store
 
 ### HDB04 — System Discovery Integration
 
-**Status:** IN PROGRESS (`1.15.0-Alpha-4`)
+**Status:** COMPLETE / ACCEPTED (`1.15.0-Alpha-4`)
 
-Plan: `docs/superpowers/plans/2026-09-15-hdb04-system-discovery.md`.
+Accepted exact head: `c6e05caa4cc5158f1200050e3ba3c97e4f7aa486`.
+Closure record:
+`docs/1.15.0-HDB04-HASHED-AWARE-SYSTEM-DISCOVERY.md`.
+Plan and TDD history:
+`docs/superpowers/plans/2026-09-15-hdb04-system-discovery.md`.
 
-Implement the reviewed hashed-aware system provider.
+The accepted opt-in system provider reuses Runtime's internal discovery policy,
+including construction-time environment snapshots, precedence, empty
+`TERMINFO_DIRS` default components, and path deduplication. At each logical
+location, an existing exact directory or supported exact hashed file wins; only
+an absent exact location permits the ncurses-compatible `.db` companion.
+Encoded `TERMINFO` remains first. Runtime's public API and existing
+`SystemTerminalDescriptionProvider` behavior are unchanged.
 
-Requirements:
+Reached malformed sources fail explicitly; missing sources remain clean misses.
+Only successful outer and underlying provider results are cached, so later-created
+sources and replacement after failures remain retryable. Parser and resource
+options are snapshotted.
 
-- preserve existing discovery precedence;
-- preserve snapshot-at-construction behavior;
-- distinguish encoded `TERMINFO`, directories, and supported hashed files;
-- deduplicate equivalent locations;
-- preserve clean-miss semantics;
-- never alter the frozen behavior of `SystemTerminalDescriptionProvider`; and
-- reuse existing discovery-policy implementation rather than duplicating it.
-
-Any Runtime refactor needed for this should remain internal unless a separate
-public API addition is independently justified.
+Qualification: PR workflow #1060 / 35041557637, all 12 jobs; HDB00 workflow
+#89 / 35041557669, all 3 jobs. The package passed 253 unit cases and 18 native
+interoperability cases per TFM on Windows, Linux, and macOS. The isolated
+package-only consumer loaded the public system provider and alias on
+net8/net9/net10.
 
 ### HDB05 — Hashed Catalog Enumeration
 
