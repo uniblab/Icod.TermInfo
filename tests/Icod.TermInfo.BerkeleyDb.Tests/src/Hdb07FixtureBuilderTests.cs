@@ -28,11 +28,15 @@ namespace Icod.TermInfo.BerkeleyDb.Tests;
 
 public sealed class Hdb07FixtureBuilderTests {
 	[Theory]
-	[InlineData( Hdb07ByteOrder.LittleEndian )]
-	[InlineData( Hdb07ByteOrder.BigEndian )]
+	[InlineData( false )]
+	[InlineData( true )]
 	public void CreateDatabaseWritesLiteralMetadataAndInlineItems(
-		Hdb07ByteOrder byteOrder
+		bool isBigEndian
 	) {
+		Hdb07ByteOrder byteOrder = ( isBigEndian )
+			? Hdb07ByteOrder.BigEndian
+			: Hdb07ByteOrder.LittleEndian
+		;
 		byte[] database = Hdb07HashV9FixtureBuilder.CreateDatabase(
 			byteOrder,
 			512,
@@ -76,11 +80,15 @@ public sealed class Hdb07FixtureBuilderTests {
 	}
 
 	[Theory]
-	[InlineData( Hdb07ByteOrder.LittleEndian )]
-	[InlineData( Hdb07ByteOrder.BigEndian )]
+	[InlineData( false )]
+	[InlineData( true )]
 	public void CreateDatabaseWritesRequestedOffPageChain(
-		Hdb07ByteOrder byteOrder
+		bool isBigEndian
 	) {
+		Hdb07ByteOrder byteOrder = ( isBigEndian )
+			? Hdb07ByteOrder.BigEndian
+			: Hdb07ByteOrder.LittleEndian
+		;
 		byte[] database = Hdb07HashV9FixtureBuilder.CreateDatabase(
 			byteOrder,
 			512,
