@@ -18,8 +18,10 @@ on:
       - 'tests/Icod.TermInfo.Router.Tests/**'
       - 'tests/Shared/BerkeleyDbHashV9TestStore.cs'
       - '.github/scripts/new-hdb06-test-store.ps1'
+      - '.github/scripts/verify-hdb07-permissions.ps1'
       - '.github/scripts/smoke-tool-package.ps1'
       - '.github/scripts/smoke-tool-archive.ps1'
+      - 'tools/hdb07-permission-probe/**'
       - 'docs/1.15.0-HDB06-INSPECTION-AND-TOOL-INTEGRATION.md'
       - 'docs/superpowers/plans/2026-09-16-hdb06-inspection-tool-integration.md'
       - 'Icod.TermInfo-1.15.0-Berkeley-DB-Hashed-Terminfo-Acquisition-Roadmap.md'
@@ -90,6 +92,14 @@ jobs:
         if: steps.hdb00-scope.outputs.required == 'true'
         shell: bash
         run: bash tools/hdb00/run-linux.sh
+
+      - name: Verify HDB07 permission propagation
+        if: steps.hdb00-scope.outputs.required == 'true'
+        shell: pwsh
+        run: >-
+          ./.github/scripts/verify-hdb07-permissions.ps1
+          -DatabasePath "${{ runner.temp }}/icod-terminfo-hdb00/hashed-db.db"
+          -TerminalName hdb00-primary
 
       - name: Verify managed Hash v9 reader
         if: steps.hdb00-scope.outputs.required == 'true'
@@ -175,6 +185,14 @@ jobs:
         shell: bash
         run: bash tools/hdb00/run-macos.sh
 
+      - name: Verify HDB07 permission propagation
+        if: steps.hdb00-scope.outputs.required == 'true'
+        shell: pwsh
+        run: >-
+          ./.github/scripts/verify-hdb07-permissions.ps1
+          -DatabasePath "${{ runner.temp }}/icod-terminfo-hdb00-macos/hashed-db.db"
+          -TerminalName hdb00-primary
+
       - name: Verify managed Hash v9 reader
         if: steps.hdb00-scope.outputs.required == 'true'
         shell: bash
@@ -242,6 +260,13 @@ jobs:
         with:
           name: hdb00-linux-hash-v9
           path: ${{ runner.temp }}/hdb00-linux-hash-v9
+
+      - name: Verify HDB07 permission propagation
+        shell: pwsh
+        run: >-
+          ./.github/scripts/verify-hdb07-permissions.ps1
+          -DatabasePath "${{ runner.temp }}/hdb00-linux-hash-v9/hashed-db.db"
+          -TerminalName hdb00-primary
 
       - name: Read Linux-generated Hash v9 store without Berkeley DB
         shell: pwsh
