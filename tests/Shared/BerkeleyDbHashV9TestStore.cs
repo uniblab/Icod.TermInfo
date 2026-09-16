@@ -55,7 +55,8 @@ internal static class BerkeleyDbHashV9TestStore {
 		string identity = ( aliases.Length == 0 )
 			? canonical + "|" + description + "\0"
 			: canonical + "|" + string.Join( "|", aliases )
-				+ "|" + description + "\0";
+				+ "|" + description + "\0"
+		;
 		byte[] names = Encoding.Latin1.GetBytes( identity );
 		int length = 12 + names.Length;
 		if ( ( length & 1 ) != 0 ) {
