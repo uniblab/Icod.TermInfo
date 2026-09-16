@@ -71,8 +71,34 @@ public sealed class BerkeleyDbTerminalCatalogReader {
 	private IReadOnlyList<BerkeleyDbTerminalCatalogEntry> ReadCore(
 		CancellationToken cancellationToken
 	) {
-		_ = _options;
-		_ = cancellationToken;
-		throw new NotImplementedException();
+		cancellationToken.ThrowIfCancellationRequested();
+
+		IReadOnlyList<BerkeleyDbHashRecord> records;
+		try {
+			byte[] database = BerkeleyDbHashReader.ReadDatabase(
+				DatabasePath,
+				_options.MaximumDatabaseSize
+			);
+			records = BerkeleyDbHashReader.ReadRecords(
+				database,
+				checked(
+					_options.ParserOptions.MaximumEntrySize + 1
+				),
+				_options.MaximumRecordCount,
+				cancellationToken
+			);
+		} catch ( InvalidDataException exception ) {
+			throw new BerkeleyDbDatabaseFormatException(
+				"The Berkeley DB file is malformed or unsupported.",
+				exception
+			);
+		}
+
+		return NcursesCatalogReader.Read(
+			records,
+			_options.ParserOptions,
+			_options.MaximumIndexHops,
+			cancellationToken
+		);
 	}
 }

@@ -88,7 +88,7 @@ public sealed class BerkeleyDbTerminalDescriptionProvider
 		string name,
 		[NotNullWhen( true )] out TerminalDescription? terminal
 	) {
-		ValidateTerminalName( name );
+		TerminalNameValidator.Validate( name );
 
 		Lazy<TerminalDescription?> load =
 			_cache.GetOrAdd(
@@ -196,47 +196,4 @@ public sealed class BerkeleyDbTerminalDescriptionProvider
 		);
 	}
 
-	private static void ValidateTerminalName( string name ) {
-		ArgumentNullException.ThrowIfNull( name );
-
-		if ( string.IsNullOrWhiteSpace( name ) ) {
-			throw new ArgumentException(
-				"The terminal name cannot be empty or whitespace.",
-				nameof( name )
-			);
-		}
-
-		if (
-			string.Equals(
-				name,
-				".",
-				StringComparison.Ordinal
-			)
-			|| string.Equals(
-				name,
-				"..",
-				StringComparison.Ordinal
-			)
-		) {
-			throw new ArgumentException(
-				"The terminal name must be an exact database key.",
-				nameof( name )
-			);
-		}
-
-		foreach ( char character in name ) {
-			if (
-				character == '\0'
-				|| character == '/'
-				|| character == '\\'
-				|| char.IsControl( character )
-				|| char.IsSurrogate( character )
-			) {
-				throw new ArgumentException(
-					"The terminal name contains unsafe key syntax.",
-					nameof( name )
-				);
-			}
-		}
-	}
 }
