@@ -40,7 +40,7 @@ internal readonly record struct Hdb07ItemSpec {
 	internal bool AppendEmptyOverflowPage { get; }
 
 	internal int OverflowPageCount =>
-		IsOffPage
+		( IsOffPage )
 			? checked(
 				ChunkLengths.Length
 				+ ( AppendEmptyOverflowPage ? 1 : 0 )
