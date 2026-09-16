@@ -6,7 +6,7 @@
 
 **Architecture:** Production path acquisition verifies two complete byte-identical observations through one open handle while the borrowed stream helper remains single-pass. Native CI repacks ncurses-produced records through Berkeley DB's C API into a big-endian Hash container, and terminal-name handling uses strict UTF-8 first with a Latin-1 candidate only after a clean miss or invalid UTF-8 publication key. Each workstream has an independently committed RED, narrow GREEN, and exact CI checkpoint.
 
-**Tech Stack:** C# 13; .NET 8/9/10; xUnit 2.9; Berkeley DB 5.3 C API; pinned ncurses `tic`; Bash; Python 3; PowerShell; GitHub Actions.
+**Tech Stack:** C# 13; .NET 8/9/10; xUnit 2.9; Berkeley DB 5.3 C API; pinned ncurses `tic`; Bash; PowerShell; GitHub Actions.
 
 **Spec:** `docs/superpowers/specs/2026-09-16-hdb07c-compatibility-expansion-design.md`
 
@@ -21,6 +21,7 @@
 - Do not add retry, encoding normalization, culture/code-page inference, case folding, transliteration, or best-fit mapping.
 - A UTF-8 record that is found but malformed or identity-invalid must fail; Latin-1 fallback occurs only after a clean UTF-8 miss.
 - Generated native databases remain short-lived workflow artifacts and are not committed.
+- Add no Python source, script, inline program, or Python-dependent verification step.
 - Run the ordinary PR workflow for every pushed checkpoint. Let the existing synchronize-delta classifier decide whether HDB00 performs expensive work.
 - Run complete normal 12-job and HDB00 3-job qualification on the exact final implementation head.
 - Keep PR #45 open, draft, and unmerged.
@@ -38,8 +39,8 @@
 | `tests/Icod.TermInfo.BerkeleyDb.Tests/src/Hdb07cEncodingCompatibilityTests.cs` | Synthetic provider/catalog encoding, precedence, ambiguity, and system-provider tests. |
 | `tests/Icod.TermInfo.BerkeleyDb.Interop.Tests/src/NativeOracleTests.cs` | Native dump, big-endian, Latin-1, provider, system-provider, and catalog comparisons. |
 | `tools/hdb00/hdb07c_repack.c` | CI-only byte-exact record copier with selectable Berkeley DB metadata order. |
-| `tools/hdb00/assert-byte-order.py` | Independent metadata-magic byte-order assertion. |
-| `tools/hdb00/run-byte-key-probe.py` | Invoke the native probe with an explicit arbitrary-byte terminal key. |
+| `tools/hdb00/native-verifier/` | Managed metadata-magic, dump-parity, and Latin-1 native-evidence verification. |
+| `tools/hdb00/hdb00_probe.c` | Native probe with exact text-key and explicit hex-key lookup modes. |
 | `tools/hdb00/run-linux.sh` | Linux native big-endian and Latin-1 fixture generation/evidence. |
 | `tools/hdb00/run-macos.sh` | macOS native big-endian and Latin-1 fixture generation/evidence. |
 | `tools/hdb00/verify-managed.sh` | Managed probe verification for generated big-endian fixtures. |
@@ -254,7 +255,8 @@ Push and require normal CI 12/12 plus HDB00 3/3 because production acquisition c
 
 **Files:**
 - Create: `tools/hdb00/hdb07c_repack.c`
-- Create: `tools/hdb00/assert-byte-order.py`
+- Create: `tools/hdb00/native-verifier/Hdb07c.NativeVerifier.csproj`
+- Create: `tools/hdb00/native-verifier/Program.cs`
 - Modify: `tests/Icod.TermInfo.BerkeleyDb.Interop.Tests/src/NativeOracleTests.cs`
 - Modify: `tools/hdb00/run-linux.sh`
 - Modify: `tools/hdb00/run-macos.sh`
@@ -378,29 +380,24 @@ The completed file must:
 - print copied record count and selected order; and
 - compile with `-std=c11 -Wall -Wextra -Werror` on Linux and macOS.
 
-- [ ] **Step 4: Add an independent byte-order assertion**
+- [ ] **Step 4: Add an independent managed native-evidence verifier**
 
-Create `assert-byte-order.py`:
+Create a package-free net8.0 console project under `tools/hdb00/native-verifier`.
+Its initial interface is:
 
-```python
-from pathlib import Path
-import sys
+```text
+Hdb07c.NativeVerifier DATABASE SOURCE_DUMP DESTINATION_DUMP
+```
 
-if len(sys.argv) != 3 or sys.argv[2] not in {"little", "big"}:
-    raise SystemExit("Usage: assert-byte-order.py DATABASE little|big")
+The verifier must independently require the big-endian Hash magic bytes
+`00 06 15 61` at metadata offset 12, parse the bytevalue dump lines after
+`HEADER=END`, require `DATA=END`, build sorted exact key/value hex tuples,
+require source and destination tuples to be identical, require exactly three
+records, and print:
 
-data = Path(sys.argv[1]).read_bytes()
-if len(data) < 512:
-    raise SystemExit("Database is smaller than one metadata page.")
-
-expected = bytes.fromhex("61150600" if sys.argv[2] == "little" else "00061561")
-actual = data[12:16]
-if actual != expected:
-    raise SystemExit(
-        f"Expected {sys.argv[2]}-endian Hash magic {expected.hex()}, got {actual.hex()}."
-    )
-
-print(f"HDB07C byte order: {sys.argv[2]}-endian")
+```text
+HDB07C byte order: big-endian
+HDB07C native big-endian records: 3
 ```
 
 - [ ] **Step 5: Generate and verify the big-endian database on Linux and macOS**
@@ -410,8 +407,8 @@ In each native script:
 1. define the repacker executable and destination paths;
 2. compile `hdb07c_repack.c` with the same Berkeley DB include/library settings as `hdb00_probe.c`;
 3. run `hdb07c_repack "$hashed_db" "$big_endian_db" 4321` under the macOS `DYLD_LIBRARY_PATH` wrapper when required;
-4. run `assert-byte-order.py "$big_endian_db" big`;
-5. dump source and destination with `-k` and compare parsed `(key,value)` pairs rather than textual headers;
+4. dump source and destination with `-k`;
+5. run the managed native-evidence verifier to assert metadata order and exact parsed `(key,value)` parity rather than textual header equality;
 6. use the native probe for canonical and alias extraction and compare both with `hdb00-primary.bin`; and
 7. print exactly `HDB07C native big-endian records: 3`.
 
@@ -422,7 +419,7 @@ The record comparator must parse the bytevalue dump lines after `HEADER=END`, re
 ```bash
 bash -n tools/hdb00/run-linux.sh
 bash -n tools/hdb00/run-macos.sh
-python3 -m py_compile tools/hdb00/assert-byte-order.py
+dotnet build tools/hdb00/native-verifier/Hdb07c.NativeVerifier.csproj -c Release
 ```
 
 On CI, require native creation/dump/probe success on Linux and macOS, managed interop tests on all three TFMs/hosts, command verification on all hosts, and Windows reading the transported Linux fixture.
@@ -430,7 +427,7 @@ On CI, require native creation/dump/probe success on Linux and macOS, managed in
 - [ ] **Step 7: Commit the GREEN**
 
 ```bash
-git add tools/hdb00/hdb07c_repack.c tools/hdb00/assert-byte-order.py tools/hdb00/run-linux.sh tools/hdb00/run-macos.sh
+git add tools/hdb00/hdb07c_repack.c tools/hdb00/native-verifier tools/hdb00/run-linux.sh tools/hdb00/run-macos.sh
 git commit -m "test: produce native HDB07C big-endian stores"
 ```
 
@@ -747,7 +744,8 @@ Require the complete normal and HDB00 workflows green.
 ### Task 5: Native Latin-1 ncurses producer evidence
 
 **Files:**
-- Create: `tools/hdb00/run-byte-key-probe.py`
+- Modify: `tools/hdb00/hdb00_probe.c`
+- Modify: `tools/hdb00/native-verifier/Program.cs`
 - Modify: `tests/Icod.TermInfo.BerkeleyDb.Interop.Tests/src/NativeOracleTests.cs`
 - Modify: `tools/hdb00/run-linux.sh`
 - Modify: `tools/hdb00/run-macos.sh`
@@ -795,63 +793,31 @@ git commit -m "test: require native HDB07C Latin-1 evidence"
 
 Expected HDB00 result: Linux/macOS fail because `latin1-hashed-db.db` is missing; Windows skips. This evidence RED is separate from the already observed managed behavior RED.
 
-- [ ] **Step 3: Add arbitrary-byte native probe invocation**
+- [ ] **Step 3: Add explicit arbitrary-byte lookup to the native probe**
 
-Create `run-byte-key-probe.py`:
+Extend `hdb00_probe.c` without changing its existing interface. Add:
 
-```python
-import os
-from pathlib import Path
-import subprocess
-import sys
-
-if len(sys.argv) != 5:
-    raise SystemExit(
-        "Usage: run-byte-key-probe.py PROBE DATABASE KEY_HEX OUTPUT"
-    )
-
-key = bytes.fromhex(sys.argv[3])
-if b"\x00" in key:
-    raise SystemExit("The probe key cannot contain NUL.")
-
-completed = subprocess.run(
-    [
-        os.fsencode(sys.argv[1]),
-        os.fsencode(sys.argv[2]),
-        key,
-        os.fsencode(sys.argv[4]),
-    ],
-    check=False,
-    env=os.environ.copy(),
-)
-if completed.returncode != 0:
-    raise SystemExit(completed.returncode)
-if not Path(sys.argv[4]).is_file():
-    raise SystemExit("The native probe did not create its output file.")
+```text
+hdb00_probe DATABASE --key-hex KEY_HEX OUTPUT
 ```
 
-This helper passes bytes directly in Unix argv and inherits `DYLD_LIBRARY_PATH` on macOS.
+The hex mode must require nonempty even-length ASCII hex, reject invalid digits
+and decoded NUL, allocate the exact decoded bytes, use their explicit length for
+Berkeley DB lookup, retain the existing marker/hop behavior, and print the exact
+lookup key hex. Existing text-key calls and output remain unchanged.
 
 - [ ] **Step 4: Generate the source as exact bytes and compile it with native tic**
 
-In each native script write the source through Python:
+In each Bash native script write the source as exact bytes without a new
+language dependency: emit the ASCII fragments with `printf '%s'` and the two
+Latin-1 bytes with `printf '\351'`, then emit the remaining capability lines as
+ASCII. Compile it with the already built hashed `tic` into
+`latin1-hashed-db.db`. Use the native probe's `--key-hex` mode with the
+canonical and alias hex keys, compare both payloads, and save the canonical
+output as `hdb07c-latin1.bin`.
 
-```python
-from pathlib import Path
-import sys
-
-Path(sys.argv[1]).write_bytes(
-    b"hdb07c-caf\xe9|hdb07c-ali\xe9|Icod HDB07C Latin-1 fixture,\n"
-    b"    am,\n"
-    b"    cols#80,\n"
-    b"    lines#24,\n"
-    b"    clear=\\E[H\\E[2J,\n"
-)
-```
-
-Compile it with the already built hashed `tic` into `latin1-hashed-db.db`. Use `run-byte-key-probe.py` with the canonical and alias hex keys, compare both payloads, and save the canonical output as `hdb07c-latin1.bin`.
-
-Dump the database with `db_dump -k`. Parse the dump and require:
+Dump the database with `db_dump -k`. Extend the managed native-evidence verifier
+with a Latin-1 dump mode and require:
 
 - exactly three records;
 - both exact publication keys;
@@ -870,7 +836,7 @@ HDB07C native Latin-1 publications: 2
 ```bash
 bash -n tools/hdb00/run-linux.sh
 bash -n tools/hdb00/run-macos.sh
-python3 -m py_compile tools/hdb00/run-byte-key-probe.py
+dotnet build tools/hdb00/native-verifier/Hdb07c.NativeVerifier.csproj -c Release
 ```
 
 Require Linux/macOS native creation, byte-key probe, dump, and managed interop success. Require Windows provider/system-provider/catalog/command success against the Linux artifact without Berkeley DB installed.
@@ -878,7 +844,7 @@ Require Linux/macOS native creation, byte-key probe, dump, and managed interop s
 - [ ] **Step 6: Commit the native Latin-1 GREEN**
 
 ```bash
-git add tools/hdb00/run-byte-key-probe.py tools/hdb00/run-linux.sh tools/hdb00/run-macos.sh
+git add tools/hdb00/hdb00_probe.c tools/hdb00/native-verifier/Program.cs tools/hdb00/run-linux.sh tools/hdb00/run-macos.sh
 git commit -m "test: produce native HDB07C Latin-1 stores"
 ```
 

@@ -29,6 +29,7 @@ big_endian_dump="$work_root/big-endian-hashed-db.dump"
 source_dump="$work_root/hashed-db.dump"
 big_endian_primary="$work_root/hdb07c-big-endian-primary.bin"
 big_endian_alias="$work_root/hdb07c-big-endian-alias.bin"
+native_verifier_project="$repo_root/tools/hdb00/native-verifier/Hdb07c.NativeVerifier.csproj"
 
 rm -rf "$work_root"
 mkdir -p \
@@ -162,50 +163,15 @@ cmp "$primary_payload" "$directory_entry"
 
 printf '%s\n' "== HDB07C: produce and verify native big-endian Hash container =="
 "$repacker" "$hashed_db" "$big_endian_db" 4321
-python3 \
-    "$repo_root/tools/hdb00/assert-byte-order.py" \
-    "$big_endian_db" \
-    big
 db5.3_dump -k -f "$source_dump" "$hashed_db"
 db5.3_dump -k -f "$big_endian_dump" "$big_endian_db"
-python3 - "$source_dump" "$big_endian_dump" <<'PY'
-from pathlib import Path
-import sys
-
-
-def read_records(path):
-    lines = Path(path).read_text(encoding="ascii").splitlines()
-    try:
-        header_end = lines.index("HEADER=END")
-    except ValueError as error:
-        raise SystemExit(f"{path}: missing HEADER=END") from error
-    if lines[-1] != "DATA=END":
-        raise SystemExit(f"{path}: missing DATA=END")
-    header = lines[:header_end]
-    for expected in ("VERSION=3", "format=bytevalue", "type=hash"):
-        if expected not in header:
-            raise SystemExit(f"{path}: missing {expected}")
-    data_lines = lines[header_end + 1:-1]
-    if not data_lines or len(data_lines) % 2:
-        raise SystemExit(f"{path}: malformed key/value lines")
-    if any(not line.startswith(" ") for line in data_lines):
-        raise SystemExit(f"{path}: malformed bytevalue line")
-    return sorted(
-        (
-            bytes.fromhex(data_lines[index][1:]),
-            bytes.fromhex(data_lines[index + 1][1:]),
-        )
-        for index in range(0, len(data_lines), 2)
-    )
-
-
-source = read_records(sys.argv[1])
-destination = read_records(sys.argv[2])
-if source != destination:
-    raise SystemExit("Big-endian repack changed one or more exact records.")
-if len(destination) != 3:
-    raise SystemExit(f"Expected 3 big-endian records, got {len(destination)}.")
-PY
+dotnet run \
+    --project "$native_verifier_project" \
+    -c Release \
+    -- \
+    "$big_endian_db" \
+    "$source_dump" \
+    "$big_endian_dump"
 "$probe" \
     "$big_endian_db" \
     hdb00-primary \
@@ -216,7 +182,6 @@ PY
     "$big_endian_alias"
 cmp "$big_endian_primary" "$primary_payload"
 cmp "$big_endian_alias" "$primary_payload"
-printf '%s\n' "HDB07C native big-endian records: 3"
 
 printf '%s\n' "== HDB00: prove existing managed parser accepts extracted bytes unchanged =="
 dotnet run \
