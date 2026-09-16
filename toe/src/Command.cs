@@ -1009,6 +1009,7 @@ public static class Command {
 			or IOException
 			or UnauthorizedAccessException
 			or NotSupportedException
+			or FormatException
 			or InvalidOperationException;
 	}
 
