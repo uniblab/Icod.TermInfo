@@ -124,8 +124,7 @@ try {
 	& ( Join-Path $scriptDirectory 'new-hdb06-test-store.ps1' ) `
 		-OutputPath $hdb06Store
 
-	$hdb06InfocmpOutput = Invoke-ReleaseTool -Name 'icod-terminfo' -Arguments @(
-		'infocmp',
+	$hdb06InfocmpOutput = Invoke-ReleaseTool -Name 'infocmp' -Arguments @(
 		'-A',
 		$hdb06Store,
 		'hdb06-distribution-alias'
@@ -135,11 +134,10 @@ try {
 			'hdb06-distribution-main|hdb06-distribution-alias|HDB06 distribution terminal,'
 		)
 	) {
-		throw "Archive '$archiveName' routed infocmp did not acquire the controlled Hash-v9 alias."
+		throw "Archive '$archiveName' direct infocmp did not acquire the controlled Hash-v9 alias."
 	}
 
-	$hdb06ToeOutput = Invoke-ReleaseTool -Name 'icod-terminfo' -Arguments @(
-		'toe',
+	$hdb06ToeOutput = Invoke-ReleaseTool -Name 'toe' -Arguments @(
 		'-s',
 		$hdb06Store
 	)
@@ -152,11 +150,11 @@ try {
 		"hdb06-distribution-main`tHDB06 distribution terminal"
 	)
 	if ( $expectedHdb06ToeLines.Count -ne $hdb06ToeLines.Count ) {
-		throw "Archive '$archiveName' routed toe did not emit exactly two controlled Hash-v9 publications."
+		throw "Archive '$archiveName' direct toe did not emit exactly two controlled Hash-v9 publications."
 	}
 	for ( $index = 0; $index -lt $expectedHdb06ToeLines.Count; $index++ ) {
 		if ( $expectedHdb06ToeLines[$index] -cne $hdb06ToeLines[$index] ) {
-			throw "Archive '$archiveName' routed toe emitted unexpected Hash-v9 publication '$($hdb06ToeLines[$index])'."
+			throw "Archive '$archiveName' direct toe emitted unexpected Hash-v9 publication '$($hdb06ToeLines[$index])'."
 		}
 	}
 
