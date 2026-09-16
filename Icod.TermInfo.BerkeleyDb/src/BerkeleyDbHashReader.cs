@@ -237,6 +237,13 @@ internal static class BerkeleyDbHashReader {
 			4096,
 			FileOptions.SequentialScan
 		);
+		return ReadStableDatabase( stream, maximumDatabaseSize );
+	}
+
+	internal static byte[] ReadStableDatabase(
+		Stream stream,
+		int maximumDatabaseSize
+	) {
 		return ReadDatabase( stream, maximumDatabaseSize );
 	}
 
