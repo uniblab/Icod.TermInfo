@@ -4,13 +4,37 @@
 
 ## 1.15 development status
 
-`1.15.0-Alpha-4` completes the accepted explicit and opt-in system terminal-description providers on the accepted managed Hash-v9 reader. It supports bounded exact-key lookup with inline and off-page records, overflow reconstruction, both byte orders, ncurses marker resolution, compiled-entry parsing, exact identity validation, and successful-result caching.
+`1.15.0-Alpha-5` adds the accepted hashed terminal catalog to the explicit and opt-in system terminal-description providers on the managed Hash-v9 reader. It supports bounded exact-key lookup and complete record enumeration with inline and off-page records, overflow reconstruction, both byte orders, ncurses marker resolution, Runtime-owned compiled-entry parsing, exact identity validation, and deterministic logical publication ordering.
 
 HDB00 selected a dependency-free managed reader for the reviewed Berkeley DB **Hash on-disk format version 9** subset required by ncurses acquisition. Native Berkeley DB remains a CI interoperability oracle and is not a production dependency.
 
 The internal ncurses resolver follows bounded marker-2 index chains over one acquired database image and extracts opaque marker-0 payloads. Empty records, unsupported markers, dangling targets, cycles, and excessive hops fail explicitly. Only an absent initial key is a clean miss.
 
 `BerkeleyDbTerminalDescriptionProvider` reads one caller-selected database path. `BerkeleyDbTerminalDescriptionProviderOptions` snapshots parser, database-size, and index-hop limits. `BerkeleyDbDatabaseFormatException` identifies malformed or unsupported containers and ncurses record envelopes while parser and I/O failures retain their existing exception types.
+
+
+## Hashed terminal catalog
+
+`BerkeleyDbTerminalCatalogReader` reads one explicit database path and returns
+a fresh immutable snapshot on every call. Its options snapshot parser,
+database-size, record-count, and index-hop limits.
+
+The catalog emits only marker-2 logical publications. It classifies each
+publication as `Canonical` or `Alias` by comparing the strict UTF-8 key with
+the `TerminalDescription` parsed by Runtime. Entries resolving to the same
+marker-0 record share one parsed terminal instance within the snapshot.
+Marker-0 storage records, including unreferenced orphans, are still parsed and
+validated but their internal keys are not emitted.
+
+Raw records are validated in unsigned byte-key order. Successful entries are
+ordered by ordinal publication name, then kind, then canonical terminal name.
+Physical Hash-page order is never exposed. Reads are uncached, bounded,
+cancellable, independent, and release the database handle before parsing.
+
+Malformed Berkeley DB structures and ncurses envelopes use
+`BerkeleyDbDatabaseFormatException`. Malformed compiled entries retain
+`CompiledTermInfoFormatException`; identity mismatches, I/O failures, and
+cancellation retain their established exception types.
 
 ## Package boundary
 
@@ -45,7 +69,8 @@ matching ncurses discovery behavior. Missing sources continue; malformed reached
 sources fail explicitly. Successful results are cached, while misses and
 failures remain retryable.
 
-HDB04 qualification passed 253 unit cases and 18 native-store interoperability
+HDB05 qualification passed 308 unit cases and 20 native-store interoperability
 cases per target framework on Windows, Linux, and macOS. The isolated
-package-only consumer exercised the system provider on net8.0, net9.0, and
-net10.0. HDB05 catalog enumeration is next.
+package-only consumer exercised explicit lookup, system discovery, and catalog
+enumeration on net8.0, net9.0, and net10.0. HDB06 Inspection/tool integration
+is next.

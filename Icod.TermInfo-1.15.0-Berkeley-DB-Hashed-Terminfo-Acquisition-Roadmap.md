@@ -6,8 +6,8 @@
 **Optional package:** `Icod.TermInfo.BerkeleyDb`  
 **Language:** C# 13  
 **Reusable target frameworks:** `net8.0`; `net9.0`; `net10.0`  
-**Status:** HDB00–HDB04 accepted; HDB05 catalog enumeration next  
-**Current coordinated prerelease:** `1.15.0-Alpha-4`
+**Status:** HDB00–HDB05 accepted; HDB06 Inspection/tool integration next  
+**Current coordinated prerelease:** `1.15.0-Alpha-5`
 
 ---
 
@@ -308,6 +308,7 @@ The full evidence and rationale are recorded in:
 
 ```text
 docs/1.15.0-HDB00-BERKELEY-DB-INTEROPERABILITY-AND-BACKEND-DECISION.md
+docs/1.15.0-HDB05-HASHED-CATALOG-ENUMERATION.md
 ```
 
 ---
@@ -320,20 +321,25 @@ The optional package is:
 Icod.TermInfo.BerkeleyDb
 ```
 
-HDB01 deliberately exports no acquisition API. HDB03 and HDB04 accepted the
-following public surface, limited to terminfo acquisition:
+HDB01 deliberately exports no acquisition API. HDB03 through HDB05 accepted the
+following public surface, limited to terminfo acquisition and catalog inspection:
 
 ```text
 BerkeleyDbTerminalDescriptionProvider
 BerkeleyDbTerminalDescriptionProviderOptions
 BerkeleyDbSystemTerminalDescriptionProvider
 BerkeleyDbSystemTerminalDescriptionProviderOptions
+BerkeleyDbTerminalCatalogReader
+BerkeleyDbTerminalCatalogReaderOptions
+BerkeleyDbTerminalCatalogEntry
+BerkeleyDbTerminalCatalogEntryKind
 BerkeleyDbDatabaseFormatException
 ```
 
 The explicit provider, its immutable options, and the format exception were
 accepted in HDB03. The opt-in system provider and its immutable options were
-accepted in HDB04.
+accepted in HDB04. The fresh-snapshot catalog reader, immutable catalog options,
+logical entry, and canonical/alias kind were accepted in HDB05.
 
 There is intentionally no `BerkeleyDbBackendAvailability` or
 `BerkeleyDbBackendUnavailableException`: production acquisition has no native
@@ -775,18 +781,38 @@ net8/net9/net10.
 
 ### HDB05 — Hashed Catalog Enumeration
 
-Add deterministic read-only enumeration needed by tooling and diagnostics.
+**Status:** COMPLETE / ACCEPTED
 
-Requirements:
+Accepted implementation/qualification head:
+`819ca194b51baa78f52a6464a2e64c45418eebc6`.
 
-- enumerate logical terminal records safely;
-- distinguish canonical entries and aliases where the ncurses envelope permits;
-- validate emitted compiled entries through Runtime;
-- bound record counts and record sizes;
-- reject malformed records deterministically; and
-- impose deterministic ordering independent of physical Hash-page order.
+Coordinated prerelease: `1.15.0-Alpha-5`.
 
-Physical database order is not an Icod API contract.
+- Normal PR workflow run `35049904561`: 12/12 jobs passed.
+- HDB00 interoperability run `35049904277`: 3/3 jobs passed.
+- BerkeleyDb unit suite: 308/308 per TFM on Windows, Linux, and macOS.
+- Native-store interoperability suite: 20/20 per TFM on all three hosts.
+- The isolated package-only consumer enumerated canonical and alias
+  publications and verified fresh snapshots on net8/net9/net10.
+- Exact package, dependency/native-asset, cross-TFM API, installed-tool, and
+  six-RID archive gates passed.
+
+The accepted public catalog enumerates marker-2 logical publications, classifies
+canonical names and aliases against Runtime-parsed identity, validates every
+marker-0 storage record including orphans, and never exposes storage keys.
+Each read acquires one fresh bounded image and returns an immutable ordinal
+snapshot. Physical Hash-page order is not an API contract.
+
+Container/envelope failures use `BerkeleyDbDatabaseFormatException`; compiled
+parser, identity, I/O, and cancellation failures preserve their distinct
+contracts. Record count, database size, parser-derived stored-item size, index
+hops, duplicate keys, cycles, and cancellation are bounded.
+
+Closure record:
+`docs/1.15.0-HDB05-HASHED-CATALOG-ENUMERATION.md`.
+
+HDB06 Inspection/tool integration is next. PR remains open, draft, and
+unmerged.
 
 ### HDB06 — Inspection and Tool Integration
 

@@ -1,6 +1,6 @@
 # HDB05 Hashed Catalog Enumeration Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Add bounded, deterministic, read-only enumeration of logical canonical and alias publications in one supported ncurses Berkeley DB Hash-v9 terminfo store.
 
@@ -9,6 +9,16 @@
 **Tech Stack:** C# 13; .NET 8/9/10; xUnit; pure-managed `Icod.TermInfo.BerkeleyDb`; native Berkeley DB/ncurses only as CI fixture producers.
 
 **Spec:** `docs/superpowers/specs/2026-09-16-hdb05-hashed-catalog-enumeration-design.md`
+
+**Execution status:** COMPLETE / ACCEPTED at qualification head
+`819ca194b51baa78f52a6464a2e64c45418eebc6`.
+
+- Normal PR workflow run `35049904561`: 12/12 jobs passed.
+- HDB00 workflow run `35049904277`: 3/3 jobs passed.
+- Unit suite: 308/308 per TFM on Windows/Linux/macOS.
+- Native suite: 20/20 per TFM on Windows/Linux/macOS.
+- Package-only catalog consumer: passed on net8/net9/net10.
+- Closure record: `docs/1.15.0-HDB05-HASHED-CATALOG-ENUMERATION.md`.
 
 ## Global Constraints
 
@@ -57,7 +67,7 @@ internal sealed class ByteArrayComparer
 }
 ```
 
-- [ ] **Step 1: bump the coordinated version**
+- [x] **Step 1: bump the coordinated version**
 
 Change only:
 
@@ -65,7 +75,7 @@ Change only:
 <IcodTermInfoSuiteVersion>1.15.0-Alpha-5</IcodTermInfoSuiteVersion>
 ```
 
-- [ ] **Step 2: write the missing-interface tests**
+- [x] **Step 2: write the missing-interface tests**
 
 Create real synthetic Hash-v9 images and call the wished-for API directly. Begin with independently derived literal expectations:
 
@@ -109,7 +119,7 @@ The file must also cover:
 
 For every test, name the production mutation it catches in a comment only when the test name cannot state it clearly.
 
-- [ ] **Step 3: commit and verify compile RED**
+- [x] **Step 3: commit and verify compile RED**
 
 Commit:
 
@@ -122,7 +132,7 @@ Expected CI failure: `CS0117` for missing
 `BerkeleyDbHashRecord`, on every exercised TFM. No production enumeration
 exists at this head.
 
-- [ ] **Step 4: add declaration-only production surface**
+- [x] **Step 4: add declaration-only production surface**
 
 Add the exact internal types/signature above. `ReadRecords` must throw
 `NotImplementedException`; no page enumeration behavior is added.
@@ -141,7 +151,7 @@ internal static IReadOnlyList<BerkeleyDbHashRecord> ReadRecords(
 Implement `ByteArrayComparer` only far enough for compilation; the behavior
 tests must still fail because `ReadRecords` is unimplemented.
 
-- [ ] **Step 5: commit and verify behavioral RED**
+- [x] **Step 5: commit and verify behavioral RED**
 
 Commit:
 
@@ -167,7 +177,7 @@ remain green. Record exact run IDs and per-TFM pass/fail totals before Task 2.
 - Consumes: the declaration-only Task 1 interfaces.
 - Produces: validated, byte-key-sorted immutable internal records over one caller-owned image.
 
-- [ ] **Step 1: implement immutable record ownership**
+- [x] **Step 1: implement immutable record ownership**
 
 Clone constructor inputs and expose read-only memory:
 
@@ -185,12 +195,12 @@ If double copying is measurable in tests, transfer ownership through a private
 factory rather than exposing mutable arrays; do not weaken the immutable
 contract.
 
-- [ ] **Step 2: implement byte-array equality, hashing, and ordering**
+- [x] **Step 2: implement byte-array equality, hashing, and ordering**
 
 Ordering is unsigned lexicographic byte order, with a shorter equal prefix first.
 Equality and hash codes consume byte content, never array identity.
 
-- [ ] **Step 3: implement the bounded scan**
+- [x] **Step 3: implement the bounded scan**
 
 Validate null/positive arguments and cancellation before metadata parsing. Reuse
 `ReadMetadata`, `GetPage`, `ValidatePageIdentity`,
@@ -208,7 +218,7 @@ For each ascending page number and paired item index:
 
 Sort the completed array using `ByteArrayComparer.Instance` on `Key`.
 
-- [ ] **Step 4: run the dedicated suite**
+- [x] **Step 4: run the dedicated suite**
 
 Run:
 
@@ -218,12 +228,12 @@ dotnet test tests/Icod.TermInfo.BerkeleyDb.Tests/Icod.TermInfo.BerkeleyDb.Tests.
 
 Expected: all HDB05 enumeration tests pass on net8/net9/net10.
 
-- [ ] **Step 5: run all BerkeleyDb unit tests**
+- [x] **Step 5: run all BerkeleyDb unit tests**
 
 Run the complete project in Release. Expected: all prior HDB02–HDB04 cases plus
 the new HDB05 cases pass on all three TFMs.
 
-- [ ] **Step 6: commit GREEN**
+- [x] **Step 6: commit GREEN**
 
 Commit:
 
@@ -250,7 +260,7 @@ starting the public catalog RED. Record counts and exact run IDs.
 - Consumes: Task 2 `ReadRecords` and approved HDB05 specification.
 - Produces: the exact four-type public API frozen in the specification.
 
-- [ ] **Step 1: write public behavior tests before declarations**
+- [x] **Step 1: write public behavior tests before declarations**
 
 Use complete compiled fixtures with literal expected names/kinds. Representative
 test:
@@ -291,7 +301,7 @@ Include tests for every Section 10 Checkpoint B behavior in the specification.
 Expected values must be literal or derived from fixture inputs, never from
 production helpers.
 
-- [ ] **Step 2: commit and verify compile RED**
+- [x] **Step 2: commit and verify compile RED**
 
 Commit:
 
@@ -301,7 +311,7 @@ test: define HDB05 public catalog
 
 Expected: missing-type `CS0246` failures on every host/TFM.
 
-- [ ] **Step 3: add declaration-only public types**
+- [x] **Step 3: add declaration-only public types**
 
 Add XML documentation, immutable constructor/property snapshots, enum values,
 and public method signatures exactly as approved. Both `Read` methods must
@@ -310,7 +320,7 @@ reach a private method that throws `NotImplementedException`.
 Options validation and snapshot tests should pass; catalog behavior tests must
 fail with the declaration-only exception.
 
-- [ ] **Step 4: commit and verify behavioral RED**
+- [x] **Step 4: commit and verify behavioral RED**
 
 Commit:
 
@@ -348,14 +358,14 @@ internal static IReadOnlyList<BerkeleyDbTerminalCatalogEntry> Read(
 );
 ```
 
-- [ ] **Step 1: extract shared exact-name validation**
+- [x] **Step 1: extract shared exact-name validation**
 
 Move HDB03's validation rules into
 `TerminalNameValidator.Validate(string name)`. Keep exception types, parameter
 name `name`, and messages unchanged. Call it from the explicit provider and
 new catalog reader. Run HDB03 provider tests before continuing.
 
-- [ ] **Step 2: acquire one fresh image per public read**
+- [x] **Step 2: acquire one fresh image per public read**
 
 `BerkeleyDbTerminalCatalogReader.Read()` delegates to
 `Read(CancellationToken.None)`. The token overload:
@@ -369,13 +379,13 @@ new catalog reader. Run HDB03 provider tests before continuing.
 
 No result cache is added.
 
-- [ ] **Step 3: index exact raw keys**
+- [x] **Step 3: index exact raw keys**
 
 Build a content-keyed dictionary from record keys. Duplicate keys should already
 have failed in Task 2; keep a defensive format failure if this invariant is
 violated.
 
-- [ ] **Step 4: validate and resolve records in byte-key order**
+- [x] **Step 4: validate and resolve records in byte-key order**
 
 For each record in the already ordered list:
 
@@ -394,7 +404,7 @@ Envelope failures should be constructed as
 `BerkeleyDbDatabaseFormatException` at this layer so parser exceptions remain
 unwrapped.
 
-- [ ] **Step 5: verify identity and classify**
+- [x] **Step 5: verify identity and classify**
 
 Use ordinal comparison. The publication is canonical only when it equals
 `Terminal.Name`; otherwise it is an alias only when present in
@@ -404,17 +414,17 @@ which does not declare the publication.
 Reuse the memoized `TerminalDescription` instance for all publications which
 reach the same marker-0 key.
 
-- [ ] **Step 6: sort and freeze output**
+- [x] **Step 6: sort and freeze output**
 
 Order entries by ordinal `Name`, then enum `Kind`, then
 `Terminal.Name`. Return `Array.AsReadOnly(entries.ToArray())`.
 
-- [ ] **Step 7: verify GREEN**
+- [x] **Step 7: verify GREEN**
 
 Run the HDB05 catalog tests, HDB03 provider tests, and complete BerkeleyDb unit
 project. All must pass on net8/net9/net10 with no warnings.
 
-- [ ] **Step 8: commit GREEN**
+- [x] **Step 8: commit GREEN**
 
 Commit:
 
@@ -441,7 +451,7 @@ IDs, and per-TFM totals.
 - Consumes: Task 4 public catalog.
 - Produces: permanent adversarial guarantees required by the HDB05 acceptance gate.
 
-- [ ] **Step 1: add mutation-focused tests**
+- [x] **Step 1: add mutation-focused tests**
 
 Add physical page permutations which must return identical entries, plus two
 different malformed logical records whose lowest byte key must fail first.
@@ -457,14 +467,14 @@ Add exact boundary cases for:
 - concurrent reads with different reader option snapshots; and
 - file-handle release after success and each failure family.
 
-- [ ] **Step 2: observe RED for any uncovered production defect**
+- [x] **Step 2: observe RED for any uncovered production defect**
 
 If all additions pass, record them as characterization/qualification coverage
 and do not alter production. If a test exposes a real defect, commit the failing
 test alone, observe the exact failure, then make the smallest production
 correction and rerun the complete suite.
 
-- [ ] **Step 3: commit qualification coverage**
+- [x] **Step 3: commit qualification coverage**
 
 Commit:
 
@@ -491,7 +501,7 @@ characterization.
 - Consumes: native `hashed-db.db` and `overflow-hashed-db.db` fixtures already generated by HDB00.
 - Produces: cross-host native-oracle and isolated-NuGet evidence for the public catalog.
 
-- [ ] **Step 1: add native catalog assertions**
+- [x] **Step 1: add native catalog assertions**
 
 For the primary store, assert ordinal publication names and canonical/alias
 kinds using literals from the HDB00 fixture. Assert that all publications share
@@ -503,7 +513,7 @@ successful parsing of the overflow-backed entry.
 Run on net8/net9/net10 on Linux and macOS native-generated stores and Windows'
 downloaded Linux store.
 
-- [ ] **Step 2: extend the isolated package consumer**
+- [x] **Step 2: extend the isolated package consumer**
 
 Construct `BerkeleyDbTerminalCatalogReader` only from packed
 `Icod.TermInfo.BerkeleyDb` and Runtime artifacts. Assert:
@@ -517,7 +527,7 @@ Construct `BerkeleyDbTerminalCatalogReader` only from packed
 
 No project reference or repository output path may satisfy the consumer.
 
-- [ ] **Step 3: run qualification workflows**
+- [x] **Step 3: run qualification workflows**
 
 Require:
 
@@ -529,7 +539,7 @@ Require:
 - installed-tool smoke on Windows/Linux/macOS; and
 - all six standalone archive RIDs.
 
-- [ ] **Step 4: commit qualification**
+- [x] **Step 4: commit qualification**
 
 Commit:
 
@@ -554,13 +564,13 @@ Do not accept HDB05 until both workflows and their complete job sets are green.
 - Consumes: exact RED/GREEN/qualification heads and workflow logs.
 - Produces: auditable HDB05 closure and an explicit HDB06 next step.
 
-- [ ] **Step 1: perform verification-before-completion**
+- [x] **Step 1: perform verification-before-completion**
 
 Review the exact public API, dependency direction, native/package evidence,
 exception boundaries, ordering, resource bounds, and all workflow conclusions.
 Do not infer success from individual green jobs while a run remains active.
 
-- [ ] **Step 2: write the closure record**
+- [x] **Step 2: write the closure record**
 
 Record:
 
@@ -576,12 +586,12 @@ Record:
 - explicit non-goals; and
 - any already-green characterization cases.
 
-- [ ] **Step 3: update release-facing documentation**
+- [x] **Step 3: update release-facing documentation**
 
 Mark HDB05 complete/accepted, retain `1.15.0-Alpha-5`, and make HDB06
 Inspection/tool integration next. Do not claim HDB06 behavior.
 
-- [ ] **Step 4: commit and qualify documentation closure**
+- [x] **Step 4: commit and qualify documentation closure**
 
 Commit:
 
