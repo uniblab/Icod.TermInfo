@@ -158,6 +158,62 @@ public sealed class NativeOracleTests {
 		Assert.IsType<InvalidDataException>( exception.InnerException );
 	}
 
+	[Theory]
+	[InlineData( "hashed-db", "hdb00-primary", "hdb00-primary" )]
+	[InlineData( "hashed-db", "hdb00-alias", "hdb00-primary" )]
+	[InlineData( "overflow-hashed-db", "hdb00-overflow", "hdb00-overflow" )]
+	public void PublicSystemProviderParsesNativeStore(
+		string fixtureName,
+		string requestedName,
+		string expectedCanonicalName
+	) {
+		string? previousTermInfo =
+			Environment.GetEnvironmentVariable( "TERMINFO" );
+		string? previousTermInfoDirs =
+			Environment.GetEnvironmentVariable( "TERMINFO_DIRS" );
+
+		try {
+			Environment.SetEnvironmentVariable(
+				"TERMINFO",
+				FixturePath(
+					fixtureName + ".db"
+				)
+			);
+			Environment.SetEnvironmentVariable(
+				"TERMINFO_DIRS",
+				null
+			);
+			BerkeleyDbSystemTerminalDescriptionProvider provider =
+				new(
+					new BerkeleyDbSystemTerminalDescriptionProviderOptions(
+						useEnvironment: true,
+						useUserDatabase: false,
+						useSystemDatabases: false
+					)
+				);
+
+			Assert.True(
+				provider.TryLoad(
+					requestedName,
+					out TerminalDescription? terminal
+				)
+			);
+			Assert.Equal(
+				expectedCanonicalName,
+				terminal.Name
+			);
+		} finally {
+			Environment.SetEnvironmentVariable(
+				"TERMINFO",
+				previousTermInfo
+			);
+			Environment.SetEnvironmentVariable(
+				"TERMINFO_DIRS",
+				previousTermInfoDirs
+			);
+		}
+	}
+
 	private static List<( byte[] Key, byte[] Value )> ReadNativeRecords( string fixtureName ) {
 		string[] lines = File.ReadAllLines( FixturePath( fixtureName + ".dump" ) );
 		int headerEnd = Array.IndexOf( lines, "HEADER=END" );

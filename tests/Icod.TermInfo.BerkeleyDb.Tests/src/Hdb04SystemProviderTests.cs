@@ -482,6 +482,140 @@ public sealed class Hdb04SystemProviderTests {
 		);
 	}
 
+	[Fact]
+	public async Task ConcurrentSuccessfulLoadsPublishOneDescription() {
+		using TemporaryDirectory temporary = new();
+		string name = "hdb04-concurrent";
+		string databasePath =
+			Path.Combine(
+				temporary.Root,
+				"concurrent.db"
+			);
+		WriteHashedStore(
+			databasePath,
+			name,
+			"concurrent"
+		);
+		BerkeleyDbSystemTerminalDescriptionProvider provider =
+			CreateProvider(
+				CreateSnapshot(
+					temporary.Root,
+					termInfo: databasePath
+				),
+				Array.Empty<string>()
+			);
+
+		Task<TerminalDescription>[] loads =
+			Enumerable.Range(
+				0,
+				16
+			)
+			.Select(
+				_ => Task.Run(
+					() => Load(
+						provider,
+						name
+					)
+				)
+			)
+			.ToArray();
+		TerminalDescription[] terminals =
+			await Task.WhenAll( loads );
+
+		Assert.All(
+			terminals,
+			terminal => Assert.Same(
+				terminals[0],
+				terminal
+			)
+		);
+	}
+
+	[Fact]
+	public void MalformedFailureRemainsRetryableAfterReplacement() {
+		using TemporaryDirectory temporary = new();
+		string name = "hdb04-failure-retry";
+		string databasePath =
+			Path.Combine(
+				temporary.Root,
+				"failure.db"
+			);
+		File.WriteAllText(
+			databasePath,
+			"not a Berkeley DB"
+		);
+		BerkeleyDbSystemTerminalDescriptionProvider provider =
+			CreateProvider(
+				CreateSnapshot(
+					temporary.Root,
+					termInfo: databasePath
+				),
+				Array.Empty<string>()
+			);
+
+		Assert.Throws<BerkeleyDbDatabaseFormatException>(
+			() => provider.TryLoad(
+				name,
+				out _
+			)
+		);
+
+		WriteHashedStore(
+			databasePath,
+			name,
+			"recovered"
+		);
+		AssertDescription(
+			"recovered",
+			Load(
+				provider,
+				name
+			)
+		);
+	}
+
+	[Fact]
+	public void RuntimePolicyDeduplicatesEquivalentLogicalLocations() {
+		using TemporaryDirectory temporary = new();
+		SystemTerminalDescriptionProviderOptions options =
+			new(
+				useEnvironment: true,
+				useUserDatabase: false,
+				useSystemDatabases: true
+			);
+		SystemTerminalDiscoverySnapshot snapshot =
+			CreateSnapshot(
+				temporary.Root,
+				termInfo: "same",
+				termInfoDirs: "same:./same:"
+			);
+		string defaultRoot =
+			Path.Combine(
+				temporary.Root,
+				"same"
+			);
+
+		IReadOnlyList<SystemTerminalDatabaseLocation> locations =
+			SystemTerminalDescriptionProvider.GetDatabaseLocations(
+				options,
+				snapshot,
+				new[] {
+					defaultRoot,
+				}
+			);
+		SystemTerminalDatabaseLocation location =
+			Assert.Single( locations );
+
+		Assert.Equal(
+			SystemTerminalDatabaseLocationKind.TermInfoDirectory,
+			location.Kind
+		);
+		Assert.Equal(
+			defaultRoot,
+			location.Path
+		);
+	}
+
 	private static BerkeleyDbSystemTerminalDescriptionProvider CreateProvider(
 		SystemTerminalDiscoverySnapshot snapshot,
 		IReadOnlyList<string> defaultRoots,

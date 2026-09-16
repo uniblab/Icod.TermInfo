@@ -34,4 +34,15 @@ Declaration/test head `798ae5694f69a6187e8f62818f1cdad16cdf86f4` produced 15 exp
 
 ## GREEN
 
-Implement the smallest adapter over Runtime's internal discovery policy. Exact locations are inspected at lookup time so later-created sources remain retryable; an existing exact directory or file wins before its `.db` companion. Preserve exact Lazy removal and successful-only caching. Keep Runtime's public API and existing `SystemTerminalDescriptionProvider` behavior unchanged. Then add concurrency, location deduplication, native system-provider fixtures, and package-only consumer qualification before HDB04 acceptance.
+Implementation head `3e3f6530fa70b992a615502c70d0d5b424f2d4b3`
+passed PR run 35033593219 (12/12 jobs) and HDB00 run 35033593195
+(3/3 jobs). The BerkeleyDb suite passed 250 cases per target framework on
+Windows, Linux, and macOS; the unchanged native suite passed 15 cases per target
+framework on every host.
+
+The adapter inspects exact locations at lookup time so later-created sources
+remain retryable; an existing exact directory or file wins before its `.db`
+companion. Exact failed/missed Lazy instances are removed at both system and
+underlying provider layers. Qualification continues with concurrent publication,
+failure replacement, policy deduplication, native system-provider parsing, and
+packed-package system-provider consumption. Preserve exact Lazy removal and successful-only caching. Keep Runtime's public API and existing `SystemTerminalDescriptionProvider` behavior unchanged. Then add concurrency, location deduplication, native system-provider fixtures, and package-only consumer qualification before HDB04 acceptance.

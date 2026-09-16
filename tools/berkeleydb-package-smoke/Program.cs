@@ -10,6 +10,10 @@ string databasePath = Path.Combine(
 	Path.GetTempPath(),
 	"Icod.TermInfo.HDB03PackageSmoke." + Guid.NewGuid().ToString( "N" ) + ".db"
 );
+string? previousTermInfo =
+	Environment.GetEnvironmentVariable( "TERMINFO" );
+string? previousTermInfoDirs =
+	Environment.GetEnvironmentVariable( "TERMINFO_DIRS" );
 
 try {
 	File.WriteAllBytes(
@@ -92,15 +96,64 @@ try {
 		);
 	}
 
+	Environment.SetEnvironmentVariable(
+		"TERMINFO",
+		databasePath
+	);
+	Environment.SetEnvironmentVariable(
+		"TERMINFO_DIRS",
+		null
+	);
+	BerkeleyDbSystemTerminalDescriptionProvider systemProvider =
+		new(
+			new BerkeleyDbSystemTerminalDescriptionProviderOptions(
+				useEnvironment: true,
+				useUserDatabase: false,
+				useSystemDatabases: false,
+				parserOptions: parserOptions,
+				maximumDatabaseSize: 1024 * 1024,
+				maximumIndexHops: 4
+			)
+		);
+	Environment.SetEnvironmentVariable(
+		"TERMINFO",
+		databasePath + ".missing"
+	);
+
+	TerminalDescription systemTerminal =
+		LoadRequired(
+			systemProvider,
+			alias
+		);
+	if (
+		!string.Equals(
+			canonical,
+			systemTerminal.Name,
+			StringComparison.Ordinal
+		)
+	) {
+		throw new InvalidOperationException(
+			"The packaged system provider returned an unexpected terminal identity."
+		);
+	}
+
 	Console.WriteLine(
-		$"HDB03 package provider loaded {terminal.Name} through alias {alias}."
+		$"HDB04 package system provider loaded {systemTerminal.Name} through alias {alias}."
 	);
 } finally {
+	Environment.SetEnvironmentVariable(
+		"TERMINFO",
+		previousTermInfo
+	);
+	Environment.SetEnvironmentVariable(
+		"TERMINFO_DIRS",
+		previousTermInfoDirs
+	);
 	File.Delete( databasePath );
 }
 
 static TerminalDescription LoadRequired(
-	BerkeleyDbTerminalDescriptionProvider provider,
+	ITerminalDescriptionProvider provider,
 	string name
 ) {
 	if (
