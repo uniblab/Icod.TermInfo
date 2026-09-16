@@ -51,7 +51,7 @@
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<Deterministic>true</Deterministic>
-		<PackageTags>ansi;cli;console;cross-platform;csharp;dotnet;libtinfo;ms-terminal;ms-terminal-direct;termcap;terminal;terminal-capabilities;terminfo;text-ui;truecolor;tui;vt100;vt102;vt200;vt220;windows-console;windows-terminal;xterm</PackageTags>
+		<PackageTags>ansi;cli;console;cross-platform;csharp;curses;dcurses;dotnet;icod;libtinfo;ms-terminal;ms-terminal-direct;pcurses;pdcurses;termcap;terminal;terminal-capabilities;terminfo;text-ui;truecolor;tui;vt100;vt102;vt200;vt220;windows-console;windows-terminal;xterm</PackageTags>
 		<RepositoryUrl>https://github.com/uniblab/Icod.TermInfo</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<GenerateAppxPackageOnBuild>false</GenerateAppxPackageOnBuild>
