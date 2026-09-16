@@ -164,7 +164,7 @@ public sealed class Hdb06HashedListingCommandTests {
 
 				Assert.Equal( CommandExitCodes.Success, result.Status );
 				Assert.Contains(
-					"UnsupportedStore",
+					"\"kind\":\"unsupportedStore\"",
 					result.Stdout,
 					StringComparison.Ordinal
 				);
