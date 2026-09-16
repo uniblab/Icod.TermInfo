@@ -244,6 +244,36 @@ public sealed class Hdb05HashEnumerationTests {
 		);
 	}
 
+
+	[Fact]
+	public void ReadRecordsObservesCancellationDuringLongEnumeration() {
+		const int recordCount = 50_000;
+		var records =
+			new ( byte[] Key, byte[] Value )[recordCount];
+		for ( int index = 0; index < records.Length; index++ ) {
+			records[index] = (
+				BitConverter.GetBytes( index ),
+				new byte[] { checked( (byte)( index % 251 ) ) }
+			);
+		}
+		byte[] database = CreateInlineDatabase(
+			isBigEndian: false,
+			separatePages: true,
+			records
+		);
+		using CancellationTokenSource cancellation = new();
+		cancellation.CancelAfter( TimeSpan.FromMilliseconds( 1 ) );
+
+		Assert.Throws<OperationCanceledException>(
+			() => BerkeleyDbHashReader.ReadRecords(
+				database,
+				maximumItemSize: 16,
+				maximumRecordCount: recordCount,
+				cancellation.Token
+			)
+		);
+	}
+
 	private const int PageSize = 512;
 	private const int PageHeaderSize = 26;
 

@@ -500,6 +500,288 @@ public sealed class Hdb05CatalogReaderTests {
 		);
 	}
 
+
+	[Fact]
+	public void LowestByteKeyLogicalFailureWinsAcrossPagePermutations() {
+		( byte[] Key, byte[] Value )[] records = [
+			(
+				Encoding.UTF8.GetBytes( "z-bad" ),
+				new byte[] { 7 }
+			),
+			(
+				Encoding.UTF8.GetBytes( "a-bad" ),
+				PrependMarker(
+					Encoding.UTF8.GetBytes( "missing" ),
+					2
+				)
+			),
+		];
+		WithTwoDatabases(
+			CreateDatabase( records ),
+			CreateDatabase( records.Reverse().ToArray() ),
+			( firstPath, secondPath ) => {
+				BerkeleyDbDatabaseFormatException first =
+					Assert.Throws<BerkeleyDbDatabaseFormatException>(
+						() => new BerkeleyDbTerminalCatalogReader(
+							firstPath
+						).Read()
+					);
+				BerkeleyDbDatabaseFormatException second =
+					Assert.Throws<BerkeleyDbDatabaseFormatException>(
+						() => new BerkeleyDbTerminalCatalogReader(
+							secondPath
+						).Read()
+					);
+
+				Assert.Contains(
+					"missing key",
+					first.Message,
+					StringComparison.Ordinal
+				);
+				Assert.Equal( first.Message, second.Message );
+			}
+		);
+	}
+
+	[Fact]
+	public void RecordLimitAcceptsExactBoundaryAndRejectsNextRecord() {
+		byte[] database = CreateCatalogStore( "sample" );
+		WithDatabase(
+			database,
+			path => {
+				BerkeleyDbTerminalCatalogReaderOptions exact =
+					new( maximumRecordCount: 2 );
+				Assert.Single(
+					new BerkeleyDbTerminalCatalogReader(
+						path,
+						exact
+					).Read()
+				);
+
+				BerkeleyDbTerminalCatalogReaderOptions tooSmall =
+					new( maximumRecordCount: 1 );
+				Assert.Throws<BerkeleyDbDatabaseFormatException>(
+					() => new BerkeleyDbTerminalCatalogReader(
+						path,
+						tooSmall
+					).Read()
+				);
+			}
+		);
+	}
+
+	[Fact]
+	public void DatabaseLimitAcceptsExactLengthAndRejectsNextByte() {
+		byte[] database = CreateCatalogStore( "sample" );
+		WithDatabase(
+			database,
+			path => {
+				BerkeleyDbTerminalCatalogReaderOptions exact =
+					new( maximumDatabaseSize: database.Length );
+				Assert.Single(
+					new BerkeleyDbTerminalCatalogReader(
+						path,
+						exact
+					).Read()
+				);
+
+				BerkeleyDbTerminalCatalogReaderOptions tooSmall =
+					new( maximumDatabaseSize: database.Length - 1 );
+				Assert.Throws<BerkeleyDbDatabaseFormatException>(
+					() => new BerkeleyDbTerminalCatalogReader(
+						path,
+						tooSmall
+					).Read()
+				);
+			}
+		);
+	}
+
+	[Fact]
+	public void ParserLimitPlusMarkerIsTheExactStoredItemBoundary() {
+		byte[] entry = CreateCompiledEntry( "sample", [] );
+		byte[] storageKey =
+			Encoding.UTF8.GetBytes( "sample|test terminal" );
+		byte[] database = CreateDatabase(
+			(
+				Encoding.UTF8.GetBytes( "sample" ),
+				PrependMarker( storageKey, 2 )
+			),
+			(
+				storageKey,
+				PrependMarker( entry )
+			)
+		);
+		WithDatabase(
+			database,
+			path => {
+				BerkeleyDbTerminalCatalogReaderOptions exact =
+					new(
+						new CompiledTermInfoParserOptions(
+							entry.Length
+						)
+					);
+				Assert.Single(
+					new BerkeleyDbTerminalCatalogReader(
+						path,
+						exact
+					).Read()
+				);
+
+				BerkeleyDbTerminalCatalogReaderOptions tooSmall =
+					new(
+						new CompiledTermInfoParserOptions(
+							entry.Length - 1
+						)
+					);
+				Assert.Throws<BerkeleyDbDatabaseFormatException>(
+					() => new BerkeleyDbTerminalCatalogReader(
+						path,
+						tooSmall
+					).Read()
+				);
+			}
+		);
+	}
+
+	[Fact]
+	public void MaximumSupportedHopLimitIsAccepted() {
+		BerkeleyDbTerminalCatalogReaderOptions options =
+			new(
+				maximumIndexHops:
+					BerkeleyDbTerminalDescriptionProviderOptions
+						.MaximumSupportedIndexHops
+			);
+
+		Assert.Equal(
+			BerkeleyDbTerminalDescriptionProviderOptions
+				.MaximumSupportedIndexHops,
+			options.MaximumIndexHops
+		);
+	}
+
+	[Fact]
+	public void EmptyDatabaseReturnsAnEmptyImmutableSnapshot() {
+		WithDatabase(
+			CreateDatabase(),
+			path => {
+				IReadOnlyList<BerkeleyDbTerminalCatalogEntry> entries =
+					new BerkeleyDbTerminalCatalogReader( path ).Read();
+
+				Assert.Empty( entries );
+				IList<BerkeleyDbTerminalCatalogEntry> list =
+					Assert.IsAssignableFrom<IList<BerkeleyDbTerminalCatalogEntry>>(
+						entries
+					);
+				Assert.True( list.IsReadOnly );
+			}
+		);
+	}
+
+	[Fact]
+	public void ConcurrentReadsUseIndependentLimitSnapshots() {
+		WithDatabase(
+			CreateCatalogStore( "sample", "sample-alias" ),
+			path => {
+				BerkeleyDbTerminalCatalogReader accepted =
+					new(
+						path,
+						new BerkeleyDbTerminalCatalogReaderOptions(
+							maximumRecordCount: 3
+						)
+					);
+				BerkeleyDbTerminalCatalogReader rejected =
+					new(
+						path,
+						new BerkeleyDbTerminalCatalogReaderOptions(
+							maximumRecordCount: 2
+						)
+					);
+
+				Task<IReadOnlyList<BerkeleyDbTerminalCatalogEntry>> success =
+					Task.Run( () => accepted.Read() );
+				Task<Exception?> failure =
+					Task.Run(
+						() => Record.Exception( () => rejected.Read() )
+					);
+				Task.WaitAll( success, failure );
+
+				Assert.Equal( 2, success.Result.Count );
+				Assert.IsType<BerkeleyDbDatabaseFormatException>(
+					failure.Result
+				);
+			}
+		);
+	}
+
+	[Fact]
+	public void FileHandleIsReleasedAfterSuccessAndFailureFamilies() {
+		WithDatabase(
+			CreateCatalogStore( "sample" ),
+			path => {
+				new BerkeleyDbTerminalCatalogReader( path ).Read();
+				AssertFileUnlocked( path );
+
+				byte[] malformedDatabase =
+					CreateCatalogStore( "sample" );
+				malformedDatabase[12] = 0;
+				File.WriteAllBytes( path, malformedDatabase );
+				Assert.Throws<BerkeleyDbDatabaseFormatException>(
+					() => new BerkeleyDbTerminalCatalogReader( path ).Read()
+				);
+				AssertFileUnlocked( path );
+
+				File.WriteAllBytes(
+					path,
+					CreateDatabase(
+						(
+							Encoding.UTF8.GetBytes( "orphan" ),
+							new byte[] { 0, 1, 2 }
+						)
+					)
+				);
+				Assert.Throws<CompiledTermInfoFormatException>(
+					() => new BerkeleyDbTerminalCatalogReader( path ).Read()
+				);
+				AssertFileUnlocked( path );
+
+				byte[] storageKey =
+					Encoding.UTF8.GetBytes( "other|test terminal" );
+				File.WriteAllBytes(
+					path,
+					CreateDatabase(
+						(
+							Encoding.UTF8.GetBytes( "sample" ),
+							PrependMarker( storageKey, 2 )
+						),
+						(
+							storageKey,
+							PrependMarker(
+								CreateCompiledEntry( "other", [] )
+							)
+						)
+					)
+				);
+				Assert.Throws<InvalidDataException>(
+					() => new BerkeleyDbTerminalCatalogReader( path ).Read()
+				);
+				AssertFileUnlocked( path );
+			}
+		);
+	}
+
+
+	private static void AssertFileUnlocked( string path ) {
+		using FileStream stream = new FileStream(
+			path,
+			FileMode.Open,
+			FileAccess.ReadWrite,
+			FileShare.None
+		);
+		Assert.True( stream.CanRead );
+		Assert.True( stream.CanWrite );
+	}
+
 	private static byte[] CreateCatalogStore(
 		string canonical,
 		params string[] aliases
