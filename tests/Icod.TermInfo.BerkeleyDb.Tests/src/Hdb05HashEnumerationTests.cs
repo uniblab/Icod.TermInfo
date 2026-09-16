@@ -397,7 +397,7 @@ public sealed class Hdb05HashEnumerationTests {
 		metadata[25] = 8;
 		WriteUInt32(
 			metadata.Slice( 32, 4 ),
-			lastPageNumber,
+			checked( (uint)lastPageNumber ),
 			isBigEndian
 		);
 		return database;
@@ -483,7 +483,7 @@ public sealed class Hdb05HashEnumerationTests {
 		);
 		WriteUInt32(
 			item.Slice( 8, 4 ),
-			length,
+			checked( (uint)length ),
 			isBigEndian: false
 		);
 	}
