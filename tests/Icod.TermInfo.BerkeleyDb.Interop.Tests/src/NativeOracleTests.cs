@@ -214,6 +214,56 @@ public sealed class NativeOracleTests {
 		}
 	}
 
+
+	[Fact]
+	public void PublicCatalogEnumeratesNativeCanonicalAndAliasPublications() {
+		BerkeleyDbTerminalCatalogReader reader =
+			new( FixturePath( "hashed-db.db" ) );
+
+		IReadOnlyList<BerkeleyDbTerminalCatalogEntry> entries =
+			reader.Read();
+
+		Assert.Collection(
+			entries,
+			entry => {
+				Assert.Equal( "hdb00-alias", entry.Name );
+				Assert.Equal(
+					BerkeleyDbTerminalCatalogEntryKind.Alias,
+					entry.Kind
+				);
+			},
+			entry => {
+				Assert.Equal( "hdb00-primary", entry.Name );
+				Assert.Equal(
+					BerkeleyDbTerminalCatalogEntryKind.Canonical,
+					entry.Kind
+				);
+			}
+		);
+		Assert.Same( entries[0].Terminal, entries[1].Terminal );
+		Assert.Equal( "hdb00-primary", entries[0].Terminal.Name );
+		Assert.Contains(
+			"hdb00-alias",
+			entries[0].Terminal.Aliases
+		);
+	}
+
+	[Fact]
+	public void PublicCatalogParsesNativeOverflowPublication() {
+		BerkeleyDbTerminalCatalogReader reader =
+			new( FixturePath( "overflow-hashed-db.db" ) );
+
+		BerkeleyDbTerminalCatalogEntry entry =
+			Assert.Single( reader.Read() );
+
+		Assert.Equal( "hdb00-overflow", entry.Name );
+		Assert.Equal(
+			BerkeleyDbTerminalCatalogEntryKind.Canonical,
+			entry.Kind
+		);
+		Assert.Equal( "hdb00-overflow", entry.Terminal.Name );
+	}
+
 	private static List<( byte[] Key, byte[] Value )> ReadNativeRecords( string fixtureName ) {
 		string[] lines = File.ReadAllLines( FixturePath( fixtureName + ".dump" ) );
 		int headerEnd = Array.IndexOf( lines, "HEADER=END" );

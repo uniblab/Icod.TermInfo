@@ -96,6 +96,121 @@ try {
 		);
 	}
 
+
+	CompiledTermInfoParserOptions catalogParserOptions =
+		new( maximumEntrySize: 4096 );
+	BerkeleyDbTerminalCatalogReaderOptions catalogOptions =
+		new(
+			catalogParserOptions,
+			maximumDatabaseSize: 1024 * 1024,
+			maximumRecordCount: 3,
+			maximumIndexHops: 4
+		);
+	if (
+		ReferenceEquals(
+			catalogParserOptions,
+			catalogOptions.ParserOptions
+		)
+		|| catalogOptions.ParserOptions.MaximumEntrySize != 4096
+	) {
+		throw new InvalidOperationException(
+			"The catalog options did not snapshot parser limits."
+		);
+	}
+
+	BerkeleyDbTerminalCatalogReader catalogReader =
+		new(
+			databasePath,
+			catalogOptions
+		);
+	if (
+		!string.Equals(
+			Path.GetFullPath( databasePath ),
+			catalogReader.DatabasePath,
+			StringComparison.Ordinal
+		)
+	) {
+		throw new InvalidOperationException(
+			"The catalog reader did not canonicalize its database path."
+		);
+	}
+
+	IReadOnlyList<BerkeleyDbTerminalCatalogEntry> catalog =
+		catalogReader.Read();
+	if (
+		catalog.Count != 2
+		|| !string.Equals(
+			catalog[0].Name,
+			canonical,
+			StringComparison.Ordinal
+		)
+		|| catalog[0].Kind
+			!= BerkeleyDbTerminalCatalogEntryKind.Canonical
+		|| !string.Equals(
+			catalog[1].Name,
+			alias,
+			StringComparison.Ordinal
+		)
+		|| catalog[1].Kind
+			!= BerkeleyDbTerminalCatalogEntryKind.Alias
+		|| !ReferenceEquals(
+			catalog[0].Terminal,
+			catalog[1].Terminal
+		)
+		|| !string.Equals(
+			catalog[0].Terminal.Name,
+			canonical,
+			StringComparison.Ordinal
+		)
+	) {
+		throw new InvalidOperationException(
+			"The packaged catalog reader returned an unexpected snapshot."
+		);
+	}
+
+	const string replacementCanonical = "hdb05-replacement";
+	const string replacementAlias = "hdb05-replacement-alias";
+	File.WriteAllBytes(
+		databasePath,
+		CreateStore(
+			replacementCanonical,
+			replacementAlias,
+			"HDB05 fresh package snapshot"
+		)
+	);
+	IReadOnlyList<BerkeleyDbTerminalCatalogEntry> replacement =
+		catalogReader.Read();
+	if (
+		replacement.Count != 2
+		|| !replacement.Any(
+			entry => string.Equals(
+				entry.Name,
+				replacementCanonical,
+				StringComparison.Ordinal
+			)
+		)
+		|| replacement.Any(
+			entry => string.Equals(
+				entry.Name,
+				canonical,
+				StringComparison.Ordinal
+			)
+		)
+	) {
+		throw new InvalidOperationException(
+			"The packaged catalog reader did not acquire a fresh snapshot."
+		);
+	}
+
+	File.WriteAllBytes(
+		databasePath,
+		CreateStore(
+			canonical,
+			alias,
+			description
+		)
+	);
+
 	Environment.SetEnvironmentVariable(
 		"TERMINFO",
 		databasePath
@@ -138,7 +253,7 @@ try {
 	}
 
 	Console.WriteLine(
-		$"HDB04 package system provider loaded {systemTerminal.Name} through alias {alias}."
+		$"HDB05 package catalog and system provider loaded {systemTerminal.Name} through alias {alias}."
 	);
 } finally {
 	Environment.SetEnvironmentVariable(
