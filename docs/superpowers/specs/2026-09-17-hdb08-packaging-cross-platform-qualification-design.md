@@ -134,7 +134,9 @@ For `Icod.TermInfo.BerkeleyDb.<version>.nupkg`, the verifier requires:
   `https://github.com/uniblab/Icod.TermInfo`, repository type `git`, README
   `README.md`, icon `icon.png`, license acceptance `true`, description
   `Managed read-only acquisition support for ncurses-compatible Berkeley DB
-  Hash-v9 terminfo stores.`, and tags
+  Hash-v9 terminfo stores.`, and nuspec tags
+  `terminfo libtinfo terminal berkeleydb hash ncurses database dotnet csharp`;
+- the project retains the semicolon-separated MSBuild tag authority
   `terminfo;libtinfo;terminal;berkeleydb;hash;ncurses;database;dotnet;csharp`;
 - root package entries include `README.md`, `icon.png`, and `LICENSE`;
 - exactly the `net8.0`, `net9.0`, and `net10.0` library groups are present;
