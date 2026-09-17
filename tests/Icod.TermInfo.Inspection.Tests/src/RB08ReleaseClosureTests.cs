@@ -226,13 +226,9 @@ public sealed class RB08ReleaseClosureTests {
 
 	[Fact]
 	public void ReleaseDocumentationDescribesStableOneFourteen() {
-		string buildProperties = ReadRequiredRepositoryFile( "Directory.Build.props" );
 		string rootReadme = ReadRequiredRepositoryFile( "README.md" );
 		string inspectionReadme = ReadRequiredRepositoryFile(
 			"Icod.TermInfo.Inspection/README.md"
-		);
-		string inspectionProject = ReadRequiredRepositoryFile(
-			"Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj"
 		);
 		string samplesReadme = ReadRequiredRepositoryFile( "samples/README.md" );
 		string versioning = ReadRequiredRepositoryFile( "docs/VERSIONING.md" );
@@ -250,13 +246,7 @@ public sealed class RB08ReleaseClosureTests {
 			"docs/1.14.0-RELEASE-AUDIT.md"
 		);
 
-		Assert.Contains(
-			"<IcodTermInfoSuiteVersion>1.14.0</IcodTermInfoSuiteVersion>",
-			buildProperties,
-			StringComparison.Ordinal
-		);
 		Assert.Contains( "## Status", rootReadme, StringComparison.Ordinal );
-		Assert.Contains( "Icod.TermInfo 1.14.0", rootReadme, StringComparison.Ordinal );
 		Assert.Contains( "## Architecture", rootReadme, StringComparison.Ordinal );
 		Assert.Contains( "## Quick Start", rootReadme, StringComparison.Ordinal );
 		Assert.Contains( "## Feature Inventory", rootReadme, StringComparison.Ordinal );
@@ -277,18 +267,8 @@ public sealed class RB08ReleaseClosureTests {
 			StringComparison.Ordinal
 		);
 		Assert.Contains(
-			"dotnet add package Icod.TermInfo.Inspection --version 1.14.0",
-			rootReadme,
-			StringComparison.Ordinal
-		);
-		Assert.Contains(
-			"## 1.14 release status",
+			"1.14.0-INSPECTION-PUBLIC-API-FREEZE.md",
 			inspectionReadme,
-			StringComparison.Ordinal
-		);
-		Assert.Contains(
-			"<PackageReleaseNotes>1.14.0",
-			inspectionProject,
 			StringComparison.Ordinal
 		);
 		Assert.Contains(
@@ -303,12 +283,12 @@ public sealed class RB08ReleaseClosureTests {
 			StringComparison.Ordinal
 		);
 		Assert.Contains(
-			"**Current coordinated version:** `1.14.0`",
+			"docs/1.14.0-RELEASE-AUDIT.md",
 			longRange,
 			StringComparison.Ordinal
 		);
 		Assert.Contains(
-			"**Latest completed line:** `1.14.0`",
+			"Icod.TermInfo-1.14.0-Raster-Backend-Capability-Evidence-Selection-and-Planning-Roadmap.md",
 			longRange,
 			StringComparison.Ordinal
 		);

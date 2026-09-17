@@ -3,18 +3,19 @@
 `Icod.TermInfo.Termcap` is the optional managed termcap interoperability layer for
 the Icod.TermInfo package family.
 
-## 1.14 release status
+## 1.15 release status
 
-Version `1.14.0` preserves the frozen 1.6 Termcap public API, Runtime-only
+Version `1.15.0` preserves the frozen 1.6 Termcap public API, Runtime-only
 production dependency, parsing/resolution/conversion/rendering/acquisition
 semantics, `net8.0` / `net9.0` / `net10.0` support, and assembly identity
-`1.0.0.0`. The coordinated 1.14 raster-backend work is isolated to Inspection;
-Termcap acquires no Source, Compiler, Inspection, Terminal, or command dependency.
+`1.0.0.0`. Hashed acquisition is isolated to the optional BerkeleyDb package;
+Termcap acquires no Source, Compiler, Inspection, BerkeleyDb, Terminal, or
+command dependency.
 
 ## Install
 
 ```text
-dotnet add package Icod.TermInfo.Termcap --version 1.14.0
+dotnet add package Icod.TermInfo.Termcap --version 1.15.0
 ```
 
 The package depends only on the matching `Icod.TermInfo` version.
@@ -79,7 +80,7 @@ Callers choose the acquisition source/provider intentionally.
 
 The Termcap public surface frozen by TC08 remains immutable through the
 coordinated 1.x line unless a later compatible release deliberately adds reviewed
-API. Version 1.14 changes package/release identity only for Termcap and does not
+API. Version 1.15 changes package/release identity only for Termcap and does not
 change its semantics.
 
 See `../docs/VERSIONING.md`, `../docs/COMPATIBILITY.md`, and the root

@@ -6,11 +6,12 @@ family. It depends on matching Runtime and Source packages and deliberately has
 no production dependency on Compiler, Termcap, `Icod.Terminal`, or
 `Icod.DCurses`.
 
-## 1.14 release status
+## 1.15 release status
 
-Version `1.14.0` promotes the validated `1.14.0-Alpha-8` raster-backend contract
-without changing its feature semantics, public API, schemas, dependency graph,
-target frameworks, command behavior, package-consumer topology, or archive RIDs.
+Version `1.15.0` preserves the validated 1.14 raster-backend contract without
+changing its feature semantics, public API, schemas, dependency graph, target
+frameworks, command behavior, package-consumer topology, or archive RIDs. Hashed
+acquisition remains provider-side in the optional BerkeleyDb package.
 
 Inspection now provides bounded `RasterBackend*` availability evidence and
 profiles for the initial **Sixel** and **Kitty Graphics** backend identities.
@@ -67,7 +68,7 @@ See:
 ## Install
 
 ```text
-dotnet add package Icod.TermInfo.Inspection --version 1.14.0
+dotnet add package Icod.TermInfo.Inspection --version 1.15.0
 ```
 
 Inspection targets `net8.0`, `net9.0`, and `net10.0` and retains assembly

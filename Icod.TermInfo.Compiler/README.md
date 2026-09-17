@@ -3,19 +3,19 @@
 `Icod.TermInfo.Compiler` is the optional managed compiled-terminfo writing and
 explicit database-publication layer for `Icod.TermInfo`.
 
-## 1.14 release status
+## 1.15 release status
 
-Version `1.14.0` preserves the frozen Compiler 1.2 public API, deterministic
+Version `1.15.0` preserves the frozen Compiler 1.2 public API, deterministic
 compiled-entry and database-publication semantics, Runtime-and-Source dependency
 graph, `net8.0` / `net9.0` / `net10.0` support, and assembly identity
-`1.0.0.0`. The coordinated 1.14 feature work is isolated to
-`Icod.TermInfo.Inspection`; Compiler does not acquire an Inspection, Termcap,
-Terminal, or command-layer dependency.
+`1.0.0.0`. Read-only hashed acquisition is isolated to the optional BerkeleyDb
+package; Compiler retains conventional directory publication and does not acquire
+a BerkeleyDb, Inspection, Termcap, Terminal, or command-layer dependency.
 
 ## Install
 
 ```text
-dotnet add package Icod.TermInfo.Compiler --version 1.14.0
+dotnet add package Icod.TermInfo.Compiler --version 1.15.0
 ```
 
 The package depends on matching `Icod.TermInfo` and `Icod.TermInfo.Source`
@@ -83,12 +83,12 @@ Compiler in tests/samples for semantic round trips, but production
 Version `1.9.0` was the first coordinated line whose machine-readable Inspection
 release closure required package-facing documentation across the full suite. That
 historical marker remains part of the release-closure compatibility record; the
-current install version is `1.14.0`.
+current install version is `1.15.0`.
 
 ## Compatibility
 
 The Compiler public contract was frozen at 1.2 and remains compatible throughout
-the coordinated 1.x line. Version 1.14 changes package/release identity only for
+the coordinated 1.x line. Version 1.15 changes package/release identity only for
 Compiler; it does not change Compiler semantics or public API.
 
 See `../docs/VERSIONING.md`, `../docs/COMPATIBILITY.md`, and the root

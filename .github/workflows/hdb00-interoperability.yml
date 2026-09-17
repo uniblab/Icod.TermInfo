@@ -1,0 +1,384 @@
+name: hdb00-interoperability
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/hdb00-interoperability.yml'
+      - 'tools/hdb00/**'
+      - 'Icod.TermInfo.BerkeleyDb/**'
+      - 'tests/Icod.TermInfo.BerkeleyDb.Tests/**'
+      - 'tests/Icod.TermInfo.BerkeleyDb.Interop.Tests/**'
+      - 'samples/Icod.TermInfo.BerkeleyDb.Sample/**'
+      - 'infocmp/**'
+      - 'toe/**'
+      - 'icod-terminfo/**'
+      - 'tests/Icod.TermInfo.InfoCmp.Tests/**'
+      - 'tests/Icod.TermInfo.Toe.Tests/**'
+      - 'tests/Icod.TermInfo.Router.Tests/**'
+      - 'tests/Shared/BerkeleyDbHashV9TestStore.cs'
+      - '.github/scripts/new-hdb06-test-store.ps1'
+      - '.github/scripts/verify-hdb07-permissions.ps1'
+      - '.github/scripts/verify-berkeleydb-package.ps1'
+      - '.github/scripts/smoke-tool-package.ps1'
+      - '.github/scripts/smoke-tool-archive.ps1'
+      - 'tools/hdb07-permission-probe/**'
+      - 'docs/1.15.0-HDB06-INSPECTION-AND-TOOL-INTEGRATION.md'
+      - 'docs/1.15.0-BERKELEYDB-PUBLIC-API-BASELINE.txt'
+      - 'docs/1.15.0-BERKELEY-DB-PUBLIC-API-FREEZE.md'
+      - 'docs/1.15.0-RELEASE-AUDIT.md'
+      - 'docs/superpowers/plans/2026-09-16-hdb06-inspection-tool-integration.md'
+      - 'Icod.TermInfo-1.15.0-Berkeley-DB-Hashed-Terminfo-Acquisition-Roadmap.md'
+      - 'README.md'
+      - 'Icod.TermInfo.BerkeleyDb/README.md'
+      - 'infocmp/README.md'
+      - 'toe/README.md'
+      - 'Directory.Build.props'
+      - 'Directory.Build.targets'
+      - 'samples/Icod.TermInfo.Acquisition.Sample/**'
+      - 'Icod.TermInfo.csproj'
+      - 'src/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linux-berkeley-db-5-3:
+    name: Linux / Berkeley DB 5.3 / ncurses hashed store
+    runs-on: ubuntu-24.04
+    outputs:
+      hdb00-required: ${{ steps.hdb00-scope.outputs.required }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify HDB00 change-scope classifier
+        shell: pwsh
+        run: ./tools/hdb00/verify-change-scope.ps1
+
+      - name: Determine HDB00 change scope
+        id: hdb00-scope
+        shell: pwsh
+        env:
+          HDB00_EVENT_NAME: ${{ github.event_name }}
+          HDB00_ACTION: ${{ github.event.action }}
+          HDB00_BEFORE: ${{ github.event.before }}
+          HDB00_AFTER: ${{ github.event.after }}
+        run: |
+          $required = ./tools/hdb00/Get-Hdb00ChangeScope.ps1 `
+              -EventName $env:HDB00_EVENT_NAME `
+              -Action $env:HDB00_ACTION `
+              -Before $env:HDB00_BEFORE `
+              -After $env:HDB00_AFTER `
+              -RepositoryRoot $env:GITHUB_WORKSPACE
+          "required=$required" >> $env:GITHUB_OUTPUT
+
+      - name: Set up .NET
+        if: steps.hdb00-scope.outputs.required == 'true'
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+            10.0.x
+
+      - name: Install Berkeley DB development tools
+        if: steps.hdb00-scope.outputs.required == 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes libdb5.3-dev db5.3-util
+
+      - name: Run native HDB00 interoperability probe
+        if: steps.hdb00-scope.outputs.required == 'true'
+        shell: bash
+        run: bash tools/hdb00/run-linux.sh
+
+      - name: Verify HDB07 permission propagation
+        if: steps.hdb00-scope.outputs.required == 'true'
+        shell: pwsh
+        run: >-
+          ./.github/scripts/verify-hdb07-permissions.ps1
+          -DatabasePath "${{ runner.temp }}/icod-terminfo-hdb00/hashed-db.db"
+          -TerminalName hdb00-primary
+
+      - name: Verify managed Hash v9 reader
+        if: steps.hdb00-scope.outputs.required == 'true'
+        shell: bash
+        run: bash tools/hdb00/verify-managed.sh "$RUNNER_TEMP/icod-terminfo-hdb00"
+
+      - name: Compare production reader with native Berkeley DB records
+        if: steps.hdb00-scope.outputs.required == 'true'
+        shell: bash
+        env:
+          ICOD_HDB02_FIXTURE_ROOT: ${{ runner.temp }}/icod-terminfo-hdb00
+        run: |
+          db5.3_dump -k -f "$ICOD_HDB02_FIXTURE_ROOT/hashed-db.dump" "$ICOD_HDB02_FIXTURE_ROOT/hashed-db.db"
+          db5.3_dump -k -f "$ICOD_HDB02_FIXTURE_ROOT/big-endian-hashed-db.dump" "$ICOD_HDB02_FIXTURE_ROOT/big-endian-hashed-db.db"
+          db5.3_dump -k -f "$ICOD_HDB02_FIXTURE_ROOT/latin1-hashed-db.dump" "$ICOD_HDB02_FIXTURE_ROOT/latin1-hashed-db.db"
+          db5.3_dump -k -f "$ICOD_HDB02_FIXTURE_ROOT/overflow-hashed-db.dump" "$ICOD_HDB02_FIXTURE_ROOT/overflow-hashed-db.db"
+          dotnet test tests/Icod.TermInfo.BerkeleyDb.Interop.Tests/Icod.TermInfo.BerkeleyDb.Interop.Tests.csproj -c Release
+
+      - name: Verify HDB06 direct and routed commands
+        if: steps.hdb00-scope.outputs.required == 'true'
+        shell: pwsh
+        run: |
+          ./tools/hdb00/verify-hdb06-commands.ps1 -FixtureRoot "${{ runner.temp }}/icod-terminfo-hdb00" -LaunchMode Direct
+          ./tools/hdb00/verify-hdb06-commands.ps1 -FixtureRoot "${{ runner.temp }}/icod-terminfo-hdb00" -LaunchMode Routed
+
+      - name: Upload Linux Hash v9 fixtures
+        if: steps.hdb00-scope.outputs.required == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: hdb00-linux-hash-v9
+          if-no-files-found: error
+          retention-days: 7
+          path: |
+            ${{ runner.temp }}/icod-terminfo-hdb00/hashed-db.db
+            ${{ runner.temp }}/icod-terminfo-hdb00/big-endian-hashed-db.db
+            ${{ runner.temp }}/icod-terminfo-hdb00/latin1-hashed-db.db
+            ${{ runner.temp }}/icod-terminfo-hdb00/hdb07c-latin1.bin
+            ${{ runner.temp }}/icod-terminfo-hdb00/hdb00-primary.bin
+            ${{ runner.temp }}/icod-terminfo-hdb00/overflow-hashed-db.db
+            ${{ runner.temp }}/icod-terminfo-hdb00/hdb00-overflow.bin
+            ${{ runner.temp }}/icod-terminfo-hdb00/hashed-db.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00/big-endian-hashed-db.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00/latin1-hashed-db.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00/overflow-hashed-db.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00/multi-hashed-db.db
+            ${{ runner.temp }}/icod-terminfo-hdb00/multi-hashed-db.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00/not-hash.db
+            ${{ runner.temp }}/icod-terminfo-hdb00/random.db
+
+  macos-berkeley-db-5-3:
+    name: macOS / Berkeley DB 5.3 / ncurses hashed store
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine HDB00 change scope
+        id: hdb00-scope
+        shell: pwsh
+        env:
+          HDB00_EVENT_NAME: ${{ github.event_name }}
+          HDB00_ACTION: ${{ github.event.action }}
+          HDB00_BEFORE: ${{ github.event.before }}
+          HDB00_AFTER: ${{ github.event.after }}
+        run: |
+          $required = ./tools/hdb00/Get-Hdb00ChangeScope.ps1 `
+              -EventName $env:HDB00_EVENT_NAME `
+              -Action $env:HDB00_ACTION `
+              -Before $env:HDB00_BEFORE `
+              -After $env:HDB00_AFTER `
+              -RepositoryRoot $env:GITHUB_WORKSPACE
+          "required=$required" >> $env:GITHUB_OUTPUT
+
+      - name: Set up .NET
+        if: steps.hdb00-scope.outputs.required == 'true'
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+            10.0.x
+
+      - name: Install Berkeley DB 5
+        if: steps.hdb00-scope.outputs.required == 'true'
+        run: brew install berkeley-db@5
+
+      - name: Run native HDB00 interoperability probe
+        if: steps.hdb00-scope.outputs.required == 'true'
+        shell: bash
+        run: bash tools/hdb00/run-macos.sh
+
+      - name: Verify HDB07 permission propagation
+        if: steps.hdb00-scope.outputs.required == 'true'
+        shell: pwsh
+        run: >-
+          ./.github/scripts/verify-hdb07-permissions.ps1
+          -DatabasePath "${{ runner.temp }}/icod-terminfo-hdb00-macos/hashed-db.db"
+          -TerminalName hdb00-primary
+
+      - name: Verify managed Hash v9 reader
+        if: steps.hdb00-scope.outputs.required == 'true'
+        shell: bash
+        run: bash tools/hdb00/verify-managed.sh "$RUNNER_TEMP/icod-terminfo-hdb00-macos"
+
+      - name: Compare production reader with native Berkeley DB records
+        if: steps.hdb00-scope.outputs.required == 'true'
+        shell: bash
+        env:
+          ICOD_HDB02_FIXTURE_ROOT: ${{ runner.temp }}/icod-terminfo-hdb00-macos
+        run: |
+          db_prefix="$(brew --prefix berkeley-db@5)"
+          export DYLD_LIBRARY_PATH="$db_prefix/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}"
+          "$db_prefix/bin/db_dump" -k -f "$ICOD_HDB02_FIXTURE_ROOT/hashed-db.dump" "$ICOD_HDB02_FIXTURE_ROOT/hashed-db.db"
+          "$db_prefix/bin/db_dump" -k -f "$ICOD_HDB02_FIXTURE_ROOT/big-endian-hashed-db.dump" "$ICOD_HDB02_FIXTURE_ROOT/big-endian-hashed-db.db"
+          "$db_prefix/bin/db_dump" -k -f "$ICOD_HDB02_FIXTURE_ROOT/latin1-hashed-db.dump" "$ICOD_HDB02_FIXTURE_ROOT/latin1-hashed-db.db"
+          "$db_prefix/bin/db_dump" -k -f "$ICOD_HDB02_FIXTURE_ROOT/overflow-hashed-db.dump" "$ICOD_HDB02_FIXTURE_ROOT/overflow-hashed-db.db"
+          dotnet test tests/Icod.TermInfo.BerkeleyDb.Interop.Tests/Icod.TermInfo.BerkeleyDb.Interop.Tests.csproj -c Release
+
+      - name: Verify HDB06 direct and routed commands
+        if: steps.hdb00-scope.outputs.required == 'true'
+        shell: pwsh
+        run: |
+          ./tools/hdb00/verify-hdb06-commands.ps1 -FixtureRoot "${{ runner.temp }}/icod-terminfo-hdb00-macos" -LaunchMode Direct
+          ./tools/hdb00/verify-hdb06-commands.ps1 -FixtureRoot "${{ runner.temp }}/icod-terminfo-hdb00-macos" -LaunchMode Routed
+
+      - name: Upload macOS native oracle fixtures
+        if: steps.hdb00-scope.outputs.required == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: hdb02-macos-native-oracle
+          if-no-files-found: error
+          retention-days: 7
+          path: |
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hashed-db.db
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/big-endian-hashed-db.db
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/latin1-hashed-db.db
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/overflow-hashed-db.db
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hashed-db.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/big-endian-hashed-db.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/latin1-hashed-db.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/overflow-hashed-db.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/multi-hashed-db.db
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/multi-hashed-db.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/not-hash.db
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/random.db
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hdb00-primary.bin
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hdb07c-latin1.bin
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hdb00-overflow.bin
+
+  windows-managed-cross-host:
+    name: Windows / managed-only Linux Hash v9 fixture
+    runs-on: windows-latest
+    needs:
+      - linux-berkeley-db-5-3
+    if: needs.linux-berkeley-db-5-3.outputs.hdb00-required == 'true'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+            10.0.x
+
+      - name: Download Linux Hash v9 fixtures
+        uses: actions/download-artifact@v4
+        with:
+          name: hdb00-linux-hash-v9
+          path: ${{ runner.temp }}/hdb00-linux-hash-v9
+
+      - name: Verify HDB07 permission propagation
+        shell: pwsh
+        run: >-
+          ./.github/scripts/verify-hdb07-permissions.ps1
+          -DatabasePath "${{ runner.temp }}/hdb00-linux-hash-v9/hashed-db.db"
+          -TerminalName hdb00-primary
+
+      - name: Read Linux-generated Hash v9 store without Berkeley DB
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $fixtureRoot = Join-Path $env:RUNNER_TEMP 'hdb00-linux-hash-v9'
+          $project = Join-Path $env:GITHUB_WORKSPACE 'tools/hdb00/managed/Hdb00.ManagedProbe.csproj'
+
+          $database = Join-Path $fixtureRoot 'hashed-db.db'
+          $bigEndianDatabase = Join-Path $fixtureRoot 'big-endian-hashed-db.db'
+          $latin1Database = Join-Path $fixtureRoot 'latin1-hashed-db.db'
+          $latin1Dump = Join-Path $fixtureRoot 'latin1-hashed-db.dump'
+          $latin1Expected = Join-Path $fixtureRoot 'hdb07c-latin1.bin'
+          foreach ($requiredPath in @($latin1Database, $latin1Dump, $latin1Expected)) {
+              if (-not (Test-Path -LiteralPath $requiredPath -PathType Leaf)) {
+                  throw "Required transported HDB07C Latin-1 fixture '$requiredPath' was not found."
+              }
+          }
+          $expected = Join-Path $fixtureRoot 'hdb00-primary.bin'
+          $actual = Join-Path $fixtureRoot 'windows-alias.bin'
+
+          dotnet run --project $project -c Release -- $database hdb00-alias $actual
+          if ((Get-FileHash $actual -Algorithm SHA256).Hash -ne (Get-FileHash $expected -Algorithm SHA256).Hash) {
+              throw 'Windows managed alias extraction differs from the Linux native oracle.'
+          }
+
+          $bigEndianActual = Join-Path $fixtureRoot 'windows-big-endian.bin'
+          dotnet run --project $project -c Release -- $bigEndianDatabase hdb00-primary $bigEndianActual
+          if ((Get-FileHash $bigEndianActual -Algorithm SHA256).Hash -ne (Get-FileHash $expected -Algorithm SHA256).Hash) {
+              throw 'Windows managed big-endian extraction differs from the Linux native oracle.'
+          }
+
+          $overflowDatabase = Join-Path $fixtureRoot 'overflow-hashed-db.db'
+          $overflowExpected = Join-Path $fixtureRoot 'hdb00-overflow.bin'
+          $overflowActual = Join-Path $fixtureRoot 'windows-overflow.bin'
+
+          dotnet run --project $project -c Release -- $overflowDatabase hdb00-overflow $overflowActual
+          if ((Get-FileHash $overflowActual -Algorithm SHA256).Hash -ne (Get-FileHash $overflowExpected -Algorithm SHA256).Hash) {
+              throw 'Windows managed overflow extraction differs from the Linux native oracle.'
+          }
+
+          $multiDatabase = Join-Path $fixtureRoot 'multi-hashed-db.db'
+          foreach ($index in @(0, 32, 63)) {
+              $number = $index.ToString('D3')
+              $canonical = "hdb07-multi-$number"
+              $alias = "$canonical-alias"
+              $canonicalOutput = Join-Path $fixtureRoot "windows-$canonical.bin"
+              $aliasOutput = Join-Path $fixtureRoot "windows-$alias.bin"
+
+              $probeOutput = dotnet run --project $project -c Release -- $multiDatabase $canonical $canonicalOutput
+              if ($LASTEXITCODE -ne 0) {
+                  throw "Windows managed lookup for '$canonical' failed with exit code $LASTEXITCODE."
+              }
+              $probeOutput | Write-Host
+              $aliasProbeOutput = dotnet run --project $project -c Release -- $multiDatabase $alias $aliasOutput
+              if ($LASTEXITCODE -ne 0) {
+                  throw "Windows managed lookup for '$alias' failed with exit code $LASTEXITCODE."
+              }
+              $aliasProbeOutput | Write-Host
+
+              if ((Get-FileHash $canonicalOutput -Algorithm SHA256).Hash -ne (Get-FileHash $aliasOutput -Algorithm SHA256).Hash) {
+                  throw "Windows managed primary and alias extraction differ for '$canonical'."
+              }
+              if ('Data records: 64' -cnotin $probeOutput) {
+                  throw "Windows managed probe did not report 64 data records for '$canonical'."
+              }
+              if ('Index records: 128' -cnotin $probeOutput) {
+                  throw "Windows managed probe did not report 128 index records for '$canonical'."
+              }
+          }
+
+          Write-Host 'HDB07 multi managed records: 192'
+          Write-Host 'HDB07 multi catalog publications: 128'
+
+          Write-Host 'HDB00 Windows managed-only cross-host probe passed.'
+
+      - name: Compare production reader with Linux native oracle records
+        shell: pwsh
+        env:
+          ICOD_HDB02_FIXTURE_ROOT: ${{ runner.temp }}/hdb00-linux-hash-v9
+        run: |
+          dotnet test tests/Icod.TermInfo.BerkeleyDb.Interop.Tests/Icod.TermInfo.BerkeleyDb.Interop.Tests.csproj -c Release
+          if ($LASTEXITCODE -ne 0) {
+              throw "Production reader native-oracle tests failed with exit code $LASTEXITCODE."
+          }
+
+      - name: Verify HDB06 direct and routed commands
+        shell: pwsh
+        run: |
+          $fixtureRoot = Join-Path $env:RUNNER_TEMP 'hdb00-linux-hash-v9'
+          ./tools/hdb00/verify-hdb06-commands.ps1 -FixtureRoot $fixtureRoot -LaunchMode Direct
+          ./tools/hdb00/verify-hdb06-commands.ps1 -FixtureRoot $fixtureRoot -LaunchMode Routed

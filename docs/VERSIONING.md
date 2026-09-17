@@ -5,6 +5,31 @@ package contracts. Version-specific roadmaps, API freezes, schema fingerprints,
 and release audits remain the authoritative historical evidence for completed
 releases; this document defines the current cross-release policy.
 
+## 1.15 release line
+
+The HDB01-HDB09 development sequence used `1.15.0-Alpha-1` through the
+accepted `1.15.0-Alpha-8` feature/API source.
+
+Stable `1.15.0` is the current coordinated release. Version 1.15 adds one
+optional package, `Icod.TermInfo.BerkeleyDb`, for pure-managed, read-only
+acquisition from the reviewed ncurses-compatible Berkeley DB Hash-v9 subset.
+
+HDB09 freezes the complete BerkeleyDb reflection manifest at **9 exported public
+types** with normalized-LF SHA-256:
+
+```text
+f519600aa4085d07c2d20bd8dc7a32c4dc06a43f4e361554b205ce2f97a8bf36
+```
+
+The package depends only on matching-version Runtime and has equivalent API on
+net8.0, net9.0, and net10.0. Runtime's 1.0 API, the other reusable package APIs,
+Inspection JSON versions 1 through 6, and existing commands remain frozen except
+for the accepted explicit hashed-file behavior in `infocmp` and human `toe`.
+
+The promotion changed release identity and release-facing text only. It did not
+change API, acquisition semantics, dependencies, target frameworks, JSON,
+command contracts, package topology, or archive RIDs.
+
 ## 1.14 release line
 
 The RB01-RB08 development sequence is `1.14.0-Alpha-1` through
@@ -129,9 +154,9 @@ For the 1.x line:
 
 Beginning with 1.5.0, `Directory.Build.props` contains the single
 `IcodTermInfoSuiteVersion` authority. Runtime, Source, Compiler, Inspection,
-Termcap, all five standalone command projects, and the `Icod.TermInfo.Tools`
-router consume that coordinated release identity rather than carrying independent
-current-version literals.
+Termcap, BerkeleyDb, all five standalone command projects, and the
+`Icod.TermInfo.Tools` router consume that coordinated release identity rather
+than carrying independent current-version literals.
 
 ## Coordinated package family
 
@@ -143,10 +168,11 @@ Icod.TermInfo.Source
 Icod.TermInfo.Compiler
 Icod.TermInfo.Inspection
 Icod.TermInfo.Termcap
+Icod.TermInfo.BerkeleyDb
 Icod.TermInfo.Tools
 ```
 
-The five reusable libraries target `net8.0`, `net9.0`, and `net10.0`. The command
+The six reusable libraries target `net8.0`, `net9.0`, and `net10.0`. The command
 applications and router follow the repository's separately documented command
 framework/TFM policy. A coordinated minor or patch release advances package and
 reported command identities together even when only one optional layer receives
@@ -176,9 +202,13 @@ Strong-name signed no
 AssemblyName       Icod.TermInfo.Termcap
 AssemblyVersion    1.0.0.0
 Strong-name signed no
+
+AssemblyName       Icod.TermInfo.BerkeleyDb
+AssemblyVersion    1.0.0.0
+Strong-name signed no
 ```
 
-All five reusable assemblies remain **unsigned** throughout the compatible 1.x
+All six reusable assemblies remain **unsigned** throughout the compatible 1.x
 line. Package minor/patch versions do not advance `AssemblyVersion`. Adding a
 strong name or otherwise changing assembly identity is a major-version design
 decision unless a future compatibility review proves a safe migration.
@@ -197,7 +227,12 @@ reusable package and release line. Important current authorities include:
 - `1.11.0-INSPECTION-PUBLIC-API-FREEZE.md` — composite 1.11 freeze;
 - `1.12.0-INSPECTION-PUBLIC-API-FREEZE.md` — composite 1.12 freeze;
 - `1.13.0-INSPECTION-PUBLIC-API-FREEZE.md` — composite 1.13 freeze; and
-- `1.14.0-INSPECTION-PUBLIC-API-FREEZE.md` — current composite 1.14 freeze.
+- `1.14.0-INSPECTION-PUBLIC-API-FREEZE.md` — frozen composite 1.14
+  Inspection freeze;
+- `1.15.0-BERKELEYDB-PUBLIC-API-BASELINE.txt` — exact BerkeleyDb manifest;
+  and
+- `1.15.0-BERKELEY-DB-PUBLIC-API-FREEZE.md` — BerkeleyDb freeze and
+  fingerprint authority.
 
 Routine validation must require equivalent public API across `net8.0`, `net9.0`,
 and `net10.0` for reusable libraries. A baseline/fingerprint must never be
@@ -227,9 +262,11 @@ The supported production dependency graph is intentionally one-way:
 - `Icod.TermInfo` is dependency-free;
 - Source depends on matching Runtime;
 - Termcap depends only on matching Runtime;
+- BerkeleyDb depends only on matching Runtime;
 - Compiler depends on matching Runtime and Source;
 - Inspection depends on matching Runtime and Source;
 - reusable libraries do not depend on command projects or `Icod.CommandFramework`;
+- Runtime, Source, Termcap, Compiler, and Inspection do not depend on BerkeleyDb;
 - Inspection does not depend on Compiler, Termcap, `Icod.Terminal`, or
   `Icod.DCurses` in production.
 

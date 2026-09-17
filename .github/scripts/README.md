@@ -25,7 +25,7 @@ The legacy `verify-release-package.*` names remain internal compatibility engine
 ## Coordinated package validation
 
 The deep verifier covers the coordinated Runtime, Source, Termcap, Compiler,
-Inspection, and `Icod.TermInfo.Tools` artifacts. It retains API-baseline checks,
+Inspection, BerkeleyDb, and `Icod.TermInfo.Tools` artifacts. It retains API-baseline checks,
 net8.0/net9.0/net10.0 equivalence where applicable, structural package checks,
 isolated package-reference consumers, deterministic samples, and router/package
 validation. MI06 runs the planning Toolchain sample in two separate processes,
@@ -43,6 +43,19 @@ Package production is centralized in:
 ```text
 packaging/PackPackages.ps1
 ```
+
+HDB08 exact BerkeleyDb package validation is implemented by the dependency-free
+C# project under `tools/berkeleydb-package-verifier`. The
+`verify-berkeleydb-package.ps1` wrapper runs that already-built verifier and
+retains the two existing API comparisons. The verifier checks exact nupkg and
+snupkg payloads, Runtime-only dependency identity, unsigned IL-only assembly
+identity, portable symbols with Source Link, and absence of runtime/native
+assets.
+
+`smoke-hdb03-package-consumer.ps1` restores and runs an isolated BerkeleyDb
+package consumer against net8.0, net9.0, and net10.0. HDB08 invokes that same
+consumer in package-smoke jobs on Windows, Linux, and macOS for pull-request,
+main, and release workflows.
 
 ## Tool-suite archives
 

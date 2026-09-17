@@ -17,6 +17,7 @@ env:
     10.0.x
   CONFIGURATION: Staging
   SOLUTION_PATH: Icod.TermInfo.sln
+  BERKELEYDB_TEST_PROJECT: tests/Icod.TermInfo.BerkeleyDb.Tests/Icod.TermInfo.BerkeleyDb.Tests.csproj
 
 jobs:
   build:
@@ -50,6 +51,10 @@ jobs:
         run: ./.github/scripts/verify-inspection-compatibility.ps1 -Configuration '${{ env.CONFIGURATION }}' -AssemblyPath 'Icod.TermInfo.Inspection/bin/${{ env.CONFIGURATION }}/net10.0/Icod.TermInfo.Inspection.dll'
       - name: Test
         run: dotnet test ${{ env.SOLUTION_PATH }} -c ${{ env.CONFIGURATION }} --no-build --no-restore --logger trx
+      - name: Restore HDB01 BerkeleyDb tests
+        run: dotnet restore ${{ env.BERKELEYDB_TEST_PROJECT }}
+      - name: Test HDB01 BerkeleyDb package foundation
+        run: dotnet test ${{ env.BERKELEYDB_TEST_PROJECT }} -c ${{ env.CONFIGURATION }} --no-restore --logger trx -p:ContinuousIntegrationBuild=true
       - name: Pack coordinated Staging packages
         if: matrix.package_host
         shell: pwsh
@@ -97,11 +102,14 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 10.0.x
+          dotnet-version: ${{ env.DOTNET_VERSIONS }}
       - uses: actions/download-artifact@v4
         with:
           name: terminfo-pr-packages
           path: artifacts
+      - name: Smoke isolated HDB08 BerkeleyDb package consumer
+        shell: pwsh
+        run: ./.github/scripts/smoke-hdb03-package-consumer.ps1 artifacts -Configuration '${{ env.CONFIGURATION }}'
       - name: Smoke installable Icod.TermInfo.Tools package
         shell: pwsh
         run: ./.github/scripts/smoke-tool-package.ps1 artifacts

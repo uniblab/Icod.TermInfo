@@ -4,7 +4,7 @@ using Xunit;
 namespace Icod.TermInfo.Termcap.Tests;
 
 public sealed class TC08ContractTests {
-	private const string CurrentDevelopmentVersion = "1.14.0";
+	private const string CurrentDevelopmentVersion = "1.15.0";
 	private const string HistoricalTc08Version = "1.6.0-Alpha-8";
 	private const string HistoricalTc07Version = "1.6.0-Alpha-7";
 	private const string TermcapApiSnapshotSha256 =
@@ -133,8 +133,9 @@ public sealed class TC08ContractTests {
 				)
 			);
 
-		Assert.Contains( "if (17 -ne $files.Count)", release );
-		Assert.Contains( "if (18 -ne $assets.Count)", release );
+		Assert.Contains( "if (7 -ne $packages.Count)", release );
+		Assert.Contains( "if (19 -ne $files.Count)", release );
+		Assert.Contains( "if (20 -ne $assets.Count)", release );
 		Assert.Contains( "Icod.TermInfo.Termcap/Icod.TermInfo.Termcap.csproj", packPackages );
 		Assert.Contains( "NuGet/login@v1", release );
 		Assert.Contains( "environment: Release", release );

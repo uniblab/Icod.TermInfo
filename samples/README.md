@@ -1,14 +1,32 @@
 # Icod.TermInfo Samples
 
-The repository contains **nine executable API samples** plus one command-suite
+The repository contains **ten executable API samples** plus one command-suite
 walkthrough. The samples stay separate so acquisition, reusable toolchain,
 multi-database automation, persistent-raster semantics, runtime-evidence
 integration, and raster-backend selection can be copied without mixing unrelated
 concerns.
 
-All nine executable API sample projects target `net8.0`, `net9.0`, and
+All ten executable API sample projects target `net8.0`, `net9.0`, and
 `net10.0`; every `dotnet run` example therefore specifies a framework. Substitute
 `-f net8.0` or `-f net9.0` when exercising those consumer targets.
+
+## Icod.TermInfo.BerkeleyDb.Sample
+
+`Icod.TermInfo.BerkeleyDb.Sample` is the focused **1.15** hashed-acquisition
+example. It creates a controlled Hash-v9 file in a temporary directory, resolves
+a controlled alias through `BerkeleyDbTerminalDescriptionProvider`, prints the
+canonical identity and selected capability state, and removes the fixture.
+
+The sample is deterministic and CI-safe. It uses no ambient terminfo database,
+native Berkeley DB library, subprocess, or network access. Its fixture writer is
+sample setup only; the production package remains read only.
+
+```text
+dotnet run --project samples/Icod.TermInfo.BerkeleyDb.Sample/Icod.TermInfo.BerkeleyDb.Sample.csproj -f net10.0
+```
+
+See `Icod.TermInfo.BerkeleyDb.Sample/README.md` and
+`../docs/1.15.0-BERKELEY-DB-HASHED-ACQUISITION-GUIDE.md`.
 
 ## Icod.TermInfo.RasterBackendSelection.Sample
 
@@ -224,6 +242,10 @@ on `net8.0`, `net9.0`, and `net10.0` as part of exact package verification. The 
 raster-backend selection sample and a package-reference-only consumer that uses a
 freshly packed `Icod.TermInfo.Inspection` candidate beside published
 `Icod.Terminal 1.13.0`.
+
+The 1.15 qualification runs the controlled BerkeleyDb sample on net8.0,
+net9.0, and net10.0 and separately consumes the exact package on Windows, Linux,
+and macOS. Neither path requires native Berkeley DB.
 
 Live verification is never required by CI. Interactive `--live` modes exist only
 to demonstrate the caller/sibling-layer boundary.

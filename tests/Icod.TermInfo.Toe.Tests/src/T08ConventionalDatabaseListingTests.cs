@@ -439,7 +439,7 @@ public sealed class T08ConventionalDatabaseListingTests {
 	}
 
 	[Fact]
-	public async Task NonDirectoryStoreReturnsOperationalFailure() {
+	public async Task MalformedFileStoreReturnsInspectionFailure() {
 		string parent = CreateTemporaryDirectory();
 		string file = System.IO.Path.Combine(
 			parent,
@@ -455,7 +455,7 @@ public sealed class T08ConventionalDatabaseListingTests {
 
 			Assert.Equal( CommandExitCodes.Failure, result.Status );
 			Assert.Equal( string.Empty, result.Stdout );
-			Assert.Contains( "TOE0003", result.Stderr, StringComparison.Ordinal );
+			Assert.Contains( "TOE0005", result.Stderr, StringComparison.Ordinal );
 		} finally {
 			DeleteDirectory( parent );
 		}

@@ -1,10 +1,36 @@
 # Icod.TermInfo Compatibility Policy
 
+## 1.15 compatibility freeze
+
+Icod.TermInfo 1.15 adds the optional `Icod.TermInfo.BerkeleyDb` package with an
+exact nine-type public API freeze. It supports the reviewed ncurses-compatible
+Berkeley DB Hash-v9 subset in pure managed, read only code. The package API is
+equivalent on net8.0, net9.0, and net10.0 and assembly identity remains
+`1.0.0.0`.
+
+BerkeleyDb depends only on matching-version Runtime. Runtime stays
+dependency-free and never discovers hashed stores implicitly. Source, Termcap,
+Compiler, and Inspection do not depend on BerkeleyDb; Inspection remains
+provider-neutral. Native Berkeley DB is a CI oracle only and is not shipped.
+
+Compatibility includes exact lookup/canonical-alias identity, deterministic
+catalog ordering, bounded error categories, and the reviewed explicit-path
+`infocmp`/human-`toe` behavior. It excludes hashed writing, `tic` hashed
+publication, atomic snapshots, other Berkeley DB access methods or revisions,
+and general encoding detection. Inspection JSON versions 1 through 6 are
+unchanged.
+
+Stable 1.15 promotion preserves the exact nine-type public API freeze,
+acquisition semantics, dependency direction, target frameworks, JSON and
+command contracts, package topology, archive RIDs, pure-managed deployment, and
+read-only boundary accepted from Alpha-8.
+
 This document defines the supported 1.x compatibility boundary for
 `Icod.TermInfo`, `Icod.TermInfo.Source`, `Icod.TermInfo.Compiler`,
-`Icod.TermInfo.Inspection`, `Icod.TermInfo.Termcap`, and the coordinated tool
-distribution. Exact release evidence remains in the versioned API freezes,
-schema files, roadmaps, and release audits.
+`Icod.TermInfo.Inspection`, `Icod.TermInfo.Termcap`,
+`Icod.TermInfo.BerkeleyDb`, and the coordinated tool distribution. Exact
+release evidence remains in the versioned API freezes, schema files, roadmaps,
+and release audits.
 
 ## 1.14 compatibility freeze
 
@@ -122,8 +148,8 @@ The 1.x line is compatible-additive:
 - incompatible contract changes require a new major release unless a documented
   emergency compatibility decision explicitly says otherwise.
 
-Runtime, Source, Compiler, Inspection, and Termcap retain reusable assembly
-version `1.0.0.0` throughout the compatible 1.x package line.
+Runtime, Source, Compiler, Inspection, Termcap, and BerkeleyDb retain reusable
+assembly version `1.0.0.0` throughout the compatible 1.x package line.
 
 ## Target-framework compatibility
 
@@ -148,6 +174,7 @@ The production dependency direction is frozen:
 Icod.TermInfo                 dependency-free
 Icod.TermInfo.Source          -> Runtime
 Icod.TermInfo.Termcap         -> Runtime
+Icod.TermInfo.BerkeleyDb      -> Runtime
 Icod.TermInfo.Compiler        -> Runtime + Source
 Icod.TermInfo.Inspection      -> Runtime + Source
 ```
@@ -155,7 +182,8 @@ Icod.TermInfo.Inspection      -> Runtime + Source
 Runtime never depends upward on optional layers. Inspection does not depend on
 Compiler or Termcap. Reusable packages do not depend on command projects or
 `Icod.CommandFramework`. Beginning with 1.11 and continuing through 1.14,
-Inspection also must not acquire a production dependency on `Icod.Terminal` or
+Inspection also must not acquire a production dependency on BerkeleyDb,
+`Icod.Terminal` or
 `Icod.DCurses`.
 
 Tests, samples, and isolated package consumers may reference sibling packages to

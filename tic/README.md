@@ -2,14 +2,14 @@
 
 `tic` is part of the `Icod.TermInfo` managed terminfo tool suite.
 
-## 1.14 release status
+## 1.15 release status
 
-Version `1.14.0` carries the frozen `tic` compiler, source-language, database,
-and command contracts forward unchanged. The coordinated 1.14 raster-backend
-selection work is isolated in `Icod.TermInfo.Inspection`; `tic` acquires no new
-semantics, options, dependencies, target-framework changes, or archive topology.
-Both standalone `tic` and routed `icod-terminfo tic` therefore retain their
-existing command behavior while reporting the coordinated `1.14.0` suite version.
+Version `1.15.0` carries the frozen `tic` compiler, source-language,
+conventional database, and command contracts forward unchanged. Read-only hashed
+acquisition is isolated in the optional BerkeleyDb package; `tic` acquires no
+hashed writing, new option, dependency, target-framework change, or archive
+topology. Both standalone `tic` and routed `icod-terminfo tic` retain their
+existing command behavior while reporting the coordinated `1.15.0` suite version.
 
 ## 1.9 status
 

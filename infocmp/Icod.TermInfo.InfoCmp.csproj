@@ -37,6 +37,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Icod.CommandFramework" Version="2.2.1" />
+		<ProjectReference Include="..\Icod.TermInfo.BerkeleyDb\Icod.TermInfo.BerkeleyDb.csproj" />
 		<ProjectReference Include="..\Icod.TermInfo.Inspection\Icod.TermInfo.Inspection.csproj" />
 	</ItemGroup>
 	<ItemGroup>

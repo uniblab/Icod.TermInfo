@@ -1,6 +1,33 @@
 # infocmp
 
-## 1.14 release status
+## 1.15 release status
+
+`1.15.0` accepts pure-managed hashed acquisition for explicit
+`-A` and `-B` paths. An existing file uses
+`BerkeleyDbTerminalDescriptionProvider`; an existing directory or
+unclassified path retains the conventional provider. Rendering, comparison,
+explicit-parent synthesis, explicit-candidate planning, and the existing
+terminal-description/comparison JSON documents remain storage-neutral.
+
+The catalog-wide `--plan-use --all-candidates` forms remain
+conventional-directory-only. A BerkeleyDb file in that mode is rejected before
+output. Direct `infocmp` and routed `icod-terminfo infocmp` are qualified as
+equivalent, and no Inspection public API or dependency changes.
+
+HDB07 adds no command option or output-contract change. It hardens direct and
+routed failure boundaries and verifies first, middle, and last primary/alias
+lookups in a 64-entry native ASCII Hash-v9 matrix on Linux and macOS, with the
+Linux fixture transported to Windows. The accepted suite passes 115 `infocmp`
+cases on every host; frozen JSON documents remain unchanged.
+
+HDB07C likewise adds no command or JSON contract. Exact hashed lookup is
+UTF-8-first and tries one representable Latin-1 key only after a clean miss.
+Direct and routed `infocmp` consume the qualified native big-endian container
+and Latin-1 canonical/alias fixtures on Linux and macOS, and the transported
+Linux fixtures on Windows. Unequal two-observation database reads fail as I/O;
+this detection is not an atomic snapshot or arbitrary writer coordination.
+
+## 1.14 release history
 
 Version `1.14.0` carries the existing `infocmp` rendering, comparison,
 relative-source synthesis/planning, and JSON automation command contracts
@@ -191,8 +218,8 @@ command output, not a failure, and therefore return status `0`.
 Database selection is:
 
 ```text
--A <directory>    use this explicit database for the first terminal
--B <directory>    use this explicit database for subsequent terminals
+-A <path>         use this explicit directory or hashed file for the first terminal
+-B <path>         use this explicit directory or hashed file for subsequent terminals
 ```
 
 Neither option mutates `TERMINFO` or other process environment variables. Without
@@ -250,8 +277,8 @@ infocmp --help
 ## Options
 
 ```text
--A directory    explicit database for the first terminal
--B directory    explicit database for subsequent terminals
+-A path         explicit directory or hashed file for the first terminal
+-B path         explicit directory or hashed file for subsequent terminals
 -0              one logical source line
 -1              one capability per line
 -w width        canonical wrapping width
@@ -297,9 +324,11 @@ candidate is selected. Duplicate candidate spellings are usage errors.
 ## Environment
 
 `TERM` is read only for zero-operand one-terminal inspection. `-A` and `-B`
-construct explicit directory providers and do not mutate `TERMINFO` or other
-process environment variables. Without an explicit database for a side, normal
-Runtime system discovery is used.
+classify explicit paths by current filesystem shape: existing files construct
+the BerkeleyDb provider; directories and unclassified paths retain the
+conventional provider. They do not mutate `TERMINFO` or other process
+environment variables. Without an explicit database for a side, normal Runtime
+system discovery is used.
 
 ## Exit statuses
 

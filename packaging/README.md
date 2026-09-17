@@ -14,7 +14,7 @@ This directory adapts the canonical Icod C#/.NET build-cycle contract to the coo
 
 ## Coordinated package set
 
-`PackPackages.ps1` produces the six coordinated registry packages from the already-built solution:
+`PackPackages.ps1` produces the seven coordinated registry packages from the already-built solution:
 
 ```text
 Icod.TermInfo
@@ -22,12 +22,20 @@ Icod.TermInfo.Source
 Icod.TermInfo.Termcap
 Icod.TermInfo.Compiler
 Icod.TermInfo.Inspection
+Icod.TermInfo.BerkeleyDb
 Icod.TermInfo.Tools
 ```
 
-The reusable libraries also produce their symbol packages. Package versions remain authoritative in MSBuild through `IcodTermInfoSuiteVersion`.
+The six reusable libraries also produce symbol packages. Package versions remain authoritative in MSBuild through `IcodTermInfoSuiteVersion`.
 
 `VerifyPackageArtifact.ps1` delegates to the repository's existing deep package contract, including API baselines, cross-target equivalence, fresh package consumers, structural checks, deterministic samples, and router validation.
+
+For HDB08, it also invokes the managed
+`Icod.TermInfo.BerkeleyDb.PackageVerifier`. That verifier requires the exact
+BerkeleyDb nupkg/snupkg identity, matching Runtime-only dependencies, the
+unsigned IL-only `1.0.0.0` assembly, portable PDBs with Source Link, and no
+runtime/native payload. The PowerShell entry point is orchestration only; it
+does not parse ZIP archives.
 
 ## Tool-suite archives
 
@@ -56,7 +64,7 @@ Matching-host execution smoke remains separate from structural archive verificat
 
 ## CI/CD dependency model
 
-Pull requests build and test Staging on Windows, Linux, and macOS. Linux x64 produces the canonical Staging packages and archives; matching-host jobs smoke the exact artifacts.
+Pull requests build and test Staging on Windows, Linux, and macOS. Linux x64 produces the canonical Staging packages and archives; matching-host jobs smoke the exact artifacts. Each Windows, Linux, and macOS package-smoke host consumes the same BerkeleyDb package set on net8.0, net9.0, and net10.0 before installed-tool smoke. The six RID jobs retain matching-host archive execution.
 
 `main` builds and tests Release on six OS/architecture runners. The Linux x64 matrix member reuses that validated build to pack and verify the canonical package artifacts and build the archive set rather than performing a second identical Release build.
 

@@ -7,18 +7,18 @@ The package is intentionally separate from Runtime. Applications that only load
 compiled terminfo or consume `TerminalDescription` values continue to reference
 `Icod.TermInfo` alone.
 
-## 1.14 release status
+## 1.15 release status
 
-Version `1.14.0` preserves the frozen Source 1.1 public API, parser/resolver
+Version `1.15.0` preserves the frozen Source 1.1 public API, parser/resolver
 semantics, Runtime-only dependency, `net8.0` / `net9.0` / `net10.0` support, and
-assembly identity `1.0.0.0`. The coordinated 1.14 feature work is isolated to
-`Icod.TermInfo.Inspection`; Source does not acquire Inspection, Terminal, Termcap,
-or command-layer dependencies.
+assembly identity `1.0.0.0`. Hashed acquisition is isolated to the optional
+`Icod.TermInfo.BerkeleyDb` package; Source does not acquire BerkeleyDb,
+Inspection, Terminal, Termcap, or command-layer dependencies.
 
 ## Install
 
 ```text
-dotnet add package Icod.TermInfo.Source --version 1.14.0
+dotnet add package Icod.TermInfo.Source --version 1.15.0
 ```
 
 The package depends on the matching `Icod.TermInfo` version.
@@ -83,7 +83,7 @@ does not change the current install version above.
 ## Compatibility
 
 The Source public contract was frozen at 1.1 and remains compatible throughout
-the coordinated 1.x line. Version 1.14 changes package/release identity only for
+the coordinated 1.x line. Version 1.15 changes package/release identity only for
 Source; it does not change Source semantics or public API.
 
 See `../docs/VERSIONING.md`, `../docs/COMPATIBILITY.md`, and the root

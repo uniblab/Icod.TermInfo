@@ -26,6 +26,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Icod.TermInfo.csproj" />
+    <ProjectReference Include="..\..\Icod.TermInfo.BerkeleyDb\Icod.TermInfo.BerkeleyDb.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Shared\Hdb07HashV9FixtureBuilder.cs"
+             Link="Shared\Hdb07HashV9FixtureBuilder.cs" />
   </ItemGroup>
 
   <ItemGroup>

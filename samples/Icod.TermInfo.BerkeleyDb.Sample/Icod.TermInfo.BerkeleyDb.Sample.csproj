@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+	Icod.TermInfo.BerkeleyDb.Sample
+	Demonstrates deterministic explicit Berkeley DB Hash-v9 acquisition.
+	Copyright (C) 2026  Timothy J. Bruce <uniblab@hotmail.com>
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<AssemblyName>Icod.TermInfo.BerkeleyDb.Sample</AssemblyName>
+		<RootNamespace>Icod.TermInfo.BerkeleyDb.Sample</RootNamespace>
+		<IsPackable>false</IsPackable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\Icod.TermInfo.BerkeleyDb\Icod.TermInfo.BerkeleyDb.csproj" />
+	</ItemGroup>
+</Project>

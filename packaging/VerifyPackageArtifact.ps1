@@ -27,6 +27,13 @@ try {
         throw "Package artifact verification exited with status $LASTEXITCODE."
     }
 
+    & ./.github/scripts/verify-berkeleydb-package.ps1 `
+        -ArtifactDirectory $ArtifactDirectory `
+        -Configuration $Configuration
+    if (0 -ne $LASTEXITCODE) {
+        throw "HDB01 BerkeleyDb package verification exited with status $LASTEXITCODE."
+    }
+
     & ./.github/scripts/smoke-rl07-package-consumer.ps1 `
         -ArtifactDirectory $ArtifactDirectory `
         -Configuration $Configuration

@@ -29,6 +29,13 @@
 		<ProjectReference Include="..\..\toe\Icod.TermInfo.Toe.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<Compile Include="..\Shared\BerkeleyDbHashV9TestStore.cs"
+			Link="Shared\BerkeleyDbHashV9TestStore.cs" />
+		<Compile Include="..\Shared\Hdb07HashV9FixtureBuilder.cs"
+			Link="Shared\Hdb07HashV9FixtureBuilder.cs" />
+	</ItemGroup>
+
 	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
 		<ErrorReport>prompt</ErrorReport>
 		<WarningLevel>2</WarningLevel>
