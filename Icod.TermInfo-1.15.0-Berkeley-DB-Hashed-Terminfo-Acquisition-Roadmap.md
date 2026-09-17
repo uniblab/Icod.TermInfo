@@ -1024,10 +1024,14 @@ case. The Alpha-8 GREEN candidate adds:
   authorities; and
 - a root changelog plus synchronized Alpha-8 release-facing documentation.
 
-Alpha-8 closure qualification is pending. Stable promotion remains a separate
-version/status-only checkpoint after that exact candidate passes the complete
-normal and genuine HDB00 matrices. PR #45 remains draft and unmerged; HDB09
-does not create a tag or publication.
+The corrected Alpha-8 closure implementation head
+`406891bff059bafb4dba82b1de64e33861c78773` passed normal run `35178539117`
+with 12/12 jobs. HDB00-sensitive implementation head
+`5f485265c51ef2b7b37842608bb53db4fabe100a` passed genuine HDB00 run
+`35178105916` with native Linux/macOS and transported Windows work executed.
+This evidence-record head must now independently pass both complete gates.
+Stable promotion remains a separate version/status-only checkpoint. PR #45
+remains draft and unmerged; HDB09 does not create a tag or publication.
 
 ---
 
