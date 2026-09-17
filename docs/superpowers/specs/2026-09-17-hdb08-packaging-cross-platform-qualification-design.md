@@ -1,7 +1,11 @@
 # HDB08 Packaging and Cross-platform Qualification Design
 
-**Status:** DESIGN APPROVED / IMPLEMENTATION PLANNING
+**Status:** COMPLETE / ACCEPTED
 **Target prerelease:** `1.15.0-Alpha-8`
+**Accepted implementation/qualification head:**
+`b25733851c963585b56fcf064e9e27c6fdd47ee5`
+**Accepted qualification runs:** normal `35171310997` (12/12), HDB00
+`35171310971` (3/3)
 **Accepted HDB07C implementation/qualification head:**
 `2c122abd7e4e63397b474f248d51273a1b7fc006`
 **Accepted HDB07C final closure head:**

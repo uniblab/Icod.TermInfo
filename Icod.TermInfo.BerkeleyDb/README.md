@@ -4,7 +4,7 @@
 
 ## 1.15 development status
 
-`1.15.0-Alpha-8` is the HDB08 packaging and cross-platform qualification candidate for the accepted HDB07/HDB07C behavior of the explicit and opt-in system terminal-description providers and hashed terminal catalog on the managed Hash-v9 reader. It supports bounded exact-key lookup and complete record enumeration with inline and off-page records, overflow reconstruction, both byte orders, ncurses marker resolution, Runtime-owned compiled-entry parsing, exact identity validation, and deterministic logical publication ordering. HDB08 changes qualification infrastructure and release metadata, not acquisition behavior or public API.
+`1.15.0-Alpha-8` has completed HDB08 packaging and cross-platform qualification for the accepted HDB07/HDB07C behavior of the explicit and opt-in system terminal-description providers and hashed terminal catalog on the managed Hash-v9 reader. It supports bounded exact-key lookup and complete record enumeration with inline and off-page records, overflow reconstruction, both byte orders, ncurses marker resolution, Runtime-owned compiled-entry parsing, exact identity validation, and deterministic logical publication ordering. HDB08 changes qualification infrastructure and release metadata, not acquisition behavior or public API.
 
 HDB00 selected a dependency-free managed reader for the reviewed Berkeley DB **Hash on-disk format version 9** subset required by ncurses acquisition. Native Berkeley DB remains a CI interoperability oracle and is not a production dependency.
 
@@ -86,7 +86,9 @@ explicit paths and then call the accepted provider or catalog reader. Explicit
 Inspection stays provider-neutral, ambient `toe` discovery and JSON stay
 conventional, and `tic` remains directory-write-only. Installed-tool smoke
 passed on all three hosts and direct-command smoke passed for all six archive
-RIDs. The suite is now the `1.15.0-Alpha-8` HDB08 qualification candidate;
-acceptance requires the exact candidate head to pass the normal 12-job and
-HDB00 3-job workflows. Atomic snapshots, arbitrary writer coordination, and
-non-UTF-8/non-Latin-1 producer encodings remain outside the qualified contract.
+RIDs. The `1.15.0-Alpha-8` HDB08 exact head passed the normal 12-job and HDB00
+3-job workflows, including the managed exact-package verifier and three-host
+net8/net9/net10 package consumption. Atomic snapshots, arbitrary writer
+coordination, and non-UTF-8/non-Latin-1 producer encodings remain outside the
+qualified contract. HDB09 API freeze, audits, documentation, and stable
+promotion are next.

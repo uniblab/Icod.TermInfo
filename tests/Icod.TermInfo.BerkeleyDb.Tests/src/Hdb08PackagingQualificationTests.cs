@@ -251,7 +251,7 @@ public sealed class Hdb08PackagingQualificationTests {
 			StringComparison.Ordinal
 		);
 		Assert.Contains(
-			"HDB08 — Packaging and Cross-platform Qualification — IN QUALIFICATION",
+			"HDB08 — Packaging and Cross-platform Qualification — COMPLETE / ACCEPTED",
 			roadmap,
 			StringComparison.Ordinal
 		);

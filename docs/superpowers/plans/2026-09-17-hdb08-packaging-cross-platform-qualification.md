@@ -1,5 +1,11 @@
 # HDB08 Packaging and Cross-platform Qualification Implementation Plan
 
+**Execution status:** COMPLETE / ACCEPTED
+**Accepted implementation/qualification head:**
+`b25733851c963585b56fcf064e9e27c6fdd47ee5`
+**Accepted qualification runs:** normal `35171310997` (12/12), HDB00
+`35171310971` (3/3)
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Freeze the accepted HDB07C behavior as `1.15.0-Alpha-8` with exact C# package verification and package-only net8/net9/net10 consumption on Windows, Linux, and macOS.
@@ -57,7 +63,7 @@
 - Consumes: repository-root discovery and xUnit conventions already used by `Hdb01ContractTests`.
 - Produces: permanent static contracts for the C# verifier project, program, solution ownership, and PowerShell orchestration entry point.
 
-- [ ] **Step 1: Add the verifier-ownership contract test**
+- [x] **Step 1: Add the verifier-ownership contract test**
 
 Create `Hdb08PackagingQualificationTests` with the repository copyright/license header and this first test/helper shape:
 
@@ -195,7 +201,7 @@ public sealed class Hdb08PackagingQualificationTests {
 }
 ```
 
-- [ ] **Step 2: Verify the focused RED**
+- [x] **Step 2: Verify the focused RED**
 
 Run:
 
@@ -205,7 +211,7 @@ dotnet test tests/Icod.TermInfo.BerkeleyDb.Tests/Icod.TermInfo.BerkeleyDb.Tests.
 
 Expected: FAIL at `Assert.True( File.Exists( projectPath ) )`; the new C# verifier does not exist. With no local .NET SDK, commit and push this test-only checkpoint and require the normal workflow to show the same focused failure on Windows, Linux, and macOS across net8/net9/net10.
 
-- [ ] **Step 3: Commit the RED**
+- [x] **Step 3: Commit the RED**
 
 ```bash
 git add tests/Icod.TermInfo.BerkeleyDb.Tests/src/Hdb08PackagingQualificationTests.cs
@@ -229,7 +235,7 @@ Record the exact commit, workflow IDs, failing host jobs, and assertion. Do not 
 - Consumes: `Directory.Build.props`, `Icod.TermInfo.BerkeleyDb.csproj`, canonical package artifacts, and `Icod.TermInfo.PublicApiSnapshot`.
 - Produces: `Icod.TermInfo.BerkeleyDb.PackageVerifier.Main(string[]) -> int`; stable wrapper command `.github/scripts/verify-berkeleydb-package.ps1 -ArtifactDirectory <path> -Configuration <configuration>`.
 
-- [ ] **Step 1: Add the non-packable verifier project**
+- [x] **Step 1: Add the non-packable verifier project**
 
 Create the project exactly as:
 
@@ -247,7 +253,7 @@ Create the project exactly as:
 
 Add it to `Icod.TermInfo.sln` as a normal C# project with Debug, Release, and Staging Any CPU configuration entries. Add no project or package reference.
 
-- [ ] **Step 2: Implement CLI/version discovery and exact package paths**
+- [x] **Step 2: Implement CLI/version discovery and exact package paths**
 
 `Program.Main` accepts zero or one artifact-directory argument. Use these constants and target list:
 
@@ -287,7 +293,7 @@ string snupkg =
 
 More than one argument writes the documented usage and returns 2. Catch `IOException`, `UnauthorizedAccessException`, `InvalidDataException`, `InvalidOperationException`, and `XmlException`; write the exact exception message and return 1.
 
-- [ ] **Step 3: Verify exact nupkg structure, identity, and dependency graph**
+- [x] **Step 3: Verify exact nupkg structure, identity, and dependency graph**
 
 Open the nupkg with `ZipFile.OpenRead`. Require these exact entries:
 
@@ -340,7 +346,7 @@ Require(
 );
 ```
 
-- [ ] **Step 4: Verify exact snupkg and Source Link**
+- [x] **Step 4: Verify exact snupkg and Source Link**
 
 Require the symbol package to contain exactly these PDB paths and no DLL, native extension, or `runtimes/` path:
 
@@ -377,7 +383,7 @@ Require(
 
 Require the symbol nuspec id/version to match and its package type name to equal `SymbolsPackage`. Require its repository URL/commit and dependency groups to match the primary package.
 
-- [ ] **Step 5: Replace PowerShell archive parsing with orchestration**
+- [x] **Step 5: Replace PowerShell archive parsing with orchestration**
 
 Keep the current parameter block, root/path normalization, strict mode, and `Push-Location`/`finally`. Replace the PowerShell ZIP/nuspec parsing with:
 
@@ -395,11 +401,11 @@ if (0 -ne $LASTEXITCODE) {
 
 Retain the two existing `Icod.TermInfo.PublicApiSnapshot --compare` invocations for net8/net9 and net8/net10. Do not use `ConvertFrom-Json`, `System.IO.Compression.ZipFile`, PowerShell classes, or PowerShell 7-only syntax.
 
-- [ ] **Step 6: Document the maintainer command**
+- [x] **Step 6: Document the maintainer command**
 
 Create the verifier README with the exact command, zero/one-argument behavior, primary/symbol package checks, API-comparison ownership, no-native-asset rule, and statement that this tool is not packaged.
 
-- [ ] **Step 7: Run focused and artifact verification**
+- [x] **Step 7: Run focused and artifact verification**
 
 Run:
 
@@ -412,7 +418,7 @@ pwsh ./.github/scripts/verify-berkeleydb-package.ps1 -ArtifactDirectory artifact
 
 Expected: PASS and exact verifier success. In this workspace, use CI for compilation/execution because no local .NET SDK is installed. Run `git diff --check` locally before commit.
 
-- [ ] **Step 8: Commit and qualify verifier GREEN**
+- [x] **Step 8: Commit and qualify verifier GREEN**
 
 ```bash
 git add tools/berkeleydb-package-verifier Icod.TermInfo.sln .github/scripts/verify-berkeleydb-package.ps1
@@ -432,7 +438,7 @@ Push and require normal 12/12. Require HDB00 3/3 if triggered. Capture exact log
 - Consumes: the three workflow YAML files and the existing isolated consumer script.
 - Produces: permanent job-local assertions that package smoke installs all supported SDKs and invokes BerkeleyDb package consumption exactly once per workflow.
 
-- [ ] **Step 1: Add workflow-job extraction helpers**
+- [x] **Step 1: Add workflow-job extraction helpers**
 
 Add:
 
@@ -479,7 +485,7 @@ private static int CountOccurrences(
 }
 ```
 
-- [ ] **Step 2: Add the failing workflow theory**
+- [x] **Step 2: Add the failing workflow theory**
 
 ```csharp
 [Theory]
@@ -529,11 +535,11 @@ public void PackageSmokeConsumesBerkeleyDbOnEveryOperatingSystem(
 }
 ```
 
-- [ ] **Step 3: Add the already-green six-RID characterization**
+- [x] **Step 3: Add the already-green six-RID characterization**
 
 Add a theory over all three workflows that asserts `windows-11-arm`, `ubuntu-24.04-arm`, `macos-15-intel`, both macOS entries, both x64 entries, `name: Archive ${{ matrix.name }}`, and `smoke-tool-archive.ps1`. This test must pass before workflow edits and permanently prevents HDB08 from narrowing archive coverage.
 
-- [ ] **Step 4: Observe and commit RED**
+- [x] **Step 4: Observe and commit RED**
 
 Run:
 
@@ -563,7 +569,7 @@ Push and record the exact failing assertions before workflow changes.
 - Consumes: one uploaded package set and `.github/scripts/smoke-hdb03-package-consumer.ps1`.
 - Produces: net8/net9/net10 package-only execution on Windows, Linux, and macOS in all workflow families.
 
-- [ ] **Step 1: Move PR ownership to the cross-host smoke job**
+- [x] **Step 1: Move PR ownership to the cross-host smoke job**
 
 Remove only this Linux packaging-host step from `pull-request.yaml`:
 
@@ -590,15 +596,15 @@ After artifact download and before installed-tool smoke, add:
         run: ./.github/scripts/smoke-hdb03-package-consumer.ps1 artifacts -Configuration '${{ env.CONFIGURATION }}'
 ```
 
-- [ ] **Step 2: Add the same consumer to `main`**
+- [x] **Step 2: Add the same consumer to `main`**
 
 Change `main.yaml` package-smoke SDK setup to `${{ env.DOTNET_VERSIONS }}` and add the exact named step above after artifact download. Use the workflow's `Release` configuration through `${{ env.CONFIGURATION }}`.
 
-- [ ] **Step 3: Add the same consumer to tagged release**
+- [x] **Step 3: Add the same consumer to tagged release**
 
 Change `release.yaml` package-smoke SDK setup to `${{ env.DOTNET_VERSIONS }}` and add the exact named step above after artifact download. Retain `needs: [metadata, package]` and retain publication dependencies on both `smoke-tool-package` and `smoke-tool-archives`.
 
-- [ ] **Step 4: Run static and focused verification**
+- [x] **Step 4: Run static and focused verification**
 
 Run:
 
@@ -609,7 +615,7 @@ git diff --check
 
 Expected: all HDB08 contract tests pass.
 
-- [ ] **Step 5: Commit and qualify workflow GREEN**
+- [x] **Step 5: Commit and qualify workflow GREEN**
 
 ```bash
 git add .github/workflows/pull-request.yaml .github/workflows/main.yaml .github/workflows/release.yaml
@@ -629,7 +635,7 @@ Push and require normal 12/12. Verify each Windows/Linux/macOS package-smoke log
 - Consumes: version authority, BerkeleyDb package project, roadmap, candidate record, and release-facing READMEs.
 - Produces: exact Alpha-8/version/documentation synchronization contract without claiming HDB08 acceptance prematurely.
 
-- [ ] **Step 1: Add exact Alpha-8 authority test**
+- [x] **Step 1: Add exact Alpha-8 authority test**
 
 ```csharp
 [Fact]
@@ -671,7 +677,7 @@ public void Alpha8AuthorityAndQualificationCandidateAreSynchronized() {
 		StringComparison.Ordinal
 	);
 	Assert.Contains(
-		"HDB08 — Packaging and Cross-platform Qualification — IN QUALIFICATION",
+		"HDB08 — Packaging and Cross-platform Qualification — COMPLETE / ACCEPTED",
 		roadmap,
 		StringComparison.Ordinal
 	);
@@ -683,7 +689,7 @@ public void Alpha8AuthorityAndQualificationCandidateAreSynchronized() {
 }
 ```
 
-- [ ] **Step 2: Observe and commit RED**
+- [x] **Step 2: Observe and commit RED**
 
 Run the focused test. Expected: FAIL because the version is still Alpha-7, the roadmap still says HDB08 is next, and the candidate record is absent.
 
@@ -712,7 +718,7 @@ Push and record the exact RED before version/documentation changes.
 - Consumes: qualified verifier/workflow checkpoints.
 - Produces: one exact Alpha-8 implementation/qualification candidate with no production behavior change.
 
-- [ ] **Step 1: Advance only the coordinated version authority**
+- [x] **Step 1: Advance only the coordinated version authority**
 
 Change:
 
@@ -728,7 +734,7 @@ to:
 
 Do not change any assembly version or individual `<Version>`/`<PackageVersion>` property reference.
 
-- [ ] **Step 2: Replace BerkeleyDb package release notes exactly**
+- [x] **Step 2: Replace BerkeleyDb package release notes exactly**
 
 Use one XML element containing:
 
@@ -736,17 +742,17 @@ Use one XML element containing:
 1.15.0-Alpha-8 completes exact package and cross-platform qualification for managed read-only Berkeley DB Hash-v9 acquisition. Public API, dependencies, acquisition behavior, pure-managed deployment, and the read-only boundary remain unchanged.
 ```
 
-- [ ] **Step 3: Create the qualification-candidate record**
+- [x] **Step 3: Create the qualification-candidate record**
 
 The record states `STATUS: QUALIFICATION CANDIDATE`, Alpha-8, the accepted HDB07C behavior head, verifier/workflow RED and GREEN heads/runs, exact expected normal 12/12 and HDB00 3/3 evidence, seven nupkg/six snupkg accounting, three-host net8/net9/net10 consumption, installed-tool smoke, six archive RIDs, unchanged contracts, and PR draft/unmerged requirement. It must explicitly state that the document does not claim acceptance until the exact containing head is green.
 
-- [ ] **Step 4: Synchronize release-facing descriptions without claiming acceptance**
+- [x] **Step 4: Synchronize release-facing descriptions without claiming acceptance**
 
 Update the roadmap status to `HDB00–HDB07C accepted; HDB08 in qualification`, current prerelease Alpha-8, and the HDB08 heading/status required by the test. Update root and package READMEs to describe Alpha-8 as a qualification candidate. Update packaging/script documentation to describe the C# verifier and cross-host package-only consumer topology.
 
 Do not edit HDB07C's accepted head or reinterpret its claims. Do not mark HDB08 complete in this commit.
 
-- [ ] **Step 5: Run complete static/focused checks**
+- [x] **Step 5: Run complete static/focused checks**
 
 Run:
 
@@ -758,14 +764,14 @@ rg -n "1.15.0-Alpha-7" Directory.Build.props Icod.TermInfo.BerkeleyDb/Icod.TermI
 
 Expected: focused tests pass, no whitespace errors, and the final `rg` finds Alpha-7 only where it identifies the prior accepted HDB07/HDB07C state rather than current authority.
 
-- [ ] **Step 6: Commit candidate GREEN**
+- [x] **Step 6: Commit candidate GREEN**
 
 ```bash
 git add Directory.Build.props Icod.TermInfo.BerkeleyDb/Icod.TermInfo.BerkeleyDb.csproj docs/1.15.0-HDB08-QUALIFICATION-CANDIDATE.md Icod.TermInfo-1.15.0-Berkeley-DB-Hashed-Terminfo-Acquisition-Roadmap.md README.md Icod.TermInfo.BerkeleyDb/README.md packaging/README.md .github/scripts/README.md
 git commit -m "build: qualify HDB08 Alpha-8 packages"
 ```
 
-- [ ] **Step 7: Require exact implementation qualification**
+- [x] **Step 7: Require exact implementation qualification**
 
 Push the exact candidate head and require:
 
@@ -794,7 +800,7 @@ Capture exact head SHA, workflow IDs/URLs, BerkeleyDb count per TFM/host, packag
 - Consumes: exact RED/GREEN heads and exact Alpha-8 workflow evidence.
 - Produces: auditable HDB08 acceptance with HDB09 as the next tranche.
 
-- [ ] **Step 1: Write the closure record**
+- [x] **Step 1: Write the closure record**
 
 Record:
 
@@ -810,18 +816,18 @@ Record:
 - explicit absence of tag, publication, merge, or ready-for-review transition; and
 - HDB09 stable-freeze handoff.
 
-- [ ] **Step 2: Mark spec, plan, candidate, roadmap, and READMEs accepted**
+- [x] **Step 2: Mark spec, plan, candidate, roadmap, and READMEs accepted**
 
 Set spec and plan status to `COMPLETE / ACCEPTED`, mark completed plan checkboxes, convert the candidate record to point at the accepted closure record, and mark HDB08 complete in the roadmap without changing HDB07C evidence. State that Alpha-8 remains the current coordinated prerelease and HDB09 is next.
 
-- [ ] **Step 3: Commit documentation closure**
+- [x] **Step 3: Commit documentation closure**
 
 ```bash
 git add docs/1.15.0-HDB08-PACKAGING-AND-CROSS-PLATFORM-QUALIFICATION.md docs/1.15.0-HDB08-QUALIFICATION-CANDIDATE.md docs/superpowers/specs/2026-09-17-hdb08-packaging-cross-platform-qualification-design.md docs/superpowers/plans/2026-09-17-hdb08-packaging-cross-platform-qualification.md Icod.TermInfo-1.15.0-Berkeley-DB-Hashed-Terminfo-Acquisition-Roadmap.md README.md Icod.TermInfo.BerkeleyDb/README.md
 git commit -m "docs: accept HDB08 packaging qualification"
 ```
 
-- [ ] **Step 4: Verify documentation-complete head**
+- [x] **Step 4: Verify documentation-complete head**
 
 Require normal 12/12 and HDB00 3/3 on the exact documentation head. Run:
 
@@ -832,7 +838,7 @@ git status --short --branch
 
 Expected: no whitespace errors and a clean branch synchronized with origin.
 
-- [ ] **Step 5: Update and verify PR #45**
+- [x] **Step 5: Update and verify PR #45**
 
 Update the PR body with HDB08 implementation/documentation heads, RED/GREEN evidence, exact workflows and counts, verifier and three-host package evidence, preserved boundaries, Alpha-8 identity, and HDB09 next. Re-fetch and require:
 

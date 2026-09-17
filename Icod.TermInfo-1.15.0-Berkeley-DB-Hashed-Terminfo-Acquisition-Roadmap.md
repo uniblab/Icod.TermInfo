@@ -6,7 +6,7 @@
 **Optional package:** `Icod.TermInfo.BerkeleyDb`  
 **Language:** C# 13  
 **Reusable target frameworks:** `net8.0`; `net9.0`; `net10.0`  
-**Status:** HDB00–HDB07C accepted; HDB08 in qualification
+**Status:** HDB00–HDB08 accepted; HDB09 next
 **Current coordinated prerelease:** `1.15.0-Alpha-8`
 
 ---
@@ -934,11 +934,16 @@ transliteration, and the big-endian claim does not imply a big-endian host.
 Closure record:
 `docs/1.15.0-HDB07C-COMPATIBILITY-EXPANSION.md`.
 
-HDB08 has advanced the coordinated prerelease to Alpha-8 as a qualification
-candidate. HDB07C remains the accepted behavior boundary. PR #45 remains open,
-draft, and unmerged.
+HDB08 advanced the coordinated prerelease to Alpha-8 and is accepted. HDB07C
+remains the accepted behavior boundary; HDB08 adds qualification infrastructure
+and evidence only. PR #45 remains open, draft, and unmerged.
 
-### HDB08 — Packaging and Cross-platform Qualification — IN QUALIFICATION
+### HDB08 — Packaging and Cross-platform Qualification — COMPLETE / ACCEPTED
+
+Accepted implementation/qualification head:
+`b25733851c963585b56fcf064e9e27c6fdd47ee5`.
+
+Coordinated prerelease: `1.15.0-Alpha-8`.
 
 Qualification covers:
 
@@ -964,10 +969,23 @@ CI must include:
 6. all six standalone tool archive RIDs; and
 7. the existing complete Windows/Linux/macOS PR matrix.
 
-The candidate record is
-`docs/1.15.0-HDB08-QUALIFICATION-CANDIDATE.md`. It does not claim HDB08
-acceptance until the exact containing head passes the normal 12-job and HDB00
-3-job workflows.
+Qualification passed normal run `35171310997` with 12/12 jobs and HDB00 run
+`35171310971` with 3/3 jobs. Seven nupkg and six snupkg files were produced.
+The managed verifier proved exact BerkeleyDb package/dependency identity,
+unsigned IL-only assembly version `1.0.0.0`, portable symbols with Source Link,
+cross-TFM public-API equivalence, and no native/runtime assets. One canonical
+package set passed the isolated net8/net9/net10 consumer on Windows, Linux, and
+macOS. Installed-tool smoke and all six matching-host archive RIDs passed.
+
+HDB08 changes no public API, dependency direction, acquisition behavior, JSON
+schema, command contract, native-production boundary, or read-only boundary.
+It created no tag or publication and did not merge or mark PR #45 ready.
+
+Closure record:
+`docs/1.15.0-HDB08-PACKAGING-AND-CROSS-PLATFORM-QUALIFICATION.md`.
+
+HDB09 API freeze, documentation, audits, and stable promotion are next. Alpha-8
+remains the current coordinated prerelease.
 
 ### HDB09 — API Freeze, Documentation, and Stable Promotion
 
