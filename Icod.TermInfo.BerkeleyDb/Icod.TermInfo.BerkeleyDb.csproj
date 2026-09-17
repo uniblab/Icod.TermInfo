@@ -42,7 +42,7 @@
 		<Title>Icod.TermInfo.BerkeleyDb</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed read-only acquisition support for ncurses-compatible Berkeley DB Hash-v9 terminfo stores.</Description>
-		<PackageReleaseNotes>1.15.0-Alpha-7 adds adversarial hardening plus detected-mutation rejection, native big-endian Hash-v9 evidence, and bounded exact UTF-8-first/Latin-1-fallback acquisition. Public API, dependencies, pure-managed deployment, and the read-only boundary remain unchanged.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.15.0-Alpha-8 completes exact package and cross-platform qualification for managed read-only Berkeley DB Hash-v9 acquisition. Public API, dependencies, acquisition behavior, pure-managed deployment, and the read-only boundary remain unchanged.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>

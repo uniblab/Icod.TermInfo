@@ -4,7 +4,7 @@
 
 ## 1.15 development status
 
-`1.15.0-Alpha-7` adds accepted adversarial hardening and the HDB07C compatibility expansion to the explicit and opt-in system terminal-description providers and hashed terminal catalog on the managed Hash-v9 reader. It supports bounded exact-key lookup and complete record enumeration with inline and off-page records, overflow reconstruction, both byte orders, ncurses marker resolution, Runtime-owned compiled-entry parsing, exact identity validation, and deterministic logical publication ordering.
+`1.15.0-Alpha-8` is the HDB08 packaging and cross-platform qualification candidate for the accepted HDB07/HDB07C behavior of the explicit and opt-in system terminal-description providers and hashed terminal catalog on the managed Hash-v9 reader. It supports bounded exact-key lookup and complete record enumeration with inline and off-page records, overflow reconstruction, both byte orders, ncurses marker resolution, Runtime-owned compiled-entry parsing, exact identity validation, and deterministic logical publication ordering. HDB08 changes qualification infrastructure and release metadata, not acquisition behavior or public API.
 
 HDB00 selected a dependency-free managed reader for the reviewed Berkeley DB **Hash on-disk format version 9** subset required by ncurses acquisition. Native Berkeley DB remains a CI interoperability oracle and is not a production dependency.
 
@@ -55,7 +55,7 @@ The reviewed subset supports unencrypted, non-checksummed Hash-v9 files with sor
 
 Dedicated CI compares the production reader, providers, catalog, and tools with native Berkeley DB stores on Linux and macOS; Windows reads Linux-generated fixtures without Berkeley DB installed. Native big-endian Hash-v9 containers are produced by reloading byte-exact ncurses records with big-endian metadata. Native `tic` also produces exact Latin-1 canonical and alias keys. Lookup is UTF-8-first with the bounded clean-miss-only Latin-1 fallback above, while compiled identity fields retain Runtime's byte-preserving Latin-1 interpretation. Universal non-ASCII encodings, normalization, transliteration, and best-fit mapping are not claimed.
 
-HDB03 qualification includes native-fixture provider parsing on all supported target frameworks and an isolated package-only consumer on `net8.0`, `net9.0`, and `net10.0`.
+HDB08 qualification requires an isolated package-only consumer on `net8.0`, `net9.0`, and `net10.0` on Windows, Linux, and macOS. A managed verifier enforces the exact package identity, dependency, assembly, symbol, Source Link, and no-native-asset contract.
 
 ## Hashed-aware system discovery
 
@@ -86,7 +86,7 @@ explicit paths and then call the accepted provider or catalog reader. Explicit
 Inspection stays provider-neutral, ambient `toe` discovery and JSON stay
 conventional, and `tic` remains directory-write-only. Installed-tool smoke
 passed on all three hosts and direct-command smoke passed for all six archive
-RIDs. The suite remains `1.15.0-Alpha-7`; HDB08 packaging and cross-platform
-qualification advances to Alpha-8. Atomic snapshots, arbitrary writer
-coordination, and non-UTF-8/non-Latin-1 producer encodings remain outside the
-qualified contract.
+RIDs. The suite is now the `1.15.0-Alpha-8` HDB08 qualification candidate;
+acceptance requires the exact candidate head to pass the normal 12-job and
+HDB00 3-job workflows. Atomic snapshots, arbitrary writer coordination, and
+non-UTF-8/non-Latin-1 producer encodings remain outside the qualified contract.

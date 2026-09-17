@@ -6,8 +6,8 @@
 **Optional package:** `Icod.TermInfo.BerkeleyDb`  
 **Language:** C# 13  
 **Reusable target frameworks:** `net8.0`; `net9.0`; `net10.0`  
-**Status:** HDB00–HDB07C accepted; HDB08 next
-**Current coordinated prerelease:** `1.15.0-Alpha-7`
+**Status:** HDB00–HDB07C accepted; HDB08 in qualification
+**Current coordinated prerelease:** `1.15.0-Alpha-8`
 
 ---
 
@@ -934,10 +934,11 @@ transliteration, and the big-endian claim does not imply a big-endian host.
 Closure record:
 `docs/1.15.0-HDB07C-COMPATIBILITY-EXPANSION.md`.
 
-HDB08 is next and advances the coordinated prerelease to Alpha-8. PR #45
-remains open, draft, and unmerged.
+HDB08 has advanced the coordinated prerelease to Alpha-8 as a qualification
+candidate. HDB07C remains the accepted behavior boundary. PR #45 remains open,
+draft, and unmerged.
 
-### HDB08 — Packaging and Cross-platform Qualification
+### HDB08 — Packaging and Cross-platform Qualification — IN QUALIFICATION
 
 Qualification covers:
 
@@ -962,6 +963,11 @@ CI must include:
 5. installed `Icod.TermInfo.Tools` smoke where applicable;
 6. all six standalone tool archive RIDs; and
 7. the existing complete Windows/Linux/macOS PR matrix.
+
+The candidate record is
+`docs/1.15.0-HDB08-QUALIFICATION-CANDIDATE.md`. It does not claim HDB08
+acceptance until the exact containing head passes the normal 12-job and HDB00
+3-job workflows.
 
 ### HDB09 — API Freeze, Documentation, and Stable Promotion
 
