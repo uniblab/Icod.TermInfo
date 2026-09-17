@@ -127,6 +127,138 @@ public sealed class Hdb08PackagingQualificationTests {
 		);
 	}
 
+	[Theory]
+	[InlineData( "pull-request.yaml" )]
+	[InlineData( "main.yaml" )]
+	[InlineData( "release.yaml" )]
+	public void PackageSmokeConsumesBerkeleyDbOnEveryOperatingSystem(
+		string workflowName
+	) {
+		string root = FindRepositoryRoot();
+		string workflow =
+			ReadRepositoryFile(
+				root,
+				".github",
+				"workflows",
+				workflowName
+			);
+		string job =
+			ReadWorkflowJob(
+				workflow,
+				"smoke-tool-package",
+				"smoke-tool-archives"
+			);
+
+		Assert.Contains(
+			"os: [windows-latest, ubuntu-latest, macos-latest]",
+			job,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"dotnet-version: ${{ env.DOTNET_VERSIONS }}",
+			job,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"smoke-hdb03-package-consumer.ps1 artifacts",
+			job,
+			StringComparison.Ordinal
+		);
+		Assert.Equal(
+			1,
+			CountOccurrences(
+				workflow,
+				"smoke-hdb03-package-consumer.ps1"
+			)
+		);
+	}
+
+	[Theory]
+	[InlineData( "pull-request.yaml" )]
+	[InlineData( "main.yaml" )]
+	[InlineData( "release.yaml" )]
+	public void ArchiveSmokeRetainsAllSixMatchingHosts(
+		string workflowName
+	) {
+		string workflow =
+			ReadRepositoryFile(
+				FindRepositoryRoot(),
+				".github",
+				"workflows",
+				workflowName
+			);
+		string[] expected = [
+			"- os: windows-latest",
+			"name: Windows x64",
+			"- os: windows-11-arm",
+			"name: Windows ARM64",
+			"- os: ubuntu-24.04",
+			"name: Linux x64",
+			"- os: ubuntu-24.04-arm",
+			"name: Linux ARM64",
+			"- os: macos-15-intel",
+			"name: macOS x64",
+			"- os: macos-15",
+			"name: macOS ARM64",
+			"name: Archive ${{ matrix.name }}",
+			"smoke-tool-archive.ps1 artifacts/tools",
+		];
+
+		foreach ( string fragment in expected ) {
+			Assert.Contains(
+				fragment,
+				workflow,
+				StringComparison.Ordinal
+			);
+		}
+	}
+
+	private static string ReadRepositoryFile(
+		string root,
+		params string[] segments
+	) {
+		string[] pathSegments = [ root, .. segments ];
+		return File.ReadAllText( Path.Combine( pathSegments ) );
+	}
+
+	private static string ReadWorkflowJob(
+		string workflow,
+		string jobName,
+		string nextJobName
+	) {
+		string startMarker = $"  {jobName}:";
+		string endMarker = $"  {nextJobName}:";
+		int start = workflow.IndexOf( startMarker, StringComparison.Ordinal );
+		Assert.True( start >= 0, $"Missing workflow job '{jobName}'." );
+		int end =
+			workflow.IndexOf(
+				endMarker,
+				start,
+				StringComparison.Ordinal
+			);
+		Assert.True( end > start, $"Missing workflow job '{nextJobName}'." );
+		return workflow[start..end];
+	}
+
+	private static int CountOccurrences(
+		string value,
+		string fragment
+	) {
+		int count = 0;
+		int index = 0;
+		while (
+			(index = value.IndexOf(
+				fragment,
+				index,
+				StringComparison.Ordinal
+			)) >= 0
+		) {
+			count++;
+			index += fragment.Length;
+		}
+		return count;
+	}
+
 	private static string FindRepositoryRoot() {
 		DirectoryInfo? current =
 			new DirectoryInfo( AppContext.BaseDirectory );
