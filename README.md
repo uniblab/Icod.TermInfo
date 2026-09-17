@@ -201,6 +201,7 @@ Recommended documentation entry points:
 - [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md) — public and binary compatibility commitments;
 - [`docs/1.15.0-BERKELEY-DB-HASHED-ACQUISITION-GUIDE.md`](docs/1.15.0-BERKELEY-DB-HASHED-ACQUISITION-GUIDE.md) — explicit provider, catalog, discovery, command, and error contracts;
 - [`docs/1.15.0-BERKELEY-DB-HASH-V9-COMPATIBILITY.md`](docs/1.15.0-BERKELEY-DB-HASH-V9-COMPATIBILITY.md) — exact supported Berkeley DB/ncurses subset;
+- [`docs/1.15.0-RELEASE-AUDIT.md`](docs/1.15.0-RELEASE-AUDIT.md) — exact 1.15 qualification and release evidence;
 - [`docs/1.14.0-RASTER-BACKEND-SELECTION-GUIDE.md`](docs/1.14.0-RASTER-BACKEND-SELECTION-GUIDE.md) — current raster-backend evidence and selection model;
 - [`docs/1.14.0-RELEASE-AUDIT.md`](docs/1.14.0-RELEASE-AUDIT.md) — exact 1.14 qualification and release evidence;
 - [`Icod.TermInfo-Post-1.0-Development-Roadmap.md`](Icod.TermInfo-Post-1.0-Development-Roadmap.md) — longer-range development direction.

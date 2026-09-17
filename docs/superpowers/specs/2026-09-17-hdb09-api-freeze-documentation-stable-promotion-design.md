@@ -41,7 +41,7 @@ The final freeze has four independent layers.
    Runtime; Runtime and the reusable sibling packages do not depend on
    BerkeleyDb. `infocmp` and `toe` remain the only direct command consumers.
    No native assets or third-party production package dependencies are added.
-4. **Distribution identity.** The exact seven nupkg/seven snupkg family,
+4. **Distribution identity.** The exact seven nupkg/six reusable-library snupkg family,
    package-only all-TFM consumers, installed-tool smoke, and six RID archives
    remain authoritative. Stable promotion must pass a fresh complete matrix.
 

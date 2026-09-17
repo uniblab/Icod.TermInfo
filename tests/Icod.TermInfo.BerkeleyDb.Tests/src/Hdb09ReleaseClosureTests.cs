@@ -269,7 +269,8 @@ public sealed class Hdb09ReleaseClosureTests {
 			"1.15.0-Alpha-8",
 			"public API",
 			"dependency",
-			"Hash-v9"
+			"Hash-v9",
+			"six reusable-library symbol packages"
 		);
 		AssertContainsAll(
 			"CHANGELOG.md",
@@ -371,12 +372,20 @@ public sealed class Hdb09ReleaseClosureTests {
 		AssertContainsAll(
 			"docs/VERSIONING.md",
 			"Stable `1.15.0` is the current coordinated release",
-			"promotion changed release identity and release-facing text only"
+			"promotion changed release identity and release-facing text only",
+			"six reusable libraries",
+			"Icod.TermInfo.BerkeleyDb",
+			"1.15.0-BERKELEYDB-PUBLIC-API-BASELINE.txt"
 		);
 		AssertContainsAll(
 			"docs/COMPATIBILITY.md",
 			"Stable 1.15 promotion preserves",
-			"exact nine-type public API freeze"
+			"exact nine-type public API freeze",
+			"Runtime, Source, Compiler, Inspection, Termcap, and BerkeleyDb"
+		);
+		AssertContainsAll(
+			"docs/superpowers/specs/2026-09-17-hdb09-api-freeze-documentation-stable-promotion-design.md",
+			"seven nupkg/six reusable-library snupkg family"
 		);
 		AssertContainsAll(
 			"Icod.TermInfo-Post-1.0-Development-Roadmap.md",

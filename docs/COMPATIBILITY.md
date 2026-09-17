@@ -27,9 +27,10 @@ read-only boundary accepted from Alpha-8.
 
 This document defines the supported 1.x compatibility boundary for
 `Icod.TermInfo`, `Icod.TermInfo.Source`, `Icod.TermInfo.Compiler`,
-`Icod.TermInfo.Inspection`, `Icod.TermInfo.Termcap`, and the coordinated tool
-distribution. Exact release evidence remains in the versioned API freezes,
-schema files, roadmaps, and release audits.
+`Icod.TermInfo.Inspection`, `Icod.TermInfo.Termcap`,
+`Icod.TermInfo.BerkeleyDb`, and the coordinated tool distribution. Exact
+release evidence remains in the versioned API freezes, schema files, roadmaps,
+and release audits.
 
 ## 1.14 compatibility freeze
 
@@ -147,8 +148,8 @@ The 1.x line is compatible-additive:
 - incompatible contract changes require a new major release unless a documented
   emergency compatibility decision explicitly says otherwise.
 
-Runtime, Source, Compiler, Inspection, and Termcap retain reusable assembly
-version `1.0.0.0` throughout the compatible 1.x package line.
+Runtime, Source, Compiler, Inspection, Termcap, and BerkeleyDb retain reusable
+assembly version `1.0.0.0` throughout the compatible 1.x package line.
 
 ## Target-framework compatibility
 

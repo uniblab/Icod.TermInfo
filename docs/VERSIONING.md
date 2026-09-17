@@ -154,9 +154,9 @@ For the 1.x line:
 
 Beginning with 1.5.0, `Directory.Build.props` contains the single
 `IcodTermInfoSuiteVersion` authority. Runtime, Source, Compiler, Inspection,
-Termcap, all five standalone command projects, and the `Icod.TermInfo.Tools`
-router consume that coordinated release identity rather than carrying independent
-current-version literals.
+Termcap, BerkeleyDb, all five standalone command projects, and the
+`Icod.TermInfo.Tools` router consume that coordinated release identity rather
+than carrying independent current-version literals.
 
 ## Coordinated package family
 
@@ -168,10 +168,11 @@ Icod.TermInfo.Source
 Icod.TermInfo.Compiler
 Icod.TermInfo.Inspection
 Icod.TermInfo.Termcap
+Icod.TermInfo.BerkeleyDb
 Icod.TermInfo.Tools
 ```
 
-The five reusable libraries target `net8.0`, `net9.0`, and `net10.0`. The command
+The six reusable libraries target `net8.0`, `net9.0`, and `net10.0`. The command
 applications and router follow the repository's separately documented command
 framework/TFM policy. A coordinated minor or patch release advances package and
 reported command identities together even when only one optional layer receives
@@ -201,9 +202,13 @@ Strong-name signed no
 AssemblyName       Icod.TermInfo.Termcap
 AssemblyVersion    1.0.0.0
 Strong-name signed no
+
+AssemblyName       Icod.TermInfo.BerkeleyDb
+AssemblyVersion    1.0.0.0
+Strong-name signed no
 ```
 
-All five reusable assemblies remain **unsigned** throughout the compatible 1.x
+All six reusable assemblies remain **unsigned** throughout the compatible 1.x
 line. Package minor/patch versions do not advance `AssemblyVersion`. Adding a
 strong name or otherwise changing assembly identity is a major-version design
 decision unless a future compatibility review proves a safe migration.
@@ -222,7 +227,12 @@ reusable package and release line. Important current authorities include:
 - `1.11.0-INSPECTION-PUBLIC-API-FREEZE.md` — composite 1.11 freeze;
 - `1.12.0-INSPECTION-PUBLIC-API-FREEZE.md` — composite 1.12 freeze;
 - `1.13.0-INSPECTION-PUBLIC-API-FREEZE.md` — composite 1.13 freeze; and
-- `1.14.0-INSPECTION-PUBLIC-API-FREEZE.md` — current composite 1.14 freeze.
+- `1.14.0-INSPECTION-PUBLIC-API-FREEZE.md` — frozen composite 1.14
+  Inspection freeze;
+- `1.15.0-BERKELEYDB-PUBLIC-API-BASELINE.txt` — exact BerkeleyDb manifest;
+  and
+- `1.15.0-BERKELEY-DB-PUBLIC-API-FREEZE.md` — BerkeleyDb freeze and
+  fingerprint authority.
 
 Routine validation must require equivalent public API across `net8.0`, `net9.0`,
 and `net10.0` for reusable libraries. A baseline/fingerprint must never be
