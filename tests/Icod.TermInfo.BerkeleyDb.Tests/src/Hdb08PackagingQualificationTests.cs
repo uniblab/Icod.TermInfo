@@ -213,6 +213,68 @@ public sealed class Hdb08PackagingQualificationTests {
 		}
 	}
 
+	[Fact]
+	public void Alpha8AuthorityAndQualificationCandidateAreSynchronized() {
+		string root = FindRepositoryRoot();
+		string props = ReadRepositoryFile( root, "Directory.Build.props" );
+		string project =
+			ReadRepositoryFile(
+				root,
+				"Icod.TermInfo.BerkeleyDb",
+				"Icod.TermInfo.BerkeleyDb.csproj"
+			);
+		string roadmap =
+			ReadRepositoryFile(
+				root,
+				"Icod.TermInfo-1.15.0-Berkeley-DB-Hashed-Terminfo-Acquisition-Roadmap.md"
+			);
+		string candidatePath =
+			Path.Combine(
+				root,
+				"docs",
+				"1.15.0-HDB08-QUALIFICATION-CANDIDATE.md"
+			);
+
+		Assert.Contains(
+			"<IcodTermInfoSuiteVersion>1.15.0-Alpha-8</IcodTermInfoSuiteVersion>",
+			props,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"<PackageReleaseNotes>1.15.0-Alpha-8 completes exact package and cross-platform qualification",
+			project,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"**Current coordinated prerelease:** `1.15.0-Alpha-8`",
+			roadmap,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"HDB08 — Packaging and Cross-platform Qualification — IN QUALIFICATION",
+			roadmap,
+			StringComparison.Ordinal
+		);
+		Assert.True( File.Exists( candidatePath ) );
+
+		string candidate = File.ReadAllText( candidatePath );
+		Assert.Contains(
+			"1.15.0-Alpha-8",
+			candidate,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"normal PR workflow: 12/12",
+			candidate,
+			StringComparison.Ordinal
+		);
+		Assert.Contains(
+			"HDB00 workflow: 3/3",
+			candidate,
+			StringComparison.Ordinal
+		);
+	}
+
 	private static string ReadRepositoryFile(
 		string root,
 		params string[] segments
