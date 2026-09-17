@@ -316,6 +316,91 @@ public sealed class Hdb09ReleaseClosureTests {
 		);
 	}
 
+	[Fact]
+	public void StablePromotionAuthoritiesIdentifyTheCoordinated1150Release() {
+		XDocument buildProperties = XDocument.Parse(
+			ReadRequiredRepositoryFile( "Directory.Build.props" )
+		);
+		Assert.Equal(
+			"1.15.0",
+			Assert.Single(
+				buildProperties.Descendants(),
+				element => element.Name.LocalName == "IcodTermInfoSuiteVersion"
+			).Value
+		);
+
+		AssertContainsAll(
+			"README.md",
+			"Current release line: `Icod.TermInfo 1.15.0`.",
+			"Icod.TermInfo.BerkeleyDb --version 1.15.0"
+		);
+		Assert.DoesNotContain(
+			"HDB09 Alpha-8 closure qualification is in progress",
+			ReadRequiredRepositoryFile( "README.md" ),
+			StringComparison.Ordinal
+		);
+		AssertContainsAll(
+			"Icod.TermInfo.BerkeleyDb/README.md",
+			"`1.15.0` is the stable coordinated release",
+			"stable promotion changed no acquisition behavior or public API"
+		);
+
+		foreach ( string projectPath in new[] {
+			"Icod.TermInfo.csproj",
+			"Icod.TermInfo.Source/Icod.TermInfo.Source.csproj",
+			"Icod.TermInfo.Termcap/Icod.TermInfo.Termcap.csproj",
+			"Icod.TermInfo.BerkeleyDb/Icod.TermInfo.BerkeleyDb.csproj",
+			"Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj",
+			"Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj",
+			"icod-terminfo/Icod.TermInfo.Router.csproj",
+		} ) {
+			XDocument project = XDocument.Parse(
+				ReadRequiredRepositoryFile( projectPath )
+			);
+			string releaseNotes = Assert.Single(
+				project.Descendants(),
+				element => element.Name.LocalName == "PackageReleaseNotes"
+			).Value;
+			Assert.StartsWith(
+				"1.15.0 ",
+				releaseNotes,
+				StringComparison.Ordinal
+			);
+		}
+
+		AssertContainsAll(
+			"docs/VERSIONING.md",
+			"Stable `1.15.0` is the current coordinated release",
+			"promotion changed release identity and release-facing text only"
+		);
+		AssertContainsAll(
+			"docs/COMPATIBILITY.md",
+			"Stable 1.15 promotion preserves",
+			"exact nine-type public API freeze"
+		);
+		AssertContainsAll(
+			"Icod.TermInfo-Post-1.0-Development-Roadmap.md",
+			"**Current coordinated version:** `1.15.0`",
+			"**Latest completed line:** `1.15.0`",
+			"**Latest completed release audit:** `docs/1.15.0-RELEASE-AUDIT.md`"
+		);
+		AssertContainsAll(
+			"Icod.TermInfo-1.15.0-Berkeley-DB-Hashed-Terminfo-Acquisition-Roadmap.md",
+			"**Status:** COMPLETE / ACCEPTED (`1.15.0`)",
+			"**Current coordinated release:** `1.15.0`"
+		);
+		AssertContainsAll(
+			"docs/1.15.0-RELEASE-AUDIT.md",
+			"Stable `1.15.0` is the coordinated version",
+			"promotion changed no production behavior or public API"
+		);
+		AssertContainsAll(
+			"CHANGELOG.md",
+			"## 1.15.0",
+			"stable coordinated release"
+		);
+	}
+
 	private static void AssertContainsAll(
 		string relativePath,
 		params string[] tokens
