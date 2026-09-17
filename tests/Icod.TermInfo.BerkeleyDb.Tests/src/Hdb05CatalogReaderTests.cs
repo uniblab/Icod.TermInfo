@@ -679,10 +679,10 @@ public sealed class Hdb05CatalogReaderTests {
 	}
 
 	[Fact]
-	public void ConcurrentReadsUseIndependentLimitSnapshots() {
-		WithDatabase(
+	public async Task ConcurrentReadsUseIndependentLimitSnapshots() {
+		await WithDatabaseAsync(
 			CreateCatalogStore( "sample", "sample-alias" ),
-			path => {
+			async path => {
 				BerkeleyDbTerminalCatalogReader accepted =
 					new(
 						path,
@@ -700,15 +700,15 @@ public sealed class Hdb05CatalogReaderTests {
 
 				Task<IReadOnlyList<BerkeleyDbTerminalCatalogEntry>> success =
 					Task.Run( () => accepted.Read() );
-				Task<Exception?> failure =
+				Task<Exception> failure =
 					Task.Run(
 						() => Record.Exception( () => rejected.Read() )
 					);
-				Task.WaitAll( success, failure );
+				await Task.WhenAll( success, failure );
 
-				Assert.Equal( 2, success.Result.Count );
+				Assert.Equal( 2, ( await success ).Count );
 				Assert.IsType<BerkeleyDbDatabaseFormatException>(
-					failure.Result
+					await failure
 				);
 			}
 		);
@@ -1009,6 +1009,19 @@ public sealed class Hdb05CatalogReaderTests {
 		try {
 			File.WriteAllBytes( path, database );
 			assertion( path );
+		} finally {
+			File.Delete( path );
+		}
+	}
+
+	private static async Task WithDatabaseAsync(
+		byte[] database,
+		Func<string, Task> assertion
+	) {
+		string path = Path.GetTempFileName();
+		try {
+			File.WriteAllBytes( path, database );
+			await assertion( path );
 		} finally {
 			File.Delete( path );
 		}

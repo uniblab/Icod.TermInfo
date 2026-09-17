@@ -112,7 +112,7 @@ public sealed class Hdb07LifecycleHardeningTests {
 	}
 
 	[Fact]
-	public void ConcurrentExplicitProvidersKeepResourceLimitsIndependent() {
+	public async Task ConcurrentExplicitProvidersKeepResourceLimitsIndependent() {
 		using TemporaryRoot temporary = new();
 		string path = temporary.GetPath( "limits.db" );
 		string name = "hdb07-limits";
@@ -134,7 +134,7 @@ public sealed class Hdb07LifecycleHardeningTests {
 				() => rejected.TryLoad( name, out _ )
 			)
 		);
-		Task.WaitAll( success, failure );
+		await Task.WhenAll( success, failure );
 
 		AssertFileCanBeOpenedExclusively( path );
 	}

@@ -53,8 +53,8 @@ jobs:
         run: dotnet test ${{ env.SOLUTION_PATH }} -c ${{ env.CONFIGURATION }} --no-build --no-restore --logger trx
       - name: Restore HDB01 BerkeleyDb tests
         run: dotnet restore ${{ env.BERKELEYDB_TEST_PROJECT }}
-      - name: Test HDB01 BerkeleyDb package foundation
-        run: dotnet test ${{ env.BERKELEYDB_TEST_PROJECT }} -c ${{ env.CONFIGURATION }} --no-restore --logger trx -p:ContinuousIntegrationBuild=true
+      - name: Test BerkeleyDb release configuration
+        run: dotnet test ${{ env.BERKELEYDB_TEST_PROJECT }} -c Release --no-restore --logger trx -p:ContinuousIntegrationBuild=true
       - name: Pack coordinated Staging packages
         if: matrix.package_host
         shell: pwsh
