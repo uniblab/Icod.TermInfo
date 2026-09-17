@@ -1038,8 +1038,11 @@ head `6b80bdb88801ac5158e967c5e4615f20609944cc` failed normal run
 `35179692620` remained 3/3 green.
 
 Stable `1.15.0` promotion changes coordinated identity and release-facing text
-only. Its exact qualification evidence is recorded in the release audit. PR #45
-remains draft and unmerged; HDB09 does not create a tag or publication.
+only. Exact head `10851c380b2df7eba35ea2151ecb7b982a8a7a2d` passed
+normal run `35182018598` with 12/12 jobs and genuine HDB00 run
+`35182018597` with native Linux/macOS and transported Windows work
+executed. PR #45 remains draft and unmerged; HDB09 does not create a tag or
+publication.
 
 ---
 

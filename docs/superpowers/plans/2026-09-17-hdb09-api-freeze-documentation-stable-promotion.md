@@ -94,19 +94,19 @@ to stable `1.15.0` without behavior changes.
 
 ## Task 7: Stable `1.15.0` promotion
 
-- [ ] Add a focused stable-promotion test first and prove that it fails while
+- [x] Add a focused stable-promotion test first and prove that it fails while
   the coordinated version and release authorities still identify Alpha-8.
-- [ ] Change only coordinated version/release-facing identity from
+- [x] Change only coordinated version/release-facing identity from
   `1.15.0-Alpha-8` to `1.15.0`.
-- [ ] Update all seven coordinated package release notes for the 1.15 stable
+- [x] Update all seven coordinated package release notes for the 1.15 stable
   contract, without production behavior changes.
-- [ ] Update release audit/roadmaps/readmes/changelog to stable state.
-- [ ] Commit and push the promotion.
-- [ ] Require fresh exact-head 12/12 normal and genuine 3/3 HDB00 green runs.
+- [x] Update release audit/roadmaps/readmes/changelog to stable state.
+- [x] Commit and push the promotion.
+- [x] Require fresh exact-head 12/12 normal and genuine 3/3 HDB00 green runs.
 
 ## Task 8: Final evidence and review
 
-- [ ] Update the release audit and 1.15 roadmap with final exact evidence.
+- [x] Update the release audit and 1.15 roadmap with final exact evidence.
 - [ ] If evidence edits touch qualified paths, rerun exact complete gates.
 - [ ] Review the full diff against this plan and address all critical or
   important findings.
@@ -122,7 +122,9 @@ Record here during execution:
   `35176822414`, HDB00 `35176822401`
 - Alpha-8 GREEN head/run: `406891bff059bafb4dba82b1de64e33861c78773` /
   normal `35178539117`; genuine HDB00 implementation run `35178105916`
-- Stable promotion head/run: pending
+- Stable promotion head/run:
+  `10851c380b2df7eba35ea2151ecb7b982a8a7a2d` / normal
+  `35182018598`, genuine HDB00 `35182018597`
 - Final documentation head/run: pending
 - BerkeleyDb API SHA-256: `f519600aa4085d07c2d20bd8dc7a32c4dc06a43f4e361554b205ce2f97a8bf36`
 - Final PR state: pending

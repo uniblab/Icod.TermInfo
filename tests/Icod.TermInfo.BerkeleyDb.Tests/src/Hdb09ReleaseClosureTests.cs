@@ -401,7 +401,12 @@ public sealed class Hdb09ReleaseClosureTests {
 		AssertContainsAll(
 			"docs/1.15.0-RELEASE-AUDIT.md",
 			"Stable `1.15.0` is the coordinated version",
-			"promotion changed no production behavior or public API"
+			"promotion changed no production behavior or public API",
+			"10851c380b2df7eba35ea2151ecb7b982a8a7a2d",
+			"35182018598",
+			"35182018597",
+			"passed 12/12 jobs",
+			"passed 3/3 jobs"
 		);
 		AssertContainsAll(
 			"CHANGELOG.md",

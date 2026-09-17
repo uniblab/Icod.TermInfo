@@ -228,7 +228,11 @@ Copyright (c) 2026 Timothy J. Bruce
 
 ## License
 
-The reusable `Icod.TermInfo`, `Icod.TermInfo.Source`, `Icod.TermInfo.Termcap`, `Icod.TermInfo.Compiler`, and `Icod.TermInfo.Inspection` library projects are licensed under the GNU Lesser General Public License, version 3 or later.
+The reusable `Icod.TermInfo`, `Icod.TermInfo.Source`,
+`Icod.TermInfo.Termcap`, `Icod.TermInfo.Compiler`,
+`Icod.TermInfo.Inspection`, and `Icod.TermInfo.BerkeleyDb` library
+projects are licensed under the GNU Lesser General Public License, version 3 or
+later.
 
 Executable command, sample, and repository tooling projects are licensed under the GNU General Public License, version 3 or later, as stated in their project and source declarations.
 

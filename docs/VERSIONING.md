@@ -262,9 +262,11 @@ The supported production dependency graph is intentionally one-way:
 - `Icod.TermInfo` is dependency-free;
 - Source depends on matching Runtime;
 - Termcap depends only on matching Runtime;
+- BerkeleyDb depends only on matching Runtime;
 - Compiler depends on matching Runtime and Source;
 - Inspection depends on matching Runtime and Source;
 - reusable libraries do not depend on command projects or `Icod.CommandFramework`;
+- Runtime, Source, Termcap, Compiler, and Inspection do not depend on BerkeleyDb;
 - Inspection does not depend on Compiler, Termcap, `Icod.Terminal`, or
   `Icod.DCurses` in production.
 
