@@ -113,7 +113,27 @@ For explicit ncurses-compatible hashed acquisition:
 dotnet add package Icod.TermInfo.BerkeleyDb --version 1.15.0
 ```
 
-See the [Berkeley DB hashed acquisition guide](docs/1.15.0-BERKELEY-DB-HASHED-ACQUISITION-GUIDE.md).
+```csharp
+using Icod.TermInfo;
+using Icod.TermInfo.BerkeleyDb;
+
+var provider = new BerkeleyDbTerminalDescriptionProvider(
+	"/path/to/terminfo.db"
+);
+if (
+	provider.TryLoad(
+		"xterm-256color",
+		out TerminalDescription? terminal
+	)
+) {
+	Console.WriteLine( terminal.Name );
+}
+```
+
+See the [deterministic BerkeleyDb sample](samples/Icod.TermInfo.BerkeleyDb.Sample/README.md)
+for a complete controlled example and the
+[Berkeley DB hashed acquisition guide](docs/1.15.0-BERKELEY-DB-HASHED-ACQUISITION-GUIDE.md)
+for provider, catalog, discovery, command, ownership, and error contracts.
 
 ## Feature Inventory
 

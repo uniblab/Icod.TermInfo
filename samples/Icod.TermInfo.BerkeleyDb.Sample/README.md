@@ -23,6 +23,16 @@ Substitute `-f net8.0` or `-f net9.0` to exercise the other package targets.
 The stable output identifies `hdb09-sample-alias` as the requested publication
 and `hdb09-sample` as the canonical terminal.
 
+Expected output:
+
+```text
+Database: controlled-hash-v9.db
+Requested: hdb09-sample-alias
+Canonical: hdb09-sample
+Description: Icod HDB09 controlled sample
+Colors: (absent)
+```
+
 For the full acquisition and compatibility boundary, see:
 
 - `../../docs/1.15.0-BERKELEY-DB-HASHED-ACQUISITION-GUIDE.md`; and
