@@ -24,6 +24,8 @@ $cases = @(
     @{ Paths = @('tools/hdb00/run-linux.sh'); Expected = 'true' },
     @{ Paths = @('.github/workflows/hdb00-interoperability.yml'); Expected = 'true' },
     @{ Paths = @('Directory.Build.props'); Expected = 'true' },
+    @{ Paths = @('tests/Icod.TermInfo.BerkeleyDb.Tests/src/Hdb08PackagingQualificationTests.cs'); Expected = 'true' },
+    @{ Paths = @('docs/1.15.0-HDB08-PACKAGING-AND-CROSS-PLATFORM-QUALIFICATION.md'); Expected = 'true' },
     @{ Paths = @('tests/Icod.TermInfo.BerkeleyDb.Tests/src/Hdb07StorageHardeningTests.cs'); Expected = 'false' },
     @{ Paths = @('docs/superpowers/plans/2026-09-16-hdb07-adversarial-compatibility-hardening.md'); Expected = 'false' },
     @{ Paths = @('README.md'); Expected = 'false' },
