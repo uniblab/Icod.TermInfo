@@ -68,7 +68,8 @@ internal static class Program {
 			string artifactDirectory =
 				( args.Length == 0 )
 					? Path.Combine( root, "artifacts" )
-					: Path.GetFullPath( args[0], root );
+					: Path.GetFullPath( args[0], root )
+			;
 			string packageVersion =
 				ReadPackageVersion(
 					root,
