@@ -303,7 +303,7 @@ public sealed class RB08ReleaseClosureTests {
 			StringComparison.Ordinal
 		);
 		Assert.Contains(
-			"**Current coordinated version:** `1.14.0`",
+			"**Latest completed release audit:** `docs/1.14.0-RELEASE-AUDIT.md`",
 			longRange,
 			StringComparison.Ordinal
 		);
