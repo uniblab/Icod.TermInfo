@@ -20,6 +20,7 @@ on:
       - 'tests/Shared/BerkeleyDbHashV9TestStore.cs'
       - '.github/scripts/new-hdb06-test-store.ps1'
       - '.github/scripts/verify-hdb07-permissions.ps1'
+      - '.github/scripts/verify-berkeleydb-package.ps1'
       - '.github/scripts/smoke-tool-package.ps1'
       - '.github/scripts/smoke-tool-archive.ps1'
       - 'tools/hdb07-permission-probe/**'

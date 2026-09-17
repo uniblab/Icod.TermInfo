@@ -33,6 +33,18 @@ try {
         -c $Configuration `
         --no-build `
         -- `
+        --check `
+        'docs/1.15.0-BERKELEYDB-PUBLIC-API-BASELINE.txt' `
+        "Icod.TermInfo.BerkeleyDb/bin/$Configuration/net10.0/Icod.TermInfo.BerkeleyDb.dll"
+    if (0 -ne $LASTEXITCODE) {
+        throw 'Icod.TermInfo.BerkeleyDb public API differs from the frozen 1.15 manifest.'
+    }
+
+    & dotnet run `
+        --project $publicApiProject `
+        -c $Configuration `
+        --no-build `
+        -- `
         --compare `
         "Icod.TermInfo.BerkeleyDb/bin/$Configuration/net8.0/Icod.TermInfo.BerkeleyDb.dll" `
         "Icod.TermInfo.BerkeleyDb/bin/$Configuration/net9.0/Icod.TermInfo.BerkeleyDb.dll"
@@ -50,6 +62,19 @@ try {
         "Icod.TermInfo.BerkeleyDb/bin/$Configuration/net10.0/Icod.TermInfo.BerkeleyDb.dll"
     if (0 -ne $LASTEXITCODE) {
         throw 'Icod.TermInfo.BerkeleyDb net8.0/net10.0 public API comparison failed.'
+    }
+
+    $sampleProject =
+        'samples/Icod.TermInfo.BerkeleyDb.Sample/Icod.TermInfo.BerkeleyDb.Sample.csproj'
+    foreach ($framework in @('net8.0', 'net9.0', 'net10.0')) {
+        & dotnet run `
+            --project $sampleProject `
+            -c $Configuration `
+            -f $framework `
+            --no-build
+        if (0 -ne $LASTEXITCODE) {
+            throw "Icod.TermInfo.BerkeleyDb deterministic sample failed on $framework."
+        }
     }
 } finally {
     Pop-Location

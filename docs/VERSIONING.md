@@ -5,6 +5,30 @@ package contracts. Version-specific roadmaps, API freezes, schema fingerprints,
 and release audits remain the authoritative historical evidence for completed
 releases; this document defines the current cross-release policy.
 
+## 1.15 release line
+
+The HDB01-HDB09 development sequence uses `1.15.0-Alpha-1` through the
+accepted `1.15.0-Alpha-8` feature/API source. Version 1.15 adds one optional
+package, `Icod.TermInfo.BerkeleyDb`, for pure-managed, read-only acquisition from
+the reviewed ncurses-compatible Berkeley DB Hash-v9 subset.
+
+HDB09 freezes the complete BerkeleyDb reflection manifest at **9 exported public
+types** with normalized-LF SHA-256:
+
+```text
+f519600aa4085d07c2d20bd8dc7a32c4dc06a43f4e361554b205ce2f97a8bf36
+```
+
+The package depends only on matching-version Runtime and has equivalent API on
+net8.0, net9.0, and net10.0. Runtime's 1.0 API, the other reusable package APIs,
+Inspection JSON versions 1 through 6, and existing commands remain frozen except
+for the accepted explicit hashed-file behavior in `infocmp` and human `toe`.
+
+Stable `1.15.0` is a promotion-only transition after the exact Alpha-8 closure
+passes. It may change coordinated package identity and release-facing text only;
+it may not change API, acquisition semantics, dependencies, target frameworks,
+JSON, command contracts, package topology, or archive RIDs.
+
 ## 1.14 release line
 
 The RB01-RB08 development sequence is `1.14.0-Alpha-1` through

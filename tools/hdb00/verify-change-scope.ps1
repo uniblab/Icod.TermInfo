@@ -23,6 +23,7 @@ $cases = @(
     @{ Paths = @('tests/Icod.TermInfo.BerkeleyDb.Interop.Tests/src/NativeOracleTests.cs'); Expected = 'true' },
     @{ Paths = @('tools/hdb00/run-linux.sh'); Expected = 'true' },
     @{ Paths = @('.github/workflows/hdb00-interoperability.yml'); Expected = 'true' },
+    @{ Paths = @('.github/scripts/verify-berkeleydb-package.ps1'); Expected = 'true' },
     @{ Paths = @('Directory.Build.props'); Expected = 'true' },
     @{ Paths = @('tests/Icod.TermInfo.BerkeleyDb.Tests/src/Hdb08PackagingQualificationTests.cs'); Expected = 'true' },
     @{ Paths = @('docs/1.15.0-HDB08-PACKAGING-AND-CROSS-PLATFORM-QUALIFICATION.md'); Expected = 'true' },

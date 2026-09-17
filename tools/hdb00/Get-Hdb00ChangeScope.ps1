@@ -16,6 +16,7 @@ $patterns = @(
     '^tools/hdb00/',
     '^tools/hdb07-permission-probe/',
     '^\.github/scripts/verify-hdb07-permissions\.ps1$',
+    '^\.github/scripts/verify-berkeleydb-package\.ps1$',
     '^Icod\.TermInfo\.BerkeleyDb/(src/|Icod\.TermInfo\.BerkeleyDb\.csproj$)',
     '^tests/Icod\.TermInfo\.BerkeleyDb\.Tests/src/Hdb08PackagingQualificationTests\.cs$',
     '^tests/Icod\.TermInfo\.BerkeleyDb\.Tests/src/Hdb09ReleaseClosureTests\.cs$',

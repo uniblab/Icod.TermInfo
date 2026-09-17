@@ -15,7 +15,7 @@ Version `1.14.0` adds raster-backend availability evidence, deterministic candid
 
 The 1.14 release contract passed the complete Staging qualification matrix on Windows, Linux, and macOS, including package verification, isolated consumers, installed-tool smoke, and all six standalone archive RIDs.
 
-Development prerelease `1.15.0-Alpha-8` has completed HDB08 packaging and cross-platform qualification for accepted pure-managed, read-only Berkeley DB Hash-v9 acquisition through the optional `Icod.TermInfo.BerkeleyDb` package. Exact package verification is managed C#, and isolated package consumers pass net8.0, net9.0, and net10.0 on Windows, Linux, and macOS alongside all six matching-host archive smokes. Explicit `infocmp -A/-B` file paths and explicit human `toe` file operands use the hashed provider/catalog; Runtime discovery, frozen JSON schemas, and `tic` directory publication remain unchanged. HDB07 hardens storage, marker/identity, lifecycle, permission, provider/router, and command boundaries. HDB07C adds detected two-observation mutation rejection, native big-endian container evidence, and exact UTF-8-first/representable-Latin-1 terminal-name compatibility. Native Berkeley DB 5.3 CI runs independently on Linux and macOS; Windows verifies transported Linux fixtures without Berkeley DB installed. These observations are not an atomic snapshot, and the encoding policy is not general encoding detection or normalization. HDB09 API freeze, audits, documentation, and stable promotion are next.
+Development prerelease `1.15.0-Alpha-8` is the accepted feature/API source for HDB09 release closure. Its pure-managed, read-only Berkeley DB Hash-v9 acquisition is now frozen by an exact 9-type public manifest, dependency-direction checks, cross-TFM equality, security/resource and ecosystem audits, a complete acquisition guide, and a controlled deterministic sample. Exact package verification is managed C#, and isolated package consumers pass net8.0, net9.0, and net10.0 on Windows, Linux, and macOS alongside all six matching-host archive smokes. Explicit `infocmp -A/-B` file paths and explicit human `toe` file operands use the hashed provider/catalog; Runtime discovery, frozen JSON schemas, and `tic` directory publication remain unchanged. Native Berkeley DB 5.3 CI runs independently on Linux and macOS; Windows verifies transported Linux fixtures without Berkeley DB installed. These observations are not an atomic snapshot, and the encoding policy is not general encoding detection or normalization. HDB09 Alpha-8 closure qualification is in progress before stable promotion.
 
 ## Support the Project
 
@@ -95,6 +95,15 @@ if ( clear is not null ) {
 
 Applications that only need compiled terminfo acquisition, immutable `TerminalDescription` values, capability lookup, expansion, or output continue to reference `Icod.TermInfo` alone. Add the optional packages only for the higher-level source, compiler, termcap, or planning workflows described below.
 
+For explicit ncurses-compatible hashed acquisition during the accepted
+prerelease closure:
+
+```text
+dotnet add package Icod.TermInfo.BerkeleyDb --version 1.15.0-Alpha-8
+```
+
+See the [Berkeley DB hashed acquisition guide](docs/1.15.0-BERKELEY-DB-HASHED-ACQUISITION-GUIDE.md).
+
 ## Feature Inventory
 
 The root README describes the current product by capability rather than by the release in which each feature first appeared.
@@ -106,6 +115,7 @@ The root README describes the current product by capability rather than by the r
 - **Terminfo source language** — `Icod.TermInfo.Source` provides `.ti` lexing, parsing, diagnostics, capability classification, cancellation semantics, `use=` inheritance resolution, and materialization into ordinary `TerminalDescription` values.
 - **Compilation and publication** — `Icod.TermInfo.Compiler` writes deterministic legacy and wide compiled entries, validates representability, compiles resolved descriptions or `.ti` source, and publishes explicit conventional terminfo directory layouts.
 - **Termcap interoperability** — `Icod.TermInfo.Termcap` provides bounded termcap parsing, capability classification, `tc=` resolution, semantic conversion, reverse representability/rendering, and explicit historical `TERMCAP` / `TERMPATH` acquisition.
+- **Hashed terminfo acquisition** — `Icod.TermInfo.BerkeleyDb` provides pure-managed, read-only exact lookup, opt-in hashed-aware system discovery, and deterministic logical catalog enumeration for the reviewed ncurses-compatible Berkeley DB Hash-v9 subset.
 - **Inspection, comparison, and planning** — `Icod.TermInfo.Inspection` provides canonical effective-source rendering, semantic comparison, database catalogs and ordered database-set analysis, relative-source synthesis and parent planning, machine-readable JSON automation, persistent-raster lifecycle/placement/runtime-evidence planning, and raster-backend availability and selection.
 - **Managed command toolchain** — `tic`, `infocmp`, `toe`, `captoinfo`, and `infotocap` expose the reusable engines as traditional command-line workflows; `Icod.TermInfo.Tools` provides the non-colliding `icod-terminfo` router.
 
@@ -171,13 +181,15 @@ The managed packages contain no native ncurses or system terminfo payload. Runti
 
 ## Samples and Documentation
 
-The [`samples`](samples/README.md) directory contains focused examples for runtime acquisition, reusable Termcap parsing/conversion/acquisition, the source/compiler toolchain, database-set analysis, persistent-raster lifecycle and placement planning, runtime-evidence integration, raster-backend selection, and command-tool workflows.
+The [`samples`](samples/README.md) directory contains focused examples for runtime and controlled hashed acquisition, reusable Termcap parsing/conversion/acquisition, the source/compiler toolchain, database-set analysis, persistent-raster lifecycle and placement planning, runtime-evidence integration, raster-backend selection, and command-tool workflows.
 
 Recommended documentation entry points:
 
 - [`CHANGELOG.md`](CHANGELOG.md) — release-by-release feature history;
 - [`docs/VERSIONING.md`](docs/VERSIONING.md) — versioning and compatibility policy;
 - [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md) — public and binary compatibility commitments;
+- [`docs/1.15.0-BERKELEY-DB-HASHED-ACQUISITION-GUIDE.md`](docs/1.15.0-BERKELEY-DB-HASHED-ACQUISITION-GUIDE.md) — explicit provider, catalog, discovery, command, and error contracts;
+- [`docs/1.15.0-BERKELEY-DB-HASH-V9-COMPATIBILITY.md`](docs/1.15.0-BERKELEY-DB-HASH-V9-COMPATIBILITY.md) — exact supported Berkeley DB/ncurses subset;
 - [`docs/1.14.0-RASTER-BACKEND-SELECTION-GUIDE.md`](docs/1.14.0-RASTER-BACKEND-SELECTION-GUIDE.md) — current raster-backend evidence and selection model;
 - [`docs/1.14.0-RELEASE-AUDIT.md`](docs/1.14.0-RELEASE-AUDIT.md) — exact 1.14 qualification and release evidence;
 - [`Icod.TermInfo-Post-1.0-Development-Roadmap.md`](Icod.TermInfo-Post-1.0-Development-Roadmap.md) — longer-range development direction.

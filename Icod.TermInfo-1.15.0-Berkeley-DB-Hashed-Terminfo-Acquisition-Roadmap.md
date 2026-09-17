@@ -6,7 +6,7 @@
 **Optional package:** `Icod.TermInfo.BerkeleyDb`  
 **Language:** C# 13  
 **Reusable target frameworks:** `net8.0`; `net9.0`; `net10.0`  
-**Status:** HDB00–HDB08 accepted; HDB09 next
+**Status:** HDB00–HDB08 accepted; HDB09 Alpha-8 closure candidate
 **Current coordinated prerelease:** `1.15.0-Alpha-8`
 
 ---
@@ -1008,6 +1008,26 @@ Final release closure includes:
 
 Stable `1.15.0` promotion adds no behavior beyond the accepted final prerelease
 contract.
+
+HDB09 is implemented as a staged closeout. The first RED witness is exact head
+`1525096d1a5925c2816159f7f7b7c826dfd7013b`: normal run `35176822414`
+compiled the new closure suite and failed on the absent freeze/sample/guide/audit
+authorities, while HDB00 run `35176822401` failed the intended new sensitivity
+case. The Alpha-8 GREEN candidate adds:
+
+- the complete 9-type BerkeleyDb reflection baseline with normalized-LF
+  SHA-256 `f519600aa4085d07c2d20bd8dc7a32c4dc06a43f4e361554b205ce2f97a8bf36`;
+- exact baseline and existing cross-TFM checks in package verification;
+- Runtime frozen-API and dependency-direction closure tests;
+- the controlled all-TFM `Icod.TermInfo.BerkeleyDb.Sample`;
+- acquisition, Hash-v9 compatibility, security/resource, ecosystem, and release
+  authorities; and
+- a root changelog plus synchronized Alpha-8 release-facing documentation.
+
+Alpha-8 closure qualification is pending. Stable promotion remains a separate
+version/status-only checkpoint after that exact candidate passes the complete
+normal and genuine HDB00 matrices. PR #45 remains draft and unmerged; HDB09
+does not create a tag or publication.
 
 ---
 

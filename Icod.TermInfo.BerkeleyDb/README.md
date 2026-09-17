@@ -2,9 +2,9 @@
 
 `Icod.TermInfo.BerkeleyDb` is the optional managed package for read-only acquisition from ncurses-compatible Berkeley DB hashed terminfo stores.
 
-## 1.15 development status
+## 1.15 release closure status
 
-`1.15.0-Alpha-8` has completed HDB08 packaging and cross-platform qualification for the accepted HDB07/HDB07C behavior of the explicit and opt-in system terminal-description providers and hashed terminal catalog on the managed Hash-v9 reader. It supports bounded exact-key lookup and complete record enumeration with inline and off-page records, overflow reconstruction, both byte orders, ncurses marker resolution, Runtime-owned compiled-entry parsing, exact identity validation, and deterministic logical publication ordering. HDB08 changes qualification infrastructure and release metadata, not acquisition behavior or public API.
+`1.15.0-Alpha-8` has completed HDB08 packaging and cross-platform qualification and is the accepted feature/API source for HDB09 release closure. The complete public surface is frozen at nine exported types, dependency direction remains Runtime-only, and the deterministic sample plus acquisition, compatibility, security/resource, ecosystem, and release authorities are now present. HDB09 adds no acquisition behavior or public API.
 
 HDB00 selected a dependency-free managed reader for the reviewed Berkeley DB **Hash on-disk format version 9** subset required by ncurses acquisition. Native Berkeley DB remains a CI interoperability oracle and is not a production dependency.
 
@@ -90,5 +90,5 @@ RIDs. The `1.15.0-Alpha-8` HDB08 exact head passed the normal 12-job and HDB00
 3-job workflows, including the managed exact-package verifier and three-host
 net8/net9/net10 package consumption. Atomic snapshots, arbitrary writer
 coordination, and non-UTF-8/non-Latin-1 producer encodings remain outside the
-qualified contract. HDB09 API freeze, audits, documentation, and stable
-promotion are next.
+qualified contract. HDB09 Alpha-8 closure qualification is next; stable
+promotion follows only after that exact candidate passes the complete matrices.
