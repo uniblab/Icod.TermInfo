@@ -11,14 +11,14 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`  
 **Frozen runtime contract:** `1.0.0`  
-**Current coordinated version:** `1.15.0-Alpha-8`
-**Latest completed line:** `1.14.0` - Raster Backend Capability Evidence, Selection, and Planning  
-**Latest completed prerelease:** `1.14.0-Alpha-8`  
-**Status:** stable `1.14.0` is merged; `1.15.0-Alpha-8` is the HDB09 API/documentation closure candidate
+**Current coordinated version:** `1.15.0`
+**Latest completed line:** `1.15.0` - Berkeley DB / Hashed Terminfo Acquisition
+**Latest completed prerelease:** `1.15.0-Alpha-8`
+**Status:** stable `1.15.0` release closure is complete in draft PR #45; merge and publication remain user-owned
 **Active release roadmap:** `Icod.TermInfo-1.15.0-Berkeley-DB-Hashed-Terminfo-Acquisition-Roadmap.md`  
 **Release audit:** `docs/1.15.0-RELEASE-AUDIT.md`
-**Latest completed release audit:** `docs/1.14.0-RELEASE-AUDIT.md`  
-**Next implementation gate:** HDB09 exact Alpha-8 closure qualification, then behavior-neutral stable promotion
+**Latest completed release audit:** `docs/1.15.0-RELEASE-AUDIT.md`
+**Next implementation gate:** final exact-head review; no further 1.15 feature work is planned
 
 ---
 
@@ -120,7 +120,7 @@ existing Icod.TermInfo parser
 TerminalDescription
 ```
 
-HDB00 through HDB08 are complete and accepted. Their Linux/macOS native-oracle and Windows
+HDB00 through HDB09 are complete and accepted. Their Linux/macOS native-oracle and Windows
 managed-only experiments established that production 1.15 can read the required
 ncurses Berkeley DB Hash-v9 subset without an installed or bundled Berkeley DB
 runtime. Native Berkeley DB remains a development/CI fixture producer and
@@ -131,10 +131,9 @@ downward on Runtime, ships no native Berkeley DB binaries, and does not expose a
 general-purpose database API. HDB01 established the optional package boundary;
 HDB02 productionized the internal managed reader; HDB03 introduced the public
 provider; HDB04-HDB08 completed discovery, catalogs, tool integration,
-hardening, and cross-platform package qualification. HDB09 freezes the complete
-API and dependencies, adds release guides/audits/sample/changelog, and then
-promotes the accepted Alpha-8 contract to stable 1.15.0 without behavior
-changes.
+hardening, and cross-platform package qualification. HDB09 froze the complete
+API and dependencies, added release guides/audits/sample/changelog, and promoted
+the accepted Alpha-8 contract to stable 1.15.0 without behavior changes.
 
 1.15 deliberately excludes hashed-store writing, `tic` hashed publication,
 database migration, general-purpose Berkeley DB APIs, and bundled Oracle Berkeley

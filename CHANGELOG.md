@@ -5,7 +5,8 @@ API fingerprints, and preserved boundaries live in the linked release audits.
 
 ## 1.15.0
 
-Icod.TermInfo 1.15 adds the optional `Icod.TermInfo.BerkeleyDb` package for
+This is the stable coordinated release of Icod.TermInfo 1.15. It adds the
+optional `Icod.TermInfo.BerkeleyDb` package for
 pure-managed, read-only acquisition from the qualified ncurses-compatible
 Berkeley DB Hash-v9 subset.
 

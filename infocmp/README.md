@@ -1,8 +1,8 @@
 # infocmp
 
-## 1.15 development status
+## 1.15 release status
 
-`1.15.0-Alpha-7` accepts pure-managed hashed acquisition for explicit
+`1.15.0` accepts pure-managed hashed acquisition for explicit
 `-A` and `-B` paths. An existing file uses
 `BerkeleyDbTerminalDescriptionProvider`; an existing directory or
 unclassified path retains the conventional provider. Rendering, comparison,
@@ -27,7 +27,7 @@ and Latin-1 canonical/alias fixtures on Linux and macOS, and the transported
 Linux fixtures on Windows. Unequal two-observation database reads fail as I/O;
 this detection is not an atomic snapshot or arbitrary writer coordination.
 
-## 1.14 release status
+## 1.14 release history
 
 Version `1.14.0` carries the existing `infocmp` rendering, comparison,
 relative-source synthesis/planning, and JSON automation command contracts

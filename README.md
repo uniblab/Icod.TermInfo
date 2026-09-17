@@ -9,13 +9,25 @@
 
 ## Status
 
-Current release line: `Icod.TermInfo 1.14.0`.
+Current release line: `Icod.TermInfo 1.15.0`.
 
-Version `1.14.0` adds raster-backend availability evidence, deterministic candidate evaluation, and explicit caller-preference-aware backend selection in `Icod.TermInfo.Inspection`, while preserving the Runtime, Source, Compiler, Termcap, command, package, and archive contracts.
+Version `1.15.0` adds the optional `Icod.TermInfo.BerkeleyDb` package for
+pure-managed, read-only Berkeley DB Hash-v9 acquisition while preserving the
+frozen Runtime, Source, Compiler, Termcap, Inspection, JSON, package, and
+archive contracts.
 
-The 1.14 release contract passed the complete Staging qualification matrix on Windows, Linux, and macOS, including package verification, isolated consumers, installed-tool smoke, and all six standalone archive RIDs.
-
-Development prerelease `1.15.0-Alpha-8` is the accepted feature/API source for HDB09 release closure. Its pure-managed, read-only Berkeley DB Hash-v9 acquisition is now frozen by an exact 9-type public manifest, dependency-direction checks, cross-TFM equality, security/resource and ecosystem audits, a complete acquisition guide, and a controlled deterministic sample. Exact package verification is managed C#, and isolated package consumers pass net8.0, net9.0, and net10.0 on Windows, Linux, and macOS alongside all six matching-host archive smokes. Explicit `infocmp -A/-B` file paths and explicit human `toe` file operands use the hashed provider/catalog; Runtime discovery, frozen JSON schemas, and `tic` directory publication remain unchanged. Native Berkeley DB 5.3 CI runs independently on Linux and macOS; Windows verifies transported Linux fixtures without Berkeley DB installed. These observations are not an atomic snapshot, and the encoding policy is not general encoding detection or normalization. HDB09 Alpha-8 closure qualification is in progress before stable promotion.
+The complete BerkeleyDb public surface is frozen at nine exported types, with
+Runtime-only dependency direction and equivalent API on net8.0, net9.0, and
+net10.0. Exact package verification, isolated consumers, installed-tool smoke,
+and all six matching-host archive smokes pass on Windows, Linux, and macOS.
+Explicit `infocmp -A/-B` file paths and explicit human `toe` file operands
+use the hashed provider/catalog; Runtime discovery, frozen JSON schemas, and
+`tic` directory publication remain unchanged. Native Berkeley DB 5.3 CI runs
+independently on Linux and macOS, while Windows verifies transported Linux
+fixtures without Berkeley DB installed. These observations are not an atomic
+snapshot, and the encoding policy is not general encoding detection or
+normalization. Stable promotion changed release identity and release-facing text
+only; the accepted `1.15.0-Alpha-8` artifact remains the feature/API source.
 
 ## Support the Project
 
@@ -65,7 +77,7 @@ Dependency boundaries are explicit: Runtime has no production package dependenci
 Install the runtime package:
 
 ```text
-dotnet add package Icod.TermInfo --version 1.14.0
+dotnet add package Icod.TermInfo --version 1.15.0
 ```
 
 Resolve the current terminal through conventional system discovery with immutable built-in fallback:
@@ -95,11 +107,10 @@ if ( clear is not null ) {
 
 Applications that only need compiled terminfo acquisition, immutable `TerminalDescription` values, capability lookup, expansion, or output continue to reference `Icod.TermInfo` alone. Add the optional packages only for the higher-level source, compiler, termcap, or planning workflows described below.
 
-For explicit ncurses-compatible hashed acquisition during the accepted
-prerelease closure:
+For explicit ncurses-compatible hashed acquisition:
 
 ```text
-dotnet add package Icod.TermInfo.BerkeleyDb --version 1.15.0-Alpha-8
+dotnet add package Icod.TermInfo.BerkeleyDb --version 1.15.0
 ```
 
 See the [Berkeley DB hashed acquisition guide](docs/1.15.0-BERKELEY-DB-HASHED-ACQUISITION-GUIDE.md).
@@ -134,16 +145,16 @@ The root README describes the current product by capability rather than by the r
 Install an optional package only when its capability is needed:
 
 ```text
-dotnet add package Icod.TermInfo.Source --version 1.14.0
-dotnet add package Icod.TermInfo.Termcap --version 1.14.0
-dotnet add package Icod.TermInfo.Compiler --version 1.14.0
-dotnet add package Icod.TermInfo.Inspection --version 1.14.0
+dotnet add package Icod.TermInfo.Source --version 1.15.0
+dotnet add package Icod.TermInfo.Termcap --version 1.15.0
+dotnet add package Icod.TermInfo.Compiler --version 1.15.0
+dotnet add package Icod.TermInfo.Inspection --version 1.15.0
 ```
 
 Install the command router with:
 
 ```text
-dotnet tool install --global Icod.TermInfo.Tools --version 1.14.0
+dotnet tool install --global Icod.TermInfo.Tools --version 1.15.0
 
 icod-terminfo tic -V
 icod-terminfo infocmp -V

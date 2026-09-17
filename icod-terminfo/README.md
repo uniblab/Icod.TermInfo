@@ -7,12 +7,13 @@ which dispatches to the existing `tic`, `infocmp`, `toe`, `captoinfo`, and
 
 The tool targets `net10.0` and requires a .NET 10 runtime.
 
-## 1.14 release status
+## 1.15 release status
 
-Version `1.14.0` preserves the frozen five-command router contract, direct/routed
-command equivalence, installed-tool validation, and six-RID standalone archive
-topology. Raster-backend evidence and selection are reusable Inspection APIs;
-1.14 adds no router-owned command or option semantics.
+Version `1.15.0` preserves the five-command router contract, installed-tool
+validation, and six-RID standalone archive topology. It adds reviewed explicit
+hashed-file acquisition for `infocmp -A/-B` and human `toe` operands without
+changing frozen JSON routes, conventional ambient discovery, or `tic`
+publication.
 
 The coordinated tool version advances with the reusable package family so a
 single release identity covers Runtime, Source, Compiler, Inspection, Termcap,
@@ -21,13 +22,13 @@ and the tool distribution.
 ## Install
 
 ```text
-dotnet tool install --global Icod.TermInfo.Tools --version 1.14.0
+dotnet tool install --global Icod.TermInfo.Tools --version 1.15.0
 ```
 
 Update or remove the global tool with:
 
 ```text
-dotnet tool update --global Icod.TermInfo.Tools --version 1.14.0
+dotnet tool update --global Icod.TermInfo.Tools --version 1.15.0
 dotnet tool uninstall --global Icod.TermInfo.Tools
 ```
 
@@ -35,7 +36,7 @@ For repository-local or application-local use:
 
 ```text
 dotnet new tool-manifest
-dotnet tool install Icod.TermInfo.Tools --version 1.14.0
+dotnet tool install Icod.TermInfo.Tools --version 1.15.0
 dotnet tool run icod-terminfo --version
 ```
 

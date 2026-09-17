@@ -42,7 +42,7 @@
 		<Title>Icod.TermInfo.Inspection</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed inspection, semantic-comparison, planning, and machine-readable automation foundation for Icod.TermInfo.</Description>
-		<PackageReleaseNotes>1.14.0 adds bounded raster-backend availability evidence and classification, lifecycle/placement-aware candidate evaluation, deterministic caller-preference selection, additive version-6 backend profile/selection JSON automation, and package-only interoperability qualification against Icod.Terminal 1.13.0 without adding a production Terminal dependency.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.15.0 preserves the frozen 1.14 Inspection public API, raster-backend evidence and selection semantics, JSON versions 1 through 6, Runtime-and-Source dependency graph, net8/net9/net10 support, and 1.0.0.0 assembly identity; hashed acquisition remains provider-side and no Inspection semantics or dependencies change.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>

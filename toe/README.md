@@ -3,9 +3,9 @@
 `toe` is the managed terminfo database-listing command in the
 `Icod.TermInfo` tool suite.
 
-## 1.15 development status
+## 1.15 release status
 
-`1.15.0-Alpha-7` accepts hashed files for explicit human listing. Each
+`1.15.0` accepts hashed files for explicit human listing. Each
 existing file operand is read through `BerkeleyDbTerminalCatalogReader`; each
 directory or unclassified operand retains conventional behavior. Mixed roots
 preserve caller order, hashed aliases are printed as distinct logical
@@ -31,7 +31,7 @@ Latin-1 canonical/alias fixture on Linux and macOS, and transported Linux
 fixtures on Windows. Unequal two-observation reads fail as I/O without claiming
 an atomic snapshot or arbitrary writer coordination.
 
-## 1.14 release status
+## 1.14 release history
 
 Version `1.14.0` carries the frozen `toe` database-listing, source-dependency,
 and multi-database JSON automation contracts forward unchanged. Raster-backend

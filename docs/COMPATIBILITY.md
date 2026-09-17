@@ -20,6 +20,11 @@ publication, atomic snapshots, other Berkeley DB access methods or revisions,
 and general encoding detection. Inspection JSON versions 1 through 6 are
 unchanged.
 
+Stable 1.15 promotion preserves the exact nine-type public API freeze,
+acquisition semantics, dependency direction, target frameworks, JSON and
+command contracts, package topology, archive RIDs, pure-managed deployment, and
+read-only boundary accepted from Alpha-8.
+
 This document defines the supported 1.x compatibility boundary for
 `Icod.TermInfo`, `Icod.TermInfo.Source`, `Icod.TermInfo.Compiler`,
 `Icod.TermInfo.Inspection`, `Icod.TermInfo.Termcap`, and the coordinated tool

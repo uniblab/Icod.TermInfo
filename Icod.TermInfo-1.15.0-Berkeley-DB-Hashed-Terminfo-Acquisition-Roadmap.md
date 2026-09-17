@@ -6,8 +6,8 @@
 **Optional package:** `Icod.TermInfo.BerkeleyDb`  
 **Language:** C# 13  
 **Reusable target frameworks:** `net8.0`; `net9.0`; `net10.0`  
-**Status:** HDB00–HDB08 accepted; HDB09 Alpha-8 closure candidate
-**Current coordinated prerelease:** `1.15.0-Alpha-8`
+**Status:** COMPLETE / ACCEPTED (`1.15.0`)
+**Current coordinated release:** `1.15.0`
 
 ---
 
@@ -984,10 +984,10 @@ It created no tag or publication and did not merge or mark PR #45 ready.
 Closure record:
 `docs/1.15.0-HDB08-PACKAGING-AND-CROSS-PLATFORM-QUALIFICATION.md`.
 
-HDB09 API freeze, documentation, audits, and stable promotion are next. Alpha-8
-remains the current coordinated prerelease.
+HDB09 API freeze, documentation, audits, and stable promotion are complete.
+Alpha-8 remains the accepted feature/API source for stable `1.15.0`.
 
-### HDB09 — API Freeze, Documentation, and Stable Promotion
+### HDB09 — API Freeze, Documentation, and Stable Promotion — COMPLETE / ACCEPTED
 
 Final release closure includes:
 
@@ -1029,8 +1029,16 @@ The corrected Alpha-8 closure implementation head
 with 12/12 jobs. HDB00-sensitive implementation head
 `5f485265c51ef2b7b37842608bb53db4fabe100a` passed genuine HDB00 run
 `35178105916` with native Linux/macOS and transported Windows work executed.
-This evidence-record head must now independently pass both complete gates.
-Stable promotion remains a separate version/status-only checkpoint. PR #45
+The Alpha-8 evidence-record head
+`5f0be1100f3b2c7db2f5a3198e4a08e7229c86c2` passed normal run
+`35179100564` with 12/12 jobs and genuine HDB00 run `35179100607` with
+native Linux/macOS and transported Windows work executed. Stable-promotion RED
+head `6b80bdb88801ac5158e967c5e4615f20609944cc` failed normal run
+`35179692542` on the intended Alpha-8 identity mismatch; its HDB00 run
+`35179692620` remained 3/3 green.
+
+Stable `1.15.0` promotion changes coordinated identity and release-facing text
+only. Its exact qualification evidence is recorded in the release audit. PR #45
 remains draft and unmerged; HDB09 does not create a tag or publication.
 
 ---

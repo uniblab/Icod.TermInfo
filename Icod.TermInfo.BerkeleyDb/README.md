@@ -4,7 +4,11 @@
 
 ## 1.15 release closure status
 
-`1.15.0-Alpha-8` has completed HDB08 packaging and cross-platform qualification and is the accepted feature/API source for HDB09 release closure. The complete public surface is frozen at nine exported types, dependency direction remains Runtime-only, and the deterministic sample plus acquisition, compatibility, security/resource, ecosystem, and release authorities are now present. HDB09 adds no acquisition behavior or public API.
+`1.15.0` is the stable coordinated release. The complete public surface is
+frozen at nine exported types, dependency direction remains Runtime-only, and
+the deterministic sample plus acquisition, compatibility, security/resource,
+ecosystem, and release authorities are complete.
+The stable promotion changed no acquisition behavior or public API.
 
 HDB00 selected a dependency-free managed reader for the reviewed Berkeley DB **Hash on-disk format version 9** subset required by ncurses acquisition. Native Berkeley DB remains a CI interoperability oracle and is not a production dependency.
 
@@ -86,9 +90,9 @@ explicit paths and then call the accepted provider or catalog reader. Explicit
 Inspection stays provider-neutral, ambient `toe` discovery and JSON stay
 conventional, and `tic` remains directory-write-only. Installed-tool smoke
 passed on all three hosts and direct-command smoke passed for all six archive
-RIDs. The `1.15.0-Alpha-8` HDB08 exact head passed the normal 12-job and HDB00
-3-job workflows, including the managed exact-package verifier and three-host
-net8/net9/net10 package consumption. Atomic snapshots, arbitrary writer
-coordination, and non-UTF-8/non-Latin-1 producer encodings remain outside the
-qualified contract. HDB09 Alpha-8 closure qualification is next; stable
-promotion follows only after that exact candidate passes the complete matrices.
+RIDs. The accepted Alpha-8 feature/API source and its HDB09 evidence-record head
+passed the normal 12-job and genuine HDB00 3-job workflows, including the
+managed exact-package verifier and three-host net8/net9/net10 package
+consumption. Atomic snapshots, arbitrary writer coordination, and
+non-UTF-8/non-Latin-1 producer encodings remain outside the qualified contract.
+Stable `1.15.0` preserves that exact behavior and surface.
