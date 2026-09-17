@@ -134,7 +134,7 @@ public sealed class Hdb09ReleaseClosureTests {
 		} ) {
 			string verifier = ReadRequiredRepositoryFile( verifierPath );
 			Assert.Contains(
-				"1.0.0-PUBLIC-API-BASELINE.txt",
+				"-- --check",
 				verifier,
 				StringComparison.Ordinal
 			);

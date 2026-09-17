@@ -45,6 +45,13 @@ jobs:
         run: dotnet restore ${{ env.SOLUTION_PATH }}
       - name: Build
         run: dotnet build ${{ env.SOLUTION_PATH }} -c ${{ env.CONFIGURATION }} --no-restore -p:ContinuousIntegrationBuild=true
+      - name: Capture accepted Alpha-8 BerkeleyDb public API
+        if: matrix.package_host
+        shell: pwsh
+        run: |
+          $manifestPath = Join-Path $env:RUNNER_TEMP 'Icod.TermInfo.BerkeleyDb.public-api.txt'
+          dotnet run --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj -c '${{ env.CONFIGURATION }}' --no-build -- --write $manifestPath 'Icod.TermInfo.BerkeleyDb/bin/${{ env.CONFIGURATION }}/net10.0/Icod.TermInfo.BerkeleyDb.dll'
+          Get-Content -LiteralPath $manifestPath -Raw
       - name: Verify Inspection compatibility under Windows PowerShell
         if: runner.os == 'Windows'
         shell: powershell
