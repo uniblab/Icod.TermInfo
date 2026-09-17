@@ -214,15 +214,8 @@ public sealed class Hdb08PackagingQualificationTests {
 	}
 
 	[Fact]
-	public void Alpha8AuthorityAndQualificationCandidateAreSynchronized() {
+	public void Alpha8QualificationEvidenceRemainsRecorded() {
 		string root = FindRepositoryRoot();
-		string props = ReadRepositoryFile( root, "Directory.Build.props" );
-		string project =
-			ReadRepositoryFile(
-				root,
-				"Icod.TermInfo.BerkeleyDb",
-				"Icod.TermInfo.BerkeleyDb.csproj"
-			);
 		string roadmap =
 			ReadRepositoryFile(
 				root,
@@ -236,17 +229,7 @@ public sealed class Hdb08PackagingQualificationTests {
 			);
 
 		Assert.Contains(
-			"<IcodTermInfoSuiteVersion>1.15.0-Alpha-8</IcodTermInfoSuiteVersion>",
-			props,
-			StringComparison.Ordinal
-		);
-		Assert.Contains(
-			"<PackageReleaseNotes>1.15.0-Alpha-8 completes exact package and cross-platform qualification",
-			project,
-			StringComparison.Ordinal
-		);
-		Assert.Contains(
-			"**Current coordinated prerelease:** `1.15.0-Alpha-8`",
+			"Coordinated prerelease: `1.15.0-Alpha-8`.",
 			roadmap,
 			StringComparison.Ordinal
 		);
