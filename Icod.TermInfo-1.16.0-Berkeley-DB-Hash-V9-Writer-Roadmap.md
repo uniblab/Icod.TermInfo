@@ -6,7 +6,7 @@
 **Command integration:** `tic` and `Icod.TermInfo.Tools`
 **Language:** C# 13
 **Reusable target frameworks:** `net8.0`; `net9.0`; `net10.0`
-**Status:** PLANNED / NOT IMPLEMENTED
+**Status:** ACTIVE — HW00 COMPLETE / HW01 NEXT
 **Stable predecessor:** `1.15.0`
 **Initial development version:** `1.16.0-Alpha-1`
 
@@ -508,7 +508,10 @@ later tranche may not silently absorb an unaccepted earlier tranche.
 
 ### HW00 / pre-Alpha — Native interoperability and backend proof
 
-**Status:** PLANNED
+**Status:** COMPLETE / ACCEPTED  
+**Accepted exact head:** `5d3cea771d6fb0187caab191632bc1ef84d6a705`  
+**Accepted workflow:** `hdb00-interoperability` run `35376556264`  
+**Decision record:** `docs/1.16.0-HW00-HASH-V9-WRITER-INTEROPERABILITY-AND-BACKEND-DECISION.md`
 
 - generate a minimal managed candidate Hash-v9 image from independently reviewed
   format facts;

@@ -14,11 +14,11 @@
 **Current coordinated version:** `1.15.0`
 **Latest completed line:** `1.15.0` - Berkeley DB / Hashed Terminfo Acquisition
 **Latest completed prerelease:** `1.15.0-Alpha-8`
-**Status:** stable `1.15.0` is published; focused `1.16.0` Hash-v9 writer planning is active
+**Status:** stable `1.15.0` is published; focused `1.16.0` Hash-v9 writer implementation is active; HW00 is accepted
 **Active release roadmap:** `Icod.TermInfo-1.16.0-Berkeley-DB-Hash-V9-Writer-Roadmap.md`
 **Release audit:** `docs/1.15.0-RELEASE-AUDIT.md`
 **Latest completed release audit:** `docs/1.15.0-RELEASE-AUDIT.md`
-**Next implementation gate:** HW00 native interoperability and writer-backend proof
+**Next implementation gate:** HW01 writer contract and public-API regret gate
 
 ---
 
@@ -447,7 +447,11 @@ The active planning line is documented by:
 
 ```text
 Icod.TermInfo-1.16.0-Berkeley-DB-Hash-V9-Writer-Roadmap.md
+docs/1.16.0-HW00-HASH-V9-WRITER-INTEROPERABILITY-AND-BACKEND-DECISION.md
 ```
 
-HW00 is the next implementation gate. No 1.16 production API or behavior is
-implemented by the roadmap-only planning change.
+HW00 is complete and accepted at exact head
+`5d3cea771d6fb0187caab191632bc1ef84d6a705`; its pure-managed writer probe is
+qualified by native Berkeley DB on Linux/macOS and managed-only readback on
+Windows. HW01 is the next implementation gate. No 1.16 production API is frozen
+until its public-API regret review is complete.
