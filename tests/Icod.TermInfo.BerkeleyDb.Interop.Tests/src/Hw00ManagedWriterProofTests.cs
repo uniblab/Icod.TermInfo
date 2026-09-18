@@ -7,6 +7,7 @@
 using System.Buffers.Binary;
 using System.Text;
 using Icod.TermInfo.Hw00.ManagedWriterProbe;
+using Xunit;
 
 namespace Icod.TermInfo.BerkeleyDb.Interop.Tests;
 
