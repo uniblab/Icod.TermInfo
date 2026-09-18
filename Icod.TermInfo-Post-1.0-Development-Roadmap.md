@@ -14,11 +14,11 @@
 **Current coordinated version:** `1.15.0`
 **Latest completed line:** `1.15.0` - Berkeley DB / Hashed Terminfo Acquisition
 **Latest completed prerelease:** `1.15.0-Alpha-8`
-**Status:** stable `1.15.0` is published; focused `1.16.0` Hash-v9 writer implementation is active; HW00 is accepted
+**Status:** stable `1.15.0` is published; focused `1.16.0` Hash-v9 writer implementation is active; HW01 is accepted
 **Active release roadmap:** `Icod.TermInfo-1.16.0-Berkeley-DB-Hash-V9-Writer-Roadmap.md`
 **Release audit:** `docs/1.15.0-RELEASE-AUDIT.md`
 **Latest completed release audit:** `docs/1.15.0-RELEASE-AUDIT.md`
-**Next implementation gate:** HW01 writer contract and public-API regret gate
+**Next implementation gate:** HW02 deterministic metadata, buckets, and inline records
 
 ---
 
@@ -448,10 +448,14 @@ The active planning line is documented by:
 ```text
 Icod.TermInfo-1.16.0-Berkeley-DB-Hash-V9-Writer-Roadmap.md
 docs/1.16.0-HW00-HASH-V9-WRITER-INTEROPERABILITY-AND-BACKEND-DECISION.md
+docs/1.16.0-HW01-BERKELEY-DB-WRITER-CONTRACT.md
 ```
 
 HW00 is complete and accepted at exact head
 `5d3cea771d6fb0187caab191632bc1ef84d6a705`; its pure-managed writer probe is
 qualified by native Berkeley DB on Linux/macOS and managed-only readback on
-Windows. HW01 is the next implementation gate. No 1.16 production API is frozen
-until its public-API regret review is complete.
+Windows. HW01 is complete and accepted at exact head
+`36a71697b7c8db4b5aa9004b4cfa60f005bf4bf8`; pull-request workflow run
+`35383543026` passed 12/12 jobs and froze the exact additive three-type writer
+surface plus bounded whole-input preflight. HW02 deterministic metadata, buckets,
+and inline records is the next implementation gate.

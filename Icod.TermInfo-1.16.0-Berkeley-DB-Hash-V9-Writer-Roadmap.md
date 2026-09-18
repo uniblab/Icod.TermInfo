@@ -6,7 +6,7 @@
 **Command integration:** `tic` and `Icod.TermInfo.Tools`
 **Language:** C# 13
 **Reusable target frameworks:** `net8.0`; `net9.0`; `net10.0`
-**Status:** ACTIVE — HW00 COMPLETE / HW01 NEXT
+**Status:** ACTIVE — HW01 COMPLETE / HW02 NEXT
 **Stable predecessor:** `1.15.0`
 **Initial development version:** `1.16.0-Alpha-1`
 
@@ -527,18 +527,23 @@ managed.
 
 ### HW01 / Alpha-1 — Writer contract and public-API regret gate
 
-**Status:** PLANNED
+**Status:** COMPLETE / ACCEPTED
+**Accepted exact head:** `36a71697b7c8db4b5aa9004b4cfa60f005bf4bf8`
+**Accepted workflow:** `pull-request` run `35383543026` (12/12 jobs)
+**Contract record:** `docs/1.16.0-HW01-BERKELEY-DB-WRITER-CONTRACT.md`
 
 - add failing contract tests for terminfo-specific whole-database publication;
-- freeze publication, options, result, exception, and writer type shapes;
+- freeze publication, options, and writer type shapes while rejecting public
+  writer result and writer-specific exception types;
 - freeze input snapshot, duplicate, alias, identity, encoding, and resource rules;
 - preserve the Runtime-only BerkeleyDb dependency;
 - add exact API-baseline tooling for the additive surface; and
 - advance the coordinated development version to `1.16.0-Alpha-1` only when the
   contract tests exist.
 
-**Gate:** API review demonstrates no generic Berkeley DB surface and no dependency
-reversal.
+**Gate:** PASSED — API review demonstrates no generic Berkeley DB surface and no
+dependency reversal. Exact preflight, cross-target API, package, command, and
+archive verification passed at the accepted head.
 
 ### HW02 / Alpha-2 — Deterministic metadata, buckets, and inline records
 
