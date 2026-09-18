@@ -318,18 +318,7 @@ public sealed class Hdb09ReleaseClosureTests {
 	}
 
 	[Fact]
-	public void StablePromotionAuthoritiesIdentifyTheCoordinated1150Release() {
-		XDocument buildProperties = XDocument.Parse(
-			ReadRequiredRepositoryFile( "Directory.Build.props" )
-		);
-		Assert.Equal(
-			"1.15.0",
-			Assert.Single(
-				buildProperties.Descendants(),
-				element => element.Name.LocalName == "IcodTermInfoSuiteVersion"
-			).Value
-		);
-
+	public void StablePromotionAuthoritiesPreserveTheCoordinated1150ReleaseHistory() {
 		AssertContainsAll(
 			"README.md",
 			"Current release line: `Icod.TermInfo 1.15.0`.",
