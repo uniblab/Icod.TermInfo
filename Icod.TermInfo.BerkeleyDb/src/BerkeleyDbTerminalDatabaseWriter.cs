@@ -22,7 +22,7 @@
 namespace Icod.TermInfo.BerkeleyDb;
 
 /// <summary>Writes ncurses-compatible Berkeley DB Hash-v9 terminal databases.</summary>
-public static class BerkeleyDbTerminalDatabaseWriter {
+public static partial class BerkeleyDbTerminalDatabaseWriter {
 	/// <summary>Writes terminal entries to one Hash-v9 database.</summary>
 	/// <param name="databasePath">The destination database path.</param>
 	/// <param name="entries">The terminal entries to publish.</param>
@@ -53,25 +53,15 @@ public static class BerkeleyDbTerminalDatabaseWriter {
 		cancellationToken.ThrowIfCancellationRequested();
 
 		_ = Path.GetFullPath( databasePath );
-		_ = SnapshotOptions( options );
-
-		List<BerkeleyDbTerminalDatabaseEntry> entrySnapshot = [];
-		foreach ( BerkeleyDbTerminalDatabaseEntry? entry in entries ) {
-			cancellationToken.ThrowIfCancellationRequested();
-			if ( entry is null ) {
-				throw new ArgumentException(
-					"The entry sequence cannot contain null.",
-					nameof( entries )
-				);
-			}
-			entrySnapshot.Add( entry );
-		}
-		if ( entrySnapshot.Count == 0 ) {
-			throw new ArgumentException(
-				"The entry sequence cannot be empty.",
-				nameof( entries )
-			);
-		}
+		BerkeleyDbTerminalDatabaseWriterOptions effectiveOptions =
+			SnapshotOptions( options );
+		BerkeleyDbTerminalDatabaseEntry[] entrySnapshot =
+			SnapshotEntries( entries, cancellationToken );
+		_ = PreparePublications(
+			entrySnapshot,
+			effectiveOptions,
+			cancellationToken
+		);
 
 		cancellationToken.ThrowIfCancellationRequested();
 		throw new NotSupportedException(
