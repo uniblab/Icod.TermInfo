@@ -21,6 +21,7 @@
 
 using System.Reflection;
 using Icod.TermInfo;
+using Icod.TermInfo.Tests.Shared;
 using Xunit;
 
 namespace Icod.TermInfo.BerkeleyDb.Tests;
@@ -384,6 +385,254 @@ public sealed class Hw01WriterContractTests {
 		Assert.IsType<ArgumentOutOfRangeException>( exception.InnerException );
 	}
 
+	[Fact]
+	public void WriterRejectsNullAndEmptyEntrySequencesBeforeCreatingDestination() {
+		ArgumentException nullElement =
+			AssertWriteThrowsWithoutDestination<ArgumentException>(
+				new BerkeleyDbTerminalDatabaseEntry[] { null! }
+			);
+		Assert.Equal( "entries", nullElement.ParamName );
+
+		ArgumentException empty =
+			AssertWriteThrowsWithoutDestination<ArgumentException>(
+				Array.Empty<BerkeleyDbTerminalDatabaseEntry>()
+			);
+		Assert.Equal( "entries", empty.ParamName );
+	}
+
+	[Fact]
+	public void WriterRejectsDuplicateCanonicalOwnership() {
+		InvalidOperationException exception =
+			AssertWriteThrowsWithoutDestination<InvalidOperationException>(
+				new[] {
+					CreateEntry( "duplicate" ),
+					CreateEntry( "duplicate" ),
+				}
+			);
+
+		Assert.Contains(
+			"terminal name",
+			exception.Message,
+			StringComparison.OrdinalIgnoreCase
+		);
+	}
+
+	[Fact]
+	public void WriterRejectsRepeatedAliasOwnershipWithinAndAcrossEntries() {
+		InvalidOperationException within =
+			AssertWriteThrowsWithoutDestination<InvalidOperationException>(
+				new[] { CreateEntry( "within", "shared", "shared" ) }
+			);
+		Assert.Contains(
+			"terminal name",
+			within.Message,
+			StringComparison.OrdinalIgnoreCase
+		);
+
+		InvalidOperationException across =
+			AssertWriteThrowsWithoutDestination<InvalidOperationException>(
+				new[] {
+					CreateEntry( "first", "shared" ),
+					CreateEntry( "second", "shared" ),
+				}
+			);
+		Assert.Contains(
+			"terminal name",
+			across.Message,
+			StringComparison.OrdinalIgnoreCase
+		);
+	}
+
+	[Fact]
+	public void WriterRejectsCanonicalAliasOwnershipCollision() {
+		InvalidOperationException exception =
+			AssertWriteThrowsWithoutDestination<InvalidOperationException>(
+				new[] {
+					CreateEntry( "canonical" ),
+					CreateEntry( "other", "canonical" ),
+				}
+			);
+
+		Assert.Contains(
+			"terminal name",
+			exception.Message,
+			StringComparison.OrdinalIgnoreCase
+		);
+	}
+
+	[Theory]
+	[MemberData( nameof( UnsafeTerminalIdentities ) )]
+	public void WriterRejectsUnsafeCanonicalAndAliasIdentitiesOnEveryHost(
+		string unsafeIdentity
+	) {
+		byte[] validData = Hdb07HashV9FixtureBuilder.CreateCompiledEntry(
+			"valid",
+			"HW01 fixture"
+		);
+		ArgumentException canonical =
+			AssertWriteThrowsWithoutDestination<ArgumentException>(
+				new[] {
+					new BerkeleyDbTerminalDatabaseEntry(
+						unsafeIdentity,
+						[],
+						validData
+					),
+				}
+			);
+		Assert.Equal( "entries", canonical.ParamName );
+
+		ArgumentException alias =
+			AssertWriteThrowsWithoutDestination<ArgumentException>(
+				new[] {
+					new BerkeleyDbTerminalDatabaseEntry(
+						"valid",
+						[ unsafeIdentity ],
+						validData
+					),
+				}
+			);
+		Assert.Equal( "entries", alias.ParamName );
+	}
+
+	[Fact]
+	public void WriterRequiresParsedCanonicalIdentityAgreement() {
+		BerkeleyDbTerminalDatabaseEntry entry = new(
+			"declared",
+			[],
+			Hdb07HashV9FixtureBuilder.CreateCompiledEntry(
+				"compiled",
+				"HW01 fixture"
+			)
+		);
+
+		InvalidOperationException exception =
+			AssertWriteThrowsWithoutDestination<InvalidOperationException>(
+				new[] { entry }
+			);
+		Assert.Contains(
+			"canonical",
+			exception.Message,
+			StringComparison.OrdinalIgnoreCase
+		);
+	}
+
+	[Fact]
+	public void WriterRequiresParsedAliasOrderAgreement() {
+		BerkeleyDbTerminalDatabaseEntry entry = new(
+			"ordered",
+			[ "first", "second" ],
+			Hdb07HashV9FixtureBuilder.CreateCompiledEntry(
+				"ordered",
+				"HW01 fixture",
+				"second",
+				"first"
+			)
+		);
+
+		InvalidOperationException exception =
+			AssertWriteThrowsWithoutDestination<InvalidOperationException>(
+				new[] { entry }
+			);
+		Assert.Contains(
+			"alias",
+			exception.Message,
+			StringComparison.OrdinalIgnoreCase
+		);
+	}
+
+	[Fact]
+	public void WriterPropagatesCompiledEntryFormatFailures() {
+		BerkeleyDbTerminalDatabaseEntry entry = new(
+			"malformed",
+			[],
+			[ 1, 2, 3 ]
+		);
+
+		AssertWriteThrowsWithoutDestination<CompiledTermInfoFormatException>(
+			new[] { entry }
+		);
+	}
+
+	[Fact]
+	public void WriterEnforcesThePhysicalHashRecordLimit() {
+		BerkeleyDbTerminalDatabaseWriterOptions options = new(
+			maximumRecordCount: 2
+		);
+
+		InvalidOperationException exception =
+			AssertWriteThrowsWithoutDestination<InvalidOperationException>(
+				new[] { CreateEntry( "limited", "alias" ) },
+				options
+			);
+		Assert.Contains(
+			"record limit",
+			exception.Message,
+			StringComparison.OrdinalIgnoreCase
+		);
+	}
+
+	[Fact]
+	public void WriterHonorsPreCancellationBeforeCreatingDestination() {
+		using CancellationTokenSource source = new();
+		source.Cancel();
+
+		AssertWriteThrowsWithoutDestination<OperationCanceledException>(
+			new[] { CreateEntry( "cancelled" ) },
+			cancellationToken: source.Token
+		);
+	}
+
+	[Fact]
+	public void WriterEnumeratesInputOnceAndStopsAtTheExactHw01Boundary() {
+		int enumerationCount = 0;
+		IEnumerable<BerkeleyDbTerminalDatabaseEntry> Entries() {
+			enumerationCount++;
+			yield return CreateEntry( "sample", "sample-alias" );
+		}
+
+		NotSupportedException exception =
+			AssertWriteThrowsWithoutDestination<NotSupportedException>(
+				Entries()
+			);
+
+		Assert.Equal( 1, enumerationCount );
+		Assert.Equal(
+			"HW01 freezes writer contracts; Hash-v9 image construction begins in HW02.",
+			exception.Message
+		);
+	}
+
+	public static TheoryData<string> UnsafeTerminalIdentities => new() {
+		"",
+		" ",
+		".",
+		"..",
+		"sample/name",
+		@"sample\name",
+		"sample\0name",
+		"sample<name",
+		"sample>name",
+		"sample:name",
+		"sample\"name",
+		"sample|name",
+		"sample?name",
+		"sample*name",
+		"sample.",
+		"sample ",
+		"CON",
+		"con.txt",
+		"PRN",
+		"AUX",
+		"NUL",
+		"CLOCK$",
+		"COM1",
+		"COM9.log",
+		"LPT1",
+		"LPT9.log",
+		"\u0001",
+		"\uD800",
+	};
+
 	private static Assembly LoadBerkeleyDbAssembly() {
 		string assemblyPath = Path.Combine(
 			AppContext.BaseDirectory,
@@ -404,6 +653,46 @@ public sealed class Hw01WriterContractTests {
 		);
 		Assert.NotNull( type );
 		return type;
+	}
+
+	private static BerkeleyDbTerminalDatabaseEntry CreateEntry(
+		string canonical,
+		params string[] aliases
+	) => new(
+		canonical,
+		aliases,
+		Hdb07HashV9FixtureBuilder.CreateCompiledEntry(
+			canonical,
+			"HW01 fixture",
+			aliases
+		)
+	);
+
+	private static TException AssertWriteThrowsWithoutDestination<TException>(
+		IEnumerable<BerkeleyDbTerminalDatabaseEntry> entries,
+		BerkeleyDbTerminalDatabaseWriterOptions? options = null,
+		CancellationToken cancellationToken = default
+	) where TException : Exception {
+		string directory = Path.Combine(
+			Path.GetTempPath(),
+			"icod-terminfo-hw01-" + Guid.NewGuid().ToString( "N" )
+		);
+		Directory.CreateDirectory( directory );
+		string destination = Path.Combine( directory, "terminfo.db" );
+		try {
+			TException exception = Assert.Throws<TException>(
+				() => BerkeleyDbTerminalDatabaseWriter.Write(
+					destination,
+					entries,
+					options,
+					cancellationToken
+				)
+			);
+			Assert.False( File.Exists( destination ) );
+			return exception;
+		} finally {
+			Directory.Delete( directory, recursive: true );
+		}
 	}
 
 	private static void AssertParameter(
