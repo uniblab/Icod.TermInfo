@@ -1,8 +1,11 @@
 # HW01 Hash-v9 Writer Public API Design
 
-**Date:** 2026-09-18  
-**Release:** Icod.TermInfo 1.16.0  
-**Tranche:** HW01 / Alpha-1  
+**Date:** 2026-09-18
+
+**Release:** Icod.TermInfo 1.16.0
+
+**Tranche:** HW01 / Alpha-1
+
 **Status:** Approved design; implementation pending
 
 ## 1. Purpose
