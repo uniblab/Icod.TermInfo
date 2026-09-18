@@ -24,7 +24,7 @@ public static class Hw00HashV9Writer {
 	private const ushort ClassicTermInfoMagic = 0x011A;
 	private const ushort ExtendedTermInfoMagic = 0x021E;
 	private static readonly byte[] CharacterKey =
-		Encoding.ASCII.GetBytes( "%$sniglet^&" )
+		Encoding.ASCII.GetBytes( "%$sniglet^&\0" )
 	;
 
 	public const int PageSize = 4096;

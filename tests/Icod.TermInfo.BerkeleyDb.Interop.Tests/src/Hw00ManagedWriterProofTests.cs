@@ -36,6 +36,10 @@ public sealed class Hw00ManagedWriterProofTests {
 			BinaryPrimitives.ReadUInt32LittleEndian( database.AsSpan( 20, 4 ) )
 		);
 		Assert.Equal( (byte)8, database[25] );
+		Assert.Equal(
+			0x5E688DD1U,
+			BinaryPrimitives.ReadUInt32LittleEndian( database.AsSpan( 92, 4 ) )
+		);
 	}
 
 	[Fact]
