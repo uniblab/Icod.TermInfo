@@ -16,9 +16,9 @@ public sealed class Hw00ManagedWriterProofTests {
 	public void WritesCanonicalLittleEndianHashV9Profile() {
 		byte[] database = WriteCatalog(
 			CreateCompiledEntry(
-				"hw00-primary",
-				"HW00 managed writer proof",
-				"hw00-alias"
+				"hw00-primary-0",
+				"HW00 proof 0",
+				"hw00-alias-0"
 			)
 		);
 
@@ -58,6 +58,30 @@ public sealed class Hw00ManagedWriterProofTests {
 		byte[] reverse = WriteCatalog( second, first );
 
 		Assert.Equal( forward, reverse );
+	}
+
+	[Fact]
+	public void OrdersExactPrefixesForNativeHashBinarySearch() {
+		byte[] database = WriteCatalog(
+			CreateCompiledEntry(
+				"hw00-primary",
+				"HW00 managed writer proof",
+				"hw00-alias"
+			)
+		);
+		ReadOnlySpan<byte> page = database.AsSpan(
+			2 * Hw00HashV9Writer.PageSize,
+			Hw00HashV9Writer.PageSize
+		);
+
+		Assert.Equal(
+			new[] {
+				"hw00-alias-0",
+				"hw00-primary-0|hw00-alias-0|HW00 proof 0",
+				"hw00-primary-0",
+			},
+			ReadInlineKeys( page )
+		);
 	}
 
 	[Fact]
@@ -195,6 +219,31 @@ public sealed class Hw00ManagedWriterProofTests {
 			)
 		);
 		return destination.ToArray();
+	}
+
+	private static string[] ReadInlineKeys( ReadOnlySpan<byte> page ) {
+		ushort itemCount = BinaryPrimitives.ReadUInt16LittleEndian(
+			page[20..22]
+		);
+		var keys = new List<string>( itemCount / 2 );
+		for ( int index = 0; index < itemCount; index += 2 ) {
+			ushort offset = BinaryPrimitives.ReadUInt16LittleEndian(
+				page.Slice( 26 + ( index * 2 ), 2 )
+			);
+			int previousOffset = ( index == 0 )
+				? Hw00HashV9Writer.PageSize
+				: BinaryPrimitives.ReadUInt16LittleEndian(
+					page.Slice( 26 + ( ( index - 1 ) * 2 ), 2 )
+				)
+			;
+			Assert.Equal( (byte)1, page[offset] );
+			keys.Add(
+				Encoding.Latin1.GetString(
+					page.Slice( offset + 1, previousOffset - offset - 1 )
+				)
+			);
+		}
+		return keys.ToArray();
 	}
 
 	private static byte[] CreateCompiledEntry(

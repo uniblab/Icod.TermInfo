@@ -375,7 +375,16 @@ public static class Hw00HashV9Writer {
 			if ( right is null ) {
 				return 1;
 			}
-			return left.AsSpan().SequenceCompareTo( right );
+			int commonLength = Math.Min( left.Length, right.Length );
+			for ( int index = 0; index < commonLength; index++ ) {
+				int comparison = left[index].CompareTo( right[index] );
+				if ( comparison != 0 ) {
+					return comparison;
+				}
+			}
+
+			// Berkeley DB Hash-v9 orders a longer key before its exact prefix.
+			return right.Length.CompareTo( left.Length );
 		}
 	}
 }
