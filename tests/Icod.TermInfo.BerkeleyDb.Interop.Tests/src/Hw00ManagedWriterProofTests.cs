@@ -56,6 +56,132 @@ public sealed class Hw00ManagedWriterProofTests {
 		Assert.Equal( forward, reverse );
 	}
 
+	[Fact]
+	public void DistributesRecordsAcrossBothBucketsAndPreservesCollisions() {
+		byte[][] entries = Enumerable.Range( 0, 8 )
+			.Select(
+				index => CreateCompiledEntry(
+					$"hw00-bucket-{index:D2}",
+					$"HW00 bucket fixture {index:D2}"
+				)
+			)
+			.ToArray()
+		;
+
+		byte[] database = WriteCatalog( entries );
+		ushort firstBucketItems = BinaryPrimitives.ReadUInt16LittleEndian(
+			database.AsSpan( Hw00HashV9Writer.PageSize + 20, 2 )
+		);
+		ushort secondBucketItems = BinaryPrimitives.ReadUInt16LittleEndian(
+			database.AsSpan( ( 2 * Hw00HashV9Writer.PageSize ) + 20, 2 )
+		);
+
+		Assert.NotEqual( 0, firstBucketItems );
+		Assert.NotEqual( 0, secondBucketItems );
+		Assert.Equal( 32, firstBucketItems + secondBucketItems );
+		Assert.True(
+			firstBucketItems >= 4 || secondBucketItems >= 4,
+			"At least one canonical bucket must preserve multiple colliding records."
+		);
+	}
+
+	[Fact]
+	public void WritesLargeCompiledValueThroughOverflowEnvelope() {
+		byte[] compiled = CreateCompiledEntry(
+			"hw00-overflow",
+			"HW00 overflow fixture"
+		);
+		Array.Resize( ref compiled, 3000 );
+
+		byte[] database = WriteCatalog( compiled );
+		uint lastPage = BinaryPrimitives.ReadUInt32LittleEndian(
+			database.AsSpan( 32, 4 )
+		);
+		Assert.True( lastPage > 2 );
+
+		bool foundOffPageValue = false;
+		for ( int pageNumber = 1; pageNumber <= 2; pageNumber++ ) {
+			ReadOnlySpan<byte> page = database.AsSpan(
+				pageNumber * Hw00HashV9Writer.PageSize,
+				Hw00HashV9Writer.PageSize
+			);
+			ushort itemCount = BinaryPrimitives.ReadUInt16LittleEndian(
+				page[20..22]
+			);
+			for ( int index = 1; index < itemCount; index += 2 ) {
+				ushort itemOffset = BinaryPrimitives.ReadUInt16LittleEndian(
+					page.Slice( 26 + ( index * 2 ), 2 )
+				);
+				if ( page[itemOffset] != 3 ) {
+					continue;
+				}
+
+				uint overflowPage = BinaryPrimitives.ReadUInt32LittleEndian(
+					page.Slice( itemOffset + 4, 4 )
+				);
+				uint declaredLength = BinaryPrimitives.ReadUInt32LittleEndian(
+					page.Slice( itemOffset + 8, 4 )
+				);
+				Assert.Equal( checked( (uint)( compiled.Length + 1 ) ), declaredLength );
+				Assert.Equal(
+					(byte)7,
+					database[checked( (int)overflowPage * Hw00HashV9Writer.PageSize ) + 25]
+				);
+				foundOffPageValue = true;
+			}
+		}
+
+		Assert.True( foundOffPageValue, "Expected one off-page marker-0 record." );
+	}
+
+	[Fact]
+	public void ExistingManagedReaderResolvesCanonicalAliasAndOverflowRecords() {
+		byte[] inline = CreateCompiledEntry(
+			"hw00-primary",
+			"HW00 reader fixture",
+			"hw00-alias"
+		);
+		byte[] overflow = CreateCompiledEntry(
+			"hw00-overflow",
+			"HW00 reader overflow fixture"
+		);
+		Array.Resize( ref overflow, 3000 );
+		string path = Path.Combine(
+			Path.GetTempPath(),
+			$"icod-terminfo-hw00-{Guid.NewGuid():N}.db"
+		);
+
+		try {
+			File.WriteAllBytes( path, WriteCatalog( inline, overflow ) );
+			Assert.True(
+				NcursesRecordReader.TryReadCompiledEntry(
+					path,
+					Encoding.ASCII.GetBytes( "hw00-primary" ),
+					out byte[] canonical
+				)
+			);
+			Assert.True(
+				NcursesRecordReader.TryReadCompiledEntry(
+					path,
+					Encoding.ASCII.GetBytes( "hw00-alias" ),
+					out byte[] alias
+				)
+			);
+			Assert.True(
+				NcursesRecordReader.TryReadCompiledEntry(
+					path,
+					Encoding.ASCII.GetBytes( "hw00-overflow" ),
+					out byte[] actualOverflow
+				)
+			);
+			Assert.Equal( inline, canonical );
+			Assert.Equal( inline, alias );
+			Assert.Equal( overflow, actualOverflow );
+		} finally {
+			File.Delete( path );
+		}
+	}
+
 	private static byte[] WriteCatalog( params byte[][] compiledEntries ) {
 		using var destination = new MemoryStream();
 		Hw00HashV9Writer.WriteNcursesCatalog(

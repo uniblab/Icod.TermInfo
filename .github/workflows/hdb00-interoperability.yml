@@ -111,6 +111,32 @@ jobs:
         shell: bash
         run: bash tools/hdb00/verify-managed.sh "$RUNNER_TEMP/icod-terminfo-hdb00"
 
+      - name: Verify HW00 managed writer with native Berkeley DB
+        if: steps.hdb00-scope.outputs.required == 'true'
+        shell: bash
+        env:
+          ICOD_HDB02_FIXTURE_ROOT: ${{ runner.temp }}/icod-terminfo-hdb00
+        run: |
+          project="tools/hdb00/writer-probe/Hw00.ManagedWriterProbe.csproj"
+          candidate="$ICOD_HDB02_FIXTURE_ROOT/hw00-managed-writer.db"
+          dump="$ICOD_HDB02_FIXTURE_ROOT/hw00-managed-writer.dump"
+          primary="$ICOD_HDB02_FIXTURE_ROOT/hw00-managed-primary.bin"
+          alias="$ICOD_HDB02_FIXTURE_ROOT/hw00-managed-alias.bin"
+          overflow="$ICOD_HDB02_FIXTURE_ROOT/hw00-managed-overflow.bin"
+
+          dotnet run --project "$project" -c Release -f net10.0 -- \
+            "$candidate" \
+            "$ICOD_HDB02_FIXTURE_ROOT/hdb00-primary.bin" \
+            "$ICOD_HDB02_FIXTURE_ROOT/hdb00-overflow.bin"
+          db5.3_verify "$candidate"
+          db5.3_dump -k -f "$dump" "$candidate"
+          "$ICOD_HDB02_FIXTURE_ROOT/hdb00-probe" "$candidate" hdb00-primary "$primary"
+          "$ICOD_HDB02_FIXTURE_ROOT/hdb00-probe" "$candidate" hdb00-alias "$alias"
+          "$ICOD_HDB02_FIXTURE_ROOT/hdb00-probe" "$candidate" hdb00-overflow "$overflow"
+          cmp "$primary" "$ICOD_HDB02_FIXTURE_ROOT/hdb00-primary.bin"
+          cmp "$alias" "$ICOD_HDB02_FIXTURE_ROOT/hdb00-primary.bin"
+          cmp "$overflow" "$ICOD_HDB02_FIXTURE_ROOT/hdb00-overflow.bin"
+
       - name: Compare production reader with native Berkeley DB records
         if: steps.hdb00-scope.outputs.required == 'true'
         shell: bash
@@ -151,6 +177,8 @@ jobs:
             ${{ runner.temp }}/icod-terminfo-hdb00/overflow-hashed-db.dump
             ${{ runner.temp }}/icod-terminfo-hdb00/multi-hashed-db.db
             ${{ runner.temp }}/icod-terminfo-hdb00/multi-hashed-db.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw00-managed-writer.db
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw00-managed-writer.dump
             ${{ runner.temp }}/icod-terminfo-hdb00/not-hash.db
             ${{ runner.temp }}/icod-terminfo-hdb00/random.db
 
@@ -212,6 +240,34 @@ jobs:
         shell: bash
         run: bash tools/hdb00/verify-managed.sh "$RUNNER_TEMP/icod-terminfo-hdb00-macos"
 
+      - name: Verify HW00 managed writer with native Berkeley DB
+        if: steps.hdb00-scope.outputs.required == 'true'
+        shell: bash
+        env:
+          ICOD_HDB02_FIXTURE_ROOT: ${{ runner.temp }}/icod-terminfo-hdb00-macos
+        run: |
+          db_prefix="$(brew --prefix berkeley-db@5)"
+          export DYLD_LIBRARY_PATH="$db_prefix/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}"
+          project="tools/hdb00/writer-probe/Hw00.ManagedWriterProbe.csproj"
+          candidate="$ICOD_HDB02_FIXTURE_ROOT/hw00-managed-writer.db"
+          dump="$ICOD_HDB02_FIXTURE_ROOT/hw00-managed-writer.dump"
+          primary="$ICOD_HDB02_FIXTURE_ROOT/hw00-managed-primary.bin"
+          alias="$ICOD_HDB02_FIXTURE_ROOT/hw00-managed-alias.bin"
+          overflow="$ICOD_HDB02_FIXTURE_ROOT/hw00-managed-overflow.bin"
+
+          dotnet run --project "$project" -c Release -f net10.0 -- \
+            "$candidate" \
+            "$ICOD_HDB02_FIXTURE_ROOT/hdb00-primary.bin" \
+            "$ICOD_HDB02_FIXTURE_ROOT/hdb00-overflow.bin"
+          "$db_prefix/bin/db_verify" "$candidate"
+          "$db_prefix/bin/db_dump" -k -f "$dump" "$candidate"
+          "$ICOD_HDB02_FIXTURE_ROOT/hdb00-probe" "$candidate" hdb00-primary "$primary"
+          "$ICOD_HDB02_FIXTURE_ROOT/hdb00-probe" "$candidate" hdb00-alias "$alias"
+          "$ICOD_HDB02_FIXTURE_ROOT/hdb00-probe" "$candidate" hdb00-overflow "$overflow"
+          cmp "$primary" "$ICOD_HDB02_FIXTURE_ROOT/hdb00-primary.bin"
+          cmp "$alias" "$ICOD_HDB02_FIXTURE_ROOT/hdb00-primary.bin"
+          cmp "$overflow" "$ICOD_HDB02_FIXTURE_ROOT/hdb00-overflow.bin"
+
       - name: Compare production reader with native Berkeley DB records
         if: steps.hdb00-scope.outputs.required == 'true'
         shell: bash
@@ -251,6 +307,8 @@ jobs:
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/overflow-hashed-db.dump
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/multi-hashed-db.db
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/multi-hashed-db.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw00-managed-writer.db
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw00-managed-writer.dump
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/not-hash.db
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/random.db
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/hdb00-primary.bin
@@ -329,6 +387,23 @@ jobs:
           dotnet run --project $project -c Release -- $overflowDatabase hdb00-overflow $overflowActual
           if ((Get-FileHash $overflowActual -Algorithm SHA256).Hash -ne (Get-FileHash $overflowExpected -Algorithm SHA256).Hash) {
               throw 'Windows managed overflow extraction differs from the Linux native oracle.'
+          }
+
+          $managedWriterDatabase = Join-Path $fixtureRoot 'hw00-managed-writer.db'
+          $managedWriterPrimary = Join-Path $fixtureRoot 'windows-hw00-primary.bin'
+          $managedWriterAlias = Join-Path $fixtureRoot 'windows-hw00-alias.bin'
+          $managedWriterOverflow = Join-Path $fixtureRoot 'windows-hw00-overflow.bin'
+          dotnet run --project $project -c Release -- $managedWriterDatabase hdb00-primary $managedWriterPrimary
+          dotnet run --project $project -c Release -- $managedWriterDatabase hdb00-alias $managedWriterAlias
+          dotnet run --project $project -c Release -- $managedWriterDatabase hdb00-overflow $managedWriterOverflow
+          if ((Get-FileHash $managedWriterPrimary -Algorithm SHA256).Hash -ne (Get-FileHash $expected -Algorithm SHA256).Hash) {
+              throw 'Windows managed HW00 primary extraction differs from the Linux writer input.'
+          }
+          if ((Get-FileHash $managedWriterAlias -Algorithm SHA256).Hash -ne (Get-FileHash $expected -Algorithm SHA256).Hash) {
+              throw 'Windows managed HW00 alias extraction differs from the Linux writer input.'
+          }
+          if ((Get-FileHash $managedWriterOverflow -Algorithm SHA256).Hash -ne (Get-FileHash $overflowExpected -Algorithm SHA256).Hash) {
+              throw 'Windows managed HW00 overflow extraction differs from the Linux writer input.'
           }
 
           $multiDatabase = Join-Path $fixtureRoot 'multi-hashed-db.db'
