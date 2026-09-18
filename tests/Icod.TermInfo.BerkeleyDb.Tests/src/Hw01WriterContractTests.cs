@@ -602,6 +602,34 @@ public sealed class Hw01WriterContractTests {
 		);
 	}
 
+	[Fact]
+	public void ApiBaselineAndPackageVerifierTrackCurrentWriterContract() {
+		string root = FindRepositoryRoot();
+		string baselinePath = Path.Combine(
+			root,
+			"docs",
+			"1.16.0-BERKELEYDB-PUBLIC-API-BASELINE.txt"
+		);
+		Assert.True(
+			File.Exists( baselinePath ),
+			$"Missing current BerkeleyDb API baseline: {baselinePath}"
+		);
+
+		string verifier = File.ReadAllText(
+			Path.Combine(
+				root,
+				".github",
+				"scripts",
+				"verify-berkeleydb-package.ps1"
+			)
+		);
+		Assert.Contains(
+			"docs/1.16.0-BERKELEYDB-PUBLIC-API-BASELINE.txt",
+			verifier,
+			StringComparison.Ordinal
+		);
+	}
+
 	public static TheoryData<string> UnsafeTerminalIdentities => new() {
 		"",
 		" ",
@@ -653,6 +681,26 @@ public sealed class Hw01WriterContractTests {
 		);
 		Assert.NotNull( type );
 		return type;
+	}
+
+	private static string FindRepositoryRoot() {
+		DirectoryInfo? directory = new( AppContext.BaseDirectory );
+		while ( directory is not null ) {
+			if (
+				File.Exists(
+					Path.Combine(
+						directory.FullName,
+						"Icod.TermInfo.sln"
+					)
+				)
+			) {
+				return directory.FullName;
+			}
+			directory = directory.Parent;
+		}
+		throw new DirectoryNotFoundException(
+			"Could not locate the repository root from the test output directory."
+		);
 	}
 
 	private static BerkeleyDbTerminalDatabaseEntry CreateEntry(
