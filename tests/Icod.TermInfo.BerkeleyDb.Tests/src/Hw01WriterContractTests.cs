@@ -287,6 +287,103 @@ public sealed class Hw01WriterContractTests {
 		);
 	}
 
+	[Fact]
+	public void EntryAndOptionsSnapshotMutableInputs() {
+		Assembly assembly = LoadBerkeleyDbAssembly();
+		Type entryType = RequireType(
+			assembly,
+			"BerkeleyDbTerminalDatabaseEntry"
+		);
+		Type optionsType = RequireType(
+			assembly,
+			"BerkeleyDbTerminalDatabaseWriterOptions"
+		);
+
+		string[] aliases = [ "sample-alias" ];
+		byte[] data = [ 1, 2, 3 ];
+		object entry = Assert.Single( entryType.GetConstructors() ).Invoke(
+			new object?[] { "sample", aliases, data }
+		);
+		aliases[0] = "mutated";
+		data[0] = 255;
+
+		Assert.Equal(
+			new[] { "sample-alias" },
+			Assert.IsAssignableFrom<IEnumerable<string>>(
+				entryType.GetProperty( "Aliases" )!.GetValue( entry )
+			)
+		);
+		byte[] first = Assert.IsType<byte[]>(
+			entryType.GetProperty( "Data" )!.GetValue( entry )
+		);
+		Assert.Equal( new byte[] { 1, 2, 3 }, first );
+		first[0] = 254;
+		byte[] second = Assert.IsType<byte[]>(
+			entryType.GetProperty( "Data" )!.GetValue( entry )
+		);
+		Assert.Equal( new byte[] { 1, 2, 3 }, second );
+
+		CompiledTermInfoParserOptions parserOptions = new( 4_096 );
+		object options = Assert.Single( optionsType.GetConstructors() ).Invoke(
+			new object?[] { parserOptions, 8_192, 32, true }
+		);
+		CompiledTermInfoParserOptions parserSnapshot =
+			Assert.IsType<CompiledTermInfoParserOptions>(
+				optionsType.GetProperty( "ParserOptions" )!.GetValue( options )
+			);
+		Assert.NotSame( parserOptions, parserSnapshot );
+		Assert.Equal( 4_096, parserSnapshot.MaximumEntrySize );
+		Assert.Equal(
+			8_192,
+			Assert.IsType<int>(
+				optionsType.GetProperty( "MaximumDatabaseSize" )!.GetValue( options )
+			)
+		);
+		Assert.Equal(
+			32,
+			Assert.IsType<int>(
+				optionsType.GetProperty( "MaximumRecordCount" )!.GetValue( options )
+			)
+		);
+		Assert.True(
+			Assert.IsType<bool>(
+				optionsType.GetProperty( "OverwriteExisting" )!.GetValue( options )
+			)
+		);
+	}
+
+	[Theory]
+	[InlineData( 0, 1 )]
+	[InlineData( -1, 1 )]
+	[InlineData( 1, 0 )]
+	[InlineData( 1, -1 )]
+	public void OptionsRejectNonpositiveResourceLimits(
+		int maximumDatabaseSize,
+		int maximumRecordCount
+	) {
+		Type optionsType = RequireType(
+			LoadBerkeleyDbAssembly(),
+			"BerkeleyDbTerminalDatabaseWriterOptions"
+		);
+		ConstructorInfo constructor = Assert.Single(
+			optionsType.GetConstructors()
+		);
+
+		TargetInvocationException exception =
+			Assert.Throws<TargetInvocationException>(
+				() => constructor.Invoke(
+					new object?[] {
+						null,
+						maximumDatabaseSize,
+						maximumRecordCount,
+						false,
+					}
+				)
+			);
+
+		Assert.IsType<ArgumentOutOfRangeException>( exception.InnerException );
+	}
+
 	private static Assembly LoadBerkeleyDbAssembly() {
 		string assemblyPath = Path.Combine(
 			AppContext.BaseDirectory,
