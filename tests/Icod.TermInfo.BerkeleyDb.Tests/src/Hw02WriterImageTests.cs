@@ -62,7 +62,7 @@ public sealed class Hw02WriterImageTests {
 	private static Array InvokePreparePublications(
 		BerkeleyDbTerminalDatabaseEntry[] entries
 	) {
-		MethodInfo method = Assert.IsType<MethodInfo>(
+		MethodInfo method = Assert.IsAssignableFrom<MethodInfo>(
 			typeof( BerkeleyDbTerminalDatabaseWriter ).GetMethod(
 				"PreparePublications",
 				BindingFlags.Static
