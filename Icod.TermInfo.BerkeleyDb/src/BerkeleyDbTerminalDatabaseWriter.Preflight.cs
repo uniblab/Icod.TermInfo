@@ -19,6 +19,7 @@
 	along with this library.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+using System.Buffers.Binary;
 using System.Text;
 
 namespace Icod.TermInfo.BerkeleyDb;
@@ -81,7 +82,7 @@ public static partial class BerkeleyDbTerminalDatabaseWriter {
 		return snapshot.ToArray();
 	}
 
-	private static PreparedPublication[] PreparePublications(
+	internal static PreparedPublication[] PreparePublications(
 		IReadOnlyList<BerkeleyDbTerminalDatabaseEntry> entries,
 		BerkeleyDbTerminalDatabaseWriterOptions options,
 		CancellationToken cancellationToken
@@ -126,12 +127,20 @@ public static partial class BerkeleyDbTerminalDatabaseWriter {
 				new PreparedPublication(
 					canonical,
 					Array.AsReadOnly( aliases ),
+					ExtractStorageKey( data ),
 					data
 				)
 			);
 		}
 
 		return publications.ToArray();
+	}
+
+	private static byte[] ExtractStorageKey( byte[] data ) {
+		int namesLength = BinaryPrimitives.ReadUInt16LittleEndian(
+			data.AsSpan( 2, sizeof( ushort ) )
+		);
+		return data.AsSpan( 12, namesLength - 1 ).ToArray();
 	}
 
 	private static PreparedIdentity PrepareIdentity( string name ) {
@@ -224,14 +233,15 @@ public static partial class BerkeleyDbTerminalDatabaseWriter {
 		"The declared alias order does not match the compiled entry."
 	);
 
-	private sealed record PreparedIdentity(
+	internal sealed record PreparedIdentity(
 		string Name,
 		byte[] Utf8
 	);
 
-	private sealed record PreparedPublication(
+	internal sealed record PreparedPublication(
 		PreparedIdentity Canonical,
 		IReadOnlyList<PreparedIdentity> Aliases,
+		byte[] StorageKey,
 		byte[] Data
 	);
 }
