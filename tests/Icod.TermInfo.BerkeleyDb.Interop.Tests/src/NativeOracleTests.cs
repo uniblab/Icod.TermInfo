@@ -34,6 +34,7 @@ public sealed class NativeOracleTests {
 	[InlineData( "latin1-hashed-db", 3 )]
 	[InlineData( "overflow-hashed-db", 2 )]
 	[InlineData( "multi-hashed-db", 192 )]
+	[InlineData( "hw00-managed-writer", 5 )]
 	public void ProductionReaderMatchesEveryNativeRecord(
 		string fixtureName,
 		int expectedRecordCount
@@ -74,6 +75,7 @@ public sealed class NativeOracleTests {
 	[InlineData( "hashed-db" )]
 	[InlineData( "big-endian-hashed-db" )]
 	[InlineData( "overflow-hashed-db" )]
+	[InlineData( "hw00-managed-writer" )]
 	public void ProductionReaderReturnsCleanMissForAbsentNativeKey( string fixtureName ) {
 		byte[] key = Encoding.UTF8.GetBytes( "hdb00-missing" );
 		List<( byte[] Key, byte[] Value )> records = ReadNativeRecords( fixtureName );
@@ -112,6 +114,9 @@ public sealed class NativeOracleTests {
 	[InlineData( "big-endian-hashed-db", "hdb00-primary", "hdb00-primary.bin" )]
 	[InlineData( "big-endian-hashed-db", "hdb00-alias", "hdb00-primary.bin" )]
 	[InlineData( "overflow-hashed-db", "hdb00-overflow", "hdb00-overflow.bin" )]
+	[InlineData( "hw00-managed-writer", "hdb00-primary", "hdb00-primary.bin" )]
+	[InlineData( "hw00-managed-writer", "hdb00-alias", "hdb00-primary.bin" )]
+	[InlineData( "hw00-managed-writer", "hdb00-overflow", "hdb00-overflow.bin" )]
 	public void ProductionRecordResolverMatchesNativeCompiledEntry(
 		string fixtureName,
 		string terminalName,
@@ -138,6 +143,9 @@ public sealed class NativeOracleTests {
 	[InlineData( "latin1-hashed-db", Latin1Canonical, Latin1Canonical, Latin1Alias )]
 	[InlineData( "latin1-hashed-db", Latin1Alias, Latin1Canonical, Latin1Alias )]
 	[InlineData( "overflow-hashed-db", "hdb00-overflow", "hdb00-overflow", null )]
+	[InlineData( "hw00-managed-writer", "hdb00-primary", "hdb00-primary", "hdb00-alias" )]
+	[InlineData( "hw00-managed-writer", "hdb00-alias", "hdb00-primary", "hdb00-alias" )]
+	[InlineData( "hw00-managed-writer", "hdb00-overflow", "hdb00-overflow", null )]
 	public void PublicProviderParsesNativeStore(
 		string fixtureName,
 		string requestedName,

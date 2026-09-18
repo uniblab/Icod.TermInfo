@@ -46,6 +46,9 @@ public sealed class Hdb01ContractTests {
 				"Icod.TermInfo.BerkeleyDb.BerkeleyDbTerminalCatalogEntryKind",
 				"Icod.TermInfo.BerkeleyDb.BerkeleyDbTerminalCatalogReader",
 				"Icod.TermInfo.BerkeleyDb.BerkeleyDbTerminalCatalogReaderOptions",
+				"Icod.TermInfo.BerkeleyDb.BerkeleyDbTerminalDatabaseEntry",
+				"Icod.TermInfo.BerkeleyDb.BerkeleyDbTerminalDatabaseWriter",
+				"Icod.TermInfo.BerkeleyDb.BerkeleyDbTerminalDatabaseWriterOptions",
 				"Icod.TermInfo.BerkeleyDb.BerkeleyDbTerminalDescriptionProvider",
 				"Icod.TermInfo.BerkeleyDb.BerkeleyDbTerminalDescriptionProviderOptions",
 			},
@@ -95,7 +98,7 @@ public sealed class Hdb01ContractTests {
 	}
 
 	[Fact]
-	public void CoordinatedOneFifteenLineAndPackagePipelineIncludeBerkeleyDb() {
+	public void CoordinatedDevelopmentLineAndPackagePipelineIncludeBerkeleyDb() {
 		string root = FindRepositoryRoot();
 		string props =
 			File.ReadAllText(
@@ -149,7 +152,7 @@ public sealed class Hdb01ContractTests {
 			);
 
 		Assert.Contains(
-			"<IcodTermInfoSuiteVersion>1.15.0-",
+			"<IcodTermInfoSuiteVersion>1.16.0-Alpha-2</IcodTermInfoSuiteVersion>",
 			props,
 			StringComparison.Ordinal
 		);
