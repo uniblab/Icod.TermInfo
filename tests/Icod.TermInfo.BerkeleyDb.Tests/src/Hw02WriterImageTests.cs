@@ -266,9 +266,8 @@ public sealed class Hw02WriterImageTests {
 		byte[] value
 	) {
 		BerkeleyDbHashRecord record = Assert.Single(
-			records.Where(
-				item => item.Key.Span.SequenceEqual( key )
-			)
+			records,
+			item => item.Key.Span.SequenceEqual( key )
 		);
 		Assert.True( record.Value.Span.SequenceEqual( value ) );
 	}
