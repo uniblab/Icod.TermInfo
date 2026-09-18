@@ -38,7 +38,6 @@
 - Create `Icod.TermInfo.BerkeleyDb/src/BerkeleyDbHashV9ImageBuilder.cs`: hashing, deterministic file ID, metadata, two buckets, inline items, and checked bounds.
 - Modify `Directory.Build.props`: advance the active coordinated version to `1.16.0-Alpha-2`.
 - Modify `tests/Icod.TermInfo.BerkeleyDb.Tests/src/Hdb01ContractTests.cs`: active development-version expectation only.
-- Modify `tests/Icod.TermInfo.BerkeleyDb.Tests/src/Hdb09ReleaseClosureTests.cs`: active development-version expectation only.
 - Create `docs/1.16.0-HW02-DETERMINISTIC-HASH-V9-INLINE-IMAGE.md`: accepted exact-head evidence after GREEN.
 - Modify `Icod.TermInfo-1.16.0-Berkeley-DB-Hash-V9-Writer-Roadmap.md`: HW02 completion and HW03 next gate after acceptance.
 - Modify `Icod.TermInfo-Post-1.0-Development-Roadmap.md`: coordinated 1.16 progress after acceptance.
@@ -51,7 +50,6 @@
 - Create: `tests/Icod.TermInfo.BerkeleyDb.Tests/src/Hw02WriterImageTests.cs`
 - Modify: `Directory.Build.props`
 - Modify: `tests/Icod.TermInfo.BerkeleyDb.Tests/src/Hdb01ContractTests.cs`
-- Modify: `tests/Icod.TermInfo.BerkeleyDb.Tests/src/Hdb09ReleaseClosureTests.cs`
 - Modify: `Icod.TermInfo.BerkeleyDb/src/BerkeleyDbTerminalDatabaseWriter.Preflight.cs`
 
 **Interfaces:**
@@ -109,16 +107,17 @@ Set:
 <IcodTermInfoSuiteVersion>1.16.0-Alpha-2</IcodTermInfoSuiteVersion>
 ```
 
-Update only active assertions in `Hdb01ContractTests` and
-`Hdb09ReleaseClosureTests` from `1.16.0-Alpha-1` to `1.16.0-Alpha-2`. Preserve
-the historical 1.15 marker and accepted stable-version assertions.
+Update only the active assertion in `Hdb01ContractTests` from
+`1.16.0-Alpha-1` to `1.16.0-Alpha-2`. Preserve the historical 1.15 marker,
+the HW01 Alpha-1 acceptance record in `Hdb09ReleaseClosureTests`, and accepted
+stable-version assertions.
 
 - [ ] **Step 3: Run the focused suite and verify intentional RED**
 
 Run:
 
 ```text
-dotnet test tests/Icod.TermInfo.BerkeleyDb.Tests/Icod.TermInfo.BerkeleyDb.Tests.csproj -c Release -f net10.0 --filter "FullyQualifiedName~Hw02WriterImageTests|FullyQualifiedName~Hdb01ContractTests|FullyQualifiedName~Hdb09ReleaseClosureTests"
+dotnet test tests/Icod.TermInfo.BerkeleyDb.Tests/Icod.TermInfo.BerkeleyDb.Tests.csproj -c Release -f net10.0 --filter "FullyQualifiedName~Hw02WriterImageTests|FullyQualifiedName~Hdb01ContractTests"
 ```
 
 Expected: the project compiles and only the new storage-key assertion fails
@@ -128,7 +127,7 @@ pass.
 - [ ] **Step 4: Commit and publish RED**
 
 ```bash
-git add Directory.Build.props tests/Icod.TermInfo.BerkeleyDb.Tests/src/Hdb01ContractTests.cs tests/Icod.TermInfo.BerkeleyDb.Tests/src/Hdb09ReleaseClosureTests.cs tests/Icod.TermInfo.BerkeleyDb.Tests/src/Hw02WriterImageTests.cs
+git add Directory.Build.props tests/Icod.TermInfo.BerkeleyDb.Tests/src/Hdb01ContractTests.cs tests/Icod.TermInfo.BerkeleyDb.Tests/src/Hw02WriterImageTests.cs
 git commit -m "test: define HW02 prepared publication identity"
 ```
 
