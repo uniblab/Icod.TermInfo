@@ -14,11 +14,11 @@
 **Current coordinated version:** `1.15.0`
 **Latest completed line:** `1.15.0` - Berkeley DB / Hashed Terminfo Acquisition
 **Latest completed prerelease:** `1.15.0-Alpha-8`
-**Status:** stable `1.15.0` release closure is complete in draft PR #45; merge and publication remain user-owned
-**Active release roadmap:** `Icod.TermInfo-1.15.0-Berkeley-DB-Hashed-Terminfo-Acquisition-Roadmap.md`  
+**Status:** stable `1.15.0` is published; focused `1.16.0` Hash-v9 writer planning is active
+**Active release roadmap:** `Icod.TermInfo-1.16.0-Berkeley-DB-Hash-V9-Writer-Roadmap.md`
 **Release audit:** `docs/1.15.0-RELEASE-AUDIT.md`
 **Latest completed release audit:** `docs/1.15.0-RELEASE-AUDIT.md`
-**Next implementation gate:** final exact-head review; no further 1.15 feature work is planned
+**Next implementation gate:** HW00 native interoperability and writer-backend proof
 
 ---
 
@@ -91,9 +91,45 @@ version-specific roadmap.
 | **1.13.0** | Runtime evidence interchange | Caller-owned runtime observations/integration and replanning, JSON v5 |
 | **1.14.0** | Raster backend selection | Backend availability evidence/classification, candidate evaluation, explicit preference selection, JSON v6 |
 | **1.15.0** | Berkeley DB / hashed terminfo acquisition | Optional pure-managed read-only Hash-v9 acquisition recovers compiled entry bytes and delegates semantic parsing to existing Runtime |
-| **later** | Explicitly planned deferred work | Hashed-store writing, additional backends, richer graphics policy, historical formats, or other justified tracks |
+| **1.16.0** | Berkeley DB Hash-v9 writer | Optional pure-managed deterministic whole-file Hash-v9 publication and explicit `tic` hashed output |
+| **1.17.0** | Hashed migration and catalog automation | Directory/hashed migration, unified catalog automation, cross-container analysis, and machine-readable expansion if justified |
+| **later** | Explicitly planned deferred work | Additional backends, richer graphics policy, historical formats, or other justified tracks |
 
-### 2.1 Active 1.15 line
+### 2.1 Active 1.16 line
+
+Version 1.16 is governed by
+`Icod.TermInfo-1.16.0-Berkeley-DB-Hash-V9-Writer-Roadmap.md`.
+
+The approved scope is intentionally smaller than the complete hashed-store
+administration menu. Version 1.16 owns only:
+
+```text
+compiled terminfo bytes
+          |
+          v
+deterministic managed Hash-v9 writer
+          |
+          v
+verified whole-file publication
+          |
+          v
+explicit managed tic hashed output
+```
+
+The writer remains in the optional `Icod.TermInfo.BerkeleyDb` package, which
+continues to depend only on Runtime. Compiler remains the owner of compiled-entry
+encoding; `tic` composes Compiler and BerkeleyDb without creating a reusable
+package dependency between them.
+
+Version 1.16 excludes in-place database mutation, general Berkeley DB APIs,
+directory/hashed migration, unified catalog automation, cross-container planning,
+and JSON v7. Migration and catalog automation are explicitly assigned to 1.17.
+
+HW00 through HW08 separate interoperability proof, API-regret review, deterministic
+image construction, collision/overflow support, public publication, safe filesystem
+commit, `tic` integration, hardening, and stable release qualification.
+
+### 2.2 Completed 1.15 line
 
 Version 1.15 is governed by
 `Icod.TermInfo-1.15.0-Berkeley-DB-Hashed-Terminfo-Acquisition-Roadmap.md`.
@@ -336,14 +372,16 @@ See `docs/VERSIONING.md` and `docs/COMPATIBILITY.md` for the complete policy.
 
 ---
 
-## 7. Deferred work during and after 1.15
+## 7. Deferred work during and after 1.16
 
-The following remain explicitly outside the approved read-only 1.15 scope and
-require a future design/roadmap before implementation:
+The following remain explicitly outside the approved 1.16 writer-only scope and
+require the 1.17 roadmap or a later independent design before implementation:
 
-- Berkeley DB / hashed terminfo writing;
-- `tic` hashed-database publication;
 - directory-to-hashed or hashed-to-directory migration;
+- unified directory/hashed catalog automation;
+- cross-container comparison, synchronization, and migration planning;
+- hashed-aware machine-readable output or JSON v7;
+- in-place Berkeley DB mutation, transactions, recovery, or repair;
 - bundled Berkeley DB native binaries;
 - additional concrete raster backends;
 - alpha/pixel-format capability planning;
@@ -355,9 +393,10 @@ require a future design/roadmap before implementation:
 - divergent historical vendor binary formats; and
 - any migration of live-session/protocol execution into TermInfo.
 
-Any future expansion beyond the HDB00-selected managed Hash-v9 read-only subset
-must be driven by authoritative interoperability evidence and API-regret analysis,
-not inferred automatically from Berkeley DB's broader feature set.
+The 1.16 writer extends only the HDB00-selected managed Hash-v9 terminfo subset.
+Any expansion beyond that subset must be driven by authoritative interoperability
+evidence and API-regret analysis, not inferred automatically from Berkeley DB's
+broader feature set.
 
 ---
 
@@ -391,7 +430,7 @@ docs/1.14.0-RB08-FREEZE-FINGERPRINTS.txt
 docs/1.14.0-RELEASE-AUDIT.md
 ```
 
-The active line is documented by:
+The latest completed line is documented by:
 
 ```text
 Icod.TermInfo-1.15.0-Berkeley-DB-Hashed-Terminfo-Acquisition-Roadmap.md
@@ -399,6 +438,16 @@ docs/1.15.0-HDB00-BERKELEY-DB-INTEROPERABILITY-AND-BACKEND-DECISION.md
 docs/1.15.0-BERKELEY-DB-ECOSYSTEM-AUDIT.md
 ```
 
-HDB00 is complete and accepted. HDB01 is responsible for the optional
-`Icod.TermInfo.BerkeleyDb` package/test/package-verification foundation before
-HDB02 begins production managed Hash-v9 reader implementation.
+HDB00 through HDB09 are complete and accepted. Stable 1.15 established the
+optional Runtime-only BerkeleyDb package, the production managed Hash-v9 reader,
+explicit and system providers, logical catalog enumeration, command composition,
+hardening, package qualification, and the exact nine-type public API freeze.
+
+The active planning line is documented by:
+
+```text
+Icod.TermInfo-1.16.0-Berkeley-DB-Hash-V9-Writer-Roadmap.md
+```
+
+HW00 is the next implementation gate. No 1.16 production API or behavior is
+implemented by the roadmap-only planning change.
