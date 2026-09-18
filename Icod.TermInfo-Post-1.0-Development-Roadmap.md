@@ -11,14 +11,14 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`  
 **Frozen runtime contract:** `1.0.0`  
-**Current coordinated version:** `1.15.0`
+**Current coordinated version:** `1.16.0-Alpha-2`
 **Latest completed line:** `1.15.0` - Berkeley DB / Hashed Terminfo Acquisition
-**Latest completed prerelease:** `1.15.0-Alpha-8`
-**Status:** stable `1.15.0` is published; focused `1.16.0` Hash-v9 writer implementation is active; HW01 is accepted
+**Latest completed prerelease:** `1.16.0-Alpha-2`
+**Status:** stable `1.15.0` is published; focused `1.16.0` Hash-v9 writer implementation is active; HW02 is accepted
 **Active release roadmap:** `Icod.TermInfo-1.16.0-Berkeley-DB-Hash-V9-Writer-Roadmap.md`
 **Release audit:** `docs/1.15.0-RELEASE-AUDIT.md`
 **Latest completed release audit:** `docs/1.15.0-RELEASE-AUDIT.md`
-**Next implementation gate:** HW02 deterministic metadata, buckets, and inline records
+**Next implementation gate:** HW03 collisions, overflow, and bounded growth
 
 ---
 
@@ -125,9 +125,9 @@ Version 1.16 excludes in-place database mutation, general Berkeley DB APIs,
 directory/hashed migration, unified catalog automation, cross-container planning,
 and JSON v7. Migration and catalog automation are explicitly assigned to 1.17.
 
-HW00 through HW08 separate interoperability proof, API-regret review, deterministic
-image construction, collision/overflow support, public publication, safe filesystem
-commit, `tic` integration, hardening, and stable release qualification.
+HW00 through HW02 are complete and accepted. HW03 through HW08 continue with
+collision/overflow support, public publication, safe filesystem commit, `tic`
+integration, hardening, and stable release qualification.
 
 ### 2.2 Completed 1.15 line
 

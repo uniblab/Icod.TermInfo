@@ -6,7 +6,7 @@
 **Command integration:** `tic` and `Icod.TermInfo.Tools`
 **Language:** C# 13
 **Reusable target frameworks:** `net8.0`; `net9.0`; `net10.0`
-**Status:** ACTIVE — HW01 COMPLETE / HW02 NEXT
+**Status:** ACTIVE — HW02 COMPLETE / HW03 NEXT
 **Stable predecessor:** `1.15.0`
 **Initial development version:** `1.16.0-Alpha-1`
 
@@ -547,7 +547,11 @@ archive verification passed at the accepted head.
 
 ### HW02 / Alpha-2 — Deterministic metadata, buckets, and inline records
 
-**Status:** PLANNED
+**Status:** COMPLETE / ACCEPTED
+**Accepted exact head:** `a31125898e7ab169457a9f9060a134cfcdbe4af6`
+**Accepted pull-request workflow:** run `35394326963` (12/12 jobs)
+**Accepted HDB00 workflow:** run `35394327002` (3/3 jobs)
+**Acceptance record:** `docs/1.16.0-HW02-DETERMINISTIC-HASH-V9-INLINE-IMAGE.md`
 
 - implement checked metadata and page construction;
 - implement canonical bucket sizing and hash placement;
@@ -556,8 +560,10 @@ archive verification passed at the accepted head.
 - add byte-exact fixtures and repeated/cross-culture determinism tests; and
 - prove reader round trips for canonical names and aliases.
 
-**Gate:** Equivalent logical input produces byte-identical single-page and
-multi-bucket stores accepted by the 1.15 reader.
+**Gate:** PASSED — equivalent logical input produces byte-identical three-page
+inline stores across order and culture changes; the 1.15 reader recovers exact
+canonical, alias, and compiled payload data; and complete production images
+match the independent HW00 byte oracle for compact and both-bucket catalogs.
 
 ### HW03 / Alpha-3 — Collisions, overflow, and bounded growth
 
