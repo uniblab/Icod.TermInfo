@@ -19,6 +19,7 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+using System.Buffers.Binary;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Text;
@@ -171,6 +172,53 @@ public sealed class Hw02WriterImageTests {
 		);
 	}
 
+	[Fact]
+	public void ImageBuilderWritesExactMetadataAndInlineBuckets() {
+		byte[] compiled = Hdb07HashV9FixtureBuilder.CreateCompiledEntry(
+			"hw02-primary",
+			"HW02 inline layout",
+			"hw02-alias"
+		);
+		var entry = new BerkeleyDbTerminalDatabaseEntry(
+			"hw02-primary",
+			[ "hw02-alias" ],
+			compiled
+		);
+		BerkeleyDbTerminalDatabaseWriter.PreparedPublication[] prepared =
+			BerkeleyDbTerminalDatabaseWriter.PreparePublications(
+				[ entry ],
+				new BerkeleyDbTerminalDatabaseWriterOptions(),
+				CancellationToken.None
+			);
+		IReadOnlyList<BerkeleyDbHashRecord> records =
+			InvokeCreateRecords( prepared, CancellationToken.None );
+
+		byte[] image = InvokeBuild(
+			records,
+			maximumDatabaseSize: 3 * 4096,
+			CancellationToken.None
+		);
+
+		Assert.Equal( 3 * 4096, image.Length );
+		Assert.Equal( 1U, ReadUInt32( image, 4 ) );
+		Assert.Equal( 0x00061561U, ReadUInt32( image, 12 ) );
+		Assert.Equal( 9U, ReadUInt32( image, 16 ) );
+		Assert.Equal( 4096U, ReadUInt32( image, 20 ) );
+		Assert.Equal( (byte)8, image[25] );
+		Assert.Equal( 2U, ReadUInt32( image, 32 ) );
+		Assert.Equal( 1U, ReadUInt32( image, 72 ) );
+		Assert.Equal( 1U, ReadUInt32( image, 76 ) );
+		Assert.Equal( 0U, ReadUInt32( image, 80 ) );
+		Assert.Equal( 0U, ReadUInt32( image, 84 ) );
+		Assert.Equal( 3U, ReadUInt32( image, 88 ) );
+		Assert.Equal( 0x5E688DD1U, ReadUInt32( image, 92 ) );
+		Assert.Equal( 1U, ReadUInt32( image, 96 ) );
+		Assert.Equal( 1U, ReadUInt32( image, 100 ) );
+
+		AssertInlineBucket( image, 1, records );
+		AssertInlineBucket( image, 2, records );
+	}
+
 	private static Array InvokePreparePublications(
 		BerkeleyDbTerminalDatabaseEntry[] entries
 	) {
@@ -259,6 +307,139 @@ public sealed class Hw02WriterImageTests {
 			property.GetValue( null )
 		);
 	}
+
+	private static byte[] InvokeBuild(
+		IReadOnlyList<BerkeleyDbHashRecord> records,
+		int maximumDatabaseSize,
+		CancellationToken cancellationToken
+	) {
+		Type? builderType = typeof( BerkeleyDbTerminalDatabaseWriter )
+			.Assembly
+			.GetType(
+				"Icod.TermInfo.BerkeleyDb.BerkeleyDbHashV9ImageBuilder",
+				throwOnError: false,
+				ignoreCase: false
+			);
+		Assert.NotNull( builderType );
+		MethodInfo method = Assert.IsAssignableFrom<MethodInfo>(
+			builderType!.GetMethod(
+				"Build",
+				BindingFlags.Static
+					| BindingFlags.Public
+					| BindingFlags.NonPublic
+			)
+		);
+
+		try {
+			return Assert.IsType<byte[]>(
+				method.Invoke(
+					null,
+					new object[] {
+						records,
+						maximumDatabaseSize,
+						cancellationToken,
+					}
+				)
+			);
+		} catch (
+			TargetInvocationException exception
+		) when ( exception.InnerException is not null ) {
+			ExceptionDispatchInfo.Capture( exception.InnerException ).Throw();
+			throw;
+		}
+	}
+
+	private static void AssertInlineBucket(
+		byte[] image,
+		int pageNumber,
+		IReadOnlyList<BerkeleyDbHashRecord> records
+	) {
+		const int pageSize = 4096;
+		int pageStart = checked( pageNumber * pageSize );
+		BerkeleyDbHashRecord[] expected = records
+			.Where(
+				record =>
+					( ExpectedHash( record.Key.Span ) & 1 )
+						== (uint)( pageNumber - 1 )
+			)
+			.ToArray();
+
+		Assert.Equal( 1U, ReadUInt32( image, pageStart + 4 ) );
+		Assert.Equal(
+			checked( (uint)pageNumber ),
+			ReadUInt32( image, pageStart + 8 )
+		);
+		Assert.Equal( (byte)13, image[pageStart + 25] );
+		Assert.Equal(
+			checked( (ushort)( expected.Length * 2 ) ),
+			ReadUInt16( image, pageStart + 20 )
+		);
+
+		int expectedHighFree = pageSize - expected.Sum(
+			static record =>
+				checked( record.Key.Length + record.Value.Length + 2 )
+		);
+		Assert.Equal(
+			checked( (ushort)expectedHighFree ),
+			ReadUInt16( image, pageStart + 22 )
+		);
+
+		int itemIndex = 0;
+		foreach ( BerkeleyDbHashRecord record in expected ) {
+			AssertInlineItem(
+				image,
+				pageStart,
+				itemIndex++,
+				record.Key.Span
+			);
+			AssertInlineItem(
+				image,
+				pageStart,
+				itemIndex++,
+				record.Value.Span
+			);
+		}
+	}
+
+	private static void AssertInlineItem(
+		byte[] image,
+		int pageStart,
+		int itemIndex,
+		ReadOnlySpan<byte> expectedPayload
+	) {
+		ushort itemOffset = ReadUInt16(
+			image,
+			checked( pageStart + 26 + ( itemIndex * 2 ) )
+		);
+		Assert.Equal( (byte)1, image[pageStart + itemOffset] );
+		Assert.True(
+			image.AsSpan(
+				checked( pageStart + itemOffset + 1 ),
+				expectedPayload.Length
+			).SequenceEqual( expectedPayload )
+		);
+	}
+
+	private static uint ExpectedHash( ReadOnlySpan<byte> key ) {
+		uint result = 0;
+		foreach ( byte value in key ) {
+			result = unchecked( result * 16777619 );
+			result ^= value;
+		}
+		return result;
+	}
+
+	private static ushort ReadUInt16( byte[] bytes, int offset ) =>
+		BinaryPrimitives.ReadUInt16LittleEndian(
+			bytes.AsSpan( offset, sizeof( ushort ) )
+		)
+	;
+
+	private static uint ReadUInt32( byte[] bytes, int offset ) =>
+		BinaryPrimitives.ReadUInt32LittleEndian(
+			bytes.AsSpan( offset, sizeof( uint ) )
+		)
+	;
 
 	private static void AssertRecord(
 		IEnumerable<BerkeleyDbHashRecord> records,
