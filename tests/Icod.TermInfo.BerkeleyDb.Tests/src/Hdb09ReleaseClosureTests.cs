@@ -28,13 +28,13 @@ namespace Icod.TermInfo.BerkeleyDb.Tests;
 
 public sealed class Hdb09ReleaseClosureTests {
 	private const string ApiBaselinePath =
-		"docs/1.15.0-BERKELEYDB-PUBLIC-API-BASELINE.txt";
+		"docs/1.16.0-BERKELEYDB-PUBLIC-API-BASELINE.txt";
 
 	[Fact]
 	public void ExactBerkeleyDbPublicApiHasACompleteCheckedInFreeze() {
 		string baseline = ReadRequiredRepositoryFile( ApiBaselinePath );
 		string freeze = ReadRequiredRepositoryFile(
-			"docs/1.15.0-BERKELEY-DB-PUBLIC-API-FREEZE.md"
+			"docs/1.16.0-HW01-BERKELEY-DB-WRITER-CONTRACT.md"
 		);
 		string verifier = ReadRequiredRepositoryFile(
 			".github/scripts/verify-berkeleydb-package.ps1"
@@ -58,7 +58,7 @@ public sealed class Hdb09ReleaseClosureTests {
 		int typeCount = NormalizeLf( baseline ).Split( '\n' ).Count(
 			line => line.StartsWith( "TYPE ", StringComparison.Ordinal )
 		);
-		Assert.True( typeCount > 0 );
+		Assert.Equal( 12, typeCount );
 		string sha256 = NormalizedLfSha256( baseline );
 		Assert.Contains( sha256, freeze, StringComparison.Ordinal );
 		Assert.Contains(
@@ -66,6 +66,15 @@ public sealed class Hdb09ReleaseClosureTests {
 			freeze,
 			StringComparison.Ordinal
 		);
+		foreach ( string token in new[] {
+			"1.16.0-Alpha-1",
+			"BerkeleyDbTerminalDatabaseEntry",
+			"BerkeleyDbTerminalDatabaseWriterOptions",
+			"BerkeleyDbTerminalDatabaseWriter",
+			"HW02",
+		} ) {
+			Assert.Contains( token, freeze, StringComparison.Ordinal );
+		}
 
 		Assert.Contains( "--check", verifier, StringComparison.Ordinal );
 		Assert.Contains( ApiBaselinePath, verifier, StringComparison.Ordinal );
