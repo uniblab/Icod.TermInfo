@@ -16,9 +16,9 @@ public sealed class Hw00ManagedWriterProofTests {
 	public void WritesCanonicalLittleEndianHashV9Profile() {
 		byte[] database = WriteCatalog(
 			CreateCompiledEntry(
-				"hw00-primary-0",
-				"HW00 proof 0",
-				"hw00-alias-0"
+				"hw00-primary",
+				"HW00 managed writer proof",
+				"hw00-alias"
 			)
 		);
 
@@ -64,9 +64,9 @@ public sealed class Hw00ManagedWriterProofTests {
 	public void OrdersExactPrefixesForNativeHashBinarySearch() {
 		byte[] database = WriteCatalog(
 			CreateCompiledEntry(
-				"hw00-primary",
-				"HW00 managed writer proof",
-				"hw00-alias"
+				"hw00-primary-0",
+				"HW00 proof 0",
+				"hw00-alias-0"
 			)
 		);
 		ReadOnlySpan<byte> page = database.AsSpan(
