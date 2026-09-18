@@ -20,6 +20,7 @@
 */
 
 using System.Buffers.Binary;
+using System.Globalization;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Text;
@@ -219,6 +220,196 @@ public sealed class Hw02WriterImageTests {
 		AssertInlineBucket( image, 2, records );
 	}
 
+	[Fact]
+	public void ManagedImageIsDeterministicAndRoundTripsAcrossCultures() {
+		byte[] alphaCompiled = Hdb07HashV9FixtureBuilder.CreateCompiledEntry(
+			"hw02-alpha",
+			"HW02 alpha terminal",
+			"hw02-alpha-alias"
+		);
+		byte[] zetaCompiled = Hdb07HashV9FixtureBuilder.CreateCompiledEntry(
+			"hw02-zeta",
+			"HW02 zeta terminal",
+			"hw02-zeta-alias"
+		);
+		BerkeleyDbTerminalDatabaseEntry[] forward = [
+			new(
+				"hw02-alpha",
+				[ "hw02-alpha-alias" ],
+				alphaCompiled
+			),
+			new(
+				"hw02-zeta",
+				[ "hw02-zeta-alias" ],
+				zetaCompiled
+			),
+		];
+		CultureInfo originalCulture = CultureInfo.CurrentCulture;
+		CultureInfo originalUiCulture = CultureInfo.CurrentUICulture;
+		byte[] image;
+
+		try {
+			CultureInfo enUs = CultureInfo.GetCultureInfo( "en-US" );
+			CultureInfo.CurrentCulture = enUs;
+			CultureInfo.CurrentUICulture = enUs;
+			image = BuildImage( forward );
+			Assert.Equal( image, BuildImage( forward ) );
+			Assert.Equal(
+				image,
+				BuildImage( forward.Reverse().ToArray() )
+			);
+
+			CultureInfo trTr = CultureInfo.GetCultureInfo( "tr-TR" );
+			CultureInfo.CurrentCulture = trTr;
+			CultureInfo.CurrentUICulture = trTr;
+			Assert.Equal( image, BuildImage( forward ) );
+		} finally {
+			CultureInfo.CurrentCulture = originalCulture;
+			CultureInfo.CurrentUICulture = originalUiCulture;
+		}
+
+		IReadOnlyList<BerkeleyDbHashRecord> records =
+			BerkeleyDbHashReader.ReadRecords(
+				image,
+				maximumItemSize: 1025,
+				maximumRecordCount: 64,
+				CancellationToken.None
+			);
+		IReadOnlyList<BerkeleyDbTerminalCatalogEntry> catalog =
+			NcursesCatalogReader.Read(
+				records,
+				new CompiledTermInfoParserOptions(),
+				maximumIndexHops: 16,
+				CancellationToken.None
+			);
+
+		Assert.Equal(
+			new[] {
+				"hw02-alpha",
+				"hw02-alpha-alias",
+				"hw02-zeta",
+				"hw02-zeta-alias",
+			},
+			catalog.Select( entry => entry.Name ).ToArray()
+		);
+		Assert.Equal(
+			new[] {
+				BerkeleyDbTerminalCatalogEntryKind.Canonical,
+				BerkeleyDbTerminalCatalogEntryKind.Alias,
+				BerkeleyDbTerminalCatalogEntryKind.Canonical,
+				BerkeleyDbTerminalCatalogEntryKind.Alias,
+			},
+			catalog.Select( entry => entry.Kind ).ToArray()
+		);
+		AssertCompiledPayload( records, alphaCompiled );
+		AssertCompiledPayload( records, zetaCompiled );
+	}
+
+	[Fact]
+	public void ImageBuilderAcceptsMaximumInlinePayloads() {
+		var record = new BerkeleyDbHashRecord(
+			new byte[1024],
+			new byte[1024]
+		);
+
+		byte[] image = BerkeleyDbHashV9ImageBuilder.Build(
+			[ record ],
+			maximumDatabaseSize: 3 * 4096,
+			CancellationToken.None
+		);
+
+		Assert.Equal( 3 * 4096, image.Length );
+	}
+
+	[Fact]
+	public void ImageBuilderRejectsPayloadOverInlineLimit() {
+		Assert.Throws<InvalidOperationException>(
+			() => BerkeleyDbHashV9ImageBuilder.Build(
+				[ new BerkeleyDbHashRecord( new byte[1025], [ 0x01 ] ) ],
+				maximumDatabaseSize: 3 * 4096,
+				CancellationToken.None
+			)
+		);
+		Assert.Throws<InvalidOperationException>(
+			() => BerkeleyDbHashV9ImageBuilder.Build(
+				[ new BerkeleyDbHashRecord( [ 0x01 ], new byte[1025] ) ],
+				maximumDatabaseSize: 3 * 4096,
+				CancellationToken.None
+			)
+		);
+	}
+
+	[Fact]
+	public void ImageBuilderEnforcesThreePageDatabaseLimit() {
+		var record = new BerkeleyDbHashRecord( [ 0x01 ], [ 0x02 ] );
+
+		Assert.Throws<InvalidOperationException>(
+			() => BerkeleyDbHashV9ImageBuilder.Build(
+				[ record ],
+				maximumDatabaseSize: ( 3 * 4096 ) - 1,
+				CancellationToken.None
+			)
+		);
+		Assert.Equal(
+			3 * 4096,
+			BerkeleyDbHashV9ImageBuilder.Build(
+				[ record ],
+				maximumDatabaseSize: 3 * 4096,
+				CancellationToken.None
+			).Length
+		);
+	}
+
+	[Fact]
+	public void ImageBuilderObservesPreCancelledToken() {
+		using var cancellation = new CancellationTokenSource();
+		cancellation.Cancel();
+
+		Assert.Throws<OperationCanceledException>(
+			() => BerkeleyDbHashV9ImageBuilder.Build(
+				[ new BerkeleyDbHashRecord( [ 0x01 ], [ 0x02 ] ) ],
+				maximumDatabaseSize: 3 * 4096,
+				cancellation.Token
+			)
+		);
+	}
+
+	[Fact]
+	public void ImageBuilderHonorsExactBucketCapacity() {
+		byte[] firstKey = new byte[1024];
+		byte[] secondKey = new byte[1024];
+		secondKey[^1] = 2;
+		var first = new BerkeleyDbHashRecord(
+			firstKey,
+			new byte[1024]
+		);
+		var exactFit = new BerkeleyDbHashRecord(
+			secondKey,
+			new byte[986]
+		);
+
+		byte[] image = BerkeleyDbHashV9ImageBuilder.Build(
+			[ first, exactFit ],
+			maximumDatabaseSize: 3 * 4096,
+			CancellationToken.None
+		);
+		Assert.Equal( (ushort)34, ReadUInt16( image, 4096 + 22 ) );
+
+		Assert.Throws<InvalidOperationException>(
+			() => BerkeleyDbHashV9ImageBuilder.Build(
+				[
+					first,
+					new BerkeleyDbHashRecord(
+						secondKey,
+						new byte[987]
+					),
+				],
+				maximumDatabaseSize: 3 * 4096,
+				CancellationToken.None
+			)
+		);
+	}
+
 	private static Array InvokePreparePublications(
 		BerkeleyDbTerminalDatabaseEntry[] entries
 	) {
@@ -358,6 +549,40 @@ public sealed class Hw02WriterImageTests {
 				record.Value.Span
 			);
 		}
+	}
+
+	private static byte[] BuildImage(
+		IReadOnlyList<BerkeleyDbTerminalDatabaseEntry> entries
+	) {
+		BerkeleyDbTerminalDatabaseWriter.PreparedPublication[] prepared =
+			BerkeleyDbTerminalDatabaseWriter.PreparePublications(
+				entries,
+				new BerkeleyDbTerminalDatabaseWriterOptions(),
+				CancellationToken.None
+			);
+		IReadOnlyList<BerkeleyDbHashRecord> records =
+			BerkeleyDbNcursesRecordPlanner.CreateRecords(
+				prepared,
+				CancellationToken.None
+			);
+		return BerkeleyDbHashV9ImageBuilder.Build(
+			records,
+			maximumDatabaseSize: 3 * 4096,
+			CancellationToken.None
+		);
+	}
+
+	private static void AssertCompiledPayload(
+		IEnumerable<BerkeleyDbHashRecord> records,
+		byte[] compiled
+	) {
+		Assert.Contains(
+			records,
+			record =>
+				record.Value.Length == compiled.Length + 1
+					&& record.Value.Span[0] == 0
+					&& record.Value.Span[1..].SequenceEqual( compiled )
+		);
 	}
 
 	private static void AssertInlineItem(
