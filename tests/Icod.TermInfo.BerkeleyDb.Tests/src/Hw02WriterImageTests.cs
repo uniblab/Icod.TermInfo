@@ -193,7 +193,7 @@ public sealed class Hw02WriterImageTests {
 		IReadOnlyList<BerkeleyDbHashRecord> records =
 			InvokeCreateRecords( prepared, CancellationToken.None );
 
-		byte[] image = InvokeBuild(
+		byte[] image = BerkeleyDbHashV9ImageBuilder.Build(
 			records,
 			maximumDatabaseSize: 3 * 4096,
 			CancellationToken.None
@@ -306,47 +306,6 @@ public sealed class Hw02WriterImageTests {
 		return Assert.IsAssignableFrom<IComparer<byte[]>>(
 			property.GetValue( null )
 		);
-	}
-
-	private static byte[] InvokeBuild(
-		IReadOnlyList<BerkeleyDbHashRecord> records,
-		int maximumDatabaseSize,
-		CancellationToken cancellationToken
-	) {
-		Type? builderType = typeof( BerkeleyDbTerminalDatabaseWriter )
-			.Assembly
-			.GetType(
-				"Icod.TermInfo.BerkeleyDb.BerkeleyDbHashV9ImageBuilder",
-				throwOnError: false,
-				ignoreCase: false
-			);
-		Assert.NotNull( builderType );
-		MethodInfo method = Assert.IsAssignableFrom<MethodInfo>(
-			builderType!.GetMethod(
-				"Build",
-				BindingFlags.Static
-					| BindingFlags.Public
-					| BindingFlags.NonPublic
-			)
-		);
-
-		try {
-			return Assert.IsType<byte[]>(
-				method.Invoke(
-					null,
-					new object[] {
-						records,
-						maximumDatabaseSize,
-						cancellationToken,
-					}
-				)
-			);
-		} catch (
-			TargetInvocationException exception
-		) when ( exception.InnerException is not null ) {
-			ExceptionDispatchInfo.Capture( exception.InnerException ).Throw();
-			throw;
-		}
 	}
 
 	private static void AssertInlineBucket(
