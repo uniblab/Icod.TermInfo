@@ -87,10 +87,9 @@ public void PreparedPublicationPreservesExactCompiledNamesSection() {
 
 	Assert.NotNull( property );
 	Assert.Equal(
-		compiled.AsSpan(
-			12,
-			BinaryPrimitives.ReadUInt16LittleEndian( compiled.AsSpan( 2, 2 ) ) - 1
-		).ToArray(),
+		Encoding.Latin1.GetBytes(
+			"hw02-primary|hw02-alias|HW02 caf\u00E9 description"
+		),
 		Assert.IsType<byte[]>( property!.GetValue( publication ) )
 	);
 }
@@ -230,8 +229,9 @@ key = storageKey
 value = 0x00 + complete compiled bytes
 ```
 
-Add a separate ordering test with raw keys `a`, `aa`, and `b`; require `aa`,
-`a`, `b`. Add a duplicate-byte-key test and a pre-cancelled-token test.
+Add a separate reflection-first comparer test with raw keys `a`, `aa`, and `b`;
+require `aa`, `a`, `b`. Add a planner duplicate-byte-key test and a
+pre-cancelled-token test.
 
 - [ ] **Step 2: Run targeted tests and verify intentional RED**
 
