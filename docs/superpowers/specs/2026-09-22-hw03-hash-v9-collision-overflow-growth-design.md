@@ -429,9 +429,9 @@ Production does not reference or invoke it.
 
 ## 15. Native interoperability qualification
 
-The HDB00 interoperability workflow qualifies production-built HW03 images on
-Linux, macOS, and Windows using the already established native Berkeley DB
-tooling.
+The HDB00 interoperability workflow qualifies production-built HW03 images
+with the established host split: native Berkeley DB tools on Linux and macOS,
+then managed-only reading of the transported Linux artifact on Windows.
 
 For the frozen two-bucket overflow fixture, production bytes must equal the
 independent HW00 writer bytes completely.
@@ -443,8 +443,11 @@ history affect native physical bytes. Instead, each production image must:
 - pass native `db_verify`;
 - produce the expected complete key/value set through native `db_dump -k`;
 - return exact canonical, alias, exact-collision, and large compiled payloads
-  through the native lookup probe; and
-- produce the same logical records through the managed reader.
+  through the native lookup probe on Linux and macOS;
+- produce the same logical records through the managed reader on Linux and
+  macOS; and
+- remain byte-identical and fully readable after artifact transport to the
+  Windows managed-only job.
 
 These checks are executable test evidence, not a production dependency. The
 NuGet package remains pure managed, IL-only, and free of native Berkeley DB
@@ -485,7 +488,9 @@ HW03 is accepted when exact-head CI proves that:
   continuation chains;
 - large keys and values use correct bounded type-3/type-7 storage;
 - managed and native readers recover every exact record and payload;
-- native verification accepts the grown and chained images on all three hosts;
+- native verification accepts the grown and chained images on Linux and macOS,
+  while Windows validates the transported Linux images through the managed
+  reader;
 - boundary failures occur before allocation or destination access;
 - the public writer remains deliberately disconnected; and
 - public API, dependency, package, assembly-version, and target-framework
