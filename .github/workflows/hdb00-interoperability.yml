@@ -137,6 +137,37 @@ jobs:
           cmp "$alias" "$ICOD_HDB02_FIXTURE_ROOT/hdb00-primary.bin"
           cmp "$overflow" "$ICOD_HDB02_FIXTURE_ROOT/hdb00-overflow.bin"
 
+      - name: Generate and verify HW03 managed writer fixtures
+        if: steps.hdb00-scope.outputs.required == 'true'
+        shell: bash
+        run: |
+          root="$RUNNER_TEMP/icod-terminfo-hdb00"
+          project="tools/hdb00/hw03-writer-probe/Hw03.ManagedWriterProbe.csproj"
+
+          dotnet run --project "$project" -c Release -f net10.0 -- "$root"
+
+          for name in hw03-overflow hw03-growth hw03-collision; do
+            db5.3_verify "$root/$name.db"
+            db5.3_dump -k -f "$root/$name.dump" "$root/$name.db"
+          done
+
+          overflow_key="$(LC_ALL=C tr -d '\n' < "$root/hw03-overflow.key")"
+          growth_key="$(LC_ALL=C tr -d '\n' < "$root/hw03-growth-003.key")"
+          first_key="$(LC_ALL=C tr -d '\n' < "$root/hw03-collision-first.key")"
+          second_key="$(LC_ALL=C tr -d '\n' < "$root/hw03-collision-second.key")"
+          "$root/hdb00-probe" "$root/hw03-overflow.db" "$overflow_key" \
+            "$root/hw03-overflow.actual"
+          "$root/hdb00-probe" "$root/hw03-growth.db" "$growth_key" \
+            "$root/hw03-growth-003.actual"
+          "$root/hdb00-probe" "$root/hw03-collision.db" "$first_key" \
+            "$root/hw03-collision-first.actual"
+          "$root/hdb00-probe" "$root/hw03-collision.db" "$second_key" \
+            "$root/hw03-collision-second.actual"
+          cmp "$root/hw03-overflow.actual" "$root/hw03-overflow.value"
+          cmp "$root/hw03-growth-003.actual" "$root/hw03-growth-003.value"
+          cmp "$root/hw03-collision-first.actual" "$root/hw03-collision-first.value"
+          cmp "$root/hw03-collision-second.actual" "$root/hw03-collision-second.value"
+
       - name: Compare production reader with native Berkeley DB records
         if: steps.hdb00-scope.outputs.required == 'true'
         shell: bash
@@ -179,6 +210,20 @@ jobs:
             ${{ runner.temp }}/icod-terminfo-hdb00/multi-hashed-db.dump
             ${{ runner.temp }}/icod-terminfo-hdb00/hw00-managed-writer.db
             ${{ runner.temp }}/icod-terminfo-hdb00/hw00-managed-writer.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw03-overflow.db
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw03-overflow.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw03-overflow.key
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw03-overflow.value
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw03-growth.db
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw03-growth.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw03-growth-003.key
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw03-growth-003.value
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw03-collision.db
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw03-collision.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw03-collision-first.key
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw03-collision-first.value
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw03-collision-second.key
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw03-collision-second.value
             ${{ runner.temp }}/icod-terminfo-hdb00/not-hash.db
             ${{ runner.temp }}/icod-terminfo-hdb00/random.db
 
@@ -268,6 +313,39 @@ jobs:
           cmp "$alias" "$ICOD_HDB02_FIXTURE_ROOT/hdb00-primary.bin"
           cmp "$overflow" "$ICOD_HDB02_FIXTURE_ROOT/hdb00-overflow.bin"
 
+      - name: Generate and verify HW03 managed writer fixtures
+        if: steps.hdb00-scope.outputs.required == 'true'
+        shell: bash
+        run: |
+          root="$RUNNER_TEMP/icod-terminfo-hdb00-macos"
+          project="tools/hdb00/hw03-writer-probe/Hw03.ManagedWriterProbe.csproj"
+          db_prefix="$(brew --prefix berkeley-db@5)"
+          export DYLD_LIBRARY_PATH="$db_prefix/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}"
+
+          dotnet run --project "$project" -c Release -f net10.0 -- "$root"
+
+          for name in hw03-overflow hw03-growth hw03-collision; do
+            "$db_prefix/bin/db_verify" "$root/$name.db"
+            "$db_prefix/bin/db_dump" -k -f "$root/$name.dump" "$root/$name.db"
+          done
+
+          overflow_key="$(LC_ALL=C tr -d '\n' < "$root/hw03-overflow.key")"
+          growth_key="$(LC_ALL=C tr -d '\n' < "$root/hw03-growth-003.key")"
+          first_key="$(LC_ALL=C tr -d '\n' < "$root/hw03-collision-first.key")"
+          second_key="$(LC_ALL=C tr -d '\n' < "$root/hw03-collision-second.key")"
+          "$root/hdb00-probe" "$root/hw03-overflow.db" "$overflow_key" \
+            "$root/hw03-overflow.actual"
+          "$root/hdb00-probe" "$root/hw03-growth.db" "$growth_key" \
+            "$root/hw03-growth-003.actual"
+          "$root/hdb00-probe" "$root/hw03-collision.db" "$first_key" \
+            "$root/hw03-collision-first.actual"
+          "$root/hdb00-probe" "$root/hw03-collision.db" "$second_key" \
+            "$root/hw03-collision-second.actual"
+          cmp "$root/hw03-overflow.actual" "$root/hw03-overflow.value"
+          cmp "$root/hw03-growth-003.actual" "$root/hw03-growth-003.value"
+          cmp "$root/hw03-collision-first.actual" "$root/hw03-collision-first.value"
+          cmp "$root/hw03-collision-second.actual" "$root/hw03-collision-second.value"
+
       - name: Compare production reader with native Berkeley DB records
         if: steps.hdb00-scope.outputs.required == 'true'
         shell: bash
@@ -309,6 +387,24 @@ jobs:
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/multi-hashed-db.dump
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw00-managed-writer.db
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw00-managed-writer.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-overflow.db
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-overflow.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-overflow.key
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-overflow.value
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-overflow.actual
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-growth.db
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-growth.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-growth-003.key
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-growth-003.value
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-growth-003.actual
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-collision.db
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-collision.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-collision-first.key
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-collision-first.value
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-collision-first.actual
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-collision-second.key
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-collision-second.value
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-collision-second.actual
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/not-hash.db
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/random.db
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/hdb00-primary.bin
