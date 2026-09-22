@@ -11,14 +11,14 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`  
 **Frozen runtime contract:** `1.0.0`  
-**Current coordinated version:** `1.16.0-Alpha-2`
+**Current coordinated version:** `1.16.0-Alpha-3`
 **Latest completed line:** `1.15.0` - Berkeley DB / Hashed Terminfo Acquisition
-**Latest completed prerelease:** `1.16.0-Alpha-2`
-**Status:** stable `1.15.0` is published; focused `1.16.0` Hash-v9 writer implementation is active; HW02 is accepted
+**Latest completed prerelease:** `1.16.0-Alpha-3`
+**Status:** stable `1.15.0` is published; focused `1.16.0` Hash-v9 writer implementation is active; HW03 is accepted
 **Active release roadmap:** `Icod.TermInfo-1.16.0-Berkeley-DB-Hash-V9-Writer-Roadmap.md`
 **Release audit:** `docs/1.15.0-RELEASE-AUDIT.md`
 **Latest completed release audit:** `docs/1.15.0-RELEASE-AUDIT.md`
-**Next implementation gate:** HW03 collisions, overflow, and bounded growth
+**Next implementation gate:** HW04 public terminfo publication engine
 
 ---
 
@@ -125,9 +125,9 @@ Version 1.16 excludes in-place database mutation, general Berkeley DB APIs,
 directory/hashed migration, unified catalog automation, cross-container planning,
 and JSON v7. Migration and catalog automation are explicitly assigned to 1.17.
 
-HW00 through HW02 are complete and accepted. HW03 through HW08 continue with
-collision/overflow support, public publication, safe filesystem commit, `tic`
-integration, hardening, and stable release qualification.
+HW00 through HW03 are complete and accepted. HW04 through HW08 continue with
+public publication, safe filesystem commit, `tic` integration, hardening, and
+stable release qualification.
 
 ### 2.2 Completed 1.15 line
 
@@ -449,6 +449,8 @@ The active planning line is documented by:
 Icod.TermInfo-1.16.0-Berkeley-DB-Hash-V9-Writer-Roadmap.md
 docs/1.16.0-HW00-HASH-V9-WRITER-INTEROPERABILITY-AND-BACKEND-DECISION.md
 docs/1.16.0-HW01-BERKELEY-DB-WRITER-CONTRACT.md
+docs/1.16.0-HW02-DETERMINISTIC-HASH-V9-INLINE-IMAGE.md
+docs/1.16.0-HW03-COLLISION-OVERFLOW-BOUNDED-GROWTH.md
 ```
 
 HW00 is complete and accepted at exact head
@@ -457,5 +459,10 @@ qualified by native Berkeley DB on Linux/macOS and managed-only readback on
 Windows. HW01 is complete and accepted at exact head
 `36a71697b7c8db4b5aa9004b4cfa60f005bf4bf8`; pull-request workflow run
 `35383543026` passed 12/12 jobs and froze the exact additive three-type writer
-surface plus bounded whole-input preflight. HW02 deterministic metadata, buckets,
-and inline records is the next implementation gate.
+surface plus bounded whole-input preflight. HW02 is complete and accepted at
+exact head `a31125898e7ab169457a9f9060a134cfcdbe4af6`; pull-request workflow run
+`35394326963` passed 12/12 jobs and HDB00 workflow run `35394327002` passed 3/3
+jobs. HW03 is complete and accepted at exact code head
+`cd55a1099f72f1ce970f55eb113a3acddf532464`; pull-request workflow run
+`35785978854` passed 12/12 jobs and HDB00 workflow run `35785978928` passed 3/3
+jobs. HW04 public terminfo publication is the next implementation gate.

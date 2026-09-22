@@ -6,7 +6,7 @@
 **Command integration:** `tic` and `Icod.TermInfo.Tools`
 **Language:** C# 13
 **Reusable target frameworks:** `net8.0`; `net9.0`; `net10.0`
-**Status:** ACTIVE — HW02 COMPLETE / HW03 NEXT
+**Status:** ACTIVE — HW03 COMPLETE / HW04 NEXT
 **Stable predecessor:** `1.15.0`
 **Initial development version:** `1.16.0-Alpha-1`
 
@@ -567,7 +567,11 @@ match the independent HW00 byte oracle for compact and both-bucket catalogs.
 
 ### HW03 / Alpha-3 — Collisions, overflow, and bounded growth
 
-**Status:** PLANNED
+**Status:** COMPLETE / ACCEPTED
+**Accepted exact code head:** `cd55a1099f72f1ce970f55eb113a3acddf532464`
+**Accepted pull-request workflow:** run `35785978854` (12/12 jobs)
+**Accepted HDB00 workflow:** run `35785978928` (3/3 jobs)
+**Acceptance record:** `docs/1.16.0-HW03-COLLISION-OVERFLOW-BOUNDED-GROWTH.md`
 
 - implement deterministic collision packing;
 - implement overflow pages and chains;
@@ -576,8 +580,9 @@ match the independent HW00 byte oracle for compact and both-bucket catalogs.
 - add adversarial collision and arithmetic tests; and
 - qualify native reading of overflow fixtures.
 
-**Gate:** Boundary, collision, and overflow stores remain deterministic, bounded,
-and interoperable.
+**Gate:** PASSED — boundary, collision, and overflow stores are deterministic,
+bounded, and interoperable across native Linux/macOS verification and
+managed-only transported-fixture Windows qualification.
 
 ### HW04 / Alpha-4 — Public terminfo publication engine
 
