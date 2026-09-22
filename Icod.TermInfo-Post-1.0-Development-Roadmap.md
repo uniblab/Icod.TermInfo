@@ -463,6 +463,6 @@ surface plus bounded whole-input preflight. HW02 is complete and accepted at
 exact head `a31125898e7ab169457a9f9060a134cfcdbe4af6`; pull-request workflow run
 `35394326963` passed 12/12 jobs and HDB00 workflow run `35394327002` passed 3/3
 jobs. HW03 is complete and accepted at exact code head
-`cd55a1099f72f1ce970f55eb113a3acddf532464`; pull-request workflow run
-`35785978854` passed 12/12 jobs and HDB00 workflow run `35785978928` passed 3/3
+`009dbc66e4bbb5c8aec3d59ee479a5c7d300e8ac`; pull-request workflow run
+`35788135300` passed 12/12 jobs and HDB00 workflow run `35788135283` passed 3/3
 jobs. HW04 public terminfo publication is the next implementation gate.

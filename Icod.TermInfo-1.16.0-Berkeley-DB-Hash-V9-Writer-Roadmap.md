@@ -568,9 +568,9 @@ match the independent HW00 byte oracle for compact and both-bucket catalogs.
 ### HW03 / Alpha-3 — Collisions, overflow, and bounded growth
 
 **Status:** COMPLETE / ACCEPTED
-**Accepted exact code head:** `cd55a1099f72f1ce970f55eb113a3acddf532464`
-**Accepted pull-request workflow:** run `35785978854` (12/12 jobs)
-**Accepted HDB00 workflow:** run `35785978928` (3/3 jobs)
+**Accepted exact code head:** `009dbc66e4bbb5c8aec3d59ee479a5c7d300e8ac`
+**Accepted pull-request workflow:** run `35788135300` (12/12 jobs)
+**Accepted HDB00 workflow:** run `35788135283` (3/3 jobs)
 **Acceptance record:** `docs/1.16.0-HW03-COLLISION-OVERFLOW-BOUNDED-GROWTH.md`
 
 - implement deterministic collision packing;
