@@ -20,6 +20,7 @@
 */
 
 using System.Buffers.Binary;
+using System.Numerics;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -52,7 +53,7 @@ internal static class BerkeleyDbHashV9ImageBuilder {
 				cancellationToken
 			);
 		byte[] image = new byte[plan.ImageSize];
-		WriteMetadata( image, records, plan );
+		WriteMetadata( image, records, plan, cancellationToken );
 		foreach ( BerkeleyDbHashV9HashPagePlan page in plan.HashPages ) {
 			cancellationToken.ThrowIfCancellationRequested();
 			WriteHashPage( image, page );
@@ -78,7 +79,8 @@ internal static class BerkeleyDbHashV9ImageBuilder {
 	private static void WriteMetadata(
 		Span<byte> image,
 		IReadOnlyList<BerkeleyDbHashRecord> records,
-		BerkeleyDbHashV9LayoutPlan plan
+		BerkeleyDbHashV9LayoutPlan plan,
+		CancellationToken cancellationToken
 	) {
 		WriteNotLoggedLsn( image );
 		WriteUInt32( image, 12, HashMagic );
@@ -91,25 +93,48 @@ internal static class BerkeleyDbHashV9ImageBuilder {
 			checked( (uint)( plan.PageCount - 1 ) )
 		);
 
-		CreateFileId( records ).CopyTo( image[52..72] );
-		WriteUInt32( image, 72, 1 );
-		WriteUInt32( image, 76, 1 );
-		WriteUInt32( image, 80, 0 );
+		CreateFileId( records, cancellationToken ).CopyTo( image[52..72] );
+		WriteUInt32(
+			image,
+			72,
+			checked( (uint)( plan.BucketCount - 1 ) )
+		);
+		WriteUInt32(
+			image,
+			76,
+			checked( (uint)( plan.BucketCount - 1 ) )
+		);
+		WriteUInt32(
+			image,
+			80,
+			checked( (uint)( ( plan.BucketCount / 2 ) - 1 ) )
+		);
 		WriteUInt32( image, 84, 0 );
 		WriteUInt32( image, 88, checked( (uint)records.Count ) );
 		WriteUInt32( image, 92, Hash( CharacterKey ) );
-		WriteUInt32( image, 96, 1 );
-		WriteUInt32( image, 100, 1 );
+		int spareCount = BitOperations.Log2(
+			checked( (uint)plan.BucketCount )
+		) + 1;
+		for ( int index = 0; index < spareCount; index++ ) {
+			WriteUInt32(
+				image,
+				checked( 96 + checked( index * sizeof( uint ) ) ),
+				1
+			);
+		}
 	}
 
 	private static byte[] CreateFileId(
-		IReadOnlyList<BerkeleyDbHashRecord> records
+		IReadOnlyList<BerkeleyDbHashRecord> records,
+		CancellationToken cancellationToken
 	) {
 		using IncrementalHash hash = IncrementalHash.CreateHash(
 			HashAlgorithmName.SHA256
 		);
 		Span<byte> length = stackalloc byte[sizeof( int )];
-		foreach ( BerkeleyDbHashRecord record in records ) {
+		for ( int index = 0; index < records.Count; index++ ) {
+			cancellationToken.ThrowIfCancellationRequested();
+			BerkeleyDbHashRecord record = records[index];
 			BinaryPrimitives.WriteInt32LittleEndian(
 				length,
 				record.Key.Length

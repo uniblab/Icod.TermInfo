@@ -24,8 +24,7 @@ namespace Icod.TermInfo.BerkeleyDb;
 internal static class BerkeleyDbHashV9LayoutPlanner {
 	private const int PageSize = 4096;
 	private const int PageHeaderSize = 26;
-	private const int BucketCount = 2;
-	private const int FirstOverflowPageNumber = BucketCount + 1;
+	private const int InitialBucketCount = 2;
 	private const int BigItemThreshold = PageSize / 4;
 	private const int OverflowPayloadSize = PageSize - PageHeaderSize;
 
@@ -46,10 +45,89 @@ internal static class BerkeleyDbHashV9LayoutPlanner {
 			);
 		}
 
-		var buckets = new[] {
-			new List<ClassifiedRecord>(),
-			new List<ClassifiedRecord>(),
-		};
+		try {
+			return CreateChecked(
+				records,
+				maximumDatabaseSize,
+				cancellationToken
+			);
+		} catch ( OverflowException exception ) {
+			throw new InvalidOperationException(
+				"The Berkeley DB records exceed the Hash-v9 numeric limits.",
+				exception
+			);
+		}
+	}
+
+	private static BerkeleyDbHashV9LayoutPlan CreateChecked(
+		IReadOnlyList<BerkeleyDbHashRecord> records,
+		int maximumDatabaseSize,
+		CancellationToken cancellationToken
+	) {
+		( RecordShape[] shapes, int overflowPageCount ) = CreateShapes(
+			records,
+			cancellationToken
+		);
+		int pageBudget = Math.Min(
+			maximumDatabaseSize / PageSize,
+			Array.MaxLength / PageSize
+		);
+		CandidateLayout? greatestFeasible = null;
+		for (
+			int bucketCount = InitialBucketCount;
+			;
+			bucketCount = checked( bucketCount * 2 )
+		) {
+			cancellationToken.ThrowIfCancellationRequested();
+			CandidateLayout candidate = Evaluate(
+				shapes,
+				bucketCount,
+				overflowPageCount,
+				pageBudget,
+				cancellationToken
+			);
+			if ( candidate.IsFeasible ) {
+				greatestFeasible = candidate;
+				if ( !candidate.HasReducibleCollision ) {
+					return Finalize(
+						candidate,
+						cancellationToken
+					);
+				}
+			} else if ( !candidate.HasReducibleCollision ) {
+				break;
+			}
+
+			if (
+				!CanEvaluateNextBucketCount(
+					bucketCount,
+					pageBudget,
+					overflowPageCount
+				)
+			) {
+				break;
+			}
+		}
+
+		if ( greatestFeasible is null ) {
+			throw new InvalidOperationException(
+				$"The Berkeley DB records do not fit the configured {maximumDatabaseSize}-byte database limit."
+			);
+		}
+		return Finalize(
+			greatestFeasible,
+			cancellationToken
+		);
+	}
+
+	private static (
+		RecordShape[] Shapes,
+		int OverflowPageCount
+	) CreateShapes(
+		IReadOnlyList<BerkeleyDbHashRecord> records,
+		CancellationToken cancellationToken
+	) {
+		var shapes = new RecordShape[records.Count];
 		int overflowPageCount = 0;
 		for ( int index = 0; index < records.Count; index++ ) {
 			cancellationToken.ThrowIfCancellationRequested();
@@ -68,89 +146,235 @@ internal static class BerkeleyDbHashV9LayoutPlanner {
 					+ keyOverflowPageCount
 					+ valueOverflowPageCount
 			);
-			uint hash = BerkeleyDbHashV9ImageBuilder.Hash( record.Key.Span );
-			buckets[checked( (int)( hash & 1 ) )].Add(
-				new ClassifiedRecord(
-					hash,
-					record.Key,
-					keyOverflowPageCount,
-					record.Value,
+			var shape = new RecordShape(
+				Hash: BerkeleyDbHashV9ImageBuilder.Hash( record.Key.Span ),
+				KeyPayload: record.Key,
+				KeyEncodedLength: GetEncodedLength(
+					record.Key.Length,
+					keyOverflowPageCount
+				),
+				KeyOverflowPageCount: keyOverflowPageCount,
+				ValuePayload: record.Value,
+				ValueEncodedLength: GetEncodedLength(
+					record.Value.Length,
 					valueOverflowPageCount
-				)
+				),
+				ValueOverflowPageCount: valueOverflowPageCount
+			);
+			if ( !Fits( 0, 0, shape ) ) {
+				throw new InvalidOperationException(
+					"A Berkeley DB record pair does not fit on an empty Hash-v9 page."
+				);
+			}
+			shapes[index] = shape;
+		}
+		return ( shapes, overflowPageCount );
+	}
+
+	private static CandidateLayout Evaluate(
+		IReadOnlyList<RecordShape> shapes,
+		int bucketCount,
+		int overflowPageCount,
+		int pageBudget,
+		CancellationToken cancellationToken
+	) {
+		var buckets = new List<RecordShape>[bucketCount];
+		for ( int index = 0; index < buckets.Length; index++ ) {
+			buckets[index] = [];
+		}
+		uint bucketMask = checked( (uint)( bucketCount - 1 ) );
+		foreach ( RecordShape shape in shapes ) {
+			cancellationToken.ThrowIfCancellationRequested();
+			int bucketNumber = checked( (int)( shape.Hash & bucketMask ) );
+			buckets[bucketNumber].Add( shape );
+		}
+
+		var bucketPages =
+			new List<IReadOnlyList<IReadOnlyList<RecordShape>>>(
+				bucketCount
+			);
+		int continuationPageCount = 0;
+		bool hasReducibleCollision = false;
+		foreach ( List<RecordShape> bucket in buckets ) {
+			cancellationToken.ThrowIfCancellationRequested();
+			IReadOnlyList<IReadOnlyList<RecordShape>> pages = PackBucket(
+				bucket,
+				cancellationToken
+			);
+			bucketPages.Add( pages );
+			continuationPageCount = checked(
+				continuationPageCount + pages.Count - 1
+			);
+			if (
+				pages.Count > 1
+				&& bucket.Select( static record => record.Hash )
+					.Distinct()
+					.Skip( 1 )
+					.Any()
+			) {
+				hasReducibleCollision = true;
+			}
+		}
+
+		int totalPageCount = checked(
+			1
+				+ bucketCount
+				+ continuationPageCount
+				+ overflowPageCount
+		);
+		return new CandidateLayout(
+			BucketCount: bucketCount,
+			BucketPages: bucketPages.ToArray(),
+			ContinuationPageCount: continuationPageCount,
+			TotalPageCount: totalPageCount,
+			HasReducibleCollision: hasReducibleCollision,
+			IsFeasible: totalPageCount <= pageBudget
+		);
+	}
+
+	private static IReadOnlyList<IReadOnlyList<RecordShape>> PackBucket(
+		IReadOnlyList<RecordShape> records,
+		CancellationToken cancellationToken
+	) {
+		var pages = new List<IReadOnlyList<RecordShape>>();
+		var current = new List<RecordShape>();
+		int currentItemBytes = 0;
+		foreach ( RecordShape record in records ) {
+			cancellationToken.ThrowIfCancellationRequested();
+			if ( !Fits( current.Count, currentItemBytes, record ) ) {
+				if ( current.Count == 0 ) {
+					throw new InvalidOperationException(
+						"A Berkeley DB record pair does not fit on an empty Hash-v9 page."
+					);
+				}
+				pages.Add( current.ToArray() );
+				current = [];
+				currentItemBytes = 0;
+			}
+			current.Add( record );
+			currentItemBytes = checked(
+				currentItemBytes
+					+ record.KeyEncodedLength
+					+ record.ValueEncodedLength
+			);
+		}
+		pages.Add( current.ToArray() );
+		return pages.ToArray();
+	}
+
+	private static BerkeleyDbHashV9LayoutPlan Finalize(
+		CandidateLayout candidate,
+		CancellationToken cancellationToken
+	) {
+		int nextContinuationPageNumber = checked(
+			candidate.BucketCount + 1
+		);
+		var pageNumbers = new int[candidate.BucketCount][];
+		for (
+			int bucketNumber = 0;
+			bucketNumber < candidate.BucketCount;
+			bucketNumber++
+		) {
+			cancellationToken.ThrowIfCancellationRequested();
+			int pageCount = candidate.BucketPages[bucketNumber].Count;
+			var numbers = new int[pageCount];
+			numbers[0] = checked( bucketNumber + 1 );
+			for ( int pageIndex = 1; pageIndex < pageCount; pageIndex++ ) {
+				numbers[pageIndex] = nextContinuationPageNumber;
+				nextContinuationPageNumber = checked(
+					nextContinuationPageNumber + 1
+				);
+			}
+			pageNumbers[bucketNumber] = numbers;
+		}
+
+		int firstOverflowPageNumber = checked(
+			1
+				+ candidate.BucketCount
+				+ candidate.ContinuationPageCount
+		);
+		if ( nextContinuationPageNumber != firstOverflowPageNumber ) {
+			throw new InvalidOperationException(
+				"The Hash-v9 layout did not assign its declared continuation pages."
 			);
 		}
 
-		foreach ( List<ClassifiedRecord> bucket in buckets ) {
-			cancellationToken.ThrowIfCancellationRequested();
-			ValidateBucketFits( bucket );
-		}
-
-		int pageCount = checked(
-			FirstOverflowPageNumber + overflowPageCount
-		);
-		int imageSize = ValidateImageSize(
-			pageCount,
-			maximumDatabaseSize
-		);
 		var hashPages = new List<BerkeleyDbHashV9HashPagePlan>(
-			BucketCount
+			checked(
+				candidate.BucketCount + candidate.ContinuationPageCount
+			)
 		);
-		var overflowPages = new List<BerkeleyDbHashV9OverflowPagePlan>(
-			overflowPageCount
-		);
-		int nextOverflowPageNumber = FirstOverflowPageNumber;
-		for ( int bucketNumber = 0; bucketNumber < BucketCount; bucketNumber++ ) {
+		var overflowPages = new List<BerkeleyDbHashV9OverflowPagePlan>();
+		int nextOverflowPageNumber = firstOverflowPageNumber;
+		for (
+			int bucketNumber = 0;
+			bucketNumber < candidate.BucketCount;
+			bucketNumber++
+		) {
 			cancellationToken.ThrowIfCancellationRequested();
-			List<ClassifiedRecord> bucket = buckets[bucketNumber];
-			var plannedRecords = new List<BerkeleyDbHashV9RecordPlan>(
-				bucket.Count
-			);
-			foreach ( ClassifiedRecord record in bucket ) {
+			IReadOnlyList<IReadOnlyList<RecordShape>> pages =
+				candidate.BucketPages[bucketNumber];
+			int[] numbers = pageNumbers[bucketNumber];
+			for ( int pageIndex = 0; pageIndex < pages.Count; pageIndex++ ) {
 				cancellationToken.ThrowIfCancellationRequested();
-				BerkeleyDbHashV9ItemPlan key = CreateItemPlan(
-					record.Key,
-					record.KeyOverflowPageCount,
-					ref nextOverflowPageNumber,
-					overflowPages,
-					cancellationToken
+				IReadOnlyList<RecordShape> sourceRecords = pages[pageIndex];
+				var records = new List<BerkeleyDbHashV9RecordPlan>(
+					sourceRecords.Count
 				);
-				BerkeleyDbHashV9ItemPlan value = CreateItemPlan(
-					record.Value,
-					record.ValueOverflowPageCount,
-					ref nextOverflowPageNumber,
-					overflowPages,
-					cancellationToken
-				);
-				plannedRecords.Add(
-					new BerkeleyDbHashV9RecordPlan(
-						record.Hash,
-						key,
-						value
+				foreach ( RecordShape record in sourceRecords ) {
+					cancellationToken.ThrowIfCancellationRequested();
+					BerkeleyDbHashV9ItemPlan key = CreateItemPlan(
+						record.KeyPayload,
+						record.KeyOverflowPageCount,
+						ref nextOverflowPageNumber,
+						overflowPages,
+						cancellationToken
+					);
+					BerkeleyDbHashV9ItemPlan value = CreateItemPlan(
+						record.ValuePayload,
+						record.ValueOverflowPageCount,
+						ref nextOverflowPageNumber,
+						overflowPages,
+						cancellationToken
+					);
+					records.Add(
+						new BerkeleyDbHashV9RecordPlan(
+							record.Hash,
+							key,
+							value
+						)
+					);
+				}
+
+				hashPages.Add(
+					new BerkeleyDbHashV9HashPagePlan(
+						PageNumber: numbers[pageIndex],
+						BucketNumber: bucketNumber,
+						PreviousPageNumber: ( pageIndex == 0 )
+							? 0
+							: numbers[pageIndex - 1],
+						NextPageNumber: ( pageIndex + 1 == pages.Count )
+							? 0
+							: numbers[pageIndex + 1],
+						Records: records.ToArray()
 					)
 				);
 			}
-
-			hashPages.Add(
-				new BerkeleyDbHashV9HashPagePlan(
-					PageNumber: checked( bucketNumber + 1 ),
-					BucketNumber: bucketNumber,
-					PreviousPageNumber: 0,
-					NextPageNumber: 0,
-					Records: plannedRecords.ToArray()
-				)
-			);
 		}
 
-		if ( nextOverflowPageNumber != pageCount ) {
+		if ( nextOverflowPageNumber != candidate.TotalPageCount ) {
 			throw new InvalidOperationException(
 				"The Hash-v9 layout did not assign its declared overflow pages."
 			);
 		}
+		int imageSize = checked( candidate.TotalPageCount * PageSize );
 		return new BerkeleyDbHashV9LayoutPlan {
-			BucketCount = BucketCount,
-			PageCount = pageCount,
+			BucketCount = candidate.BucketCount,
+			PageCount = candidate.TotalPageCount,
 			ImageSize = imageSize,
-			HashPages = hashPages.ToArray(),
+			HashPages = hashPages
+				.OrderBy( static page => page.PageNumber )
+				.ToArray(),
 			OverflowPages = overflowPages.ToArray(),
 		};
 	}
@@ -170,7 +394,10 @@ internal static class BerkeleyDbHashV9LayoutPlanner {
 		int payloadOffset = 0;
 		for ( int index = 0; index < overflowPageCount; index++ ) {
 			cancellationToken.ThrowIfCancellationRequested();
-			int pageNumber = nextOverflowPageNumber++;
+			int pageNumber = nextOverflowPageNumber;
+			nextOverflowPageNumber = checked(
+				nextOverflowPageNumber + 1
+			);
 			int chunkLength = Math.Min(
 				OverflowPayloadSize,
 				checked( payload.Length - payloadOffset )
@@ -207,50 +434,32 @@ internal static class BerkeleyDbHashV9LayoutPlanner {
 		);
 	}
 
-	private static void ValidateBucketFits(
-		IReadOnlyCollection<ClassifiedRecord> records
-	) {
-		int tableEnd = checked(
-			PageHeaderSize
-				+ checked( records.Count * 2 * sizeof( ushort ) )
-		);
-		int highFreeOffset = PageSize;
-		foreach ( ClassifiedRecord record in records ) {
-			highFreeOffset = checked(
-				highFreeOffset
-					- GetEncodedLength(
-						record.Key.Length,
-						record.KeyOverflowPageCount
-					)
-					- GetEncodedLength(
-						record.Value.Length,
-						record.ValueOverflowPageCount
-					)
-			);
-		}
-		if ( highFreeOffset < tableEnd ) {
-			throw new InvalidOperationException(
-				"A Berkeley DB hash bucket does not fit in its canonical two-bucket HW03 page."
-			);
-		}
-	}
+	private static bool Fits(
+		int currentRecordCount,
+		int currentItemBytes,
+		RecordShape next
+	) => checked(
+		PageHeaderSize
+			+ ( ( currentRecordCount + 1 ) * 2 * sizeof( ushort ) )
+			+ currentItemBytes
+			+ next.KeyEncodedLength
+			+ next.ValueEncodedLength
+	) <= PageSize;
 
-	private static int ValidateImageSize(
-		int pageCount,
-		int maximumDatabaseSize
+	private static bool CanEvaluateNextBucketCount(
+		int bucketCount,
+		int pageBudget,
+		int overflowPageCount
 	) {
-		if ( pageCount > maximumDatabaseSize / PageSize ) {
-			long requiredSize = pageCount * (long)PageSize;
-			throw new InvalidOperationException(
-				$"The Berkeley DB records require a {requiredSize}-byte Hash-v9 image, which exceeds the {maximumDatabaseSize}-byte database limit."
-			);
+		if ( bucketCount > int.MaxValue / 2 ) {
+			return false;
 		}
-		if ( pageCount > Array.MaxLength / PageSize ) {
-			throw new InvalidOperationException(
-				"The Berkeley DB records require a Hash-v9 image larger than the runtime array limit."
-			);
-		}
-		return checked( pageCount * PageSize );
+		int nextBucketCount = checked( bucketCount * 2 );
+		long minimumPageCount = 1L
+			+ nextBucketCount
+			+ overflowPageCount
+		;
+		return minimumPageCount <= pageBudget;
 	}
 
 	private static int GetEncodedLength(
@@ -269,11 +478,22 @@ internal static class BerkeleyDbHashV9LayoutPlanner {
 			)
 	;
 
-	private sealed record ClassifiedRecord(
+	private sealed record RecordShape(
 		uint Hash,
-		ReadOnlyMemory<byte> Key,
+		ReadOnlyMemory<byte> KeyPayload,
+		int KeyEncodedLength,
 		int KeyOverflowPageCount,
-		ReadOnlyMemory<byte> Value,
+		ReadOnlyMemory<byte> ValuePayload,
+		int ValueEncodedLength,
 		int ValueOverflowPageCount
+	);
+
+	private sealed record CandidateLayout(
+		int BucketCount,
+		IReadOnlyList<IReadOnlyList<IReadOnlyList<RecordShape>>> BucketPages,
+		int ContinuationPageCount,
+		int TotalPageCount,
+		bool HasReducibleCollision,
+		bool IsFeasible
 	);
 }
