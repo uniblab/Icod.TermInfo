@@ -29,17 +29,26 @@ namespace Icod.TermInfo.BerkeleyDb.Interop.Tests;
 public sealed class Hw03ProductionWriterProofTests {
 	[Fact]
 	public void TwoBucketOverflowProductionImageExactlyMatchesHw00Oracle() {
-		byte[] compiled = CreateCompiledEntry(
-			"hw03-overflow",
-			"HW03 overflow byte proof"
+		const string canonical = "hw03-overflow";
+		const string description = "HW03 overflow byte proof";
+		byte[] compact = CreateCompiledEntry(
+			canonical,
+			description
 		);
-		Array.Resize( ref compiled, 3000 );
+		int descriptionPaddingLength = checked( 3000 - compact.Length );
+		Assert.True( descriptionPaddingLength > 0 );
+		Assert.Equal( 0, descriptionPaddingLength & 1 );
+		byte[] compiled = CreateCompiledEntry(
+			canonical,
+			description + new string( 'x', descriptionPaddingLength )
+		);
+		Assert.Equal( 3000, compiled.Length );
 
 		Assert.Equal(
 			WriteOracle( compiled ),
 			WriteProduction(
 				new BerkeleyDbTerminalDatabaseEntry(
-					"hw03-overflow",
+					canonical,
 					Array.Empty<string>(),
 					compiled
 				)
