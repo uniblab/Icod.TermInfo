@@ -76,6 +76,17 @@ internal static class Hw03WriterTestSupport {
 		ReadUInt32( image, checked( ( pageNumber * PageSize ) + 16 ) )
 	;
 
+	internal static ushort ReadPageItemCount(
+		byte[] image,
+		int pageNumber
+	) => BinaryPrimitives.ReadUInt16LittleEndian(
+		Page( image, pageNumber )[20..22]
+	);
+
+	internal static byte ReadPageType( byte[] image, int pageNumber ) =>
+		Page( image, pageNumber )[25]
+	;
+
 	internal static BerkeleyDbHashRecord[] Sort(
 		params BerkeleyDbHashRecord[] records
 	) {
