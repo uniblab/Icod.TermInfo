@@ -1,6 +1,6 @@
 /*
 	Icod.TermInfo.BerkeleyDb
-	Builds deterministic ncurses-compatible Berkeley DB Hash-v9 inline images.
+	Builds deterministic ncurses-compatible Berkeley DB Hash-v9 images.
 	Copyright (C) 2026  Timothy J. Bruce <uniblab@hotmail.com>
 */
 
@@ -29,12 +29,11 @@ internal static class BerkeleyDbHashV9ImageBuilder {
 	private const uint HashMagic = 0x00061561;
 	private const uint HashVersion = 9;
 	private const byte MetadataPage = 8;
+	private const byte OverflowPage = 7;
 	private const byte HashPage = 13;
 	private const byte InlineItem = 1;
+	private const byte OffPageItem = 3;
 	private const int PageHeaderSize = 26;
-	private const int BucketCount = 2;
-	private const int PageCount = BucketCount + 1;
-	private const int BigItemThreshold = PageSize / 4;
 	private static readonly byte[] CharacterKey =
 		Encoding.ASCII.GetBytes( "%$sniglet^&\0" )
 	;
@@ -46,46 +45,23 @@ internal static class BerkeleyDbHashV9ImageBuilder {
 		int maximumDatabaseSize,
 		CancellationToken cancellationToken
 	) {
-		ArgumentNullException.ThrowIfNull( records );
-		ArgumentOutOfRangeException.ThrowIfNegativeOrZero(
-			maximumDatabaseSize
-		);
-		cancellationToken.ThrowIfCancellationRequested();
-		if ( records.Count == 0 ) {
-			throw new ArgumentException(
-				"At least one Berkeley DB record is required.",
-				nameof( records )
+		BerkeleyDbHashV9LayoutPlan plan =
+			BerkeleyDbHashV9LayoutPlanner.Create(
+				records,
+				maximumDatabaseSize,
+				cancellationToken
 			);
-		}
-
-		int imageSize = checked( PageCount * PageSize );
-		if ( maximumDatabaseSize < imageSize ) {
-			throw new InvalidOperationException(
-				$"The {maximumDatabaseSize}-byte database limit is smaller than the {imageSize}-byte Hash-v9 inline image."
-			);
-		}
-
-		var buckets = new[] {
-			new List<BerkeleyDbHashRecord>(),
-			new List<BerkeleyDbHashRecord>(),
-		};
-		foreach ( BerkeleyDbHashRecord record in records ) {
+		byte[] image = new byte[plan.ImageSize];
+		WriteMetadata( image, records, plan );
+		foreach ( BerkeleyDbHashV9HashPagePlan page in plan.HashPages ) {
 			cancellationToken.ThrowIfCancellationRequested();
-			ValidateInlinePayload( record.Key, "key" );
-			ValidateInlinePayload( record.Value, "value" );
-			int bucket = checked( (int)( Hash( record.Key.Span ) & 1 ) );
-			buckets[bucket].Add( record );
+			WriteHashPage( image, page );
 		}
-
-		byte[] image = new byte[imageSize];
-		WriteMetadata( image, records );
-		for ( int bucket = 0; bucket < BucketCount; bucket++ ) {
+		foreach (
+			BerkeleyDbHashV9OverflowPagePlan page in plan.OverflowPages
+		) {
 			cancellationToken.ThrowIfCancellationRequested();
-			WriteHashPage(
-				image,
-				checked( bucket + 1 ),
-				buckets[bucket]
-			);
+			WriteOverflowPage( image, page );
 		}
 		return image;
 	}
@@ -99,20 +75,10 @@ internal static class BerkeleyDbHashV9ImageBuilder {
 		return result;
 	}
 
-	private static void ValidateInlinePayload(
-		ReadOnlyMemory<byte> payload,
-		string role
-	) {
-		if ( payload.Length > BigItemThreshold ) {
-			throw new InvalidOperationException(
-				$"A Berkeley DB record {role} is {payload.Length} bytes; HW02 supports at most {BigItemThreshold}-byte inline payloads."
-			);
-		}
-	}
-
 	private static void WriteMetadata(
 		Span<byte> image,
-		IReadOnlyList<BerkeleyDbHashRecord> records
+		IReadOnlyList<BerkeleyDbHashRecord> records,
+		BerkeleyDbHashV9LayoutPlan plan
 	) {
 		WriteNotLoggedLsn( image );
 		WriteUInt32( image, 12, HashMagic );
@@ -122,7 +88,7 @@ internal static class BerkeleyDbHashV9ImageBuilder {
 		WriteUInt32(
 			image,
 			32,
-			checked( (uint)( PageCount - 1 ) )
+			checked( (uint)( plan.PageCount - 1 ) )
 		);
 
 		CreateFileId( records ).CopyTo( image[52..72] );
@@ -162,35 +128,36 @@ internal static class BerkeleyDbHashV9ImageBuilder {
 
 	private static void WriteHashPage(
 		byte[] image,
-		int pageNumber,
-		IReadOnlyList<BerkeleyDbHashRecord> records
+		BerkeleyDbHashV9HashPagePlan source
 	) {
 		Span<byte> page = image.AsSpan(
-			checked( pageNumber * PageSize ),
+			checked( source.PageNumber * PageSize ),
 			PageSize
 		);
 		WriteNotLoggedLsn( page );
-		WriteUInt32( page, 8, checked( (uint)pageNumber ) );
+		WriteUInt32( page, 8, checked( (uint)source.PageNumber ) );
+		WriteUInt32( page, 12, checked( (uint)source.PreviousPageNumber ) );
+		WriteUInt32( page, 16, checked( (uint)source.NextPageNumber ) );
 		page[25] = HashPage;
 
-		int itemCount = checked( records.Count * 2 );
+		int itemCount = checked( source.Records.Count * 2 );
 		WriteUInt16( page, 20, checked( (ushort)itemCount ) );
 		int tableEnd = checked(
 			PageHeaderSize + checked( itemCount * sizeof( ushort ) )
 		);
 		int offset = PageSize;
 		int itemIndex = 0;
-		foreach ( BerkeleyDbHashRecord record in records ) {
-			WriteInlineItem(
+		foreach ( BerkeleyDbHashV9RecordPlan record in source.Records ) {
+			WriteItem(
 				page,
-				record.Key.Span,
+				record.Key,
 				tableEnd,
 				ref offset,
 				itemIndex++
 			);
-			WriteInlineItem(
+			WriteItem(
 				page,
-				record.Value.Span,
+				record.Value,
 				tableEnd,
 				ref offset,
 				itemIndex++
@@ -199,28 +166,64 @@ internal static class BerkeleyDbHashV9ImageBuilder {
 		WriteUInt16( page, 22, checked( (ushort)offset ) );
 	}
 
-	private static void WriteInlineItem(
+	private static void WriteItem(
 		Span<byte> page,
-		ReadOnlySpan<byte> payload,
+		BerkeleyDbHashV9ItemPlan item,
 		int tableEnd,
 		ref int offset,
 		int itemIndex
 	) {
-		int itemLength = checked( payload.Length + 1 );
+		int itemLength = item.EncodedLength;
 		offset = checked( offset - itemLength );
 		if ( offset < tableEnd ) {
 			throw new InvalidOperationException(
-				"A Berkeley DB hash bucket does not fit in its canonical HW02 inline page."
+				"A preflighted Berkeley DB hash item does not fit its planned page."
 			);
 		}
 
-		page[offset] = InlineItem;
-		payload.CopyTo( page[checked( offset + 1 )..] );
+		if ( !item.IsOffPage ) {
+			page[offset] = InlineItem;
+			item.Payload.Span.CopyTo( page[checked( offset + 1 )..] );
+		} else {
+			page[offset] = OffPageItem;
+			WriteUInt32(
+				page,
+				checked( offset + 4 ),
+				checked( (uint)item.FirstOverflowPageNumber )
+			);
+			WriteUInt32(
+				page,
+				checked( offset + 8 ),
+				checked( (uint)item.Payload.Length )
+			);
+		}
 		WriteUInt16(
 			page,
 			checked( PageHeaderSize + checked( itemIndex * sizeof( ushort ) ) ),
 			checked( (ushort)offset )
 		);
+	}
+
+	private static void WriteOverflowPage(
+		byte[] image,
+		BerkeleyDbHashV9OverflowPagePlan source
+	) {
+		Span<byte> page = image.AsSpan(
+			checked( source.PageNumber * PageSize ),
+			PageSize
+		);
+		WriteNotLoggedLsn( page );
+		WriteUInt32( page, 8, checked( (uint)source.PageNumber ) );
+		WriteUInt32( page, 12, checked( (uint)source.PreviousPageNumber ) );
+		WriteUInt32( page, 16, checked( (uint)source.NextPageNumber ) );
+		WriteUInt16( page, 20, 1 );
+		WriteUInt16(
+			page,
+			22,
+			checked( (ushort)source.Payload.Length )
+		);
+		page[25] = OverflowPage;
+		source.Payload.Span.CopyTo( page[PageHeaderSize..] );
 	}
 
 	private static void WriteNotLoggedLsn( Span<byte> bytes ) =>
