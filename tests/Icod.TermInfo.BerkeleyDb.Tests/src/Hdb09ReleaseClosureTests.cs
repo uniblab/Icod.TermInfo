@@ -387,7 +387,7 @@ public sealed class Hdb09ReleaseClosureTests {
 		);
 		AssertContainsAll(
 			"Icod.TermInfo-Post-1.0-Development-Roadmap.md",
-			"**Current coordinated version:** `1.15.0`",
+			"stable `1.15.0` is published",
 			"**Latest completed line:** `1.15.0`",
 			"**Latest completed release audit:** `docs/1.15.0-RELEASE-AUDIT.md`"
 		);
