@@ -334,7 +334,7 @@ jobs:
           ./tools/hdb00/verify-hdb06-commands.ps1 -FixtureRoot "${{ runner.temp }}/icod-terminfo-hdb00-macos" -LaunchMode Routed
 
       - name: Upload macOS native oracle fixtures
-        if: steps.hdb00-scope.outputs.required == 'true'
+        if: always() && steps.hdb00-scope.outputs.required == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: hdb02-macos-native-oracle
