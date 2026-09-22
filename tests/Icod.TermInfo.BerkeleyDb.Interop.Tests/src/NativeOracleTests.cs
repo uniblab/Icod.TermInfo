@@ -35,6 +35,9 @@ public sealed class NativeOracleTests {
 	[InlineData( "overflow-hashed-db", 2 )]
 	[InlineData( "multi-hashed-db", 192 )]
 	[InlineData( "hw00-managed-writer", 5 )]
+	[InlineData( "hw03-overflow", 1 )]
+	[InlineData( "hw03-growth", 4 )]
+	[InlineData( "hw03-collision", 2 )]
 	public void ProductionReaderMatchesEveryNativeRecord(
 		string fixtureName,
 		int expectedRecordCount
@@ -76,6 +79,9 @@ public sealed class NativeOracleTests {
 	[InlineData( "big-endian-hashed-db" )]
 	[InlineData( "overflow-hashed-db" )]
 	[InlineData( "hw00-managed-writer" )]
+	[InlineData( "hw03-overflow" )]
+	[InlineData( "hw03-growth" )]
+	[InlineData( "hw03-collision" )]
 	public void ProductionReaderReturnsCleanMissForAbsentNativeKey( string fixtureName ) {
 		byte[] key = Encoding.UTF8.GetBytes( "hdb00-missing" );
 		List<( byte[] Key, byte[] Value )> records = ReadNativeRecords( fixtureName );
@@ -93,6 +99,35 @@ public sealed class NativeOracleTests {
 			)
 		);
 		Assert.Empty( actual );
+	}
+
+	[Theory]
+	[InlineData( "hw03-overflow", "hw03-overflow.key", "hw03-overflow.value" )]
+	[InlineData(
+		"hw03-collision",
+		"hw03-collision-first.key",
+		"hw03-collision-first.value"
+	)]
+	[InlineData(
+		"hw03-collision",
+		"hw03-collision-second.key",
+		"hw03-collision-second.value"
+	)]
+	public void ProductionReaderRecoversExactHw03RawValue(
+		string database,
+		string keyFile,
+		string valueFile
+	) {
+		byte[] key = File.ReadAllBytes( FixturePath( keyFile ) );
+		byte[] expected = File.ReadAllBytes( FixturePath( valueFile ) );
+		Assert.True(
+			BerkeleyDbHashReader.TryReadValue(
+				FixturePath( database + ".db" ),
+				key,
+				out byte[] actual
+			)
+		);
+		Assert.Equal( expected, actual );
 	}
 
 	[Theory]
