@@ -29,7 +29,7 @@ internal readonly record struct BerkeleyDbHashV9ItemPlan(
 	internal bool IsOffPage =>
 		OverflowPageCount != 0;
 
-	internal int EncodedLength => IsOffPage
+	internal int EncodedLength => ( IsOffPage )
 		? 12
 		: checked( Payload.Length + 1 )
 	;
