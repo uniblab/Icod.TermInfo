@@ -39,8 +39,13 @@ public static partial class BerkeleyDbTerminalDatabaseWriter {
 	/// <exception cref="OperationCanceledException">
 	/// <paramref name="cancellationToken"/> is cancelled.
 	/// </exception>
-	/// <exception cref="NotSupportedException">
-	/// HW01 contract validation completed; image construction begins in HW02.
+	/// <exception cref="IOException">
+	/// The destination cannot be created or written, including when it already
+	/// exists and <see cref="BerkeleyDbTerminalDatabaseWriterOptions.OverwriteExisting"/>
+	/// is <see langword="false"/>.
+	/// </exception>
+	/// <exception cref="UnauthorizedAccessException">
+	/// Access to <paramref name="databasePath"/> is denied.
 	/// </exception>
 	public static void Write(
 		string databasePath,
@@ -52,21 +57,39 @@ public static partial class BerkeleyDbTerminalDatabaseWriter {
 		ArgumentNullException.ThrowIfNull( entries );
 		cancellationToken.ThrowIfCancellationRequested();
 
-		_ = Path.GetFullPath( databasePath );
+		string fullPath = Path.GetFullPath( databasePath );
 		BerkeleyDbTerminalDatabaseWriterOptions effectiveOptions =
 			SnapshotOptions( options );
 		BerkeleyDbTerminalDatabaseEntry[] entrySnapshot =
 			SnapshotEntries( entries, cancellationToken );
-		_ = PreparePublications(
+		PreparedPublication[] publications = PreparePublications(
 			entrySnapshot,
 			effectiveOptions,
 			cancellationToken
 		);
+		IReadOnlyList<BerkeleyDbHashRecord> records =
+			BerkeleyDbNcursesRecordPlanner.CreateRecords(
+				publications,
+				cancellationToken
+			);
+		byte[] image = BerkeleyDbHashV9ImageBuilder.Build(
+			records,
+			effectiveOptions.MaximumDatabaseSize,
+			cancellationToken
+		);
 
 		cancellationToken.ThrowIfCancellationRequested();
-		throw new NotSupportedException(
-			"HW01 freezes writer contracts; Hash-v9 image construction begins in HW02."
+		FileMode mode = effectiveOptions.OverwriteExisting
+			? FileMode.Create
+			: FileMode.CreateNew
+		;
+		using FileStream destination = new(
+			fullPath,
+			mode,
+			FileAccess.Write,
+			FileShare.None
 		);
+		destination.Write( image );
 	}
 
 	private static BerkeleyDbTerminalDatabaseWriterOptions SnapshotOptions(
