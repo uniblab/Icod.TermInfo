@@ -79,7 +79,7 @@ public static partial class BerkeleyDbTerminalDatabaseWriter {
 		);
 
 		cancellationToken.ThrowIfCancellationRequested();
-		FileMode mode = effectiveOptions.OverwriteExisting
+		FileMode mode = ( effectiveOptions.OverwriteExisting )
 			? FileMode.Create
 			: FileMode.CreateNew
 		;
