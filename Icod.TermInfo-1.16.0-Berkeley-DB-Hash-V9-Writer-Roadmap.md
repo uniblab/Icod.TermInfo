@@ -6,7 +6,7 @@
 **Command integration:** `tic` and `Icod.TermInfo.Tools`
 **Language:** C# 13
 **Reusable target frameworks:** `net8.0`; `net9.0`; `net10.0`
-**Status:** ACTIVE — HW03 COMPLETE / HW04 NEXT
+**Status:** ACTIVE — HW04 COMPLETE / HW05 NEXT
 **Stable predecessor:** `1.15.0`
 **Initial development version:** `1.16.0-Alpha-1`
 
@@ -586,17 +586,25 @@ managed-only transported-fixture Windows qualification.
 
 ### HW04 / Alpha-4 — Public terminfo publication engine
 
-**Status:** PLANNED
+**Status:** COMPLETE / ACCEPTED
+**Accepted exact code head:** `698f1d212aa5e213ff0b5496e10af76ead4232de`
+**Accepted pull-request workflow:** run `35890184477` (12/12 jobs)
+**Accepted HDB00 workflow:** run `35890184469` (3/3 jobs)
+**Acceptance record:** `docs/1.16.0-HW04-PUBLIC-TERMINFO-PUBLICATION-ENGINE.md`
 
 - connect the internal image builder to the frozen public writer API;
 - snapshot and validate publications;
 - parse every payload through Runtime;
 - enforce canonical/alias identity equality;
-- return deterministic publication counts/results; and
+- publish the deterministic complete image at the caller-selected path; and
 - verify net8.0/net9.0/net10.0 API equivalence.
 
-**Gate:** A package consumer can create a complete caller-selected Hash-v9
-terminfo database without Compiler or native dependencies.
+**Gate:** PASSED — a package consumer creates a complete caller-selected
+Hash-v9 terminfo database without Compiler or native dependencies. Public output
+round-trips through the managed reader/provider, matches the independent HW00
+oracle for the qualified overflow shape, and retains the frozen public API and
+Runtime-only dependency. HW04 uses direct whole-image output; verified atomic
+filesystem commit remains exclusively HW05.
 
 ### HW05 / Alpha-5 — Safe filesystem commit
 

@@ -11,14 +11,14 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`  
 **Frozen runtime contract:** `1.0.0`  
-**Current coordinated version:** `1.16.0-Alpha-3`
+**Current coordinated version:** `1.16.0-Alpha-4`
 **Latest completed line:** `1.15.0` - Berkeley DB / Hashed Terminfo Acquisition
-**Latest completed prerelease:** `1.16.0-Alpha-3`
-**Status:** stable `1.15.0` is published; focused `1.16.0` Hash-v9 writer implementation is active; HW03 is accepted
+**Latest completed prerelease:** `1.16.0-Alpha-4`
+**Status:** stable `1.15.0` is published; focused `1.16.0` Hash-v9 writer implementation is active; HW04 is accepted
 **Active release roadmap:** `Icod.TermInfo-1.16.0-Berkeley-DB-Hash-V9-Writer-Roadmap.md`
 **Release audit:** `docs/1.15.0-RELEASE-AUDIT.md`
 **Latest completed release audit:** `docs/1.15.0-RELEASE-AUDIT.md`
-**Next implementation gate:** HW04 public terminfo publication engine
+**Next implementation gate:** HW05 safe filesystem commit
 
 ---
 
@@ -125,9 +125,9 @@ Version 1.16 excludes in-place database mutation, general Berkeley DB APIs,
 directory/hashed migration, unified catalog automation, cross-container planning,
 and JSON v7. Migration and catalog automation are explicitly assigned to 1.17.
 
-HW00 through HW03 are complete and accepted. HW04 through HW08 continue with
-public publication, safe filesystem commit, `tic` integration, hardening, and
-stable release qualification.
+HW00 through HW04 are complete and accepted. HW05 through HW08 continue with
+safe filesystem commit, `tic` integration, hardening, and stable release
+qualification.
 
 ### 2.2 Completed 1.15 line
 
@@ -451,6 +451,7 @@ docs/1.16.0-HW00-HASH-V9-WRITER-INTEROPERABILITY-AND-BACKEND-DECISION.md
 docs/1.16.0-HW01-BERKELEY-DB-WRITER-CONTRACT.md
 docs/1.16.0-HW02-DETERMINISTIC-HASH-V9-INLINE-IMAGE.md
 docs/1.16.0-HW03-COLLISION-OVERFLOW-BOUNDED-GROWTH.md
+docs/1.16.0-HW04-PUBLIC-TERMINFO-PUBLICATION-ENGINE.md
 ```
 
 HW00 is complete and accepted at exact head
@@ -465,4 +466,7 @@ exact head `a31125898e7ab169457a9f9060a134cfcdbe4af6`; pull-request workflow run
 jobs. HW03 is complete and accepted at exact code head
 `009dbc66e4bbb5c8aec3d59ee479a5c7d300e8ac`; pull-request workflow run
 `35788135300` passed 12/12 jobs and HDB00 workflow run `35788135283` passed 3/3
-jobs. HW04 public terminfo publication is the next implementation gate.
+jobs. HW04 is complete and accepted at exact code head
+`698f1d212aa5e213ff0b5496e10af76ead4232de`; pull-request workflow run
+`35890184477` passed 12/12 jobs and HDB00 workflow run `35890184469` passed 3/3
+jobs. HW05 safe filesystem commit is the next implementation gate.
