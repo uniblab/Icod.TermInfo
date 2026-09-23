@@ -583,23 +583,26 @@ public sealed class Hw01WriterContractTests {
 	}
 
 	[Fact]
-	public void WriterEnumeratesInputOnceAndStopsAtTheExactHw01Boundary() {
+	public void WriterEnumeratesInputOnceWhenPublishingTheCompleteImage() {
 		int enumerationCount = 0;
 		IEnumerable<BerkeleyDbTerminalDatabaseEntry> Entries() {
 			enumerationCount++;
 			yield return CreateEntry( "sample", "sample-alias" );
 		}
 
-		NotSupportedException exception =
-			AssertWriteThrowsWithoutDestination<NotSupportedException>(
-				Entries()
-			);
-
-		Assert.Equal( 1, enumerationCount );
-		Assert.Equal(
-			"HW01 freezes writer contracts; Hash-v9 image construction begins in HW02.",
-			exception.Message
+		string directory = Path.Combine(
+			Path.GetTempPath(),
+			"icod-terminfo-hw04-enumeration-" + Guid.NewGuid().ToString( "N" )
 		);
+		Directory.CreateDirectory( directory );
+		string destination = Path.Combine( directory, "terminfo.db" );
+		try {
+			BerkeleyDbTerminalDatabaseWriter.Write( destination, Entries() );
+			Assert.Equal( 1, enumerationCount );
+			Assert.True( File.Exists( destination ) );
+		} finally {
+			Directory.Delete( directory, recursive: true );
+		}
 	}
 
 	[Fact]

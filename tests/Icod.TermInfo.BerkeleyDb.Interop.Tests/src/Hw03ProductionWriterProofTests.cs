@@ -56,6 +56,35 @@ public sealed class Hw03ProductionWriterProofTests {
 		);
 	}
 
+	[Fact]
+	public void PublicWriterTwoBucketOverflowImageExactlyMatchesHw00Oracle() {
+		const string canonical = "hw04-public-overflow";
+		const string description = "HW04 public overflow byte proof";
+		byte[] compact = CreateCompiledEntry(
+			canonical,
+			description
+		);
+		int descriptionPaddingLength = checked( 3000 - compact.Length );
+		Assert.True( descriptionPaddingLength > 0 );
+		Assert.Equal( 0, descriptionPaddingLength & 1 );
+		byte[] compiled = CreateCompiledEntry(
+			canonical,
+			description + new string( 'x', descriptionPaddingLength )
+		);
+		Assert.Equal( 3000, compiled.Length );
+
+		Assert.Equal(
+			WriteOracle( compiled ),
+			WritePublic(
+				new BerkeleyDbTerminalDatabaseEntry(
+					canonical,
+					Array.Empty<string>(),
+					compiled
+				)
+			)
+		);
+	}
+
 	private static byte[] WriteProduction(
 		params BerkeleyDbTerminalDatabaseEntry[] entries
 	) {
@@ -87,6 +116,23 @@ public sealed class Hw03ProductionWriterProofTests {
 			)
 		);
 		return destination.ToArray();
+	}
+
+	private static byte[] WritePublic(
+		params BerkeleyDbTerminalDatabaseEntry[] entries
+	) {
+		string directory = Path.Combine(
+			Path.GetTempPath(),
+			"icod-terminfo-hw04-interop-" + Guid.NewGuid().ToString( "N" )
+		);
+		Directory.CreateDirectory( directory );
+		string destination = Path.Combine( directory, "terminfo.db" );
+		try {
+			BerkeleyDbTerminalDatabaseWriter.Write( destination, entries );
+			return File.ReadAllBytes( destination );
+		} finally {
+			Directory.Delete( directory, recursive: true );
+		}
 	}
 
 	private static byte[] CreateCompiledEntry(
