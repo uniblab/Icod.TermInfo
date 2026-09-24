@@ -14,7 +14,7 @@
 **Current coordinated version:** `1.16.0-Alpha-4`
 **Latest completed line:** `1.15.0` - Berkeley DB / Hashed Terminfo Acquisition
 **Latest completed prerelease:** `1.16.0-Alpha-4`
-**Status:** stable `1.15.0` is published; focused `1.16.0` Hash-v9 writer implementation is active; HW04 is accepted
+**Status:** stable `1.15.0` is published; focused `1.16.0` Hash-v9 writer implementation is active; HW04 is accepted and the HW05 design is locked without implementation
 **Active release roadmap:** `Icod.TermInfo-1.16.0-Berkeley-DB-Hash-V9-Writer-Roadmap.md`
 **Release audit:** `docs/1.15.0-RELEASE-AUDIT.md`
 **Latest completed release audit:** `docs/1.15.0-RELEASE-AUDIT.md`
@@ -452,6 +452,7 @@ docs/1.16.0-HW01-BERKELEY-DB-WRITER-CONTRACT.md
 docs/1.16.0-HW02-DETERMINISTIC-HASH-V9-INLINE-IMAGE.md
 docs/1.16.0-HW03-COLLISION-OVERFLOW-BOUNDED-GROWTH.md
 docs/1.16.0-HW04-PUBLIC-TERMINFO-PUBLICATION-ENGINE.md
+docs/superpowers/specs/2026-09-24-hw05-safe-filesystem-commit-design.md
 ```
 
 HW00 is complete and accepted at exact head
@@ -469,4 +470,6 @@ jobs. HW03 is complete and accepted at exact code head
 jobs. HW04 is complete and accepted at exact code head
 `698f1d212aa5e213ff0b5496e10af76ead4232de`; pull-request workflow run
 `35890184477` passed 12/12 jobs and HDB00 workflow run `35890184469` passed 3/3
-jobs. HW05 safe filesystem commit is the next implementation gate.
+jobs. The HW05 safe-filesystem-commit design is approved and locked in
+`docs/superpowers/specs/2026-09-24-hw05-safe-filesystem-commit-design.md`;
+implementation has not started and remains the next implementation gate.

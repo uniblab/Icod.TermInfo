@@ -6,7 +6,7 @@
 **Command integration:** `tic` and `Icod.TermInfo.Tools`
 **Language:** C# 13
 **Reusable target frameworks:** `net8.0`; `net9.0`; `net10.0`
-**Status:** ACTIVE — HW04 COMPLETE / HW05 NEXT
+**Status:** ACTIVE — HW04 COMPLETE / HW05 DESIGN LOCKED / IMPLEMENTATION NOT STARTED
 **Stable predecessor:** `1.15.0`
 **Initial development version:** `1.16.0-Alpha-1`
 
@@ -342,6 +342,11 @@ closed, reopened, and verified.
 The writer shall not silently merge with an existing hashed database. Replacement
 always means replacement of the complete logical database.
 
+HW05 freezes replacement as a fresh whole-file publication. The staged file
+becomes the destination and retains the fresh filesystem metadata inherited
+through ordinary directory creation rules. Existing destination ACLs,
+attributes, and other metadata are not copied.
+
 ### 8.3 Guarantees and limits
 
 The writer guarantees:
@@ -365,8 +370,19 @@ successfully commit under a non-overwrite policy. Under explicit overwrite,
 commit serialization and destination identity checks must prevent partial files,
 temporary-file collisions, and accidental deletion of another writer's artifact.
 
+HW05 uses a persistent destination-specific sibling lock file held open with
+exclusive sharing. A contending Icod writer waits until it acquires that lock or
+its existing cancellation token is signaled; no public lock timeout is added.
+The lock pathname remains after publication because deleting it could allow
+writers to lock different filesystem objects for the same destination. The lock
+serializes path validation, staging, verification, commit, and cleanup, while
+complete in-memory image construction may remain concurrent.
+
 1.16 does not promise coordination with external native Berkeley DB writers and
 does not mutate a database held open for native write access.
+
+The complete approved HW05 design is frozen in
+`docs/superpowers/specs/2026-09-24-hw05-safe-filesystem-commit-design.md`.
 
 ---
 
@@ -608,12 +624,16 @@ filesystem commit remains exclusively HW05.
 
 ### HW05 / Alpha-5 — Safe filesystem commit
 
-**Status:** PLANNED
+**Status:** DESIGN APPROVED / LOCKED — IMPLEMENTATION NOT STARTED
+**Design record:** `docs/superpowers/specs/2026-09-24-hw05-safe-filesystem-commit-design.md`
 
 - implement sibling temporary-file preparation;
 - flush, close, reopen, and verify through the production reader;
 - implement refuse-existing and explicit-overwrite policies;
 - define the cancellation commit boundary;
+- serialize publication through a persistent destination-specific sibling lock,
+  waiting until acquisition or cancellation;
+- use fresh destination metadata rather than preserving replaced-file metadata;
 - harden concurrent writer behavior and cleanup; and
 - test file/directory/symlink/reparse/permission/fault boundaries on all hosts.
 
