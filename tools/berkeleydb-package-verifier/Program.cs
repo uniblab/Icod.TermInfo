@@ -39,7 +39,7 @@ internal static class Program {
 	private const string ExpectedCopyright =
 		"Copyright (c) 2026 Timothy J. Bruce";
 	private const string ExpectedDescription =
-		"Managed read-only acquisition support for ncurses-compatible "
+		"Managed acquisition and deterministic publication for ncurses-compatible "
 			+ "Berkeley DB Hash-v9 terminfo stores.";
 	private const string ExpectedTags =
 		"terminfo libtinfo terminal berkeleydb hash ncurses database dotnet csharp";
@@ -65,6 +65,10 @@ internal static class Program {
 
 		try {
 			string root = FindRepositoryRoot();
+			BerkeleyDbApiFreeze.VerifyReaderReconstruction(
+				File.ReadAllText( Path.Combine( root, "docs", "1.16.0-BERKELEYDB-PUBLIC-API-BASELINE.txt" ) ),
+				File.ReadAllText( Path.Combine( root, "docs", "1.15.0-BERKELEYDB-PUBLIC-API-BASELINE.txt" ) )
+			);
 			string artifactDirectory =
 				( args.Length == 0 )
 					? Path.Combine( root, "artifacts" )

@@ -152,3 +152,11 @@ The exact destination file and an existing parent directory are required.
 Directory output remains the default. See [tic](../tic/README.md#116-development-status)
 for selection, cancellation, and safe-publication behavior.
 Migration and catalog automation remain deferred to 1.17.
+
+The `1.16.0-Alpha-8` candidate adds the
+[public writer sample](../samples/Icod.TermInfo.BerkeleyDb.Sample/README.md),
+[writing guide](../docs/1.16.0-BERKELEY-DB-WRITING-GUIDE.md), and
+[twelve-type API freeze](../docs/1.16.0-BERKELEYDB-PUBLIC-API-FREEZE.md).
+Its isolated package consumer exercises the writer on .NET 8, 9, and 10;
+the verifier subtracts the three writer types to reconstruct the frozen 1.15
+reader surface. See the [release audit](../docs/1.16.0-RELEASE-AUDIT.md).

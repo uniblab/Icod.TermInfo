@@ -1,5 +1,22 @@
 # Icod.TermInfo Compatibility Policy
 
+## 1.16 additive writer freeze
+
+The 1.16 candidate adds exactly three BerkeleyDb writer types to the unchanged
+nine-type 1.15 reader. A package-verifier reconstruction gate and current
+assembly manifest comparisons enforce both surfaces on all three frameworks.
+Runtime, Source, Compiler, Termcap, Inspection, and JSON APIs remain unchanged.
+BerkeleyDb remains pure managed and Runtime-only; the `tic` executable composes
+Compiler and BerkeleyDb without changing either reusable dependency boundary.
+
+Writer output is little-endian Hash-v9 with 4096-byte pages, exact UTF-8 keys,
+power-of-two primary buckets, collision chains, and overflow. The 1.15 reader's
+UTF-8-first/exact-Latin-1 fallback remains unchanged; writing does not synthesize
+fallback aliases. Publication replaces the complete database under the reviewed
+filesystem/cancellation contract. Conventional `tic` output stays the default.
+See [writing contracts and exclusions](1.16.0-BERKELEY-DB-WRITING-GUIDE.md) and
+[the exact API freeze](1.16.0-BERKELEYDB-PUBLIC-API-FREEZE.md).
+
 ## 1.15 compatibility freeze
 
 Icod.TermInfo 1.15 adds the optional `Icod.TermInfo.BerkeleyDb` package with an

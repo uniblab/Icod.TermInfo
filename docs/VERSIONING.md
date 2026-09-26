@@ -5,6 +5,20 @@ package contracts. Version-specific roadmaps, API freezes, schema fingerprints,
 and release audits remain the authoritative historical evidence for completed
 releases; this document defines the current cross-release policy.
 
+## 1.16 candidate line
+
+The current development candidate is `1.16.0-Alpha-8`, coordinated through
+`Directory.Build.props` for all seven packages. The published stable line
+remains 1.15 until release publication. HW08 freezes the twelve-type BerkeleyDb
+API and proves that subtracting the three writer types reproduces the complete
+1.15 reader API. Assembly versions remain `1.0.0.0`; all six reusable libraries
+continue to target net8.0/net9.0/net10.0.
+
+Stable `1.16.0` promotion must change identity and release-facing text only,
+then pass exact-head normal and native qualification before tagging. No feature
+or public API changes may be included in that promotion. Migration and catalog
+automation remain 1.17. See [the release audit](1.16.0-RELEASE-AUDIT.md).
+
 ## 1.15 release line
 
 The HDB01-HDB09 development sequence used `1.15.0-Alpha-1` through the

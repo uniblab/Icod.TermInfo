@@ -11,14 +11,14 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`  
 **Frozen runtime contract:** `1.0.0`  
-**Current coordinated version:** `1.16.0-Alpha-7`
+**Current coordinated version:** `1.16.0-Alpha-8`
 **Latest completed line:** `1.15.0` - Berkeley DB / Hashed Terminfo Acquisition
 **Latest completed prerelease:** `1.16.0-Alpha-7`
-**Status:** stable `1.15.0` is published; HW07 hardening is complete and accepted; HW08 release qualification is next
+**Status:** stable `1.15.0` is published; HW07 is accepted; HW08 is implemented and Alpha-8 qualification is in progress
 **Active release roadmap:** `Icod.TermInfo-1.16.0-Berkeley-DB-Hash-V9-Writer-Roadmap.md`
 **Release audit:** `docs/1.15.0-RELEASE-AUDIT.md`
 **Latest completed release audit:** `docs/1.15.0-RELEASE-AUDIT.md`
-**Next implementation gate:** HW08 package, documentation, API freeze, and stable release qualification
+**Next implementation gate:** HW08 exact-head Alpha-8 qualification, then stable identity promotion
 
 ---
 

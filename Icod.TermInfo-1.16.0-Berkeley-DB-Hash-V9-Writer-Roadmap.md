@@ -6,7 +6,7 @@
 **Command integration:** `tic` and `Icod.TermInfo.Tools`
 **Language:** C# 13
 **Reusable target frameworks:** `net8.0`; `net9.0`; `net10.0`
-**Status:** ACTIVE — HW07 COMPLETE / HW08 NEXT
+**Status:** ACTIVE — HW08 IMPLEMENTED / ALPHA-8 QUALIFICATION PENDING
 **Stable predecessor:** `1.15.0`
 **Initial development version:** `1.16.0-Alpha-1`
 
@@ -694,7 +694,16 @@ same exact head.
 
 ### HW08 / Alpha-8 — Package, documentation, freeze, and stable promotion
 
-**Status:** PLANNED
+**Status:** IMPLEMENTED — Alpha-8 qualification pending; stable promotion follows acceptance
+
+The sample now uses the public writer and proves input-order determinism.
+The isolated package consumer tests publication, UTF-8 aliases, refusal,
+cancellation, and complete replacement. Package verification reconstructs the
+immutable nine-type 1.15 reader API by removing exactly the three writer types
+from the twelve-type manifest; live three-framework API checks remain required.
+The [writing guide](docs/1.16.0-BERKELEY-DB-WRITING-GUIDE.md),
+[API freeze](docs/1.16.0-BERKELEYDB-PUBLIC-API-FREEZE.md), and
+[release audit](docs/1.16.0-RELEASE-AUDIT.md) own the release-facing contract.
 
 - add a deterministic writer sample and package-only consumer;
 - document API, `tic`, error, filesystem, and interoperability contracts;

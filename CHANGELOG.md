@@ -3,6 +3,25 @@
 This file records release-level product changes. Exact qualification evidence,
 API fingerprints, and preserved boundaries live in the linked release audits.
 
+## 1.16.0 (candidate)
+
+- Adds deterministic pure-managed whole-file Berkeley DB Hash-v9 publication
+  from validated compiled entries, with exact UTF-8 canonical and alias keys.
+- Supports linked collision pages and overflow records within configured
+  record/image/parser limits; source enumeration is bounded by record cost.
+- Stages, flushes, reopens, and verifies the complete database before commit
+  under a persistent cooperative lock, with explicit overwrite and cancellation.
+- Adds `tic --database-format directory|hashed`; hashed output requires an
+  exact `-o` file, `--force` permits replacement, and `-s` reports publication.
+- Preserves the nine-type reader API and adds exactly three writer types;
+  all other reusable APIs, JSON contracts, dependencies, and archive RIDs remain
+  unchanged. No native production dependency is introduced.
+- Adds a public writer sample, package-only writer consumer, API reconstruction
+  gate, and native/cross-host pathological qualification.
+
+Migration and catalog automation are deferred to 1.17. See the
+[1.16 release audit](docs/1.16.0-RELEASE-AUDIT.md).
+
 ## 1.15.0
 
 This is the stable coordinated release of Icod.TermInfo 1.15. It adds the

@@ -12,21 +12,21 @@ All ten executable API sample projects target `net8.0`, `net9.0`, and
 
 ## Icod.TermInfo.BerkeleyDb.Sample
 
-`Icod.TermInfo.BerkeleyDb.Sample` is the focused **1.15** hashed-acquisition
-example. It creates a controlled Hash-v9 file in a temporary directory, resolves
-a controlled alias through `BerkeleyDbTerminalDescriptionProvider`, prints the
-canonical identity and selected capability state, and removes the fixture.
+`Icod.TermInfo.BerkeleyDb.Sample` is the focused **1.16** publication/acquisition
+example. It publishes two controlled entries with the public writer, verifies
+that reversed input produces identical bytes, resolves an alias through
+`BerkeleyDbTerminalDescriptionProvider`, and removes its private directory.
 
 The sample is deterministic and CI-safe. It uses no ambient terminfo database,
-native Berkeley DB library, subprocess, or network access. Its fixture writer is
-sample setup only; the production package remains read only.
+native Berkeley DB library, subprocess, or network access. It prepares compiled
+entry bytes locally; all Hash-v9 pages are produced by the public writer.
 
 ```text
 dotnet run --project samples/Icod.TermInfo.BerkeleyDb.Sample/Icod.TermInfo.BerkeleyDb.Sample.csproj -f net10.0
 ```
 
 See `Icod.TermInfo.BerkeleyDb.Sample/README.md` and
-`../docs/1.15.0-BERKELEY-DB-HASHED-ACQUISITION-GUIDE.md`.
+`../docs/1.16.0-BERKELEY-DB-WRITING-GUIDE.md`.
 
 ## Icod.TermInfo.RasterBackendSelection.Sample
 
@@ -246,6 +246,8 @@ freshly packed `Icod.TermInfo.Inspection` candidate beside published
 The 1.15 qualification runs the controlled BerkeleyDb sample on net8.0,
 net9.0, and net10.0 and separately consumes the exact package on Windows, Linux,
 and macOS. Neither path requires native Berkeley DB.
+The 1.16 qualification adds public-writer determinism, UTF-8 aliases,
+overwrite/refusal, and cancellation to those same three-target package gates.
 
 Live verification is never required by CI. Interactive `--live` modes exist only
 to demonstrate the caller/sibling-layer boundary.

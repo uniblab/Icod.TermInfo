@@ -34,7 +34,7 @@ public sealed class Hdb09ReleaseClosureTests {
 	public void ExactBerkeleyDbPublicApiHasACompleteCheckedInFreeze() {
 		string baseline = ReadRequiredRepositoryFile( ApiBaselinePath );
 		string freeze = ReadRequiredRepositoryFile(
-			"docs/1.16.0-HW01-BERKELEY-DB-WRITER-CONTRACT.md"
+			"docs/1.16.0-BERKELEYDB-PUBLIC-API-FREEZE.md"
 		);
 		string verifier = ReadRequiredRepositoryFile(
 			".github/scripts/verify-berkeleydb-package.ps1"
@@ -67,11 +67,10 @@ public sealed class Hdb09ReleaseClosureTests {
 			StringComparison.Ordinal
 		);
 		foreach ( string token in new[] {
-			"1.16.0-Alpha-1",
+			"1.16.0",
 			"BerkeleyDbTerminalDatabaseEntry",
 			"BerkeleyDbTerminalDatabaseWriterOptions",
 			"BerkeleyDbTerminalDatabaseWriter",
-			"HW02",
 		} ) {
 			Assert.Contains( token, freeze, StringComparison.Ordinal );
 		}
@@ -201,14 +200,14 @@ public sealed class Hdb09ReleaseClosureTests {
 			"BerkeleyDbTerminalDescriptionProvider",
 			"TryLoad",
 			"Path.GetTempPath",
-			"File.WriteAllBytes",
+			"BerkeleyDbTerminalDatabaseWriter.Write",
 			"hdb09-sample",
 			"NumericCapability.Colors",
 		} ) {
 			Assert.Contains( token, program, StringComparison.Ordinal );
 		}
 		Assert.Contains( "controlled", readme, StringComparison.OrdinalIgnoreCase );
-		Assert.Contains( "read-only", readme, StringComparison.OrdinalIgnoreCase );
+		Assert.Contains( "publication", readme, StringComparison.OrdinalIgnoreCase );
 		Assert.Contains( "no native", readme, StringComparison.OrdinalIgnoreCase );
 
 		string solution = ReadRequiredRepositoryFile( "Icod.TermInfo.sln" );
@@ -327,7 +326,7 @@ public sealed class Hdb09ReleaseClosureTests {
 	}
 
 	[Fact]
-	public void StablePromotionAuthoritiesPreserveTheCoordinated1150ReleaseHistory() {
+	public void StableHistoryAndCurrentPackageNotesRemainCoordinated() {
 		AssertContainsAll(
 			"README.md",
 			"Current release line: `Icod.TermInfo 1.15.0`.",
@@ -361,7 +360,7 @@ public sealed class Hdb09ReleaseClosureTests {
 				element => element.Name.LocalName == "PackageReleaseNotes"
 			).Value;
 			Assert.StartsWith(
-				"1.15.0 ",
+				"1.16.0 ",
 				releaseNotes,
 				StringComparison.Ordinal
 			);

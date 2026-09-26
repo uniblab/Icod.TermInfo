@@ -58,8 +58,10 @@ public sealed class BerkeleyDbTerminalDatabaseWriterOptions {
 	/// <summary>Gets the compiled-entry parser options snapshot.</summary>
 	public CompiledTermInfoParserOptions ParserOptions { get; }
 	/// <summary>Gets the maximum output database size in bytes.</summary>
+	/// <remarks>This bounds the output image, not total managed memory.</remarks>
 	public int MaximumDatabaseSize { get; }
 	/// <summary>Gets the maximum physical Hash record count.</summary>
+	/// <remarks>Each entry costs two records plus one per alias.</remarks>
 	public int MaximumRecordCount { get; }
 	/// <summary>Gets whether an existing destination may be replaced.</summary>
 	/// <remarks>

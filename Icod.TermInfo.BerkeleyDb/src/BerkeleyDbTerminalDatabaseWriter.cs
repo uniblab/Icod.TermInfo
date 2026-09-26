@@ -37,6 +37,8 @@ public static partial class BerkeleyDbTerminalDatabaseWriter {
 	/// the host filesystem; directory power-loss durability and coordination with
 	/// native writers are not provided. The immediate parent, destination, and lock
 	/// must not be symbolic links or reparse points. The lock sidecar remains on disk.
+	/// Source enumeration is bounded by the physical record budget. Each entry costs
+	/// two records plus one per alias. The image-size limit is not a total heap limit.
 	/// </remarks>
 	/// <exception cref="ArgumentException">
 	/// <paramref name="databasePath"/> is empty or whitespace, or
@@ -48,6 +50,13 @@ public static partial class BerkeleyDbTerminalDatabaseWriter {
 	/// </exception>
 	/// <exception cref="OperationCanceledException">
 	/// <paramref name="cancellationToken"/> is cancelled before commit begins.
+	/// </exception>
+	/// <exception cref="InvalidOperationException">
+	/// Names have conflicting owners, parsed identities disagree with declarations,
+	/// or the configured physical record or output image limit is exceeded.
+	/// </exception>
+	/// <exception cref="FormatException">
+	/// A compiled entry fails validation by the Runtime parser.
 	/// </exception>
 	/// <exception cref="IOException">
 	/// The destination cannot be created or written, including when it already

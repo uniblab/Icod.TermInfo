@@ -30,13 +30,18 @@ normalization. Stable promotion changed release identity and release-facing text
 only; the accepted `1.15.0-Alpha-8` artifact remains the feature/API source.
 
 The `1.16.0` development branch adds managed Hash-v9 writing. Its
-`1.16.0-Alpha-6` tool suite supports explicit publication with
+`1.16.0-Alpha-8` candidate includes deterministic writer samples, an isolated
+package consumer, and the additive twelve-type API freeze. The tool suite
+supports explicit publication with
 `icod-terminfo tic --database-format hashed -o ./terminfo.db source.ti`.
 Directory publication remains the default; hashed output requires an exact
 destination file and an existing parent directory. See the
 [tic documentation](tic/README.md#116-development-status) and
 [1.16 roadmap](Icod.TermInfo-1.16.0-Berkeley-DB-Hash-V9-Writer-Roadmap.md).
 Migration and catalog automation remain deferred to 1.17.
+See the [writing guide](docs/1.16.0-BERKELEY-DB-WRITING-GUIDE.md) for the public
+API, resource limits, errors, and filesystem contract, and the
+[1.16 release audit](docs/1.16.0-RELEASE-AUDIT.md) for candidate qualification.
 
 ## Support the Project
 
