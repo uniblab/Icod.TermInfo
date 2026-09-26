@@ -9,6 +9,7 @@
 		<RootNamespace>Icod.TermInfo.Hw03.ManagedWriterProbe</RootNamespace>
 	</PropertyGroup>
 	<ItemGroup>
+		<Compile Include="..\..\..\tests\Shared\Hw07WriterMatrix.cs" Link="Shared\Hw07WriterMatrix.cs" />
 		<ProjectReference Include="..\..\..\Icod.TermInfo.BerkeleyDb\Icod.TermInfo.BerkeleyDb.csproj" />
 	</ItemGroup>
 </Project>

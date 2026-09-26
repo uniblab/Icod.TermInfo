@@ -21,6 +21,7 @@ $patterns = @(
     '^tests/Icod\.TermInfo\.BerkeleyDb\.Tests/src/Hdb08PackagingQualificationTests\.cs$',
     '^tests/Icod\.TermInfo\.BerkeleyDb\.Tests/src/Hdb09ReleaseClosureTests\.cs$',
     '^tests/Icod\.TermInfo\.BerkeleyDb\.Interop\.Tests/',
+    '^tests/Shared/Hw07WriterMatrix\.cs$',
     '^docs/1\.15\.0-HDB08-PACKAGING-AND-CROSS-PLATFORM-QUALIFICATION\.md$',
     '^docs/1\.15\.0-BERKELEYDB-PUBLIC-API-BASELINE\.txt$',
     '^docs/1\.15\.0-BERKELEY-DB-PUBLIC-API-FREEZE\.md$',

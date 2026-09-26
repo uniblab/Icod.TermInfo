@@ -20,6 +20,7 @@ on:
       - 'tests/Icod.TermInfo.Toe.Tests/**'
       - 'tests/Icod.TermInfo.Router.Tests/**'
       - 'tests/Shared/BerkeleyDbHashV9TestStore.cs'
+      - 'tests/Shared/Hw07WriterMatrix.cs'
       - '.github/scripts/new-hdb06-test-store.ps1'
       - '.github/scripts/verify-hdb07-permissions.ps1'
       - '.github/scripts/verify-berkeleydb-package.ps1'
@@ -152,6 +153,7 @@ jobs:
             db5.3_verify "$root/$name.db"
             db5.3_dump -k -f "$root/$name.dump" "$root/$name.db"
           done
+          bash tools/hdb00/verify-hw07-writer.sh "$root" db5.3_verify db5.3_dump db5.3_load
 
       - name: Compare production reader with native Berkeley DB records
         if: steps.hdb00-scope.outputs.required == 'true'
@@ -215,6 +217,10 @@ jobs:
             ${{ runner.temp }}/icod-terminfo-hdb00/hw03-collision-second.key
             ${{ runner.temp }}/icod-terminfo-hdb00/hw03-collision-second.value
             ${{ runner.temp }}/icod-terminfo-hdb00/hw06-tic/**
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw07-*.db
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw07-*.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw07-*.bin
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw07-*.names
             ${{ runner.temp }}/icod-terminfo-hdb00/not-hash.db
             ${{ runner.temp }}/icod-terminfo-hdb00/random.db
 
@@ -319,6 +325,7 @@ jobs:
             "$db_prefix/bin/db_verify" "$root/$name.db"
             "$db_prefix/bin/db_dump" -k -f "$root/$name.dump" "$root/$name.db"
           done
+          bash tools/hdb00/verify-hw07-writer.sh "$root" "$db_prefix/bin/db_verify" "$db_prefix/bin/db_dump" "$db_prefix/bin/db_load"
 
       - name: Compare production reader with native Berkeley DB records
         if: steps.hdb00-scope.outputs.required == 'true'
@@ -384,6 +391,10 @@ jobs:
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-collision-second.key
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-collision-second.value
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw06-tic/**
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw07-*.db
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw07-*.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw07-*.bin
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw07-*.names
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/not-hash.db
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/random.db
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/hdb00-primary.bin

@@ -60,6 +60,7 @@ public static partial class BerkeleyDbTerminalDatabaseWriter {
 
 	private static BerkeleyDbTerminalDatabaseEntry[] SnapshotEntries(
 		IEnumerable<BerkeleyDbTerminalDatabaseEntry> entries,
+		int remainingRecords,
 		CancellationToken cancellationToken
 	) {
 		List<BerkeleyDbTerminalDatabaseEntry> snapshot = [];
@@ -71,6 +72,7 @@ public static partial class BerkeleyDbTerminalDatabaseWriter {
 					nameof( entries )
 				);
 			}
+			ConsumeRecordBudget( entry, ref remainingRecords );
 			snapshot.Add( entry );
 		}
 		if ( snapshot.Count == 0 ) {
@@ -82,6 +84,16 @@ public static partial class BerkeleyDbTerminalDatabaseWriter {
 		return snapshot.ToArray();
 	}
 
+	private static void ConsumeRecordBudget( BerkeleyDbTerminalDatabaseEntry entry, ref int remainingRecords ) {
+		long required = 2L + entry.Aliases.Count;
+		if ( required > remainingRecords ) {
+			throw new InvalidOperationException(
+				"The terminal publications exceed the configured Hash record limit."
+			);
+		}
+		remainingRecords -= (int)required;
+	}
+
 	internal static PreparedPublication[] PreparePublications(
 		IReadOnlyList<BerkeleyDbTerminalDatabaseEntry> entries,
 		BerkeleyDbTerminalDatabaseWriterOptions options,
@@ -89,10 +101,11 @@ public static partial class BerkeleyDbTerminalDatabaseWriter {
 	) {
 		Dictionary<string, string> owners = new( StringComparer.Ordinal );
 		List<PreparedPublication> publications = new( entries.Count );
-		int recordCount = 0;
+		int remainingRecords = options.MaximumRecordCount;
 
 		foreach ( BerkeleyDbTerminalDatabaseEntry entry in entries ) {
 			cancellationToken.ThrowIfCancellationRequested();
+			ConsumeRecordBudget( entry, ref remainingRecords );
 			PreparedIdentity canonical = PrepareIdentity( entry.CanonicalName );
 			AddOwner( owners, canonical.Name, entry.CanonicalName );
 
@@ -103,21 +116,7 @@ public static partial class BerkeleyDbTerminalDatabaseWriter {
 				aliases[index] = alias;
 			}
 
-			try {
-				recordCount = checked( recordCount + 2 + aliases.Length );
-			} catch ( OverflowException exception ) {
-				throw new InvalidOperationException(
-					"The terminal publications exceed the configured Hash record limit.",
-					exception
-				);
-			}
-			if ( recordCount > options.MaximumRecordCount ) {
-				throw new InvalidOperationException(
-					"The terminal publications exceed the configured Hash record limit."
-				);
-			}
-
-			byte[] data = (byte[])entry.Data.Clone();
+			byte[] data = entry.Data;
 			TerminalDescription parsed = CompiledTermInfoParser.Parse(
 				data,
 				options.ParserOptions

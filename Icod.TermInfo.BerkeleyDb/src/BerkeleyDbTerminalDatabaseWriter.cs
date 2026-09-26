@@ -83,7 +83,7 @@ public static partial class BerkeleyDbTerminalDatabaseWriter {
 		BerkeleyDbTerminalDatabaseWriterOptions effectiveOptions =
 			SnapshotOptions( options );
 		BerkeleyDbTerminalDatabaseEntry[] entrySnapshot =
-			SnapshotEntries( entries, cancellationToken );
+			SnapshotEntries( entries, effectiveOptions.MaximumRecordCount, cancellationToken );
 		PreparedPublication[] publications = PreparePublications(
 			entrySnapshot,
 			effectiveOptions,

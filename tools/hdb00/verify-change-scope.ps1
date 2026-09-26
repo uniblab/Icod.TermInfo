@@ -25,6 +25,7 @@ $cases = @(
     @{ Paths = @('Icod.TermInfo.BerkeleyDb/src/BerkeleyDbHashReader.cs'); Expected = 'true' },
     @{ Paths = @('tests/Icod.TermInfo.BerkeleyDb.Interop.Tests/src/NativeOracleTests.cs'); Expected = 'true' },
     @{ Paths = @('tools/hdb00/run-linux.sh'); Expected = 'true' },
+    @{ Paths = @('tests/Shared/Hw07WriterMatrix.cs'); Expected = 'true' },
     @{ Paths = @('.github/workflows/hdb00-interoperability.yml'); Expected = 'true' },
     @{ Paths = @('.github/scripts/verify-berkeleydb-package.ps1'); Expected = 'true' },
     @{ Paths = @('Directory.Build.props'); Expected = 'true' },

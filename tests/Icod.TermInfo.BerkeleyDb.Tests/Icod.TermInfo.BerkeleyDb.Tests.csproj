@@ -33,6 +33,7 @@
 	<ItemGroup>
 		<Compile Include="..\Shared\Hdb07HashV9FixtureBuilder.cs"
 			Link="Shared\Hdb07HashV9FixtureBuilder.cs" />
+		<Compile Include="..\Shared\Hw07WriterMatrix.cs" Link="Shared\Hw07WriterMatrix.cs" />
 	</ItemGroup>
 
 	<Target Name="CopyPublicationProbe" AfterTargets="Build" Condition="'$(TargetFramework)' != ''">

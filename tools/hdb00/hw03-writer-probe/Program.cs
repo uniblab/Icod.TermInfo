@@ -7,6 +7,15 @@
 using System.Text;
 using Icod.TermInfo.BerkeleyDb;
 
+if ( args.Length == 3 && args[0] == "hw07-generate" ) {
+	Hw07Qualification.Generate( Path.GetFullPath( args[1] ), Path.GetFullPath( args[2] ) );
+	return 0;
+}
+if ( args.Length == 2 && args[0] == "hw07-verify" ) {
+	Hw07Qualification.Verify( Path.GetFullPath( args[1] ) );
+	return 0;
+}
+
 if ( args.Length != 1 ) {
 	Console.Error.WriteLine( "Usage: Hw03.ManagedWriterProbe OUTPUT_DIRECTORY" );
 	return 64;
