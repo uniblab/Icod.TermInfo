@@ -102,6 +102,12 @@ internal static class TicCommandLineNormalizer {
 				continue;
 			}
 
+			if ( string.Equals( argument, "--database-format", StringComparison.Ordinal ) ) {
+				normalized.Add( argument );
+				preserveNextValue = true;
+				continue;
+			}
+
 			if (
 				argument.Length <= 1
 				|| argument[ 0 ] != '-'

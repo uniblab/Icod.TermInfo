@@ -11,10 +11,10 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`  
 **Frozen runtime contract:** `1.0.0`  
-**Current coordinated version:** `1.16.0-Alpha-5`
+**Current coordinated version:** `1.16.0-Alpha-6`
 **Latest completed line:** `1.15.0` - Berkeley DB / Hashed Terminfo Acquisition
 **Latest completed prerelease:** `1.16.0-Alpha-5`
-**Status:** stable `1.15.0` is published; focused `1.16.0` Hash-v9 writer implementation is active; HW05 is complete and accepted; HW06 is next
+**Status:** stable `1.15.0` is published; focused `1.16.0` Hash-v9 writer implementation is active; HW05 is complete and accepted; HW06 is implemented and undergoing qualification
 **Active release roadmap:** `Icod.TermInfo-1.16.0-Berkeley-DB-Hash-V9-Writer-Roadmap.md`
 **Release audit:** `docs/1.15.0-RELEASE-AUDIT.md`
 **Latest completed release audit:** `docs/1.15.0-RELEASE-AUDIT.md`

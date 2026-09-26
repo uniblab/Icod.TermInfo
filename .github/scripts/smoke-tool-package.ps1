@@ -206,6 +206,20 @@ release-smoke|Icod.TermInfo release smoke terminal,
 	}
 
 	$planningSourcePath = Join-Path $workRoot 'release-planning.ti'
+	$hashedDatabase = Join-Path $workRoot 'hw06-exact-file'
+	[void] ( Invoke-Router -Arguments @(
+		'tic', '--database-format', 'hashed', '-o', $hashedDatabase, $sourcePath
+	) )
+	if ( -not ( Test-Path -LiteralPath $hashedDatabase -PathType Leaf ) ) {
+		throw 'Installed tic did not publish the exact hashed destination.'
+	}
+	$hashedOutput = Invoke-Router -Arguments @(
+		'infocmp', '-A', $hashedDatabase, 'release-smoke'
+	)
+	if ( $hashedOutput -cne $infocmpOutput ) {
+		throw 'Installed tic hashed publication differs from directory publication.'
+	}
+
 	[System.IO.File]::WriteAllText(
 		$planningSourcePath,
 		@"

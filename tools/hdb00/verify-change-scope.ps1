@@ -19,6 +19,9 @@ function Assert-ScopeResult {
 }
 
 $cases = @(
+    @{ Paths = @('tic/src/TicPublisher.cs'); Expected = 'true' },
+    @{ Paths = @('tic/Icod.TermInfo.Tic.csproj'); Expected = 'true' },
+    @{ Paths = @('tic/README.md'); Expected = 'false' },
     @{ Paths = @('Icod.TermInfo.BerkeleyDb/src/BerkeleyDbHashReader.cs'); Expected = 'true' },
     @{ Paths = @('tests/Icod.TermInfo.BerkeleyDb.Interop.Tests/src/NativeOracleTests.cs'); Expected = 'true' },
     @{ Paths = @('tools/hdb00/run-linux.sh'); Expected = 'true' },

@@ -189,6 +189,20 @@ release-smoke|Icod.TermInfo release smoke terminal,
 	}
 
 	$relativeSourcePath = Join-Path $workRoot 'release-relative.ti'
+	$hashedDatabase = Join-Path $workRoot 'hw06-exact-file'
+	[void] ( Invoke-ReleaseTool -Name 'tic' -Arguments @(
+		'--database-format', 'hashed', '-o', $hashedDatabase, $sourcePath
+	) )
+	if ( -not ( Test-Path -LiteralPath $hashedDatabase -PathType Leaf ) ) {
+		throw 'Archive tic did not publish the exact hashed destination.'
+	}
+	$hashedOutput = Invoke-ReleaseTool -Name 'infocmp' -Arguments @(
+		'-A', $hashedDatabase, 'release-smoke'
+	)
+	if ( $hashedOutput -cne $infocmpOutput ) {
+		throw 'Archive tic hashed publication differs from directory publication.'
+	}
+
 	[System.IO.File]::WriteAllText(
 		$relativeSourcePath,
 		@"

@@ -6,7 +6,7 @@
 **Command integration:** `tic` and `Icod.TermInfo.Tools`
 **Language:** C# 13
 **Reusable target frameworks:** `net8.0`; `net9.0`; `net10.0`
-**Status:** ACTIVE — HW05 COMPLETE / HW06 NEXT
+**Status:** ACTIVE — HW05 COMPLETE / HW06 IN QUALIFICATION
 **Stable predecessor:** `1.15.0`
 **Initial development version:** `1.16.0-Alpha-1`
 
@@ -410,7 +410,7 @@ No `.db` suffix is appended and no format is inferred from the path.
 
 ### 9.2 Existing policy composition
 
-- `-f` controls whether an existing hashed destination may be replaced.
+- `--force` controls whether an existing hashed destination may be replaced.
 - `-s` reports the selected `hashed` format, exact destination, canonical entry
   count, alias key count, and warning count.
 - `-c` performs validation only and writes no temporary or destination file.
@@ -646,14 +646,14 @@ successful publication exposes only a completely verified database.
 
 ### HW06 / Alpha-6 — Explicit `tic` hashed publication
 
-**Status:** PLANNED
+**Status:** IMPLEMENTED — CROSS-PLATFORM QUALIFICATION PENDING
 
 - add the BerkeleyDb project/package dependency to `tic`, not Compiler;
 - implement `--database-format directory|hashed`;
 - require explicit `-o` for hashed output;
 - compose existing source resolution and compiled-byte writing with the hashed
   publisher;
-- preserve `-c`, `-f`, `-s`, diagnostics, cancellation, and default directory
+- preserve `-c`, `--force`, `-s`, diagnostics, cancellation, and default directory
   behavior; and
 - prove direct, routed, package-installed, and archive command parity.
 

@@ -22,6 +22,7 @@
 using System.Globalization;
 using System.Text;
 using Icod.CommandFramework.Diagnostics;
+using Icod.TermInfo.BerkeleyDb;
 using Icod.TermInfo.Compiler;
 using Icod.TermInfo.Inspection;
 
@@ -75,6 +76,12 @@ internal static class TicPublisher {
 
 		cancellationToken.ThrowIfCancellationRequested();
 
+		if ( options.HashedOutput ) {
+			return await PublishHashedAsync(
+				options, validation, root, stderr, cancellationToken
+			).ConfigureAwait( false );
+		}
+
 		try {
 			CompiledTermInfoDatabaseWriter.Write(
 				root,
@@ -126,6 +133,63 @@ internal static class TicPublisher {
 			).ConfigureAwait( false );
 		}
 
+		return CommandExitCodes.Success;
+	}
+
+	private static async Task<int> PublishHashedAsync(
+		TicOptions options,
+		TicSourceValidationResult validation,
+		string databasePath,
+		Stream stderr,
+		CancellationToken cancellationToken
+	) {
+		try {
+			List<BerkeleyDbTerminalDatabaseEntry> entries = [];
+			foreach ( TerminalDescription description in validation.Descriptions ) {
+				cancellationToken.ThrowIfCancellationRequested();
+				entries.Add(
+					new BerkeleyDbTerminalDatabaseEntry(
+						description.Name,
+						description.Aliases,
+						CompiledTermInfoWriter.Write( description )
+					)
+				);
+			}
+			BerkeleyDbTerminalDatabaseWriter.Write(
+				databasePath,
+				entries,
+				new BerkeleyDbTerminalDatabaseWriterOptions( overwriteExisting: options.Force ),
+				cancellationToken
+			);
+		} catch ( Exception exception ) when (
+			exception is IOException or UnauthorizedAccessException or ArgumentException
+				or InvalidOperationException or NotSupportedException or InvalidDataException
+				or BerkeleyDbDatabaseFormatException or CompiledTermInfoFormatException
+		) {
+			// Do not expose payloads or generated staging paths in command diagnostics.
+			string message = exception switch {
+				UnauthorizedAccessException => "access to the hashed destination was denied",
+				IOException => "the hashed destination could not be written; check its parent directory and overwrite policy ('--force')",
+				NotSupportedException => "the filesystem does not support safe hashed publication",
+				InvalidDataException or BerkeleyDbDatabaseFormatException or CompiledTermInfoFormatException => "hashed database verification failed",
+				_ => "the source entries cannot be published as a hashed database",
+			};
+			return await WritePublicationFailureAsync(
+				stderr, message, cancellationToken
+			).ConfigureAwait( false );
+		}
+
+		if ( options.Summary ) {
+			// The writer has committed. A later cancellation must not report a rollback.
+			await WriteSummaryAsync(
+				stderr,
+				databasePath,
+				validation.Descriptions.Count,
+				TicDiagnosticWriter.CountWarnings( validation.Diagnostics ),
+				CancellationToken.None,
+				validation.Descriptions.Sum( description => description.Aliases.Count )
+			).ConfigureAwait( false );
+		}
 		return CommandExitCodes.Success;
 	}
 
@@ -252,7 +316,8 @@ internal static class TicPublisher {
 		string root,
 		int entryCount,
 		int warningCount,
-		CancellationToken cancellationToken
+		CancellationToken cancellationToken,
+		int? aliasCount = null
 	) {
 		ArgumentNullException.ThrowIfNull( stderr );
 		ArgumentException.ThrowIfNullOrWhiteSpace( root );
@@ -274,6 +339,11 @@ internal static class TicPublisher {
 				bufferSize: 1024,
 				leaveOpen: true
 			);
+		if ( aliasCount is not null ) {
+			await writer.WriteAsync(
+				$"tic: format: hashed{Environment.NewLine}".AsMemory(), cancellationToken
+			).ConfigureAwait( false );
+		}
 		await writer.WriteAsync(
 			$"tic: output: {root}{Environment.NewLine}".AsMemory(),
 			cancellationToken
@@ -282,6 +352,11 @@ internal static class TicPublisher {
 			$"tic: compiled entries: {entryCount.ToString( CultureInfo.InvariantCulture )}{Environment.NewLine}".AsMemory(),
 			cancellationToken
 		).ConfigureAwait( false );
+		if ( aliasCount is int count ) {
+			await writer.WriteAsync(
+				$"tic: alias keys: {count.ToString( CultureInfo.InvariantCulture )}{Environment.NewLine}".AsMemory(), cancellationToken
+			).ConfigureAwait( false );
+		}
 		await writer.WriteAsync(
 			$"tic: warnings: {warningCount.ToString( CultureInfo.InvariantCulture )}{Environment.NewLine}".AsMemory(),
 			cancellationToken

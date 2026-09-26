@@ -26,7 +26,7 @@ $patterns = @(
     '^docs/1\.15\.0-BERKELEY-DB-PUBLIC-API-FREEZE\.md$',
     '^docs/1\.15\.0-RELEASE-AUDIT\.md$',
     '^samples/Icod\.TermInfo\.BerkeleyDb\.Sample/',
-    '^(infocmp|toe|icod-terminfo)/(src/|[^/]+\.csproj$)',
+    '^(tic|infocmp|toe|icod-terminfo)/(src/|[^/]+\.csproj$)',
     '^\.github/scripts/(new-hdb06-test-store|smoke-tool-package|smoke-tool-archive)\.ps1$',
     '^Directory\.Build\.(props|targets)$',
     '^Icod\.TermInfo/(src/|Icod\.TermInfo\.csproj$)'

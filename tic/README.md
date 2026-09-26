@@ -2,6 +2,37 @@
 
 `tic` is part of the `Icod.TermInfo` managed terminfo tool suite.
 
+## 1.16 development status
+
+`1.16.0-Alpha-6` adds explicit Hash-v9 publication through the managed BerkeleyDb
+writer. Directory output remains the default. Both standalone `tic` and routed
+`icod-terminfo tic` support:
+
+```sh
+tic --database-format hashed -o ./terminfo.db source.ti
+icod-terminfo tic --database-format hashed -e demo-alias -s -o ./selected.db source.ti
+tic --database-format hashed --force -o ./terminfo.db replacement.ti
+```
+
+Hashed output requires an explicit `-o` naming the exact destination file; no
+suffix is appended and no format is inferred from its name. The parent directory
+must already exist. Ambient `TERMINFO`, home, and system locations are never
+hashed write destinations. `--force` replaces the whole database with the selected
+entries; it does not merge an existing catalog. Alias selection and `use=`
+inheritance use the same source-resolution path as directory publication.
+
+The writer stages, flushes, and verifies a complete database before one
+same-directory move. A persistent sibling `.name.icod-terminfo.lock` coordinates
+Icod writers. Cancellation before commit preserves the old destination; after
+commit, the command reports success even if cancellation arrives during its
+summary. Filesystem atomicity and open-reader replacement restrictions still
+apply; native writers are not coordinated. `-s` reports format, exact normalized
+path, canonical-entry count, alias-key count, and warnings on standard error.
+
+`--database-format directory` explicitly selects the existing directory path.
+Neither format selection nor publication options may be combined with `-c`.
+Use `tic -c source.ti` for validation without filesystem publication artifacts.
+
 ## 1.15 release status
 
 Version `1.15.0` carries the frozen `tic` compiler, source-language,
@@ -54,7 +85,7 @@ tic -c -e name,alias file
 tic -c -x file
 ```
 
-Without `-c`, successful validation is followed by publication through
+Without `-c`, the default directory mode follows successful validation with publication through
 `CompiledTermInfoDatabaseWriter`:
 
 ```text
@@ -64,7 +95,7 @@ tic --force -o ./terminfo file
 tic -s -o ./terminfo file
 ```
 
-`-o` chooses an explicit conventional database root. When `-o` is absent, the
+In directory mode, `-o` chooses an explicit conventional database root. When `-o` is absent, the
 command selects only these safe writable candidates, in this order:
 
 ```text
@@ -127,7 +158,8 @@ tic --help
 -c              validate only; never publish
 -e name,...     select canonical names or aliases
 -x              permit unknown extended capability names
--o directory    publish to an explicit conventional database root
+-o path         directory root, or exact file for hashed output
+--database-format directory|hashed   output format; directory is the default
 -s              write the successful publication summary to stderr
 --force         replace existing compiled destinations safely
 -D              report Runtime database discovery locations
@@ -146,7 +178,7 @@ before a source filename beginning with `-`.
 
 ## Environment
 
-When publishing without `-o`, `tic` considers a directory-valued `TERMINFO`,
+When publishing directory output without `-o`, `tic` considers a directory-valued `TERMINFO`,
 then the Runtime-defined user database. Encoded `TERMINFO`, `TERMINFO_DIRS`, and
 platform system roots are not implicit write destinations. `-D` reports the
 Runtime discovery model without mutating environment variables.

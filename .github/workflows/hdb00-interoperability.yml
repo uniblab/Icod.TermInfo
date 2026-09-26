@@ -12,6 +12,8 @@ on:
       - 'tests/Icod.TermInfo.BerkeleyDb.Interop.Tests/**'
       - 'samples/Icod.TermInfo.BerkeleyDb.Sample/**'
       - 'infocmp/**'
+      - 'tic/**'
+      - 'tests/Icod.TermInfo.Tic.Tests/**'
       - 'toe/**'
       - 'icod-terminfo/**'
       - 'tests/Icod.TermInfo.InfoCmp.Tests/**'
@@ -170,6 +172,11 @@ jobs:
           ./tools/hdb00/verify-hdb06-commands.ps1 -FixtureRoot "${{ runner.temp }}/icod-terminfo-hdb00" -LaunchMode Direct
           ./tools/hdb00/verify-hdb06-commands.ps1 -FixtureRoot "${{ runner.temp }}/icod-terminfo-hdb00" -LaunchMode Routed
 
+      - name: Verify HW06 tic publication with native consumers
+        if: steps.hdb00-scope.outputs.required == 'true'
+        shell: bash
+        run: bash tools/hdb00/verify-hw06-tic.sh "$RUNNER_TEMP/icod-terminfo-hdb00" db5.3_verify
+
       - name: Upload Linux Hash v9 fixtures
         if: steps.hdb00-scope.outputs.required == 'true'
         uses: actions/upload-artifact@v4
@@ -207,6 +214,7 @@ jobs:
             ${{ runner.temp }}/icod-terminfo-hdb00/hw03-collision-first.value
             ${{ runner.temp }}/icod-terminfo-hdb00/hw03-collision-second.key
             ${{ runner.temp }}/icod-terminfo-hdb00/hw03-collision-second.value
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw06-tic/**
             ${{ runner.temp }}/icod-terminfo-hdb00/not-hash.db
             ${{ runner.temp }}/icod-terminfo-hdb00/random.db
 
@@ -333,6 +341,14 @@ jobs:
           ./tools/hdb00/verify-hdb06-commands.ps1 -FixtureRoot "${{ runner.temp }}/icod-terminfo-hdb00-macos" -LaunchMode Direct
           ./tools/hdb00/verify-hdb06-commands.ps1 -FixtureRoot "${{ runner.temp }}/icod-terminfo-hdb00-macos" -LaunchMode Routed
 
+      - name: Verify HW06 tic publication with native consumers
+        if: steps.hdb00-scope.outputs.required == 'true'
+        shell: bash
+        run: |
+          db_prefix="$(brew --prefix berkeley-db@5)"
+          export DYLD_LIBRARY_PATH="$db_prefix/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}"
+          bash tools/hdb00/verify-hw06-tic.sh "$RUNNER_TEMP/icod-terminfo-hdb00-macos" "$db_prefix/bin/db_verify"
+
       - name: Upload macOS native oracle fixtures
         if: always() && steps.hdb00-scope.outputs.required == 'true'
         uses: actions/upload-artifact@v4
@@ -367,6 +383,7 @@ jobs:
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-collision-first.value
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-collision-second.key
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-collision-second.value
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw06-tic/**
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/not-hash.db
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/random.db
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/hdb00-primary.bin
