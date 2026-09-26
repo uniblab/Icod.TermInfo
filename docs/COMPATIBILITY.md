@@ -2,7 +2,7 @@
 
 ## 1.16 additive writer freeze
 
-The 1.16 candidate adds exactly three BerkeleyDb writer types to the unchanged
+Version 1.16 adds exactly three BerkeleyDb writer types to the unchanged
 nine-type 1.15 reader. A package-verifier reconstruction gate and current
 assembly manifest comparisons enforce both surfaces on all three frameworks.
 Runtime, Source, Compiler, Termcap, Inspection, and JSON APIs remain unchanged.

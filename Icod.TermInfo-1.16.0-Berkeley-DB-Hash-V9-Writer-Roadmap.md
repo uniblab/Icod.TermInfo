@@ -6,7 +6,7 @@
 **Command integration:** `tic` and `Icod.TermInfo.Tools`
 **Language:** C# 13
 **Reusable target frameworks:** `net8.0`; `net9.0`; `net10.0`
-**Status:** ACTIVE — HW08 IMPLEMENTED / ALPHA-8 QUALIFICATION PENDING
+**Status:** ACTIVE — ALPHA-8 ACCEPTED / STABLE CANDIDATE QUALIFICATION PENDING
 **Stable predecessor:** `1.15.0`
 **Initial development version:** `1.16.0-Alpha-1`
 
@@ -694,7 +694,15 @@ same exact head.
 
 ### HW08 / Alpha-8 — Package, documentation, freeze, and stable promotion
 
-**Status:** IMPLEMENTED — Alpha-8 qualification pending; stable promotion follows acceptance
+**Status:** ALPHA-8 ACCEPTED — stable identity promoted; exact stable qualification pending
+
+Accepted Alpha-8 head: `b458b0d18c0a8b1e2c6c37a0698cc9ea4fd6341e`.
+Normal workflow `36279869607` passed all 12 jobs; native workflow `36279869638`
+passed all 3 jobs. BerkeleyDb passed 606 cases and interoperability passed 83
+cases per framework on all three hosts. Release packages, installed consumers,
+and all six Release archives passed. The `1.16.0` identity update preserves
+the accepted production feature/API source; its exact-head evidence is the
+remaining qualification gate.
 
 The sample now uses the public writer and proves input-order determinism.
 The isolated package consumer tests publication, UTF-8 aliases, refusal,

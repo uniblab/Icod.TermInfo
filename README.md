@@ -9,39 +9,32 @@
 
 ## Status
 
-Current release line: `Icod.TermInfo 1.15.0`.
+Current release line: `Icod.TermInfo 1.16.0`.
 
-Version `1.15.0` adds the optional `Icod.TermInfo.BerkeleyDb` package for
-pure-managed, read-only Berkeley DB Hash-v9 acquisition while preserving the
-frozen Runtime, Source, Compiler, Termcap, Inspection, JSON, package, and
-archive contracts.
+Version 1.16 adds deterministic, pure-managed Berkeley DB Hash-v9 publication
+to `Icod.TermInfo.BerkeleyDb`, alongside exact lookup, logical catalogs, and
+opt-in hashed-aware discovery. The public surface is the unchanged nine-type
+1.15 reader plus three writer types, with a Runtime-only dependency and
+equivalent APIs on .NET 8, 9, and 10.
 
-The complete BerkeleyDb public surface is frozen at nine exported types, with
-Runtime-only dependency direction and equivalent API on net8.0, net9.0, and
-net10.0. Exact package verification, isolated consumers, installed-tool smoke,
-and all six matching-host archive smokes pass on Windows, Linux, and macOS.
-Explicit `infocmp -A/-B` file paths and explicit human `toe` file operands
-use the hashed provider/catalog; Runtime discovery, frozen JSON schemas, and
-`tic` directory publication remain unchanged. Native Berkeley DB 5.3 CI runs
-independently on Linux and macOS, while Windows verifies transported Linux
-fixtures without Berkeley DB installed. These observations are not an atomic
-snapshot, and the encoding policy is not general encoding detection or
-normalization. Stable promotion changed release identity and release-facing text
-only; the accepted `1.15.0-Alpha-8` artifact remains the feature/API source.
+Publish compiled entries with `BerkeleyDbTerminalDatabaseWriter.Write`, or
+compile source directly with:
 
-The `1.16.0` development branch adds managed Hash-v9 writing. Its
-`1.16.0-Alpha-8` candidate includes deterministic writer samples, an isolated
-package consumer, and the additive twelve-type API freeze. The tool suite
-supports explicit publication with
-`icod-terminfo tic --database-format hashed -o ./terminfo.db source.ti`.
-Directory publication remains the default; hashed output requires an exact
-destination file and an existing parent directory. See the
-[tic documentation](tic/README.md#116-development-status) and
-[1.16 roadmap](Icod.TermInfo-1.16.0-Berkeley-DB-Hash-V9-Writer-Roadmap.md).
-Migration and catalog automation remain deferred to 1.17.
-See the [writing guide](docs/1.16.0-BERKELEY-DB-WRITING-GUIDE.md) for the public
-API, resource limits, errors, and filesystem contract, and the
-[1.16 release audit](docs/1.16.0-RELEASE-AUDIT.md) for candidate qualification.
+```sh
+icod-terminfo tic --database-format hashed -o ./terminfo.db source.ti
+```
+
+Directory publication remains the default. Hashed output requires an exact
+destination file and an existing parent directory; `--force` permits whole-file
+replacement. Publication uses a persistent cooperative lock and verifies staged
+bytes before commit. See the [writing guide](docs/1.16.0-BERKELEY-DB-WRITING-GUIDE.md)
+for limits, cancellation, errors, and filesystem guarantees.
+
+Runtime discovery, sibling public APIs, and JSON contracts remain unchanged.
+Native Berkeley DB and ncurses are qualification tools, never production
+dependencies. Migration and catalog automation remain deferred to 1.17.
+The [release audit](docs/1.16.0-RELEASE-AUDIT.md) records exact qualification
+and publication status.
 
 ## Support the Project
 
@@ -80,19 +73,19 @@ Icod.TermInfo                    runtime / capability authority
 ├── Icod.TermInfo.Termcap        termcap interoperability
 ├── Icod.TermInfo.Compiler       compilation / conventional database writing
 ├── Icod.TermInfo.Inspection     inspection / comparison / planning
-└── Icod.TermInfo.BerkeleyDb     optional read-only hashed acquisition
+└── Icod.TermInfo.BerkeleyDb     optional hashed acquisition and publication
 
 Icod.TermInfo.Tools              command distribution / routing
 ```
 
-Dependency boundaries are explicit: Runtime has no production package dependencies; Source, Termcap, and BerkeleyDb each depend on Runtime; Compiler and Inspection each depend on Runtime and Source. Inspection does not depend on BerkeleyDb, Compiler, Termcap, `Icod.Terminal`, or `Icod.DCurses`. The `infocmp` and `toe` executables reference BerkeleyDb directly for HDB06 path-shape dispatch.
+Dependency boundaries are explicit: Runtime has no production package dependencies; Source, Termcap, and BerkeleyDb each depend on Runtime; Compiler and Inspection each depend on Runtime and Source. Inspection does not depend on BerkeleyDb, Compiler, Termcap, `Icod.Terminal`, or `Icod.DCurses`. The `infocmp` and `toe` executables reference BerkeleyDb for explicit hashed acquisition; `tic` composes Compiler and BerkeleyDb for explicit hashed publication.
 
 ## Quick Start
 
 Install the runtime package:
 
 ```text
-dotnet add package Icod.TermInfo --version 1.15.0
+dotnet add package Icod.TermInfo --version 1.16.0
 ```
 
 Resolve the current terminal through conventional system discovery with immutable built-in fallback:
@@ -125,7 +118,7 @@ Applications that only need compiled terminfo acquisition, immutable `TerminalDe
 For explicit ncurses-compatible hashed acquisition:
 
 ```text
-dotnet add package Icod.TermInfo.BerkeleyDb --version 1.15.0
+dotnet add package Icod.TermInfo.BerkeleyDb --version 1.16.0
 ```
 
 ```csharp
@@ -161,7 +154,7 @@ The root README describes the current product by capability rather than by the r
 - **Terminfo source language** — `Icod.TermInfo.Source` provides `.ti` lexing, parsing, diagnostics, capability classification, cancellation semantics, `use=` inheritance resolution, and materialization into ordinary `TerminalDescription` values.
 - **Compilation and publication** — `Icod.TermInfo.Compiler` writes deterministic legacy and wide compiled entries, validates representability, compiles resolved descriptions or `.ti` source, and publishes explicit conventional terminfo directory layouts.
 - **Termcap interoperability** — `Icod.TermInfo.Termcap` provides bounded termcap parsing, capability classification, `tc=` resolution, semantic conversion, reverse representability/rendering, and explicit historical `TERMCAP` / `TERMPATH` acquisition.
-- **Hashed terminfo acquisition** — `Icod.TermInfo.BerkeleyDb` provides pure-managed, read-only exact lookup, opt-in hashed-aware system discovery, and deterministic logical catalog enumeration for the reviewed ncurses-compatible Berkeley DB Hash-v9 subset.
+- **Hashed terminfo acquisition and publication** — `Icod.TermInfo.BerkeleyDb` provides pure-managed exact lookup, opt-in hashed-aware discovery, logical catalog enumeration, and deterministic whole-file Hash-v9 writing.
 - **Inspection, comparison, and planning** — `Icod.TermInfo.Inspection` provides canonical effective-source rendering, semantic comparison, database catalogs and ordered database-set analysis, relative-source synthesis and parent planning, machine-readable JSON automation, persistent-raster lifecycle/placement/runtime-evidence planning, and raster-backend availability and selection.
 - **Managed command toolchain** — `tic`, `infocmp`, `toe`, `captoinfo`, and `infotocap` expose the reusable engines as traditional command-line workflows; `Icod.TermInfo.Tools` provides the non-colliding `icod-terminfo` router.
 
@@ -174,22 +167,22 @@ The root README describes the current product by capability rather than by the r
 | `Icod.TermInfo.Termcap` | Termcap parsing, conversion, rendering, and explicit acquisition |
 | `Icod.TermInfo.Compiler` | Deterministic compiled terminfo writing and database publication |
 | `Icod.TermInfo.Inspection` | Rendering, comparison, database analysis, planning, and JSON automation |
-| `Icod.TermInfo.BerkeleyDb` | Optional pure-managed, read-only Berkeley DB Hash-v9 acquisition and logical catalog enumeration |
+| `Icod.TermInfo.BerkeleyDb` | Optional pure-managed Hash-v9 acquisition, catalog enumeration, and deterministic publication |
 | `Icod.TermInfo.Tools` | Installable `icod-terminfo` multi-command router |
 
 Install an optional package only when its capability is needed:
 
 ```text
-dotnet add package Icod.TermInfo.Source --version 1.15.0
-dotnet add package Icod.TermInfo.Termcap --version 1.15.0
-dotnet add package Icod.TermInfo.Compiler --version 1.15.0
-dotnet add package Icod.TermInfo.Inspection --version 1.15.0
+dotnet add package Icod.TermInfo.Source --version 1.16.0
+dotnet add package Icod.TermInfo.Termcap --version 1.16.0
+dotnet add package Icod.TermInfo.Compiler --version 1.16.0
+dotnet add package Icod.TermInfo.Inspection --version 1.16.0
 ```
 
 Install the command router with:
 
 ```text
-dotnet tool install --global Icod.TermInfo.Tools --version 1.15.0
+dotnet tool install --global Icod.TermInfo.Tools --version 1.16.0
 
 icod-terminfo tic -V
 icod-terminfo infocmp -V
@@ -227,7 +220,7 @@ The managed packages contain no native ncurses or system terminfo payload. Runti
 
 ## Samples and Documentation
 
-The [`samples`](samples/README.md) directory contains focused examples for runtime and controlled hashed acquisition, reusable Termcap parsing/conversion/acquisition, the source/compiler toolchain, database-set analysis, persistent-raster lifecycle and placement planning, runtime-evidence integration, raster-backend selection, and command-tool workflows.
+The [`samples`](samples/README.md) directory contains focused examples for runtime and controlled hashed publication/acquisition, reusable Termcap parsing/conversion/acquisition, the source/compiler toolchain, database-set analysis, persistent-raster lifecycle and placement planning, runtime-evidence integration, raster-backend selection, and command-tool workflows.
 
 Recommended documentation entry points:
 
@@ -236,7 +229,8 @@ Recommended documentation entry points:
 - [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md) — public and binary compatibility commitments;
 - [`docs/1.15.0-BERKELEY-DB-HASHED-ACQUISITION-GUIDE.md`](docs/1.15.0-BERKELEY-DB-HASHED-ACQUISITION-GUIDE.md) — explicit provider, catalog, discovery, command, and error contracts;
 - [`docs/1.15.0-BERKELEY-DB-HASH-V9-COMPATIBILITY.md`](docs/1.15.0-BERKELEY-DB-HASH-V9-COMPATIBILITY.md) — exact supported Berkeley DB/ncurses subset;
-- [`docs/1.15.0-RELEASE-AUDIT.md`](docs/1.15.0-RELEASE-AUDIT.md) — exact 1.15 qualification and release evidence;
+- [`docs/1.16.0-BERKELEY-DB-WRITING-GUIDE.md`](docs/1.16.0-BERKELEY-DB-WRITING-GUIDE.md) — public writer and command contracts;
+- [`docs/1.16.0-RELEASE-AUDIT.md`](docs/1.16.0-RELEASE-AUDIT.md) — exact 1.16 qualification and release evidence;
 - [`Icod.TermInfo-1.16.0-Berkeley-DB-Hash-V9-Writer-Roadmap.md`](Icod.TermInfo-1.16.0-Berkeley-DB-Hash-V9-Writer-Roadmap.md) — active focused writer-only plan, with migration and catalog automation reserved for 1.17;
 - [`docs/1.14.0-RASTER-BACKEND-SELECTION-GUIDE.md`](docs/1.14.0-RASTER-BACKEND-SELECTION-GUIDE.md) — current raster-backend evidence and selection model;
 - [`docs/1.14.0-RELEASE-AUDIT.md`](docs/1.14.0-RELEASE-AUDIT.md) — exact 1.14 qualification and release evidence;

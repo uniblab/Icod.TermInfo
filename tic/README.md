@@ -2,9 +2,9 @@
 
 `tic` is part of the `Icod.TermInfo` managed terminfo tool suite.
 
-## 1.16 development status
+## 1.16 hashed publication
 
-`1.16.0-Alpha-6` adds explicit Hash-v9 publication through the managed BerkeleyDb
+Version `1.16.0` adds explicit Hash-v9 publication through the managed BerkeleyDb
 writer. Directory output remains the default. Both standalone `tic` and routed
 `icod-terminfo tic` support:
 
@@ -33,14 +33,14 @@ path, canonical-entry count, alias-key count, and warnings on standard error.
 Neither format selection nor publication options may be combined with `-c`.
 Use `tic -c source.ti` for validation without filesystem publication artifacts.
 
-## 1.15 release status
+## Compatibility with 1.15
 
 Version `1.15.0` carries the frozen `tic` compiler, source-language,
 conventional database, and command contracts forward unchanged. Read-only hashed
 acquisition is isolated in the optional BerkeleyDb package; `tic` acquires no
 hashed writing, new option, dependency, target-framework change, or archive
 topology. Both standalone `tic` and routed `icod-terminfo tic` retain their
-existing command behavior while reporting the coordinated `1.15.0` suite version.
+existing command behavior while reporting the coordinated suite version.
 
 ## 1.9 status
 

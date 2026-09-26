@@ -11,14 +11,14 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`  
 **Frozen runtime contract:** `1.0.0`  
-**Current coordinated version:** `1.16.0-Alpha-8`
+**Current coordinated version:** `1.16.0`
 **Latest completed line:** `1.15.0` - Berkeley DB / Hashed Terminfo Acquisition
-**Latest completed prerelease:** `1.16.0-Alpha-7`
-**Status:** stable `1.15.0` is published; HW07 is accepted; HW08 is implemented and Alpha-8 qualification is in progress
+**Latest completed prerelease:** `1.16.0-Alpha-8`
+**Status:** stable `1.15.0` is published; Alpha-8 is accepted; the `1.16.0` stable candidate is undergoing exact-head qualification
 **Active release roadmap:** `Icod.TermInfo-1.16.0-Berkeley-DB-Hash-V9-Writer-Roadmap.md`
-**Release audit:** `docs/1.15.0-RELEASE-AUDIT.md`
+**Release audit:** `docs/1.16.0-RELEASE-AUDIT.md`
 **Latest completed release audit:** `docs/1.15.0-RELEASE-AUDIT.md`
-**Next implementation gate:** HW08 exact-head Alpha-8 qualification, then stable identity promotion
+**Next implementation gate:** HW08 exact-head stable candidate qualification and release-readiness record
 
 ---
 
@@ -126,8 +126,9 @@ directory/hashed migration, unified catalog automation, cross-container planning
 and JSON v7. Migration and catalog automation are explicitly assigned to 1.17.
 
 HW00 through HW07 are complete and accepted, including explicit `tic` hashed
-publication and pathological/native hardening. HW08 continues with samples,
-package consumers, documentation, API freeze, and stable release qualification.
+publication and pathological/native hardening. HW08 samples, package consumers,
+documentation, and API freeze passed Alpha-8 qualification; exact stable release
+qualification is the remaining gate.
 
 ### 2.2 Completed 1.15 line
 
@@ -500,4 +501,9 @@ and exact UTF-8 keys passed native consumers. BerkeleyDb tests passed 599/599
 and interoperability tests 83/83 per framework on Windows, Linux, and macOS.
 Release warnings-as-errors builds, package checks, and all six archives passed.
 See `docs/1.16.0-HW07-WRITER-HARDENING.md` for the resource/security audit and
-qualification record. HW08 is next; migration/catalog automation remain 1.17.
+qualification record. HW08 Alpha-8 is accepted at
+`b458b0d18c0a8b1e2c6c37a0698cc9ea4fd6341e`: normal workflow `36279869607`
+passed 12/12 jobs and native workflow `36279869638` passed 3/3 jobs.
+The stable identity promotion preserves that feature/API source and now requires
+the same gates at the exact `1.16.0` candidate head. See
+`docs/1.16.0-RELEASE-AUDIT.md`; migration/catalog automation remain 1.17.

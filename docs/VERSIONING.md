@@ -5,9 +5,9 @@ package contracts. Version-specific roadmaps, API freezes, schema fingerprints,
 and release audits remain the authoritative historical evidence for completed
 releases; this document defines the current cross-release policy.
 
-## 1.16 candidate line
+## 1.16 release line
 
-The current development candidate is `1.16.0-Alpha-8`, coordinated through
+The stable candidate identity is `1.16.0`, promoted from accepted `1.16.0-Alpha-8` and coordinated through
 `Directory.Build.props` for all seven packages. The published stable line
 remains 1.15 until release publication. HW08 freezes the twelve-type BerkeleyDb
 API and proves that subtracting the three writer types reproduces the complete
@@ -24,7 +24,7 @@ automation remain 1.17. See [the release audit](1.16.0-RELEASE-AUDIT.md).
 The HDB01-HDB09 development sequence used `1.15.0-Alpha-1` through the
 accepted `1.15.0-Alpha-8` feature/API source.
 
-Stable `1.15.0` is the current coordinated release. Version 1.15 adds one
+Stable `1.15.0` is the previous coordinated release. Version 1.15 adds one
 optional package, `Icod.TermInfo.BerkeleyDb`, for pure-managed, read-only
 acquisition from the reviewed ncurses-compatible Berkeley DB Hash-v9 subset.
 

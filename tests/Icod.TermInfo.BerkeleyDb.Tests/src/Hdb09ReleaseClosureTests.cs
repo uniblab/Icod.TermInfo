@@ -294,7 +294,7 @@ public sealed class Hdb09ReleaseClosureTests {
 		AssertContainsAll(
 			"README.md",
 			"Icod.TermInfo.BerkeleyDb",
-			"1.15.0-Alpha-8",
+			"1.16.0",
 			"Feature Inventory",
 			"BERKELEY-DB-HASHED-ACQUISITION-GUIDE"
 		);
@@ -329,8 +329,8 @@ public sealed class Hdb09ReleaseClosureTests {
 	public void StableHistoryAndCurrentPackageNotesRemainCoordinated() {
 		AssertContainsAll(
 			"README.md",
-			"Current release line: `Icod.TermInfo 1.15.0`.",
-			"Icod.TermInfo.BerkeleyDb --version 1.15.0"
+			"Current release line: `Icod.TermInfo 1.16.0`.",
+			"Icod.TermInfo.BerkeleyDb --version 1.16.0"
 		);
 		Assert.DoesNotContain(
 			"HDB09 Alpha-8 closure qualification is in progress",
@@ -339,8 +339,8 @@ public sealed class Hdb09ReleaseClosureTests {
 		);
 		AssertContainsAll(
 			"Icod.TermInfo.BerkeleyDb/README.md",
-			"`1.15.0` is the stable coordinated release",
-			"stable promotion changed no acquisition behavior or public API"
+			"12 exported public types",
+			"1.15 reader API"
 		);
 
 		foreach ( string projectPath in new[] {
@@ -368,7 +368,7 @@ public sealed class Hdb09ReleaseClosureTests {
 
 		AssertContainsAll(
 			"docs/VERSIONING.md",
-			"Stable `1.15.0` is the current coordinated release",
+			"Stable `1.15.0` is the previous coordinated release",
 			"promotion changed release identity and release-facing text only",
 			"six reusable libraries",
 			"Icod.TermInfo.BerkeleyDb",
