@@ -41,7 +41,11 @@ for mode in direct routed; do
     for name in hw06-child hw06-alias; do
         "$fixture_root/hdb00-probe" "$candidate" "$name" "$work_root/$mode-$name.bin"
         cmp "$entry" "$work_root/$mode-$name.bin"
-        "$fixture_root/ncurses-hashed/progs/infocmp" -A "$candidate" "$name" > "$work_root/$mode-$name.native.txt"
+        # Pinned native infocmp's -A bypasses hashed lookup and reads a directory.
+        # TERMINFO selects the native database path, including Hash-v9 files.
+        TERMINFO="$candidate" TERMINFO_DIRS="$candidate" \
+            "$fixture_root/ncurses-hashed/progs/infocmp" "$name" > "$work_root/$mode-$name.native.txt"
+        grep -F "$candidate" "$work_root/$mode-$name.native.txt"
         grep -F 'cols#80' "$work_root/$mode-$name.native.txt"
         grep -F 'lines#24' "$work_root/$mode-$name.native.txt"
         dotnet "$router" infocmp -A "$candidate" "$name" > "$work_root/$mode-$name.managed.txt"
