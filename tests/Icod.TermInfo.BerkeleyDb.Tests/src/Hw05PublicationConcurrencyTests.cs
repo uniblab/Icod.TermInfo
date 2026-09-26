@@ -122,7 +122,21 @@ public sealed class Hw05PublicationConcurrencyTests( Xunit.Abstractions.ITestOut
 		try {
 			Assert.True( started.Wait( TimeSpan.FromSeconds( 10 ) ) );
 			for ( int index = 0; index < 12; index++ ) {
-				Write( scope.Destination, ( index % 2 == 0 ) ? "new" : "old", true, new SystemBerkeleyDbDatabasePublicationFileSystem(), default );
+				byte[] prior = File.ReadAllBytes( scope.Destination );
+				var fs = new ObservedMoveFileSystem();
+				try {
+					Write( scope.Destination, ( index % 2 == 0 ) ? "new" : "old", true, fs, default );
+				}
+				catch ( UnauthorizedAccessException exception ) when (
+					OperatingSystem.IsWindows() && ReferenceEquals( exception, fs.MoveFailure )
+				) {
+					// MoveFileEx may refuse an open destination even with delete sharing.
+					// Qualify safe refusal, without adding a production retry or fallback.
+					Assert.Equal( prior, File.ReadAllBytes( scope.Destination ) );
+					Assert.Empty( Directory.GetFiles( scope.DirectoryPath, "*.tmp" ) );
+					using var reacquired = scope.Acquire();
+					output.WriteLine( "Windows refused replacement while the observer held the destination; prior bytes and cleanup verified." );
+				}
 			}
 		}
 		finally {
@@ -130,6 +144,9 @@ public sealed class Hw05PublicationConcurrencyTests( Xunit.Abstractions.ITestOut
 			await reader.WaitAsync( TimeSpan.FromSeconds( 10 ) );
 		}
 		Assert.True( observations > 0 );
+		// A refused concurrent attempt must not poison subsequent publication.
+		Write( scope.Destination, "new", true, new SystemBerkeleyDbDatabasePublicationFileSystem(), default );
+		Assert.Equal( newImage, File.ReadAllBytes( scope.Destination ) );
 	}
 
 	[Fact]
@@ -196,6 +213,18 @@ public sealed class Hw05PublicationConcurrencyTests( Xunit.Abstractions.ITestOut
 				throw new TimeoutException( "The test did not release the staged writer." );
 			}
 			return base.CreateTemporary( path );
+		}
+	}
+	private sealed class ObservedMoveFileSystem : Hw05PublicationTestSupport.FileSystem {
+		internal Exception? MoveFailure { get; private set; }
+		internal override void Move( string source, string destination, bool overwrite ) {
+			try {
+				base.Move( source, destination, overwrite );
+			}
+			catch ( UnauthorizedAccessException exception ) {
+				MoveFailure = exception;
+				throw;
+			}
 		}
 	}
 }
