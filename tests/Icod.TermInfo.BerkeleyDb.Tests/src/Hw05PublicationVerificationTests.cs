@@ -1,6 +1,6 @@
 /*
 	Icod.TermInfo.BerkeleyDb.Tests
-	Validates the HW04 public Hash-v9 publication engine.
+	Validates HW05 safe Hash-v9 filesystem publication.
 	Copyright (C) 2026  Timothy J. Bruce <uniblab@hotmail.com>
 */
 
