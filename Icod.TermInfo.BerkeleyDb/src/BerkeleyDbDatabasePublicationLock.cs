@@ -19,11 +19,58 @@
 	along with this library.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+
 namespace Icod.TermInfo.BerkeleyDb;
 
 internal static class BerkeleyDbDatabasePublicationLock {
 	internal static IDisposable Acquire(
 		string destinationPath, string lockPath, bool overwriteExisting,
 		BerkeleyDbDatabasePublicationFileSystem fileSystem, CancellationToken cancellationToken
-	) => throw new NotImplementedException();
+	) {
+		while ( true ) {
+			cancellationToken.ThrowIfCancellationRequested();
+			fileSystem.ValidatePaths( destinationPath, lockPath, overwriteExisting );
+			Stream held;
+			try {
+				held = fileSystem.OpenLock( lockPath, true );
+			}
+			catch ( IOException exception ) when ( IsContention( exception ) ) {
+				cancellationToken.WaitHandle.WaitOne( 50 );
+				continue;
+			}
+			try {
+				bool enforced = false;
+				try {
+					using Stream probe = fileSystem.OpenLock( lockPath, false );
+				}
+				catch ( IOException exception ) when ( IsContention( exception ) ) {
+					enforced = true;
+				}
+				if ( !enforced ) {
+					throw new NotSupportedException( "The filesystem does not enforce exclusive publication locks." );
+				}
+				cancellationToken.ThrowIfCancellationRequested();
+				fileSystem.ValidatePaths( destinationPath, lockPath, overwriteExisting );
+				return held;
+			}
+			catch {
+				try {
+					held.Dispose();
+				}
+				catch ( IOException ) { }
+				catch ( UnauthorizedAccessException ) { }
+				throw;
+			}
+		}
+	}
+
+	internal static bool IsContention( IOException exception ) {
+		if ( OperatingSystem.IsWindows() ) {
+			return exception.HResult is unchecked( (int)0x80070020 ) or unchecked( (int)0x80070021 );
+		}
+		return ( OperatingSystem.IsMacOS() )
+			? exception.HResult == 35
+			: OperatingSystem.IsLinux() && exception.HResult == 11
+		;
+	}
 }

@@ -19,11 +19,47 @@
 	along with this library.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+
 namespace Icod.TermInfo.BerkeleyDb;
 
 internal sealed class SystemBerkeleyDbDatabasePublicationFileSystem : BerkeleyDbDatabasePublicationFileSystem {
-	internal override void ValidatePaths( string destinationPath, string lockPath, bool overwriteExisting ) => throw new NotImplementedException();
-	internal override Stream OpenLock( string lockPath, bool createIfMissing ) => throw new NotImplementedException();
+	internal override void ValidatePaths( string destinationPath, string lockPath, bool overwriteExisting ) {
+		string parent = Path.GetDirectoryName( destinationPath )
+			?? throw new IOException( "A database destination must have a parent directory." );
+		FileAttributes parentAttributes = File.GetAttributes( parent );
+		if ( ( parentAttributes & FileAttributes.Directory ) == 0
+			|| ( parentAttributes & FileAttributes.ReparsePoint ) != 0 ) {
+			throw new IOException( "The immediate parent must be an ordinary directory." );
+		}
+		bool destinationExists = ValidateFile( destinationPath );
+		ValidateFile( lockPath );
+		if ( destinationExists && !overwriteExisting ) {
+			throw new IOException( "The database destination already exists." );
+		}
+	}
+
+	private static bool ValidateFile( string path ) {
+		FileAttributes attributes;
+		try {
+			attributes = File.GetAttributes( path );
+		}
+		catch ( FileNotFoundException ) {
+			return false;
+		}
+		if ( ( attributes & ( FileAttributes.Directory | FileAttributes.ReparsePoint ) ) != 0 ) {
+			throw new IOException( "Publication paths must not be directories or symbolic links/reparse points." );
+		}
+		return true;
+	}
+
+	internal override Stream OpenLock( string lockPath, bool createIfMissing ) {
+		FileMode mode = ( createIfMissing )
+			? FileMode.OpenOrCreate
+			: FileMode.Open
+		;
+		return new FileStream( lockPath, mode, FileAccess.ReadWrite, FileShare.None );
+	}
+
 	internal override Stream CreateTemporary( string temporaryPath ) => throw new NotImplementedException();
 	internal override void FlushToDisk( Stream stream ) => throw new NotImplementedException();
 	internal override Stream OpenRead( string temporaryPath ) => throw new NotImplementedException();
