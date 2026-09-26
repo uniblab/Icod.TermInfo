@@ -13,12 +13,12 @@
 **Frozen runtime contract:** `1.0.0`  
 **Current coordinated version:** `1.16.0-Alpha-7`
 **Latest completed line:** `1.15.0` - Berkeley DB / Hashed Terminfo Acquisition
-**Latest completed prerelease:** `1.16.0-Alpha-6`
-**Status:** stable `1.15.0` is published; HW06 is accepted; HW07 hardening is implemented and awaiting exact-head qualification
+**Latest completed prerelease:** `1.16.0-Alpha-7`
+**Status:** stable `1.15.0` is published; HW07 hardening is complete and accepted; HW08 release qualification is next
 **Active release roadmap:** `Icod.TermInfo-1.16.0-Berkeley-DB-Hash-V9-Writer-Roadmap.md`
 **Release audit:** `docs/1.15.0-RELEASE-AUDIT.md`
 **Latest completed release audit:** `docs/1.15.0-RELEASE-AUDIT.md`
-**Next implementation gate:** HW07 hardening qualification, followed by HW08 release closure
+**Next implementation gate:** HW08 package, documentation, API freeze, and stable release qualification
 
 ---
 
@@ -125,8 +125,9 @@ Version 1.16 excludes in-place database mutation, general Berkeley DB APIs,
 directory/hashed migration, unified catalog automation, cross-container planning,
 and JSON v7. Migration and catalog automation are explicitly assigned to 1.17.
 
-HW00 through HW06 are complete and accepted, including explicit `tic` hashed
-publication. HW07 and HW08 continue with hardening and stable release qualification.
+HW00 through HW07 are complete and accepted, including explicit `tic` hashed
+publication and pathological/native hardening. HW08 continues with samples,
+package consumers, documentation, API freeze, and stable release qualification.
 
 ### 2.2 Completed 1.15 line
 
@@ -488,3 +489,15 @@ existing compiler with safe hashed publication, requiring an exact `-o` file
 for hashed output. Direct/routed commands, installed packages, all six archives,
 and native Berkeley DB/ncurses consumers passed. See
 `docs/1.16.0-HW06-TIC-HASHED-PUBLICATION.md` for the qualification record.
+
+HW07 is complete and accepted at code head
+`ffe723278fa86977a92d839788a27a6a977e1977`. Normal workflow `36277723824`
+passed 12/12 jobs and native workflow `36277723830` passed 3/3 at that same
+head. The writer now enforces its physical record budget during source
+enumeration and before alias preparation. All 384 generated collision/overflow
+records survived native dump/reload; eight representative ncurses terminals
+and exact UTF-8 keys passed native consumers. BerkeleyDb tests passed 599/599
+and interoperability tests 83/83 per framework on Windows, Linux, and macOS.
+Release warnings-as-errors builds, package checks, and all six archives passed.
+See `docs/1.16.0-HW07-WRITER-HARDENING.md` for the resource/security audit and
+qualification record. HW08 is next; migration/catalog automation remain 1.17.

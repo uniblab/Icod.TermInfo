@@ -108,7 +108,11 @@ explicitly permits replacement. This is whole-file publication, not incremental
 mutation. The published 1.15 reader contract is unchanged.
 
 Before publication, the writer validates all inputs and builds the complete
-image in memory. It then acquires a persistent sibling lock, writes a uniquely
+image in memory. `MaximumRecordCount` bounds the single input enumeration:
+each entry costs two records plus one per alias, and the first over-budget
+entry fails before filesystem work. `MaximumDatabaseSize` limits the output
+image, not total process memory; parser limits apply separately to compiled
+entries. It then acquires a persistent sibling lock, writes a uniquely
 named sibling temporary file, flushes it to disk, closes it, and reopens it
 through the production reader. Complete image bytes, physical records, and the
 resolved logical catalog must match before one same-directory move commits it.

@@ -6,7 +6,7 @@
 **Command integration:** `tic` and `Icod.TermInfo.Tools`
 **Language:** C# 13
 **Reusable target frameworks:** `net8.0`; `net9.0`; `net10.0`
-**Status:** ACTIVE — HW07 IMPLEMENTED / QUALIFICATION PENDING
+**Status:** ACTIVE — HW07 COMPLETE / HW08 NEXT
 **Stable predecessor:** `1.15.0`
 **Initial development version:** `1.16.0-Alpha-1`
 
@@ -669,13 +669,17 @@ unchanged.
 
 ### HW07 / Alpha-7 — Interoperability, security, and pathological hardening
 
-**Status:** IMPLEMENTED — exact-head qualification pending
+**Status:** COMPLETE — accepted at `ffe723278fa86977a92d839788a27a6a977e1977`
 
 Record-budget checks now bound input enumeration and precede alias preparation.
 Four seeded collision/overflow matrices, eight representative native terminals,
 and exact UTF-8 identities extend the native and cross-host gates. See the
 [HW07 hardening record](docs/1.16.0-HW07-WRITER-HARDENING.md) for the audit,
 resource boundaries, and qualification evidence.
+
+Normal workflow `36277723824` passed 12/12 jobs and native workflow
+`36277723830` passed 3/3 at that same code head. BerkeleyDb tests passed
+599/599 and interop tests 83/83 per target framework on all three hosts.
 
 - expand native oracle coverage across representative ncurses entries;
 - perform generated collision/overflow differential testing;
