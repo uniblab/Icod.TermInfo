@@ -7,6 +7,8 @@ on:
     paths:
       - '.github/workflows/hdb00-interoperability.yml'
       - 'tools/hdb00/**'
+      - 'tools/berkeleydb-package-smoke/**'
+      - 'tools/berkeleydb-package-verifier/**'
       - 'Icod.TermInfo.BerkeleyDb/**'
       - 'tests/Icod.TermInfo.BerkeleyDb.Tests/**'
       - 'tests/Icod.TermInfo.BerkeleyDb.Interop.Tests/**'

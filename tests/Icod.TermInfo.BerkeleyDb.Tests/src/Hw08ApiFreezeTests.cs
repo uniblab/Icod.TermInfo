@@ -7,7 +7,8 @@ public sealed class Hw08ApiFreezeTests {
 	[Fact]
 	public void RemovingOnlyWriterTypesReconstructsTheComplete115Reader() {
 		BerkeleyDbApiFreeze.VerifyReaderReconstruction( Read( "1.16.0" ), Read( "1.15.0" ) );
-		BerkeleyDbApiFreeze.VerifyReaderReconstruction( Read( "1.16.0" ).Replace( "\n", "\r\n" ), Read( "1.15.0" ) );
+		string crlf = Read( "1.16.0" ).Replace( "\r\n", "\n" ).Replace( "\n", "\r\n" );
+		BerkeleyDbApiFreeze.VerifyReaderReconstruction( crlf, Read( "1.15.0" ) );
 	}
 
 	[Theory]
