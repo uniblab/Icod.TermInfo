@@ -6,7 +6,7 @@
 
 **Tranche:** HW05 / Alpha-5
 
-**Status:** Design approved and locked; implementation explicitly not started
+**Status:** Design approved and locked; implementation subsequently accepted in [the HW05 acceptance record](../../1.16.0-HW05-SAFE-FILESYSTEM-COMMIT.md)
 
 **Accepted baseline:** HW04 documentation head
 `4603e9e41d0f52520a942222e03e8cd71d1864e6`

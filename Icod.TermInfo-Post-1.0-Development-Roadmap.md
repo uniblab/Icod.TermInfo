@@ -11,14 +11,14 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`  
 **Frozen runtime contract:** `1.0.0`  
-**Current coordinated version:** `1.16.0-Alpha-4`
+**Current coordinated version:** `1.16.0-Alpha-5`
 **Latest completed line:** `1.15.0` - Berkeley DB / Hashed Terminfo Acquisition
-**Latest completed prerelease:** `1.16.0-Alpha-4`
-**Status:** stable `1.15.0` is published; focused `1.16.0` Hash-v9 writer implementation is active; HW04 is accepted and the HW05 design is locked without implementation
+**Latest completed prerelease:** `1.16.0-Alpha-5`
+**Status:** stable `1.15.0` is published; focused `1.16.0` Hash-v9 writer implementation is active; HW05 is complete and accepted; HW06 is next
 **Active release roadmap:** `Icod.TermInfo-1.16.0-Berkeley-DB-Hash-V9-Writer-Roadmap.md`
 **Release audit:** `docs/1.15.0-RELEASE-AUDIT.md`
 **Latest completed release audit:** `docs/1.15.0-RELEASE-AUDIT.md`
-**Next implementation gate:** HW05 safe filesystem commit
+**Next implementation gate:** HW06 explicit `tic` hashed publication
 
 ---
 
@@ -125,9 +125,8 @@ Version 1.16 excludes in-place database mutation, general Berkeley DB APIs,
 directory/hashed migration, unified catalog automation, cross-container planning,
 and JSON v7. Migration and catalog automation are explicitly assigned to 1.17.
 
-HW00 through HW04 are complete and accepted. HW05 through HW08 continue with
-safe filesystem commit, `tic` integration, hardening, and stable release
-qualification.
+HW00 through HW05 are complete and accepted. HW06 through HW08 continue with
+`tic` integration, hardening, and stable release qualification.
 
 ### 2.2 Completed 1.15 line
 
@@ -472,6 +471,11 @@ jobs. HW04 is complete and accepted at exact code head
 `35890184477` passed 12/12 jobs and HDB00 workflow run `35890184469` passed 3/3
 jobs. The HW05 safe-filesystem-commit design is approved and locked in
 `docs/superpowers/specs/2026-09-24-hw05-safe-filesystem-commit-design.md`;
-implementation has not started and remains the next implementation gate.
+implementation is accepted at code head
+`341162b405978f0ff28bf0996e497e3a41f46460`. Normal workflow `36273050526`
+passed 12/12 jobs; full HDB00 workflow `36273400765` passed 3/3 jobs.
+BerkeleyDb tests passed 587/587 and interoperability tests passed 77/77 per
+target framework on Windows, Linux, and macOS.
 The [HW05 implementation plan](docs/superpowers/plans/2026-09-26-hw05-safe-filesystem-commit.md)
-is ready for review; the selected execution method remains inline without subagents.
+was approved and executed inline without subagents. See
+`docs/1.16.0-HW05-SAFE-FILESYSTEM-COMMIT.md` for the qualification record.

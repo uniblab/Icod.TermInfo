@@ -1,6 +1,6 @@
 # Icod.TermInfo.BerkeleyDb
 
-`Icod.TermInfo.BerkeleyDb` is the optional managed package for read-only acquisition from ncurses-compatible Berkeley DB hashed terminfo stores.
+`Icod.TermInfo.BerkeleyDb` is the optional pure-managed package for ncurses-compatible Berkeley DB Hash-v9 terminfo stores. The stable 1.15 line provides read-only acquisition; the 1.16 development branch adds verified whole-file publication.
 
 ## 1.15 release closure status
 
@@ -96,3 +96,46 @@ managed exact-package verifier and three-host net8/net9/net10 package
 consumption. Atomic snapshots, arbitrary writer coordination, and
 non-UTF-8/non-Latin-1 producer encodings remain outside the qualified contract.
 Stable `1.15.0` preserves that exact behavior and surface.
+
+## 1.16 development: verified whole-file writing
+
+The 1.16 development branch adds `BerkeleyDbTerminalDatabaseWriter.Write` for
+deterministic ncurses-compatible Hash-v9 databases. Supply
+`BerkeleyDbTerminalDatabaseEntry` objects containing the canonical name, ordered
+aliases, and existing compiled-entry bytes. The default refuses an existing
+destination; `new BerkeleyDbTerminalDatabaseWriterOptions(overwriteExisting: true)`
+explicitly permits replacement. This is whole-file publication, not incremental
+mutation. The published 1.15 reader contract is unchanged.
+
+Before publication, the writer validates all inputs and builds the complete
+image in memory. It then acquires a persistent sibling lock, writes a uniquely
+named sibling temporary file, flushes it to disk, closes it, and reopens it
+through the production reader. Complete image bytes, physical records, and the
+resolved logical catalog must match before one same-directory move commits it.
+A pre-commit failure preserves the previous destination (or its absence), with
+best-effort cleanup of only the temporary file owned by that attempt.
+
+For `terminfo.db`, the lock is `.terminfo.db.icod-terminfo.lock`. It remains
+after success, cancellation, or failure; its presence does not mean a writer is
+active. Do not remove it while cooperating writers might use the destination.
+Contention waits until the lock is acquired or the caller cancels, without a
+timeout. Unsupported exclusive locking fails before staging. Cancellation is
+honored until the final pre-move check; a successful commit remains successful
+if cancellation arrives during the move.
+
+Replacement uses the temporary file's fresh metadata, including normal
+directory-inherited access controls; it does not preserve the old file's ACLs,
+attributes, or Unix mode. The immediate parent must be an existing ordinary
+directory. Destination and lock directories, symbolic links, and reparse points
+are rejected.
+
+Atomic visibility depends on the filesystem's same-directory rename/replacement
+semantics. There is no portable directory power-loss durability guarantee,
+hostile path-substitution protection, or coordination with native Berkeley DB
+writers. An existing Windows reader can cause replacement to fail safely, even
+when it allows delete sharing. The writer never falls back to application-level copy/delete.
+
+HW05 qualification is recorded in
+[`docs/1.16.0-HW05-SAFE-FILESYSTEM-COMMIT.md`](../docs/1.16.0-HW05-SAFE-FILESYSTEM-COMMIT.md).
+Command-line hashed output remains the next HW06 task; `tic` is still
+directory-write-only. Migration and catalog automation remain deferred to 1.17.

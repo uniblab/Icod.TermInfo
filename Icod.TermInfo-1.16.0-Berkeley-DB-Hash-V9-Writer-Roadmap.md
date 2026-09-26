@@ -6,7 +6,7 @@
 **Command integration:** `tic` and `Icod.TermInfo.Tools`
 **Language:** C# 13
 **Reusable target frameworks:** `net8.0`; `net9.0`; `net10.0`
-**Status:** ACTIVE — HW04 COMPLETE / HW05 DESIGN LOCKED / IMPLEMENTATION NOT STARTED
+**Status:** ACTIVE — HW05 COMPLETE / HW06 NEXT
 **Stable predecessor:** `1.15.0`
 **Initial development version:** `1.16.0-Alpha-1`
 
@@ -624,9 +624,12 @@ filesystem commit remains exclusively HW05.
 
 ### HW05 / Alpha-5 — Safe filesystem commit
 
-**Status:** DESIGN APPROVED / LOCKED — IMPLEMENTATION NOT STARTED
+**Status:** COMPLETE AND ACCEPTED
+**Accepted code head:** `341162b405978f0ff28bf0996e497e3a41f46460`
+**Verification:** pull-request run `36273050526` (12/12 jobs) and full HDB00 run `36273400765` (3/3 jobs); 587 BerkeleyDb and 77 interoperability tests per TFM per host.
 **Design record:** `docs/superpowers/specs/2026-09-24-hw05-safe-filesystem-commit-design.md`
-**Implementation plan:** [HW05 plan](docs/superpowers/plans/2026-09-26-hw05-safe-filesystem-commit.md) — ready for review; execution remains inline without subagents.
+**Implementation plan:** [HW05 plan](docs/superpowers/plans/2026-09-26-hw05-safe-filesystem-commit.md) — approved and executed inline without subagents.
+**Qualification record:** `docs/1.16.0-HW05-SAFE-FILESYSTEM-COMMIT.md`
 
 - implement sibling temporary-file preparation;
 - flush, close, reopen, and verify through the production reader;
