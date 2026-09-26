@@ -29,8 +29,22 @@ internal sealed class BerkeleyDbCancellationReadStream( Stream inner, Cancellati
 	public override long Length => inner.Length;
 	public override long Position { get => inner.Position; set => inner.Position = value; }
 	public override int Read( byte[] buffer, int offset, int count ) {
-		_ = token;
-		throw new NotImplementedException();
+		token.ThrowIfCancellationRequested();
+		int read = inner.Read( buffer, offset, Math.Min( count, 81_920 ) );
+		token.ThrowIfCancellationRequested();
+		return read;
+	}
+	public override int Read( Span<byte> buffer ) {
+		token.ThrowIfCancellationRequested();
+		int read = inner.Read( buffer[..Math.Min( buffer.Length, 81_920 )] );
+		token.ThrowIfCancellationRequested();
+		return read;
+	}
+	public override int ReadByte() {
+		token.ThrowIfCancellationRequested();
+		int value = inner.ReadByte();
+		token.ThrowIfCancellationRequested();
+		return value;
 	}
 	public override long Seek( long offset, SeekOrigin origin ) => inner.Seek( offset, origin );
 	public override void Flush() => throw new NotSupportedException();
