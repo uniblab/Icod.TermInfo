@@ -60,9 +60,12 @@ internal sealed class SystemBerkeleyDbDatabasePublicationFileSystem : BerkeleyDb
 		return new FileStream( lockPath, mode, FileAccess.ReadWrite, FileShare.None );
 	}
 
-	internal override Stream CreateTemporary( string temporaryPath ) => throw new NotImplementedException();
-	internal override void FlushToDisk( Stream stream ) => throw new NotImplementedException();
-	internal override Stream OpenRead( string temporaryPath ) => throw new NotImplementedException();
-	internal override void Move( string temporaryPath, string destinationPath, bool overwriteExisting ) => throw new NotImplementedException();
-	internal override void DeleteTemporary( string temporaryPath ) => throw new NotImplementedException();
+	internal override Stream CreateTemporary( string temporaryPath ) =>
+		new FileStream( temporaryPath, FileMode.CreateNew, FileAccess.Write, FileShare.None, 4096, FileOptions.WriteThrough );
+	internal override void FlushToDisk( Stream stream ) => ((FileStream)stream).Flush( flushToDisk: true );
+	internal override Stream OpenRead( string temporaryPath ) =>
+		new FileStream( temporaryPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.SequentialScan );
+	internal override void Move( string temporaryPath, string destinationPath, bool overwriteExisting ) =>
+		File.Move( temporaryPath, destinationPath, overwriteExisting );
+	internal override void DeleteTemporary( string temporaryPath ) => File.Delete( temporaryPath );
 }

@@ -28,6 +28,16 @@ public static partial class BerkeleyDbTerminalDatabaseWriter {
 	/// <param name="entries">The terminal entries to publish.</param>
 	/// <param name="options">Writer limits and destination policy, or defaults.</param>
 	/// <param name="cancellationToken">A token that may cancel the operation.</param>
+	/// <remarks>
+	/// Stages, flushes, closes, and verifies a unique sibling file before a single
+	/// same-directory move. A persistent sibling lock serializes cooperative Icod
+	/// writers; contention waits until acquisition or cancellation, without a timeout.
+	/// Replacement uses fresh file metadata. Cancellation is observed until the
+	/// final pre-move check, never after commit begins. Atomic visibility depends on
+	/// the host filesystem; directory power-loss durability and coordination with
+	/// native writers are not provided. The immediate parent, destination, and lock
+	/// must not be symbolic links or reparse points. The lock sidecar remains on disk.
+	/// </remarks>
 	/// <exception cref="ArgumentException">
 	/// <paramref name="databasePath"/> is empty or whitespace, or
 	/// <paramref name="entries"/> is empty or contains a null element.
@@ -37,7 +47,7 @@ public static partial class BerkeleyDbTerminalDatabaseWriter {
 	/// <see langword="null"/>.
 	/// </exception>
 	/// <exception cref="OperationCanceledException">
-	/// <paramref name="cancellationToken"/> is cancelled.
+	/// <paramref name="cancellationToken"/> is cancelled before commit begins.
 	/// </exception>
 	/// <exception cref="IOException">
 	/// The destination cannot be created or written, including when it already
@@ -47,11 +57,23 @@ public static partial class BerkeleyDbTerminalDatabaseWriter {
 	/// <exception cref="UnauthorizedAccessException">
 	/// Access to <paramref name="databasePath"/> is denied.
 	/// </exception>
+	/// <exception cref="NotSupportedException">
+	/// The filesystem does not enforce the required exclusive publication lock.
+	/// </exception>
+	/// <exception cref="InvalidDataException">
+	/// The reopened staged image, records, or catalog differ from the publication plan.
+	/// </exception>
 	public static void Write(
 		string databasePath,
 		IEnumerable<BerkeleyDbTerminalDatabaseEntry> entries,
 		BerkeleyDbTerminalDatabaseWriterOptions? options = null,
 		CancellationToken cancellationToken = default
+	) => WriteCore( databasePath, entries, options, cancellationToken, new SystemBerkeleyDbDatabasePublicationFileSystem() );
+
+	internal static void WriteCore(
+		string databasePath, IEnumerable<BerkeleyDbTerminalDatabaseEntry> entries,
+		BerkeleyDbTerminalDatabaseWriterOptions? options, CancellationToken cancellationToken,
+		BerkeleyDbDatabasePublicationFileSystem fileSystem
 	) {
 		ArgumentException.ThrowIfNullOrWhiteSpace( databasePath );
 		ArgumentNullException.ThrowIfNull( entries );
@@ -78,18 +100,9 @@ public static partial class BerkeleyDbTerminalDatabaseWriter {
 			cancellationToken
 		);
 
-		cancellationToken.ThrowIfCancellationRequested();
-		FileMode mode = ( effectiveOptions.OverwriteExisting )
-			? FileMode.Create
-			: FileMode.CreateNew
-		;
-		using FileStream destination = new(
-			fullPath,
-			mode,
-			FileAccess.Write,
-			FileShare.None
+		BerkeleyDbDatabasePublisher.Publish(
+			fullPath, image, records, publications, effectiveOptions, fileSystem, cancellationToken
 		);
-		destination.Write( image );
 	}
 
 	private static BerkeleyDbTerminalDatabaseWriterOptions SnapshotOptions(
@@ -105,9 +118,4 @@ public static partial class BerkeleyDbTerminalDatabaseWriter {
 		);
 	}
 
-	internal static void WriteCore(
-		string databasePath, IEnumerable<BerkeleyDbTerminalDatabaseEntry> entries,
-		BerkeleyDbTerminalDatabaseWriterOptions? options, CancellationToken cancellationToken,
-		BerkeleyDbDatabasePublicationFileSystem fileSystem
-	) => throw new NotImplementedException();
 }

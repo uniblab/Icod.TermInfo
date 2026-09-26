@@ -1,6 +1,6 @@
 /*
 	Icod.TermInfo.BerkeleyDb.Tests
-	Validates the HW04 public Hash-v9 publication engine.
+	Validates HW05 safe Hash-v9 filesystem publication.
 	Copyright (C) 2026  Timothy J. Bruce <uniblab@hotmail.com>
 */
 
@@ -50,9 +50,15 @@ public sealed class Hw05AtomicPublicationTests {
 		var publications = ( stage == "catalog" )
 			? new[] { data.Publications[0] with { Aliases = [ new( "wrong", [ 1 ] ) ] } }
 			: data.Publications;
-		Assert.ThrowsAny<IOException>( () => BerkeleyDbDatabasePublisher.Publish(
+		Exception? error = Record.Exception( () => BerkeleyDbDatabasePublisher.Publish(
 			scope.Destination, data.Image, records, publications, new( overwriteExisting: true ), fs, default
 		) );
+		if ( stage is "bytes" or "records" or "catalog" ) {
+			Assert.IsType<InvalidDataException>( error );
+		}
+		else {
+			Assert.Same( fs.Failure, error );
+		}
 		if ( exists ) {
 			Assert.Equal( prior, File.ReadAllBytes( scope.Destination ) );
 		}

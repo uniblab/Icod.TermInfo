@@ -62,5 +62,9 @@ public sealed class BerkeleyDbTerminalDatabaseWriterOptions {
 	/// <summary>Gets the maximum physical Hash record count.</summary>
 	public int MaximumRecordCount { get; }
 	/// <summary>Gets whether an existing destination may be replaced.</summary>
+	/// <remarks>
+	/// Replacement publishes a newly created file with fresh filesystem metadata;
+	/// attributes and access controls from the previous destination are not copied.
+	/// </remarks>
 	public bool OverwriteExisting { get; }
 }
