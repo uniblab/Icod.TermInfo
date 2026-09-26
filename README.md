@@ -222,6 +222,7 @@ Recommended documentation entry points:
 - [`docs/1.15.0-BERKELEY-DB-HASHED-ACQUISITION-GUIDE.md`](docs/1.15.0-BERKELEY-DB-HASHED-ACQUISITION-GUIDE.md) — explicit provider, catalog, discovery, command, and error contracts;
 - [`docs/1.15.0-BERKELEY-DB-HASH-V9-COMPATIBILITY.md`](docs/1.15.0-BERKELEY-DB-HASH-V9-COMPATIBILITY.md) — exact supported Berkeley DB/ncurses subset;
 - [`docs/1.15.0-RELEASE-AUDIT.md`](docs/1.15.0-RELEASE-AUDIT.md) — exact 1.15 qualification and release evidence;
+- [`Icod.TermInfo-1.16.0-Berkeley-DB-Hash-V9-Writer-Roadmap.md`](Icod.TermInfo-1.16.0-Berkeley-DB-Hash-V9-Writer-Roadmap.md) — active focused writer-only plan, with migration and catalog automation reserved for 1.17;
 - [`docs/1.14.0-RASTER-BACKEND-SELECTION-GUIDE.md`](docs/1.14.0-RASTER-BACKEND-SELECTION-GUIDE.md) — current raster-backend evidence and selection model;
 - [`docs/1.14.0-RELEASE-AUDIT.md`](docs/1.14.0-RELEASE-AUDIT.md) — exact 1.14 qualification and release evidence;
 - [`Icod.TermInfo-Post-1.0-Development-Roadmap.md`](Icod.TermInfo-Post-1.0-Development-Roadmap.md) — longer-range development direction.
