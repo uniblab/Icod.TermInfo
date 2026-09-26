@@ -104,4 +104,10 @@ public static partial class BerkeleyDbTerminalDatabaseWriter {
 			effective.OverwriteExisting
 		);
 	}
+
+	internal static void WriteCore(
+		string databasePath, IEnumerable<BerkeleyDbTerminalDatabaseEntry> entries,
+		BerkeleyDbTerminalDatabaseWriterOptions? options, CancellationToken cancellationToken,
+		BerkeleyDbDatabasePublicationFileSystem fileSystem
+	) => throw new NotImplementedException();
 }
