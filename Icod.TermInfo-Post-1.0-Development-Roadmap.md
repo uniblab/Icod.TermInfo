@@ -473,3 +473,5 @@ jobs. HW04 is complete and accepted at exact code head
 jobs. The HW05 safe-filesystem-commit design is approved and locked in
 `docs/superpowers/specs/2026-09-24-hw05-safe-filesystem-commit-design.md`;
 implementation has not started and remains the next implementation gate.
+The [HW05 implementation plan](docs/superpowers/plans/2026-09-26-hw05-safe-filesystem-commit.md)
+is ready for review; the selected execution method remains inline without subagents.

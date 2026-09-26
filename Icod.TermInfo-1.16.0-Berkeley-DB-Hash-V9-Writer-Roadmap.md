@@ -626,6 +626,7 @@ filesystem commit remains exclusively HW05.
 
 **Status:** DESIGN APPROVED / LOCKED — IMPLEMENTATION NOT STARTED
 **Design record:** `docs/superpowers/specs/2026-09-24-hw05-safe-filesystem-commit-design.md`
+**Implementation plan:** [HW05 plan](docs/superpowers/plans/2026-09-26-hw05-safe-filesystem-commit.md) — ready for review; execution remains inline without subagents.
 
 - implement sibling temporary-file preparation;
 - flush, close, reopen, and verify through the production reader;
