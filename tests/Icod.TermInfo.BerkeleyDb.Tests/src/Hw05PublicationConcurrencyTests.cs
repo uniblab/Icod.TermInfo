@@ -57,7 +57,8 @@ public sealed class Hw05PublicationConcurrencyTests( Xunit.Abstractions.ITestOut
 			Assert.True( staged.Wait( TimeSpan.FromSeconds( 10 ) ) );
 			string secondPath = ( changeCase )
 				? Path.Combine( scope.DirectoryPath, "TERMINFO.DB" )
-				: scope.Destination;
+				: scope.Destination
+			;
 			second = Task.Run( () => Write( secondPath, "second", overwrite, secondFs, cancellation.Token ) );
 			Assert.True( contended.Wait( TimeSpan.FromSeconds( 10 ) ) );
 			Assert.False( second.IsCompleted );
@@ -116,7 +117,8 @@ public sealed class Hw05PublicationConcurrencyTests( Xunit.Abstractions.ITestOut
 				Interlocked.Increment( ref observations );
 				started.Set();
 			} while ( !stop.IsCancellationRequested );
-		} );
+		}
+		);
 		try {
 			Assert.True( started.Wait( TimeSpan.FromSeconds( 10 ) ) );
 			for ( int index = 0; index < 12; index++ ) {
@@ -159,7 +161,8 @@ public sealed class Hw05PublicationConcurrencyTests( Xunit.Abstractions.ITestOut
 		File.SetAttributes( scope.Destination, FileAttributes.ReadOnly );
 		try {
 			Assert.Throws<UnauthorizedAccessException>( () =>
-				Write( scope.Destination, "new", true, new SystemBerkeleyDbDatabasePublicationFileSystem(), default ) );
+				Write( scope.Destination, "new", true, new SystemBerkeleyDbDatabasePublicationFileSystem(), default )
+			);
 			Assert.Equal( new byte[] { 1, 2 }, File.ReadAllBytes( scope.Destination ) );
 		}
 		finally {
@@ -172,7 +175,8 @@ public sealed class Hw05PublicationConcurrencyTests( Xunit.Abstractions.ITestOut
 		using var scope = new Hw05PublicationTestSupport();
 		string path = Path.Combine( scope.DirectoryPath, new string( 'x', 240 ) );
 		File.WriteAllBytes( path, [ 1, 2 ] );
-		Assert.ThrowsAny<IOException>( () => Write( path, "new", true, new SystemBerkeleyDbDatabasePublicationFileSystem(), default ) );
+		Assert.ThrowsAny<IOException>( () => Write( path, "new", true, new SystemBerkeleyDbDatabasePublicationFileSystem(), default )
+			);
 		Assert.Equal( new byte[] { 1, 2 }, File.ReadAllBytes( path ) );
 	}
 

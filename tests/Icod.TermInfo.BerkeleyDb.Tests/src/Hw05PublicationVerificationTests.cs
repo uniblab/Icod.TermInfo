@@ -48,7 +48,8 @@ public sealed class Hw05PublicationVerificationTests {
 		changed[^1] ^= 1;
 		Assert.Throws<InvalidDataException>( () => BerkeleyDbDatabasePublicationVerifier.Verify(
 			changed, data.Image, data.Records, data.Publications, new(), default
-		) );
+		)
+		);
 	}
 
 	[Fact]
@@ -56,7 +57,8 @@ public sealed class Hw05PublicationVerificationTests {
 		var data = Prepare();
 		Assert.Throws<InvalidDataException>( () => BerkeleyDbDatabasePublicationVerifier.Verify(
 			data.Image, data.Image, data.Records.Skip( 1 ).ToArray(), data.Publications, new(), default
-		) );
+		)
+		);
 	}
 
 	[Fact]
@@ -67,7 +69,8 @@ public sealed class Hw05PublicationVerificationTests {
 		};
 		Assert.Throws<InvalidDataException>( () => BerkeleyDbDatabasePublicationVerifier.Verify(
 			data.Image, data.Image, data.Records, [ changed ], new(), default
-		) );
+		)
+		);
 	}
 
 	[Theory]

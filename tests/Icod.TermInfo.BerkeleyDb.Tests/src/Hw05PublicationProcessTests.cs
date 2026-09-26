@@ -90,7 +90,8 @@ public sealed class Hw05PublicationProcessTests {
 	private static void AssertContention( string path ) {
 		var error = Assert.Throws<IOException>( () => {
 			using var probe = new FileStream( path, FileMode.Open, FileAccess.ReadWrite, FileShare.None );
-		} );
+		}
+		);
 		Assert.True( BerkeleyDbDatabasePublicationLock.IsContention( error ), $"Unexpected contention HRESULT: {error.HResult:X8}" );
 	}
 	private static Child Start( params string[] arguments ) {

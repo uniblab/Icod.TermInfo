@@ -134,7 +134,8 @@ public sealed class Hw05PublicationLockTests {
 		Assert.Throws<IOException>( () => BerkeleyDbDatabasePublicationLock.Acquire(
 			Path.Combine( link, "db" ), Path.Combine( link, ".db.icod-terminfo.lock" ),
 			true, new SystemBerkeleyDbDatabasePublicationFileSystem(), CancellationToken.None
-		) );
+		)
+		);
 		Assert.Empty( Directory.GetFileSystemEntries( real ) );
 	}
 

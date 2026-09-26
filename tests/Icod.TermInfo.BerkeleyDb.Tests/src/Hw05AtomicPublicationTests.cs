@@ -49,10 +49,12 @@ public sealed class Hw05AtomicPublicationTests {
 		var records = ( stage == "records" ) ? data.Records.Skip( 1 ).ToArray() : data.Records;
 		var publications = ( stage == "catalog" )
 			? new[] { data.Publications[0] with { Aliases = [ new( "wrong", [ 1 ] ) ] } }
-			: data.Publications;
+			: data.Publications
+		;
 		Exception? error = Record.Exception( () => BerkeleyDbDatabasePublisher.Publish(
 			scope.Destination, data.Image, records, publications, new( overwriteExisting: true ), fs, default
-		) );
+		)
+		);
 		if ( stage is "bytes" or "records" or "catalog" ) {
 			Assert.IsType<InvalidDataException>( error );
 		}
@@ -127,7 +129,8 @@ public sealed class Hw05AtomicPublicationTests {
 			scope.Destination,
 			[ new( "hw05-primary", [ "hw05-alias" ], data.Publications[0].Data ) ],
 			new( overwriteExisting: true ), default, new FaultFileSystem( "bytes" )
-		) );
+		)
+		);
 		Assert.Equal( new byte[] { 9, 8 }, File.ReadAllBytes( scope.Destination ) );
 	}
 

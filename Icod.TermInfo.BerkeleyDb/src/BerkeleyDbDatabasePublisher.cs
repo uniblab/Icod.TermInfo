@@ -51,14 +51,16 @@ internal static class BerkeleyDbDatabasePublisher {
 				}
 				cancellationToken.ThrowIfCancellationRequested();
 				fileSystem.FlushToDisk( staged );
-			} );
+			}
+			);
 			cancellationToken.ThrowIfCancellationRequested();
 			byte[] reopened = [];
 			Stream source = fileSystem.OpenRead( temporaryPath );
 			WithOwnedStream( source, () => {
 				using var cancellable = new BerkeleyDbCancellationReadStream( source, cancellationToken );
 				reopened = BerkeleyDbHashReader.ReadStableDatabase( cancellable, options.MaximumDatabaseSize );
-			} );
+			}
+			);
 			BerkeleyDbDatabasePublicationVerifier.Verify(
 				reopened, image, records, publications, options, cancellationToken
 			);
