@@ -137,5 +137,14 @@ when it allows delete sharing. The writer never falls back to application-level 
 
 HW05 qualification is recorded in
 [`docs/1.16.0-HW05-SAFE-FILESYSTEM-COMMIT.md`](../docs/1.16.0-HW05-SAFE-FILESYSTEM-COMMIT.md).
-Command-line hashed output remains the next HW06 task; `tic` is still
-directory-write-only. Migration and catalog automation remain deferred to 1.17.
+The `1.16.0-Alpha-6` tool suite adds explicit command-line publication:
+
+```sh
+icod-terminfo tic --database-format hashed -o ./terminfo.db source.ti
+```
+
+The exact destination file and an existing parent directory are required.
+`--force` replaces the whole database; `-s` reports canonical and alias counts.
+Directory output remains the default. See [tic](../tic/README.md#116-development-status)
+for selection, cancellation, and safe-publication behavior.
+Migration and catalog automation remain deferred to 1.17.

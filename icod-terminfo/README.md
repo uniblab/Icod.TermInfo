@@ -7,6 +7,22 @@ which dispatches to the existing `tic`, `infocmp`, `toe`, `captoinfo`, and
 
 The tool targets `net10.0` and requires a .NET 10 runtime.
 
+## 1.16 development status
+
+`1.16.0-Alpha-6` adds `tic --database-format directory|hashed`. The routed
+command publishes the same bytes as standalone `tic`:
+
+```sh
+icod-terminfo tic --database-format hashed -s -o ./terminfo.db source.ti
+icod-terminfo infocmp -A ./terminfo.db demo-alias
+icod-terminfo toe -s ./terminfo.db
+```
+
+Hashed publication requires an exact `-o` file path and an existing parent
+directory. No suffix is appended. `--force` replaces the whole database with the
+selected source entries; directory output remains the default. See
+[tic](../tic/README.md#116-development-status) for the full contract.
+
 ## 1.15 release status
 
 Version `1.15.0` preserves the five-command router contract, installed-tool

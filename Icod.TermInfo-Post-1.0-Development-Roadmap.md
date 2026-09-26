@@ -13,8 +13,8 @@
 **Frozen runtime contract:** `1.0.0`  
 **Current coordinated version:** `1.16.0-Alpha-6`
 **Latest completed line:** `1.15.0` - Berkeley DB / Hashed Terminfo Acquisition
-**Latest completed prerelease:** `1.16.0-Alpha-5`
-**Status:** stable `1.15.0` is published; focused `1.16.0` Hash-v9 writer implementation is active; HW05 is complete and accepted; HW06 is implemented and undergoing qualification
+**Latest completed prerelease:** `1.16.0-Alpha-6`
+**Status:** stable `1.15.0` is published; focused `1.16.0` Hash-v9 writer implementation is active; HW06 is complete and accepted; HW07 is next
 **Active release roadmap:** `Icod.TermInfo-1.16.0-Berkeley-DB-Hash-V9-Writer-Roadmap.md`
 **Release audit:** `docs/1.15.0-RELEASE-AUDIT.md`
 **Latest completed release audit:** `docs/1.15.0-RELEASE-AUDIT.md`
@@ -125,8 +125,8 @@ Version 1.16 excludes in-place database mutation, general Berkeley DB APIs,
 directory/hashed migration, unified catalog automation, cross-container planning,
 and JSON v7. Migration and catalog automation are explicitly assigned to 1.17.
 
-HW00 through HW05 are complete and accepted. HW06 through HW08 continue with
-`tic` integration, hardening, and stable release qualification.
+HW00 through HW06 are complete and accepted, including explicit `tic` hashed
+publication. HW07 and HW08 continue with hardening and stable release qualification.
 
 ### 2.2 Completed 1.15 line
 
@@ -479,3 +479,12 @@ target framework on Windows, Linux, and macOS.
 The [HW05 implementation plan](docs/superpowers/plans/2026-09-26-hw05-safe-filesystem-commit.md)
 was approved and executed inline without subagents. See
 `docs/1.16.0-HW05-SAFE-FILESYSTEM-COMMIT.md` for the qualification record.
+
+HW06 is complete and accepted at code head
+`1f44a1db651b9a5ac5551e6cb8cd4536828893ea`. Normal workflow `36275562017`
+passed 12/12 jobs and native HDB00 workflow `36275562053` passed 3/3 jobs at
+that same head. `tic --database-format directory|hashed` now composes the
+existing compiler with safe hashed publication, requiring an exact `-o` file
+for hashed output. Direct/routed commands, installed packages, all six archives,
+and native Berkeley DB/ncurses consumers passed. See
+`docs/1.16.0-HW06-TIC-HASHED-PUBLICATION.md` for the qualification record.

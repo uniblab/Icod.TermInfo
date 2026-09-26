@@ -6,7 +6,7 @@
 **Command integration:** `tic` and `Icod.TermInfo.Tools`
 **Language:** C# 13
 **Reusable target frameworks:** `net8.0`; `net9.0`; `net10.0`
-**Status:** ACTIVE — HW05 COMPLETE / HW06 IN QUALIFICATION
+**Status:** ACTIVE — HW06 COMPLETE / HW07 NEXT
 **Stable predecessor:** `1.15.0`
 **Initial development version:** `1.16.0-Alpha-1`
 
@@ -646,7 +646,13 @@ successful publication exposes only a completely verified database.
 
 ### HW06 / Alpha-6 — Explicit `tic` hashed publication
 
-**Status:** IMPLEMENTED — CROSS-PLATFORM QUALIFICATION PENDING
+**Status:** COMPLETE AND ACCEPTED
+
+Accepted at code head `1f44a1db651b9a5ac5551e6cb8cd4536828893ea`.
+Normal workflow `36275562017` passed 12/12 jobs; native HDB00 workflow
+`36275562053` passed 3/3 jobs at that same head. Direct/routed commands,
+installed packages, six archive RIDs, and native Berkeley DB/ncurses consumers
+passed. See [HW06 acceptance](docs/1.16.0-HW06-TIC-HASHED-PUBLICATION.md).
 
 - add the BerkeleyDb project/package dependency to `tic`, not Compiler;
 - implement `--database-format directory|hashed`;
