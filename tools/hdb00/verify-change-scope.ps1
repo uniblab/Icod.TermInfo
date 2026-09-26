@@ -28,6 +28,7 @@ $cases = @(
     @{ Paths = @('tools/berkeleydb-package-smoke/Program.cs'); Expected = 'true' },
     @{ Paths = @('tools/berkeleydb-package-verifier/BerkeleyDbApiFreeze.cs'); Expected = 'true' },
     @{ Paths = @('tests/Icod.TermInfo.BerkeleyDb.Tests/src/Hw08ApiFreezeTests.cs'); Expected = 'true' },
+    @{ Paths = @('tests/Icod.TermInfo.Tests/src/T45CompletionGateTests.cs'); Expected = 'true' },
     @{ Paths = @('tests/Shared/Hw07WriterMatrix.cs'); Expected = 'true' },
     @{ Paths = @('.github/workflows/hdb00-interoperability.yml'); Expected = 'true' },
     @{ Paths = @('.github/scripts/verify-berkeleydb-package.ps1'); Expected = 'true' },

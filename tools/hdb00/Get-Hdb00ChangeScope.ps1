@@ -22,6 +22,7 @@ $patterns = @(
     '^tests/Icod\.TermInfo\.BerkeleyDb\.Tests/src/Hdb08PackagingQualificationTests\.cs$',
     '^tests/Icod\.TermInfo\.BerkeleyDb\.Tests/src/Hdb09ReleaseClosureTests\.cs$',
     '^tests/Icod\.TermInfo\.BerkeleyDb\.Tests/src/Hw08ApiFreezeTests\.cs$',
+    '^tests/Icod\.TermInfo\.Tests/src/T45CompletionGateTests\.cs$',
     '^tests/Icod\.TermInfo\.BerkeleyDb\.Interop\.Tests/',
     '^tests/Shared/Hw07WriterMatrix\.cs$',
     '^docs/1\.15\.0-HDB08-PACKAGING-AND-CROSS-PLATFORM-QUALIFICATION\.md$',
