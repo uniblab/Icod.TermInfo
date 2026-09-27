@@ -117,7 +117,8 @@ public sealed class UC01CatalogModelTests {
 			TerminalCatalog catalog = new( Source, TerminalCatalogStatus.Partial, entries, issues, duplicates );
 			entries.Clear(); issues.Clear(); duplicates.Clear();
 			Assert.Equal( new[] { "alias", "sample", "sample" }, catalog.Entries.Select( x => x.PublicationName ) );
-			Assert.EndsWith( Path.Combine( "73", "sample" ), catalog.Entries[1].EntryPath, StringComparison.Ordinal );
+			// Preserve the supplied absolute path spelling, including valid Windows '/' separators.
+			Assert.Equal( Path.Combine( Root, "73/sample" ), catalog.Entries[1].EntryPath );
 			Assert.Equal( new[] { TerminalCatalogIssueKind.IoFailure, TerminalCatalogIssueKind.DuplicatePublication }, catalog.Issues.Select( x => x.Kind ) );
 			Assert.Equal( new[] { "sample" }, catalog.DuplicatePublicationNames );
 			Assert.True( catalog.HasIssues );
