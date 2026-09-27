@@ -7,7 +7,23 @@ which dispatches to the existing `tic`, `infocmp`, `toe`, `captoinfo`, and
 
 The tool targets `net10.0` and requires a .NET 10 runtime.
 
-## 1.15 release status
+## 1.16 hashed publication
+
+Version `1.16.0` adds `tic --database-format directory|hashed`. The routed
+command publishes the same bytes as standalone `tic`:
+
+```sh
+icod-terminfo tic --database-format hashed -s -o ./terminfo.db source.ti
+icod-terminfo infocmp -A ./terminfo.db demo-alias
+icod-terminfo toe -s ./terminfo.db
+```
+
+Hashed publication requires an exact `-o` file path and an existing parent
+directory. No suffix is appended. `--force` replaces the whole database with the
+selected source entries; directory output remains the default. See
+[tic](../tic/README.md#116-hashed-publication) for the full contract.
+
+## Compatibility with 1.15
 
 Version `1.15.0` preserves the five-command router contract, installed-tool
 validation, and six-RID standalone archive topology. It adds reviewed explicit
@@ -17,18 +33,18 @@ publication.
 
 The coordinated tool version advances with the reusable package family so a
 single release identity covers Runtime, Source, Compiler, Inspection, Termcap,
-and the tool distribution.
+BerkeleyDb, and the tool distribution.
 
 ## Install
 
 ```text
-dotnet tool install --global Icod.TermInfo.Tools --version 1.15.0
+dotnet tool install --global Icod.TermInfo.Tools --version 1.16.0
 ```
 
 Update or remove the global tool with:
 
 ```text
-dotnet tool update --global Icod.TermInfo.Tools --version 1.15.0
+dotnet tool update --global Icod.TermInfo.Tools --version 1.16.0
 dotnet tool uninstall --global Icod.TermInfo.Tools
 ```
 
@@ -36,7 +52,7 @@ For repository-local or application-local use:
 
 ```text
 dotnet new tool-manifest
-dotnet tool install Icod.TermInfo.Tools --version 1.15.0
+dotnet tool install Icod.TermInfo.Tools --version 1.16.0
 dotnet tool run icod-terminfo --version
 ```
 
@@ -113,8 +129,8 @@ the .NET 10 runtime and choose the unpack/install location.
 PR validation installs the freshly packed `Icod.TermInfo.Tools` package and
 executes router smoke on supported hosts. The release pipeline also builds and
 structurally verifies all six archive RIDs and executes matching-host archive
-smoke. Version 1.14 changes release identity only for the command layer; existing
-command semantics remain frozen.
+smoke. Version 1.16 adds explicit hashed publication through `tic`; the other
+commands retain their established contracts.
 
 See the root `../README.md`, `../docs/VERSIONING.md`, and
 `../docs/COMPATIBILITY.md` for the coordinated release contract.

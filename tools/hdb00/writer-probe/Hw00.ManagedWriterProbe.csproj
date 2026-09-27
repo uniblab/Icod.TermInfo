@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+		<LangVersion>13.0</LangVersion>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<IsPackable>false</IsPackable>
+		<AssemblyName>Icod.TermInfo.Hw00.ManagedWriterProbe</AssemblyName>
+		<RootNamespace>Icod.TermInfo.Hw00.ManagedWriterProbe</RootNamespace>
+		<Configurations>Debug;Release;Staging</Configurations>
+	</PropertyGroup>
+</Project>

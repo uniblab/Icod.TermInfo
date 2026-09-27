@@ -11,14 +11,15 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`  
 **Frozen runtime contract:** `1.0.0`  
-**Current coordinated version:** `1.15.0`
+**Current coordinated version:** `1.16.0`
 **Latest completed line:** `1.15.0` - Berkeley DB / Hashed Terminfo Acquisition
-**Latest completed prerelease:** `1.15.0-Alpha-8`
-**Status:** stable `1.15.0` release closure is complete in draft PR #45; merge and publication remain user-owned
-**Active release roadmap:** `Icod.TermInfo-1.15.0-Berkeley-DB-Hashed-Terminfo-Acquisition-Roadmap.md`  
-**Release audit:** `docs/1.15.0-RELEASE-AUDIT.md`
+**Latest completed prerelease:** `1.16.0-Alpha-8`
+**Latest accepted development line:** `1.16.0` - Berkeley DB Hash-v9 Writer (HW00–HW08 complete)
+**Status:** stable `1.15.0` is published; the `1.16.0` stable candidate is accepted and ready for review; publication is pending
+**Active release roadmap:** `Icod.TermInfo-1.16.0-Berkeley-DB-Hash-V9-Writer-Roadmap.md`
+**Release audit:** `docs/1.16.0-RELEASE-AUDIT.md`
 **Latest completed release audit:** `docs/1.15.0-RELEASE-AUDIT.md`
-**Next implementation gate:** final exact-head review; no further 1.15 feature work is planned
+**Next gate:** user review, merge, and publication of 1.16; migration/catalog automation remain separate 1.17 work
 
 ---
 
@@ -91,9 +92,48 @@ version-specific roadmap.
 | **1.13.0** | Runtime evidence interchange | Caller-owned runtime observations/integration and replanning, JSON v5 |
 | **1.14.0** | Raster backend selection | Backend availability evidence/classification, candidate evaluation, explicit preference selection, JSON v6 |
 | **1.15.0** | Berkeley DB / hashed terminfo acquisition | Optional pure-managed read-only Hash-v9 acquisition recovers compiled entry bytes and delegates semantic parsing to existing Runtime |
-| **later** | Explicitly planned deferred work | Hashed-store writing, additional backends, richer graphics policy, historical formats, or other justified tracks |
+| **1.16.0** | Berkeley DB Hash-v9 writer | Optional pure-managed deterministic whole-file Hash-v9 publication and explicit `tic` hashed output |
+| **1.17.0** | Hashed migration and catalog automation | Directory/hashed migration, unified catalog automation, cross-container analysis, and machine-readable expansion if justified |
+| **later** | Explicitly planned deferred work | Additional backends, richer graphics policy, historical formats, or other justified tracks |
 
-### 2.1 Active 1.15 line
+### 2.1 Active 1.16 line
+
+Version 1.16 is governed by
+`Icod.TermInfo-1.16.0-Berkeley-DB-Hash-V9-Writer-Roadmap.md`.
+
+The approved scope is intentionally smaller than the complete hashed-store
+administration menu. Version 1.16 owns only:
+
+```text
+compiled terminfo bytes
+          |
+          v
+deterministic managed Hash-v9 writer
+          |
+          v
+verified whole-file publication
+          |
+          v
+explicit managed tic hashed output
+```
+
+The writer remains in the optional `Icod.TermInfo.BerkeleyDb` package, which
+continues to depend only on Runtime. Compiler remains the owner of compiled-entry
+encoding; `tic` composes Compiler and BerkeleyDb without creating a reusable
+package dependency between them.
+
+Version 1.16 excludes in-place database mutation, general Berkeley DB APIs,
+directory/hashed migration, unified catalog automation, cross-container planning,
+and JSON v7. Migration and catalog automation are explicitly assigned to 1.17.
+
+HW00 through HW07 are complete and accepted, including explicit `tic` hashed
+publication and pathological/native hardening. HW08 samples, package consumers,
+documentation, and API freeze passed Alpha-8 qualification. Stable `1.16.0`
+passed exact-head qualification at `30a7a23f01ca856bb5f9e15ba24db78bd137f139`:
+normal workflow `36281070193` (12/12) and native workflow `36281070040` (3/3).
+All planned 1.16 development gates are complete; review and publication remain.
+
+### 2.2 Completed 1.15 line
 
 Version 1.15 is governed by
 `Icod.TermInfo-1.15.0-Berkeley-DB-Hashed-Terminfo-Acquisition-Roadmap.md`.
@@ -336,14 +376,16 @@ See `docs/VERSIONING.md` and `docs/COMPATIBILITY.md` for the complete policy.
 
 ---
 
-## 7. Deferred work during and after 1.15
+## 7. Deferred work during and after 1.16
 
-The following remain explicitly outside the approved read-only 1.15 scope and
-require a future design/roadmap before implementation:
+The following remain explicitly outside the approved 1.16 writer-only scope and
+require the 1.17 roadmap or a later independent design before implementation:
 
-- Berkeley DB / hashed terminfo writing;
-- `tic` hashed-database publication;
 - directory-to-hashed or hashed-to-directory migration;
+- unified directory/hashed catalog automation;
+- cross-container comparison, synchronization, and migration planning;
+- hashed-aware machine-readable output or JSON v7;
+- in-place Berkeley DB mutation, transactions, recovery, or repair;
 - bundled Berkeley DB native binaries;
 - additional concrete raster backends;
 - alpha/pixel-format capability planning;
@@ -355,9 +397,10 @@ require a future design/roadmap before implementation:
 - divergent historical vendor binary formats; and
 - any migration of live-session/protocol execution into TermInfo.
 
-Any future expansion beyond the HDB00-selected managed Hash-v9 read-only subset
-must be driven by authoritative interoperability evidence and API-regret analysis,
-not inferred automatically from Berkeley DB's broader feature set.
+The 1.16 writer extends only the HDB00-selected managed Hash-v9 terminfo subset.
+Any expansion beyond that subset must be driven by authoritative interoperability
+evidence and API-regret analysis, not inferred automatically from Berkeley DB's
+broader feature set.
 
 ---
 
@@ -391,7 +434,7 @@ docs/1.14.0-RB08-FREEZE-FINGERPRINTS.txt
 docs/1.14.0-RELEASE-AUDIT.md
 ```
 
-The active line is documented by:
+The latest completed line is documented by:
 
 ```text
 Icod.TermInfo-1.15.0-Berkeley-DB-Hashed-Terminfo-Acquisition-Roadmap.md
@@ -399,6 +442,73 @@ docs/1.15.0-HDB00-BERKELEY-DB-INTEROPERABILITY-AND-BACKEND-DECISION.md
 docs/1.15.0-BERKELEY-DB-ECOSYSTEM-AUDIT.md
 ```
 
-HDB00 is complete and accepted. HDB01 is responsible for the optional
-`Icod.TermInfo.BerkeleyDb` package/test/package-verification foundation before
-HDB02 begins production managed Hash-v9 reader implementation.
+HDB00 through HDB09 are complete and accepted. Stable 1.15 established the
+optional Runtime-only BerkeleyDb package, the production managed Hash-v9 reader,
+explicit and system providers, logical catalog enumeration, command composition,
+hardening, package qualification, and the exact nine-type public API freeze.
+
+The active planning line is documented by:
+
+```text
+Icod.TermInfo-1.16.0-Berkeley-DB-Hash-V9-Writer-Roadmap.md
+docs/1.16.0-HW00-HASH-V9-WRITER-INTEROPERABILITY-AND-BACKEND-DECISION.md
+docs/1.16.0-HW01-BERKELEY-DB-WRITER-CONTRACT.md
+docs/1.16.0-HW02-DETERMINISTIC-HASH-V9-INLINE-IMAGE.md
+docs/1.16.0-HW03-COLLISION-OVERFLOW-BOUNDED-GROWTH.md
+docs/1.16.0-HW04-PUBLIC-TERMINFO-PUBLICATION-ENGINE.md
+docs/superpowers/specs/2026-09-24-hw05-safe-filesystem-commit-design.md
+```
+
+HW00 is complete and accepted at exact head
+`5d3cea771d6fb0187caab191632bc1ef84d6a705`; its pure-managed writer probe is
+qualified by native Berkeley DB on Linux/macOS and managed-only readback on
+Windows. HW01 is complete and accepted at exact head
+`36a71697b7c8db4b5aa9004b4cfa60f005bf4bf8`; pull-request workflow run
+`35383543026` passed 12/12 jobs and froze the exact additive three-type writer
+surface plus bounded whole-input preflight. HW02 is complete and accepted at
+exact head `a31125898e7ab169457a9f9060a134cfcdbe4af6`; pull-request workflow run
+`35394326963` passed 12/12 jobs and HDB00 workflow run `35394327002` passed 3/3
+jobs. HW03 is complete and accepted at exact code head
+`009dbc66e4bbb5c8aec3d59ee479a5c7d300e8ac`; pull-request workflow run
+`35788135300` passed 12/12 jobs and HDB00 workflow run `35788135283` passed 3/3
+jobs. HW04 is complete and accepted at exact code head
+`698f1d212aa5e213ff0b5496e10af76ead4232de`; pull-request workflow run
+`35890184477` passed 12/12 jobs and HDB00 workflow run `35890184469` passed 3/3
+jobs. The HW05 safe-filesystem-commit design is approved and locked in
+`docs/superpowers/specs/2026-09-24-hw05-safe-filesystem-commit-design.md`;
+implementation is accepted at code head
+`341162b405978f0ff28bf0996e497e3a41f46460`. Normal workflow `36273050526`
+passed 12/12 jobs; full HDB00 workflow `36273400765` passed 3/3 jobs.
+BerkeleyDb tests passed 587/587 and interoperability tests passed 77/77 per
+target framework on Windows, Linux, and macOS.
+The [HW05 implementation plan](docs/superpowers/plans/2026-09-26-hw05-safe-filesystem-commit.md)
+was approved and executed inline without subagents. See
+`docs/1.16.0-HW05-SAFE-FILESYSTEM-COMMIT.md` for the qualification record.
+
+HW06 is complete and accepted at code head
+`1f44a1db651b9a5ac5551e6cb8cd4536828893ea`. Normal workflow `36275562017`
+passed 12/12 jobs and native HDB00 workflow `36275562053` passed 3/3 jobs at
+that same head. `tic --database-format directory|hashed` now composes the
+existing compiler with safe hashed publication, requiring an exact `-o` file
+for hashed output. Direct/routed commands, installed packages, all six archives,
+and native Berkeley DB/ncurses consumers passed. See
+`docs/1.16.0-HW06-TIC-HASHED-PUBLICATION.md` for the qualification record.
+
+HW07 is complete and accepted at code head
+`ffe723278fa86977a92d839788a27a6a977e1977`. Normal workflow `36277723824`
+passed 12/12 jobs and native workflow `36277723830` passed 3/3 at that same
+head. The writer now enforces its physical record budget during source
+enumeration and before alias preparation. All 384 generated collision/overflow
+records survived native dump/reload; eight representative ncurses terminals
+and exact UTF-8 keys passed native consumers. BerkeleyDb tests passed 599/599
+and interoperability tests 83/83 per framework on Windows, Linux, and macOS.
+Release warnings-as-errors builds, package checks, and all six archives passed.
+See `docs/1.16.0-HW07-WRITER-HARDENING.md` for the resource/security audit and
+qualification record. HW08 Alpha-8 is accepted at
+`b458b0d18c0a8b1e2c6c37a0698cc9ea4fd6341e`: normal workflow `36279869607`
+passed 12/12 jobs and native workflow `36279869638` passed 3/3 jobs.
+Stable candidate `30a7a23f01ca856bb5f9e15ba24db78bd137f139` preserves that
+production feature/API source and passed normal workflow `36281070193` (12/12)
+and native workflow `36281070040` (3/3). See
+`docs/1.16.0-RELEASE-AUDIT.md` for exact stable artifacts and acceptance.
+Migration/catalog automation remain 1.17.

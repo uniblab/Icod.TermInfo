@@ -1,0 +1,93 @@
+# Icod.TermInfo.BerkeleyDb public API baseline
+# Format: Icod.TermInfo.PublicApiSnapshot/v1
+# AssemblyVersion: 1.0.0.0
+
+TYPE class Icod.TermInfo.BerkeleyDb.BerkeleyDbDatabaseFormatException [sealed]
+  BASE System.FormatException
+  INTERFACES System.Runtime.Serialization.ISerializable
+  CTOR public BerkeleyDbDatabaseFormatException()
+  CTOR public BerkeleyDbDatabaseFormatException(System.String message null=nullable/nullable)
+  CTOR public BerkeleyDbDatabaseFormatException(System.String message null=nullable/nullable, System.Exception innerException null=nullable/nullable)
+END
+
+TYPE class Icod.TermInfo.BerkeleyDb.BerkeleyDbSystemTerminalDescriptionProvider [sealed]
+  INTERFACES Icod.TermInfo.ITerminalDescriptionProvider
+  CTOR public BerkeleyDbSystemTerminalDescriptionProvider(Icod.TermInfo.BerkeleyDb.BerkeleyDbSystemTerminalDescriptionProviderOptions options null=nullable/nullable default=null)
+  METHOD public System.Boolean TryLoad(System.String name null=not-null/not-null, out Icod.TermInfo.TerminalDescription terminal null=nullable/nullable attrs=NotNullWhenAttribute(true)) return-null=not-null/not-null
+END
+
+TYPE class Icod.TermInfo.BerkeleyDb.BerkeleyDbSystemTerminalDescriptionProviderOptions [sealed]
+  CTOR public BerkeleyDbSystemTerminalDescriptionProviderOptions(System.Boolean useEnvironment null=not-null/not-null default=true, System.Boolean useUserDatabase null=not-null/not-null default=true, System.Boolean useSystemDatabases null=not-null/not-null default=true, Icod.TermInfo.CompiledTermInfoParserOptions parserOptions null=nullable/nullable default=null, System.Int32 maximumDatabaseSize null=not-null/not-null default=67108864, System.Int32 maximumIndexHops null=not-null/not-null default=16)
+  PROPERTY Icod.TermInfo.CompiledTermInfoParserOptions ParserOptions { public get; } null=not-null/unknown
+  PROPERTY System.Boolean UseEnvironment { public get; } null=not-null/unknown
+  PROPERTY System.Boolean UseSystemDatabases { public get; } null=not-null/unknown
+  PROPERTY System.Boolean UseUserDatabase { public get; } null=not-null/unknown
+  PROPERTY System.Int32 MaximumDatabaseSize { public get; } null=not-null/unknown
+  PROPERTY System.Int32 MaximumIndexHops { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.BerkeleyDb.BerkeleyDbTerminalCatalogEntry [sealed]
+  PROPERTY Icod.TermInfo.BerkeleyDb.BerkeleyDbTerminalCatalogEntryKind Kind { public get; } null=not-null/unknown
+  PROPERTY Icod.TermInfo.TerminalDescription Terminal { public get; } null=not-null/unknown
+  PROPERTY System.String Name { public get; } null=not-null/unknown
+END
+
+TYPE enum Icod.TermInfo.BerkeleyDb.BerkeleyDbTerminalCatalogEntryKind [sealed]
+  INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  UNDERLYING System.Int32
+  ENUM Alias = 1
+  ENUM Canonical = 0
+END
+
+TYPE class Icod.TermInfo.BerkeleyDb.BerkeleyDbTerminalCatalogReader [sealed]
+  CTOR public BerkeleyDbTerminalCatalogReader(System.String databasePath null=not-null/not-null, Icod.TermInfo.BerkeleyDb.BerkeleyDbTerminalCatalogReaderOptions options null=nullable/nullable default=null)
+  PROPERTY System.String DatabasePath { public get; } null=not-null/unknown
+  METHOD public System.Collections.Generic.IReadOnlyList<Icod.TermInfo.BerkeleyDb.BerkeleyDbTerminalCatalogEntry> Read() return-null=not-null/not-null<not-null/not-null>
+  METHOD public System.Collections.Generic.IReadOnlyList<Icod.TermInfo.BerkeleyDb.BerkeleyDbTerminalCatalogEntry> Read(System.Threading.CancellationToken cancellationToken null=not-null/not-null) return-null=not-null/not-null<not-null/not-null>
+END
+
+TYPE class Icod.TermInfo.BerkeleyDb.BerkeleyDbTerminalCatalogReaderOptions [sealed]
+  FIELD public static const System.Int32 DefaultMaximumRecordCount null=not-null/not-null value=65536
+  CTOR public BerkeleyDbTerminalCatalogReaderOptions(Icod.TermInfo.CompiledTermInfoParserOptions parserOptions null=nullable/nullable default=null, System.Int32 maximumDatabaseSize null=not-null/not-null default=67108864, System.Int32 maximumRecordCount null=not-null/not-null default=65536, System.Int32 maximumIndexHops null=not-null/not-null default=16)
+  PROPERTY Icod.TermInfo.CompiledTermInfoParserOptions ParserOptions { public get; } null=not-null/unknown
+  PROPERTY System.Int32 MaximumDatabaseSize { public get; } null=not-null/unknown
+  PROPERTY System.Int32 MaximumIndexHops { public get; } null=not-null/unknown
+  PROPERTY System.Int32 MaximumRecordCount { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.BerkeleyDb.BerkeleyDbTerminalDatabaseEntry [sealed]
+  CTOR public BerkeleyDbTerminalDatabaseEntry(System.String canonicalName null=not-null/not-null, System.Collections.Generic.IEnumerable<System.String> aliases null=not-null/not-null<not-null/not-null>, System.Byte[] data null=not-null/not-null<not-null/not-null>)
+  PROPERTY System.Byte[] Data { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.Collections.Generic.IReadOnlyList<System.String> Aliases { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.String CanonicalName { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.BerkeleyDb.BerkeleyDbTerminalDatabaseWriter [static]
+  METHOD public static System.Void Write(System.String databasePath null=not-null/not-null, System.Collections.Generic.IEnumerable<Icod.TermInfo.BerkeleyDb.BerkeleyDbTerminalDatabaseEntry> entries null=not-null/not-null<not-null/not-null>, Icod.TermInfo.BerkeleyDb.BerkeleyDbTerminalDatabaseWriterOptions options null=nullable/nullable default=null, System.Threading.CancellationToken cancellationToken null=not-null/not-null default=null) return-null=not-null/not-null
+END
+
+TYPE class Icod.TermInfo.BerkeleyDb.BerkeleyDbTerminalDatabaseWriterOptions [sealed]
+  FIELD public static const System.Int32 DefaultMaximumRecordCount null=not-null/not-null value=65536
+  CTOR public BerkeleyDbTerminalDatabaseWriterOptions(Icod.TermInfo.CompiledTermInfoParserOptions parserOptions null=nullable/nullable default=null, System.Int32 maximumDatabaseSize null=not-null/not-null default=67108864, System.Int32 maximumRecordCount null=not-null/not-null default=65536, System.Boolean overwriteExisting null=not-null/not-null default=false)
+  PROPERTY Icod.TermInfo.CompiledTermInfoParserOptions ParserOptions { public get; } null=not-null/unknown
+  PROPERTY System.Boolean OverwriteExisting { public get; } null=not-null/unknown
+  PROPERTY System.Int32 MaximumDatabaseSize { public get; } null=not-null/unknown
+  PROPERTY System.Int32 MaximumRecordCount { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.BerkeleyDb.BerkeleyDbTerminalDescriptionProvider [sealed]
+  INTERFACES Icod.TermInfo.ITerminalDescriptionProvider
+  CTOR public BerkeleyDbTerminalDescriptionProvider(System.String databasePath null=not-null/not-null, Icod.TermInfo.BerkeleyDb.BerkeleyDbTerminalDescriptionProviderOptions options null=nullable/nullable default=null)
+  PROPERTY System.String DatabasePath { public get; } null=not-null/unknown
+  METHOD public System.Boolean TryLoad(System.String name null=not-null/not-null, out Icod.TermInfo.TerminalDescription terminal null=nullable/nullable attrs=NotNullWhenAttribute(true)) return-null=not-null/not-null
+END
+
+TYPE class Icod.TermInfo.BerkeleyDb.BerkeleyDbTerminalDescriptionProviderOptions [sealed]
+  FIELD public static const System.Int32 DefaultMaximumDatabaseSize null=not-null/not-null value=67108864
+  FIELD public static const System.Int32 DefaultMaximumIndexHops null=not-null/not-null value=16
+  FIELD public static const System.Int32 MaximumSupportedIndexHops null=not-null/not-null value=1024
+  CTOR public BerkeleyDbTerminalDescriptionProviderOptions(Icod.TermInfo.CompiledTermInfoParserOptions parserOptions null=nullable/nullable default=null, System.Int32 maximumDatabaseSize null=not-null/not-null default=67108864, System.Int32 maximumIndexHops null=not-null/not-null default=16)
+  PROPERTY Icod.TermInfo.CompiledTermInfoParserOptions ParserOptions { public get; } null=not-null/unknown
+  PROPERTY System.Int32 MaximumDatabaseSize { public get; } null=not-null/unknown
+  PROPERTY System.Int32 MaximumIndexHops { public get; } null=not-null/unknown
+END

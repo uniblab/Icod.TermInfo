@@ -27,12 +27,22 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\Icod.TermInfo.BerkeleyDb\Icod.TermInfo.BerkeleyDb.csproj" />
 		<ProjectReference Include="..\..\Icod.TermInfo.Inspection\Icod.TermInfo.Inspection.csproj" />
+		<ProjectReference Include="..\..\tools\hw05-publication-probe\Hw05.PublicationProbe.csproj" ReferenceOutputAssembly="false" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<Compile Include="..\Shared\Hdb07HashV9FixtureBuilder.cs"
 			Link="Shared\Hdb07HashV9FixtureBuilder.cs" />
+		<Compile Include="..\Shared\Hw07WriterMatrix.cs" Link="Shared\Hw07WriterMatrix.cs" />
+		<Compile Include="..\..\tools\berkeleydb-package-verifier\BerkeleyDbApiFreeze.cs" Link="Qualification\BerkeleyDbApiFreeze.cs" />
 	</ItemGroup>
+
+	<Target Name="CopyPublicationProbe" AfterTargets="Build" Condition="'$(TargetFramework)' != ''">
+		<ItemGroup>
+			<PublicationProbe Include="$(MSBuildProjectDirectory)/../../tools/hw05-publication-probe/bin/$(Configuration)/$(TargetFramework)/*" />
+		</ItemGroup>
+		<Copy SourceFiles="@(PublicationProbe)" DestinationFolder="$(OutDir)publication-probe" />
+	</Target>
 
 	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
 		<ErrorReport>prompt</ErrorReport>

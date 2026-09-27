@@ -208,7 +208,8 @@ public static class Command {
 			+ $"  -c              check source only; do not publish database entries{Environment.NewLine}"
 			+ $"  -e name,...     process only selected canonical names or aliases{Environment.NewLine}"
 			+ $"  -x              permit unknown extended capability names{Environment.NewLine}"
-			+ $"  -o directory    publish beneath an explicit conventional database root{Environment.NewLine}"
+			+ $"  -o path         directory root, or exact file for hashed output{Environment.NewLine}"
+			+ $"      --database-format directory|hashed   publication format (default: directory){Environment.NewLine}"
 			+ $"  -s              write a concise publication summary to standard error{Environment.NewLine}"
 			+ $"      --force     replace existing compiled destinations safely{Environment.NewLine}"
 			+ $"  -D              print Runtime database discovery locations and exit{Environment.NewLine}"
@@ -217,7 +218,8 @@ public static class Command {
 			+ Environment.NewLine
 			+ $"Use '-' as file to read strict UTF-8 source from standard input.{Environment.NewLine}"
 			+ $"Unambiguous short options may be clustered; -e and -o accept attached values; use -- before a source filename beginning with '-'.{Environment.NewLine}"
-			+ $"Without -o, publication uses directory-valued TERMINFO, then the Runtime-defined user database; system roots are never selected implicitly.{Environment.NewLine}";
+			+ $"Directory output without -o uses directory-valued TERMINFO, then the Runtime-defined user database; system roots are never selected implicitly.{Environment.NewLine}"
+			+ $"Hashed output requires -o; no .db suffix is appended. --database-format is not valid with -c.{Environment.NewLine}";
 	}
 
 	private static string GetSemanticVersion() {

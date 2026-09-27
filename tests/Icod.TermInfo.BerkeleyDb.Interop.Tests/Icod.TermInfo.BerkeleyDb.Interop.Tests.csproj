@@ -26,6 +26,8 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\Icod.TermInfo.BerkeleyDb\Icod.TermInfo.BerkeleyDb.csproj" />
+		<Compile Include="..\Shared\Hw07WriterMatrix.cs" Link="Shared\Hw07WriterMatrix.cs" />
+		<ProjectReference Include="..\..\tools\hdb00\writer-probe\Hw00.ManagedWriterProbe.csproj" />
 	</ItemGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">

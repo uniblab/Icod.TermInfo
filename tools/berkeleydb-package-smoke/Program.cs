@@ -22,6 +22,7 @@ string? previousTermInfoDirs =
 	Environment.GetEnvironmentVariable( "TERMINFO_DIRS" );
 
 try {
+	VerifyWriterPublication();
 	File.WriteAllBytes(
 		databasePath,
 		CreateStore(
@@ -373,6 +374,60 @@ try {
 	);
 	File.Delete( databasePath );
 	File.Delete( latin1DatabasePath );
+}
+
+static void VerifyWriterPublication() {
+	string root = Path.Combine( Path.GetTempPath(), "Icod.HW08." + Guid.NewGuid().ToString( "N" ) );
+	Directory.CreateDirectory( root );
+	try {
+		string path = Path.Combine( root, "written.db" );
+		string other = Path.Combine( root, "reordered.db" );
+		var first = new BerkeleyDbTerminalDatabaseEntry(
+			"hw08-caf\u00e9", [ "hw08-alias-\u00e9" ], CreateCompiledEntry( "hw08-caf\u00e9", "hw08-alias-\u00e9", "Writer package smoke" )
+		);
+		var second = new BerkeleyDbTerminalDatabaseEntry(
+			"hw08-second", [ "hw08-second-alias" ], CreateCompiledEntry( "hw08-second", "hw08-second-alias", "Second writer entry" )
+		);
+		var options = new BerkeleyDbTerminalDatabaseWriterOptions( maximumRecordCount: 6 );
+		BerkeleyDbTerminalDatabaseWriter.Write( path, [ first, second ], options );
+		BerkeleyDbTerminalDatabaseWriter.Write( other, [ second, first ], options );
+		byte[] original = File.ReadAllBytes( path );
+		if ( !original.SequenceEqual( File.ReadAllBytes( other ) ) ) {
+			throw new InvalidOperationException( "Packaged writer changed bytes with input order." );
+		}
+		var provider = new BerkeleyDbTerminalDescriptionProvider( path );
+		if ( LoadRequired( provider, "hw08-alias-\u00e9" ).Name != "hw08-caf\u00e9"
+			|| new BerkeleyDbTerminalCatalogReader( path ).Read().Count != 4 ) {
+			throw new InvalidOperationException( "Packaged writer lost canonical/alias publications." );
+		}
+		RequireFailure<IOException>( () => BerkeleyDbTerminalDatabaseWriter.Write( path, [ second ] ) );
+		using var cancellation = new CancellationTokenSource();
+		cancellation.Cancel();
+		RequireFailure<OperationCanceledException>(
+			() => BerkeleyDbTerminalDatabaseWriter.Write( path, [ second ], new( overwriteExisting: true ), cancellation.Token )
+		);
+		if ( !original.SequenceEqual( File.ReadAllBytes( path ) ) ) {
+			throw new InvalidOperationException( "Rejected publication changed the packaged database." );
+		}
+		BerkeleyDbTerminalDatabaseWriter.Write( path, [ second ], new( overwriteExisting: true ) );
+		var replacement = new BerkeleyDbTerminalDescriptionProvider( path );
+		if ( replacement.TryLoad( "hw08-caf\u00e9", out _ )
+			|| LoadRequired( replacement, "hw08-second-alias" ).Name != "hw08-second" ) {
+			throw new InvalidOperationException( "Packaged overwrite did not replace the complete database." );
+		}
+		Console.WriteLine( "HW08 packaged writer: deterministic publication, UTF-8 aliases, refusal, cancellation, and replacement passed." );
+	} finally {
+		Directory.Delete( root, recursive: true );
+	}
+}
+
+static void RequireFailure<TException>( Action action ) where TException : Exception {
+	try {
+		action();
+	} catch ( TException ) {
+		return;
+	}
+	throw new InvalidOperationException( "Expected packaged writer failure: " + typeof( TException ).Name );
 }
 
 static TerminalDescription LoadRequired(

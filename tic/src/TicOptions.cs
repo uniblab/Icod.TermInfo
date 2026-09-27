@@ -29,7 +29,8 @@ internal sealed class TicOptions {
 		bool checkOnly,
 		string? outputDirectory,
 		bool summary,
-		bool force
+		bool force,
+		bool hashedOutput
 	) {
 		ArgumentException.ThrowIfNullOrWhiteSpace( sourceOperand );
 		ArgumentNullException.ThrowIfNull( selectedNames );
@@ -41,6 +42,7 @@ internal sealed class TicOptions {
 		OutputDirectory = outputDirectory;
 		Summary = summary;
 		Force = force;
+		HashedOutput = hashedOutput;
 	}
 
 	internal string SourceOperand {
@@ -70,6 +72,8 @@ internal sealed class TicOptions {
 	internal bool Force {
 		get;
 	}
+
+	internal bool HashedOutput { get; }
 }
 
 internal sealed class TicOptionsParseResult {
@@ -122,6 +126,7 @@ internal static class TicOptionsParser {
 		bool allowUnknownExtensions = false;
 		bool summary = false;
 		bool force = false;
+		string? databaseFormat = null;
 		List<string> selectedNames = [];
 		string? outputDirectory = null;
 		string? sourceOperand = null;
@@ -158,6 +163,16 @@ internal static class TicOptionsParser {
 			}
 
 			switch ( argument ) {
+				case "--database-format":
+					if ( databaseFormat is not null ) {
+						return TicOptionsParseResult.FromError( "option '--database-format' may be specified only once" );
+					}
+					if ( index + 1 >= args.Count || args[ index + 1 ] is not ( "directory" or "hashed" ) ) {
+						return TicOptionsParseResult.FromError( "option '--database-format' requires 'directory' or 'hashed'" );
+					}
+					databaseFormat = args[ ++index ];
+					break;
+
 				case "-c":
 					checkOnly = true;
 					break;
@@ -263,11 +278,16 @@ internal static class TicOptionsParser {
 				outputDirectory is not null
 				|| summary
 				|| force
+				|| databaseFormat is not null
 			)
 		) {
 			return TicOptionsParseResult.FromError(
-				"options '-o', '-s', and '--force' are not valid with check-only mode '-c'"
+				"options '-o', '-s', '--force', and '--database-format' are not valid with check-only mode '-c'"
 			);
+		}
+
+		if ( databaseFormat == "hashed" && outputDirectory is null ) {
+			return TicOptionsParseResult.FromError( "hashed output requires an explicit '-o' destination file" );
 		}
 
 		return TicOptionsParseResult.FromOptions(
@@ -278,7 +298,8 @@ internal static class TicOptionsParser {
 				checkOnly,
 				outputDirectory,
 				summary,
-				force
+				force,
+				databaseFormat == "hashed"
 			)
 		);
 	}

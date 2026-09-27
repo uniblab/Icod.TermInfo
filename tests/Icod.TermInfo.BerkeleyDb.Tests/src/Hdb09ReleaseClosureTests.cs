@@ -28,13 +28,13 @@ namespace Icod.TermInfo.BerkeleyDb.Tests;
 
 public sealed class Hdb09ReleaseClosureTests {
 	private const string ApiBaselinePath =
-		"docs/1.15.0-BERKELEYDB-PUBLIC-API-BASELINE.txt";
+		"docs/1.16.0-BERKELEYDB-PUBLIC-API-BASELINE.txt";
 
 	[Fact]
 	public void ExactBerkeleyDbPublicApiHasACompleteCheckedInFreeze() {
 		string baseline = ReadRequiredRepositoryFile( ApiBaselinePath );
 		string freeze = ReadRequiredRepositoryFile(
-			"docs/1.15.0-BERKELEY-DB-PUBLIC-API-FREEZE.md"
+			"docs/1.16.0-BERKELEYDB-PUBLIC-API-FREEZE.md"
 		);
 		string verifier = ReadRequiredRepositoryFile(
 			".github/scripts/verify-berkeleydb-package.ps1"
@@ -58,7 +58,7 @@ public sealed class Hdb09ReleaseClosureTests {
 		int typeCount = NormalizeLf( baseline ).Split( '\n' ).Count(
 			line => line.StartsWith( "TYPE ", StringComparison.Ordinal )
 		);
-		Assert.True( typeCount > 0 );
+		Assert.Equal( 12, typeCount );
 		string sha256 = NormalizedLfSha256( baseline );
 		Assert.Contains( sha256, freeze, StringComparison.Ordinal );
 		Assert.Contains(
@@ -66,6 +66,14 @@ public sealed class Hdb09ReleaseClosureTests {
 			freeze,
 			StringComparison.Ordinal
 		);
+		foreach ( string token in new[] {
+			"1.16.0",
+			"BerkeleyDbTerminalDatabaseEntry",
+			"BerkeleyDbTerminalDatabaseWriterOptions",
+			"BerkeleyDbTerminalDatabaseWriter",
+		} ) {
+			Assert.Contains( token, freeze, StringComparison.Ordinal );
+		}
 
 		Assert.Contains( "--check", verifier, StringComparison.Ordinal );
 		Assert.Contains( ApiBaselinePath, verifier, StringComparison.Ordinal );
@@ -192,14 +200,14 @@ public sealed class Hdb09ReleaseClosureTests {
 			"BerkeleyDbTerminalDescriptionProvider",
 			"TryLoad",
 			"Path.GetTempPath",
-			"File.WriteAllBytes",
+			"BerkeleyDbTerminalDatabaseWriter.Write",
 			"hdb09-sample",
 			"NumericCapability.Colors",
 		} ) {
 			Assert.Contains( token, program, StringComparison.Ordinal );
 		}
 		Assert.Contains( "controlled", readme, StringComparison.OrdinalIgnoreCase );
-		Assert.Contains( "read-only", readme, StringComparison.OrdinalIgnoreCase );
+		Assert.Contains( "publication", readme, StringComparison.OrdinalIgnoreCase );
 		Assert.Contains( "no native", readme, StringComparison.OrdinalIgnoreCase );
 
 		string solution = ReadRequiredRepositoryFile( "Icod.TermInfo.sln" );
@@ -286,7 +294,7 @@ public sealed class Hdb09ReleaseClosureTests {
 		AssertContainsAll(
 			"README.md",
 			"Icod.TermInfo.BerkeleyDb",
-			"1.15.0-Alpha-8",
+			"1.16.0",
 			"Feature Inventory",
 			"BERKELEY-DB-HASHED-ACQUISITION-GUIDE"
 		);
@@ -318,22 +326,11 @@ public sealed class Hdb09ReleaseClosureTests {
 	}
 
 	[Fact]
-	public void StablePromotionAuthoritiesIdentifyTheCoordinated1150Release() {
-		XDocument buildProperties = XDocument.Parse(
-			ReadRequiredRepositoryFile( "Directory.Build.props" )
-		);
-		Assert.Equal(
-			"1.15.0",
-			Assert.Single(
-				buildProperties.Descendants(),
-				element => element.Name.LocalName == "IcodTermInfoSuiteVersion"
-			).Value
-		);
-
+	public void StableHistoryAndCurrentPackageNotesRemainCoordinated() {
 		AssertContainsAll(
 			"README.md",
-			"Current release line: `Icod.TermInfo 1.15.0`.",
-			"Icod.TermInfo.BerkeleyDb --version 1.15.0"
+			"Current release line: `Icod.TermInfo 1.16.0`.",
+			"Icod.TermInfo.BerkeleyDb --version 1.16.0"
 		);
 		Assert.DoesNotContain(
 			"HDB09 Alpha-8 closure qualification is in progress",
@@ -342,8 +339,8 @@ public sealed class Hdb09ReleaseClosureTests {
 		);
 		AssertContainsAll(
 			"Icod.TermInfo.BerkeleyDb/README.md",
-			"`1.15.0` is the stable coordinated release",
-			"stable promotion changed no acquisition behavior or public API"
+			"12 exported public types",
+			"1.15 reader API"
 		);
 
 		foreach ( string projectPath in new[] {
@@ -363,7 +360,7 @@ public sealed class Hdb09ReleaseClosureTests {
 				element => element.Name.LocalName == "PackageReleaseNotes"
 			).Value;
 			Assert.StartsWith(
-				"1.15.0 ",
+				"1.16.0 ",
 				releaseNotes,
 				StringComparison.Ordinal
 			);
@@ -371,7 +368,7 @@ public sealed class Hdb09ReleaseClosureTests {
 
 		AssertContainsAll(
 			"docs/VERSIONING.md",
-			"Stable `1.15.0` is the current coordinated release",
+			"Stable `1.15.0` is the previous coordinated release",
 			"promotion changed release identity and release-facing text only",
 			"six reusable libraries",
 			"Icod.TermInfo.BerkeleyDb",
@@ -389,7 +386,7 @@ public sealed class Hdb09ReleaseClosureTests {
 		);
 		AssertContainsAll(
 			"Icod.TermInfo-Post-1.0-Development-Roadmap.md",
-			"**Current coordinated version:** `1.15.0`",
+			"stable `1.15.0` is published",
 			"**Latest completed line:** `1.15.0`",
 			"**Latest completed release audit:** `docs/1.15.0-RELEASE-AUDIT.md`"
 		);

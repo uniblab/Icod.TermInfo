@@ -34,10 +34,10 @@ try {
         --no-build `
         -- `
         --check `
-        'docs/1.15.0-BERKELEYDB-PUBLIC-API-BASELINE.txt' `
+		'docs/1.16.0-BERKELEYDB-PUBLIC-API-BASELINE.txt' `
         "Icod.TermInfo.BerkeleyDb/bin/$Configuration/net10.0/Icod.TermInfo.BerkeleyDb.dll"
     if (0 -ne $LASTEXITCODE) {
-        throw 'Icod.TermInfo.BerkeleyDb public API differs from the frozen 1.15 manifest.'
+		throw 'Icod.TermInfo.BerkeleyDb public API differs from the frozen 1.16 manifest.'
     }
 
     & dotnet run `

@@ -10,7 +10,7 @@ forward unchanged. Hashed acquisition is isolated in the optional BerkeleyDb
 package and does not alter `infotocap` source resolution, representability
 checks, rendering, options, or dependencies. Standalone `infotocap` and routed
 `icod-terminfo infotocap` retain their existing behavior while reporting the
-coordinated `1.15.0` suite version.
+coordinated `1.16.0` suite version.
 
 TC07 composes the existing Source parser/resolver with the TC05 termcap
 representability and rendering engine. It does not add another termcap semantic

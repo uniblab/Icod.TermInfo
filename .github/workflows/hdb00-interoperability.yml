@@ -7,17 +7,23 @@ on:
     paths:
       - '.github/workflows/hdb00-interoperability.yml'
       - 'tools/hdb00/**'
+      - 'tools/berkeleydb-package-smoke/**'
+      - 'tools/berkeleydb-package-verifier/**'
       - 'Icod.TermInfo.BerkeleyDb/**'
       - 'tests/Icod.TermInfo.BerkeleyDb.Tests/**'
+      - 'tests/Icod.TermInfo.Tests/src/T45CompletionGateTests.cs'
       - 'tests/Icod.TermInfo.BerkeleyDb.Interop.Tests/**'
       - 'samples/Icod.TermInfo.BerkeleyDb.Sample/**'
       - 'infocmp/**'
+      - 'tic/**'
+      - 'tests/Icod.TermInfo.Tic.Tests/**'
       - 'toe/**'
       - 'icod-terminfo/**'
       - 'tests/Icod.TermInfo.InfoCmp.Tests/**'
       - 'tests/Icod.TermInfo.Toe.Tests/**'
       - 'tests/Icod.TermInfo.Router.Tests/**'
       - 'tests/Shared/BerkeleyDbHashV9TestStore.cs'
+      - 'tests/Shared/Hw07WriterMatrix.cs'
       - '.github/scripts/new-hdb06-test-store.ps1'
       - '.github/scripts/verify-hdb07-permissions.ps1'
       - '.github/scripts/verify-berkeleydb-package.ps1'
@@ -111,6 +117,47 @@ jobs:
         shell: bash
         run: bash tools/hdb00/verify-managed.sh "$RUNNER_TEMP/icod-terminfo-hdb00"
 
+      - name: Verify HW00 managed writer with native Berkeley DB
+        if: steps.hdb00-scope.outputs.required == 'true'
+        shell: bash
+        env:
+          ICOD_HDB02_FIXTURE_ROOT: ${{ runner.temp }}/icod-terminfo-hdb00
+        run: |
+          project="tools/hdb00/writer-probe/Hw00.ManagedWriterProbe.csproj"
+          candidate="$ICOD_HDB02_FIXTURE_ROOT/hw00-managed-writer.db"
+          dump="$ICOD_HDB02_FIXTURE_ROOT/hw00-managed-writer.dump"
+          primary="$ICOD_HDB02_FIXTURE_ROOT/hw00-managed-primary.bin"
+          alias="$ICOD_HDB02_FIXTURE_ROOT/hw00-managed-alias.bin"
+          overflow="$ICOD_HDB02_FIXTURE_ROOT/hw00-managed-overflow.bin"
+
+          dotnet run --project "$project" -c Release -f net10.0 -- \
+            "$candidate" \
+            "$ICOD_HDB02_FIXTURE_ROOT/hdb00-primary.bin" \
+            "$ICOD_HDB02_FIXTURE_ROOT/hdb00-overflow.bin"
+          db5.3_verify "$candidate"
+          db5.3_dump -k -f "$dump" "$candidate"
+          "$ICOD_HDB02_FIXTURE_ROOT/hdb00-probe" "$candidate" hdb00-primary "$primary"
+          "$ICOD_HDB02_FIXTURE_ROOT/hdb00-probe" "$candidate" hdb00-alias "$alias"
+          "$ICOD_HDB02_FIXTURE_ROOT/hdb00-probe" "$candidate" hdb00-overflow "$overflow"
+          cmp "$primary" "$ICOD_HDB02_FIXTURE_ROOT/hdb00-primary.bin"
+          cmp "$alias" "$ICOD_HDB02_FIXTURE_ROOT/hdb00-primary.bin"
+          cmp "$overflow" "$ICOD_HDB02_FIXTURE_ROOT/hdb00-overflow.bin"
+
+      - name: Generate and verify HW03 managed writer fixtures
+        if: steps.hdb00-scope.outputs.required == 'true'
+        shell: bash
+        run: |
+          root="$RUNNER_TEMP/icod-terminfo-hdb00"
+          project="tools/hdb00/hw03-writer-probe/Hw03.ManagedWriterProbe.csproj"
+
+          dotnet run --project "$project" -c Release -f net10.0 -- "$root"
+
+          for name in hw03-overflow hw03-growth hw03-collision; do
+            db5.3_verify "$root/$name.db"
+            db5.3_dump -k -f "$root/$name.dump" "$root/$name.db"
+          done
+          bash tools/hdb00/verify-hw07-writer.sh "$root" db5.3_verify db5.3_dump db5.3_load
+
       - name: Compare production reader with native Berkeley DB records
         if: steps.hdb00-scope.outputs.required == 'true'
         shell: bash
@@ -129,6 +176,11 @@ jobs:
         run: |
           ./tools/hdb00/verify-hdb06-commands.ps1 -FixtureRoot "${{ runner.temp }}/icod-terminfo-hdb00" -LaunchMode Direct
           ./tools/hdb00/verify-hdb06-commands.ps1 -FixtureRoot "${{ runner.temp }}/icod-terminfo-hdb00" -LaunchMode Routed
+
+      - name: Verify HW06 tic publication with native consumers
+        if: steps.hdb00-scope.outputs.required == 'true'
+        shell: bash
+        run: bash tools/hdb00/verify-hw06-tic.sh "$RUNNER_TEMP/icod-terminfo-hdb00" db5.3_verify
 
       - name: Upload Linux Hash v9 fixtures
         if: steps.hdb00-scope.outputs.required == 'true'
@@ -151,6 +203,27 @@ jobs:
             ${{ runner.temp }}/icod-terminfo-hdb00/overflow-hashed-db.dump
             ${{ runner.temp }}/icod-terminfo-hdb00/multi-hashed-db.db
             ${{ runner.temp }}/icod-terminfo-hdb00/multi-hashed-db.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw00-managed-writer.db
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw00-managed-writer.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw03-overflow.db
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw03-overflow.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw03-overflow.key
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw03-overflow.value
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw03-growth.db
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw03-growth.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw03-growth-003.key
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw03-growth-003.value
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw03-collision.db
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw03-collision.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw03-collision-first.key
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw03-collision-first.value
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw03-collision-second.key
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw03-collision-second.value
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw06-tic/**
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw07-*.db
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw07-*.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw07-*.bin
+            ${{ runner.temp }}/icod-terminfo-hdb00/hw07-*.names
             ${{ runner.temp }}/icod-terminfo-hdb00/not-hash.db
             ${{ runner.temp }}/icod-terminfo-hdb00/random.db
 
@@ -212,6 +285,51 @@ jobs:
         shell: bash
         run: bash tools/hdb00/verify-managed.sh "$RUNNER_TEMP/icod-terminfo-hdb00-macos"
 
+      - name: Verify HW00 managed writer with native Berkeley DB
+        if: steps.hdb00-scope.outputs.required == 'true'
+        shell: bash
+        env:
+          ICOD_HDB02_FIXTURE_ROOT: ${{ runner.temp }}/icod-terminfo-hdb00-macos
+        run: |
+          db_prefix="$(brew --prefix berkeley-db@5)"
+          export DYLD_LIBRARY_PATH="$db_prefix/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}"
+          project="tools/hdb00/writer-probe/Hw00.ManagedWriterProbe.csproj"
+          candidate="$ICOD_HDB02_FIXTURE_ROOT/hw00-managed-writer.db"
+          dump="$ICOD_HDB02_FIXTURE_ROOT/hw00-managed-writer.dump"
+          primary="$ICOD_HDB02_FIXTURE_ROOT/hw00-managed-primary.bin"
+          alias="$ICOD_HDB02_FIXTURE_ROOT/hw00-managed-alias.bin"
+          overflow="$ICOD_HDB02_FIXTURE_ROOT/hw00-managed-overflow.bin"
+
+          dotnet run --project "$project" -c Release -f net10.0 -- \
+            "$candidate" \
+            "$ICOD_HDB02_FIXTURE_ROOT/hdb00-primary.bin" \
+            "$ICOD_HDB02_FIXTURE_ROOT/hdb00-overflow.bin"
+          "$db_prefix/bin/db_verify" "$candidate"
+          "$db_prefix/bin/db_dump" -k -f "$dump" "$candidate"
+          "$ICOD_HDB02_FIXTURE_ROOT/hdb00-probe" "$candidate" hdb00-primary "$primary"
+          "$ICOD_HDB02_FIXTURE_ROOT/hdb00-probe" "$candidate" hdb00-alias "$alias"
+          "$ICOD_HDB02_FIXTURE_ROOT/hdb00-probe" "$candidate" hdb00-overflow "$overflow"
+          cmp "$primary" "$ICOD_HDB02_FIXTURE_ROOT/hdb00-primary.bin"
+          cmp "$alias" "$ICOD_HDB02_FIXTURE_ROOT/hdb00-primary.bin"
+          cmp "$overflow" "$ICOD_HDB02_FIXTURE_ROOT/hdb00-overflow.bin"
+
+      - name: Generate and verify HW03 managed writer fixtures
+        if: steps.hdb00-scope.outputs.required == 'true'
+        shell: bash
+        run: |
+          root="$RUNNER_TEMP/icod-terminfo-hdb00-macos"
+          project="tools/hdb00/hw03-writer-probe/Hw03.ManagedWriterProbe.csproj"
+          db_prefix="$(brew --prefix berkeley-db@5)"
+          export DYLD_LIBRARY_PATH="$db_prefix/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}"
+
+          dotnet run --project "$project" -c Release -f net10.0 -- "$root"
+
+          for name in hw03-overflow hw03-growth hw03-collision; do
+            "$db_prefix/bin/db_verify" "$root/$name.db"
+            "$db_prefix/bin/db_dump" -k -f "$root/$name.dump" "$root/$name.db"
+          done
+          bash tools/hdb00/verify-hw07-writer.sh "$root" "$db_prefix/bin/db_verify" "$db_prefix/bin/db_dump" "$db_prefix/bin/db_load"
+
       - name: Compare production reader with native Berkeley DB records
         if: steps.hdb00-scope.outputs.required == 'true'
         shell: bash
@@ -233,8 +351,16 @@ jobs:
           ./tools/hdb00/verify-hdb06-commands.ps1 -FixtureRoot "${{ runner.temp }}/icod-terminfo-hdb00-macos" -LaunchMode Direct
           ./tools/hdb00/verify-hdb06-commands.ps1 -FixtureRoot "${{ runner.temp }}/icod-terminfo-hdb00-macos" -LaunchMode Routed
 
-      - name: Upload macOS native oracle fixtures
+      - name: Verify HW06 tic publication with native consumers
         if: steps.hdb00-scope.outputs.required == 'true'
+        shell: bash
+        run: |
+          db_prefix="$(brew --prefix berkeley-db@5)"
+          export DYLD_LIBRARY_PATH="$db_prefix/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}"
+          bash tools/hdb00/verify-hw06-tic.sh "$RUNNER_TEMP/icod-terminfo-hdb00-macos" "$db_prefix/bin/db_verify"
+
+      - name: Upload macOS native oracle fixtures
+        if: always() && steps.hdb00-scope.outputs.required == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: hdb02-macos-native-oracle
@@ -251,6 +377,27 @@ jobs:
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/overflow-hashed-db.dump
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/multi-hashed-db.db
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/multi-hashed-db.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw00-managed-writer.db
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw00-managed-writer.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-overflow.db
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-overflow.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-overflow.key
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-overflow.value
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-growth.db
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-growth.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-growth-003.key
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-growth-003.value
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-collision.db
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-collision.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-collision-first.key
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-collision-first.value
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-collision-second.key
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw03-collision-second.value
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw06-tic/**
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw07-*.db
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw07-*.dump
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw07-*.bin
+            ${{ runner.temp }}/icod-terminfo-hdb00-macos/hw07-*.names
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/not-hash.db
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/random.db
             ${{ runner.temp }}/icod-terminfo-hdb00-macos/hdb00-primary.bin
@@ -329,6 +476,23 @@ jobs:
           dotnet run --project $project -c Release -- $overflowDatabase hdb00-overflow $overflowActual
           if ((Get-FileHash $overflowActual -Algorithm SHA256).Hash -ne (Get-FileHash $overflowExpected -Algorithm SHA256).Hash) {
               throw 'Windows managed overflow extraction differs from the Linux native oracle.'
+          }
+
+          $managedWriterDatabase = Join-Path $fixtureRoot 'hw00-managed-writer.db'
+          $managedWriterPrimary = Join-Path $fixtureRoot 'windows-hw00-primary.bin'
+          $managedWriterAlias = Join-Path $fixtureRoot 'windows-hw00-alias.bin'
+          $managedWriterOverflow = Join-Path $fixtureRoot 'windows-hw00-overflow.bin'
+          dotnet run --project $project -c Release -- $managedWriterDatabase hdb00-primary $managedWriterPrimary
+          dotnet run --project $project -c Release -- $managedWriterDatabase hdb00-alias $managedWriterAlias
+          dotnet run --project $project -c Release -- $managedWriterDatabase hdb00-overflow $managedWriterOverflow
+          if ((Get-FileHash $managedWriterPrimary -Algorithm SHA256).Hash -ne (Get-FileHash $expected -Algorithm SHA256).Hash) {
+              throw 'Windows managed HW00 primary extraction differs from the Linux writer input.'
+          }
+          if ((Get-FileHash $managedWriterAlias -Algorithm SHA256).Hash -ne (Get-FileHash $expected -Algorithm SHA256).Hash) {
+              throw 'Windows managed HW00 alias extraction differs from the Linux writer input.'
+          }
+          if ((Get-FileHash $managedWriterOverflow -Algorithm SHA256).Hash -ne (Get-FileHash $overflowExpected -Algorithm SHA256).Hash) {
+              throw 'Windows managed HW00 overflow extraction differs from the Linux writer input.'
           }
 
           $multiDatabase = Join-Path $fixtureRoot 'multi-hashed-db.db'

@@ -3,19 +3,19 @@
 `Icod.TermInfo.Compiler` is the optional managed compiled-terminfo writing and
 explicit database-publication layer for `Icod.TermInfo`.
 
-## 1.15 release status
+## 1.16 release status
 
-Version `1.15.0` preserves the frozen Compiler 1.2 public API, deterministic
+Version `1.16.0` preserves the frozen Compiler 1.2 public API, deterministic
 compiled-entry and database-publication semantics, Runtime-and-Source dependency
 graph, `net8.0` / `net9.0` / `net10.0` support, and assembly identity
-`1.0.0.0`. Read-only hashed acquisition is isolated to the optional BerkeleyDb
+`1.0.0.0`. Hashed acquisition and publication are isolated to the optional BerkeleyDb
 package; Compiler retains conventional directory publication and does not acquire
 a BerkeleyDb, Inspection, Termcap, Terminal, or command-layer dependency.
 
 ## Install
 
 ```text
-dotnet add package Icod.TermInfo.Compiler --version 1.15.0
+dotnet add package Icod.TermInfo.Compiler --version 1.16.0
 ```
 
 The package depends on matching `Icod.TermInfo` and `Icod.TermInfo.Source`
@@ -83,13 +83,16 @@ Compiler in tests/samples for semantic round trips, but production
 Version `1.9.0` was the first coordinated line whose machine-readable Inspection
 release closure required package-facing documentation across the full suite. That
 historical marker remains part of the release-closure compatibility record; the
-current install version is `1.15.0`.
+current install version is `1.16.0`.
 
 ## Compatibility
 
 The Compiler public contract was frozen at 1.2 and remains compatible throughout
-the coordinated 1.x line. Version 1.15 changes package/release identity only for
-Compiler; it does not change Compiler semantics or public API.
+the coordinated 1.x line. Versions `1.15.0` and `1.16.0` retain Compiler semantics
+and public API.
+Applications compose Compiler output with the optional BerkeleyDb writer when
+hashed publication is needed; Compiler itself keeps directory publication.
+See the [writing guide](../docs/1.16.0-BERKELEY-DB-WRITING-GUIDE.md#compile-source-publish-and-replace).
 
 See `../docs/VERSIONING.md`, `../docs/COMPATIBILITY.md`, and the root
 `../README.md` for the coordinated release contract.

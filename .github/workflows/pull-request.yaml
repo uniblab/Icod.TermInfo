@@ -45,12 +45,16 @@ jobs:
         run: dotnet restore ${{ env.SOLUTION_PATH }}
       - name: Build
         run: dotnet build ${{ env.SOLUTION_PATH }} -c ${{ env.CONFIGURATION }} --no-restore -p:ContinuousIntegrationBuild=true
+      - name: Qualify Release build with warnings as errors
+        run: dotnet build ${{ env.SOLUTION_PATH }} -c Release --no-restore -warnaserror -p:ContinuousIntegrationBuild=true
       - name: Verify Inspection compatibility under Windows PowerShell
         if: runner.os == 'Windows'
         shell: powershell
         run: ./.github/scripts/verify-inspection-compatibility.ps1 -Configuration '${{ env.CONFIGURATION }}' -AssemblyPath 'Icod.TermInfo.Inspection/bin/${{ env.CONFIGURATION }}/net10.0/Icod.TermInfo.Inspection.dll'
       - name: Test
         run: dotnet test ${{ env.SOLUTION_PATH }} -c ${{ env.CONFIGURATION }} --no-build --no-restore --logger trx
+      - name: Test complete Release solution
+        run: dotnet test ${{ env.SOLUTION_PATH }} -c Release --no-build --no-restore --logger trx
       - name: Restore HDB01 BerkeleyDb tests
         run: dotnet restore ${{ env.BERKELEYDB_TEST_PROJECT }}
       - name: Test BerkeleyDb release configuration
@@ -67,22 +71,28 @@ jobs:
         if: matrix.package_host
         shell: pwsh
         run: ./.github/scripts/smoke-da07-package-consumer.ps1 artifacts -Configuration '${{ env.CONFIGURATION }}'
-      - name: Build and verify Staging tool archives
+      - name: Pack and verify Release packages before tagging
         if: matrix.package_host
         shell: pwsh
-        run: ./packaging/BuildToolArchives.ps1 -Configuration '${{ env.CONFIGURATION }}' -OutputDirectory artifacts/tools
-      - name: Upload validated Staging packages
+        run: |
+          ./packaging/PackPackages.ps1 -Configuration Release -OutputDirectory artifacts/release
+          ./packaging/VerifyPackageArtifact.ps1 -ArtifactDirectory artifacts/release -Configuration Release
+      - name: Build and verify Release tool archives
+        if: matrix.package_host
+        shell: pwsh
+        run: ./packaging/BuildToolArchives.ps1 -Configuration Release -OutputDirectory artifacts/tools
+      - name: Upload validated Release packages
         if: matrix.package_host
         uses: actions/upload-artifact@v4
         with:
           name: terminfo-pr-packages
           path: |
-            artifacts/*.nupkg
-            artifacts/*.snupkg
-            artifacts/*.txt
+            artifacts/release/*.nupkg
+            artifacts/release/*.snupkg
+            artifacts/release/*.txt
           if-no-files-found: error
           retention-days: 7
-      - name: Upload validated Staging tool archives
+      - name: Upload validated Release tool archives
         if: matrix.package_host
         uses: actions/upload-artifact@v4
         with:
@@ -109,7 +119,7 @@ jobs:
           path: artifacts
       - name: Smoke isolated HDB08 BerkeleyDb package consumer
         shell: pwsh
-        run: ./.github/scripts/smoke-hdb03-package-consumer.ps1 artifacts -Configuration '${{ env.CONFIGURATION }}'
+        run: ./.github/scripts/smoke-hdb03-package-consumer.ps1 artifacts -Configuration Release
       - name: Smoke installable Icod.TermInfo.Tools package
         shell: pwsh
         run: ./.github/scripts/smoke-tool-package.ps1 artifacts

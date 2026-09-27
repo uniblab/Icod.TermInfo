@@ -30,7 +30,8 @@ public sealed class CommandTests {
 		);
 		Assert.Contains( "-e name,...", ReadText( stdout ) );
 		Assert.Contains( "-x", ReadText( stdout ) );
-		Assert.Contains( "-o directory", ReadText( stdout ) );
+		Assert.Contains( "-o path", ReadText( stdout ) );
+		Assert.Contains( "--database-format directory|hashed", ReadText( stdout ) );
 		Assert.Contains( "--force", ReadText( stdout ) );
 		Assert.Contains( "-D", ReadText( stdout ) );
 		Assert.Empty( ReadText( stderr ) );
@@ -54,7 +55,7 @@ public sealed class CommandTests {
 		);
 
 		Assert.Equal( CommandExitCodes.Success, status );
-		Assert.Contains( "1.15.0", ReadText( stdout ) );
+		Assert.Contains( "1.16.0", ReadText( stdout ) );
 		Assert.Empty( ReadText( stderr ) );
 	}
 
