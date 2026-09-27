@@ -186,23 +186,23 @@ fixtures and frozen historical evidence intact.
 distribution payload. Eight nupkg/seven snupkg; existing tools and six archive
 RIDs remain unchanged.
 
-- [ ] Add `UC02DevelopmentMetadataTests.cs` in the Catalogs test src directory,
-  asserting Alpha-2 centralized version, accurate adapter-complete/reader-pending
-  package documentation, unchanged ten exported types and no production Compiler
-  reference. Run the named test filter and observe failure on Alpha-1 metadata.
-- [ ] Advance active coordinated metadata/assertions to Alpha-2. Add a new
+- [x] Add `UC02DevelopmentMetadataTests.cs` in the Catalogs test src directory,
+  asserting compiled Alpha-2 identity, stable assembly version and no production
+  Compiler reference. Retain the existing exact ten-type API checks; review
+  adapter-complete/reader-pending documentation directly. Run the named test filter and observe failure on Alpha-1 metadata.
+- [x] Advance active coordinated metadata/assertions to Alpha-2. Add a new
   changelog section rather than rewriting UC01 history. Document publication
   semantics and internal-only adapter status; do not publish examples using the
   future reader. Run the new test and all existing metadata contract tests.
-- [ ] Run full Release solution build and tests, plus the separately invoked
+- [x] Run full Release solution build and tests, plus the separately invoked
   BerkeleyDb test project, across all TFMs with warnings as errors and serial
   MSBuild. Record actual counts, not copied UC01 totals.
-- [ ] Run `packaging/PackPackages.ps1 -Configuration Release -OutputDirectory artifacts/uc02-release`
+- [x] Run `packaging/PackPackages.ps1 -Configuration Release -OutputDirectory artifacts/uc02-release`
   and `packaging/VerifyPackageArtifact.ps1 -ArtifactDirectory artifacts/uc02-release -Configuration Release`
   with the available PowerShell host and dotnet on PATH. Use
   DOTNET_PROCESSOR_COUNT=1 locally if needed. Require all package/API,
   compatibility, consumer, sample, symbol and managed-payload checks to pass.
-- [ ] Verify `git diff --check`, unchanged API baselines and JSON schemas, and
+- [x] Verify `git diff --check`, unchanged API baselines and JSON schemas, and
   unchanged production dependency directions. Self-review implementation and
   tests inline; commit as `Integrate and qualify UC02 Alpha-2`.
 - [ ] Push to PR #48 without force and update its body with actual evidence.

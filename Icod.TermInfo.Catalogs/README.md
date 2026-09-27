@@ -1,12 +1,13 @@
 # Icod.TermInfo.Catalogs
 
-The optional model foundation for the Icod.TermInfo 1.17 unified directory/hashed
-catalog release. Current development version: **1.17.0-Alpha-1**.
+The optional composition package for the Icod.TermInfo 1.17 unified
+directory/hashed catalog release. Current development version: **1.17.0-Alpha-2**.
 Targets .NET 8, 9, and 10; licensed LGPL-3.0-or-later.
 
 UC01 supplies immutable source descriptors, read options, publication/result
-models, typed issues, and limit exceptions. The common reader will arrive in
-UC04; this foundation does not yet enumerate catalogs through this package.
+models, typed issues, and limit exceptions. UC02 adds the internal adapter for
+conventional directories. The common public reader will arrive in UC04; consumers cannot
+yet enumerate catalogs through this package.
 
 ```csharp
 using Icod.TermInfo.Catalogs;
@@ -21,6 +22,19 @@ Source paths are resolved once at construction; selecting a source performs no
 I/O. Publication names represent observed keys or files, while a terminal's alias
 list contains declarations. Results preserve source provenance and report issues
 and duplicate publications without selecting a winner.
+
+The directory adapter uses bounded Inspection observations. A canonical file
+declaring two aliases contributes one row; separately published alias files add
+their own rows. Literal and hexadecimal copies of the same publication are all
+retained, with one duplicate issue per repeated name and Partial status. Different
+aliases of the same canonical terminal are not duplicate publications. Misplaced
+files are excluded from unified rows while their original diagnostics remain.
+
+Directory candidate errors or skipped child links produce Partial results with
+the valid observed rows, which may be empty. Missing, unsupported, and unavailable
+roots remain distinct outcomes. Physical acquisition issues and duplicate issues
+share one issue budget. Filtered parses, malformed input and separate alias copies
+still consume their applicable acquisition budgets; normalization refunds none.
 
 Budget maxima are inclusive and independent. Byte budgets count input work, not
 exact managed heap usage. Cancellation and limit failures do not return partial

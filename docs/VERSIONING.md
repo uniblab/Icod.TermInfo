@@ -7,7 +7,7 @@ releases; this document defines the current cross-release policy.
 
 ## 1.17 development line
 
-The current coordinated build identity is `1.17.0-Alpha-1`, set through
+The current coordinated build identity is `1.17.0-Alpha-2`, set through
 `Directory.Build.props` for eight packages. The new optional
 `Icod.TermInfo.Catalogs` foundation brings the family to seven reusable libraries
 and seven symbol packages. All reusable assemblies retain `1.0.0.0` identity
@@ -16,7 +16,9 @@ qualification at `656acf952c286ccd24b3819e85faf2bc598e2bcd`;
 the latest published stable release is 1.16.0.
 
 UC01 delivers immutable models and opt-in bounded Inspection acquisition.
-The directory/hashed adapters and reader follow in UC02–UC04. Migration,
+UC02 adds the internal conventional-directory adapter; its qualification is
+tracked in the active roadmap. The hashed adapter and public reader follow in
+UC03–UC04. Migration,
 mixed-source precedence, and broader automation have no assigned release.
 
 ## 1.16 release line

@@ -3,7 +3,20 @@
 This file records release-level product changes. Exact qualification evidence,
 API fingerprints, and preserved boundaries live in the linked release audits.
 
-## 1.17.0-Alpha-1 (in development)
+## 1.17.0-Alpha-2 (in development)
+
+- Adds the internal conventional-directory adapter above bounded Inspection,
+  mapping actual canonical/alias files while preserving physical provenance.
+- Retains all duplicate publication occurrences with one diagnostic per name;
+  declared aliases alone do not manufacture rows or duplicate groups.
+- Excludes misplaced parses from unified rows, retains their diagnostics, and
+  preserves Complete/Partial/Missing/UnsupportedSource/Unavailable distinctions.
+- Shares the issue budget between acquisition and duplicate diagnostics,
+  translates typed acquisition limits, and observes cancellation during mapping.
+- Preserves the ten-type Catalogs API and all legacy Inspection behavior.
+  The hashed adapter and public reader remain assigned to UC03 and UC04.
+
+## 1.17.0-Alpha-1
 
 - Adds the optional `Icod.TermInfo.Catalogs` package with ten immutable source,
   options, entry, issue, result, status, and resource-limit model types.
@@ -14,7 +27,7 @@ API fingerprints, and preserved boundaries live in the linked release audits.
 - Adds Catalogs package/API verification and coordinates eight packages with
   seven reusable-library symbol packages on .NET 8, 9, and 10.
 
-Directory/hashed adapters and the unified reader remain pending. See the
+At this checkpoint, directory/hashed adapters and the unified reader were pending. See the
 [1.17 roadmap](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadmap.md).
 
 ## 1.16.0

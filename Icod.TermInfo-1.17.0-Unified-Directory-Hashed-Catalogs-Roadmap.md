@@ -4,11 +4,13 @@
 
 **Theme:** Unified directory/hashed catalogs
 
-**Status:** DEVELOPING — UC00 and UC01 accepted; UC02 directory adapter is next
+**Status:** DEVELOPING — UC00 and UC01 accepted; UC02 implemented, qualification in progress
 
 **Stable predecessor:** `1.16.0` (published)
 
 **Initial implementation version:** `1.17.0-Alpha-1`
+
+**Current coordinated version:** `1.17.0-Alpha-2`
 
 **Language / targets:** C# 13; `net8.0`, `net9.0`, `net10.0`
 
@@ -175,7 +177,7 @@ accepted based only on a plan or an unobserved CI run.
 | --- | --- | --- | --- | --- |
 | UC00 | Planning; retain `1.16.0` build identity | Contract, package decision, bounded-acquisition design | Published 1.16 | Approved by user, 2026-09-27 UTC |
 | UC01 | `1.17.0-Alpha-1` | Package/model foundation and approved bounded acquisition seam | UC00 | Accepted at `656acf9` |
-| UC02 | `1.17.0-Alpha-2` | Conventional-directory adapter | UC01 | Pending |
+| UC02 | `1.17.0-Alpha-2` | Conventional-directory adapter | UC01 | Implemented; qualification in progress |
 | UC03 | `1.17.0-Alpha-3` | Hash-v9 adapter | UC01, UC02 contract fixtures | Pending |
 | UC04 | `1.17.0-Alpha-4` | Unified reader and cross-format behavioral qualification | UC02, UC03 | Pending |
 | UC05 | `1.17.0-Alpha-5` | Resource, failure, cancellation, and compatibility hardening | UC04 | Pending |
@@ -220,9 +222,9 @@ are tested; existing Inspection and BerkeleyDb baselines remain reconstructible.
 ### UC02 — directory adapter
 
 The [UC02 implementation plan](docs/superpowers/plans/2026-09-27-uc02-conventional-directory-adapter.md)
-is written for user review. Implementation has not started; the coordinated build
-remains Alpha-1 until the plan's integration task. Execution remains inline,
-without subagents.
+was approved on 2026-09-27 UTC. The internal adapter and 31 new cases are
+implemented; Alpha-2 integration and qualification are in progress. Execution
+remains inline, without subagents.
 
 - [ ] Adapt bounded Inspection observations into the new publication model,
   reusing Runtime parsing and shared directory-layout validation.
@@ -318,6 +320,35 @@ not add behavior or enlarge the catalog scope.
 
 ## 5. Progress and change control
 
+### UC02 implementation and qualification
+
+The approved directory adapter is implemented, with 31 behavioral/boundary cases
+and one compiled Alpha-2 identity check. It maps only observed publications,
+retains all duplicate occurrences, excludes exact-path invalid placements, and
+preserves acquisition diagnostics and typed limit causes. The test-only
+Inspection friend grant supports deterministic mapping fixtures; production
+dependency directions and the ten-type Catalogs API remain unchanged.
+
+Local Alpha-2 Release qualification:
+
+- Full solution build: zero warnings/errors, warnings treated as errors.
+- Full solution tests: **5,466 passed**, across 22 test runs.
+- Separate BerkeleyDb suite: **1,818 passed**, 606 per framework.
+- Catalogs: **57 per framework**, including all UC01 tests and 32 UC02 cases.
+- Exact Catalogs API fingerprint remains
+  `9b7479953a060de94aadf994ddd5c1946660e8f1f2341a3c26291e2a3c9e0b3f`.
+
+- Eight nupkg and seven snupkg built; full Release distribution verification
+  passed, including existing package consumers and samples, exact APIs,
+  historical Inspection reconstruction, metadata, symbols and Source Link.
+
+Code-head CI remains pending. UC02 is not yet marked accepted.
+Review is performed inline by the author, without subagents;
+documentation is reviewed directly, while compiled identity and package contracts
+are checked automatically. Published 1.16 installation examples remain unchanged.
+
+### Accepted UC01 evidence
+
 UC00 and the UC01 plan are approved. UC01 implementation comprises:
 - `af93967`: opt-in bounded Inspection acquisition.
 - `e61e9c6`: immutable Catalogs model package and explicit solution entries.
@@ -331,9 +362,9 @@ three frameworks; both Inspection compatibility entry points reconstruct 1.14
 through 1.10. All six JSON schema fingerprints remain unchanged.
 
 UC01 is accepted at `656acf952c286ccd24b3819e85faf2bc598e2bcd` after successful
-code-head qualification. UC02 directory adaptation is the next implementation
-task; UC03 adds bounded hashed acquisition, and UC04 adds the public reader.
-Alpha-1 remains a development build; no release has been tagged or published.
+code-head qualification. UC02 directory adaptation is implemented and undergoing
+Alpha-2 qualification; UC03 adds bounded hashed acquisition, and UC04 adds the
+public reader. No 1.17 release has been tagged or published.
 
 The integrated production code is `6850dd56ca0643279f55d8037e2fe4dc46b44445`.
 The qualification candidate is `656acf952c286ccd24b3819e85faf2bc598e2bcd`,

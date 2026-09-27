@@ -12,15 +12,15 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`  
 **Frozen runtime contract:** `1.0.0`  
-**Current coordinated version:** `1.17.0-Alpha-1`
+**Current coordinated version:** `1.17.0-Alpha-2`
 **Latest completed line:** `1.16.0` - Berkeley DB Hash-v9 Writer
 **Latest completed prerelease:** `1.16.0-Alpha-8`
 **Active development line:** `1.17.0` - Unified directory/hashed catalogs
-**Status:** stable `1.16.0` is published; the 1.17 UC00 contract and UC01 foundation are accepted; UC02 is next
+**Status:** stable `1.16.0` is published; UC00 and UC01 are accepted; UC02 is implemented and undergoing qualification
 **Active release roadmap:** [1.17.0 — Unified directory/hashed catalogs](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadmap.md)
 **Release audit:** planned for UC07; UC01 evidence is tracked in the active roadmap
 **Latest completed release audit:** `docs/1.16.0-RELEASE-AUDIT.md`
-**Next gate:** review the [UC02 implementation plan](docs/superpowers/plans/2026-09-27-uc02-conventional-directory-adapter.md), then execute it inline under the approved contract
+**Next gate:** complete Alpha-2 qualification under the approved [UC02 implementation plan](docs/superpowers/plans/2026-09-27-uc02-conventional-directory-adapter.md)
 
 The approved UC00 contract fixes `Icod.TermInfo.Catalogs` above Runtime,
 Inspection, and BerkeleyDb. UC01 introduces the ten model types and bounded
@@ -125,7 +125,8 @@ is complete and accepted at `656acf952c286ccd24b3819e85faf2bc598e2bcd`.
 
 UC00–UC07 cover contract design, package/model foundation, directory and hashed
 adapters, unified acquisition, adversarial qualification, samples/package
-consumers, and stable closure. UC01 is accepted; UC02–UC07 are pending.
+consumers, and stable closure. UC01 is accepted; UC02 is implemented and undergoing
+qualification; UC03–UC07 are pending.
 
 The earlier broad assignment of migration and catalog automation to 1.17 is
 superseded. Mixed-source database sets, precedence, cross-container comparison,
