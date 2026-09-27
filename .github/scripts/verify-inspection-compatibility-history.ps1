@@ -316,6 +316,14 @@ try {
             }
 
             $current = [System.IO.File]::ReadAllText($temporaryManifest)
+            if ($current.Contains('TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseCatalogReadOptions [sealed]')) {
+                # The public entry point removes UC01 and RB additions exactly
+                # once, then calls this script with the reconstructed manifest.
+                & (Join-Path $PSScriptRoot 'verify-inspection-compatibility.ps1') `
+                    -Configuration $Configuration -AssemblyPath $inputFullPath
+                if (0 -ne $LASTEXITCODE) { throw 'UC01 Inspection compatibility verification failed.' }
+                return
+            }
         } else {
             $current = [System.IO.File]::ReadAllText($inputFullPath)
         }

@@ -64,7 +64,7 @@ public sealed class PG08ReleaseClosureTests {
 			)
 			.ToHashSet( StringComparer.Ordinal );
 		Type[] currentTypes =
-			typeof( PersistentRasterPlacementProfile ).Assembly.GetExportedTypes();
+			UC01InspectionCompatibilityTests.HistoricalOneFourteenTypes();
 		Type[] reconstructedOneThirteenTypes = currentTypes
 			.Where(
 				type =>

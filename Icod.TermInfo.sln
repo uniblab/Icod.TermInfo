@@ -85,6 +85,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Icod.TermInfo.BerkeleyDb", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Icod.TermInfo.Catalogs.Tests", "tests\Icod.TermInfo.Catalogs.Tests\Icod.TermInfo.Catalogs.Tests.csproj", "{70FFC4D5-76A1-4923-A4A8-246577C36707}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Icod.TermInfo.Catalogs.PackageVerifier", "tools\catalogs-package-verifier\Icod.TermInfo.Catalogs.PackageVerifier.csproj", "{62781443-3997-4446-AE83-D2326767AB31}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -782,6 +784,24 @@ Global
 		{70FFC4D5-76A1-4923-A4A8-246577C36707}.Staging|x64.Build.0 = Staging|Any CPU
 		{70FFC4D5-76A1-4923-A4A8-246577C36707}.Staging|x86.ActiveCfg = Staging|Any CPU
 		{70FFC4D5-76A1-4923-A4A8-246577C36707}.Staging|x86.Build.0 = Staging|Any CPU
+		{62781443-3997-4446-AE83-D2326767AB31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62781443-3997-4446-AE83-D2326767AB31}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62781443-3997-4446-AE83-D2326767AB31}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{62781443-3997-4446-AE83-D2326767AB31}.Debug|x64.Build.0 = Debug|Any CPU
+		{62781443-3997-4446-AE83-D2326767AB31}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{62781443-3997-4446-AE83-D2326767AB31}.Debug|x86.Build.0 = Debug|Any CPU
+		{62781443-3997-4446-AE83-D2326767AB31}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62781443-3997-4446-AE83-D2326767AB31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62781443-3997-4446-AE83-D2326767AB31}.Release|x64.ActiveCfg = Release|Any CPU
+		{62781443-3997-4446-AE83-D2326767AB31}.Release|x64.Build.0 = Release|Any CPU
+		{62781443-3997-4446-AE83-D2326767AB31}.Release|x86.ActiveCfg = Release|Any CPU
+		{62781443-3997-4446-AE83-D2326767AB31}.Release|x86.Build.0 = Release|Any CPU
+		{62781443-3997-4446-AE83-D2326767AB31}.Staging|Any CPU.ActiveCfg = Staging|Any CPU
+		{62781443-3997-4446-AE83-D2326767AB31}.Staging|Any CPU.Build.0 = Staging|Any CPU
+		{62781443-3997-4446-AE83-D2326767AB31}.Staging|x64.ActiveCfg = Staging|Any CPU
+		{62781443-3997-4446-AE83-D2326767AB31}.Staging|x64.Build.0 = Staging|Any CPU
+		{62781443-3997-4446-AE83-D2326767AB31}.Staging|x86.ActiveCfg = Staging|Any CPU
+		{62781443-3997-4446-AE83-D2326767AB31}.Staging|x86.Build.0 = Staging|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -812,5 +832,6 @@ Global
 		{27EC28A1-0786-4397-A7C4-1E9B63509F4A} = {8B94AE15-A91A-49D7-B324-C395C84E68D7}
 		{7F178A3E-0AC5-4C8D-9449-ADFE4D6B99D2} = {8B94AE15-A91A-49D7-B324-C395C84E68D7}
 		{70FFC4D5-76A1-4923-A4A8-246577C36707} = {B55F5A14-2D39-4D4C-AEAC-916B6A25F23E}
+		{62781443-3997-4446-AE83-D2326767AB31} = {C78B23CF-38CD-4C34-8C20-4BC8DFF8A2D1}
 	EndGlobalSection
 EndGlobal

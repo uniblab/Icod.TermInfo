@@ -13,6 +13,8 @@
 
 	<ItemGroup>
 		<ProjectCapability Include="TestContainer" />
+		<Compile Include="..\..\tools\public-api-snapshot\Program.cs" Link="Support\PublicApiSnapshot.cs" />
+		<Compile Include="..\..\tools\catalogs-package-verifier\Program.cs" Link="Support\CatalogsPackageVerifier.cs" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -25,7 +25,7 @@ public sealed class RB08ReleaseClosureTests {
 
 	[Fact]
 	public void ExactOneFourteenInspectionSurfaceHasFreezeInputs() {
-		Type[] currentTypes = typeof( RasterBackendCandidate ).Assembly.GetExportedTypes();
+		Type[] currentTypes = UC01InspectionCompatibilityTests.HistoricalOneFourteenTypes();
 
 		Assert.Equal( 106, currentTypes.Length );
 
@@ -67,7 +67,7 @@ public sealed class RB08ReleaseClosureTests {
 			}
 		}
 
-		Type[] currentTypes = typeof( RasterBackendCandidate ).Assembly.GetExportedTypes();
+		Type[] currentTypes = UC01InspectionCompatibilityTests.HistoricalOneFourteenTypes();
 		Type[] reconstructedOneThirteenTypes = currentTypes
 			.Where(
 				type =>
