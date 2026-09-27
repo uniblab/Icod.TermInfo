@@ -219,6 +219,11 @@ are tested; existing Inspection and BerkeleyDb baselines remain reconstructible.
 
 ### UC02 — directory adapter
 
+The [UC02 implementation plan](docs/superpowers/plans/2026-09-27-uc02-conventional-directory-adapter.md)
+is written for user review. Implementation has not started; the coordinated build
+remains Alpha-1 until the plan's integration task. Execution remains inline,
+without subagents.
+
 - [ ] Adapt bounded Inspection observations into the new publication model,
   reusing Runtime parsing and shared directory-layout validation.
 - [ ] Cover literal/hex directories, canonical and alias files, misplaced files,
