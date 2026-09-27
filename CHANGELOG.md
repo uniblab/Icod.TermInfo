@@ -3,7 +3,7 @@
 This file records release-level product changes. Exact qualification evidence,
 API fingerprints, and preserved boundaries live in the linked release audits.
 
-## 1.17.0-Alpha-5 (in development)
+## 1.17.0-Alpha-5
 
 - Adds adversarial directory and hashed boundary tests for physical candidates,
   decoded and parsed bytes, records, links, aliases, and duplicate issues.

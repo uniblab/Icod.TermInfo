@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:executing-plans`
 > inline, task by task. Do not use subagents. Steps use checkboxes.
-> **Status:** Approved and executing. UC04 is accepted at
+> **Status:** Implemented and accepted at `09f69208d9240c755e4015cf20364a386963703b`. UC04 is accepted at
 > `168862eb6935ab10597f378a372e393591c9b7b2`; its documentation follow-up is
 > `cc3b3ceca21324ac6ae5aa68dc08445e8c659f2e`.
 

@@ -4,7 +4,7 @@
 
 **Theme:** Unified directory/hashed catalogs
 
-**Status:** DEVELOPING — UC00 through UC04 accepted; UC05 qualification in progress
+**Status:** DEVELOPING — UC00 through UC05 accepted; UC06 is next
 
 **Stable predecessor:** `1.16.0` (published)
 
@@ -180,7 +180,7 @@ accepted based only on a plan or an unobserved CI run.
 | UC02 | `1.17.0-Alpha-2` | Conventional-directory adapter | UC01 | Accepted at `965c8d2` |
 | UC03 | `1.17.0-Alpha-3` | Hash-v9 adapter | UC01, UC02 contract fixtures | Accepted at `e4dcf7e` |
 | UC04 | `1.17.0-Alpha-4` | Unified reader and cross-format behavioral qualification | UC02, UC03 | Accepted at `168862e` |
-| UC05 | `1.17.0-Alpha-5` | Resource, failure, cancellation, and compatibility hardening | UC04 | Pending |
+| UC05 | `1.17.0-Alpha-5` | Resource, failure, cancellation, and compatibility hardening | UC04 | Accepted at `09f6920` |
 | UC06 | `1.17.0-Alpha-6` | Samples, package consumers, distribution and guide | UC05 | Pending |
 | UC07 | `1.17.0` after accepted Alpha-6 | Exact API freeze and stable release audit | UC06 | Pending |
 
@@ -280,14 +280,14 @@ is required to demonstrate the release's value.
 
 ### UC05 — adversarial and compatibility hardening
 
-- [ ] Test each budget at its boundary and one beyond; include many rejected
+- [x] Test each budget at its boundary and one beyond; include many rejected
   files/issues, large descriptions, aliases, early cancellation, and checked
   size arithmetic. Demonstrate enforcement before unbounded materialization.
-- [ ] Test permission/race/link behavior with platform-aware fixtures and explicit
+- [x] Test permission/race/link behavior with platform-aware fixtures and explicit
   skips only where the host cannot exercise the condition.
-- [ ] Verify old directory catalogs, database sets, JSON v1–v6, `toe`, `infocmp`,
+- [x] Verify old directory catalogs, database sets, JSON v1–v6, `toe`, `infocmp`,
   and `tic` behavior remains unchanged; retain all 1.15/1.16 storage coverage.
-- [ ] Run Windows/Linux/macOS qualification on all three TFMs. Reuse the existing
+- [x] Run Windows/Linux/macOS qualification on all three TFMs. Reuse the existing
   native oracle on Linux/macOS for acquisition regression evidence; do not
   require native Berkeley DB in production or Windows consumer tests.
 
@@ -330,6 +330,43 @@ three TFMs; published-artifact composition matches the approved dependency graph
 not add behavior or enlarge the catalog scope.
 
 ## 5. Progress and change control
+
+### Accepted UC05 evidence
+
+UC05 adds 25 Catalogs cases per framework for aggregate directory and hashed
+budgets, cancellation, filesystem failures and legacy compatibility. No
+production parser/reader implementation or public API changed. All eight
+packages carry `1.17.0-Alpha-5`, while reusable assembly identities remain
+`1.0.0.0`. The implementation commit is
+`09f69208d9240c755e4015cf20364a386963703b`, tree
+`4834354e44b3108809179ff314719345ba7accd6`.
+
+| Boundary | Observed result |
+| --- | --- |
+| Directory | Exact candidates, entries, issues and parsed bytes pass; one fewer throws the named typed limit. Ignored root children, nested directories, malformed bytes, duplicate groups, separate copies and misplaced parses consume their applicable budgets. |
+| Hashed | Exact image, record, decoded, parsed, publication and index-hop limits pass; one fewer throws a typed lower cause. A one-byte smaller parser limit reaches the stored-item cap first because the storage marker also consumes space. Overflow payloads and twelve aliases remain bounded; malformed and orphan data return no partial rows. Existing lower tests verify shared overflow references and `long.MaxValue` arithmetic. |
+| Sources | Deterministic enumeration, deletion and cancellation tests check Missing/Partial/Unavailable, disposal, fresh retry, child links and permission classification. Real mode-000 denial is asserted only when the host enforces it; otherwise the test logs a specific skip. |
+| Compatibility | Legacy directory physical rows, refusal of an issue-bearing database-set plan, and legacy Hash-v9 publications remain intact. Generated Catalogs, Inspection and BerkeleyDb manifests match across .NET 8/9/10; exact UC01/UC03 reconstruction and all historical Inspection/JSON and command tests pass. |
+
+- Serial Release build with warnings as errors and shared compilation disabled:
+  **zero warnings/errors**. The exact local source commit
+  `417ec6bd7e5820828bf1c628c6e2bd31ebc992aa` passed **5,709** solution
+  tests in 22 runs (Catalogs 138 per framework) and **1,995** rebuilt
+  BerkeleyDb tests in three runs: **7,704 passed**, zero failures. Its tree is
+  byte-identical to the implementation commit above.
+- Eight nupkg and seven snupkg passed the full local Release package gate from
+  that same local source/PDB commit: generated and packaged APIs, dependencies,
+  isolated consumers, samples, managed-only payloads, symbols and Source Link.
+  The established RE07 package-only fixture still reports CS8321 for an unused
+  helper on each framework; all three consumer runs passed.
+- [PR workflow 36356185297](https://github.com/uniblab/Icod.TermInfo/actions/runs/36356185297): **all 12 jobs passed** on `09f6920`, including Windows/Linux/macOS builds and tests, three installed-tool consumers and six archives. Staging and Release package steps run on Linux; they are deliberately skipped on Windows/macOS by the workflow. The Inspection Windows PowerShell step runs on Windows and is skipped on Linux/macOS.
+- [Interoperability workflow 36356185291](https://github.com/uniblab/Icod.TermInfo/actions/runs/36356185291): **all three jobs passed** on `09f6920`. Linux and macOS ran native Berkeley DB/ncurses probes and production reader comparisons; Windows ran managed-only Linux Hash-v9 fixture readback. No native probe was path-filtered out.
+
+Author review was inline without subagents. A broad ancillary legacy-exception
+assertion in the new hashed test remains a minor test-quality follow-up; existing
+lower-layer tests assert the concrete exception family. Reads still lack atomic
+replacement snapshots, and cancellation cannot interrupt a synchronous OS call.
+The PR remains draft, unmerged, untagged and unpublished. **UC06 is next.**
 
 ### Accepted UC04 evidence
 
