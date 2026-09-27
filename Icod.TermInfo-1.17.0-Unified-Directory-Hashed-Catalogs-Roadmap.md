@@ -4,7 +4,7 @@
 
 **Theme:** Unified directory/hashed catalogs
 
-**Status:** DEVELOPING — UC00, UC01, and UC02 accepted; UC03 qualification in progress
+**Status:** DEVELOPING — UC00 through UC03 accepted; UC04 is next
 
 **Stable predecessor:** `1.16.0` (published)
 
@@ -178,7 +178,7 @@ accepted based only on a plan or an unobserved CI run.
 | UC00 | Planning; retain `1.16.0` build identity | Contract, package decision, bounded-acquisition design | Published 1.16 | Approved by user, 2026-09-27 UTC |
 | UC01 | `1.17.0-Alpha-1` | Package/model foundation and approved bounded acquisition seam | UC00 | Accepted at `656acf9` |
 | UC02 | `1.17.0-Alpha-2` | Conventional-directory adapter | UC01 | Accepted at `965c8d2` |
-| UC03 | `1.17.0-Alpha-3` | Hash-v9 adapter | UC01, UC02 contract fixtures | Implemented; qualification in progress |
+| UC03 | `1.17.0-Alpha-3` | Hash-v9 adapter | UC01, UC02 contract fixtures | Accepted at `e4dcf7e` |
 | UC04 | `1.17.0-Alpha-4` | Unified reader and cross-format behavioral qualification | UC02, UC03 | Pending |
 | UC05 | `1.17.0-Alpha-5` | Resource, failure, cancellation, and compatibility hardening | UC04 | Pending |
 | UC06 | `1.17.0-Alpha-6` | Samples, package consumers, distribution and guide | UC05 | Pending |
@@ -240,10 +240,10 @@ inventing aliases, choosing duplicate winners, or changing legacy catalogs.
 ### UC03 — hashed adapter
 
 The [UC03 implementation plan](docs/superpowers/plans/2026-09-27-uc03-bounded-hashed-catalog-adapter.md)
-was approved on 2026-09-27. Physical acquisition, logical budgets and ReadBounded,
-the internal adapter, and exact API compatibility are implemented. Alpha-3
-integration/qualification is in progress. Execution remains inline without
-subagents; acceptance requires the implementation commit's CI results.
+was approved on 2026-09-27 and is complete. Physical acquisition, logical budgets
+and ReadBounded, the internal adapter, exact API compatibility, and Alpha-3
+integration are accepted at `e4dcf7e` after local and code-commit CI qualification.
+Execution and author self-review remained inline without subagents.
 
 - [x] Add the UC00-specified opt-in `ReadBounded` method and two supporting types
   to `BerkeleyDbTerminalCatalogReader`, sharing existing reader/decoder internals.
@@ -327,7 +327,7 @@ not add behavior or enlarge the catalog scope.
 
 ## 5. Progress and change control
 
-### UC03 local qualification
+### Accepted UC03 evidence
 
 UC03 implements bounded physical acquisition, `ReadBounded`, the internal hashed
 adapter, exact additive API verification, and coordinated Alpha-3 metadata.
@@ -351,9 +351,22 @@ The implementation adds 59 BerkeleyDb and 40 Catalogs cases per framework.
 - The unchanged RE07 package-only fixture reports CS8321 for its unused
   `MapPersistentRasterStatus` helper; all three framework runs pass.
 
-Implementation-commit CI is the remaining acceptance gate. Author self-review
-is inline, without subagents. UC04 remains responsible
-for the public unified reader and cross-format parity.
+UC03 is accepted at code commit
+`e4dcf7e25f174d07702186d5bd9e4ea1a5ec7742`, tree
+`8ed81360d94bebc98e5b81abbf09455806c34655`. This exactly matches the locally
+qualified implementation tree.
+
+| Code-head CI check | Result |
+| --- | --- |
+| [PR workflow 36304428682](https://github.com/uniblab/Icod.TermInfo/actions/runs/36304428682) | All 12 jobs passed: Windows/Linux/macOS Staging and Release qualification, installed-tool checks on three hosts, and all six archives |
+| [Interoperability workflow 36304428688](https://github.com/uniblab/Icod.TermInfo/actions/runs/36304428688) | All three jobs passed: Linux/macOS native Berkeley DB/ncurses and Windows managed-only transported fixture; native probes ran and were not path-filtered out |
+
+Author self-review was inline, without subagents. Full package qualification from implementation
+task 4 was combined with task 5's integrated Alpha-3 distribution gate. This
+could have exposed package defects later in the session; the complete gate
+passed. UC04 remains responsible for the public unified reader and cross-format
+parity. The acceptance follow-up changes documentation only; its CI is not
+awaited. The release PR remains a draft; no merge, tag, or NuGet publication.
 
 ### Accepted UC02 evidence
 
@@ -386,10 +399,10 @@ UC02 is accepted at `965c8d2ee91a6b3515a33c64cb9f702566f3943a`, tree
 | [PR workflow 36298484406](https://github.com/uniblab/Icod.TermInfo/actions/runs/36298484406) | All 12 jobs passed: Windows/Linux/macOS Staging and Release qualification, installed-tool checks on three hosts, and all six archives |
 | [Interoperability workflow 36298484409](https://github.com/uniblab/Icod.TermInfo/actions/runs/36298484409) | All three jobs passed: Linux/macOS native Berkeley DB/ncurses and Windows managed-only transported fixture |
 
-UC03 bounded hashed acquisition and adaptation is implemented and qualifying;
-its approved implementation plan is in the integration and qualification stage.
-The acceptance follow-up changes documentation only; its CI is not awaited.
-Review was performed inline by the author, without subagents;
+UC03 bounded hashed acquisition and adaptation is accepted as recorded above;
+UC04 public unified acquisition and cross-format parity is next.
+The UC02 acceptance follow-up changed documentation only; its CI was not awaited.
+UC02 review was performed inline by the author, without subagents;
 documentation is reviewed directly, while compiled identity and package contracts
 are checked automatically. Published 1.16 installation examples remain unchanged.
 
