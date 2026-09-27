@@ -14,11 +14,12 @@
 **Current coordinated version:** `1.16.0`
 **Latest completed line:** `1.15.0` - Berkeley DB / Hashed Terminfo Acquisition
 **Latest completed prerelease:** `1.16.0-Alpha-8`
-**Status:** stable `1.15.0` is published; Alpha-8 is accepted; the `1.16.0` stable candidate is undergoing exact-head qualification
+**Latest accepted development line:** `1.16.0` - Berkeley DB Hash-v9 Writer (HW00–HW08 complete)
+**Status:** stable `1.15.0` is published; the `1.16.0` stable candidate is accepted and ready for review; publication is pending
 **Active release roadmap:** `Icod.TermInfo-1.16.0-Berkeley-DB-Hash-V9-Writer-Roadmap.md`
 **Release audit:** `docs/1.16.0-RELEASE-AUDIT.md`
 **Latest completed release audit:** `docs/1.15.0-RELEASE-AUDIT.md`
-**Next implementation gate:** HW08 exact-head stable candidate qualification and release-readiness record
+**Next gate:** user review, merge, and publication of 1.16; migration/catalog automation remain separate 1.17 work
 
 ---
 
@@ -127,8 +128,10 @@ and JSON v7. Migration and catalog automation are explicitly assigned to 1.17.
 
 HW00 through HW07 are complete and accepted, including explicit `tic` hashed
 publication and pathological/native hardening. HW08 samples, package consumers,
-documentation, and API freeze passed Alpha-8 qualification; exact stable release
-qualification is the remaining gate.
+documentation, and API freeze passed Alpha-8 qualification. Stable `1.16.0`
+passed exact-head qualification at `30a7a23f01ca856bb5f9e15ba24db78bd137f139`:
+normal workflow `36281070193` (12/12) and native workflow `36281070040` (3/3).
+All planned 1.16 development gates are complete; review and publication remain.
 
 ### 2.2 Completed 1.15 line
 
@@ -504,6 +507,8 @@ See `docs/1.16.0-HW07-WRITER-HARDENING.md` for the resource/security audit and
 qualification record. HW08 Alpha-8 is accepted at
 `b458b0d18c0a8b1e2c6c37a0698cc9ea4fd6341e`: normal workflow `36279869607`
 passed 12/12 jobs and native workflow `36279869638` passed 3/3 jobs.
-The stable identity promotion preserves that feature/API source and now requires
-the same gates at the exact `1.16.0` candidate head. See
-`docs/1.16.0-RELEASE-AUDIT.md`; migration/catalog automation remain 1.17.
+Stable candidate `30a7a23f01ca856bb5f9e15ba24db78bd137f139` preserves that
+production feature/API source and passed normal workflow `36281070193` (12/12)
+and native workflow `36281070040` (3/3). See
+`docs/1.16.0-RELEASE-AUDIT.md` for exact stable artifacts and acceptance.
+Migration/catalog automation remain 1.17.

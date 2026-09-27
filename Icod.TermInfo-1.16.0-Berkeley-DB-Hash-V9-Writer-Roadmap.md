@@ -6,7 +6,7 @@
 **Command integration:** `tic` and `Icod.TermInfo.Tools`
 **Language:** C# 13
 **Reusable target frameworks:** `net8.0`; `net9.0`; `net10.0`
-**Status:** ACTIVE — ALPHA-8 ACCEPTED / STABLE CANDIDATE QUALIFICATION PENDING
+**Status:** COMPLETE / ACCEPTED — `1.16.0` stable candidate qualified; publication pending
 **Stable predecessor:** `1.15.0`
 **Initial development version:** `1.16.0-Alpha-1`
 
@@ -694,15 +694,22 @@ same exact head.
 
 ### HW08 / Alpha-8 — Package, documentation, freeze, and stable promotion
 
-**Status:** ALPHA-8 ACCEPTED — stable identity promoted; exact stable qualification pending
+**Status:** COMPLETE / ACCEPTED — exact stable candidate qualified
 
 Accepted Alpha-8 head: `b458b0d18c0a8b1e2c6c37a0698cc9ea4fd6341e`.
 Normal workflow `36279869607` passed all 12 jobs; native workflow `36279869638`
 passed all 3 jobs. BerkeleyDb passed 606 cases and interoperability passed 83
 cases per framework on all three hosts. Release packages, installed consumers,
 and all six Release archives passed. The `1.16.0` identity update preserves
-the accepted production feature/API source; its exact-head evidence is the
-remaining qualification gate.
+the accepted production feature/API source.
+
+Accepted stable head: `30a7a23f01ca856bb5f9e15ba24db78bd137f139`.
+Normal workflow `36281070193` passed 12/12 jobs and native workflow
+`36281070040` passed 3/3 jobs. All three hosts passed 648 Runtime, 606 BerkeleyDb,
+and 83 interoperability cases per framework; exact packages, isolated consumers,
+installed tools, and all six Release archives passed. The release audit records
+artifact identities and hashes. HW00–HW08 are complete; merge/tag/publication
+remain user actions, and migration/catalog automation remain 1.17.
 
 The sample now uses the public writer and proves input-order determinism.
 The isolated package consumer tests publication, UTF-8 aliases, refusal,
