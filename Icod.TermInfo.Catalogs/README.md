@@ -1,13 +1,22 @@
 # Icod.TermInfo.Catalogs
 
 The optional composition package for the Icod.TermInfo 1.17 unified
-directory/hashed catalog release. Current development version: **1.17.0-Alpha-2**.
+directory/hashed catalog release. Current development version: **1.17.0-Alpha-3**.
 Targets .NET 8, 9, and 10; licensed LGPL-3.0-or-later.
 
 UC01 supplies immutable source descriptors, read options, publication/result
 models, typed issues, and limit exceptions. UC02 adds the internal adapter for
-conventional directories. The common public reader will arrive in UC04; consumers cannot
+conventional directories. UC03 adds the internal hashed adapter, composing
+BerkeleyDb's public bounded read API. The common public reader will arrive in UC04; consumers cannot
 yet enumerate catalogs through this package.
+
+The hashed adapter maps actual canonical/alias keys, retaining their Runtime
+terminal objects and database path; `EntryPath` is null. Declared aliases do not
+create rows. Invalid images, index chains, identities, or orphan storage records
+reject the whole store with one `InvalidHashedStore` issue and zero entries.
+Missing, directory-as-file, permission, and I/O outcomes remain distinct. Typed
+limits and cancellation throw without a catalog; only `MaximumPublicationCount`
+is renamed to the common `MaximumEntryCount`, with the original exception retained.
 
 ```csharp
 using Icod.TermInfo.Catalogs;

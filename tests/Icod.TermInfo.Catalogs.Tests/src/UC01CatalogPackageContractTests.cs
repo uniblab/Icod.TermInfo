@@ -31,7 +31,7 @@ public sealed class UC01CatalogPackageContractTests {
 	public void AlphaOneIsRegisteredAcrossCoordinatedDistribution() {
 		string root = FindRoot();
 		string Read( string path ) => File.ReadAllText( Path.Combine( root, path ) );
-		Assert.Equal( "1.17.0-Alpha-2", XDocument.Parse( Read( "Directory.Build.props" ) ).Descendants( "IcodTermInfoSuiteVersion" ).Single().Value );
+		Assert.Equal( "1.17.0-Alpha-3", XDocument.Parse( Read( "Directory.Build.props" ) ).Descendants( "IcodTermInfoSuiteVersion" ).Single().Value );
 		Assert.Contains( "Icod.TermInfo.Catalogs/Icod.TermInfo.Catalogs.csproj", Read( "packaging/PackPackages.ps1" ), StringComparison.Ordinal );
 		Assert.Contains( "tools\\catalogs-package-verifier\\Icod.TermInfo.Catalogs.PackageVerifier.csproj", Read( "Icod.TermInfo.sln" ), StringComparison.Ordinal );
 		Assert.Contains( "catalogs-package-verifier", Read( ".github/scripts/verify-release-package.sh" ), StringComparison.Ordinal );

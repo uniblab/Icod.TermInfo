@@ -7,7 +7,7 @@ releases; this document defines the current cross-release policy.
 
 ## 1.17 development line
 
-The current coordinated build identity is `1.17.0-Alpha-2`, set through
+The current coordinated build identity is `1.17.0-Alpha-3`, set through
 `Directory.Build.props` for eight packages. The new optional
 `Icod.TermInfo.Catalogs` foundation brings the family to seven reusable libraries
 and seven symbol packages. All reusable assemblies retain `1.0.0.0` identity
@@ -17,8 +17,10 @@ the latest published stable release is 1.16.0.
 
 UC01 delivers immutable models and opt-in bounded Inspection acquisition.
 UC02 adds the internal conventional-directory adapter; its qualification is
-tracked in the active roadmap. The hashed adapter and public reader follow in
-UC03–UC04. Migration,
+tracked in the active roadmap. UC03 adds bounded BerkeleyDb acquisition and the
+internal hashed adapter, with two new public types and one method; exact removal
+reconstructs the frozen 1.16 API and then the historical 1.15 reader. Catalogs
+retains ten public model types until UC04 adds the public reader. Migration,
 mixed-source precedence, and broader automation have no assigned release.
 
 ## 1.16 release line

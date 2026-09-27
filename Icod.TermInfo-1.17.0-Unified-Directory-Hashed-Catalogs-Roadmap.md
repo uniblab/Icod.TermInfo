@@ -4,13 +4,13 @@
 
 **Theme:** Unified directory/hashed catalogs
 
-**Status:** DEVELOPING — UC00, UC01, and UC02 accepted; UC03 hashed adapter is next
+**Status:** DEVELOPING — UC00, UC01, and UC02 accepted; UC03 qualification in progress
 
 **Stable predecessor:** `1.16.0` (published)
 
 **Initial implementation version:** `1.17.0-Alpha-1`
 
-**Current coordinated version:** `1.17.0-Alpha-2`
+**Current coordinated version:** `1.17.0-Alpha-3`
 
 **Language / targets:** C# 13; `net8.0`, `net9.0`, `net10.0`
 
@@ -178,7 +178,7 @@ accepted based only on a plan or an unobserved CI run.
 | UC00 | Planning; retain `1.16.0` build identity | Contract, package decision, bounded-acquisition design | Published 1.16 | Approved by user, 2026-09-27 UTC |
 | UC01 | `1.17.0-Alpha-1` | Package/model foundation and approved bounded acquisition seam | UC00 | Accepted at `656acf9` |
 | UC02 | `1.17.0-Alpha-2` | Conventional-directory adapter | UC01 | Accepted at `965c8d2` |
-| UC03 | `1.17.0-Alpha-3` | Hash-v9 adapter | UC01, UC02 contract fixtures | Plan written; awaiting review |
+| UC03 | `1.17.0-Alpha-3` | Hash-v9 adapter | UC01, UC02 contract fixtures | Implemented; qualification in progress |
 | UC04 | `1.17.0-Alpha-4` | Unified reader and cross-format behavioral qualification | UC02, UC03 | Pending |
 | UC05 | `1.17.0-Alpha-5` | Resource, failure, cancellation, and compatibility hardening | UC04 | Pending |
 | UC06 | `1.17.0-Alpha-6` | Samples, package consumers, distribution and guide | UC05 | Pending |
@@ -240,19 +240,19 @@ inventing aliases, choosing duplicate winners, or changing legacy catalogs.
 ### UC03 — hashed adapter
 
 The [UC03 implementation plan](docs/superpowers/plans/2026-09-27-uc03-bounded-hashed-catalog-adapter.md)
-is written for review. It covers bounded physical acquisition, logical budgets
-and ReadBounded, the internal adapter, exact API/package compatibility, and
-Alpha-3 integration/qualification. No UC03 production changes or version advance
-have been made. Execution remains inline without subagents.
+was approved on 2026-09-27. Physical acquisition, logical budgets and ReadBounded,
+the internal adapter, and exact API compatibility are implemented. Alpha-3
+integration/qualification is in progress. Execution remains inline without
+subagents; acceptance requires the implementation commit's CI results.
 
-- [ ] Add the UC00-specified opt-in `ReadBounded` method and two supporting types
+- [x] Add the UC00-specified opt-in `ReadBounded` method and two supporting types
   to `BerkeleyDbTerminalCatalogReader`, sharing existing reader/decoder internals.
   Preserve the old `Read` methods and reconstruct the frozen 1.16 API exactly.
-- [ ] Compose bounded acquisition and immutable options; map actual keys, kinds,
+- [x] Compose bounded acquisition and immutable options; map actual keys, kinds,
   parsed terminals, and database/key provenance.
-- [ ] Exercise canonical records, aliases/indexes, non-ASCII identities, chained
+- [x] Exercise canonical records, aliases/indexes, non-ASCII identities, chained
   buckets, and large records with existing qualified fixtures/writer output.
-- [ ] Verify missing files, malformed/unsupported images, index failures, each
+- [x] Verify missing files, malformed/unsupported images, index failures, each
   resource budget, cancellation, and fail-closed result semantics.
 
 **Exit:** No duplicate Hash-v9 decoder or raw-byte API is introduced; bounded
@@ -327,6 +327,34 @@ not add behavior or enlarge the catalog scope.
 
 ## 5. Progress and change control
 
+### UC03 local qualification
+
+UC03 implements bounded physical acquisition, `ReadBounded`, the internal hashed
+adapter, exact additive API verification, and coordinated Alpha-3 metadata.
+The implementation adds 59 BerkeleyDb and 40 Catalogs cases per framework.
+
+- Full Release solution build: **zero warnings and errors**, with warnings as
+  errors, serial MSBuild, and shared compilation disabled.
+- Fresh complete solution test run: **5,586 passed** across 22 test runs.
+- Separate complete BerkeleyDb suite: **1,995 passed**, 665 per framework.
+- Total: **7,581 passed**; Catalogs has 97 cases per framework.
+- The existing repository formatting gate found multiline closing parentheses;
+  whitespace-only corrections passed all six convention checks, all three
+  Runtime suites, and the subsequent fresh complete solution run.
+- Historical BerkeleyDb 1.15/1.16 baselines and all JSON schemas are unchanged.
+  Catalogs retains its ten-type API. The compiled fourteen-type BerkeleyDb API
+  reconstructs exactly to twelve types and then the historical nine-type reader.
+
+- Eight nupkg and seven snupkg built. Full Release distribution verification
+  passed: exact APIs, historical reconstruction, dependency closure, isolated
+  package consumers, samples, managed payloads, symbols, and Source Link.
+- The unchanged RE07 package-only fixture reports CS8321 for its unused
+  `MapPersistentRasterStatus` helper; all three framework runs pass.
+
+Implementation-commit CI is the remaining acceptance gate. Author self-review
+is inline, without subagents. UC04 remains responsible
+for the public unified reader and cross-format parity.
+
 ### Accepted UC02 evidence
 
 The approved directory adapter is implemented, with 31 behavioral/boundary cases
@@ -358,8 +386,8 @@ UC02 is accepted at `965c8d2ee91a6b3515a33c64cb9f702566f3943a`, tree
 | [PR workflow 36298484406](https://github.com/uniblab/Icod.TermInfo/actions/runs/36298484406) | All 12 jobs passed: Windows/Linux/macOS Staging and Release qualification, installed-tool checks on three hosts, and all six archives |
 | [Interoperability workflow 36298484409](https://github.com/uniblab/Icod.TermInfo/actions/runs/36298484409) | All three jobs passed: Linux/macOS native Berkeley DB/ncurses and Windows managed-only transported fixture |
 
-UC03 bounded hashed acquisition and adaptation is the next implementation task;
-its implementation plan is now written and awaiting review.
+UC03 bounded hashed acquisition and adaptation is implemented and qualifying;
+its approved implementation plan is in the integration and qualification stage.
 The acceptance follow-up changes documentation only; its CI is not awaited.
 Review was performed inline by the author, without subagents;
 documentation is reviewed directly, while compiled identity and package contracts

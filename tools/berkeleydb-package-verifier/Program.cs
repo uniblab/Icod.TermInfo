@@ -56,7 +56,8 @@ internal static class Program {
 	) {
 		ArgumentNullException.ThrowIfNull( args );
 
-		if ( args.Length > 1 ) {
+		bool reconstruct = args.Length == 3 && args[0] == "--reconstruct-uc03";
+		if ( args.Length > 1 && !reconstruct ) {
 			Console.Error.WriteLine(
 				"Usage: dotnet run --project tools/berkeleydb-package-verifier/Icod.TermInfo.BerkeleyDb.PackageVerifier.csproj -- [artifact-directory]"
 			);
@@ -65,6 +66,12 @@ internal static class Program {
 
 		try {
 			string root = FindRepositoryRoot();
+			if ( reconstruct ) {
+				string historical = ReconstructUc03( root, File.ReadAllText( args[1] ) );
+				File.WriteAllText( args[2], historical, new UTF8Encoding( false ) );
+				Console.WriteLine( "Reconstructed the frozen 1.16 BerkeleyDb API from the exact UC03 additions." );
+				return 0;
+			}
 			BerkeleyDbApiFreeze.VerifyReaderReconstruction(
 				File.ReadAllText( Path.Combine( root, "docs", "1.16.0-BERKELEYDB-PUBLIC-API-BASELINE.txt" ) ),
 				File.ReadAllText( Path.Combine( root, "docs", "1.15.0-BERKELEYDB-PUBLIC-API-BASELINE.txt" ) )
@@ -125,6 +132,17 @@ internal static class Program {
 			Console.Error.WriteLine( exception.Message );
 			return 1;
 		}
+	}
+
+	private static string ReconstructUc03( string root, string current ) {
+		string reconstructed = BerkeleyDbUc03Compatibility.Reconstruct( current,
+			File.ReadAllText( Path.Combine( root, "docs/1.17.0-UC03-BERKELEYDB-PUBLIC-API-ADDITIONS.txt" ) ),
+			File.ReadAllText( Path.Combine( root, "docs/1.17.0-UC03-BERKELEYDB-PUBLIC-API-ADDITIVE-MEMBERS.txt" ) )
+		);
+		BerkeleyDbApiFreeze.VerifyReaderReconstruction( reconstructed,
+			File.ReadAllText( Path.Combine( root, "docs/1.15.0-BERKELEYDB-PUBLIC-API-BASELINE.txt" ) )
+		);
+		return reconstructed;
 	}
 
 	private static string VerifyPackage(
@@ -220,6 +238,15 @@ internal static class Program {
 
 		foreach ( string targetFramework in TargetFrameworks ) {
 			VerifyAssemblyIdentity( package, targetFramework );
+			using Stream assemblyStream = package.GetEntry( $"lib/{targetFramework}/{PackageId}.dll" )!.Open();
+			using MemoryStream assemblyBytes = new();
+			assemblyStream.CopyTo( assemblyBytes );
+			assemblyBytes.Position = 0;
+			var context = new System.Runtime.Loader.AssemblyLoadContext( "berkeleydb-api-" + Guid.NewGuid(), isCollectible: true );
+			try {
+				Assembly assembly = context.LoadFromStream( assemblyBytes );
+				ReconstructUc03( FindRepositoryRoot(), Icod.TermInfo.PublicApiSnapshot.Program.CreateManifest( assembly ) );
+			} finally { context.Unload(); }
 			VerifyDocumentation( package, targetFramework );
 		}
 

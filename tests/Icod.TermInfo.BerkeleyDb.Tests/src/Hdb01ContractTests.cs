@@ -53,6 +53,7 @@ public sealed class Hdb01ContractTests {
 				"Icod.TermInfo.BerkeleyDb.BerkeleyDbTerminalDescriptionProviderOptions",
 			},
 			assembly.GetExportedTypes()
+				.Where( type => type != typeof( BerkeleyDbCatalogLimitException ) && type != typeof( BerkeleyDbTerminalCatalogReadLimits ) )
 				.Select( type => type.FullName )
 				.OrderBy( name => name, StringComparer.Ordinal )
 				.ToArray()
@@ -152,7 +153,7 @@ public sealed class Hdb01ContractTests {
 			);
 
 		Assert.Contains(
-			"<IcodTermInfoSuiteVersion>1.17.0-Alpha-2</IcodTermInfoSuiteVersion>",
+			"<IcodTermInfoSuiteVersion>1.17.0-Alpha-3</IcodTermInfoSuiteVersion>",
 			props,
 			StringComparison.Ordinal
 		);

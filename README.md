@@ -9,20 +9,21 @@
 
 ## Status
 
-Current release line: `Icod.TermInfo 1.17.0-Alpha-2`.
+Current release line: `Icod.TermInfo 1.17.0-Alpha-3`.
 
 The 1.17 development branch is building **Unified directory/hashed catalogs**.
-Alpha-2 adds an internal conventional-directory adapter to the optional
-`Icod.TermInfo.Catalogs` package, using the bounded Inspection acquisition
-introduced in Alpha-1. It maps actual publication files, preserves provenance,
-and reports duplicates without choosing a winner. The hashed adapter and public
-unified reader remain pending; this is not yet a public catalog-reading API.
+Alpha-3 adds opt-in bounded BerkeleyDb catalog reads and the internal hashed
+adapter in `Icod.TermInfo.Catalogs`. Together with Alpha-2's directory adapter,
+these preserve actual publications, parsed terminal identity, provenance, typed
+diagnostics, and inclusive resource budgets. The public unified reader remains
+assigned to UC04; Catalogs does not yet expose a public catalog-reading method.
 See the [1.17 roadmap](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadmap.md)
 and [approved contract](docs/1.17.0-UC00-UNIFIED-CATALOG-CONTRACT.md).
 
 The published stable release is **1.16.0**. Installation examples below use that
 published version. The Alpha-1 foundation and Alpha-2 directory adapter are
-qualified; the hashed adapter and public reader remain in development.
+qualified; Alpha-3 qualification is tracked in the roadmap, and the public
+unified reader remains in development.
 
 Version 1.16 adds deterministic, pure-managed Berkeley DB Hash-v9 publication
 to `Icod.TermInfo.BerkeleyDb`, alongside exact lookup, logical catalogs, and

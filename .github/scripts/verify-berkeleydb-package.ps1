@@ -33,12 +33,19 @@ try {
         -c $Configuration `
         --no-build `
         -- `
-        --check `
-		'docs/1.16.0-BERKELEYDB-PUBLIC-API-BASELINE.txt' `
+        --write `
+        (Join-Path $ArtifactDirectory 'uc03-berkeleydb-current-api.txt') `
         "Icod.TermInfo.BerkeleyDb/bin/$Configuration/net10.0/Icod.TermInfo.BerkeleyDb.dll"
-    if (0 -ne $LASTEXITCODE) {
-		throw 'Icod.TermInfo.BerkeleyDb public API differs from the frozen 1.16 manifest.'
-    }
+    if (0 -ne $LASTEXITCODE) { throw 'UC03 BerkeleyDb current API generation failed.' }
+    & dotnet run --project tools/berkeleydb-package-verifier/Icod.TermInfo.BerkeleyDb.PackageVerifier.csproj `
+        -c $Configuration --no-build -- --reconstruct-uc03 `
+        (Join-Path $ArtifactDirectory 'uc03-berkeleydb-current-api.txt') `
+        (Join-Path $ArtifactDirectory 'uc03-berkeleydb-reconstructed-api.txt')
+    if (0 -ne $LASTEXITCODE) { throw 'UC03 BerkeleyDb exact additive API reconstruction failed.' }
+    $normalizeApi = { param($text) $text.Replace("`r`n", "`n").Replace("`r", "`n").TrimEnd("`n") + "`n" }
+    $historicalApi = & $normalizeApi ([System.IO.File]::ReadAllText((Join-Path $repositoryRoot 'docs/1.16.0-BERKELEYDB-PUBLIC-API-BASELINE.txt')))
+    $reconstructedApi = & $normalizeApi ([System.IO.File]::ReadAllText((Join-Path $ArtifactDirectory 'uc03-berkeleydb-reconstructed-api.txt')))
+    if ($historicalApi -cne $reconstructedApi) { throw 'Icod.TermInfo.BerkeleyDb public API differs from the frozen 1.16 manifest.' }
 
     & dotnet run `
         --project $publicApiProject `

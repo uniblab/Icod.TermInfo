@@ -3,7 +3,20 @@
 This file records release-level product changes. Exact qualification evidence,
 API fingerprints, and preserved boundaries live in the linked release audits.
 
-## 1.17.0-Alpha-2 (in development)
+## 1.17.0-Alpha-3 (in development)
+
+- Adds opt-in `BerkeleyDbTerminalCatalogReader.ReadBounded`, immutable limits,
+  and typed limit failures without changing legacy read or writer behavior.
+- Accounts for each physical extraction, each actual publication, and each
+  distinct parsed storage key, including orphan records and shared alias targets.
+- Observes cancellation during image/stability reads, decoding, discovery,
+  resolution, mapping, and around sorting; invalid hashed data yields no rows.
+- Adds the internal hashed Catalogs adapter with source status diagnostics,
+  original terminal identity, file provenance, and translated resource limits.
+- Verifies exact additive API reconstruction from packaged assemblies for all
+  three target frameworks. The public unified reader remains assigned to UC04.
+
+## 1.17.0-Alpha-2
 
 - Adds the internal conventional-directory adapter above bounded Inspection,
   mapping actual canonical/alias files while preserving physical provenance.

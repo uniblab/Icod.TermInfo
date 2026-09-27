@@ -35,6 +35,8 @@
 			Link="Shared\Hdb07HashV9FixtureBuilder.cs" />
 		<Compile Include="..\Shared\Hw07WriterMatrix.cs" Link="Shared\Hw07WriterMatrix.cs" />
 		<Compile Include="..\..\tools\berkeleydb-package-verifier\BerkeleyDbApiFreeze.cs" Link="Qualification\BerkeleyDbApiFreeze.cs" />
+		<Compile Include="..\..\tools\berkeleydb-package-verifier\BerkeleyDbUc03Compatibility.cs" Link="Qualification\BerkeleyDbUc03Compatibility.cs" />
+		<Compile Include="..\..\tools\public-api-snapshot\Program.cs" Link="Qualification\PublicApiSnapshot.cs" />
 	</ItemGroup>
 
 	<Target Name="CopyPublicationProbe" AfterTargets="Build" Condition="'$(TargetFramework)' != ''">

@@ -42,7 +42,7 @@
 		<Title>Icod.TermInfo.BerkeleyDb</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed acquisition and deterministic publication for ncurses-compatible Berkeley DB Hash-v9 terminfo stores.</Description>
-		<PackageReleaseNotes>1.17.0-Alpha-2 preserves the twelve-type 1.16 reader/writer API and Runtime-only dependency. Unified hashed adaptation is planned for UC03; no native assets are shipped.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.17.0-Alpha-3 adds opt-in ReadBounded catalog acquisition with typed inclusive budgets and cancellation. The two new types and one method exactly reconstruct the frozen 1.16 API; Runtime-only dependencies and legacy reads are preserved.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>

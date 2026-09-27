@@ -42,7 +42,7 @@
 		<Title>Icod.TermInfo.Catalogs</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Immutable unified directory and hashed terminfo catalog models and bounded acquisition contracts.</Description>
-		<PackageReleaseNotes>1.17.0-Alpha-2 adds the internal conventional-directory adapter: actual publications, original provenance, typed diagnostics, duplicate groups, cancellation, and shared issue budgets. The ten-type model API is unchanged; the hashed adapter and public reader remain pending.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.17.0-Alpha-3 adds the internal hashed catalog adapter: actual publications, file provenance, typed limits, cancellation, and fail-closed invalid-store diagnostics. The ten-type model API is unchanged; the public unified reader remains UC04.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>

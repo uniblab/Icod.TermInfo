@@ -1,0 +1,1 @@
+  METHOD public System.Collections.Generic.IReadOnlyList<Icod.TermInfo.BerkeleyDb.BerkeleyDbTerminalCatalogEntry> ReadBounded(Icod.TermInfo.BerkeleyDb.BerkeleyDbTerminalCatalogReadLimits limits null=nullable/nullable default=null, System.Threading.CancellationToken cancellationToken null=not-null/not-null default=null) return-null=not-null/not-null<not-null/not-null>

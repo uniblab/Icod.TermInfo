@@ -68,8 +68,28 @@ public sealed class BerkeleyDbTerminalCatalogReader {
 		return ReadCore( cancellationToken );
 	}
 
+	/// <summary>Reads a fresh catalog with inclusive per-call acquisition and logical budgets.</summary>
+	/// <param name="limits">Publication, decoded-byte and parsed-byte limits, or null for defaults.</param>
+	/// <param name="cancellationToken">Cancellation observed between acquisition and normalization work units.</param>
+	/// <returns>The complete immutable catalog; no partial result is returned.</returns>
+	/// <exception cref="BerkeleyDbCatalogLimitException">An inclusive resource limit would be exceeded.</exception>
+	/// <exception cref="OperationCanceledException">Cancellation was requested.</exception>
+	/// <remarks>Aliases share a parsed storage record. Orphan storage records are also validated and charged.
+	/// Each call has independent budgets. Blocking operating-system calls cannot be interrupted.</remarks>
+	public IReadOnlyList<BerkeleyDbTerminalCatalogEntry> ReadBounded(
+		BerkeleyDbTerminalCatalogReadLimits? limits = null,
+		CancellationToken cancellationToken = default
+	) {
+		cancellationToken.ThrowIfCancellationRequested();
+		return ReadCore( cancellationToken, new BerkeleyDbCatalogReadBudget(
+			DatabasePath, _options, limits ?? new BerkeleyDbTerminalCatalogReadLimits(), cancellationToken
+		)
+		);
+	}
+
 	private IReadOnlyList<BerkeleyDbTerminalCatalogEntry> ReadCore(
-		CancellationToken cancellationToken
+		CancellationToken cancellationToken,
+		BerkeleyDbCatalogReadBudget? budget = null
 	) {
 		cancellationToken.ThrowIfCancellationRequested();
 
@@ -77,7 +97,8 @@ public sealed class BerkeleyDbTerminalCatalogReader {
 		try {
 			byte[] database = BerkeleyDbHashReader.ReadDatabase(
 				DatabasePath,
-				_options.MaximumDatabaseSize
+				_options.MaximumDatabaseSize,
+				budget
 			);
 			records = BerkeleyDbHashReader.ReadRecords(
 				database,
@@ -85,7 +106,8 @@ public sealed class BerkeleyDbTerminalCatalogReader {
 					_options.ParserOptions.MaximumEntrySize + 1
 				),
 				_options.MaximumRecordCount,
-				cancellationToken
+				cancellationToken,
+				budget
 			);
 		} catch ( InvalidDataException exception ) {
 			throw new BerkeleyDbDatabaseFormatException(
@@ -98,7 +120,8 @@ public sealed class BerkeleyDbTerminalCatalogReader {
 			records,
 			_options.ParserOptions,
 			_options.MaximumIndexHops,
-			cancellationToken
+			cancellationToken,
+			budget
 		);
 	}
 }

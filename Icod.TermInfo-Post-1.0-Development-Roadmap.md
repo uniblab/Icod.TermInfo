@@ -12,15 +12,15 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`  
 **Frozen runtime contract:** `1.0.0`  
-**Current coordinated version:** `1.17.0-Alpha-2`
+**Current coordinated version:** `1.17.0-Alpha-3`
 **Latest completed line:** `1.16.0` - Berkeley DB Hash-v9 Writer
 **Latest completed prerelease:** `1.16.0-Alpha-8`
 **Active development line:** `1.17.0` - Unified directory/hashed catalogs
-**Status:** stable `1.16.0` is published; UC00, UC01, and UC02 are accepted; UC03 is next
+**Status:** stable `1.16.0` is published; UC00, UC01, and UC02 are accepted; UC03 qualification is in progress
 **Active release roadmap:** [1.17.0 — Unified directory/hashed catalogs](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadmap.md)
 **Release audit:** planned for UC07; UC01 and UC02 evidence is tracked in the active roadmap
 **Latest completed release audit:** `docs/1.16.0-RELEASE-AUDIT.md`
-**Next gate:** review the [UC03 implementation plan](docs/superpowers/plans/2026-09-27-uc03-bounded-hashed-catalog-adapter.md), then implement bounded hashed acquisition and adaptation under the approved UC00 contract
+**Next gate:** qualify the approved [UC03 implementation plan](docs/superpowers/plans/2026-09-27-uc03-bounded-hashed-catalog-adapter.md), including packages and implementation-commit CI; UC04 adds the unified public reader
 
 The approved UC00 contract fixes `Icod.TermInfo.Catalogs` above Runtime,
 Inspection, and BerkeleyDb. UC01 introduces the ten model types and bounded
@@ -131,10 +131,10 @@ tests, all 12 PR workflow jobs, and all three interoperability jobs; see the
 active roadmap for commands, artifact checks, and CI links.
 
 The [UC03 plan](docs/superpowers/plans/2026-09-27-uc03-bounded-hashed-catalog-adapter.md)
-is written and awaiting review. Its five tasks cover physical acquisition,
-logical catalog budgets, the internal hashed adapter, exact additive API/package
-verification, and Alpha-3 qualification. Implementation has not started;
-the current coordinated version remains Alpha-2.
+was approved and is being executed inline. Physical acquisition, logical catalog
+budgets, the internal hashed adapter, and exact additive API verification are
+implemented. Alpha-3 qualification now covers the full suite, distribution,
+and native/managed interoperability. The public reader remains UC04.
 
 The earlier broad assignment of migration and catalog automation to 1.17 is
 superseded. Mixed-source database sets, precedence, cross-container comparison,
