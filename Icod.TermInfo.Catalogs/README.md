@@ -1,7 +1,7 @@
 # Icod.TermInfo.Catalogs
 
 The optional composition package for the Icod.TermInfo 1.17 unified
-directory/hashed catalog release. Current development version: **1.17.0-Alpha-5**.
+directory/hashed catalog release. Current development version: **1.17.0-Alpha-6**.
 Targets .NET 8, 9, and 10; licensed LGPL-3.0-or-later.
 
 UC01 supplies immutable source descriptors, read options, publication/result
@@ -11,6 +11,8 @@ BerkeleyDb's public bounded read API. UC04 adds the public reader to select one
 explicit source and acquire a fresh catalog on each call.
 UC05 exercises aggregate limits, cancellation, malformed and replaced sources,
 links, and frozen old-reader behavior without changing the public contract.
+UC06 adds the controlled two-format sample, installed-package consumer, and
+usage guide without changing the reader contract.
 
 The hashed adapter maps actual canonical/alias keys, retaining their Runtime
 terminal objects and database path; `EntryPath` is null. Declared aliases do not
@@ -73,3 +75,8 @@ remain outside this release.
 
 Production dependencies are Icod.TermInfo, Icod.TermInfo.Inspection, and
 Icod.TermInfo.BerkeleyDb. No native Berkeley DB runtime is required or bundled.
+
+The [unified catalog guide](../docs/1.17.0-UNIFIED-CATALOG-GUIDE.md) explains
+publication versus declaration, status/issue handling, limits and compatibility.
+Run the [controlled directory/Hash-v9 sample](../samples/Icod.TermInfo.Catalogs.Sample/README.md)
+on any supported TFM to inspect both formats through the same reader.

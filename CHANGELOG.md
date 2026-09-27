@@ -3,6 +3,13 @@
 This file records release-level product changes. Exact qualification evidence,
 API fingerprints, and preserved boundaries live in the linked release audits.
 
+## 1.17.0-Alpha-6 (in development)
+
+- Adds a controlled unified directory/Hash-v9 sample, an isolated Catalogs
+  package consumer and a usage guide, while retaining the existing reader API.
+- Qualifies the eight-package, seven-symbol distribution and existing Tools
+  archives before the final stable release audit.
+
 ## 1.17.0-Alpha-5
 
 - Adds adversarial directory and hashed boundary tests for physical candidates,

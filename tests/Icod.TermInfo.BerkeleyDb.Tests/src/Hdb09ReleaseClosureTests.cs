@@ -334,7 +334,7 @@ public sealed class Hdb09ReleaseClosureTests {
 	public void StableHistoryAndCurrentPackageNotesRemainCoordinated() {
 		AssertContainsAll(
 			"README.md",
-			"Current release line: `Icod.TermInfo 1.17.0-Alpha-5`.",
+			"Current release line: `Icod.TermInfo 1.17.0-Alpha-6`.",
 			"Icod.TermInfo.BerkeleyDb --version 1.16.0"
 		);
 		Assert.DoesNotContain(
@@ -366,7 +366,7 @@ public sealed class Hdb09ReleaseClosureTests {
 				element => element.Name.LocalName == "PackageReleaseNotes"
 			).Value;
 			Assert.StartsWith(
-				"1.17.0-Alpha-5 ",
+				"1.17.0-Alpha-6 ",
 				releaseNotes,
 				StringComparison.Ordinal
 			);

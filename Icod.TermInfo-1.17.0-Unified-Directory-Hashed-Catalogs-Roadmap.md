@@ -4,13 +4,13 @@
 
 **Theme:** Unified directory/hashed catalogs
 
-**Status:** DEVELOPING — UC00 through UC05 accepted; UC06 is next
+**Status:** DEVELOPING — UC00 through UC05 accepted; UC06 in progress
 
 **Stable predecessor:** `1.16.0` (published)
 
 **Initial implementation version:** `1.17.0-Alpha-1`
 
-**Current coordinated version:** `1.17.0-Alpha-5`
+**Current coordinated version:** `1.17.0-Alpha-6`
 
 **Language / targets:** C# 13; `net8.0`, `net9.0`, `net10.0`
 
@@ -181,7 +181,7 @@ accepted based only on a plan or an unobserved CI run.
 | UC03 | `1.17.0-Alpha-3` | Hash-v9 adapter | UC01, UC02 contract fixtures | Accepted at `e4dcf7e` |
 | UC04 | `1.17.0-Alpha-4` | Unified reader and cross-format behavioral qualification | UC02, UC03 | Accepted at `168862e` |
 | UC05 | `1.17.0-Alpha-5` | Resource, failure, cancellation, and compatibility hardening | UC04 | Accepted at `09f6920` |
-| UC06 | `1.17.0-Alpha-6` | Samples, package consumers, distribution and guide | UC05 | Pending |
+| UC06 | `1.17.0-Alpha-6` | Samples, package consumers, distribution and guide | UC05 | In progress |
 | UC07 | `1.17.0` after accepted Alpha-6 | Exact API freeze and stable release audit | UC06 | Pending |
 
 ### UC00 — contract and architecture decision
@@ -297,7 +297,8 @@ commits, commands, outcomes, and any remaining limitations.
 ### UC06 — usable package, sample, and documentation
 
 The [UC06 implementation plan](docs/superpowers/plans/2026-09-27-uc06-catalog-consumer-guide.md)
-is proposed for review before implementation under the tranche gate above.
+was approved for inline implementation. The sample and package consumer are
+implemented; full Alpha-6 distribution qualification remains in progress.
 
 - [ ] Add `samples/Icod.TermInfo.Catalogs.Sample/` (or the UC00-approved name)
   showing the same read/print workflow for a directory and hashed file, including

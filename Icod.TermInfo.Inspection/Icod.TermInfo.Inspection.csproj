@@ -42,7 +42,7 @@
 		<Title>Icod.TermInfo.Inspection</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed inspection, semantic-comparison, planning, and machine-readable automation foundation for Icod.TermInfo.</Description>
-		<PackageReleaseNotes>1.17.0-Alpha-5 verifies bounded conventional catalog acquisition at aggregate limits and source failures. Existing overload behavior, JSON versions 1 through 6, and Runtime-and-Source dependencies remain unchanged.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.17.0-Alpha-6 supports the two-format catalog sample and package-only consumer through bounded conventional acquisition. Existing overloads, JSON versions 1 through 6, and Runtime-and-Source dependencies remain unchanged.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>

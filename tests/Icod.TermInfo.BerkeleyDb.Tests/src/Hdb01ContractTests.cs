@@ -153,7 +153,7 @@ public sealed class Hdb01ContractTests {
 			);
 
 		Assert.Contains(
-			"<IcodTermInfoSuiteVersion>1.17.0-Alpha-5</IcodTermInfoSuiteVersion>",
+			"<IcodTermInfoSuiteVersion>1.17.0-Alpha-6</IcodTermInfoSuiteVersion>",
 			props,
 			StringComparison.Ordinal
 		);

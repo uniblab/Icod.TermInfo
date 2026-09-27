@@ -27,6 +27,13 @@ try {
         throw "Package artifact verification exited with status $LASTEXITCODE."
     }
 
+    & ./.github/scripts/smoke-uc06-catalogs-package-consumer.ps1 `
+        -ArtifactDirectory $ArtifactDirectory `
+        -Configuration $Configuration
+    if (0 -ne $LASTEXITCODE) {
+        throw 'UC06 isolated Catalogs package consumer failed.'
+    }
+
     & ./.github/scripts/verify-berkeleydb-package.ps1 `
         -ArtifactDirectory $ArtifactDirectory `
         -Configuration $Configuration
@@ -154,6 +161,26 @@ try {
             --no-restore
         if (0 -ne $LASTEXITCODE) {
             throw "RB07 raster-backend selection sample failed on $framework."
+        }
+    }
+
+    $catalogSampleProject = Join-Path `
+        $repositoryRoot `
+        'samples/Icod.TermInfo.Catalogs.Sample/Icod.TermInfo.Catalogs.Sample.csproj'
+    & dotnet restore $catalogSampleProject
+    if (0 -ne $LASTEXITCODE) {
+        throw 'UC06 unified catalog sample restore failed.'
+    }
+    foreach ($framework in @('net8.0', 'net9.0', 'net10.0')) {
+        & dotnet run `
+            --project $catalogSampleProject `
+            -c $Configuration `
+            -f $framework `
+            --no-build `
+            -- `
+            --verify
+        if (0 -ne $LASTEXITCODE) {
+            throw "UC06 unified catalog sample failed on $framework."
         }
     }
 
