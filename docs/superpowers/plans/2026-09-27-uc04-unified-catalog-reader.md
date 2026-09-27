@@ -2,8 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:executing-plans`
 > inline, task by task. Do not use subagents. Steps use checkboxes.
-> **Status:** Approved by the user on 2026-09-27; tasks 1–3 implemented and
-> Alpha-4 integration/qualification in progress. UC03 is accepted at
+> **Status:** Complete and accepted at `168862eb6935ab10597f378a372e393591c9b7b2`
+> after Alpha-4 qualification. UC03 is accepted at
 > `e4dcf7e25f174d07702186d5bd9e4ea1a5ec7742`; its documentation follow-up is
 > `a3ae098c5a096a1102d3dbe7555def1090e0ad0e`.
 
@@ -215,12 +215,12 @@ for compiled version/assembly/dependency checks.
   run `packaging/VerifyPackageArtifact.ps1` in Release with dotnet and PowerShell
   on PATH. Require API reconstruction, dependencies, isolated consumers,
   sample runs, symbols, Source Link, and managed-only payload checks to pass.
-- [ ] Review `git diff --check`, production/source compatibility and parity
+- [x] Review `git diff --check`, production/source compatibility and parity
   assertions against UC00. Commit, non-force push to PR #48, and update the PR
   body with actual counts. Observe Windows/Linux/macOS PR and applicable native
   Linux/macOS plus managed Windows interoperability on the exact code commit;
   diagnose failures before acceptance.
-- [ ] Once exact-code CI is green, record code SHA/tree, local counts and both
+- [x] Once exact-code CI is green, record code SHA/tree, local counts and both
   workflow links in roadmaps and PR, mark UC04 accepted, and identify UC05 as
   next. Commit/push the documentation-only acceptance record without waiting
   for its CI. Leave the release PR draft, unmerged and unpublished.

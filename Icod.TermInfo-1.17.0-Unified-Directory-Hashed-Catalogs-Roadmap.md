@@ -4,7 +4,7 @@
 
 **Theme:** Unified directory/hashed catalogs
 
-**Status:** DEVELOPING — UC00 through UC03 accepted; UC04 qualification in progress
+**Status:** DEVELOPING — UC00 through UC04 accepted; UC05 is next
 
 **Stable predecessor:** `1.16.0` (published)
 
@@ -179,7 +179,7 @@ accepted based only on a plan or an unobserved CI run.
 | UC01 | `1.17.0-Alpha-1` | Package/model foundation and approved bounded acquisition seam | UC00 | Accepted at `656acf9` |
 | UC02 | `1.17.0-Alpha-2` | Conventional-directory adapter | UC01 | Accepted at `965c8d2` |
 | UC03 | `1.17.0-Alpha-3` | Hash-v9 adapter | UC01, UC02 contract fixtures | Accepted at `e4dcf7e` |
-| UC04 | `1.17.0-Alpha-4` | Unified reader and cross-format behavioral qualification | UC02, UC03 | Implemented; qualification in progress |
+| UC04 | `1.17.0-Alpha-4` | Unified reader and cross-format behavioral qualification | UC02, UC03 | Accepted at `168862e` |
 | UC05 | `1.17.0-Alpha-5` | Resource, failure, cancellation, and compatibility hardening | UC04 | Pending |
 | UC06 | `1.17.0-Alpha-6` | Samples, package consumers, distribution and guide | UC05 | Pending |
 | UC07 | `1.17.0` after accepted Alpha-6 | Exact API freeze and stable release audit | UC06 | Pending |
@@ -261,8 +261,8 @@ hashed acquisition produces the agreed common model and diagnostics.
 ### UC04 — unified reader and parity
 
 The [UC04 implementation plan](docs/superpowers/plans/2026-09-27-uc04-unified-catalog-reader.md)
-is approved and in progress. It builds on the approved UC00 public signature and
-the accepted UC02/UC03 adapters; acceptance requires exact-code CI evidence.
+is complete and accepted. It builds on the approved UC00 public signature and
+the accepted UC02/UC03 adapters; exact-code qualification is recorded below.
 
 - [x] Add the reviewed single-source dispatch and public cancellation overloads.
   Test explicit format mismatch; do not silently autodetect or fall back.
@@ -331,7 +331,7 @@ not add behavior or enlarge the catalog scope.
 
 ## 5. Progress and change control
 
-### UC04 local qualification (CI pending)
+### Accepted UC04 evidence
 
 UC04 adds the explicit `TerminalCatalogReader` and proves equivalent observed
 publications and terminal semantics across conventional directory and hash-v9
@@ -353,8 +353,27 @@ differences. The coordinated development version is `1.17.0-Alpha-4`.
 - The existing RE07 package-only fixture emits CS8321 for its unused
   `MapPersistentRasterStatus` helper once per framework; all three runs passed.
 
-Exact-code CI remains the acceptance condition. The release PR remains draft,
-unmerged, untagged, and unpublished.
+The accepted repair/code head is `168862eb6935ab10597f378a372e393591c9b7b2`,
+tree `b62dd21f500147f19a672600ba83ca81411c9054`. The initial implementation
+head `e38446f06bb16fb0bdc8ff2253d0d92abba23fee` ran the native interoperability
+suite on the unchanged production code. Its platform run exposed case-insensitive
+fixture collisions on Windows/macOS and Windows line-ending comparisons in the
+new tests. The follow-up adjusted those fixtures and the verifier's normalized
+baseline comparison; the public reader and packaged production API did not change.
+The repaired full solution rerun passed **5,634** tests. A local repack after the
+branch ref changed reused a prior Termcap PDB and failed its Source Link commit
+check; the exact repaired head subsequently passed complete Staging and Release
+package verification in CI on Windows, Linux, and macOS.
+
+| Workflow | Exact result |
+| --- | --- |
+| [UC04 repaired PR workflow 36310348698](https://github.com/uniblab/Icod.TermInfo/actions/runs/36310348698) | All 12 jobs passed at `168862e`: Windows/Linux/macOS build, tests and packages; three installed-tool checks; six platform archives |
+| [UC04 implementation interoperability 36309158233](https://github.com/uniblab/Icod.TermInfo/actions/runs/36309158233) | All three jobs passed at `e38446f`: Linux/macOS native Berkeley DB/ncurses and Windows managed Linux fixture |
+| [UC04 repair interoperability 36310348679](https://github.com/uniblab/Icod.TermInfo/actions/runs/36310348679) | Successful at `168862e`; native steps were path-filtered after the test/verifier-only repair |
+
+Author self-review was inline, without subagents. UC05 adversarial, cancellation,
+and compatibility hardening is next. The release PR remains draft, unmerged,
+untagged, and unpublished.
 
 ### Accepted UC03 evidence
 

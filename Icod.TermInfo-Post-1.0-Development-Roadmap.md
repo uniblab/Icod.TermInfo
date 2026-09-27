@@ -16,11 +16,11 @@
 **Latest completed line:** `1.16.0` - Berkeley DB Hash-v9 Writer
 **Latest completed prerelease:** `1.16.0-Alpha-8`
 **Active development line:** `1.17.0` - Unified directory/hashed catalogs
-**Status:** stable `1.16.0` is published; UC00 through UC03 are accepted; UC04 qualification is in progress
+**Status:** stable `1.16.0` is published; UC00 through UC04 are accepted; UC05 is next
 **Active release roadmap:** [1.17.0 — Unified directory/hashed catalogs](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadmap.md)
 **Release audit:** planned for UC07; UC01 through UC03 evidence is tracked in the active roadmap
 **Latest completed release audit:** `docs/1.16.0-RELEASE-AUDIT.md`
-**Next gate:** qualify the [UC04 implementation plan](docs/superpowers/plans/2026-09-27-uc04-unified-catalog-reader.md) at the implementation commit, including packages and cross-platform CI
+**Next gate:** UC05 adversarial, resource, cancellation, and compatibility hardening under the [1.17 roadmap](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadmap.md)
 
 The approved UC00 contract fixes `Icod.TermInfo.Catalogs` above Runtime,
 Inspection, and BerkeleyDb. UC01 introduces the ten model types and bounded
@@ -125,7 +125,7 @@ is complete and accepted at `656acf952c286ccd24b3819e85faf2bc598e2bcd`.
 
 UC00–UC07 cover contract design, package/model foundation, directory and hashed
 adapters, unified acquisition, adversarial qualification, samples/package
-consumers, and stable closure. UC01 through UC03 are accepted; UC04–UC07 are pending.
+consumers, and stable closure. UC01 through UC04 are accepted; UC05–UC07 are pending.
 UC02 code head `965c8d2ee91a6b3515a33c64cb9f702566f3943a` passed 7,284 local
 tests, all 12 PR workflow jobs, and all three interoperability jobs; see the
 active roadmap for commands, artifact checks, and CI links.
@@ -136,7 +136,11 @@ Physical acquisition, logical catalog budgets, the internal hashed adapter,
 and exact additive API verification passed Alpha-3 qualification: 7,581 local
 tests, complete distribution verification, all 12 PR jobs, and all three
 interoperability jobs. Execution and author self-review were inline without
-subagents. The public reader and cross-format parity remain UC04.
+subagents. UC04 public reader and cross-format parity are accepted at
+`168862eb6935ab10597f378a372e393591c9b7b2`: 7,629 local tests, all 12
+repaired-head PR jobs, and full native/managed interoperability at the preceding
+unchanged-production-code implementation head. The active roadmap records the
+repair and exact workflow evidence; UC05 is next.
 
 The earlier broad assignment of migration and catalog automation to 1.17 is
 superseded. Mixed-source database sets, precedence, cross-container comparison,
