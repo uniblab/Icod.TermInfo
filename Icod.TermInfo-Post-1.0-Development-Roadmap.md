@@ -16,11 +16,11 @@
 **Latest completed line:** `1.16.0` - Berkeley DB Hash-v9 Writer
 **Latest completed prerelease:** `1.16.0-Alpha-8`
 **Active development line:** `1.17.0` - Unified directory/hashed catalogs
-**Status:** stable `1.16.0` is published; the 1.17 UC00 contract is approved and UC01 implementation is undergoing qualification
+**Status:** stable `1.16.0` is published; the 1.17 UC00 contract and UC01 foundation are accepted; UC02 is next
 **Active release roadmap:** [1.17.0 — Unified directory/hashed catalogs](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadmap.md)
 **Release audit:** planned for UC07; UC01 evidence is tracked in the active roadmap
 **Latest completed release audit:** `docs/1.16.0-RELEASE-AUDIT.md`
-**Next gate:** qualify the UC01 model package and bounded Inspection seam, then implement the UC02 directory adapter
+**Next gate:** write and execute the UC02 conventional-directory adapter task plan under the approved contract
 
 The approved UC00 contract fixes `Icod.TermInfo.Catalogs` above Runtime,
 Inspection, and BerkeleyDb. UC01 introduces the ten model types and bounded
@@ -121,11 +121,11 @@ listings before returning its catalog. The
 acquisition, publication semantics, and later opt-in BerkeleyDb additions for
 typed limits and cancellation. The approved
 [UC01 plan](docs/superpowers/plans/2026-09-27-uc01-unified-catalog-foundation.md)
-is implemented through its first three tasks; coordinated qualification is underway.
+is complete and accepted at `656acf952c286ccd24b3819e85faf2bc598e2bcd`.
 
 UC00–UC07 cover contract design, package/model foundation, directory and hashed
 adapters, unified acquisition, adversarial qualification, samples/package
-consumers, and stable closure. UC01 qualification is in progress; UC02–UC07 are pending.
+consumers, and stable closure. UC01 is accepted; UC02–UC07 are pending.
 
 The earlier broad assignment of migration and catalog automation to 1.17 is
 superseded. Mixed-source database sets, precedence, cross-container comparison,

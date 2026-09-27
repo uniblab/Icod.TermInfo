@@ -4,7 +4,7 @@
 
 **Theme:** Unified directory/hashed catalogs
 
-**Status:** DEVELOPING — UC00 approved; UC01 implemented, qualification in progress
+**Status:** DEVELOPING — UC00 and UC01 accepted; UC02 directory adapter is next
 
 **Stable predecessor:** `1.16.0` (published)
 
@@ -174,7 +174,7 @@ accepted based only on a plan or an unobserved CI run.
 | Tranche | Planned version | Deliverable | Depends on | Status |
 | --- | --- | --- | --- | --- |
 | UC00 | Planning; retain `1.16.0` build identity | Contract, package decision, bounded-acquisition design | Published 1.16 | Approved by user, 2026-09-27 UTC |
-| UC01 | `1.17.0-Alpha-1` | Package/model foundation and approved bounded acquisition seam | UC00 | Implemented; qualification in progress |
+| UC01 | `1.17.0-Alpha-1` | Package/model foundation and approved bounded acquisition seam | UC00 | Accepted at `656acf9` |
 | UC02 | `1.17.0-Alpha-2` | Conventional-directory adapter | UC01 | Pending |
 | UC03 | `1.17.0-Alpha-3` | Hash-v9 adapter | UC01, UC02 contract fixtures | Pending |
 | UC04 | `1.17.0-Alpha-4` | Unified reader and cross-format behavioral qualification | UC02, UC03 | Pending |
@@ -314,9 +314,10 @@ not add behavior or enlarge the catalog scope.
 ## 5. Progress and change control
 
 UC00 and the UC01 plan are approved. UC01 implementation comprises:
-- `c5e67ba`: opt-in bounded Inspection acquisition.
-- `7e9f2cd`: immutable Catalogs model package and explicit solution entries.
-- `4a29776`: exact additive compatibility and package-verifier fixtures.
+- `af93967`: opt-in bounded Inspection acquisition.
+- `e61e9c6`: immutable Catalogs model package and explicit solution entries.
+- `62eb787`: exact additive compatibility and package-verifier fixtures.
+- `6850dd5`: coordinated Alpha-1 integration and repository style corrections.
 
 Local Release evidence before coordinated integration: 36 bounded/legacy catalog
 checks, 24 Catalogs checks, 661 complete Inspection checks, and 7 BerkeleyDb
@@ -324,9 +325,37 @@ API-freeze checks per framework. Catalogs API equality is confirmed across all
 three frameworks; both Inspection compatibility entry points reconstruct 1.14
 through 1.10. All six JSON schema fingerprints remain unchanged.
 
-Alpha-1 distribution integration and code-head CI qualification are in progress.
-UC01 is not yet accepted. UC02 directory adaptation remains the next implementation
+UC01 is accepted at `656acf952c286ccd24b3819e85faf2bc598e2bcd` after successful
+code-head qualification. UC02 directory adaptation is the next implementation
 task; UC03 adds bounded hashed acquisition, and UC04 adds the public reader.
+Alpha-1 remains a development build; no release has been tagged or published.
+
+The integrated production code is `6850dd56ca0643279f55d8037e2fe4dc46b44445`.
+The qualification candidate is `656acf952c286ccd24b3819e85faf2bc598e2bcd`,
+tree `f27ce743c726638200b59a983d50fa4de91db5c2`. It changes only the Windows
+fixture assertion to compare the exact supplied absolute path: a valid `/` in
+Windows input must not be compared against a newly constructed `\` spelling.
+The model preserves provenance correctly. All 25 Catalogs tests passed again
+on each local framework after the assertion fix.
+Local qualification on Linux used SDK 10.0.100 and .NET 8/9/10 runtimes:
+
+| Command / check | Result |
+| --- | --- |
+| `dotnet build Icod.TermInfo.sln -c Release --no-restore -m:1 -p:UseSharedCompilation=false -warnaserror` | Passed; zero warnings/errors |
+| `dotnet test Icod.TermInfo.sln -c Release --no-restore -m:1 -p:UseSharedCompilation=false` | 5,370 passed across 22 test runs |
+| `dotnet test tests/Icod.TermInfo.BerkeleyDb.Tests/Icod.TermInfo.BerkeleyDb.Tests.csproj -c Release --no-restore -m:1 -p:UseSharedCompilation=false` | 606 per framework; 1,818 passed |
+| `packaging/PackPackages.ps1 -Configuration Release -OutputDirectory artifacts/uc01-release` | Eight nupkg and seven snupkg artifacts |
+| Catalogs package verifier plus three-TFM API baseline checks | Passed; exact dependencies, managed payload, XML docs, symbols and Source Link |
+| `packaging/VerifyPackageArtifact.ps1 -ArtifactDirectory artifacts/uc01-release -Configuration Release` | Passed, including existing package consumers and samples |
+| [Initial PR workflow 36292829043](https://github.com/uniblab/Icod.TermInfo/actions/runs/36292829043) | macOS passed; Windows exposed the fixture separator assertion; superseded |
+| [PR workflow 36293112745](https://github.com/uniblab/Icod.TermInfo/actions/runs/36293112745) | Passed: all 12 jobs, including Windows/Linux/macOS Staging and Release qualification, three installed-tool package checks and all six tool archives |
+| [Interoperability workflow 36292829036](https://github.com/uniblab/Icod.TermInfo/actions/runs/36292829036) | Passed on production head `6850dd5`: Linux/macOS native oracle and Windows managed fixture |
+
+The local package script runs used `DOTNET_PROCESSOR_COUNT=1` to keep MSBuild
+within this workspace's process limits. The initial full test run caught the
+new files' brace/multiline-parenthesis convention violations; these were corrected
+and all six convention checks passed before the successful full run. No frozen
+API/schema authority was changed to accommodate a failure.
 
 Record each accepted tranche's commit, tests, qualification run, and remaining
 risks here and in its contract/audit document. Documentation-only follow-ups

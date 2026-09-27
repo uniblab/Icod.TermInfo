@@ -11,7 +11,8 @@ The current coordinated build identity is `1.17.0-Alpha-1`, set through
 `Directory.Build.props` for eight packages. The new optional
 `Icod.TermInfo.Catalogs` foundation brings the family to seven reusable libraries
 and seven symbol packages. All reusable assemblies retain `1.0.0.0` identity
-and net8.0/net9.0/net10.0 targets. Alpha-1 qualification is in progress;
+and net8.0/net9.0/net10.0 targets. The Alpha-1 foundation passed code-head
+qualification at `656acf952c286ccd24b3819e85faf2bc598e2bcd`;
 the latest published stable release is 1.16.0.
 
 UC01 delivers immutable models and opt-in bounded Inspection acquisition.
