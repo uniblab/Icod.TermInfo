@@ -3,7 +3,16 @@
 This file records release-level product changes. Exact qualification evidence,
 API fingerprints, and preserved boundaries live in the linked release audits.
 
-## 1.17.0-Alpha-4 (in development)
+## 1.17.0-Alpha-5 (in development)
+
+- Adds adversarial directory and hashed boundary tests for physical candidates,
+  decoded and parsed bytes, records, links, aliases, and duplicate issues.
+- Tests deterministic cancellation and source changes, and pins old directory,
+  database-set planning, and Hash-v9 behavior alongside unified reads.
+- Retains the eleven-type Catalogs surface, legacy APIs, JSON v1–v6, and
+  coordinated eight-package distribution.
+
+## 1.17.0-Alpha-4
 
 - Adds the public `TerminalCatalogReader` with explicit directory/Hash-v9
   selection, fresh bounded acquisition, and a cancellation overload.

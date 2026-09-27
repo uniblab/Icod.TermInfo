@@ -4,13 +4,13 @@
 
 **Theme:** Unified directory/hashed catalogs
 
-**Status:** DEVELOPING — UC00 through UC04 accepted; UC05 is next
+**Status:** DEVELOPING — UC00 through UC04 accepted; UC05 qualification in progress
 
 **Stable predecessor:** `1.16.0` (published)
 
 **Initial implementation version:** `1.17.0-Alpha-1`
 
-**Current coordinated version:** `1.17.0-Alpha-4`
+**Current coordinated version:** `1.17.0-Alpha-5`
 
 **Language / targets:** C# 13; `net8.0`, `net9.0`, `net10.0`
 

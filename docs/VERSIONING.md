@@ -7,7 +7,7 @@ releases; this document defines the current cross-release policy.
 
 ## 1.17 development line
 
-The current coordinated build identity is `1.17.0-Alpha-4`, set through
+The current coordinated build identity is `1.17.0-Alpha-5`, set through
 `Directory.Build.props` for eight packages. The new optional
 `Icod.TermInfo.Catalogs` foundation brings the family to seven reusable libraries
 and seven symbol packages. All reusable assemblies retain `1.0.0.0` identity
@@ -22,6 +22,8 @@ internal hashed adapter, with two new public types and one method; exact removal
 reconstructs the frozen 1.16 API and then the historical 1.15 reader. Catalogs
 retains the ten public model types and adds one public reader in UC04. Migration,
 mixed-source precedence, and broader automation have no assigned release.
+UC05 hardens existing directory and hashed acquisition boundaries and verifies
+old readers and frozen surfaces without another public addition.
 
 ## 1.16 release line
 
