@@ -69,6 +69,9 @@ internal static class Program {
 				string reconstructed = CatalogsUc04Compatibility.Reconstruct( File.ReadAllText( args[1] ),
 					File.ReadAllText( Path.Combine( root, "docs/1.17.0-UC04-CATALOGS-PUBLIC-API-ADDITIONS.txt" ) )
 				);
+				string baseline = File.ReadAllText( Path.Combine( root, "docs/1.17.0-UC01-CATALOGS-PUBLIC-API-BASELINE.txt" ) )
+					.Replace( "\r\n", "\n", StringComparison.Ordinal ).Replace( '\r', '\n' ).TrimEnd( '\n' ) + "\n";
+				Require( reconstructed == baseline, "The reconstructed Catalogs API differs from the UC01 baseline." );
 				File.WriteAllText( args[2], reconstructed );
 				return 0;
 			}

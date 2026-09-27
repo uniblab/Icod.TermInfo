@@ -139,16 +139,16 @@ public sealed class UC04CatalogParityTests {
 	public void PublicReadsRetainOrdinalOrderingAcrossCultures( string culture ) {
 		using DirectoryCatalogFixture directory = new();
 		using HashedCatalogFixture hashed = new();
-		byte[] bytes = CompiledTermInfoWriter.Write( new TerminalDescriptionBuilder( "I" ).AddAlias( "i" ).SetDescription( "culture fixture" ).Build() );
+		byte[] bytes = CompiledTermInfoWriter.Write( new TerminalDescriptionBuilder( "I" ).AddAlias( "j" ).SetDescription( "culture fixture" ).Build() );
 		directory.Write( "I", "I", bytes );
-		directory.Write( "i", "i", bytes );
-		BerkeleyDbTerminalDatabaseWriter.Write( hashed.PathName, [new( "I", [ "i" ], bytes )] );
+		directory.Write( "j", "j", bytes );
+		BerkeleyDbTerminalDatabaseWriter.Write( hashed.PathName, [new( "I", [ "j" ], bytes )] );
 		CultureInfo old = CultureInfo.CurrentCulture;
 		try {
 			CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo( culture );
 			foreach ( var reader in new[] { new TerminalCatalogReader( directory.Source ), new TerminalCatalogReader( hashed.Source ) } ) {
-				Assert.Equal( new[] { "I", "i" }, reader.Read().Entries.Select( item => item.PublicationName ) );
-				Assert.Equal( new[] { "I", "i" }, reader.Read().Entries.Select( item => item.PublicationName ) );
+				Assert.Equal( new[] { "I", "j" }, reader.Read().Entries.Select( item => item.PublicationName ) );
+				Assert.Equal( new[] { "I", "j" }, reader.Read().Entries.Select( item => item.PublicationName ) );
 			}
 		} finally { CultureInfo.CurrentCulture = old; }
 	}

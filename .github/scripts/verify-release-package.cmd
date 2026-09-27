@@ -116,8 +116,7 @@ for %%F in (net8.0 net9.0 net10.0) do (
   if errorlevel 1 goto fail
   dotnet run --project tools\catalogs-package-verifier\Icod.TermInfo.Catalogs.PackageVerifier.csproj -c "%CONFIGURATION%" --no-build -- --reconstruct-uc04 "%ARTIFACT_DIR%\uc04-catalogs-current-%%F.txt" "%ARTIFACT_DIR%\uc04-catalogs-reconstructed-%%F.txt"
   if errorlevel 1 goto fail
-  fc /b docs\1.17.0-UC01-CATALOGS-PUBLIC-API-BASELINE.txt "%ARTIFACT_DIR%\uc04-catalogs-reconstructed-%%F.txt" >nul
-  if errorlevel 1 goto fail
+  rem The verifier compares the reconstructed API to the baseline after normalizing checkout line endings.
 )
 dotnet run --project tools\catalogs-package-verifier\Icod.TermInfo.Catalogs.PackageVerifier.csproj -c "%CONFIGURATION%" --no-build -- "%ARTIFACT_DIR%"
 if errorlevel 1 goto fail

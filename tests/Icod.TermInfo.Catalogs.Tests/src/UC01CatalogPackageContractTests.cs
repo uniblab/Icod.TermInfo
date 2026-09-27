@@ -14,7 +14,7 @@ public sealed class UC01CatalogPackageContractTests {
 		Assert.All( assembly.GetExportedTypes().Where( type => !type.IsEnum ), type => Assert.True( type.IsSealed ) );
 		Assert.Contains( assembly.GetExportedTypes(), type => type == typeof( TerminalCatalogReader ) );
 		string root = FindRoot();
-		Assert.Equal( File.ReadAllText( Path.Combine( root, "docs/1.17.0-UC01-CATALOGS-PUBLIC-API-BASELINE.txt" ) ),
+		Assert.Equal( File.ReadAllText( Path.Combine( root, "docs/1.17.0-UC01-CATALOGS-PUBLIC-API-BASELINE.txt" ) ).Replace( "\r\n", "\n", StringComparison.Ordinal ).TrimEnd( '\n' ) + "\n",
 			PackageVerifier.CatalogsUc04Compatibility.Reconstruct( Icod.TermInfo.PublicApiSnapshot.Program.CreateManifest( assembly ),
 				File.ReadAllText( Path.Combine( root, "docs/1.17.0-UC04-CATALOGS-PUBLIC-API-ADDITIONS.txt" ) )
 			)
