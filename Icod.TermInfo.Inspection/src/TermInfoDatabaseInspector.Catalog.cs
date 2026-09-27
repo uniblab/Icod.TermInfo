@@ -248,6 +248,14 @@ public static partial class TermInfoDatabaseInspector {
 			}
 		}
 
+		return CreateConventionalCatalog( root, entries, issues );
+	}
+
+	private static TermInfoDatabaseCatalog CreateConventionalCatalog(
+		string root,
+		IEnumerable<TermInfoDatabaseCatalogEntry> entries,
+		IEnumerable<TermInfoDatabaseCatalogIssue> issues
+	) {
 		TermInfoDatabaseCatalogEntry[] orderedEntries =
 			entries
 				.OrderBy(
@@ -302,7 +310,8 @@ public static partial class TermInfoDatabaseInspector {
 		CompiledTermInfoParserOptions parserOptions,
 		ICollection<TermInfoDatabaseCatalogEntry> entries,
 		ICollection<TermInfoDatabaseCatalogIssue> issues,
-		CancellationToken cancellationToken
+		CancellationToken cancellationToken,
+		CatalogReadBudget? budget = null
 	) {
 		ArgumentException.ThrowIfNullOrWhiteSpace( directoryName );
 		ArgumentException.ThrowIfNullOrWhiteSpace( path );
@@ -343,7 +352,8 @@ public static partial class TermInfoDatabaseInspector {
 				ReadCatalogTerminal(
 					path,
 					parserOptions,
-					cancellationToken
+					cancellationToken,
+					budget
 				);
 		}
 		catch ( CompiledTermInfoFormatException exception ) {
@@ -367,6 +377,7 @@ public static partial class TermInfoDatabaseInspector {
 			return;
 		}
 
+		budget?.ReserveEntry();
 		entries.Add(
 			new TermInfoDatabaseCatalogEntry(
 				path,
@@ -394,7 +405,8 @@ public static partial class TermInfoDatabaseInspector {
 	private static TerminalDescription ReadCatalogTerminal(
 		string path,
 		CompiledTermInfoParserOptions parserOptions,
-		CancellationToken cancellationToken
+		CancellationToken cancellationToken,
+		CatalogReadBudget? budget = null
 	) {
 		ArgumentException.ThrowIfNullOrWhiteSpace( path );
 		ArgumentNullException.ThrowIfNull( parserOptions );
@@ -409,15 +421,28 @@ public static partial class TermInfoDatabaseInspector {
 				FileOptions.SequentialScan
 			);
 
+		return ReadCatalogTerminalStream( stream, path, parserOptions, cancellationToken, budget );
+	}
+
+	internal static TerminalDescription ReadCatalogTerminalStream(
+		Stream stream, string path, CompiledTermInfoParserOptions parserOptions,
+		CancellationToken cancellationToken, CatalogReadBudget? budget
+	) {
+		if ( budget is not null ) cancellationToken.ThrowIfCancellationRequested();
 		long length =
 			stream.Length;
+		if ( budget is not null ) cancellationToken.ThrowIfCancellationRequested();
 		if ( length > parserOptions.MaximumEntrySize ) {
+			budget?.ThrowLimit( "MaximumEntrySize", parserOptions.MaximumEntrySize );
 			throw new CompiledTermInfoFormatException(
 				"The compiled entry is "
 				+ $"{length} bytes, exceeding the configured maximum of "
 				+ $"{parserOptions.MaximumEntrySize} bytes."
 			);
 		}
+
+		budget?.EnsureEntryCapacity();
+		budget?.ReserveParsedBytes( length );
 
 		byte[] entry =
 			new byte[(int)length];
