@@ -296,6 +296,9 @@ commits, commands, outcomes, and any remaining limitations.
 
 ### UC06 — usable package, sample, and documentation
 
+The [UC06 implementation plan](docs/superpowers/plans/2026-09-27-uc06-catalog-consumer-guide.md)
+is proposed for review before implementation under the tranche gate above.
+
 - [ ] Add `samples/Icod.TermInfo.Catalogs.Sample/` (or the UC00-approved name)
   showing the same read/print workflow for a directory and hashed file, including
   aliases, provenance, issues, cancellation, and custom limits.
