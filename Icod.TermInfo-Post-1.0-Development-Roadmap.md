@@ -19,7 +19,7 @@
 **Active release roadmap:** [1.17.0 — Unified directory/hashed catalogs](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadmap.md)
 **Release audit:** planned for UC07; no 1.17 qualification has been performed
 **Latest completed release audit:** `docs/1.16.0-RELEASE-AUDIT.md`
-**Next gate:** UC00 catalog semantics, package boundary, and resource-limit contract review
+**Next gate:** review the drafted UC00 contract and UC01 plan, including opt-in bounded acquisition in Inspection and BerkeleyDb
 
 The coordinated build version remains `1.16.0` during this planning-only change.
 The first implementation tranche will introduce `1.17.0-Alpha-1`.
@@ -115,7 +115,12 @@ The proposed implementation uses an optional composition package above Inspectio
 and BerkeleyDb; UC00 reviews that boundary and the exact public contract before
 production implementation. Existing packages retain their dependency directions.
 Directory resource bounds need explicit design because the current inspector
-materializes directory listings before returning its catalog.
+materializes directory listings before returning its catalog. The
+[UC00 contract](docs/1.17.0-UC00-UNIFIED-CATALOG-CONTRACT.md) now specifies that
+bounded acquisition design, publication semantics, and small opt-in BerkeleyDb
+additions for typed limits and cancellation. The
+[UC01 plan](docs/superpowers/plans/2026-09-27-uc01-unified-catalog-foundation.md)
+is drafted for review; production implementation has not started.
 
 UC00–UC07 cover contract design, package/model foundation, directory and hashed
 adapters, unified acquisition, adversarial qualification, samples/package

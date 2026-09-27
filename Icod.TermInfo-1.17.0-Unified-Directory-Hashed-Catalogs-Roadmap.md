@@ -4,7 +4,7 @@
 
 **Theme:** Unified directory/hashed catalogs
 
-**Status:** PLANNING — scope selected; UC00 contract review pending
+**Status:** PLANNING — UC00 contract and UC01 task plan drafted; review pending
 
 **Stable predecessor:** `1.16.0` (published)
 
@@ -25,7 +25,9 @@ directory acquisition before production code or a public API is committed.
 
 **Specification:** This roadmap defines release scope and acceptance criteria.
 The [main roadmap](Icod.TermInfo-Post-1.0-Development-Roadmap.md) owns release
-sequencing. UC00 will produce the detailed contract and implementation design.
+sequencing. The proposed detailed design is the
+[UC00 contract](docs/1.17.0-UC00-UNIFIED-CATALOG-CONTRACT.md), with a
+[UC01 implementation plan](docs/superpowers/plans/2026-09-27-uc01-unified-catalog-foundation.md).
 
 **Global constraints:** Preserve released API behavior, JSON v1–v6, command
 output, assembly identity `1.0.0.0`, and existing dependency directions. Reuse
@@ -126,8 +128,10 @@ validation order, enum values, exception behavior, and the reviewed type count.
   and typed issues. Preserve skipped-link evidence and the current policy of
   not traversing child links/junctions/reparse points.
 - Corrupt or unsupported hashed containers fail closed; never expose a partially
-  salvaged hashed catalog. Missing sources, permission failures, unsupported
-  format, malformed data, and configured limits must remain distinguishable.
+  salvaged hashed catalog. Missing sources, permission failures, source-kind
+  mismatch, invalid hashed data, and configured limits remain distinguishable.
+  UC00 groups malformed/unsupported hashed content under one stable issue code
+  because the existing reader does not expose a reliable finer classification.
 - Caller argument errors and cancellation propagate as exceptions. A catalog
   budget overrun fails the operation explicitly; it must not return a silently
   truncated success. UC00 defines how known lower-layer failures map to these
@@ -150,10 +154,13 @@ candidates and aliases where they consume resources. Specify defaults, inclusive
 boundary behavior, checked arithmetic, and cancellation checkpoints before reads,
 during traversal/normalization, and before returning a result.
 
-The preferred solution is a narrowly additive bounded Inspection acquisition
-entry point backed by shared traversal internals. Existing overload behavior and
-historical API baselines must remain compatible. UC00 must review the necessary
-Inspection API delta and demonstrate bounded discovery before UC01. If that
+The proposed solution is a narrowly additive bounded Inspection acquisition
+entry point backed by shared traversal internals. The UC00 audit also found that
+typed hashed limit failures, cumulative decoded-byte accounting, and cancellation
+during image reads require an opt-in bounded BerkeleyDb method in UC03. Existing
+methods retain their behavior; historical APIs are reconstructed after removing
+only the reviewed additions. UC00 must review these deltas and the allocation
+accounting before UC01. If that
 cannot be done without breaking existing behavior or growing scope, stop this
 gate and revise the design explicitly. Do not copy a second directory parser or
 claim that a wrapper around eager enumeration solves this problem.
@@ -168,7 +175,7 @@ accepted based only on a plan or an unobserved CI run.
 
 | Tranche | Planned version | Deliverable | Depends on | Status |
 | --- | --- | --- | --- | --- |
-| UC00 | Planning; retain `1.16.0` build identity | Contract, package decision, bounded-acquisition design | Published 1.16 | Pending |
+| UC00 | Planning; retain `1.16.0` build identity | Contract, package decision, bounded-acquisition design | Published 1.16 | Draft complete; review pending |
 | UC01 | `1.17.0-Alpha-1` | Package/model foundation and approved bounded acquisition seam | UC00 | Pending |
 | UC02 | `1.17.0-Alpha-2` | Conventional-directory adapter | UC01 | Pending |
 | UC03 | `1.17.0-Alpha-3` | Hash-v9 adapter | UC01, UC02 contract fixtures | Pending |
@@ -179,19 +186,20 @@ accepted based only on a plan or an unobserved CI run.
 
 ### UC00 — contract and architecture decision
 
-- [ ] Audit the concrete reader/model files listed in section 2 and existing
+- [x] Audit the concrete reader/model files listed in section 2 and existing
   `I03DatabaseCatalogTests`, `Hdb05CatalogReaderTests`, and HDB hardening fixtures.
-- [ ] Write `docs/1.17.0-UC00-UNIFIED-CATALOG-CONTRACT.md`: dependency graph,
+- [x] Write `docs/1.17.0-UC00-UNIFIED-CATALOG-CONTRACT.md`: dependency graph,
   exact candidate API, source/identity examples, duplicate policy, failure table,
   link/root policy, deterministic ordering, numeric limits, and allocation audit.
-- [ ] Settle the additive Inspection seam and package name. Identify every
+- [ ] Accept the proposed additive Inspection/BerkeleyDb seams and package name. Identify every
   frozen API/schema/dependency check affected; no blanket baseline replacement.
-- [ ] Specify fixture expectations for canonical-only entries, published aliases,
+- [x] Specify fixture expectations for canonical-only entries, published aliases,
   declared-but-unpublished aliases, duplicate layouts, malformed siblings, and
   invalid hashed indexes. Separate format parity from intentional storage
   differences such as skipped directory links.
-- [ ] Produce the executable UC01 plan under `docs/superpowers/plans/`, including
-  exact signatures and test commands. Record the contract review decision.
+- [x] Draft the UC01 plan under `docs/superpowers/plans/`, including
+  exact signatures and test commands.
+- [ ] Record the contract and plan review decision before production implementation.
 
 **Exit:** The public model and acquisition limits are reviewable and implementable
 without reopening storage engineering. No unresolved package/bounds decision is
@@ -225,8 +233,11 @@ inventing aliases, choosing duplicate winners, or changing legacy catalogs.
 
 ### UC03 — hashed adapter
 
-- [ ] Compose `BerkeleyDbTerminalCatalogReader` and its existing immutable options;
-  map actual keys, kinds, parsed terminals, and database/key provenance.
+- [ ] Add the UC00-specified opt-in `ReadBounded` method and two supporting types
+  to `BerkeleyDbTerminalCatalogReader`, sharing existing reader/decoder internals.
+  Preserve the old `Read` methods and reconstruct the frozen 1.16 API exactly.
+- [ ] Compose bounded acquisition and immutable options; map actual keys, kinds,
+  parsed terminals, and database/key provenance.
 - [ ] Exercise canonical records, aliases/indexes, non-ASCII identities, chained
   buckets, and large records with existing qualified fixtures/writer output.
 - [ ] Verify missing files, malformed/unsupported images, index failures, each
@@ -304,8 +315,11 @@ not add behavior or enlarge the catalog scope.
 
 ## 5. Progress and change control
 
-This PR establishes the roadmap only. There is no 1.17 production implementation,
-new package, version bump, public API freeze, or completed UC tranche yet.
+This PR contains the roadmap, proposed UC00 contract, and draft UC01 plan. There
+is no 1.17 production implementation, new package, version bump, public API freeze,
+or accepted UC tranche yet. The UC00 audit identified the eager directory scan,
+retained invalid-placement files, and hashed error/cancellation/budget limitations;
+the contract specifies opt-in solutions without changing released method behavior.
 
 Record each accepted tranche's commit, tests, qualification run, and remaining
 risks here and in its contract/audit document. Documentation-only follow-ups
