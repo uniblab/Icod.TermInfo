@@ -20,7 +20,7 @@
 **Active release roadmap:** [1.17.0 — Unified directory/hashed catalogs](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadmap.md)
 **Release audit:** planned for UC07; UC01 and UC02 evidence is tracked in the active roadmap
 **Latest completed release audit:** `docs/1.16.0-RELEASE-AUDIT.md`
-**Next gate:** write and execute the UC03 bounded hashed-acquisition/adapter plan under the approved UC00 contract
+**Next gate:** review the [UC03 implementation plan](docs/superpowers/plans/2026-09-27-uc03-bounded-hashed-catalog-adapter.md), then implement bounded hashed acquisition and adaptation under the approved UC00 contract
 
 The approved UC00 contract fixes `Icod.TermInfo.Catalogs` above Runtime,
 Inspection, and BerkeleyDb. UC01 introduces the ten model types and bounded
@@ -129,6 +129,12 @@ consumers, and stable closure. UC01 and UC02 are accepted; UC03–UC07 are pendi
 UC02 code head `965c8d2ee91a6b3515a33c64cb9f702566f3943a` passed 7,284 local
 tests, all 12 PR workflow jobs, and all three interoperability jobs; see the
 active roadmap for commands, artifact checks, and CI links.
+
+The [UC03 plan](docs/superpowers/plans/2026-09-27-uc03-bounded-hashed-catalog-adapter.md)
+is written and awaiting review. Its five tasks cover physical acquisition,
+logical catalog budgets, the internal hashed adapter, exact additive API/package
+verification, and Alpha-3 qualification. Implementation has not started;
+the current coordinated version remains Alpha-2.
 
 The earlier broad assignment of migration and catalog automation to 1.17 is
 superseded. Mixed-source database sets, precedence, cross-container comparison,
