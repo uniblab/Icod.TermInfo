@@ -16,11 +16,11 @@
 **Latest completed line:** `1.16.0` - Berkeley DB Hash-v9 Writer
 **Latest completed prerelease:** `1.16.0-Alpha-8`
 **Active development line:** `1.17.0` - Unified directory/hashed catalogs
-**Status:** stable `1.16.0` is published; UC00 and UC01 are accepted; UC02 is implemented and undergoing qualification
+**Status:** stable `1.16.0` is published; UC00, UC01, and UC02 are accepted; UC03 is next
 **Active release roadmap:** [1.17.0 — Unified directory/hashed catalogs](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadmap.md)
-**Release audit:** planned for UC07; UC01 evidence is tracked in the active roadmap
+**Release audit:** planned for UC07; UC01 and UC02 evidence is tracked in the active roadmap
 **Latest completed release audit:** `docs/1.16.0-RELEASE-AUDIT.md`
-**Next gate:** complete Alpha-2 qualification under the approved [UC02 implementation plan](docs/superpowers/plans/2026-09-27-uc02-conventional-directory-adapter.md)
+**Next gate:** write and execute the UC03 bounded hashed-acquisition/adapter plan under the approved UC00 contract
 
 The approved UC00 contract fixes `Icod.TermInfo.Catalogs` above Runtime,
 Inspection, and BerkeleyDb. UC01 introduces the ten model types and bounded
@@ -125,8 +125,10 @@ is complete and accepted at `656acf952c286ccd24b3819e85faf2bc598e2bcd`.
 
 UC00–UC07 cover contract design, package/model foundation, directory and hashed
 adapters, unified acquisition, adversarial qualification, samples/package
-consumers, and stable closure. UC01 is accepted; UC02 is implemented and undergoing
-qualification; UC03–UC07 are pending.
+consumers, and stable closure. UC01 and UC02 are accepted; UC03–UC07 are pending.
+UC02 code head `965c8d2ee91a6b3515a33c64cb9f702566f3943a` passed 7,284 local
+tests, all 12 PR workflow jobs, and all three interoperability jobs; see the
+active roadmap for commands, artifact checks, and CI links.
 
 The earlier broad assignment of migration and catalog automation to 1.17 is
 superseded. Mixed-source database sets, precedence, cross-container comparison,

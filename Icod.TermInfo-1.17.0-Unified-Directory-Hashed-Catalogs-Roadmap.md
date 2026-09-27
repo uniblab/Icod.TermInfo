@@ -4,7 +4,7 @@
 
 **Theme:** Unified directory/hashed catalogs
 
-**Status:** DEVELOPING — UC00 and UC01 accepted; UC02 implemented, qualification in progress
+**Status:** DEVELOPING — UC00, UC01, and UC02 accepted; UC03 hashed adapter is next
 
 **Stable predecessor:** `1.16.0` (published)
 
@@ -177,7 +177,7 @@ accepted based only on a plan or an unobserved CI run.
 | --- | --- | --- | --- | --- |
 | UC00 | Planning; retain `1.16.0` build identity | Contract, package decision, bounded-acquisition design | Published 1.16 | Approved by user, 2026-09-27 UTC |
 | UC01 | `1.17.0-Alpha-1` | Package/model foundation and approved bounded acquisition seam | UC00 | Accepted at `656acf9` |
-| UC02 | `1.17.0-Alpha-2` | Conventional-directory adapter | UC01 | Implemented; qualification in progress |
+| UC02 | `1.17.0-Alpha-2` | Conventional-directory adapter | UC01 | Accepted at `965c8d2` |
 | UC03 | `1.17.0-Alpha-3` | Hash-v9 adapter | UC01, UC02 contract fixtures | Pending |
 | UC04 | `1.17.0-Alpha-4` | Unified reader and cross-format behavioral qualification | UC02, UC03 | Pending |
 | UC05 | `1.17.0-Alpha-5` | Resource, failure, cancellation, and compatibility hardening | UC04 | Pending |
@@ -222,15 +222,16 @@ are tested; existing Inspection and BerkeleyDb baselines remain reconstructible.
 ### UC02 — directory adapter
 
 The [UC02 implementation plan](docs/superpowers/plans/2026-09-27-uc02-conventional-directory-adapter.md)
-was approved on 2026-09-27 UTC. The internal adapter and 31 new cases are
-implemented; Alpha-2 integration and qualification are in progress. Execution
-remains inline, without subagents.
+was approved on 2026-09-27 UTC. The internal adapter, 31 behavioral/boundary cases,
+and one compiled identity check are complete. Alpha-2 is accepted at `965c8d2`
+after local and code-head CI qualification. Execution remains inline, without
+subagents.
 
-- [ ] Adapt bounded Inspection observations into the new publication model,
+- [x] Adapt bounded Inspection observations into the new publication model,
   reusing Runtime parsing and shared directory-layout validation.
-- [ ] Cover literal/hex directories, canonical and alias files, misplaced files,
+- [x] Cover literal/hex directories, canonical and alias files, misplaced files,
   duplicate occurrences, links, empty/missing roots, and malformed siblings.
-- [ ] Verify partial status, original physical provenance, deterministic ordering,
+- [x] Verify partial status, original physical provenance, deterministic ordering,
   cancellation, and budgets during discovery, parsing, and issue accumulation.
 
 **Exit:** A directory can be read through the proposed common contract without
@@ -320,7 +321,7 @@ not add behavior or enlarge the catalog scope.
 
 ## 5. Progress and change control
 
-### UC02 implementation and qualification
+### Accepted UC02 evidence
 
 The approved directory adapter is implemented, with 31 behavioral/boundary cases
 and one compiled Alpha-2 identity check. It maps only observed publications,
@@ -342,8 +343,18 @@ Local Alpha-2 Release qualification:
   passed, including existing package consumers and samples, exact APIs,
   historical Inspection reconstruction, metadata, symbols and Source Link.
 
-Code-head CI remains pending. UC02 is not yet marked accepted.
-Review is performed inline by the author, without subagents;
+UC02 is accepted at `965c8d2ee91a6b3515a33c64cb9f702566f3943a`, tree
+`a00b37d8a4e7db913e5d1f6af399e941a410ed67`. The adapter commit is
+`142c6377b68435b2e0984a909862d016d40c3e25`.
+
+| Code-head CI check | Result |
+| --- | --- |
+| [PR workflow 36298484406](https://github.com/uniblab/Icod.TermInfo/actions/runs/36298484406) | All 12 jobs passed: Windows/Linux/macOS Staging and Release qualification, installed-tool checks on three hosts, and all six archives |
+| [Interoperability workflow 36298484409](https://github.com/uniblab/Icod.TermInfo/actions/runs/36298484409) | All three jobs passed: Linux/macOS native Berkeley DB/ncurses and Windows managed-only transported fixture |
+
+UC03 bounded hashed acquisition and adaptation is the next implementation task.
+The acceptance follow-up changes documentation only; its CI is not awaited.
+Review was performed inline by the author, without subagents;
 documentation is reviewed directly, while compiled identity and package contracts
 are checked automatically. Published 1.16 installation examples remain unchanged.
 
@@ -362,9 +373,9 @@ three frameworks; both Inspection compatibility entry points reconstruct 1.14
 through 1.10. All six JSON schema fingerprints remain unchanged.
 
 UC01 is accepted at `656acf952c286ccd24b3819e85faf2bc598e2bcd` after successful
-code-head qualification. UC02 directory adaptation is implemented and undergoing
-Alpha-2 qualification; UC03 adds bounded hashed acquisition, and UC04 adds the
-public reader. No 1.17 release has been tagged or published.
+code-head qualification. UC02 directory adaptation is accepted as recorded above;
+UC03 adds bounded hashed acquisition, and UC04 adds the public reader. No 1.17
+release has been tagged or published.
 
 The integrated production code is `6850dd56ca0643279f55d8037e2fe4dc46b44445`.
 The qualification candidate is `656acf952c286ccd24b3819e85faf2bc598e2bcd`,

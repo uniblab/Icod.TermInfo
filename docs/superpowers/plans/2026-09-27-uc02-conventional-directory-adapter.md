@@ -2,7 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:executing-plans`
 > inline, task by task. Do not use subagents. Steps use checkboxes.
-> **Status:** Approved by the user on 2026-09-27 UTC; implementation in progress.
+> **Status:** Approved by the user on 2026-09-27 UTC; complete and accepted at
+> `965c8d2ee91a6b3515a33c64cb9f702566f3943a`. Qualification evidence is in the
+> release roadmap. The acceptance follow-up changes documentation only.
 
 **Goal:** Deliver the internal conventional-directory adapter for
 `1.17.0-Alpha-2`, translating bounded physical observations into actual terminal
@@ -205,11 +207,11 @@ RIDs remain unchanged.
 - [x] Verify `git diff --check`, unchanged API baselines and JSON schemas, and
   unchanged production dependency directions. Self-review implementation and
   tests inline; commit as `Integrate and qualify UC02 Alpha-2`.
-- [ ] Push to PR #48 without force and update its body with actual evidence.
+- [x] Push to PR #48 without force and update its body with actual evidence.
   Require code-head Windows/Linux/macOS build/test/package checks to pass;
   diagnose any failure before accepting UC02. Do not claim native checks ran
   when a path-filtered workflow did not exercise them.
-- [ ] Record accepted code SHA, test counts and CI links in both roadmaps; mark
+- [x] Record accepted code SHA, test counts and CI links in both roadmaps; mark
   UC02 complete only after qualification and identify UC03 as next. Commit/push
   that documentation-only acceptance without waiting on its CI.
 

@@ -21,8 +21,8 @@ See the [1.17 roadmap](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Ro
 and [approved contract](docs/1.17.0-UC00-UNIFIED-CATALOG-CONTRACT.md).
 
 The published stable release is **1.16.0**. Installation examples below use that
-published version. The Alpha-1 foundation is qualified; Alpha-2 qualification
-is tracked in the development roadmap.
+published version. The Alpha-1 foundation and Alpha-2 directory adapter are
+qualified; the hashed adapter and public reader remain in development.
 
 Version 1.16 adds deterministic, pure-managed Berkeley DB Hash-v9 publication
 to `Icod.TermInfo.BerkeleyDb`, alongside exact lookup, logical catalogs, and
