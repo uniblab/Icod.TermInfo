@@ -20,7 +20,7 @@
 **Active release roadmap:** [1.17.0 — Unified directory/hashed catalogs](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadmap.md)
 **Release audit:** planned for UC07; UC01 through UC03 evidence is tracked in the active roadmap
 **Latest completed release audit:** `docs/1.16.0-RELEASE-AUDIT.md`
-**Next gate:** plan UC04 public unified acquisition and cross-format parity under the approved UC00 contract
+**Next gate:** review the [UC04 implementation plan](docs/superpowers/plans/2026-09-27-uc04-unified-catalog-reader.md) for public unified acquisition and cross-format parity under the approved UC00 contract
 
 The approved UC00 contract fixes `Icod.TermInfo.Catalogs` above Runtime,
 Inspection, and BerkeleyDb. UC01 introduces the ten model types and bounded

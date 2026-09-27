@@ -260,6 +260,10 @@ hashed acquisition produces the agreed common model and diagnostics.
 
 ### UC04 — unified reader and parity
 
+The [UC04 implementation plan](docs/superpowers/plans/2026-09-27-uc04-unified-catalog-reader.md)
+is proposed for review. It builds on the approved UC00 public signature and
+the accepted UC02/UC03 adapters; implementation has not started.
+
 - [ ] Add the reviewed single-source dispatch and public cancellation overloads.
   Test explicit format mismatch; do not silently autodetect or fall back.
 - [ ] Build equivalent directory/hashed fixtures from the same compiled records
