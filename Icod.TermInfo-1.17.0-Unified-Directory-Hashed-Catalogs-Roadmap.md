@@ -1,0 +1,317 @@
+# Icod.TermInfo 1.17.0 — Unified Directory/Hashed Catalogs Roadmap
+
+**Development line:** `1.17.0`
+
+**Theme:** Unified directory/hashed catalogs
+
+**Status:** PLANNING — scope selected; UC00 contract review pending
+
+**Stable predecessor:** `1.16.0` (published)
+
+**Initial implementation version:** `1.17.0-Alpha-1`
+
+**Language / targets:** C# 13; `net8.0`, `net9.0`, `net10.0`
+
+**Execution:** sequential, inline development; no subagents
+
+**Goal:** Let a caller enumerate one explicitly selected conventional terminfo
+directory or supported ncurses Hash-v9 file through one immutable, read-only
+catalog contract, with honest publication identities, provenance, and diagnostics.
+
+**Architecture:** Compose the existing directory inspector, managed hashed
+catalog reader, and Runtime parser. Prefer a new optional composition package
+above Inspection and BerkeleyDb. UC00 must settle that boundary and bounded
+directory acquisition before production code or a public API is committed.
+
+**Specification:** This roadmap defines release scope and acceptance criteria.
+The [main roadmap](Icod.TermInfo-Post-1.0-Development-Roadmap.md) owns release
+sequencing. UC00 will produce the detailed contract and implementation design.
+
+**Global constraints:** Preserve released API behavior, JSON v1–v6, command
+output, assembly identity `1.0.0.0`, and existing dependency directions. Reuse
+managed Hash-v9 support; introduce no native production dependency. Keep LGPL
+licensing and attribution intact. Use C#, PowerShell 5.1, and shell tooling.
+
+**Review focus:** Physical files versus logical publication names; truthful
+alias reporting; partial results versus failed acquisition; limits enforced
+before allocation; deterministic output; package and compatibility impact.
+
+## 1. Release boundary
+
+The approved feature is **Unified directory/hashed catalogs**. This supersedes
+the broader migration/catalog-automation assignment in the 1.16 roadmap.
+
+| Included in 1.17 | Deferred; no release assigned |
+| --- | --- |
+| One explicit directory or Hash-v9 source per read | Ordered mixed-source database sets and precedence |
+| Common immutable entry and issue model | Cross-container comparison and conflict-resolution policy |
+| Published canonical/alias identities and provenance | Directory/hashed conversion, migration, and synchronization |
+| Deterministic ordering, cancellation, resource limits | Hashed-aware JSON, JSON v7, or new automation CLI switches |
+| Library sample, package consumer, compatibility qualification | In-place mutation, repair, new Berkeley DB formats or native bindings |
+
+Existing directory-only database-set, comparison, planning, and JSON facilities
+continue unchanged. A unified catalog does not automatically become an input to
+those APIs. Existing `toe` listing behavior also remains unchanged; command
+integration needs a separate scope decision if it would add public behavior.
+
+This release reuses the difficult storage work completed in 1.15 and 1.16. It
+does not reopen hash functions, bucket/page layout, overflow chains, writer
+publication, or native compatibility decisions.
+
+## 2. Current implementation and proposed ownership
+
+| Existing authority | Contract to preserve | Work needed |
+| --- | --- | --- |
+| `Icod.TermInfo.Inspection/src/TermInfoDatabaseInspector.Catalog.cs` | Conventional layout inspection, Runtime parsing, file issues, cancellation | Map physical occurrences into publication identities; resolve aggregate traversal bounds |
+| `Icod.TermInfo.Inspection/src/TermInfoDatabaseCatalog*.cs` | Physical compiled files and duplicate canonical identities | Preserve these types; do not reinterpret their entries as hashed keys |
+| `Icod.TermInfo.BerkeleyDb/src/BerkeleyDbTerminalCatalogReader.cs` | Bounded managed hashed enumeration | Adapt actual canonical/alias keys and parsed descriptions |
+| `Icod.TermInfo.BerkeleyDb/src/BerkeleyDbTerminalCatalogReaderOptions.cs` | Database bytes, physical record count, index hops, parser limits | Preserve these distinct budgets in the composed read |
+| `Icod.TermInfo.BerkeleyDb/src/BerkeleyDbTerminalCatalogEntry.cs` | Actual key, entry kind, parsed `TerminalDescription` | Retain key identity; do not claim access to raw bytes through this API |
+| Runtime `CompiledTermInfoParser` | Compiled-entry semantics | Remain the sole semantic parser |
+
+The preferred package is provisionally named **`Icod.TermInfo.Catalogs`**. It
+would reference Runtime, Inspection, and BerkeleyDb; Inspection retains its
+Runtime/Source dependencies and BerkeleyDb retains its Runtime-only dependency.
+No existing library references the new package. Compiler is only needed by
+tests/samples that construct fixtures, not by production catalog acquisition.
+
+This costs an additional package, API baseline, verifier, consumer, and solution
+entry. UC00 must explicitly accept that cost. Putting the facade in Inspection
+would add a BerkeleyDb dependency to existing consumers; putting it in BerkeleyDb
+would violate its Runtime-only boundary. Neither is the default plan.
+
+Proposed contract roles are an explicit source descriptor, immutable read
+options, a reader with a cancellation overload, immutable catalog/entry/issue
+results, and typed source/entry/status classifications. These are design roles,
+not approved exported type names. UC00 records exact signatures, defaults,
+validation order, enum values, exception behavior, and the reviewed type count.
+
+## 3. Required observable behavior
+
+### 3.1 Explicit source and publication identity
+
+- A caller supplies the source path and chooses conventional directory or
+  supported hashed file. No ambient provider search, suffix guessing, or hidden
+  fallback to another source is part of this release.
+- Normalize source paths to absolute paths once per read. Preserve storage kind
+  and the distinction between an absent source and an empty readable source.
+- Each successful row represents an **observed publication occurrence**. Keep
+  the lookup/publication name separate from `TerminalDescription.Name` and its
+  declared aliases. A declaration alone does not prove an alias was published.
+- For a directory, derive the publication name from the inspected file's name
+  and validate it against the parsed canonical name or declared aliases and
+  supported layout rules. Preserve its actual file path. Invalid placement
+  produces an issue, not an invented usable entry.
+- For a hashed source, use the reader's actual key and canonical/alias kind.
+  Provenance is the database file plus key; do not invent a per-entry file path
+  or expose an unstable physical page number as public identity.
+- Preserve multiple directory occurrences of the same publication name. Report
+  duplication without choosing a winner, merging descriptions, or introducing
+  cross-source precedence. Existing duplicate-*canonical*-name behavior remains
+  unchanged in the old Inspection API.
+- Names use exact ordinal comparison, without case folding or Unicode
+  normalization. Native filesystem access still follows platform semantics.
+
+### 3.2 Results, ordering, and failures
+
+- Results and options are immutable snapshots. Sort entries by publication name,
+  then storage locator with ordinal comparison and an explicit final kind tie
+  breaker. Sort issues by locator, stable kind, and ordinal message text.
+  Guarantee ordering for equivalent observations, not identical OS error text
+  across operating systems.
+- Distinguish complete, partial, missing, unsupported, and unavailable reads.
+  UC00 freezes the exact representation and issue mapping. Do not label a
+  partially inspected directory as a complete catalog.
+- Recoverable directory candidate failures retain valid sibling observations
+  and typed issues. Preserve skipped-link evidence and the current policy of
+  not traversing child links/junctions/reparse points.
+- Corrupt or unsupported hashed containers fail closed; never expose a partially
+  salvaged hashed catalog. Missing sources, permission failures, unsupported
+  format, malformed data, and configured limits must remain distinguishable.
+- Caller argument errors and cancellation propagate as exceptions. A catalog
+  budget overrun fails the operation explicitly; it must not return a silently
+  truncated success. UC00 defines how known lower-layer failures map to these
+  rules without catching arbitrary programming errors.
+- Each read acquires fresh observations. There is no hidden cache and no promise
+  of an atomic directory snapshot or cross-process consistency. Document source
+  replacement/races, handle lifetime, and the guarantees inherited from readers.
+
+### 3.3 Bounds and cancellation: a mandatory design gate
+
+The existing directory inspector uses `Directory.GetDirectories` and
+`Directory.GetFiles` and returns a materialized catalog. Its per-entry parser
+limit is **not** a whole-directory resource bound. Checking the result count
+after calling that API cannot enforce a pre-allocation traversal limit.
+
+UC00 must specify budgets for discovered filesystem candidates, retained entries,
+retained diagnostics, and aggregate parsed bytes, as well as the existing hashed
+database-byte, physical-record, index-hop, and per-entry limits. Count rejected
+candidates and aliases where they consume resources. Specify defaults, inclusive
+boundary behavior, checked arithmetic, and cancellation checkpoints before reads,
+during traversal/normalization, and before returning a result.
+
+The preferred solution is a narrowly additive bounded Inspection acquisition
+entry point backed by shared traversal internals. Existing overload behavior and
+historical API baselines must remain compatible. UC00 must review the necessary
+Inspection API delta and demonstrate bounded discovery before UC01. If that
+cannot be done without breaking existing behavior or growing scope, stop this
+gate and revise the design explicitly. Do not copy a second directory parser or
+claim that a wrapper around eager enumeration solves this problem.
+
+## 4. Development sequence
+
+Every tranche requires a reviewed task plan with exact files, interfaces, focused
+tests, and commands before implementation. Execute inline with the
+`superpowers:executing-plans` workflow. Start behavior changes with meaningful
+failing tests, verify the focused behavior, then commit. Never mark a tranche
+accepted based only on a plan or an unobserved CI run.
+
+| Tranche | Planned version | Deliverable | Depends on | Status |
+| --- | --- | --- | --- | --- |
+| UC00 | Planning; retain `1.16.0` build identity | Contract, package decision, bounded-acquisition design | Published 1.16 | Pending |
+| UC01 | `1.17.0-Alpha-1` | Package/model foundation and approved bounded acquisition seam | UC00 | Pending |
+| UC02 | `1.17.0-Alpha-2` | Conventional-directory adapter | UC01 | Pending |
+| UC03 | `1.17.0-Alpha-3` | Hash-v9 adapter | UC01, UC02 contract fixtures | Pending |
+| UC04 | `1.17.0-Alpha-4` | Unified reader and cross-format behavioral qualification | UC02, UC03 | Pending |
+| UC05 | `1.17.0-Alpha-5` | Resource, failure, cancellation, and compatibility hardening | UC04 | Pending |
+| UC06 | `1.17.0-Alpha-6` | Samples, package consumers, distribution and guide | UC05 | Pending |
+| UC07 | `1.17.0` after accepted Alpha-6 | Exact API freeze and stable release audit | UC06 | Pending |
+
+### UC00 — contract and architecture decision
+
+- [ ] Audit the concrete reader/model files listed in section 2 and existing
+  `I03DatabaseCatalogTests`, `Hdb05CatalogReaderTests`, and HDB hardening fixtures.
+- [ ] Write `docs/1.17.0-UC00-UNIFIED-CATALOG-CONTRACT.md`: dependency graph,
+  exact candidate API, source/identity examples, duplicate policy, failure table,
+  link/root policy, deterministic ordering, numeric limits, and allocation audit.
+- [ ] Settle the additive Inspection seam and package name. Identify every
+  frozen API/schema/dependency check affected; no blanket baseline replacement.
+- [ ] Specify fixture expectations for canonical-only entries, published aliases,
+  declared-but-unpublished aliases, duplicate layouts, malformed siblings, and
+  invalid hashed indexes. Separate format parity from intentional storage
+  differences such as skipped directory links.
+- [ ] Produce the executable UC01 plan under `docs/superpowers/plans/`, including
+  exact signatures and test commands. Record the contract review decision.
+
+**Exit:** The public model and acquisition limits are reviewable and implementable
+without reopening storage engineering. No unresolved package/bounds decision is
+carried into production implementation.
+
+### UC01 — package and immutable model foundation
+
+- [ ] If UC00 accepts the proposed boundary, add `Icod.TermInfo.Catalogs/`, its
+  test project, explicit solution entries, and package/API verification scaffolding.
+- [ ] Implement the approved immutable source/options/result model and validate
+  nulls, names, paths, enum values, option ranges, and defensive copying.
+- [ ] Add the reviewed bounded Inspection seam with focused traversal-budget
+  tests; preserve old overload outputs, diagnostics, and cancellation contracts.
+- [ ] Introduce Alpha-1 through the existing centralized versioning process;
+  preserve reusable assembly identity and equivalent APIs on all three TFMs.
+
+**Exit:** Package dependency checks pass; model invariants and bounded discovery
+are tested; existing Inspection and BerkeleyDb baselines remain reconstructible.
+
+### UC02 — directory adapter
+
+- [ ] Adapt bounded Inspection observations into the new publication model,
+  reusing Runtime parsing and shared directory-layout validation.
+- [ ] Cover literal/hex directories, canonical and alias files, misplaced files,
+  duplicate occurrences, links, empty/missing roots, and malformed siblings.
+- [ ] Verify partial status, original physical provenance, deterministic ordering,
+  cancellation, and budgets during discovery, parsing, and issue accumulation.
+
+**Exit:** A directory can be read through the proposed common contract without
+inventing aliases, choosing duplicate winners, or changing legacy catalogs.
+
+### UC03 — hashed adapter
+
+- [ ] Compose `BerkeleyDbTerminalCatalogReader` and its existing immutable options;
+  map actual keys, kinds, parsed terminals, and database/key provenance.
+- [ ] Exercise canonical records, aliases/indexes, non-ASCII identities, chained
+  buckets, and large records with existing qualified fixtures/writer output.
+- [ ] Verify missing files, malformed/unsupported images, index failures, each
+  resource budget, cancellation, and fail-closed result semantics.
+
+**Exit:** No duplicate Hash-v9 decoder or raw-byte API is introduced; bounded
+hashed acquisition produces the agreed common model and diagnostics.
+
+### UC04 — unified reader and parity
+
+- [ ] Add the reviewed single-source dispatch and public cancellation overloads.
+  Test explicit format mismatch; do not silently autodetect or fall back.
+- [ ] Build equivalent directory/hashed fixtures from the same compiled records
+  using Compiler and BerkeleyDb writer only in test infrastructure.
+- [ ] Assert equal observed publication names, kinds, canonical identities, and
+  capability semantics where publication sets match. Assert intentionally
+  different provenance and storage-specific issues separately.
+- [ ] Verify repeat reads, caller option snapshots, cultures, input order, and
+  replacement behavior; document the absence of an atomic snapshot guarantee.
+
+**Exit:** A consumer processes either storage format through the same API without
+storage-specific branching over successful rows. No migration or JSON feature
+is required to demonstrate the release's value.
+
+### UC05 — adversarial and compatibility hardening
+
+- [ ] Test each budget at its boundary and one beyond; include many rejected
+  files/issues, large descriptions, aliases, early cancellation, and checked
+  size arithmetic. Demonstrate enforcement before unbounded materialization.
+- [ ] Test permission/race/link behavior with platform-aware fixtures and explicit
+  skips only where the host cannot exercise the condition.
+- [ ] Verify old directory catalogs, database sets, JSON v1–v6, `toe`, `infocmp`,
+  and `tic` behavior remains unchanged; retain all 1.15/1.16 storage coverage.
+- [ ] Run Windows/Linux/macOS qualification on all three TFMs. Reuse the existing
+  native oracle on Linux/macOS for acquisition regression evidence; do not
+  require native Berkeley DB in production or Windows consumer tests.
+
+**Exit:** The failure/bounds matrix and compatibility evidence identify exact
+commits, commands, outcomes, and any remaining limitations.
+
+### UC06 — usable package, sample, and documentation
+
+- [ ] Add `samples/Icod.TermInfo.Catalogs.Sample/` (or the UC00-approved name)
+  showing the same read/print workflow for a directory and hashed file, including
+  aliases, provenance, issues, cancellation, and custom limits.
+- [ ] Add `docs/1.17.0-UNIFIED-CATALOG-GUIDE.md`; explain publication names versus
+  declarations, skipped links, partial results, duplicate handling, fresh reads,
+  and why unified catalogs do not yet imply migration or mixed-source sets.
+- [ ] Add a package-reference-only consumer and verifier. Update the solution,
+  package inventory, restore/dependency checks, symbol/license checks, and release
+  scripts. If the new package is accepted, the family grows from seven nupkg/six
+  library snupkg to eight nupkg/seven library snupkg; record this explicitly.
+- [ ] Update root/package/sample READMEs, changelog, versioning/compatibility
+  documentation, and roadmap status using actual supported behavior.
+- [ ] Verify Tools and all six existing platform archives remain valid; do not
+  ship the new library in Tools merely because it exists.
+
+**Exit:** A clean package-only consumer and the documented sample work on all
+three TFMs; published-artifact composition matches the approved dependency graph.
+
+### UC07 — freeze and stable closure
+
+- [ ] Freeze the complete new API and reviewed Inspection delta; retain historical
+  reconstructions and unchanged JSON schema fingerprints.
+- [ ] Produce `docs/1.17.0-RELEASE-AUDIT.md` with exact accepted commit/tree,
+  qualification runs, test counts, packages/consumers, and known limitations.
+- [ ] Promote only the accepted feature/API source to stable `1.17.0`; verify
+  release metadata, warnings-as-errors builds, all frameworks/platforms, exact
+  package consumers, and existing command archives.
+- [ ] Update both roadmaps to accepted status only after evidence is recorded.
+  Maintainer merge, tag, and NuGet publication remain separate authorized actions.
+
+**Exit:** Stable artifacts are reviewable and qualified. Stable promotion does
+not add behavior or enlarge the catalog scope.
+
+## 5. Progress and change control
+
+This PR establishes the roadmap only. There is no 1.17 production implementation,
+new package, version bump, public API freeze, or completed UC tranche yet.
+
+Record each accepted tranche's commit, tests, qualification run, and remaining
+risks here and in its contract/audit document. Documentation-only follow-ups
+receive local relevant checks; do not stop development waiting for their CI jobs.
+
+If a proposed change introduces migration, mixed-source precedence, JSON, command
+switches, a second parser, new native requirements, or broader Hash-v9 support,
+revise the release scope explicitly before implementing it. Do not let those
+features enter through an adapter or sample as incidental work.

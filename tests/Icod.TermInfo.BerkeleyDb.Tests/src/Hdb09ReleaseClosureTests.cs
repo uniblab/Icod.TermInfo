@@ -386,9 +386,9 @@ public sealed class Hdb09ReleaseClosureTests {
 		);
 		AssertContainsAll(
 			"Icod.TermInfo-Post-1.0-Development-Roadmap.md",
-			"stable `1.15.0` is published",
-			"**Latest completed line:** `1.15.0`",
-			"**Latest completed release audit:** `docs/1.15.0-RELEASE-AUDIT.md`"
+			"stable `1.16.0` is published",
+			"**Latest completed line:** `1.16.0`",
+			"**Latest completed release audit:** `docs/1.16.0-RELEASE-AUDIT.md`"
 		);
 		AssertContainsAll(
 			"Icod.TermInfo-1.15.0-Berkeley-DB-Hashed-Terminfo-Acquisition-Roadmap.md",
