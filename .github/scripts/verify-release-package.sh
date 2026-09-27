@@ -135,12 +135,18 @@ pwsh -NoLogo -NoProfile -File \
   -AssemblyPath \
   "Icod.TermInfo.Inspection/bin/${configuration}/net10.0/Icod.TermInfo.Inspection.dll"
 
-# UC01 freezes the ten-type foundation and compares all shipped frameworks.
+# UC04 adds exactly one reader while reconstructing the UC01 ten-type foundation.
 for catalog_tfm in net8.0 net9.0 net10.0; do
   dotnet run --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj \
-    -c "${configuration}" --no-build -- --check \
-    docs/1.17.0-UC01-CATALOGS-PUBLIC-API-BASELINE.txt \
+    -c "${configuration}" --no-build -- --write \
+    "${artifact_dir}/uc04-catalogs-current-${catalog_tfm}.txt" \
     "Icod.TermInfo.Catalogs/bin/${configuration}/${catalog_tfm}/Icod.TermInfo.Catalogs.dll"
+  dotnet run --project tools/catalogs-package-verifier/Icod.TermInfo.Catalogs.PackageVerifier.csproj \
+    -c "${configuration}" --no-build -- --reconstruct-uc04 \
+    "${artifact_dir}/uc04-catalogs-current-${catalog_tfm}.txt" \
+    "${artifact_dir}/uc04-catalogs-reconstructed-${catalog_tfm}.txt"
+  cmp -s docs/1.17.0-UC01-CATALOGS-PUBLIC-API-BASELINE.txt \
+    "${artifact_dir}/uc04-catalogs-reconstructed-${catalog_tfm}.txt"
 done
 dotnet run --project tools/catalogs-package-verifier/Icod.TermInfo.Catalogs.PackageVerifier.csproj \
   -c "${configuration}" --no-build -- "${artifact_dir}"

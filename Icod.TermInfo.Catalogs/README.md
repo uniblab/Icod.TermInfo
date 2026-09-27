@@ -1,14 +1,14 @@
 # Icod.TermInfo.Catalogs
 
 The optional composition package for the Icod.TermInfo 1.17 unified
-directory/hashed catalog release. Current development version: **1.17.0-Alpha-3**.
+directory/hashed catalog release. Current development version: **1.17.0-Alpha-4**.
 Targets .NET 8, 9, and 10; licensed LGPL-3.0-or-later.
 
 UC01 supplies immutable source descriptors, read options, publication/result
 models, typed issues, and limit exceptions. UC02 adds the internal adapter for
 conventional directories. UC03 adds the internal hashed adapter, composing
-BerkeleyDb's public bounded read API. The common public reader will arrive in UC04; consumers cannot
-yet enumerate catalogs through this package.
+BerkeleyDb's public bounded read API. UC04 adds the public reader to select one
+explicit source and acquire a fresh catalog on each call.
 
 The hashed adapter maps actual canonical/alias keys, retaining their Runtime
 terminal objects and database path; `EntryPath` is null. Declared aliases do not
@@ -25,12 +25,29 @@ var source = new TerminalCatalogSource(
     "./terminfo", TerminalCatalogSourceKind.ConventionalDirectory);
 var options = new TerminalCatalogReadOptions(
     maximumCandidateCount: 10_000, maximumParsedBytes: 16 * 1024 * 1024);
+var reader = new TerminalCatalogReader(source, options);
+TerminalCatalog catalog = reader.Read();
+foreach (TerminalCatalogEntry entry in catalog.Entries)
+    Console.WriteLine($"{entry.PublicationName}: {entry.Terminal.Name}");
+
+// Select a hashed file explicitly; a CancellationToken can stop a bounded read.
+var hashed = new TerminalCatalogReader(new TerminalCatalogSource(
+    "./terminfo.db", TerminalCatalogSourceKind.BerkeleyDbHash));
+using var cancellation = new CancellationTokenSource();
+TerminalCatalog hashedCatalog = hashed.Read(cancellation.Token);
 ```
 
 Source paths are resolved once at construction; selecting a source performs no
 I/O. Publication names represent observed keys or files, while a terminal's alias
 list contains declarations. Results preserve source provenance and report issues
 and duplicate publications without selecting a winner.
+The caller checks `Status`: Complete for a valid readable source, Partial for
+directory candidate issues, Missing, UnsupportedSource, Unavailable, or
+InvalidStore for malformed hashed data. Limits raise `TerminalCatalogLimitException`
+with no partial result; cancellation raises `OperationCanceledException`. A read
+holds no source handle afterward and does not promise an atomic snapshot during
+concurrent source replacement. Directory entries retain absolute `EntryPath`;
+hashed keys retain the database `SourcePath` and a null `EntryPath`.
 
 The directory adapter uses bounded Inspection observations. A canonical file
 declaring two aliases contributes one row; separately published alias files add

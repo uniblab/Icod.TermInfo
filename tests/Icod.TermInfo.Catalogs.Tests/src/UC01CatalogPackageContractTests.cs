@@ -3,15 +3,22 @@ using Xunit;
 
 namespace Icod.TermInfo.Catalogs.Tests;
 
+[Collection( "UC01 process state" )]
 public sealed class UC01CatalogPackageContractTests {
 	[Fact]
-	public void FoundationSurfaceHasTenTypesAndStableAssemblyIdentity() {
+	public void FoundationSurfaceIsRetainedWithOnlyTheApprovedReaderAddition() {
 		var assembly = typeof( TerminalCatalog ).Assembly;
 		Assert.Equal( new Version( 1, 0, 0, 0 ), assembly.GetName().Version );
-		Assert.Equal( 10, assembly.GetExportedTypes().Length );
+		Assert.Equal( 11, assembly.GetExportedTypes().Length );
 		Assert.Equal( 4, assembly.GetExportedTypes().Count( type => type.IsEnum ) );
 		Assert.All( assembly.GetExportedTypes().Where( type => !type.IsEnum ), type => Assert.True( type.IsSealed ) );
-		Assert.DoesNotContain( assembly.GetExportedTypes(), type => type.Name == "TerminalCatalogReader" );
+		Assert.Contains( assembly.GetExportedTypes(), type => type == typeof( TerminalCatalogReader ) );
+		string root = FindRoot();
+		Assert.Equal( File.ReadAllText( Path.Combine( root, "docs/1.17.0-UC01-CATALOGS-PUBLIC-API-BASELINE.txt" ) ),
+			PackageVerifier.CatalogsUc04Compatibility.Reconstruct( Icod.TermInfo.PublicApiSnapshot.Program.CreateManifest( assembly ),
+				File.ReadAllText( Path.Combine( root, "docs/1.17.0-UC04-CATALOGS-PUBLIC-API-ADDITIONS.txt" ) )
+			)
+		);
 	}
 
 	[Fact]
@@ -31,7 +38,7 @@ public sealed class UC01CatalogPackageContractTests {
 	public void AlphaOneIsRegisteredAcrossCoordinatedDistribution() {
 		string root = FindRoot();
 		string Read( string path ) => File.ReadAllText( Path.Combine( root, path ) );
-		Assert.Equal( "1.17.0-Alpha-3", XDocument.Parse( Read( "Directory.Build.props" ) ).Descendants( "IcodTermInfoSuiteVersion" ).Single().Value );
+		Assert.Equal( "1.17.0-Alpha-4", XDocument.Parse( Read( "Directory.Build.props" ) ).Descendants( "IcodTermInfoSuiteVersion" ).Single().Value );
 		Assert.Contains( "Icod.TermInfo.Catalogs/Icod.TermInfo.Catalogs.csproj", Read( "packaging/PackPackages.ps1" ), StringComparison.Ordinal );
 		Assert.Contains( "tools\\catalogs-package-verifier\\Icod.TermInfo.Catalogs.PackageVerifier.csproj", Read( "Icod.TermInfo.sln" ), StringComparison.Ordinal );
 		Assert.Contains( "catalogs-package-verifier", Read( ".github/scripts/verify-release-package.sh" ), StringComparison.Ordinal );

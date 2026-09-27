@@ -9,10 +9,11 @@ internal sealed class HashedCatalogFixture : IDisposable {
 	internal string PathName => Path.Combine( Root, "catalog.db" );
 	internal TerminalCatalogSource Source => new( PathName, TerminalCatalogSourceKind.BerkeleyDbHash );
 	internal HashedCatalogFixture() => Directory.CreateDirectory( Root );
-	internal void Write( bool aliases = true, string? fault = null ) {
+	internal void Write( bool aliases = true, string? fault = null ) => WritePayload( Payload(), aliases, fault );
+	internal void WritePayload( byte[] payload, bool aliases = true, string? fault = null ) {
 		byte[] storage = "storage"u8.ToArray();
 		List<Hdb07RecordSpec> records = [
-			Record( storage, Hdb07HashV9FixtureBuilder.NcursesData( Payload() ) ),
+			Record( storage, Hdb07HashV9FixtureBuilder.NcursesData( payload ) ),
 			Record( "sample"u8.ToArray(), Hdb07HashV9FixtureBuilder.NcursesIndex( fault == "missing" ? "missing"u8.ToArray() : fault == "cycle" ? "sample"u8.ToArray() : storage ) ),
 		];
 		if ( aliases ) {

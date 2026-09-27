@@ -3,7 +3,17 @@
 This file records release-level product changes. Exact qualification evidence,
 API fingerprints, and preserved boundaries live in the linked release audits.
 
-## 1.17.0-Alpha-3 (in development)
+## 1.17.0-Alpha-4 (in development)
+
+- Adds the public `TerminalCatalogReader` with explicit directory/Hash-v9
+  selection, fresh bounded acquisition, and a cancellation overload.
+- Qualifies equivalent publication names, kinds, terminal identities, and
+  capabilities across both formats while retaining distinct file/key provenance
+  and storage-specific diagnostics.
+- Adds exactly one Catalogs public type; packaged assemblies on all three .NET
+  targets reconstruct the unchanged UC01 ten-type model API.
+
+## 1.17.0-Alpha-3
 
 - Adds opt-in `BerkeleyDbTerminalCatalogReader.ReadBounded`, immutable limits,
   and typed limit failures without changing legacy read or writer behavior.

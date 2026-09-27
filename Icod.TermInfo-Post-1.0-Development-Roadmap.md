@@ -12,15 +12,15 @@
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`  
 **Frozen runtime contract:** `1.0.0`  
-**Current coordinated version:** `1.17.0-Alpha-3`
+**Current coordinated version:** `1.17.0-Alpha-4`
 **Latest completed line:** `1.16.0` - Berkeley DB Hash-v9 Writer
 **Latest completed prerelease:** `1.16.0-Alpha-8`
 **Active development line:** `1.17.0` - Unified directory/hashed catalogs
-**Status:** stable `1.16.0` is published; UC00 through UC03 are accepted; UC04 is next
+**Status:** stable `1.16.0` is published; UC00 through UC03 are accepted; UC04 qualification is in progress
 **Active release roadmap:** [1.17.0 — Unified directory/hashed catalogs](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadmap.md)
 **Release audit:** planned for UC07; UC01 through UC03 evidence is tracked in the active roadmap
 **Latest completed release audit:** `docs/1.16.0-RELEASE-AUDIT.md`
-**Next gate:** review the [UC04 implementation plan](docs/superpowers/plans/2026-09-27-uc04-unified-catalog-reader.md) for public unified acquisition and cross-format parity under the approved UC00 contract
+**Next gate:** qualify the [UC04 implementation plan](docs/superpowers/plans/2026-09-27-uc04-unified-catalog-reader.md) at the implementation commit, including packages and cross-platform CI
 
 The approved UC00 contract fixes `Icod.TermInfo.Catalogs` above Runtime,
 Inspection, and BerkeleyDb. UC01 introduces the ten model types and bounded

@@ -5,6 +5,7 @@ using Xunit;
 
 namespace Icod.TermInfo.Catalogs.Tests;
 
+[Collection( "UC01 process state" )]
 public sealed class UC01CatalogPackageVerifierTests {
 	[Theory]
 	[InlineData( "missing-tfm" )]

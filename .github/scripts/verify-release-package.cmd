@@ -110,9 +110,13 @@ if errorlevel 1 goto fail
 
 echo.
 echo === Verify package structure and symbols (%CONFIGURATION%) ===
-rem UC01 freezes the ten-type foundation on all shipped frameworks.
+rem UC04 adds exactly one reader while reconstructing the UC01 ten-type foundation.
 for %%F in (net8.0 net9.0 net10.0) do (
-  dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c "%CONFIGURATION%" --no-build -- --check docs\1.17.0-UC01-CATALOGS-PUBLIC-API-BASELINE.txt "Icod.TermInfo.Catalogs\bin\%CONFIGURATION%\%%F\Icod.TermInfo.Catalogs.dll"
+  dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c "%CONFIGURATION%" --no-build -- --write "%ARTIFACT_DIR%\uc04-catalogs-current-%%F.txt" "Icod.TermInfo.Catalogs\bin\%CONFIGURATION%\%%F\Icod.TermInfo.Catalogs.dll"
+  if errorlevel 1 goto fail
+  dotnet run --project tools\catalogs-package-verifier\Icod.TermInfo.Catalogs.PackageVerifier.csproj -c "%CONFIGURATION%" --no-build -- --reconstruct-uc04 "%ARTIFACT_DIR%\uc04-catalogs-current-%%F.txt" "%ARTIFACT_DIR%\uc04-catalogs-reconstructed-%%F.txt"
+  if errorlevel 1 goto fail
+  fc /b docs\1.17.0-UC01-CATALOGS-PUBLIC-API-BASELINE.txt "%ARTIFACT_DIR%\uc04-catalogs-reconstructed-%%F.txt" >nul
   if errorlevel 1 goto fail
 )
 dotnet run --project tools\catalogs-package-verifier\Icod.TermInfo.Catalogs.PackageVerifier.csproj -c "%CONFIGURATION%" --no-build -- "%ARTIFACT_DIR%"

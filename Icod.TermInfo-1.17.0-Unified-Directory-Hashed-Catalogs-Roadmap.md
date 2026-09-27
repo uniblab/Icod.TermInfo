@@ -4,13 +4,13 @@
 
 **Theme:** Unified directory/hashed catalogs
 
-**Status:** DEVELOPING — UC00 through UC03 accepted; UC04 is next
+**Status:** DEVELOPING — UC00 through UC03 accepted; UC04 qualification in progress
 
 **Stable predecessor:** `1.16.0` (published)
 
 **Initial implementation version:** `1.17.0-Alpha-1`
 
-**Current coordinated version:** `1.17.0-Alpha-3`
+**Current coordinated version:** `1.17.0-Alpha-4`
 
 **Language / targets:** C# 13; `net8.0`, `net9.0`, `net10.0`
 
@@ -179,7 +179,7 @@ accepted based only on a plan or an unobserved CI run.
 | UC01 | `1.17.0-Alpha-1` | Package/model foundation and approved bounded acquisition seam | UC00 | Accepted at `656acf9` |
 | UC02 | `1.17.0-Alpha-2` | Conventional-directory adapter | UC01 | Accepted at `965c8d2` |
 | UC03 | `1.17.0-Alpha-3` | Hash-v9 adapter | UC01, UC02 contract fixtures | Accepted at `e4dcf7e` |
-| UC04 | `1.17.0-Alpha-4` | Unified reader and cross-format behavioral qualification | UC02, UC03 | Pending |
+| UC04 | `1.17.0-Alpha-4` | Unified reader and cross-format behavioral qualification | UC02, UC03 | Implemented; qualification in progress |
 | UC05 | `1.17.0-Alpha-5` | Resource, failure, cancellation, and compatibility hardening | UC04 | Pending |
 | UC06 | `1.17.0-Alpha-6` | Samples, package consumers, distribution and guide | UC05 | Pending |
 | UC07 | `1.17.0` after accepted Alpha-6 | Exact API freeze and stable release audit | UC06 | Pending |
@@ -261,17 +261,17 @@ hashed acquisition produces the agreed common model and diagnostics.
 ### UC04 — unified reader and parity
 
 The [UC04 implementation plan](docs/superpowers/plans/2026-09-27-uc04-unified-catalog-reader.md)
-is proposed for review. It builds on the approved UC00 public signature and
-the accepted UC02/UC03 adapters; implementation has not started.
+is approved and in progress. It builds on the approved UC00 public signature and
+the accepted UC02/UC03 adapters; acceptance requires exact-code CI evidence.
 
-- [ ] Add the reviewed single-source dispatch and public cancellation overloads.
+- [x] Add the reviewed single-source dispatch and public cancellation overloads.
   Test explicit format mismatch; do not silently autodetect or fall back.
-- [ ] Build equivalent directory/hashed fixtures from the same compiled records
+- [x] Build equivalent directory/hashed fixtures from the same compiled records
   using Compiler and BerkeleyDb writer only in test infrastructure.
-- [ ] Assert equal observed publication names, kinds, canonical identities, and
+- [x] Assert equal observed publication names, kinds, canonical identities, and
   capability semantics where publication sets match. Assert intentionally
   different provenance and storage-specific issues separately.
-- [ ] Verify repeat reads, caller option snapshots, cultures, input order, and
+- [x] Verify repeat reads, caller option snapshots, cultures, input order, and
   replacement behavior; document the absence of an atomic snapshot guarantee.
 
 **Exit:** A consumer processes either storage format through the same API without
@@ -330,6 +330,31 @@ three TFMs; published-artifact composition matches the approved dependency graph
 not add behavior or enlarge the catalog scope.
 
 ## 5. Progress and change control
+
+### UC04 local qualification (CI pending)
+
+UC04 adds the explicit `TerminalCatalogReader` and proves equivalent observed
+publications and terminal semantics across conventional directory and hash-v9
+storage. The test fixtures retain their deliberate provenance and diagnostic
+differences. The coordinated development version is `1.17.0-Alpha-4`.
+
+- Full Release solution build: **zero warnings and errors**, with warnings as
+  errors, serial MSBuild, and shared compilation disabled.
+- Fresh complete solution test run: **5,634 passed** across 22 test runs;
+  Catalogs has 113 cases per framework.
+- Separately rebuilt BerkeleyDb suite: **1,995 passed**, 665 per framework,
+  with zero build warnings and errors.
+- Total: **7,629 passed** with zero failures. The unchanged UC01 ten-type API
+  baseline reconstructs exactly from each compiled eleven-type Catalogs API;
+  historical baselines and JSON schemas have no source changes.
+- Eight nupkg and seven snupkg built. The full Release distribution gate passed:
+  exact generated and packaged APIs on all three frameworks, dependency closure,
+  isolated consumers, samples, managed-only payloads, symbols, and Source Link.
+- The existing RE07 package-only fixture emits CS8321 for its unused
+  `MapPersistentRasterStatus` helper once per framework; all three runs passed.
+
+Exact-code CI remains the acceptance condition. The release PR remains draft,
+unmerged, untagged, and unpublished.
 
 ### Accepted UC03 evidence
 

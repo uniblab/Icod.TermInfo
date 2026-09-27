@@ -2,7 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:executing-plans`
 > inline, task by task. Do not use subagents. Steps use checkboxes.
-> **Status:** Proposed for user review. UC03 is accepted at
+> **Status:** Approved by the user on 2026-09-27; tasks 1–3 implemented and
+> Alpha-4 integration/qualification in progress. UC03 is accepted at
 > `e4dcf7e25f174d07702186d5bd9e4ea1a5ec7742`; its documentation follow-up is
 > `a3ae098c5a096a1102d3dbe7555def1090e0ad0e`.
 
@@ -89,25 +90,25 @@ before dispatching. The two overloads call the corresponding internal adapter's
 token. A source of an undefined kind cannot be publicly constructed, so an
 impossible internal switch value fails explicitly.
 
-- [ ] Write failing tests for a null source, null/default and supplied option
+- [x] Write failing tests for a null source, null/default and supplied option
   snapshots, `Source` object identity, and both public overloads. Use a real
   empty directory and the existing empty Hash-v9 fixture builder; both return Complete.
   Confirm the supplied parser and options objects do not become mutable reader
   state, while constructor validation reports `source` before considering options.
-- [ ] Run the focused net10.0 Catalogs class filter. Expect failure because
+- [x] Run the focused net10.0 Catalogs class filter. Expect failure because
   `TerminalCatalogReader` is absent.
-- [ ] Implement the exact class/interface above with only the two adapter calls;
+- [x] Implement the exact class/interface above with only the two adapter calls;
   do not expose an adapter selector, test hook, async API or fallback.
-- [ ] Run the focused tests. Add tests for directory-as-file and hash-as-directory
+- [x] Run the focused tests. Add tests for directory-as-file and hash-as-directory
   (`UnsupportedSource`), missing sources (`Missing`), malformed Hash-v9
   (`InvalidStore`) and malformed directory sibling (`Partial`); assert their
   issue kinds and zero/retained rows as UC00 requires.
-- [ ] Test pre-canceled token and typed `MaximumEntryCount` failures for both
+- [x] Test pre-canceled token and typed `MaximumEntryCount` failures for both
   source kinds, and a second read after replacing the underlying data. Rely on
   the already qualified adapter seams for deterministic mid-read cancellation;
   the public path forwards that token unchanged. Ensure no result on exception
   and no persisted budget/cache across calls.
-- [ ] Run `dotnet test tests/Icod.TermInfo.Catalogs.Tests/Icod.TermInfo.Catalogs.Tests.csproj -c Release -f net10.0 -m:1 -p:UseSharedCompilation=false --filter FullyQualifiedName~UC04UnifiedReaderTests`; commit the reader and focused tests.
+- [x] Run `dotnet test tests/Icod.TermInfo.Catalogs.Tests/Icod.TermInfo.Catalogs.Tests.csproj -c Release -f net10.0 -m:1 -p:UseSharedCompilation=false --filter FullyQualifiedName~UC04UnifiedReaderTests`; commit the reader and focused tests.
 
 ## Task 2: Cross-Format Behavioral Qualification
 
@@ -125,28 +126,28 @@ published. Compare semantic values and actual publication sets, not object
 reference equality across independent parses. Preserve each format's distinct
 `SourcePath`/`EntryPath` and file-versus-key identity.
 
-- [ ] Write one failing paired-fixture test for a canonical terminal declaring
+- [x] Write one failing paired-fixture test for a canonical terminal declaring
   two aliases but publishing only `sample`. Build one compiled payload and write
   a conventional `s/sample` file and an existing fixture-builder Hash-v9
   canonical key pointing to the same payload.
   Both readers return exactly one Canonical row with matching terminal name,
   description, aliases, and representative capability values; no invented
   aliases or issues.
-- [ ] Add actual separately published `a` and `b` entries/keys; assert identical
+- [x] Add actual separately published `a` and `b` entries/keys; assert identical
   sorted publication names and Canonical/Alias kinds, equivalent parsed
   capability semantics, Complete status, and empty duplicates. Directory
   `EntryPath` is each absolute file path; hashed `EntryPath` is null, with the
   single database path as `SourcePath`. Use the public BerkeleyDb writer here.
-- [ ] Add asymmetric observations: literal/hex duplicate directory placement
+- [x] Add asymmetric observations: literal/hex duplicate directory placement
   retains both occurrences and a Partial duplicate issue while hashed keys
   remain unique; an invalid placement, malformed sibling, or skipped child link
   affects only directory issues. Malformed hashed orphan/index rejects the
   whole store with InvalidStore and no rows. Assert these deliberate differences
   separately from matching semantic rows.
-- [ ] Prove stable ordinal row ordering under `en-US` and `tr-TR`, reverse
+- [x] Prove stable ordinal row ordering under `en-US` and `tr-TR`, reverse
   fixture input order where the writer allows it, and repeat the two reads.
   Restore process culture after tests and use host-independent names/paths.
-- [ ] Run the focused parity class on net8.0/net9.0/net10.0 and commit fixture
+- [x] Run the focused parity class on net8.0/net9.0/net10.0 and commit fixture
   improvements and tests. Avoid new generic comparison or fixture framework.
 
 ## Task 3: Exact Additive Catalogs API and Packages
@@ -173,19 +174,19 @@ manifest. A verifier command `--reconstruct-uc04 input-manifest output-manifest`
 does the same for the compiled gate on each TFM. Do not use a raw type count or
 replace the historical ten-type baseline.
 
-- [ ] Write failing tests generating the actual current compiled Catalogs
+- [x] Write failing tests generating the actual current compiled Catalogs
   manifest: exact eleven public types, one approved reader block, unchanged
   ten-type reconstruction, stable `1.0.0.0` identity. Reject a missing, repeated,
   or modified reader block, an unexpected twelfth type, and one changed member
   in an existing model type. Verify package-loaded assemblies per TFM through
   the existing isolated load context.
-- [ ] Generate the exact additions block from the built assembly, review the
+- [x] Generate the exact additions block from the built assembly, review the
   signature against UC00 section 3, implement the reconstruction helper and
   verifier mode, and wire `.sh`/`.cmd` package gates to reconstruct then check
   the UC01 baseline for each framework. Update the older foundation test to
   assert ten unchanged types after reconstruction and one reader in the current
   assembly; preserve the remaining dependency tests and their semantics.
-- [ ] Run focused API and package-verifier mutation tests, then compile on all
+- [x] Run focused API and package-verifier mutation tests, then compile on all
   three TFMs and invoke both available API-gate paths. Confirm the existing
   UC01 baseline, lower-layer historical baselines, and JSON schemas have no
   diffs. Commit the manifest, verifier, scripts and tests.
@@ -198,19 +199,19 @@ replace the historical ten-type baseline.
 Include `tests/Icod.TermInfo.Catalogs.Tests/src/UC04DevelopmentMetadataTests.cs`
 for compiled version/assembly/dependency checks.
 
-- [ ] Set the coordinated version to `1.17.0-Alpha-4`. Explain public reader
+- [x] Set the coordinated version to `1.17.0-Alpha-4`. Explain public reader
   usage with explicit source kind, immutable options, cancellation, statuses,
   publication-versus-alias distinction, duplicate semantics and provenance.
   Keep stable 1.16 install commands and the older historical manifests intact.
-- [ ] Update active source tests that assert `Alpha-3` metadata or prose;
+- [x] Update active source tests that assert `Alpha-3` metadata or prose;
   retain fixture-only historical Alpha-1 package version strings. Assert Alpha-4
   informational versions, eleven public Catalogs types, and the approved
   production dependency direction without introducing Compiler/native assets.
-- [ ] Run a full Release solution build (warnings as errors, serial MSBuild,
+- [x] Run a full Release solution build (warnings as errors, serial MSBuild,
   `UseSharedCompilation=false`), full solution tests on all three frameworks,
   and the separate complete BerkeleyDb suite. Record actual counts, zero failures,
   and any warning in existing package-only consumers precisely.
-- [ ] Build eight nupkg and seven snupkg with `packaging/PackPackages.ps1`;
+- [x] Build eight nupkg and seven snupkg with `packaging/PackPackages.ps1`;
   run `packaging/VerifyPackageArtifact.ps1` in Release with dotnet and PowerShell
   on PATH. Require API reconstruction, dependencies, isolated consumers,
   sample runs, symbols, Source Link, and managed-only payload checks to pass.
@@ -230,5 +231,5 @@ UC00 has already approved the architecture and public signature; this plan
 locks down the four remaining implementation gates. Task 1 publishes the reader,
 task 2 proves semantic parity and deliberate source differences, task 3 guards
 the one additive API type in real artifacts, and task 4 qualifies Alpha-4.
-The user selected inline execution without subagents; review this plan before
-implementation under the 1.17 roadmap's per-tranche gate.
+The user selected inline execution without subagents and approved proceeding
+with this plan on 2026-09-27 under the 1.17 roadmap's per-tranche gate.

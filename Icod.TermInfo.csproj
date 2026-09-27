@@ -41,7 +41,7 @@
 		<Title>Icod.TermInfo</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed, dependency-free .NET terminfo library for terminal capability metadata, compiled terminfo parsing and database discovery, ANSI/DEC/xterm and Windows profiles, parameter expansion, color semantics, and padding-aware output.</Description>
-		<PackageReleaseNotes>1.17.0-Alpha-3 preserves the frozen Runtime API, dependency-free discovery and parsing, and assembly identity while the optional Catalogs package introduces immutable catalog models.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.17.0-Alpha-4 preserves the frozen Runtime API, dependency-free discovery and parsing, and assembly identity while Catalogs adds the public unified reader.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>

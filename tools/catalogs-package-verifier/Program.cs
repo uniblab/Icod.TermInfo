@@ -55,15 +55,23 @@ internal static class Program {
 	) {
 		ArgumentNullException.ThrowIfNull( args );
 
-		if ( args.Length > 1 ) {
+		bool reconstructUc04 = args.Length == 3 && args[0] == "--reconstruct-uc04";
+		if ( args.Length > 1 && !reconstructUc04 ) {
 			Console.Error.WriteLine(
-				"Usage: dotnet run --project tools/catalogs-package-verifier/Icod.TermInfo.Catalogs.PackageVerifier.csproj -- [artifact-directory]"
+				"Usage: catalog-package-verifier [artifact-directory] | --reconstruct-uc04 input-manifest output-manifest"
 			);
 			return 2;
 		}
 
 		try {
 			string root = FindRepositoryRoot();
+			if ( reconstructUc04 ) {
+				string reconstructed = CatalogsUc04Compatibility.Reconstruct( File.ReadAllText( args[1] ),
+					File.ReadAllText( Path.Combine( root, "docs/1.17.0-UC04-CATALOGS-PUBLIC-API-ADDITIONS.txt" ) )
+				);
+				File.WriteAllText( args[2], reconstructed );
+				return 0;
+			}
 			string artifactDirectory =
 				( args.Length == 0 )
 					? Path.Combine( root, "artifacts" )
@@ -226,7 +234,11 @@ internal static class Program {
 			try {
 				Assembly assembly = context.LoadFromStream( assemblyBytes );
 				string actual = Icod.TermInfo.PublicApiSnapshot.Program.CreateManifest( assembly );
-				Require( actual == apiBaseline.Replace( "\r\n", "\n", StringComparison.Ordinal ).TrimEnd( '\n' ) + "\n", "Catalogs packaged public API differs from the UC01 baseline." );
+				string additionPath = Path.Combine( FindRepositoryRoot(), "docs/1.17.0-UC04-CATALOGS-PUBLIC-API-ADDITIONS.txt" );
+				string reconstructed = CatalogsUc04Compatibility.Reconstruct(
+					actual, File.ReadAllText( additionPath )
+				);
+				Require( reconstructed == apiBaseline.Replace( "\r\n", "\n", StringComparison.Ordinal ).TrimEnd( '\n' ) + "\n", "Catalogs packaged public API differs from the UC01 baseline." );
 			} finally { context.Unload(); }
 			VerifyDocumentation( package, targetFramework );
 		}

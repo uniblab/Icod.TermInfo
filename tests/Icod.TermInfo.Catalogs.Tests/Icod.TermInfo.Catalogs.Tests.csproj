@@ -16,6 +16,7 @@
 		<Compile Include="..\Shared\Hdb07HashV9FixtureBuilder.cs" Link="Shared\Hdb07HashV9FixtureBuilder.cs" />
 		<Compile Include="..\..\tools\public-api-snapshot\Program.cs" Link="Support\PublicApiSnapshot.cs" />
 		<Compile Include="..\..\tools\catalogs-package-verifier\Program.cs" Link="Support\CatalogsPackageVerifier.cs" />
+		<Compile Include="..\..\tools\catalogs-package-verifier\CatalogsUc04Compatibility.cs" Link="Support\CatalogsUc04Compatibility.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
