@@ -19,6 +19,8 @@ Lookup tries the exact ordinal UTF-8 key first, then one distinct exact Latin-1
 key after a clean miss when every character is representable. Malformed or
 identity-invalid found records never become misses or fall through to another
 encoding. Successful lookups are cached; misses and failures remain retryable.
+After replacing a database, construct a new provider to observe changed content
+that was previously loaded successfully; publication does not invalidate caches.
 
 `BerkeleyDbTerminalCatalogReader` enumerates canonical and alias publications
 from an explicit file with deterministic ordering. `BerkeleyDbSystemTerminalDescriptionProvider`

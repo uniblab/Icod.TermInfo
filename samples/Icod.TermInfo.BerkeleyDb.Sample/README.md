@@ -39,8 +39,13 @@ Description: Icod HDB09 controlled sample
 Colors: (absent)
 ```
 
+For a complete source-compilation, replacement, cancellation, and cache-refresh
+example, see the [writing guide](../../docs/1.16.0-BERKELEY-DB-WRITING-GUIDE.md#compile-source-publish-and-replace).
+For command examples using checked-in source, see the
+[hashed walkthrough](../ToolSuite/README.md#publish-and-inspect-a-hashed-database).
+
 For the full acquisition and compatibility boundary, see:
 
-- `../../docs/1.16.0-BERKELEY-DB-WRITING-GUIDE.md`;
-- `../../docs/1.15.0-BERKELEY-DB-HASHED-ACQUISITION-GUIDE.md`; and
-- `../../docs/1.15.0-BERKELEY-DB-HASH-V9-COMPATIBILITY.md`.
+- [Writing guide](../../docs/1.16.0-BERKELEY-DB-WRITING-GUIDE.md);
+- [Acquisition guide](../../docs/1.15.0-BERKELEY-DB-HASHED-ACQUISITION-GUIDE.md); and
+- [Hash-v9 compatibility](../../docs/1.15.0-BERKELEY-DB-HASH-V9-COMPATIBILITY.md).

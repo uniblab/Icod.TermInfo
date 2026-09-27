@@ -28,6 +28,13 @@ dotnet run --project samples/Icod.TermInfo.BerkeleyDb.Sample/Icod.TermInfo.Berke
 See `Icod.TermInfo.BerkeleyDb.Sample/README.md` and
 `../docs/1.16.0-BERKELEY-DB-WRITING-GUIDE.md`.
 
+The [writing guide](../docs/1.16.0-BERKELEY-DB-WRITING-GUIDE.md#compile-source-publish-and-replace)
+also provides a complete Compiler-to-BerkeleyDb console example covering
+replacement, cancellation, and a fresh provider after a cached lookup. The
+[command walkthrough](ToolSuite/README.md#publish-and-inspect-a-hashed-database)
+uses checked-in source to demonstrate hashed publication, alias lookup,
+catalog listing, overwrite refusal, and whole-store replacement.
+
 ## Icod.TermInfo.RasterBackendSelection.Sample
 
 `Icod.TermInfo.RasterBackendSelection.Sample` is the focused **1.14**

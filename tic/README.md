@@ -133,10 +133,16 @@ Exit status follows the command-suite contract:
 130  cancellation before the publication commit begins
 ```
 
-Publication through the frozen synchronous Compiler writer is treated as one
-non-interruptible commit boundary. Cancellation is checked before that boundary;
-once publication begins, the writer is allowed to finish so the command does not
+In **directory mode**, publication through the synchronous Compiler writer is
+one non-interruptible commit boundary. Cancellation is checked before that
+boundary; once publication begins, the writer finishes so the command does not
 report cancellation after files have actually been committed.
+
+In **hashed mode**, cancellation remains active during image preparation, lock
+waiting, staging, and verification, through the final pre-move check. Cancellation
+before that check completes leaves the old destination (or its absence) intact.
+Once the move begins and succeeds, later cancellation cannot turn the successful
+publication into exit status 130. The post-commit summary is also non-cancellable.
 
 The command targets .NET 10. The reusable `Icod.TermInfo` libraries remain
 available for `net8.0`, `net9.0`, and `net10.0`.

@@ -10,7 +10,7 @@ forward unchanged. Hashed acquisition is isolated in the optional BerkeleyDb
 package and does not alter `captoinfo` parsing, inheritance, conversion,
 rendering, options, or dependencies. Standalone `captoinfo` and routed
 `icod-terminfo captoinfo` retain their existing behavior while reporting the
-coordinated `1.15.0` suite version.
+coordinated `1.16.0` suite version.
 
 TC07 deliberately keeps the executable thin. Conventional termcap text is
 parsed by `Icod.TermInfo.Termcap`, `tc=` inheritance is resolved by the TC03

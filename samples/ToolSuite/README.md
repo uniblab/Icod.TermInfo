@@ -164,6 +164,67 @@ over existing destinations, opt into replacement explicitly:
 tic --force -x -o ./terminfo example.ti
 ```
 
+## Publish and inspect a hashed database
+
+From this sample directory, publish the same checked-in source to a new exact
+file path. Choose a path that does not already contain a database you want to
+keep. The current directory is the existing parent; `-x` permits the sample's
+`IcodDemo` extended capability.
+
+```text
+icod-terminfo tic --database-format hashed -x -s -o ./sample-hashed.db example.ti
+icod-terminfo infocmp -A ./sample-hashed.db -1 -x idc
+icod-terminfo toe -s ./sample-hashed.db
+```
+
+The first command exits 0 and writes a summary to stderr: format `hashed`, the
+absolute destination path, three source entries, and three alias keys. Alias
+`idc` resolves to `icod-demo-child`; the rendered entry includes `cols#120`,
+inherited base capabilities, and `IcodDemo=child`. Human `toe` lists six logical
+publications: the base, child, and decoy canonical names plus `idb`, `idc`, and
+`idd`. Standalone archive users can omit the
+`icod-terminfo` prefix.
+
+Repeat publication without `--force`:
+
+```text
+icod-terminfo tic --database-format hashed -x -o ./sample-hashed.db example.ti
+```
+
+This intentionally exits 1 with a `TIC0007` diagnostic; the existing database
+remains intact. Run this expected-failure command separately if your shell stops
+on nonzero exit status. Inspect `$LASTEXITCODE` in PowerShell, `$?` in sh, or
+`%ERRORLEVEL%` in cmd immediately after the command.
+
+Now replace the whole store, selecting only the child by its alias:
+
+```text
+icod-terminfo tic --database-format hashed --force -x -e idc -s -o ./sample-hashed.db example.ti
+icod-terminfo toe -s ./sample-hashed.db
+icod-terminfo infocmp -A ./sample-hashed.db -1 -x idc
+```
+
+The summary now reports one source entry and one alias key. Only the child is
+published; its inherited capabilities remain resolved from the complete source.
+`toe` lists only `icod-demo-child` and its alias `idc`. The former base and decoy
+publications are removed: `--force` replaces the database, rather than merging
+entries into it.
+These examples use explicit human inspection; hashed catalog JSON and migration
+automation remain deferred to 1.17.
+
+After these commands finish and no writer can still use this sample destination,
+remove both files you created:
+
+```sh
+rm ./sample-hashed.db ./.sample-hashed.db.icod-terminfo.lock
+```
+
+PowerShell users can use
+`Remove-Item ./sample-hashed.db, ./.sample-hashed.db.icod-terminfo.lock`.
+The lock persists after successful publication; its presence does not mean a
+writer is active. Never delete it while another writer may use this destination.
+The remaining directory walkthrough continues using `./terminfo`.
+
 ## Render the inherited child
 
 ```text
