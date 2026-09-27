@@ -55,7 +55,8 @@ public sealed class RB08ReleaseClosureTests {
 			"docs/1.14.0-RB01-INSPECTION-PUBLIC-API-ADDITIONS.txt",
 			"docs/1.14.0-RB02-INSPECTION-PUBLIC-API-ADDITIONS.txt",
 			"docs/1.14.0-RB03-INSPECTION-PUBLIC-API-ADDITIONS.txt",
-		} ) {
+		}
+		) {
 			foreach ( string line in ReadRequiredRepositoryFile( path ).Split( '\n' ) ) {
 				string candidate = line.Trim();
 				if (
@@ -319,7 +320,8 @@ public sealed class RB08ReleaseClosureTests {
 			"RequiresRuntimeVerification",
 			"Icod.Terminal 1.13.0",
 			"JSON v6",
-		} ) {
+		}
+		) {
 			Assert.Contains( token, guide, StringComparison.OrdinalIgnoreCase );
 		}
 		Assert.Contains( "RB08", audit, StringComparison.Ordinal );

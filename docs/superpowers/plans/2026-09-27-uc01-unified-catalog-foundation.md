@@ -275,5 +275,7 @@ specified BerkeleyDb bounded method and hashed adapter. UC04 introduces the
 reader facade. None of those APIs should be stubbed into UC01 to claim that the
 whole release is already usable.
 
-**Current evidence:** this document is a reviewed-by-author task plan, not an
-execution log. No task above has been implemented, tested, or accepted yet.
+**Current evidence:** the user approved this plan on 2026-09-27 UTC. Tasks 1–3
+are implemented and locally verified; task 4 distribution integration and
+cross-host qualification are in progress. The release roadmap records evidence
+and acceptance; this task checklist remains the original execution prescription.

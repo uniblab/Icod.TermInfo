@@ -4,7 +4,7 @@
 
 **Theme:** Unified directory/hashed catalogs
 
-**Status:** PLANNING — UC00 contract and UC01 task plan drafted; review pending
+**Status:** DEVELOPING — UC00 approved; UC01 implemented, qualification in progress
 
 **Stable predecessor:** `1.16.0` (published)
 
@@ -19,13 +19,12 @@ directory or supported ncurses Hash-v9 file through one immutable, read-only
 catalog contract, with honest publication identities, provenance, and diagnostics.
 
 **Architecture:** Compose the existing directory inspector, managed hashed
-catalog reader, and Runtime parser. Prefer a new optional composition package
-above Inspection and BerkeleyDb. UC00 must settle that boundary and bounded
-directory acquisition before production code or a public API is committed.
+catalog reader, and Runtime parser. The approved optional composition package sits above Inspection and BerkeleyDb.
+UC00 fixes this boundary and opt-in bounded acquisition.
 
 **Specification:** This roadmap defines release scope and acceptance criteria.
 The [main roadmap](Icod.TermInfo-Post-1.0-Development-Roadmap.md) owns release
-sequencing. The proposed detailed design is the
+sequencing. The approved detailed design is the
 [UC00 contract](docs/1.17.0-UC00-UNIFIED-CATALOG-CONTRACT.md), with a
 [UC01 implementation plan](docs/superpowers/plans/2026-09-27-uc01-unified-catalog-foundation.md).
 
@@ -71,21 +70,20 @@ publication, or native compatibility decisions.
 | `Icod.TermInfo.BerkeleyDb/src/BerkeleyDbTerminalCatalogEntry.cs` | Actual key, entry kind, parsed `TerminalDescription` | Retain key identity; do not claim access to raw bytes through this API |
 | Runtime `CompiledTermInfoParser` | Compiled-entry semantics | Remain the sole semantic parser |
 
-The preferred package is provisionally named **`Icod.TermInfo.Catalogs`**. It
-would reference Runtime, Inspection, and BerkeleyDb; Inspection retains its
+The approved package is named **`Icod.TermInfo.Catalogs`**. It
+references Runtime, Inspection, and BerkeleyDb; Inspection retains its
 Runtime/Source dependencies and BerkeleyDb retains its Runtime-only dependency.
 No existing library references the new package. Compiler is only needed by
 tests/samples that construct fixtures, not by production catalog acquisition.
 
 This costs an additional package, API baseline, verifier, consumer, and solution
-entry. UC00 must explicitly accept that cost. Putting the facade in Inspection
+entry. The user approved that cost in UC00. Putting the facade in Inspection
 would add a BerkeleyDb dependency to existing consumers; putting it in BerkeleyDb
 would violate its Runtime-only boundary. Neither is the default plan.
 
-Proposed contract roles are an explicit source descriptor, immutable read
+Approved contract roles are an explicit source descriptor, immutable read
 options, a reader with a cancellation overload, immutable catalog/entry/issue
-results, and typed source/entry/status classifications. These are design roles,
-not approved exported type names. UC00 records exact signatures, defaults,
+results, and typed source/entry/status classifications. The authoritative UC00 contract records exact signatures, defaults,
 validation order, enum values, exception behavior, and the reviewed type count.
 
 ## 3. Required observable behavior
@@ -147,21 +145,21 @@ The existing directory inspector uses `Directory.GetDirectories` and
 limit is **not** a whole-directory resource bound. Checking the result count
 after calling that API cannot enforce a pre-allocation traversal limit.
 
-UC00 must specify budgets for discovered filesystem candidates, retained entries,
+UC00 specifies budgets for discovered filesystem candidates, retained entries,
 retained diagnostics, and aggregate parsed bytes, as well as the existing hashed
 database-byte, physical-record, index-hop, and per-entry limits. Count rejected
 candidates and aliases where they consume resources. Specify defaults, inclusive
 boundary behavior, checked arithmetic, and cancellation checkpoints before reads,
 during traversal/normalization, and before returning a result.
 
-The proposed solution is a narrowly additive bounded Inspection acquisition
+The approved solution is a narrowly additive bounded Inspection acquisition
 entry point backed by shared traversal internals. The UC00 audit also found that
 typed hashed limit failures, cumulative decoded-byte accounting, and cancellation
 during image reads require an opt-in bounded BerkeleyDb method in UC03. Existing
 methods retain their behavior; historical APIs are reconstructed after removing
-only the reviewed additions. UC00 must review these deltas and the allocation
-accounting before UC01. If that
-cannot be done without breaking existing behavior or growing scope, stop this
+only the reviewed additions. UC00 approves these deltas and the allocation
+accounting. If implementation
+cannot preserve existing behavior within this scope, stop this
 gate and revise the design explicitly. Do not copy a second directory parser or
 claim that a wrapper around eager enumeration solves this problem.
 
@@ -175,8 +173,8 @@ accepted based only on a plan or an unobserved CI run.
 
 | Tranche | Planned version | Deliverable | Depends on | Status |
 | --- | --- | --- | --- | --- |
-| UC00 | Planning; retain `1.16.0` build identity | Contract, package decision, bounded-acquisition design | Published 1.16 | Draft complete; review pending |
-| UC01 | `1.17.0-Alpha-1` | Package/model foundation and approved bounded acquisition seam | UC00 | Pending |
+| UC00 | Planning; retain `1.16.0` build identity | Contract, package decision, bounded-acquisition design | Published 1.16 | Approved by user, 2026-09-27 UTC |
+| UC01 | `1.17.0-Alpha-1` | Package/model foundation and approved bounded acquisition seam | UC00 | Implemented; qualification in progress |
 | UC02 | `1.17.0-Alpha-2` | Conventional-directory adapter | UC01 | Pending |
 | UC03 | `1.17.0-Alpha-3` | Hash-v9 adapter | UC01, UC02 contract fixtures | Pending |
 | UC04 | `1.17.0-Alpha-4` | Unified reader and cross-format behavioral qualification | UC02, UC03 | Pending |
@@ -199,7 +197,7 @@ accepted based only on a plan or an unobserved CI run.
   differences such as skipped directory links.
 - [x] Draft the UC01 plan under `docs/superpowers/plans/`, including
   exact signatures and test commands.
-- [ ] Record the contract and plan review decision before production implementation.
+- [x] User approved the UC00 contract and UC01 implementation plan on 2026-09-27 UTC.
 
 **Exit:** The public model and acquisition limits are reviewable and implementable
 without reopening storage engineering. No unresolved package/bounds decision is
@@ -207,13 +205,13 @@ carried into production implementation.
 
 ### UC01 — package and immutable model foundation
 
-- [ ] If UC00 accepts the proposed boundary, add `Icod.TermInfo.Catalogs/`, its
+- [x] Add `Icod.TermInfo.Catalogs/`, its
   test project, explicit solution entries, and package/API verification scaffolding.
-- [ ] Implement the approved immutable source/options/result model and validate
+- [x] Implement the approved immutable source/options/result model and validate
   nulls, names, paths, enum values, option ranges, and defensive copying.
-- [ ] Add the reviewed bounded Inspection seam with focused traversal-budget
+- [x] Add the reviewed bounded Inspection seam with focused traversal-budget
   tests; preserve old overload outputs, diagnostics, and cancellation contracts.
-- [ ] Introduce Alpha-1 through the existing centralized versioning process;
+- [x] Introduce Alpha-1 through the existing centralized versioning process;
   preserve reusable assembly identity and equivalent APIs on all three TFMs.
 
 **Exit:** Package dependency checks pass; model invariants and bounded discovery
@@ -315,11 +313,20 @@ not add behavior or enlarge the catalog scope.
 
 ## 5. Progress and change control
 
-This PR contains the roadmap, proposed UC00 contract, and draft UC01 plan. There
-is no 1.17 production implementation, new package, version bump, public API freeze,
-or accepted UC tranche yet. The UC00 audit identified the eager directory scan,
-retained invalid-placement files, and hashed error/cancellation/budget limitations;
-the contract specifies opt-in solutions without changing released method behavior.
+UC00 and the UC01 plan are approved. UC01 implementation comprises:
+- `c5e67ba`: opt-in bounded Inspection acquisition.
+- `7e9f2cd`: immutable Catalogs model package and explicit solution entries.
+- `4a29776`: exact additive compatibility and package-verifier fixtures.
+
+Local Release evidence before coordinated integration: 36 bounded/legacy catalog
+checks, 24 Catalogs checks, 661 complete Inspection checks, and 7 BerkeleyDb
+API-freeze checks per framework. Catalogs API equality is confirmed across all
+three frameworks; both Inspection compatibility entry points reconstruct 1.14
+through 1.10. All six JSON schema fingerprints remain unchanged.
+
+Alpha-1 distribution integration and code-head CI qualification are in progress.
+UC01 is not yet accepted. UC02 directory adaptation remains the next implementation
+task; UC03 adds bounded hashed acquisition, and UC04 adds the public reader.
 
 Record each accepted tranche's commit, tests, qualification run, and remaining
 risks here and in its contract/audit document. Documentation-only follow-ups

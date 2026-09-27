@@ -51,7 +51,9 @@ public sealed class TerminalCatalogReadOptions {
 		ArgumentOutOfRangeException.ThrowIfNegativeOrZero( maximumParsedBytes );
 		ArgumentOutOfRangeException.ThrowIfNegativeOrZero( maximumDatabaseSize );
 		ArgumentOutOfRangeException.ThrowIfNegativeOrZero( maximumRecordCount );
-		if ( maximumIndexHops < 0 || maximumIndexHops > 1024 ) throw new ArgumentOutOfRangeException( nameof( maximumIndexHops ) );
+		if ( maximumIndexHops < 0 || maximumIndexHops > 1024 ) {
+			throw new ArgumentOutOfRangeException( nameof( maximumIndexHops ) );
+		}
 		ArgumentOutOfRangeException.ThrowIfNegativeOrZero( maximumDecodedBytes );
 		MaximumCandidateCount = maximumCandidateCount;
 		MaximumEntryCount = maximumEntryCount;

@@ -35,18 +35,24 @@ internal sealed class CatalogReadBudget {
 	}
 	internal void ReserveCandidate() => Reserve( ref _candidates, _options.MaximumCandidateCount, "MaximumCandidateCount" );
 	internal void EnsureEntryCapacity() {
-		if ( _entries >= _options.MaximumEntryCount ) ThrowLimit( "MaximumEntryCount", _options.MaximumEntryCount );
+		if ( _entries >= _options.MaximumEntryCount ) {
+			ThrowLimit( "MaximumEntryCount", _options.MaximumEntryCount );
+		}
 	}
 	internal void ReserveEntry() => Reserve( ref _entries, _options.MaximumEntryCount, "MaximumEntryCount" );
 	internal void ReserveIssue() => Reserve( ref _issues, _options.MaximumIssueCount, "MaximumIssueCount" );
 	internal void ReserveParsedBytes( long length ) {
 		ArgumentOutOfRangeException.ThrowIfNegative( length );
-		if ( length > _options.MaximumParsedBytes - _parsedBytes ) ThrowLimit( "MaximumParsedBytes", _options.MaximumParsedBytes );
+		if ( length > _options.MaximumParsedBytes - _parsedBytes ) {
+			ThrowLimit( "MaximumParsedBytes", _options.MaximumParsedBytes );
+		}
 		_parsedBytes += length;
 	}
 	internal void ThrowLimit( string name, long limit ) => throw new TermInfoDatabaseCatalogLimitException( _sourcePath, name, limit );
 	private void Reserve( ref int count, int limit, string name ) {
-		if ( count >= limit ) ThrowLimit( name, limit );
+		if ( count >= limit ) {
+			ThrowLimit( name, limit );
+		}
 		count++;
 	}
 }

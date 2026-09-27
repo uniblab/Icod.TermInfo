@@ -25,7 +25,8 @@ namespace Icod.TermInfo.Catalogs;
 public sealed class TerminalCatalog {
 	internal TerminalCatalog( TerminalCatalogSource source, TerminalCatalogStatus status,
 		IEnumerable<TerminalCatalogEntry> entries, IEnumerable<TerminalCatalogIssue> issues,
-		IEnumerable<string> duplicatePublicationNames ) {
+		IEnumerable<string> duplicatePublicationNames
+	) {
 		ArgumentNullException.ThrowIfNull( source );
 		CatalogValidation.Defined( status, nameof( status ) );
 		ArgumentNullException.ThrowIfNull( entries );
@@ -34,34 +35,51 @@ public sealed class TerminalCatalog {
 		TerminalCatalogEntry[] entryArray = entries.ToArray();
 		TerminalCatalogIssue[] issueArray = issues.ToArray();
 		string[] duplicates = duplicatePublicationNames.ToArray();
-		if ( entryArray.Any( item => item is null ) ) throw new ArgumentException( "Entries cannot contain null.", nameof( entries ) );
-		if ( issueArray.Any( item => item is null ) ) throw new ArgumentException( "Issues cannot contain null.", nameof( issues ) );
-		if ( duplicates.Any( string.IsNullOrWhiteSpace ) ) throw new ArgumentException( "Duplicate names cannot be blank.", nameof( duplicatePublicationNames ) );
+		if ( entryArray.Any( item => item is null ) ) {
+			throw new ArgumentException( "Entries cannot contain null.", nameof( entries ) );
+		}
+		if ( issueArray.Any( item => item is null ) ) {
+			throw new ArgumentException( "Issues cannot contain null.", nameof( issues ) );
+		}
+		if ( duplicates.Any( string.IsNullOrWhiteSpace ) ) {
+			throw new ArgumentException( "Duplicate names cannot be blank.", nameof( duplicatePublicationNames ) );
+		}
 		if ( entryArray.Any( item => !string.Equals( item.SourcePath, source.Path, StringComparison.Ordinal )
-			|| (item.EntryPath is null) != (source.Kind == TerminalCatalogSourceKind.BerkeleyDbHash) ) )
+			|| (item.EntryPath is null) != (source.Kind == TerminalCatalogSourceKind.BerkeleyDbHash)
+		)
+		) {
 			throw new ArgumentException( "Entry provenance must match the source.", nameof( entries ) );
-		if ( issueArray.Any( item => !string.Equals( item.SourcePath, source.Path, StringComparison.Ordinal ) ) )
+		}
+		if ( issueArray.Any( item => !string.Equals( item.SourcePath, source.Path, StringComparison.Ordinal ) ) ) {
 			throw new ArgumentException( "Issue provenance must match the source.", nameof( issues ) );
+		}
 		if ( (status == TerminalCatalogStatus.Complete && issueArray.Length != 0)
 			|| (status != TerminalCatalogStatus.Complete && issueArray.Length == 0)
-			|| (status is not (TerminalCatalogStatus.Complete or TerminalCatalogStatus.Partial) && entryArray.Length != 0) )
+			|| (status is not (TerminalCatalogStatus.Complete or TerminalCatalogStatus.Partial) && entryArray.Length != 0)
+		) {
 			throw new ArgumentException( "Status does not describe the supplied observations.", nameof( status ) );
+		}
 		string[] repeated = entryArray.GroupBy( entry => entry.PublicationName, StringComparer.Ordinal )
 			.Where( group => group.Count() > 1 ).Select( group => group.Key )
 			.OrderBy( name => name, StringComparer.Ordinal ).ToArray();
 		Array.Sort( duplicates, StringComparer.Ordinal );
-		if ( !duplicates.SequenceEqual( repeated, StringComparer.Ordinal ) )
+		if ( !duplicates.SequenceEqual( repeated, StringComparer.Ordinal ) ) {
 			throw new ArgumentException( "Duplicate names must identify each repeated publication exactly once.", nameof( duplicatePublicationNames ) );
+		}
 		TerminalCatalogIssue[] duplicateIssues = issueArray.Where( item => item.Kind == TerminalCatalogIssueKind.DuplicatePublication ).ToArray();
 		if ( duplicateIssues.Any( item => item.EntryPath is not null || item.PublicationName is null )
-			|| !duplicateIssues.Select( item => item.PublicationName! ).OrderBy( name => name, StringComparer.Ordinal ).SequenceEqual( repeated, StringComparer.Ordinal ) )
+			|| !duplicateIssues.Select( item => item.PublicationName! ).OrderBy( name => name, StringComparer.Ordinal ).SequenceEqual( repeated, StringComparer.Ordinal )
+		) {
 			throw new ArgumentException( "Each repeated publication needs exactly one source-level duplicate issue.", nameof( issues ) );
+		}
 		Source = source; Status = status;
 		Entries = Array.AsReadOnly( entryArray.OrderBy( item => item.PublicationName, StringComparer.Ordinal )
-			.ThenBy( item => item.EntryPath ?? item.SourcePath, StringComparer.Ordinal ).ThenBy( item => item.Kind ).ToArray() );
+			.ThenBy( item => item.EntryPath ?? item.SourcePath, StringComparer.Ordinal ).ThenBy( item => item.Kind ).ToArray()
+		);
 		Issues = Array.AsReadOnly( issueArray.OrderBy( item => item.EntryPath ?? item.SourcePath, StringComparer.Ordinal )
 			.ThenBy( item => item.Kind ).ThenBy( item => item.PublicationName ?? "", StringComparer.Ordinal )
-			.ThenBy( item => item.Message, StringComparer.Ordinal ).ToArray() );
+			.ThenBy( item => item.Message, StringComparer.Ordinal ).ToArray()
+		);
 		DuplicatePublicationNames = Array.AsReadOnly( duplicates );
 	}
 	/// <summary>Gets the explicitly selected source.</summary>

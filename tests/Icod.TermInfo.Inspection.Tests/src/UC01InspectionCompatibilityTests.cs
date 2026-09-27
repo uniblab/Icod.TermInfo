@@ -12,7 +12,8 @@ public sealed class UC01InspectionCompatibilityTests {
 		Assert.Equal( 108, typeof( TermInfoDatabaseInspector ).Assembly.GetExportedTypes().Length );
 		string reconstructed = Reconstruct( Snapshot() );
 		Assert.Equal( "e9f240a562aec5274d64fb2ec3647862fe4ef5684582af2b442ba3c55e189497",
-			Convert.ToHexString( SHA256.HashData( Encoding.UTF8.GetBytes( reconstructed ) ) ).ToLowerInvariant() );
+			Convert.ToHexString( SHA256.HashData( Encoding.UTF8.GetBytes( reconstructed ) ) ).ToLowerInvariant()
+		);
 		Assert.Equal( 106, reconstructed.Split( '\n' ).Count( line => line.StartsWith( "TYPE ", StringComparison.Ordinal ) ) );
 	}
 
@@ -24,7 +25,10 @@ public sealed class UC01InspectionCompatibilityTests {
 		Assert.Throws<InvalidDataException>( () => Reconstruct( current.Replace( "InspectDirectoryBounded(", "UnapprovedRead(", StringComparison.Ordinal ) ) );
 		Assert.Throws<InvalidDataException>( () => Reconstruct( current.Replace(
 			"TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseInspector [static]\n",
-			"TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseInspector [static]\n  METHOD public static System.Void Extra()\n", StringComparison.Ordinal ) ) );
+			"TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseInspector [static]\n  METHOD public static System.Void Extra()\n", StringComparison.Ordinal
+		)
+		)
+		);
 	}
 
 	internal static Type[] HistoricalOneFourteenTypes() => typeof( TermInfoDatabaseInspector ).Assembly.GetExportedTypes()
@@ -36,10 +40,13 @@ public sealed class UC01InspectionCompatibilityTests {
 	}
 	private static string Reconstruct( string current ) {
 		DirectoryInfo? root = new( AppContext.BaseDirectory );
-		while ( root is not null && !File.Exists( Path.Combine( root.FullName, "Icod.TermInfo.sln" ) ) ) root = root.Parent;
+		while ( root is not null && !File.Exists( Path.Combine( root.FullName, "Icod.TermInfo.sln" ) ) ) {
+			root = root.Parent;
+		}
 		Assert.NotNull( root );
 		return InspectionUc01Compatibility.Reconstruct( current,
 			File.ReadAllText( Path.Combine( root.FullName, "docs/1.17.0-UC01-INSPECTION-PUBLIC-API-ADDITIONS.txt" ) ),
-			File.ReadAllText( Path.Combine( root.FullName, "docs/1.17.0-UC01-INSPECTION-PUBLIC-API-ADDITIVE-MEMBERS.txt" ) ) );
+			File.ReadAllText( Path.Combine( root.FullName, "docs/1.17.0-UC01-INSPECTION-PUBLIC-API-ADDITIVE-MEMBERS.txt" ) )
+		);
 	}
 }

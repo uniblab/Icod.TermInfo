@@ -29,16 +29,21 @@ public sealed class TerminalCatalogLimitException : Exception {
 	/// <param name="limit">Positive maximum, or zero for MaximumIndexHops.</param>
 	/// <param name="innerException">Optional lower-layer failure.</param>
 	public TerminalCatalogLimitException( TerminalCatalogSource source, string limitName,
-		long limit, Exception? innerException = null )
+		long limit, Exception? innerException = null
+	)
 		: base( $"Catalog limit '{limitName}' ({limit}) was exceeded.", innerException ) {
 		ArgumentNullException.ThrowIfNull( source );
 		ArgumentException.ThrowIfNullOrWhiteSpace( limitName );
 		if ( limitName is not ("MaximumCandidateCount" or "MaximumEntryCount" or "MaximumIssueCount"
 			or "MaximumParsedBytes" or "MaximumDatabaseSize" or "MaximumRecordCount" or "MaximumIndexHops"
-			or "MaximumDecodedBytes" or "MaximumEntrySize" or "MaximumStoredItemSize") )
+			or "MaximumDecodedBytes" or "MaximumEntrySize" or "MaximumStoredItemSize"
+		)
+		) {
 			throw new ArgumentException( "Unknown catalog limit.", nameof( limitName ) );
-		if ( limit < 0 || (limit == 0 && limitName != "MaximumIndexHops") )
+		}
+		if ( limit < 0 || (limit == 0 && limitName != "MaximumIndexHops") ) {
 			throw new ArgumentOutOfRangeException( nameof( limit ) );
+		}
 		Source = source; LimitName = limitName; Limit = limit;
 	}
 	/// <summary>Gets the typed acquisition source; hides the base exception's textual Source property.</summary>

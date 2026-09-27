@@ -58,8 +58,9 @@ public static partial class TermInfoDatabaseInspector {
 			budget.ReserveIssue();
 			return CreateUnavailableCatalog( normalizedRoot, exception, "terminfo database root" );
 		}
-		if ( (attributes & FileAttributes.Directory) == 0 )
+		if ( (attributes & FileAttributes.Directory) == 0 ) {
 			return CreateEmptyCatalog( normalizedRoot, TermInfoDatabaseCatalogKind.UnsupportedStore );
+		}
 
 		List<TermInfoDatabaseCatalogEntry> entries = [];
 		BudgetedCatalogIssues issues = new( budget );
@@ -68,8 +69,9 @@ public static partial class TermInfoDatabaseInspector {
 		);
 		if ( rootFailure is not null ) {
 			if ( !observed ) {
-				if ( rootFailure is DirectoryNotFoundException or FileNotFoundException )
+				if ( rootFailure is DirectoryNotFoundException or FileNotFoundException ) {
 					return CreateEmptyCatalog( normalizedRoot, TermInfoDatabaseCatalogKind.Missing );
+				}
 				budget.ReserveIssue();
 				return CreateUnavailableCatalog( normalizedRoot, rootFailure, "terminfo database root" );
 			}
@@ -82,17 +84,22 @@ public static partial class TermInfoDatabaseInspector {
 				issues.Add( CreateFileSystemIssue( directory, exception, "terminfo database subdirectory" ) );
 				continue;
 			}
-			if ( (attributes & FileAttributes.Directory) == 0 ) continue;
+			if ( (attributes & FileAttributes.Directory) == 0 ) {
+				continue;
+			}
 			if ( IsCatalogReparsePoint( attributes ) ) {
 				issues.Add( new( TermInfoDatabaseCatalogIssueKind.LinkSkipped, directory,
-					"The terminfo database subdirectory is a link or reparse point and was not traversed." ) );
+					"The terminfo database subdirectory is a link or reparse point and was not traversed."
+				)
+				);
 				continue;
 			}
 			List<string> files = EnumerateBoundedPaths(
 				directory, false, budget, cancellationToken, enumerate, out Exception? failure, out _
 			);
-			if ( failure is not null )
+			if ( failure is not null ) {
 				issues.Add( CreateFileSystemIssue( directory, failure, "terminfo database subdirectory" ) );
+			}
 			foreach ( string path in files ) {
 				cancellationToken.ThrowIfCancellationRequested();
 				try { attributes = File.GetAttributes( path ); }
@@ -101,9 +108,12 @@ public static partial class TermInfoDatabaseInspector {
 					continue;
 				}
 				// Nested regular directories are counted, but never traversed or parsed.
-				if ( (attributes & FileAttributes.Directory) != 0 && !IsCatalogReparsePoint( attributes ) ) continue;
+				if ( (attributes & FileAttributes.Directory) != 0 && !IsCatalogReparsePoint( attributes ) ) {
+					continue;
+				}
 				InspectCandidate( GetRequiredFileName( directory ), path, options.ParserOptions,
-					entries, issues, cancellationToken, budget );
+					entries, issues, cancellationToken, budget
+				);
 			}
 		}
 		cancellationToken.ThrowIfCancellationRequested();
@@ -123,13 +133,16 @@ public static partial class TermInfoDatabaseInspector {
 			using IEnumerator<string> iterator = enumerate( path ).GetEnumerator();
 			while ( true ) {
 				cancellationToken.ThrowIfCancellationRequested();
-				if ( !iterator.MoveNext() ) break;
+				if ( !iterator.MoveNext() ) {
+					break;
+				}
 				cancellationToken.ThrowIfCancellationRequested();
 				budget.ReserveCandidate();
 				observed = true;
 				string child = iterator.Current;
-				if ( !root || IsConventionalCatalogDirectoryName( GetRequiredFileName( child ) ) )
+				if ( !root || IsConventionalCatalogDirectoryName( GetRequiredFileName( child ) ) ) {
 					paths.Add( child );
+				}
 			}
 		} catch ( Exception exception ) when ( IsCatalogIoException( exception ) ) {
 			failure = exception;

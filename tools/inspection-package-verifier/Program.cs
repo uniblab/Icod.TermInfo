@@ -67,7 +67,8 @@ internal static class Program {
 				string reconstructed = InspectionUc01Compatibility.Reconstruct(
 					File.ReadAllText( args[ 1 ] ),
 					File.ReadAllText( Path.Combine( root, "docs/1.17.0-UC01-INSPECTION-PUBLIC-API-ADDITIONS.txt" ) ),
-					File.ReadAllText( Path.Combine( root, "docs/1.17.0-UC01-INSPECTION-PUBLIC-API-ADDITIVE-MEMBERS.txt" ) ) );
+					File.ReadAllText( Path.Combine( root, "docs/1.17.0-UC01-INSPECTION-PUBLIC-API-ADDITIVE-MEMBERS.txt" ) )
+				);
 				File.WriteAllText( args[ 2 ], reconstructed, new UTF8Encoding( false ) );
 				Console.WriteLine( "Verified exact UC01 additions and reconstructed the frozen 1.14 Inspection API." );
 				return 0;
@@ -974,7 +975,8 @@ internal static class Program {
 						current.FullName,
 						"Icod.TermInfo.csproj"
 					)
-				) ) {
+				)
+			) {
 				return current.FullName;
 			}
 			current =

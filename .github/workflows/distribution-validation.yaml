@@ -51,6 +51,6 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSIONS }}
-      - name: Build, test, pack, and verify distribution
+      - name: Build, test, pack, and verify eight-package distribution
         shell: pwsh
         run: ./packaging/VerifyDistribution.ps1 -Configuration '${{ inputs.configuration }}'

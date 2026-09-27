@@ -152,7 +152,7 @@ public sealed class Hdb01ContractTests {
 			);
 
 		Assert.Contains(
-			"<IcodTermInfoSuiteVersion>1.16.0</IcodTermInfoSuiteVersion>",
+			"<IcodTermInfoSuiteVersion>1.17.0-Alpha-1</IcodTermInfoSuiteVersion>",
 			props,
 			StringComparison.Ordinal
 		);
@@ -182,17 +182,17 @@ public sealed class Hdb01ContractTests {
 			StringComparison.Ordinal
 		);
 		Assert.Contains(
-			"if (7 -ne $packages.Count)",
+			"if (8 -ne $packages.Count)",
 			releaseWorkflow,
 			StringComparison.Ordinal
 		);
 		Assert.Contains(
-			"if (19 -ne $files.Count)",
+			"if (21 -ne $files.Count)",
 			releaseWorkflow,
 			StringComparison.Ordinal
 		);
 		Assert.Contains(
-			"if (20 -ne $assets.Count)",
+			"if (22 -ne $assets.Count)",
 			releaseWorkflow,
 			StringComparison.Ordinal
 		);

@@ -135,6 +135,16 @@ pwsh -NoLogo -NoProfile -File \
   -AssemblyPath \
   "Icod.TermInfo.Inspection/bin/${configuration}/net10.0/Icod.TermInfo.Inspection.dll"
 
+# UC01 freezes the ten-type foundation and compares all shipped frameworks.
+for catalog_tfm in net8.0 net9.0 net10.0; do
+  dotnet run --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj \
+    -c "${configuration}" --no-build -- --check \
+    docs/1.17.0-UC01-CATALOGS-PUBLIC-API-BASELINE.txt \
+    "Icod.TermInfo.Catalogs/bin/${configuration}/${catalog_tfm}/Icod.TermInfo.Catalogs.dll"
+done
+dotnet run --project tools/catalogs-package-verifier/Icod.TermInfo.Catalogs.PackageVerifier.csproj \
+  -c "${configuration}" --no-build -- "${artifact_dir}"
+
 # Structural package, Source Link, dependency, and architecture verification.
 dotnet run \
   --project tools/package-verifier/Icod.TermInfo.PackageVerifier.csproj \

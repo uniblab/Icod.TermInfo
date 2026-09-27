@@ -187,8 +187,12 @@ jobs:
           NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
         run: |
           $packages = @(Get-ChildItem -LiteralPath 'artifacts/package' -Filter '*.nupkg' -File | Sort-Object Name)
-          if (7 -ne $packages.Count) {
-              throw "Expected seven coordinated .nupkg files; found $($packages.Count)."
+          if (8 -ne $packages.Count) {
+              throw "Expected eight coordinated .nupkg files; found $($packages.Count)."
+          }
+          $symbols = @(Get-ChildItem -LiteralPath 'artifacts/package' -Filter '*.snupkg' -File)
+          if (7 -ne $symbols.Count) {
+              throw "Expected seven reusable-library symbol packages; found $($symbols.Count)."
           }
           foreach ($package in $packages) {
               dotnet nuget push $package.FullName --api-key $env:NUGET_API_KEY --source 'https://api.nuget.org/v3/index.json' --skip-duplicate
@@ -224,8 +228,12 @@ jobs:
               throw "GitHub Packages source configuration failed with status $LASTEXITCODE."
           }
           $packages = @(Get-ChildItem -LiteralPath 'artifacts/package' -Filter '*.nupkg' -File | Sort-Object Name)
-          if (7 -ne $packages.Count) {
-              throw "Expected seven coordinated .nupkg files; found $($packages.Count)."
+          if (8 -ne $packages.Count) {
+              throw "Expected eight coordinated .nupkg files; found $($packages.Count)."
+          }
+          $symbols = @(Get-ChildItem -LiteralPath 'artifacts/package' -Filter '*.snupkg' -File)
+          if (7 -ne $symbols.Count) {
+              throw "Expected seven reusable-library symbol packages; found $($symbols.Count)."
           }
           foreach ($package in $packages) {
               dotnet nuget push $package.FullName --source github-release --api-key $env:GITHUB_TOKEN --skip-duplicate
@@ -256,8 +264,8 @@ jobs:
         run: |
           $assetDirectory = 'artifacts/release-assets'
           $files = @(Get-ChildItem -LiteralPath $assetDirectory -File | Where-Object { $_.Extension -in @('.nupkg', '.snupkg', '.zip', '.gz') } | Sort-Object Name)
-          if (19 -ne $files.Count) {
-              throw "Expected nineteen release binaries before checksumming; found $($files.Count)."
+          if (21 -ne $files.Count) {
+              throw "Expected twenty-one release binaries before checksumming; found $($files.Count)."
           }
           $lines = foreach ($file in $files) {
               $hash = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -273,8 +281,8 @@ jobs:
           $tag = $env:GITHUB_REF_NAME
           $version = '${{ needs.metadata.outputs.version }}'
           $assets = @(Get-ChildItem -LiteralPath 'artifacts/release-assets' -File | Sort-Object Name | ForEach-Object { $_.FullName })
-          if (20 -ne $assets.Count) {
-              throw "Expected twenty GitHub Release assets; found $($assets.Count)."
+          if (22 -ne $assets.Count) {
+              throw "Expected twenty-two GitHub Release assets; found $($assets.Count)."
           }
           $arguments = @('release', 'create', $tag, '--verify-tag', '--title', "${{ github.event.repository.name }} $version", '--generate-notes')
           if ('true' -eq '${{ needs.metadata.outputs.prerelease }}') {

@@ -25,7 +25,9 @@ public sealed class UC01CatalogPackageVerifierTests {
 			CreateFixture( package, root );
 			string baseline = File.ReadAllText( Path.Combine( root, "docs/1.17.0-UC01-CATALOGS-PUBLIC-API-BASELINE.txt" ) );
 			Assert.Equal( new string( 'a', 40 ), PackageVerifier.Program.VerifyPackage( package, "1.17.0-Alpha-1", baseline ) );
-			if ( corruption == "wrong-api" ) baseline += "TYPE class Unexpected [sealed]\nEND\n";
+			if ( corruption == "wrong-api" ) {
+				baseline += "TYPE class Unexpected [sealed]\nEND\n";
+			}
 			else {
 				using ZipArchive zip = ZipFile.Open( package, ZipArchiveMode.Update );
 				string? remove = corruption switch {
@@ -36,8 +38,12 @@ public sealed class UC01CatalogPackageVerifierTests {
 					"missing-readme" => "README.md",
 					_ => null,
 				};
-				if ( remove is not null ) zip.GetEntry( remove )!.Delete();
-				if ( corruption == "native" ) Write( zip, "runtimes/linux-x64/native/libdb.so", [ 0 ] );
+				if ( remove is not null ) {
+					zip.GetEntry( remove )!.Delete();
+				}
+				if ( corruption == "native" ) {
+					Write( zip, "runtimes/linux-x64/native/libdb.so", [ 0 ] );
+				}
 				if ( corruption == "wrong-assembly" ) {
 					zip.GetEntry( "lib/net8.0/Icod.TermInfo.Catalogs.dll" )!.Delete();
 					Write( zip, "lib/net8.0/Icod.TermInfo.Catalogs.dll", File.ReadAllBytes( typeof( TerminalDescription ).Assembly.Location ) );
@@ -45,7 +51,9 @@ public sealed class UC01CatalogPackageVerifierTests {
 				if ( corruption == "wrong-dependency" ) {
 					ZipArchiveEntry entry = zip.GetEntry( "Icod.TermInfo.Catalogs.nuspec" )!;
 					string xml;
-					using ( StreamReader reader = new( entry.Open() ) ) xml = reader.ReadToEnd();
+					using ( StreamReader reader = new( entry.Open() ) ) {
+						xml = reader.ReadToEnd();
+					}
 					entry.Delete();
 					WriteText( zip, "Icod.TermInfo.Catalogs.nuspec", xml.Replace( "Icod.TermInfo.Inspection", "Icod.TermInfo.Compiler", StringComparison.Ordinal ) );
 				}
@@ -65,7 +73,8 @@ public sealed class UC01CatalogPackageVerifierTests {
 			new XElement( "icon", "icon.png" ), new XElement( "requireLicenseAcceptance", "true" ),
 			new XElement( "tags", Value( "PackageTags" ).Replace( ';', ' ' ) ),
 			new XElement( "license", new XAttribute( "type", "expression" ), "LGPL-3.0-or-later" ),
-			new XElement( "repository", new XAttribute( "type", "git" ), new XAttribute( "url", Value( "RepositoryUrl" ) ), new XAttribute( "commit", new string( 'a', 40 ) ) ) );
+			new XElement( "repository", new XAttribute( "type", "git" ), new XAttribute( "url", Value( "RepositoryUrl" ) ), new XAttribute( "commit", new string( 'a', 40 ) ) )
+		);
 		XElement dependencies = new( "dependencies" );
 		using ZipArchive zip = ZipFile.Open( path, ZipArchiveMode.Create );
 		foreach ( string tfm in new[] { "net8.0", "net9.0", "net10.0" } ) {
@@ -73,7 +82,9 @@ public sealed class UC01CatalogPackageVerifierTests {
 			Write( zip, $"lib/{tfm}/Icod.TermInfo.Catalogs.dll", File.ReadAllBytes( typeof( TerminalCatalog ).Assembly.Location ) );
 			WriteText( zip, $"lib/{tfm}/Icod.TermInfo.Catalogs.xml", "<doc><assembly><name>Icod.TermInfo.Catalogs</name></assembly><members><member name=\"T:Icod.TermInfo.Catalogs.TerminalCatalog\" /></members></doc>" );
 			dependencies.Add( new XElement( "group", new XAttribute( "targetFramework", tfm ),
-				new[] { "Icod.TermInfo", "Icod.TermInfo.Inspection", "Icod.TermInfo.BerkeleyDb" }.Select( id => new XElement( "dependency", new XAttribute( "id", id ), new XAttribute( "version", "1.17.0-Alpha-1" ), new XAttribute( "exclude", "Build,Analyzers" ) ) ) ) );
+				new[] { "Icod.TermInfo", "Icod.TermInfo.Inspection", "Icod.TermInfo.BerkeleyDb" }.Select( id => new XElement( "dependency", new XAttribute( "id", id ), new XAttribute( "version", "1.17.0-Alpha-1" ), new XAttribute( "exclude", "Build,Analyzers" ) ) )
+			)
+			);
 		}
 		metadata.Add( dependencies );
 		WriteText( zip, "Icod.TermInfo.Catalogs.nuspec", new XElement( "package", metadata ).ToString() );
@@ -85,7 +96,9 @@ public sealed class UC01CatalogPackageVerifierTests {
 	private static void Write( ZipArchive zip, string path, byte[] bytes ) { using Stream stream = zip.CreateEntry( path ).Open(); stream.Write( bytes ); }
 	private static string FindRoot() {
 		DirectoryInfo? root = new( AppContext.BaseDirectory );
-		while ( root is not null && !File.Exists( Path.Combine( root.FullName, "Icod.TermInfo.sln" ) ) ) root = root.Parent;
+		while ( root is not null && !File.Exists( Path.Combine( root.FullName, "Icod.TermInfo.sln" ) ) ) {
+			root = root.Parent;
+		}
 		return root?.FullName ?? throw new InvalidOperationException( "Repository root not found." );
 	}
 }

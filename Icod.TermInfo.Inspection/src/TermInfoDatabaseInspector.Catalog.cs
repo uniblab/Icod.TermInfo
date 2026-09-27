@@ -391,7 +391,8 @@ public static partial class TermInfoDatabaseInspector {
 				directoryName,
 				fileName,
 				terminal
-			) ) {
+			)
+		) {
 			issues.Add(
 				new TermInfoDatabaseCatalogIssue(
 					TermInfoDatabaseCatalogIssueKind.InvalidPlacement,
@@ -428,10 +429,14 @@ public static partial class TermInfoDatabaseInspector {
 		Stream stream, string path, CompiledTermInfoParserOptions parserOptions,
 		CancellationToken cancellationToken, CatalogReadBudget? budget
 	) {
-		if ( budget is not null ) cancellationToken.ThrowIfCancellationRequested();
+		if ( budget is not null ) {
+			cancellationToken.ThrowIfCancellationRequested();
+		}
 		long length =
 			stream.Length;
-		if ( budget is not null ) cancellationToken.ThrowIfCancellationRequested();
+		if ( budget is not null ) {
+			cancellationToken.ThrowIfCancellationRequested();
+		}
 		if ( length > parserOptions.MaximumEntrySize ) {
 			budget?.ThrowLimit( "MaximumEntrySize", parserOptions.MaximumEntrySize );
 			throw new CompiledTermInfoFormatException(
@@ -522,7 +527,8 @@ public static partial class TermInfoDatabaseInspector {
 		if ( !DeclaresIdentity(
 				terminal,
 				fileName
-			) ) {
+			)
+		) {
 			return false;
 		}
 
@@ -538,7 +544,8 @@ public static partial class TermInfoDatabaseInspector {
 				directoryName,
 				literalDirectory,
 				pathComparison
-			) ) {
+			)
+		) {
 			return true;
 		}
 
@@ -570,7 +577,8 @@ public static partial class TermInfoDatabaseInspector {
 				terminal.Name,
 				name,
 				StringComparison.Ordinal
-			) ) {
+			)
+		) {
 			return true;
 		}
 

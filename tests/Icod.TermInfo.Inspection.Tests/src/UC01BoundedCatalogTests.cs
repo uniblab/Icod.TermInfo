@@ -131,7 +131,9 @@ public sealed class UC01BoundedCatalogTests {
 			Assert.Single( result.Entries );
 			Assert.Equal( TermInfoDatabaseCatalogIssueKind.LinkSkipped, Assert.Single( result.Issues ).Kind );
 		} finally {
-			if ( Directory.Exists( linkedRoot ) ) Directory.Delete( linkedRoot );
+			if ( Directory.Exists( linkedRoot ) ) {
+				Directory.Delete( linkedRoot );
+			}
 		}
 	}
 
@@ -162,11 +164,15 @@ public sealed class UC01BoundedCatalogTests {
 		bool disposed = false;
 		IEnumerable<string> Enumerate( string path ) {
 			if ( path != fixture.Root ) {
-				foreach ( string child in Directory.EnumerateFileSystemEntries( path ) ) yield return child;
+				foreach ( string child in Directory.EnumerateFileSystemEntries( path ) ) {
+					yield return child;
+				}
 				yield break;
 			}
 			try {
-				if ( yieldFirst ) yield return Path.Combine( fixture.Root, "x" );
+				if ( yieldFirst ) {
+					yield return Path.Combine( fixture.Root, "x" );
+				}
 				throw new IOException( "injected failure" );
 			} finally { disposed = true; }
 		}
@@ -204,7 +210,9 @@ public sealed class UC01BoundedCatalogTests {
 		CatalogReadBudget budget = new( fixture.Root, options );
 		Assert.Throws<OperationCanceledException>( () => TermInfoDatabaseInspector.ReadCatalogTerminalStream( stream, fixture.Root, options.ParserOptions, cancellation.Token, budget ) );
 		Assert.Equal( cancelOnLength ? 0 : 1, stream.ReadCalls );
-		if ( cancelOnLength ) budget.ReserveParsedBytes( options.MaximumParsedBytes );
+		if ( cancelOnLength ) {
+			budget.ReserveParsedBytes( options.MaximumParsedBytes );
+		}
 	}
 
 	[Fact]
@@ -213,7 +221,9 @@ public sealed class UC01BoundedCatalogTests {
 		using CancellationTokenSource cancellation = new();
 		using CancelingStream stream = new( Fixture.Entry(), cancellation, true );
 		Assert.Throws<CompiledTermInfoFormatException>( () => TermInfoDatabaseInspector.ReadCatalogTerminalStream(
-			stream, fixture.Root, new( 1 ), cancellation.Token, null ) );
+			stream, fixture.Root, new( 1 ), cancellation.Token, null
+		)
+		);
 	}
 
 	[Fact]
@@ -246,7 +256,9 @@ public sealed class UC01BoundedCatalogTests {
 			_cancelOnLength = cancelOnLength;
 		}
 		public override long Length {
-			get { if ( _cancelOnLength ) _cancellation.Cancel(); return base.Length; }
+			get { if ( _cancelOnLength ) {
+				_cancellation.Cancel();
+			} return base.Length; }
 		}
 		public override int Read( byte[] buffer, int offset, int count ) {
 			ReadCalls++;

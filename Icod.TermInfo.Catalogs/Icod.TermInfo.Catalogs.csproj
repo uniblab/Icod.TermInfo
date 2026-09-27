@@ -42,7 +42,7 @@
 		<Title>Icod.TermInfo.Catalogs</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Immutable unified directory and hashed terminfo catalog models and bounded acquisition contracts.</Description>
-		<PackageReleaseNotes>UC01 foundation: immutable single-source catalog models and explicit resource budgets. The unified reader is planned for UC04.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.17.0-Alpha-1 introduces ten immutable catalog model and budget types above Runtime, Inspection, and BerkeleyDb. Directory and hashed adapters and the unified reader are not yet included.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>

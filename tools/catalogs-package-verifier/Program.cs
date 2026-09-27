@@ -103,7 +103,8 @@ internal static class Program {
 			Require( File.Exists( snupkg ), $"Symbol package not found: {snupkg}" );
 
 			string commit = VerifyPackage( nupkg, packageVersion,
-				File.ReadAllText( Path.Combine( root, "docs/1.17.0-UC01-CATALOGS-PUBLIC-API-BASELINE.txt" ) ) );
+				File.ReadAllText( Path.Combine( root, "docs/1.17.0-UC01-CATALOGS-PUBLIC-API-BASELINE.txt" ) )
+			);
 			VerifySymbols( snupkg, packageVersion, commit );
 
 			Console.WriteLine(
@@ -519,10 +520,13 @@ internal static class Program {
 			string[] expectedIds = [ RuntimePackageId, "Icod.TermInfo.BerkeleyDb", "Icod.TermInfo.Inspection" ];
 			Require( dependencies.Select( dependency => dependency.Attribute( "id" )?.Value )
 				.OrderBy( id => id, StringComparer.Ordinal ).SequenceEqual( expectedIds, StringComparer.Ordinal ),
-				$"{targetFramework} must contain exactly Runtime, BerkeleyDb, and Inspection dependencies." );
+				$"{targetFramework} must contain exactly Runtime, BerkeleyDb, and Inspection dependencies."
+			);
 			Require( dependencies.All( dependency => dependency.Attribute( "version" )?.Value == expectedVersion
-				&& dependency.Attribute( "exclude" )?.Value == "Build,Analyzers" ),
-				$"{targetFramework} dependencies must use the coordinated version and standard exclusions." );
+				&& dependency.Attribute( "exclude" )?.Value == "Build,Analyzers"
+			),
+				$"{targetFramework} dependencies must use the coordinated version and standard exclusions."
+			);
 		}
 	}
 

@@ -9,7 +9,17 @@
 
 ## Status
 
-Current release line: `Icod.TermInfo 1.16.0`.
+Current release line: `Icod.TermInfo 1.17.0-Alpha-1`.
+
+The 1.17 development branch is building **Unified directory/hashed catalogs**.
+Alpha-1 adds the optional `Icod.TermInfo.Catalogs` model package and opt-in
+`TermInfoDatabaseInspector.InspectDirectoryBounded` acquisition. The adapters
+and unified reader are still pending; this foundation is not a complete catalog
+reader. See the [1.17 roadmap](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadmap.md)
+and [approved contract](docs/1.17.0-UC00-UNIFIED-CATALOG-CONTRACT.md).
+
+The published stable release is **1.16.0**. Installation examples below use that
+published version; Alpha-1 qualification is in progress.
 
 Version 1.16 adds deterministic, pure-managed Berkeley DB Hash-v9 publication
 to `Icod.TermInfo.BerkeleyDb`, alongside exact lookup, logical catalogs, and
@@ -32,7 +42,8 @@ for limits, cancellation, errors, and filesystem guarantees.
 
 Runtime discovery, sibling public APIs, and JSON contracts remain unchanged.
 Native Berkeley DB and ncurses are qualification tools, never production
-dependencies. Migration and catalog automation remain deferred to 1.17.
+dependencies. Unified catalogs are the selected 1.17 scope; migration and broader
+catalog automation remain deferred without an assigned release.
 The [release audit](docs/1.16.0-RELEASE-AUDIT.md) records exact qualification
 and publication status.
 
@@ -79,6 +90,9 @@ Icod.TermInfo.Tools              command distribution / routing
 ```
 
 Dependency boundaries are explicit: Runtime has no production package dependencies; Source, Termcap, and BerkeleyDb each depend on Runtime; Compiler and Inspection each depend on Runtime and Source. Inspection does not depend on BerkeleyDb, Compiler, Termcap, `Icod.Terminal`, or `Icod.DCurses`. The `infocmp` and `toe` executables reference BerkeleyDb for explicit hashed acquisition; `tic` composes Compiler and BerkeleyDb for explicit hashed publication.
+
+The 1.17 `Icod.TermInfo.Catalogs` foundation sits above Runtime, Inspection,
+and BerkeleyDb. Existing libraries and command tools do not reference it.
 
 ## Quick Start
 

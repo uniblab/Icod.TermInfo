@@ -3,6 +3,20 @@
 This file records release-level product changes. Exact qualification evidence,
 API fingerprints, and preserved boundaries live in the linked release audits.
 
+## 1.17.0-Alpha-1 (in development)
+
+- Adds the optional `Icod.TermInfo.Catalogs` package with ten immutable source,
+  options, entry, issue, result, status, and resource-limit model types.
+- Adds opt-in bounded conventional acquisition in Inspection, limiting discovered
+  candidates, retained entries/issues, and parsed bytes before retention.
+- Preserves existing Inspection overloads and proves that the exact additive
+  delta reconstructs the frozen 1.14 API and earlier historical surfaces.
+- Adds Catalogs package/API verification and coordinates eight packages with
+  seven reusable-library symbol packages on .NET 8, 9, and 10.
+
+Directory/hashed adapters and the unified reader remain pending. See the
+[1.17 roadmap](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadmap.md).
+
 ## 1.16.0
 
 - Adds deterministic pure-managed whole-file Berkeley DB Hash-v9 publication

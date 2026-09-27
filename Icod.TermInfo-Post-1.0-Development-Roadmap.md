@@ -7,22 +7,24 @@
 **Optional inspection package:** `Icod.TermInfo.Inspection`  
 **Optional termcap package:** `Icod.TermInfo.Termcap`  
 **Optional hashed-store package:** `Icod.TermInfo.BerkeleyDb`  
+**Optional catalog package (1.17 development):** `Icod.TermInfo.Catalogs`
 **Installable tool package:** `Icod.TermInfo.Tools`  
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`  
 **Frozen runtime contract:** `1.0.0`  
-**Current coordinated version:** `1.16.0`
+**Current coordinated version:** `1.17.0-Alpha-1`
 **Latest completed line:** `1.16.0` - Berkeley DB Hash-v9 Writer
 **Latest completed prerelease:** `1.16.0-Alpha-8`
 **Active development line:** `1.17.0` - Unified directory/hashed catalogs
-**Status:** stable `1.16.0` is published; `1.17.0` roadmap and contract planning are in progress
+**Status:** stable `1.16.0` is published; the 1.17 UC00 contract is approved and UC01 implementation is undergoing qualification
 **Active release roadmap:** [1.17.0 — Unified directory/hashed catalogs](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadmap.md)
-**Release audit:** planned for UC07; no 1.17 qualification has been performed
+**Release audit:** planned for UC07; UC01 evidence is tracked in the active roadmap
 **Latest completed release audit:** `docs/1.16.0-RELEASE-AUDIT.md`
-**Next gate:** review the drafted UC00 contract and UC01 plan, including opt-in bounded acquisition in Inspection and BerkeleyDb
+**Next gate:** qualify the UC01 model package and bounded Inspection seam, then implement the UC02 directory adapter
 
-The coordinated build version remains `1.16.0` during this planning-only change.
-The first implementation tranche will introduce `1.17.0-Alpha-1`.
+The approved UC00 contract fixes `Icod.TermInfo.Catalogs` above Runtime,
+Inspection, and BerkeleyDb. UC01 introduces the ten model types and bounded
+Inspection acquisition; the reader facade follows in UC04.
 
 ---
 
@@ -111,20 +113,19 @@ publication name, its canonical terminal identity, declared aliases, and storage
 provenance. Existing Runtime parsing and managed BerkeleyDb acquisition remain
 the semantic and storage authorities.
 
-The proposed implementation uses an optional composition package above Inspection
-and BerkeleyDb; UC00 reviews that boundary and the exact public contract before
-production implementation. Existing packages retain their dependency directions.
-Directory resource bounds need explicit design because the current inspector
-materializes directory listings before returning its catalog. The
-[UC00 contract](docs/1.17.0-UC00-UNIFIED-CATALOG-CONTRACT.md) now specifies that
-bounded acquisition design, publication semantics, and small opt-in BerkeleyDb
-additions for typed limits and cancellation. The
+The approved implementation uses an optional composition package above Inspection
+and BerkeleyDb. Existing packages retain their dependency directions. UC01 adds
+opt-in bounded directory acquisition because the released inspector materializes
+listings before returning its catalog. The
+[UC00 contract](docs/1.17.0-UC00-UNIFIED-CATALOG-CONTRACT.md) specifies bounded
+acquisition, publication semantics, and later opt-in BerkeleyDb additions for
+typed limits and cancellation. The approved
 [UC01 plan](docs/superpowers/plans/2026-09-27-uc01-unified-catalog-foundation.md)
-is drafted for review; production implementation has not started.
+is implemented through its first three tasks; coordinated qualification is underway.
 
 UC00–UC07 cover contract design, package/model foundation, directory and hashed
 adapters, unified acquisition, adversarial qualification, samples/package
-consumers, and stable closure. All implementation tranches are pending.
+consumers, and stable closure. UC01 qualification is in progress; UC02–UC07 are pending.
 
 The earlier broad assignment of migration and catalog automation to 1.17 is
 superseded. Mixed-source database sets, precedence, cross-container comparison,
@@ -380,13 +381,14 @@ The package does not load or redistribute Berkeley DB in production, does not
 become a general-purpose Berkeley DB API, and does not introduce a production
 dependency from Runtime back to the optional package.
 
-### Proposed unified catalog composition layer (1.17)
+### Unified catalog composition layer (1.17)
 
 Owns the common single-source directory/hashed catalog model, publication-name
 mapping, provenance, acquisition dispatch, and diagnostic normalization. The
-working package name is `Icod.TermInfo.Catalogs`, subject to UC00 contract review.
+approved package name is `Icod.TermInfo.Catalogs`.
 It composes existing optional layers from above; it does not move BerkeleyDb
-into Runtime or Inspection. No new package exists in this planning change.
+into Runtime or Inspection. UC01 supplies the model foundation; adapters and
+acquisition dispatch follow in UC02–UC04.
 
 ### Command layer
 

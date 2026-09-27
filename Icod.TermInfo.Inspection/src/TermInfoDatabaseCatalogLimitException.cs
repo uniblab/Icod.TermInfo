@@ -33,11 +33,13 @@ public sealed class TermInfoDatabaseCatalogLimitException : Exception {
 		string sourcePath, string limitName, long limit, Exception? innerException = null
 	) : base( $"Catalog limit '{limitName}' ({limit}) was exceeded.", innerException ) {
 		ArgumentException.ThrowIfNullOrWhiteSpace( sourcePath );
-		if ( !Path.IsPathFullyQualified( sourcePath ) )
+		if ( !Path.IsPathFullyQualified( sourcePath ) ) {
 			throw new ArgumentException( "The source path must be fully qualified.", nameof( sourcePath ) );
+		}
 		ArgumentException.ThrowIfNullOrWhiteSpace( limitName );
-		if ( limitName is not ("MaximumCandidateCount" or "MaximumEntryCount" or "MaximumIssueCount" or "MaximumParsedBytes" or "MaximumEntrySize") )
+		if ( limitName is not ("MaximumCandidateCount" or "MaximumEntryCount" or "MaximumIssueCount" or "MaximumParsedBytes" or "MaximumEntrySize") ) {
 			throw new ArgumentException( "Unknown directory catalog limit.", nameof( limitName ) );
+		}
 		ArgumentOutOfRangeException.ThrowIfNegativeOrZero( limit );
 		SourcePath = sourcePath;
 		LimitName = limitName;

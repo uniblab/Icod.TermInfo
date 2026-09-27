@@ -135,9 +135,13 @@ public sealed class UC01CatalogModelTests {
 			CultureInfo.CurrentCulture = new( "tr-TR" );
 			string[] names = [ "ı", "İ", "i", "I" ];
 			TerminalCatalogEntry[] entries = names.Select( name => new TerminalCatalogEntry(
-				name, TerminalCatalogEntryKind.Canonical, new TerminalDescriptionBuilder( name ).Build(), Root, Path.Combine( Root, name ) ) ).ToArray();
+				name, TerminalCatalogEntryKind.Canonical, new TerminalDescriptionBuilder( name ).Build(), Root, Path.Combine( Root, name )
+			)
+			).ToArray();
 			TerminalCatalogIssue[] issues = names.Select( name => new TerminalCatalogIssue(
-				TerminalCatalogIssueKind.IoFailure, Root, null, null, name ) ).ToArray();
+				TerminalCatalogIssueKind.IoFailure, Root, null, null, name
+			)
+			).ToArray();
 			TerminalCatalog result = new( Source, TerminalCatalogStatus.Partial, entries, issues, [] );
 			Assert.Equal( new[] { "I", "i", "İ", "ı" }, result.Entries.Select( entry => entry.PublicationName ) );
 			Assert.Equal( new[] { "I", "i", "İ", "ı" }, result.Issues.Select( issue => issue.Message ) );

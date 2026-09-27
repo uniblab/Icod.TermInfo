@@ -42,7 +42,7 @@
 		<Title>Icod.TermInfo.BerkeleyDb</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed acquisition and deterministic publication for ncurses-compatible Berkeley DB Hash-v9 terminfo stores.</Description>
-		<PackageReleaseNotes>1.16.0 adds deterministic pure-managed Hash-v9 whole-file publication, exact UTF-8 canonical/alias keys, chained hash pages and overflow, bounded input, and verified cooperative filesystem commit. The nine-type reader API and Runtime-only dependency remain unchanged; no native assets are shipped.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.17.0-Alpha-1 preserves the twelve-type 1.16 reader/writer API and Runtime-only dependency. Unified hashed adaptation is planned for UC03; no native assets are shipped.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>

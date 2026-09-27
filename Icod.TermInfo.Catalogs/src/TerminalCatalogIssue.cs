@@ -24,11 +24,16 @@ namespace Icod.TermInfo.Catalogs;
 /// <summary>A typed acquisition diagnostic with storage provenance.</summary>
 public sealed class TerminalCatalogIssue {
 	internal TerminalCatalogIssue( TerminalCatalogIssueKind kind, string sourcePath,
-		string? entryPath, string? publicationName, string message ) {
+		string? entryPath, string? publicationName, string message
+	) {
 		CatalogValidation.Defined( kind, nameof( kind ) );
 		CatalogValidation.AbsolutePath( sourcePath, nameof( sourcePath ) );
-		if ( entryPath is not null ) CatalogValidation.AbsolutePath( entryPath, nameof( entryPath ) );
-		if ( publicationName is not null ) ArgumentException.ThrowIfNullOrWhiteSpace( publicationName );
+		if ( entryPath is not null ) {
+			CatalogValidation.AbsolutePath( entryPath, nameof( entryPath ) );
+		}
+		if ( publicationName is not null ) {
+			ArgumentException.ThrowIfNullOrWhiteSpace( publicationName );
+		}
 		ArgumentException.ThrowIfNullOrWhiteSpace( message );
 		Kind = kind; SourcePath = sourcePath; EntryPath = entryPath;
 		PublicationName = publicationName; Message = message;

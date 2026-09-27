@@ -196,7 +196,8 @@ public sealed class PG08ReleaseClosureTests {
 			inspectionProject.Descendants(),
 			element =>
 				(element.Name.LocalName == "PackageReference"
-					|| element.Name.LocalName == "ProjectReference")
+					|| element.Name.LocalName == "ProjectReference"
+				)
 				&& string.Equals(
 					element.Attribute( "Include" )?.Value,
 					"Icod.Terminal",

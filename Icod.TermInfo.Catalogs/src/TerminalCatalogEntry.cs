@@ -24,16 +24,21 @@ namespace Icod.TermInfo.Catalogs;
 /// <summary>One observed publication occurrence and its immutable parsed terminal.</summary>
 public sealed class TerminalCatalogEntry {
 	internal TerminalCatalogEntry( string publicationName, TerminalCatalogEntryKind kind,
-		TerminalDescription terminal, string sourcePath, string? entryPath ) {
+		TerminalDescription terminal, string sourcePath, string? entryPath
+	) {
 		ArgumentException.ThrowIfNullOrWhiteSpace( publicationName );
 		CatalogValidation.Defined( kind, nameof( kind ) );
 		ArgumentNullException.ThrowIfNull( terminal );
 		CatalogValidation.AbsolutePath( sourcePath, nameof( sourcePath ) );
-		if ( entryPath is not null ) CatalogValidation.AbsolutePath( entryPath, nameof( entryPath ) );
+		if ( entryPath is not null ) {
+			CatalogValidation.AbsolutePath( entryPath, nameof( entryPath ) );
+		}
 		bool canonical = string.Equals( publicationName, terminal.Name, StringComparison.Ordinal );
 		if ( kind == TerminalCatalogEntryKind.Canonical ? !canonical
-			: canonical || !terminal.Aliases.Contains( publicationName, StringComparer.Ordinal ) )
+			: canonical || !terminal.Aliases.Contains( publicationName, StringComparer.Ordinal )
+		) {
 			throw new ArgumentException( "The publication name and kind must match the parsed terminal.", nameof( publicationName ) );
+		}
 		PublicationName = publicationName;
 		Kind = kind;
 		Terminal = terminal;

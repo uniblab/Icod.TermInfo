@@ -24,10 +24,13 @@ namespace Icod.TermInfo.Catalogs;
 internal static class CatalogValidation {
 	internal static void AbsolutePath( string path, string parameterName ) {
 		ArgumentException.ThrowIfNullOrWhiteSpace( path, parameterName );
-		if ( !System.IO.Path.IsPathFullyQualified( path ) )
+		if ( !System.IO.Path.IsPathFullyQualified( path ) ) {
 			throw new ArgumentException( "The path must be fully qualified.", parameterName );
+		}
 	}
 	internal static void Defined<T>( T value, string parameterName ) where T : struct, Enum {
-		if ( !Enum.IsDefined( value ) ) throw new ArgumentOutOfRangeException( parameterName );
+		if ( !Enum.IsDefined( value ) ) {
+			throw new ArgumentOutOfRangeException( parameterName );
+		}
 	}
 }

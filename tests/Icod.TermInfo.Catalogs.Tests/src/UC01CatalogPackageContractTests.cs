@@ -27,10 +27,25 @@ public sealed class UC01CatalogPackageContractTests {
 		Assert.Contains( "tests\\Icod.TermInfo.Catalogs.Tests\\Icod.TermInfo.Catalogs.Tests.csproj", solution, StringComparison.Ordinal );
 	}
 
+	[Fact]
+	public void AlphaOneIsRegisteredAcrossCoordinatedDistribution() {
+		string root = FindRoot();
+		string Read( string path ) => File.ReadAllText( Path.Combine( root, path ) );
+		Assert.Equal( "1.17.0-Alpha-1", XDocument.Parse( Read( "Directory.Build.props" ) ).Descendants( "IcodTermInfoSuiteVersion" ).Single().Value );
+		Assert.Contains( "Icod.TermInfo.Catalogs/Icod.TermInfo.Catalogs.csproj", Read( "packaging/PackPackages.ps1" ), StringComparison.Ordinal );
+		Assert.Contains( "tools\\catalogs-package-verifier\\Icod.TermInfo.Catalogs.PackageVerifier.csproj", Read( "Icod.TermInfo.sln" ), StringComparison.Ordinal );
+		Assert.Contains( "catalogs-package-verifier", Read( ".github/scripts/verify-release-package.sh" ), StringComparison.Ordinal );
+		Assert.Contains( "catalogs-package-verifier", Read( ".github/scripts/verify-release-package.cmd" ), StringComparison.Ordinal );
+		Assert.Contains( "Expected eight coordinated .nupkg files", Read( ".github/workflows/release.yaml" ), StringComparison.Ordinal );
+		Assert.Contains( "Expected seven reusable-library symbol packages", Read( ".github/workflows/release.yaml" ), StringComparison.Ordinal );
+	}
+
 	internal static string FindRoot() {
 		DirectoryInfo? directory = new( AppContext.BaseDirectory );
 		while ( directory is not null ) {
-			if ( File.Exists( Path.Combine( directory.FullName, "Icod.TermInfo.sln" ) ) ) return directory.FullName;
+			if ( File.Exists( Path.Combine( directory.FullName, "Icod.TermInfo.sln" ) ) ) {
+				return directory.FullName;
+			}
 			directory = directory.Parent;
 		}
 		throw new InvalidOperationException( "Repository root missing." );
