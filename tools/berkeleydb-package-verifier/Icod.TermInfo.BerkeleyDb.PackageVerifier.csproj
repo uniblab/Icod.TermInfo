@@ -26,5 +26,10 @@
 		<AssemblyName>Icod.TermInfo.BerkeleyDb.PackageVerifier</AssemblyName>
 		<RootNamespace>Icod.TermInfo.BerkeleyDb.PackageVerifier</RootNamespace>
 		<IsPackable>false</IsPackable>
+		<StartupObject>Icod.TermInfo.BerkeleyDb.PackageVerifier.Program</StartupObject>
 	</PropertyGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\Icod.TermInfo.BerkeleyDb\Icod.TermInfo.BerkeleyDb.csproj" />
+		<Compile Include="..\public-api-snapshot\Program.cs" Link="PublicApiSnapshot.cs" />
+	</ItemGroup>
 </Project>

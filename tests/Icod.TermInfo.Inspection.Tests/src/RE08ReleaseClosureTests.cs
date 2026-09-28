@@ -46,7 +46,7 @@ public sealed class RE08ReleaseClosureTests {
 			)
 			.ToHashSet( StringComparer.Ordinal );
 		Type[] currentTypes =
-			typeof( PersistentRasterRuntimeObservationSet ).Assembly.GetExportedTypes();
+			UC01InspectionCompatibilityTests.HistoricalOneFourteenTypes();
 		Type[] reconstructedOneThirteenTypes = currentTypes
 			.Where(
 				type =>
@@ -385,7 +385,8 @@ public sealed class RE08ReleaseClosureTests {
 			inspectionProject.Descendants(),
 			element =>
 				(element.Name.LocalName == "PackageReference"
-					|| element.Name.LocalName == "ProjectReference")
+					|| element.Name.LocalName == "ProjectReference"
+				)
 				&& (element.Attribute( "Include" )?.Value ?? string.Empty).Contains(
 					"Icod.Terminal",
 					StringComparison.Ordinal

@@ -122,6 +122,17 @@ dotnet run \
   Icod.TermInfo.Inspection/bin/${configuration}/net8.0/Icod.TermInfo.Inspection.dll \
   Icod.TermInfo.Inspection/bin/${configuration}/net10.0/Icod.TermInfo.Inspection.dll
 
+# UC07 pins the complete current Catalogs and Inspection surfaces for every TFM.
+for api_component in Catalogs Inspection; do
+  api_upper=$(printf '%s' "${api_component}" | tr '[:lower:]' '[:upper:]')
+  for api_tfm in net8.0 net9.0 net10.0; do
+    dotnet run --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj \
+      -c "${configuration}" --no-build -- --check \
+      "docs/1.17.0-${api_upper}-PUBLIC-API-BASELINE.txt" \
+      "Icod.TermInfo.${api_component}/bin/${configuration}/${api_tfm}/Icod.TermInfo.${api_component}.dll"
+  done
+done
+
 # MI07 and earlier frozen Inspection baselines remain immutable historical evidence:
 # docs/1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt
 # docs/1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt
@@ -134,6 +145,22 @@ pwsh -NoLogo -NoProfile -File \
   -Configuration "${configuration}" \
   -AssemblyPath \
   "Icod.TermInfo.Inspection/bin/${configuration}/net10.0/Icod.TermInfo.Inspection.dll"
+
+# UC04 adds exactly one reader while reconstructing the UC01 ten-type foundation.
+for catalog_tfm in net8.0 net9.0 net10.0; do
+  dotnet run --project tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj \
+    -c "${configuration}" --no-build -- --write \
+    "${artifact_dir}/uc04-catalogs-current-${catalog_tfm}.txt" \
+    "Icod.TermInfo.Catalogs/bin/${configuration}/${catalog_tfm}/Icod.TermInfo.Catalogs.dll"
+  dotnet run --project tools/catalogs-package-verifier/Icod.TermInfo.Catalogs.PackageVerifier.csproj \
+    -c "${configuration}" --no-build -- --reconstruct-uc04 \
+    "${artifact_dir}/uc04-catalogs-current-${catalog_tfm}.txt" \
+    "${artifact_dir}/uc04-catalogs-reconstructed-${catalog_tfm}.txt"
+  cmp -s docs/1.17.0-UC01-CATALOGS-PUBLIC-API-BASELINE.txt \
+    "${artifact_dir}/uc04-catalogs-reconstructed-${catalog_tfm}.txt"
+done
+dotnet run --project tools/catalogs-package-verifier/Icod.TermInfo.Catalogs.PackageVerifier.csproj \
+  -c "${configuration}" --no-build -- "${artifact_dir}"
 
 # Structural package, Source Link, dependency, and architecture verification.
 dotnet run \

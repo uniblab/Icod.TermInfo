@@ -324,6 +324,13 @@ try {
             throw "Public API snapshot generation exited with status $LASTEXITCODE."
         }
 
+        # The C# verifier checks full approved type blocks, the exact member,
+        # and the frozen 1.14 hash before historical reconstruction proceeds.
+        & dotnet run --project tools/inspection-package-verifier/Icod.TermInfo.Inspection.PackageVerifier.csproj `
+            -c $Configuration --no-build -- --reconstruct-uc01 $temporaryManifest $temporaryManifest
+        if (0 -ne $LASTEXITCODE) {
+            throw "UC01 Inspection reconstruction exited with status $LASTEXITCODE."
+        }
         $current = [System.IO.File]::ReadAllText($temporaryManifest)
         if ($current.IndexOf('Icod.Terminal', [System.StringComparison]::Ordinal) -ge 0) {
             throw 'Icod.TermInfo.Inspection public API unexpectedly references Icod.Terminal.'

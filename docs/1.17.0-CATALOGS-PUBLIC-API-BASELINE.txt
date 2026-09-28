@@ -1,0 +1,102 @@
+# Icod.TermInfo.Catalogs public API baseline
+# Format: Icod.TermInfo.PublicApiSnapshot/v1
+# AssemblyVersion: 1.0.0.0
+
+TYPE class Icod.TermInfo.Catalogs.TerminalCatalog [sealed]
+  PROPERTY Icod.TermInfo.Catalogs.TerminalCatalogSource Source { public get; } null=not-null/unknown
+  PROPERTY Icod.TermInfo.Catalogs.TerminalCatalogStatus Status { public get; } null=not-null/unknown
+  PROPERTY System.Boolean HasIssues { public get; } null=not-null/unknown
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Catalogs.TerminalCatalogEntry> Entries { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.Collections.Generic.IReadOnlyList<Icod.TermInfo.Catalogs.TerminalCatalogIssue> Issues { public get; } null=not-null/unknown<not-null/not-null>
+  PROPERTY System.Collections.Generic.IReadOnlyList<System.String> DuplicatePublicationNames { public get; } null=not-null/unknown<not-null/not-null>
+END
+
+TYPE class Icod.TermInfo.Catalogs.TerminalCatalogEntry [sealed]
+  PROPERTY Icod.TermInfo.Catalogs.TerminalCatalogEntryKind Kind { public get; } null=not-null/unknown
+  PROPERTY Icod.TermInfo.TerminalDescription Terminal { public get; } null=not-null/unknown
+  PROPERTY System.String EntryPath { public get; } null=nullable/unknown
+  PROPERTY System.String PublicationName { public get; } null=not-null/unknown
+  PROPERTY System.String SourcePath { public get; } null=not-null/unknown
+END
+
+TYPE enum Icod.TermInfo.Catalogs.TerminalCatalogEntryKind [sealed]
+  INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  UNDERLYING System.Int32
+  ENUM Alias = 1
+  ENUM Canonical = 0
+END
+
+TYPE class Icod.TermInfo.Catalogs.TerminalCatalogIssue [sealed]
+  PROPERTY Icod.TermInfo.Catalogs.TerminalCatalogIssueKind Kind { public get; } null=not-null/unknown
+  PROPERTY System.String EntryPath { public get; } null=nullable/unknown
+  PROPERTY System.String Message { public get; } null=not-null/unknown
+  PROPERTY System.String PublicationName { public get; } null=nullable/unknown
+  PROPERTY System.String SourcePath { public get; } null=not-null/unknown
+END
+
+TYPE enum Icod.TermInfo.Catalogs.TerminalCatalogIssueKind [sealed]
+  INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  UNDERLYING System.Int32
+  ENUM DuplicatePublication = 5
+  ENUM InvalidHashedStore = 6
+  ENUM InvalidPlacement = 1
+  ENUM IoFailure = 3
+  ENUM LinkSkipped = 4
+  ENUM MalformedEntry = 0
+  ENUM MissingSource = 8
+  ENUM PermissionFailure = 2
+  ENUM UnsupportedSource = 7
+END
+
+TYPE class Icod.TermInfo.Catalogs.TerminalCatalogLimitException [sealed]
+  BASE System.Exception
+  INTERFACES System.Runtime.Serialization.ISerializable
+  CTOR public TerminalCatalogLimitException(Icod.TermInfo.Catalogs.TerminalCatalogSource source null=not-null/not-null, System.String limitName null=not-null/not-null, System.Int64 limit null=not-null/not-null, System.Exception innerException null=nullable/nullable default=null)
+  PROPERTY Icod.TermInfo.Catalogs.TerminalCatalogSource Source { public get; } null=not-null/unknown
+  PROPERTY System.Int64 Limit { public get; } null=not-null/unknown
+  PROPERTY System.String LimitName { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.Catalogs.TerminalCatalogReadOptions [sealed]
+  CTOR public TerminalCatalogReadOptions(Icod.TermInfo.CompiledTermInfoParserOptions parserOptions null=nullable/nullable default=null, System.Int32 maximumCandidateCount null=not-null/not-null default=131072, System.Int32 maximumEntryCount null=not-null/not-null default=65536, System.Int32 maximumIssueCount null=not-null/not-null default=4096, System.Int64 maximumParsedBytes null=not-null/not-null default=67108864, System.Int32 maximumDatabaseSize null=not-null/not-null default=67108864, System.Int32 maximumRecordCount null=not-null/not-null default=65536, System.Int32 maximumIndexHops null=not-null/not-null default=16, System.Int64 maximumDecodedBytes null=not-null/not-null default=67108864)
+  PROPERTY Icod.TermInfo.CompiledTermInfoParserOptions ParserOptions { public get; } null=not-null/unknown
+  PROPERTY System.Int32 MaximumCandidateCount { public get; } null=not-null/unknown
+  PROPERTY System.Int32 MaximumDatabaseSize { public get; } null=not-null/unknown
+  PROPERTY System.Int32 MaximumEntryCount { public get; } null=not-null/unknown
+  PROPERTY System.Int32 MaximumIndexHops { public get; } null=not-null/unknown
+  PROPERTY System.Int32 MaximumIssueCount { public get; } null=not-null/unknown
+  PROPERTY System.Int32 MaximumRecordCount { public get; } null=not-null/unknown
+  PROPERTY System.Int64 MaximumDecodedBytes { public get; } null=not-null/unknown
+  PROPERTY System.Int64 MaximumParsedBytes { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.Catalogs.TerminalCatalogReader [sealed]
+  CTOR public TerminalCatalogReader(Icod.TermInfo.Catalogs.TerminalCatalogSource source null=not-null/not-null, Icod.TermInfo.Catalogs.TerminalCatalogReadOptions options null=nullable/nullable default=null)
+  PROPERTY Icod.TermInfo.Catalogs.TerminalCatalogSource Source { public get; } null=not-null/unknown
+  METHOD public Icod.TermInfo.Catalogs.TerminalCatalog Read() return-null=not-null/not-null
+  METHOD public Icod.TermInfo.Catalogs.TerminalCatalog Read(System.Threading.CancellationToken cancellationToken null=not-null/not-null) return-null=not-null/not-null
+END
+
+TYPE class Icod.TermInfo.Catalogs.TerminalCatalogSource [sealed]
+  CTOR public TerminalCatalogSource(System.String path null=not-null/not-null, Icod.TermInfo.Catalogs.TerminalCatalogSourceKind kind null=not-null/not-null)
+  PROPERTY Icod.TermInfo.Catalogs.TerminalCatalogSourceKind Kind { public get; } null=not-null/unknown
+  PROPERTY System.String Path { public get; } null=not-null/unknown
+END
+
+TYPE enum Icod.TermInfo.Catalogs.TerminalCatalogSourceKind [sealed]
+  INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  UNDERLYING System.Int32
+  ENUM BerkeleyDbHash = 1
+  ENUM ConventionalDirectory = 0
+END
+
+TYPE enum Icod.TermInfo.Catalogs.TerminalCatalogStatus [sealed]
+  INTERFACES System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  UNDERLYING System.Int32
+  ENUM Complete = 0
+  ENUM InvalidStore = 5
+  ENUM Missing = 2
+  ENUM Partial = 1
+  ENUM Unavailable = 4
+  ENUM UnsupportedSource = 3
+END

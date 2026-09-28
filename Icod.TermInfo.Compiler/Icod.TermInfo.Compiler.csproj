@@ -42,7 +42,7 @@
 		<Title>Icod.TermInfo.Compiler</Title>
 		<Authors>Timothy J. Bruce</Authors>
 		<Description>Managed deterministic terminfo compiler for Icod.TermInfo. The 1.2 line compiles .ti source or immutable TerminalDescription values and can publish explicit conventional terminfo directory layouts without native ncurses dependencies.</Description>
-		<PackageReleaseNotes>1.16.0 preserves the frozen Compiler API and Runtime-and-Source dependencies. The tic command composes compiled output with the optional BerkeleyDb writer; Compiler remains independent of BerkeleyDb.</PackageReleaseNotes>
+		<PackageReleaseNotes>1.17.0 supports controlled directory fixture publication in the unified catalog sample while preserving the frozen Compiler API and Runtime-and-Source dependencies.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/uniblab/Icod.TermInfo</PackageProjectUrl>

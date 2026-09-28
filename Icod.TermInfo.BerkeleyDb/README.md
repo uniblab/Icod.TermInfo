@@ -32,6 +32,43 @@ Readers bound file size, record count where applicable, parser work, and index
 hops. They support the qualified Hash-v9 inline/overflow subset in both byte
 orders. Acquisition is not an atomic snapshot or general encoding detection.
 
+## Bounded catalog reads (1.17.0-Alpha-3)
+
+```csharp
+var reader = new BerkeleyDbTerminalCatalogReader("./terminfo.db");
+var limits = new BerkeleyDbTerminalCatalogReadLimits(
+    maximumPublicationCount: 10_000,
+    maximumDecodedBytes: 16 * 1024 * 1024,
+    maximumParsedBytes: 8 * 1024 * 1024);
+var catalog = reader.ReadBounded(limits, cancellationToken);
+```
+
+`cancellationToken` is supplied by the caller. Null limits select defaults of
+65,536 actual publications, 67,108,864 decoded bytes, and 67,108,864 parsed bytes.
+All maxima are inclusive. Reader constructor options still set database size,
+physical-record count, parser entry size, and index hops. Limits are independent;
+each call starts fresh and returns a complete immutable result or throws.
+
+Decoded bytes charge extracted keys and values, including markers and repeated
+overflow references. Parsed bytes charge compiled payloads once per distinct
+storage key, including orphan records. Aliases share one parsed terminal object
+but each actual publication consumes publication capacity. Defensive CLR copies
+are not charged again; these limits do not measure exact managed heap usage.
+
+`BerkeleyDbCatalogLimitException` identifies the absolute `SourcePath`, stable
+`LimitName`, and inclusive `Limit`. Names are `MaximumDatabaseSize`,
+`MaximumRecordCount`, `MaximumStoredItemSize`, `MaximumEntrySize`,
+`MaximumIndexHops`, `MaximumPublicationCount`, `MaximumDecodedBytes`, and
+`MaximumParsedBytes`. The stored-item cap is parser maximum plus one marker byte.
+No partial catalog or retry is returned after a limit, cancellation, or malformed
+record, including a malformed orphan encountered after valid publications.
+
+Cancellation is checked during image and stability reads, overflow traversal,
+discovery, resolution, parsing boundaries, and before/after sorting. Synchronous
+OS calls and a running parser cannot be interrupted. Owned handles are released
+after success or failure. Existing `Read` overloads, lookup, and writing retain
+their policies and exception families. The new bounded API is opt-in.
+
 ## Publish compiled entries
 
 ```csharp

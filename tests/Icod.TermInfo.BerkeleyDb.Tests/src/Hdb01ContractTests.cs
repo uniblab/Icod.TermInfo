@@ -53,6 +53,7 @@ public sealed class Hdb01ContractTests {
 				"Icod.TermInfo.BerkeleyDb.BerkeleyDbTerminalDescriptionProviderOptions",
 			},
 			assembly.GetExportedTypes()
+				.Where( type => type != typeof( BerkeleyDbCatalogLimitException ) && type != typeof( BerkeleyDbTerminalCatalogReadLimits ) )
 				.Select( type => type.FullName )
 				.OrderBy( name => name, StringComparer.Ordinal )
 				.ToArray()
@@ -152,7 +153,7 @@ public sealed class Hdb01ContractTests {
 			);
 
 		Assert.Contains(
-			"<IcodTermInfoSuiteVersion>1.16.0</IcodTermInfoSuiteVersion>",
+			"<IcodTermInfoSuiteVersion>1.17.0</IcodTermInfoSuiteVersion>",
 			props,
 			StringComparison.Ordinal
 		);
@@ -182,17 +183,17 @@ public sealed class Hdb01ContractTests {
 			StringComparison.Ordinal
 		);
 		Assert.Contains(
-			"if (7 -ne $packages.Count)",
+			"if (8 -ne $packages.Count)",
 			releaseWorkflow,
 			StringComparison.Ordinal
 		);
 		Assert.Contains(
-			"if (19 -ne $files.Count)",
+			"if (21 -ne $files.Count)",
 			releaseWorkflow,
 			StringComparison.Ordinal
 		);
 		Assert.Contains(
-			"if (20 -ne $assets.Count)",
+			"if (22 -ne $assets.Count)",
 			releaseWorkflow,
 			StringComparison.Ordinal
 		);

@@ -6,9 +6,15 @@
 **Command integration:** `tic` and `Icod.TermInfo.Tools`
 **Language:** C# 13
 **Reusable target frameworks:** `net8.0`; `net9.0`; `net10.0`
-**Status:** COMPLETE / ACCEPTED — `1.16.0` stable candidate qualified; publication pending
+**Status:** COMPLETE / PUBLISHED — `1.16.0` merged and publication confirmed by the maintainer
 **Stable predecessor:** `1.15.0`
 **Initial development version:** `1.16.0-Alpha-1`
+
+**Subsequent release decision:** The historical assignments to 1.17 below record
+the original writer-release split. They are superseded by the
+[1.17 unified catalog roadmap](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadmap.md):
+1.17 now owns unified directory/hashed catalogs only. Migration, mixed-source
+sets, comparison/planning, and new machine-readable output remain deferred.
 
 ---
 

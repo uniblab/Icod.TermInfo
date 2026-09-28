@@ -7,19 +7,24 @@
 **Optional inspection package:** `Icod.TermInfo.Inspection`  
 **Optional termcap package:** `Icod.TermInfo.Termcap`  
 **Optional hashed-store package:** `Icod.TermInfo.BerkeleyDb`  
+**Optional catalog package (1.17 candidate):** `Icod.TermInfo.Catalogs`
 **Installable tool package:** `Icod.TermInfo.Tools`  
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`  
 **Frozen runtime contract:** `1.0.0`  
-**Current coordinated version:** `1.16.0`
-**Latest completed line:** `1.15.0` - Berkeley DB / Hashed Terminfo Acquisition
-**Latest completed prerelease:** `1.16.0-Alpha-8`
-**Latest accepted development line:** `1.16.0` - Berkeley DB Hash-v9 Writer (HW00–HW08 complete)
-**Status:** stable `1.15.0` is published; the `1.16.0` stable candidate is accepted and ready for review; publication is pending
-**Active release roadmap:** `Icod.TermInfo-1.16.0-Berkeley-DB-Hash-V9-Writer-Roadmap.md`
-**Release audit:** `docs/1.16.0-RELEASE-AUDIT.md`
-**Latest completed release audit:** `docs/1.15.0-RELEASE-AUDIT.md`
-**Next gate:** user review, merge, and publication of 1.16; migration/catalog automation remain separate 1.17 work
+**Current coordinated version:** `1.17.0` stable candidate (unpublished)
+**Latest completed line:** `1.16.0` - Berkeley DB Hash-v9 Writer
+**Latest completed prerelease:** `1.17.0-Alpha-6`
+**Active development line:** `1.17.0` - Unified directory/hashed catalogs
+**Status:** stable `1.16.0` is published; UC00–UC07 are accepted and the `1.17.0` stable candidate is qualified, unpublished
+**Active release roadmap:** [1.17.0 — Unified directory/hashed catalogs](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadmap.md)
+**Release audit:** [accepted 1.17 stable candidate audit](docs/1.17.0-RELEASE-AUDIT.md)
+**Latest completed release audit:** `docs/1.16.0-RELEASE-AUDIT.md`
+**Next gate:** Maintainer review of the qualified draft PR before separately authorized merge, tag and publication; see the [1.17 roadmap](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadmap.md)
+
+The approved UC00 contract fixes `Icod.TermInfo.Catalogs` above Runtime,
+Inspection, and BerkeleyDb. UC01 introduces the ten model types and bounded
+Inspection acquisition; the reader facade follows in UC04.
 
 ---
 
@@ -93,10 +98,83 @@ version-specific roadmap.
 | **1.14.0** | Raster backend selection | Backend availability evidence/classification, candidate evaluation, explicit preference selection, JSON v6 |
 | **1.15.0** | Berkeley DB / hashed terminfo acquisition | Optional pure-managed read-only Hash-v9 acquisition recovers compiled entry bytes and delegates semantic parsing to existing Runtime |
 | **1.16.0** | Berkeley DB Hash-v9 writer | Optional pure-managed deterministic whole-file Hash-v9 publication and explicit `tic` hashed output |
-| **1.17.0** | Hashed migration and catalog automation | Directory/hashed migration, unified catalog automation, cross-container analysis, and machine-readable expansion if justified |
+| **1.17.0** | Unified directory/hashed catalogs | One explicit, read-only catalog contract for a conventional directory or supported Hash-v9 file, with publication identities, provenance, diagnostics, and bounded acquisition |
 | **later** | Explicitly planned deferred work | Additional backends, richer graphics policy, historical formats, or other justified tracks |
 
-### 2.1 Active 1.16 line
+### 2.1 Active 1.17 line
+
+Version 1.17 is governed by
+[the unified catalog roadmap](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadmap.md).
+The approved release theme is **Unified directory/hashed catalogs**.
+
+This release gives callers one read-only model for one explicitly selected
+directory or hashed database. It preserves the distinction between an observed
+publication name, its canonical terminal identity, declared aliases, and storage
+provenance. Existing Runtime parsing and managed BerkeleyDb acquisition remain
+the semantic and storage authorities.
+
+The approved implementation uses an optional composition package above Inspection
+and BerkeleyDb. Existing packages retain their dependency directions. UC01 adds
+opt-in bounded directory acquisition because the released inspector materializes
+listings before returning its catalog. The
+[UC00 contract](docs/1.17.0-UC00-UNIFIED-CATALOG-CONTRACT.md) specifies bounded
+acquisition, publication semantics, and later opt-in BerkeleyDb additions for
+typed limits and cancellation. The approved
+[UC01 plan](docs/superpowers/plans/2026-09-27-uc01-unified-catalog-foundation.md)
+is complete and accepted at `656acf952c286ccd24b3819e85faf2bc598e2bcd`.
+
+UC00–UC07 cover contract design, package/model foundation, directory and hashed
+adapters, unified acquisition, adversarial qualification, samples/package
+consumers, and stable closure. UC01 through UC07 are accepted at the exact
+candidate code/tree recorded in the [1.17 audit](docs/1.17.0-RELEASE-AUDIT.md).
+UC02 code head `965c8d2ee91a6b3515a33c64cb9f702566f3943a` passed 7,284 local
+tests, all 12 PR workflow jobs, and all three interoperability jobs; see the
+active roadmap for commands, artifact checks, and CI links.
+
+The [UC03 plan](docs/superpowers/plans/2026-09-27-uc03-bounded-hashed-catalog-adapter.md)
+is complete and accepted at `e4dcf7e25f174d07702186d5bd9e4ea1a5ec7742`.
+Physical acquisition, logical catalog budgets, the internal hashed adapter,
+and exact additive API verification passed Alpha-3 qualification: 7,581 local
+tests, complete distribution verification, all 12 PR jobs, and all three
+interoperability jobs. Execution and author self-review were inline without
+subagents. UC04 public reader and cross-format parity are accepted at
+`168862eb6935ab10597f378a372e393591c9b7b2`: 7,629 local tests, all 12
+repaired-head PR jobs, and full native/managed interoperability at the preceding
+unchanged-production-code implementation head. The active roadmap records the
+repair and exact workflow evidence. UC05 adversarial hardening is accepted at
+`09f69208d9240c755e4015cf20364a386963703b` (tree
+`4834354e44b3108809179ff314719345ba7accd6`): 7,704 local tests passed,
+eight nupkg and seven snupkg passed the full package verifier, all 12 PR jobs
+passed in [workflow 36356185297](https://github.com/uniblab/Icod.TermInfo/actions/runs/36356185297),
+and all three native/managed interoperability jobs passed in
+[workflow 36356185291](https://github.com/uniblab/Icod.TermInfo/actions/runs/36356185291)
+at the exact implementation code. Package gates run on Linux and intentionally
+skip Windows/macOS; the Inspection PowerShell step runs on Windows and skips
+Linux/macOS. Reads still lack atomic replacement snapshots and cancellation
+cannot interrupt a synchronous OS call. The active roadmap has the full
+boundary matrix. UC06 sample, isolated package consumer, guide and coordinated
+Alpha-6 distribution are accepted at `3327871eb22524fd38c9337b9dd41a41b232b814`
+(tree `6abac5dc1700e34c62d7fc75aeaac65f47abcbd5`): 7,707 local tests
+passed; eight nupkg and seven snupkg passed full verification; all 12 jobs
+passed in [PR workflow 36360352597](https://github.com/uniblab/Icod.TermInfo/actions/runs/36360352597)
+and all three native/managed jobs passed in
+[interoperability workflow 36360352573](https://github.com/uniblab/Icod.TermInfo/actions/runs/36360352573).
+Linux ran the Staging/Release package steps; Windows/macOS intentionally skip
+them. The Inspection PowerShell step ran on Windows and skipped Linux/macOS.
+The active roadmap records the sample fixture nuance and remaining limits.
+UC07 candidate `b69534d58899fc3c5b0b81b974ec9eb34d44dde0`, tree
+`273f470e9717ce700814936efe3c6c9a9e738c4c`, passed
+[12/12 PR jobs](https://github.com/uniblab/Icod.TermInfo/actions/runs/36366894647)
+and [3/3 native/managed jobs](https://github.com/uniblab/Icod.TermInfo/actions/runs/36366894688).
+The draft PR remains unmerged, untagged and unpublished. The next boundary is
+maintainer review and separately authorized publication.
+
+The earlier broad assignment of migration and catalog automation to 1.17 is
+superseded. Mixed-source database sets, precedence, cross-container comparison,
+JSON expansion, migration, and synchronization remain deferred without an
+assigned release. Existing directory automation and command output stay intact.
+
+### 2.2 Completed 1.16 line
 
 Version 1.16 is governed by
 `Icod.TermInfo-1.16.0-Berkeley-DB-Hash-V9-Writer-Roadmap.md`.
@@ -124,16 +202,19 @@ package dependency between them.
 
 Version 1.16 excludes in-place database mutation, general Berkeley DB APIs,
 directory/hashed migration, unified catalog automation, cross-container planning,
-and JSON v7. Migration and catalog automation are explicitly assigned to 1.17.
+and JSON v7. The current 1.17 decision brings forward unified catalogs only;
+the other deferred features require separate release decisions.
 
 HW00 through HW07 are complete and accepted, including explicit `tic` hashed
 publication and pathological/native hardening. HW08 samples, package consumers,
 documentation, and API freeze passed Alpha-8 qualification. Stable `1.16.0`
 passed exact-head qualification at `30a7a23f01ca856bb5f9e15ba24db78bd137f139`:
 normal workflow `36281070193` (12/12) and native workflow `36281070040` (3/3).
-All planned 1.16 development gates are complete; review and publication remain.
+All planned 1.16 development gates are complete. PR #47 was merged to `main`
+as `02ead7ea1622790dedb88321c88e865978827018`; the maintainer has confirmed
+that stable `1.16.0` is published to NuGet.
 
-### 2.2 Completed 1.15 line
+### 2.3 Completed 1.15 line
 
 Version 1.15 is governed by
 `Icod.TermInfo-1.15.0-Berkeley-DB-Hashed-Terminfo-Acquisition-Roadmap.md`.
@@ -331,14 +412,25 @@ Runtime conversion, reverse rendering, and explicit acquisition.
 
 ### `Icod.TermInfo.BerkeleyDb`
 
-Owns optional pure-managed read-only access to the reviewed ncurses-compatible
-Berkeley DB Hash-v9 storage subset. Its responsibility ends after obtaining
-bounded opaque compiled-entry bytes; `CompiledTermInfoParser` remains the only
-owner of compiled terminfo semantics.
+Owns optional pure-managed acquisition and deterministic whole-file publication
+of the reviewed ncurses-compatible Berkeley DB Hash-v9 storage subset. It
+provides logical catalog enumeration through the existing Runtime parser;
+`CompiledTermInfoParser` remains the only owner of compiled terminfo semantics.
+Compiler remains the owner of compiled-entry encoding. BerkeleyDb depends only
+on Runtime and does not acquire an Inspection or Compiler dependency.
 
 The package does not load or redistribute Berkeley DB in production, does not
 become a general-purpose Berkeley DB API, and does not introduce a production
 dependency from Runtime back to the optional package.
+
+### Unified catalog composition layer (1.17)
+
+Owns the common single-source directory/hashed catalog model, publication-name
+mapping, provenance, acquisition dispatch, and diagnostic normalization. The
+approved package name is `Icod.TermInfo.Catalogs`.
+It composes existing optional layers from above; it does not move BerkeleyDb
+into Runtime or Inspection. UC01 supplies the model foundation; adapters and
+acquisition dispatch follow in UC02–UC04.
 
 ### Command layer
 
@@ -376,13 +468,13 @@ See `docs/VERSIONING.md` and `docs/COMPATIBILITY.md` for the complete policy.
 
 ---
 
-## 7. Deferred work during and after 1.16
+## 7. Deferred work during and after 1.17
 
-The following remain explicitly outside the approved 1.16 writer-only scope and
-require the 1.17 roadmap or a later independent design before implementation:
+The following remain explicitly outside the approved 1.17 unified-catalog scope
+and require an independent design and release assignment before implementation:
 
 - directory-to-hashed or hashed-to-directory migration;
-- unified directory/hashed catalog automation;
+- ordered mixed directory/hashed database sets and precedence automation;
 - cross-container comparison, synchronization, and migration planning;
 - hashed-aware machine-readable output or JSON v7;
 - in-place Berkeley DB mutation, transactions, recovery, or repair;
@@ -424,7 +516,7 @@ their contract tests use this active roadmap as the historical index:
 - `docs/1.1.0-S08-TERMINAL-DESCRIPTION-MATERIALIZATION.md`
 - `docs/1.1.0-S09-CORPUS-FUZZING-COMPATIBILITY.md`
 
-The latest completed line is documented by:
+The completed 1.14 line is documented by:
 
 ```text
 Icod.TermInfo-1.14.0-Raster-Backend-Capability-Evidence-Selection-and-Planning-Roadmap.md
@@ -434,7 +526,7 @@ docs/1.14.0-RB08-FREEZE-FINGERPRINTS.txt
 docs/1.14.0-RELEASE-AUDIT.md
 ```
 
-The latest completed line is documented by:
+The completed 1.15 line is documented by:
 
 ```text
 Icod.TermInfo-1.15.0-Berkeley-DB-Hashed-Terminfo-Acquisition-Roadmap.md
@@ -447,7 +539,7 @@ optional Runtime-only BerkeleyDb package, the production managed Hash-v9 reader,
 explicit and system providers, logical catalog enumeration, command composition,
 hardening, package qualification, and the exact nine-type public API freeze.
 
-The active planning line is documented by:
+The completed 1.16 line is documented by:
 
 ```text
 Icod.TermInfo-1.16.0-Berkeley-DB-Hash-V9-Writer-Roadmap.md
@@ -511,4 +603,7 @@ Stable candidate `30a7a23f01ca856bb5f9e15ba24db78bd137f139` preserves that
 production feature/API source and passed normal workflow `36281070193` (12/12)
 and native workflow `36281070040` (3/3). See
 `docs/1.16.0-RELEASE-AUDIT.md` for exact stable artifacts and acceptance.
-Migration/catalog automation remain 1.17.
+The active 1.17 planning authority is
+[Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadmap.md](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadmap.md).
+Its narrow catalog scope supersedes the earlier broad 1.17 allocation in the
+historical writer roadmap. Migration and other catalog automation remain deferred.

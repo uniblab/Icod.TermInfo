@@ -24,6 +24,7 @@ $projects = @(
     'Icod.TermInfo.BerkeleyDb/Icod.TermInfo.BerkeleyDb.csproj',
     'Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj',
     'Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj',
+    'Icod.TermInfo.Catalogs/Icod.TermInfo.Catalogs.csproj',
     'icod-terminfo/Icod.TermInfo.Router.csproj'
 )
 

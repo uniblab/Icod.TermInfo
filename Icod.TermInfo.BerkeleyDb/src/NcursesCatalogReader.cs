@@ -26,7 +26,8 @@ internal static class NcursesCatalogReader {
 		IReadOnlyList<BerkeleyDbHashRecord> records,
 		CompiledTermInfoParserOptions parserOptions,
 		int maximumIndexHops,
-		CancellationToken cancellationToken
+		CancellationToken cancellationToken,
+		BerkeleyDbCatalogReadBudget? budget = null
 	) {
 		ArgumentNullException.ThrowIfNull( records );
 		ArgumentNullException.ThrowIfNull( parserOptions );
@@ -38,6 +39,7 @@ internal static class NcursesCatalogReader {
 				ByteArrayComparer.Instance
 			);
 		foreach ( BerkeleyDbHashRecord record in records ) {
+			cancellationToken.ThrowIfCancellationRequested();
 			byte[] key = record.Key.ToArray();
 			if ( !recordsByKey.TryAdd( key, record ) ) {
 				throw CreateFormatException(
@@ -51,6 +53,7 @@ internal static class NcursesCatalogReader {
 		var publicationKeysByName =
 			new Dictionary<string, byte[]>( StringComparer.Ordinal );
 		foreach ( BerkeleyDbHashRecord record in records ) {
+			cancellationToken.ThrowIfCancellationRequested();
 			ReadOnlySpan<byte> value = record.Value.Span;
 			if (
 				value.Length == 0
@@ -59,6 +62,7 @@ internal static class NcursesCatalogReader {
 				continue;
 			}
 
+			budget?.ReservePublication();
 			string name = DecodePublicationName( record.Key.Span );
 			byte[] key = record.Key.ToArray();
 			if (
@@ -98,7 +102,9 @@ internal static class NcursesCatalogReader {
 					ParseStorageRecord(
 						record,
 						terminalsByStorageKey,
-						parserOptions
+						parserOptions,
+						cancellationToken,
+						budget
 					);
 					break;
 
@@ -110,7 +116,8 @@ internal static class NcursesCatalogReader {
 						terminalsByStorageKey,
 						parserOptions,
 						maximumIndexHops,
-						cancellationToken
+						cancellationToken,
+						budget
 					);
 					BerkeleyDbTerminalCatalogEntryKind kind =
 						ClassifyPublication( name, terminal );
@@ -130,6 +137,7 @@ internal static class NcursesCatalogReader {
 			}
 		}
 
+		cancellationToken.ThrowIfCancellationRequested();
 		entries.Sort(
 			static ( left, right ) => {
 				int comparison = StringComparer.Ordinal.Compare(
@@ -151,7 +159,10 @@ internal static class NcursesCatalogReader {
 				);
 			}
 		);
-		return Array.AsReadOnly( entries.ToArray() );
+		cancellationToken.ThrowIfCancellationRequested();
+		var result = Array.AsReadOnly( entries.ToArray() );
+		cancellationToken.ThrowIfCancellationRequested();
+		return result;
 	}
 
 	private static string DecodePublicationName(
@@ -177,7 +188,8 @@ internal static class NcursesCatalogReader {
 		Dictionary<byte[], TerminalDescription> terminalsByStorageKey,
 		CompiledTermInfoParserOptions parserOptions,
 		int maximumIndexHops,
-		CancellationToken cancellationToken
+		CancellationToken cancellationToken,
+		BerkeleyDbCatalogReadBudget? budget
 	) {
 		BerkeleyDbHashRecord current = publication;
 		var visited =
@@ -203,7 +215,9 @@ internal static class NcursesCatalogReader {
 				return ParseStorageRecord(
 					current,
 					terminalsByStorageKey,
-					parserOptions
+					parserOptions,
+					cancellationToken,
+					budget
 				);
 			}
 			if ( value[0] != 2 ) {
@@ -216,7 +230,8 @@ internal static class NcursesCatalogReader {
 					"The ncurses index record has an empty target."
 				);
 			}
-			if ( followedLinks >= maximumIndexHops ) {
+			budget?.CheckIndexHop( followedLinks );
+			if ( budget is null && followedLinks >= maximumIndexHops ) {
 				throw CreateFormatException(
 					"The ncurses index chain exceeds the configured hop limit."
 				);
@@ -241,8 +256,11 @@ internal static class NcursesCatalogReader {
 	private static TerminalDescription ParseStorageRecord(
 		BerkeleyDbHashRecord record,
 		Dictionary<byte[], TerminalDescription> terminalsByStorageKey,
-		CompiledTermInfoParserOptions parserOptions
+		CompiledTermInfoParserOptions parserOptions,
+		CancellationToken cancellationToken,
+		BerkeleyDbCatalogReadBudget? budget
 	) {
+		cancellationToken.ThrowIfCancellationRequested();
 		byte[] key = record.Key.ToArray();
 		if (
 			terminalsByStorageKey.TryGetValue(
@@ -265,6 +283,9 @@ internal static class NcursesCatalogReader {
 			);
 		}
 
+		budget?.CheckEntry( value.Length - 1 );
+		budget?.ReserveParsed( value.Length - 1 );
+		cancellationToken.ThrowIfCancellationRequested();
 		terminal = CompiledTermInfoParser.Parse(
 			value[1..],
 			parserOptions

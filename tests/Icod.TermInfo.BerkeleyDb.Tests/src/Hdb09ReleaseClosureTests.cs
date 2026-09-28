@@ -71,11 +71,12 @@ public sealed class Hdb09ReleaseClosureTests {
 			"BerkeleyDbTerminalDatabaseEntry",
 			"BerkeleyDbTerminalDatabaseWriterOptions",
 			"BerkeleyDbTerminalDatabaseWriter",
-		} ) {
+		}
+		) {
 			Assert.Contains( token, freeze, StringComparison.Ordinal );
 		}
 
-		Assert.Contains( "--check", verifier, StringComparison.Ordinal );
+		Assert.Contains( "--reconstruct-uc03", verifier, StringComparison.Ordinal );
 		Assert.Contains( ApiBaselinePath, verifier, StringComparison.Ordinal );
 		Assert.Contains(
 			"Icod.TermInfo.BerkeleyDb/bin/$Configuration/net10.0/Icod.TermInfo.BerkeleyDb.dll",
@@ -114,7 +115,8 @@ public sealed class Hdb09ReleaseClosureTests {
 			"Icod.TermInfo.Termcap/Icod.TermInfo.Termcap.csproj",
 			"Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj",
 			"Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj",
-		} ) {
+		}
+		) {
 			Assert.DoesNotContain(
 				"Icod.TermInfo.BerkeleyDb",
 				ReadRequiredRepositoryFile( projectPath ),
@@ -125,7 +127,8 @@ public sealed class Hdb09ReleaseClosureTests {
 		foreach ( string commandProject in new[] {
 			"infocmp/Icod.TermInfo.InfoCmp.csproj",
 			"toe/Icod.TermInfo.Toe.csproj",
-		} ) {
+		}
+		) {
 			Assert.Contains(
 				"Icod.TermInfo.BerkeleyDb.csproj",
 				ReadRequiredRepositoryFile( commandProject ),
@@ -139,7 +142,8 @@ public sealed class Hdb09ReleaseClosureTests {
 		foreach ( string verifierPath in new[] {
 			".github/scripts/verify-release-package.sh",
 			".github/scripts/verify-release-package.cmd",
-		} ) {
+		}
+		) {
 			string verifier = ReadRequiredRepositoryFile( verifierPath );
 			Assert.Contains(
 				"-- --check",
@@ -203,7 +207,8 @@ public sealed class Hdb09ReleaseClosureTests {
 			"BerkeleyDbTerminalDatabaseWriter.Write",
 			"hdb09-sample",
 			"NumericCapability.Colors",
-		} ) {
+		}
+		) {
 			Assert.Contains( token, program, StringComparison.Ordinal );
 		}
 		Assert.Contains( "controlled", readme, StringComparison.OrdinalIgnoreCase );
@@ -329,7 +334,7 @@ public sealed class Hdb09ReleaseClosureTests {
 	public void StableHistoryAndCurrentPackageNotesRemainCoordinated() {
 		AssertContainsAll(
 			"README.md",
-			"Current release line: `Icod.TermInfo 1.16.0`.",
+			"The 1.17.0 release adds unified directory/hashed catalogs.",
 			"Icod.TermInfo.BerkeleyDb --version 1.16.0"
 		);
 		Assert.DoesNotContain(
@@ -351,7 +356,8 @@ public sealed class Hdb09ReleaseClosureTests {
 			"Icod.TermInfo.Compiler/Icod.TermInfo.Compiler.csproj",
 			"Icod.TermInfo.Inspection/Icod.TermInfo.Inspection.csproj",
 			"icod-terminfo/Icod.TermInfo.Router.csproj",
-		} ) {
+		}
+		) {
 			XDocument project = XDocument.Parse(
 				ReadRequiredRepositoryFile( projectPath )
 			);
@@ -360,7 +366,7 @@ public sealed class Hdb09ReleaseClosureTests {
 				element => element.Name.LocalName == "PackageReleaseNotes"
 			).Value;
 			Assert.StartsWith(
-				"1.16.0 ",
+				"1.17.0 ",
 				releaseNotes,
 				StringComparison.Ordinal
 			);
@@ -386,9 +392,9 @@ public sealed class Hdb09ReleaseClosureTests {
 		);
 		AssertContainsAll(
 			"Icod.TermInfo-Post-1.0-Development-Roadmap.md",
-			"stable `1.15.0` is published",
-			"**Latest completed line:** `1.15.0`",
-			"**Latest completed release audit:** `docs/1.15.0-RELEASE-AUDIT.md`"
+			"stable `1.16.0` is published",
+			"**Latest completed line:** `1.16.0`",
+			"**Latest completed release audit:** `docs/1.16.0-RELEASE-AUDIT.md`"
 		);
 		AssertContainsAll(
 			"Icod.TermInfo-1.15.0-Berkeley-DB-Hashed-Terminfo-Acquisition-Roadmap.md",

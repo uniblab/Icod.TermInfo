@@ -1,14 +1,29 @@
 # Icod.TermInfo Samples
 
-The repository contains **ten executable API samples** plus one command-suite
+The repository contains **eleven executable API samples** plus one command-suite
 walkthrough. The samples stay separate so acquisition, reusable toolchain,
-multi-database automation, persistent-raster semantics, runtime-evidence
+unified catalogs, multi-database automation, persistent-raster semantics, runtime-evidence
 integration, and raster-backend selection can be copied without mixing unrelated
 concerns.
 
-All ten executable API sample projects target `net8.0`, `net9.0`, and
+All eleven executable API sample projects target `net8.0`, `net9.0`, and
 `net10.0`; every `dotnet run` example therefore specifies a framework. Substitute
 `-f net8.0` or `-f net9.0` when exercising those consumer targets.
+
+## Icod.TermInfo.Catalogs.Sample
+
+`Icod.TermInfo.Catalogs.Sample` is the focused **1.17** unified catalog reader
+example. It creates controlled conventional directory and Hash-v9 publications,
+reads each through `TerminalCatalogReader`, and shows publication identity,
+provenance, `Partial` results, cancellation, inclusive limits, and a fresh retry.
+It needs no host database or native Berkeley DB library.
+
+```text
+dotnet run --project samples/Icod.TermInfo.Catalogs.Sample/Icod.TermInfo.Catalogs.Sample.csproj -f net10.0 -- --verify
+```
+
+See [its README](Icod.TermInfo.Catalogs.Sample/README.md) and the
+[unified catalog guide](../docs/1.17.0-UNIFIED-CATALOG-GUIDE.md).
 
 ## Icod.TermInfo.BerkeleyDb.Sample
 
@@ -255,6 +270,8 @@ net9.0, and net10.0 and separately consumes the exact package on Windows, Linux,
 and macOS. Neither path requires native Berkeley DB.
 The 1.16 qualification adds public-writer determinism, UTF-8 aliases,
 overwrite/refusal, and cancellation to those same three-target package gates.
+The 1.17 qualification runs the controlled Catalogs sample on all three targets
+and checks a consumer that directly references only the candidate Catalogs package.
 
 Live verification is never required by CI. Interactive `--live` modes exist only
 to demonstrate the caller/sibling-layer boundary.

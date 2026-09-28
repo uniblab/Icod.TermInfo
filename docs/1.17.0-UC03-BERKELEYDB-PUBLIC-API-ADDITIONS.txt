@@ -1,0 +1,15 @@
+TYPE class Icod.TermInfo.BerkeleyDb.BerkeleyDbCatalogLimitException [sealed]
+  BASE System.Exception
+  INTERFACES System.Runtime.Serialization.ISerializable
+  CTOR public BerkeleyDbCatalogLimitException(System.String sourcePath null=not-null/not-null, System.String limitName null=not-null/not-null, System.Int64 limit null=not-null/not-null, System.Exception innerException null=nullable/nullable default=null)
+  PROPERTY System.Int64 Limit { public get; } null=not-null/unknown
+  PROPERTY System.String LimitName { public get; } null=not-null/unknown
+  PROPERTY System.String SourcePath { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.BerkeleyDb.BerkeleyDbTerminalCatalogReadLimits [sealed]
+  CTOR public BerkeleyDbTerminalCatalogReadLimits(System.Int32 maximumPublicationCount null=not-null/not-null default=65536, System.Int64 maximumDecodedBytes null=not-null/not-null default=67108864, System.Int64 maximumParsedBytes null=not-null/not-null default=67108864)
+  PROPERTY System.Int32 MaximumPublicationCount { public get; } null=not-null/unknown
+  PROPERTY System.Int64 MaximumDecodedBytes { public get; } null=not-null/unknown
+  PROPERTY System.Int64 MaximumParsedBytes { public get; } null=not-null/unknown
+END

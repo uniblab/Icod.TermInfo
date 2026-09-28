@@ -1,0 +1,17 @@
+TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseCatalogLimitException [sealed]
+  BASE System.Exception
+  INTERFACES System.Runtime.Serialization.ISerializable
+  CTOR public TermInfoDatabaseCatalogLimitException(System.String sourcePath null=not-null/not-null, System.String limitName null=not-null/not-null, System.Int64 limit null=not-null/not-null, System.Exception innerException null=nullable/nullable default=null)
+  PROPERTY System.Int64 Limit { public get; } null=not-null/unknown
+  PROPERTY System.String LimitName { public get; } null=not-null/unknown
+  PROPERTY System.String SourcePath { public get; } null=not-null/unknown
+END
+
+TYPE class Icod.TermInfo.Inspection.TermInfoDatabaseCatalogReadOptions [sealed]
+  CTOR public TermInfoDatabaseCatalogReadOptions(Icod.TermInfo.CompiledTermInfoParserOptions parserOptions null=nullable/nullable default=null, System.Int32 maximumCandidateCount null=not-null/not-null default=131072, System.Int32 maximumEntryCount null=not-null/not-null default=65536, System.Int32 maximumIssueCount null=not-null/not-null default=4096, System.Int64 maximumParsedBytes null=not-null/not-null default=67108864)
+  PROPERTY Icod.TermInfo.CompiledTermInfoParserOptions ParserOptions { public get; } null=not-null/unknown
+  PROPERTY System.Int32 MaximumCandidateCount { public get; } null=not-null/unknown
+  PROPERTY System.Int32 MaximumEntryCount { public get; } null=not-null/unknown
+  PROPERTY System.Int32 MaximumIssueCount { public get; } null=not-null/unknown
+  PROPERTY System.Int64 MaximumParsedBytes { public get; } null=not-null/unknown
+END

@@ -1,5 +1,19 @@
 # Icod.TermInfo Compatibility Policy
 
+## 1.17 UC01 additive foundation
+
+Alpha-1 introduces ten model types in the optional `Icod.TermInfo.Catalogs`
+package, with direct Runtime, Inspection, and BerkeleyDb dependencies. Inspection
+adds exactly two types and `InspectDirectoryBounded`; its old overloads retain
+their behavior. The exact additions are checked before reconstructing the frozen
+106-type 1.14 manifest and the established historical chain through 1.10.
+
+The [UC01 Catalogs baseline](1.17.0-UC01-CATALOGS-PUBLIC-API-BASELINE.txt) matches
+all three frameworks. Assembly identity remains `1.0.0.0`. BerkeleyDb's twelve-type
+1.16 surface, Runtime and sibling baselines, and JSON v1–v6 remain unchanged.
+The unified reader and bounded BerkeleyDb additions belong to later tranches;
+they are not part of this Alpha-1 foundation.
+
 ## 1.16 additive writer freeze
 
 Version 1.16 adds exactly three BerkeleyDb writer types to the unchanged

@@ -64,7 +64,7 @@ public sealed class PG08ReleaseClosureTests {
 			)
 			.ToHashSet( StringComparer.Ordinal );
 		Type[] currentTypes =
-			typeof( PersistentRasterPlacementProfile ).Assembly.GetExportedTypes();
+			UC01InspectionCompatibilityTests.HistoricalOneFourteenTypes();
 		Type[] reconstructedOneThirteenTypes = currentTypes
 			.Where(
 				type =>
@@ -196,7 +196,8 @@ public sealed class PG08ReleaseClosureTests {
 			inspectionProject.Descendants(),
 			element =>
 				(element.Name.LocalName == "PackageReference"
-					|| element.Name.LocalName == "ProjectReference")
+					|| element.Name.LocalName == "ProjectReference"
+				)
 				&& string.Equals(
 					element.Attribute( "Include" )?.Value,
 					"Icod.Terminal",

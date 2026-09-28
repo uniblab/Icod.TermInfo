@@ -3,6 +3,80 @@
 This file records release-level product changes. Exact qualification evidence,
 API fingerprints, and preserved boundaries live in the linked release audits.
 
+## 1.17.0
+
+- Freezes the complete eleven-type Catalogs, 108-type Inspection, and fourteen-type
+  BerkeleyDb public surfaces for the coordinated eight-package 1.17.0 release.
+- Preserves Runtime/Source/Compiler/Termcap APIs, JSON v1–v6, assembly identities,
+  package dependency topology, and the established five commands and six archives.
+- Pre-release qualification is recorded in the [1.17 release audit](docs/1.17.0-RELEASE-AUDIT.md).
+
+## 1.17.0-Alpha-6
+
+- Adds a controlled unified directory/Hash-v9 sample, an isolated Catalogs
+  package consumer and a usage guide, while retaining the existing reader API.
+- Qualifies the eight-package, seven-symbol distribution and existing Tools
+  archives before the final stable release audit.
+
+## 1.17.0-Alpha-5
+
+- Adds adversarial directory and hashed boundary tests for physical candidates,
+  decoded and parsed bytes, records, links, aliases, and duplicate issues.
+- Tests deterministic cancellation and source changes, and pins old directory,
+  database-set planning, and Hash-v9 behavior alongside unified reads.
+- Retains the eleven-type Catalogs surface, legacy APIs, JSON v1–v6, and
+  coordinated eight-package distribution.
+
+## 1.17.0-Alpha-4
+
+- Adds the public `TerminalCatalogReader` with explicit directory/Hash-v9
+  selection, fresh bounded acquisition, and a cancellation overload.
+- Qualifies equivalent publication names, kinds, terminal identities, and
+  capabilities across both formats while retaining distinct file/key provenance
+  and storage-specific diagnostics.
+- Adds exactly one Catalogs public type; packaged assemblies on all three .NET
+  targets reconstruct the unchanged UC01 ten-type model API.
+
+## 1.17.0-Alpha-3
+
+- Adds opt-in `BerkeleyDbTerminalCatalogReader.ReadBounded`, immutable limits,
+  and typed limit failures without changing legacy read or writer behavior.
+- Accounts for each physical extraction, each actual publication, and each
+  distinct parsed storage key, including orphan records and shared alias targets.
+- Observes cancellation during image/stability reads, decoding, discovery,
+  resolution, mapping, and around sorting; invalid hashed data yields no rows.
+- Adds the internal hashed Catalogs adapter with source status diagnostics,
+  original terminal identity, file provenance, and translated resource limits.
+- Verifies exact additive API reconstruction from packaged assemblies for all
+  three target frameworks. The public unified reader remains assigned to UC04.
+
+## 1.17.0-Alpha-2
+
+- Adds the internal conventional-directory adapter above bounded Inspection,
+  mapping actual canonical/alias files while preserving physical provenance.
+- Retains all duplicate publication occurrences with one diagnostic per name;
+  declared aliases alone do not manufacture rows or duplicate groups.
+- Excludes misplaced parses from unified rows, retains their diagnostics, and
+  preserves Complete/Partial/Missing/UnsupportedSource/Unavailable distinctions.
+- Shares the issue budget between acquisition and duplicate diagnostics,
+  translates typed acquisition limits, and observes cancellation during mapping.
+- Preserves the ten-type Catalogs API and all legacy Inspection behavior.
+  The hashed adapter and public reader remain assigned to UC03 and UC04.
+
+## 1.17.0-Alpha-1
+
+- Adds the optional `Icod.TermInfo.Catalogs` package with ten immutable source,
+  options, entry, issue, result, status, and resource-limit model types.
+- Adds opt-in bounded conventional acquisition in Inspection, limiting discovered
+  candidates, retained entries/issues, and parsed bytes before retention.
+- Preserves existing Inspection overloads and proves that the exact additive
+  delta reconstructs the frozen 1.14 API and earlier historical surfaces.
+- Adds Catalogs package/API verification and coordinates eight packages with
+  seven reusable-library symbol packages on .NET 8, 9, and 10.
+
+At this checkpoint, directory/hashed adapters and the unified reader were pending. See the
+[1.17 roadmap](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadmap.md).
+
 ## 1.16.0
 
 - Adds deterministic pure-managed whole-file Berkeley DB Hash-v9 publication

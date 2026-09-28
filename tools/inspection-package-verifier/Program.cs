@@ -53,7 +53,7 @@ internal static class Program {
 	) {
 		ArgumentNullException.ThrowIfNull( args );
 
-		if ( args.Length > 1 ) {
+		if ( args.Length > 1 && !( args.Length == 3 && args[ 0 ] == "--reconstruct-uc01" ) ) {
 			Console.Error.WriteLine(
 				"Usage: dotnet run --project tools/inspection-package-verifier/Icod.TermInfo.Inspection.PackageVerifier.csproj -- [artifact-directory]"
 			);
@@ -63,6 +63,16 @@ internal static class Program {
 		try {
 			string root =
 				FindRepositoryRoot();
+			if ( args.Length == 3 ) {
+				string reconstructed = InspectionUc01Compatibility.Reconstruct(
+					File.ReadAllText( args[ 1 ] ),
+					File.ReadAllText( Path.Combine( root, "docs/1.17.0-UC01-INSPECTION-PUBLIC-API-ADDITIONS.txt" ) ),
+					File.ReadAllText( Path.Combine( root, "docs/1.17.0-UC01-INSPECTION-PUBLIC-API-ADDITIVE-MEMBERS.txt" ) )
+				);
+				File.WriteAllText( args[ 2 ], reconstructed, new UTF8Encoding( false ) );
+				Console.WriteLine( "Verified exact UC01 additions and reconstructed the frozen 1.14 Inspection API." );
+				return 0;
+			}
 			string artifactDirectory =
 				( args.Length == 0 )
 					? Path.Combine(
@@ -265,6 +275,18 @@ internal static class Program {
 				package,
 				targetFramework
 			);
+			using Stream assemblyStream = package.GetEntry( $"lib/{targetFramework}/{PackageId}.dll" )!.Open();
+			using MemoryStream assemblyBytes = new();
+			assemblyStream.CopyTo( assemblyBytes );
+			assemblyBytes.Position = 0;
+			var context = new System.Runtime.Loader.AssemblyLoadContext( "inspection-api-" + Guid.NewGuid(), isCollectible: true );
+			try {
+				Assembly assembly = context.LoadFromStream( assemblyBytes );
+				string actual = Icod.TermInfo.PublicApiSnapshot.Program.CreateManifest( assembly );
+				string complete = File.ReadAllText( Path.Combine( FindRepositoryRoot(), "docs/1.17.0-INSPECTION-PUBLIC-API-BASELINE.txt" ) )
+					.Replace( "\r\n", "\n", StringComparison.Ordinal ).Replace( '\r', '\n' );
+				Require( actual == complete, $"Inspection packaged {targetFramework} public API differs from the complete 1.17 freeze." );
+			} finally { context.Unload(); }
 			VerifyDocumentation(
 				package,
 				targetFramework
@@ -965,7 +987,8 @@ internal static class Program {
 						current.FullName,
 						"Icod.TermInfo.csproj"
 					)
-				) ) {
+				)
+			) {
 				return current.FullName;
 			}
 			current =

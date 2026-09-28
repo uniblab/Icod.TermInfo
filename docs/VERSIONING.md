@@ -5,19 +5,41 @@ package contracts. Version-specific roadmaps, API freezes, schema fingerprints,
 and release audits remain the authoritative historical evidence for completed
 releases; this document defines the current cross-release policy.
 
+## 1.17 stable candidate
+
+The current coordinated build identity is `1.17.0`, a stable candidate set through
+`Directory.Build.props` for eight packages. The new optional
+`Icod.TermInfo.Catalogs` foundation brings the family to seven reusable libraries
+and seven symbol packages. All reusable assemblies retain `1.0.0.0` identity
+and net8.0/net9.0/net10.0 targets. The Alpha-1 foundation passed code-head
+qualification at `656acf952c286ccd24b3819e85faf2bc598e2bcd`;
+the latest published stable release is 1.16.0.
+
+UC01 delivers immutable models and opt-in bounded Inspection acquisition.
+UC02 adds the internal conventional-directory adapter; its qualification is
+tracked in the active roadmap. UC03 adds bounded BerkeleyDb acquisition and the
+internal hashed adapter, with two new public types and one method; exact removal
+reconstructs the frozen 1.16 API and then the historical 1.15 reader. Catalogs
+retains the ten public model types and adds one public reader in UC04. Migration,
+mixed-source precedence, and broader automation have no assigned release.
+UC05 hardens existing directory and hashed acquisition boundaries and verifies
+old readers and frozen surfaces without another public addition.
+UC06 is accepted: it adds a two-format sample, an isolated package consumer
+and the [unified catalog guide](1.17.0-UNIFIED-CATALOG-GUIDE.md) without a new
+Catalogs public type. Full Alpha-6 package qualification passed; the stable
+published version remains 1.16.0. UC07 pins the [complete public API](1.17.0-PUBLIC-API-FREEZE.md)
+and records the qualified, unpublished candidate in the [release audit](1.17.0-RELEASE-AUDIT.md).
+
 ## 1.16 release line
 
-The stable candidate identity is `1.16.0`, promoted from accepted `1.16.0-Alpha-8` and coordinated through
-`Directory.Build.props` for all seven packages. The published stable line
-remains 1.15 until release publication. HW08 freezes the twelve-type BerkeleyDb
+The published stable identity is `1.16.0`, promoted from accepted `1.16.0-Alpha-8` and coordinated through
+`Directory.Build.props` for the then-seven packages. HW08 freezes the twelve-type BerkeleyDb
 API and proves that subtracting the three writer types reproduces the complete
 1.15 reader API. Assembly versions remain `1.0.0.0`; all six reusable libraries
 continue to target net8.0/net9.0/net10.0.
 
-Stable `1.16.0` promotion must change identity and release-facing text only,
-then pass exact-head normal and native qualification before tagging. No feature
-or public API changes may be included in that promotion. Migration and catalog
-automation remain 1.17. See [the release audit](1.16.0-RELEASE-AUDIT.md).
+Stable `1.16.0` promotion changed identity and release-facing text after the
+feature freeze. See [the release audit](1.16.0-RELEASE-AUDIT.md).
 
 ## 1.15 release line
 
@@ -186,7 +208,7 @@ Icod.TermInfo.BerkeleyDb
 Icod.TermInfo.Tools
 ```
 
-The six reusable libraries target `net8.0`, `net9.0`, and `net10.0`. The command
+The seven reusable libraries target `net8.0`, `net9.0`, and `net10.0`. The command
 applications and router follow the repository's separately documented command
 framework/TFM policy. A coordinated minor or patch release advances package and
 reported command identities together even when only one optional layer receives
@@ -222,7 +244,7 @@ AssemblyVersion    1.0.0.0
 Strong-name signed no
 ```
 
-All six reusable assemblies remain **unsigned** throughout the compatible 1.x
+All seven reusable assemblies remain **unsigned** throughout the compatible 1.x
 line. Package minor/patch versions do not advance `AssemblyVersion`. Adding a
 strong name or otherwise changing assembly identity is a major-version design
 decision unless a future compatibility review proves a safe migration.

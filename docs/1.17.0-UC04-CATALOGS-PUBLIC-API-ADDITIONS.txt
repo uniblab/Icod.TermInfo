@@ -1,0 +1,6 @@
+TYPE class Icod.TermInfo.Catalogs.TerminalCatalogReader [sealed]
+  CTOR public TerminalCatalogReader(Icod.TermInfo.Catalogs.TerminalCatalogSource source null=not-null/not-null, Icod.TermInfo.Catalogs.TerminalCatalogReadOptions options null=nullable/nullable default=null)
+  PROPERTY Icod.TermInfo.Catalogs.TerminalCatalogSource Source { public get; } null=not-null/unknown
+  METHOD public Icod.TermInfo.Catalogs.TerminalCatalog Read() return-null=not-null/not-null
+  METHOD public Icod.TermInfo.Catalogs.TerminalCatalog Read(System.Threading.CancellationToken cancellationToken null=not-null/not-null) return-null=not-null/not-null
+END

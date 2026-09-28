@@ -96,6 +96,14 @@ if errorlevel 1 goto fail
 dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c %CONFIGURATION% --no-build -- --compare Icod.TermInfo.Inspection\bin\%CONFIGURATION%\net8.0\Icod.TermInfo.Inspection.dll Icod.TermInfo.Inspection\bin\%CONFIGURATION%\net10.0\Icod.TermInfo.Inspection.dll
 if errorlevel 1 goto fail
 
+rem UC07 pins the complete current Catalogs and Inspection surfaces for every TFM.
+for %%F in (net8.0 net9.0 net10.0) do (
+  dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c "%CONFIGURATION%" --no-build -- --check docs\1.17.0-CATALOGS-PUBLIC-API-BASELINE.txt Icod.TermInfo.Catalogs\bin\%CONFIGURATION%\%%F\Icod.TermInfo.Catalogs.dll
+  if errorlevel 1 exit /b 1
+  dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c "%CONFIGURATION%" --no-build -- --check docs\1.17.0-INSPECTION-PUBLIC-API-BASELINE.txt Icod.TermInfo.Inspection\bin\%CONFIGURATION%\%%F\Icod.TermInfo.Inspection.dll
+  if errorlevel 1 exit /b 1
+)
+
 rem MI07 and earlier frozen Inspection baselines remain immutable historical evidence:
 rem docs\1.7.0-INSPECTION-PUBLIC-API-BASELINE.txt
 rem docs\1.8.0-INSPECTION-PUBLIC-API-BASELINE.txt
@@ -110,6 +118,16 @@ if errorlevel 1 goto fail
 
 echo.
 echo === Verify package structure and symbols (%CONFIGURATION%) ===
+rem UC04 adds exactly one reader while reconstructing the UC01 ten-type foundation.
+for %%F in (net8.0 net9.0 net10.0) do (
+  dotnet run --project tools\public-api-snapshot\Icod.TermInfo.PublicApiSnapshot.csproj -c "%CONFIGURATION%" --no-build -- --write "%ARTIFACT_DIR%\uc04-catalogs-current-%%F.txt" "Icod.TermInfo.Catalogs\bin\%CONFIGURATION%\%%F\Icod.TermInfo.Catalogs.dll"
+  if errorlevel 1 goto fail
+  dotnet run --project tools\catalogs-package-verifier\Icod.TermInfo.Catalogs.PackageVerifier.csproj -c "%CONFIGURATION%" --no-build -- --reconstruct-uc04 "%ARTIFACT_DIR%\uc04-catalogs-current-%%F.txt" "%ARTIFACT_DIR%\uc04-catalogs-reconstructed-%%F.txt"
+  if errorlevel 1 goto fail
+  rem The verifier compares the reconstructed API to the baseline after normalizing checkout line endings.
+)
+dotnet run --project tools\catalogs-package-verifier\Icod.TermInfo.Catalogs.PackageVerifier.csproj -c "%CONFIGURATION%" --no-build -- "%ARTIFACT_DIR%"
+if errorlevel 1 goto fail
 dotnet run --project tools\package-verifier\Icod.TermInfo.PackageVerifier.csproj -c %CONFIGURATION% -f net10.0 -- "%ARTIFACT_DIR%"
 if errorlevel 1 goto fail
 dotnet run --project tools\termcap-package-verifier\Icod.TermInfo.Termcap.PackageVerifier.csproj -c %CONFIGURATION% -f net10.0 -- "%ARTIFACT_DIR%"

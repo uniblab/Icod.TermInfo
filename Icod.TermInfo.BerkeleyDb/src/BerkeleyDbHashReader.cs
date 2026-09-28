@@ -131,12 +131,14 @@ internal static class BerkeleyDbHashReader {
 		byte[] database,
 		int maximumItemSize,
 		int maximumRecordCount,
-		CancellationToken cancellationToken
+		CancellationToken cancellationToken,
+		BerkeleyDbCatalogReadBudget? budget = null
 	) {
 		ArgumentNullException.ThrowIfNull( database );
 		ArgumentOutOfRangeException.ThrowIfNegativeOrZero( maximumItemSize );
 		ArgumentOutOfRangeException.ThrowIfNegativeOrZero( maximumRecordCount );
 		cancellationToken.ThrowIfCancellationRequested();
+		budget?.CancellationToken.ThrowIfCancellationRequested();
 
 		DatabaseMetadata metadata = ReadMetadata( database );
 		var records = new List<BerkeleyDbHashRecord>();
@@ -185,7 +187,8 @@ internal static class BerkeleyDbHashReader {
 
 			for ( int index = 0; index < entryCount; index += 2 ) {
 				cancellationToken.ThrowIfCancellationRequested();
-				if ( records.Count >= maximumRecordCount ) {
+				budget?.ReserveRecord();
+				if ( budget is null && records.Count >= maximumRecordCount ) {
 					throw new InvalidDataException(
 						$"The Berkeley DB contains more than {maximumRecordCount} records."
 					);
@@ -196,7 +199,8 @@ internal static class BerkeleyDbHashReader {
 					metadata,
 					page,
 					index,
-					maximumItemSize
+					maximumItemSize,
+					budget
 				);
 				if ( !keys.Add( key ) ) {
 					throw new InvalidDataException(
@@ -209,12 +213,14 @@ internal static class BerkeleyDbHashReader {
 					metadata,
 					page,
 					index + 1,
-					maximumItemSize
+					maximumItemSize,
+					budget
 				);
 				records.Add( new BerkeleyDbHashRecord( key, value ) );
 			}
 		}
 
+		budget?.CancellationToken.ThrowIfCancellationRequested();
 		records.Sort(
 			static ( left, right ) =>
 				ByteArrayComparer.Instance.Compare(
@@ -222,13 +228,16 @@ internal static class BerkeleyDbHashReader {
 					right.Key.Span
 				)
 		);
+		budget?.CancellationToken.ThrowIfCancellationRequested();
 		return records.AsReadOnly();
 	}
 
 	internal static byte[] ReadDatabase(
 		string databasePath,
-		int maximumDatabaseSize
+		int maximumDatabaseSize,
+		BerkeleyDbCatalogReadBudget? budget = null
 	) {
+		budget?.CancellationToken.ThrowIfCancellationRequested();
 		using FileStream stream = new FileStream(
 			databasePath,
 			FileMode.Open,
@@ -237,30 +246,38 @@ internal static class BerkeleyDbHashReader {
 			4096,
 			FileOptions.SequentialScan
 		);
-		return ReadStableDatabase( stream, maximumDatabaseSize );
+		return ReadStableDatabase( stream, maximumDatabaseSize, budget );
 	}
 
 	internal static byte[] ReadStableDatabase(
 		Stream stream,
-		int maximumDatabaseSize
+		int maximumDatabaseSize,
+		BerkeleyDbCatalogReadBudget? budget = null
 	) {
 		ArgumentNullException.ThrowIfNull( stream );
 		ArgumentOutOfRangeException.ThrowIfNegativeOrZero( maximumDatabaseSize );
 
-		byte[] database = ReadDatabase( stream, maximumDatabaseSize );
-		VerifyStableObservation( stream, database );
+		budget?.CancellationToken.ThrowIfCancellationRequested();
+		byte[] database = ReadDatabase( stream, maximumDatabaseSize, budget );
+		Stream verificationStream = (budget is null)
+			? stream
+			: new BerkeleyDbCancellationReadStream( stream, budget.CancellationToken )
+		;
+		VerifyStableObservation( verificationStream, database, budget );
 		return database;
 	}
 
 	private static void VerifyStableObservation(
 		Stream stream,
-		byte[] expected
+		byte[] expected,
+		BerkeleyDbCatalogReadBudget? budget
 	) {
 		stream.Position = 0;
 		if ( stream.Length != expected.LongLength ) {
 			throw CreateChangedWhileReadingException();
 		}
 
+		budget?.CancellationToken.ThrowIfCancellationRequested();
 		byte[] buffer = new byte[Math.Min( 81920, expected.Length )];
 		int offset = 0;
 		while ( offset < expected.Length ) {
@@ -286,6 +303,7 @@ internal static class BerkeleyDbHashReader {
 		) {
 			throw CreateChangedWhileReadingException();
 		}
+		budget?.CancellationToken.ThrowIfCancellationRequested();
 	}
 
 	private static IOException CreateChangedWhileReadingException() {
@@ -298,12 +316,18 @@ internal static class BerkeleyDbHashReader {
 	// The path wrapper supplies a fresh FileStream and retains sole ownership.
 	internal static byte[] ReadDatabase(
 		Stream stream,
-		int maximumDatabaseSize
+		int maximumDatabaseSize,
+		BerkeleyDbCatalogReadBudget? budget = null
 	) {
 		ArgumentNullException.ThrowIfNull( stream );
 		ArgumentOutOfRangeException.ThrowIfNegativeOrZero( maximumDatabaseSize );
 
+		budget?.CancellationToken.ThrowIfCancellationRequested();
 		long length = stream.Length;
+		budget?.CancellationToken.ThrowIfCancellationRequested();
+		if ( budget is not null && length >= 512 && length <= Array.MaxLength ) {
+			budget.CheckImage( length );
+		}
 		if ( length > maximumDatabaseSize || length > Array.MaxLength ) {
 			throw new InvalidDataException(
 				$"Berkeley DB file length {length} exceeds the supported database size."
@@ -316,8 +340,12 @@ internal static class BerkeleyDbHashReader {
 		}
 
 		byte[] database = new byte[(int)length];
-		stream.ReadExactly( database );
-		if ( stream.ReadByte() != -1 ) {
+		Stream acquisitionStream = (budget is null)
+			? stream
+			: new BerkeleyDbCancellationReadStream( stream, budget.CancellationToken )
+		;
+		acquisitionStream.ReadExactly( database );
+		if ( acquisitionStream.ReadByte() != -1 ) {
 			throw new IOException(
 				"The Berkeley DB file grew while it was being read."
 			);
@@ -468,7 +496,8 @@ internal static class BerkeleyDbHashReader {
 		DatabaseMetadata metadata,
 		ReadOnlySpan<byte> page,
 		int index,
-		int maximumItemSize
+		int maximumItemSize,
+		BerkeleyDbCatalogReadBudget? budget = null
 	) {
 		ushort offset = ReadUInt16(
 			page,
@@ -493,11 +522,13 @@ internal static class BerkeleyDbHashReader {
 
 		switch ( page[offset] ) {
 			case HashKeyData:
-				if ( itemLength - 1 > maximumItemSize ) {
+				budget?.CheckStoredItem( itemLength - 1 );
+				if ( budget is null && itemLength - 1 > maximumItemSize ) {
 					throw new InvalidDataException(
 						"The Berkeley DB inline item exceeds the configured item size."
 					);
 				}
+				budget?.ReserveDecoded( itemLength - 1 );
 				return page.Slice(
 					offset + 1,
 					itemLength - 1
@@ -525,7 +556,8 @@ internal static class BerkeleyDbHashReader {
 					metadata,
 					overflowPage,
 					totalLength,
-					maximumItemSize
+					maximumItemSize,
+					budget
 				);
 
 			default:
@@ -540,10 +572,11 @@ internal static class BerkeleyDbHashReader {
 		DatabaseMetadata metadata,
 		uint firstPage,
 		uint totalLength,
-		int maximumItemSize
+		int maximumItemSize,
+		BerkeleyDbCatalogReadBudget? budget
 	) {
 		if (
-			totalLength > maximumItemSize
+			(budget is null && totalLength > maximumItemSize)
 			|| totalLength > Array.MaxLength
 			|| totalLength > database.Length
 		) {
@@ -552,6 +585,8 @@ internal static class BerkeleyDbHashReader {
 			);
 		}
 
+		budget?.CheckStoredItem( totalLength );
+		budget?.ReserveDecoded( totalLength );
 		byte[] result = new byte[(int)totalLength];
 		int written = 0;
 		uint pageNumber = firstPage;
@@ -563,6 +598,7 @@ internal static class BerkeleyDbHashReader {
 		}
 
 		while ( pageNumber != 0 ) {
+			budget?.CancellationToken.ThrowIfCancellationRequested();
 			if ( !visited.Add( pageNumber ) ) {
 				throw new InvalidDataException(
 					"The Berkeley DB overflow chain contains a cycle."

@@ -35,7 +35,7 @@ internal static class Program {
 	private static readonly NullabilityInfoContext Nullability =
 		new();
 
-	public static int Main( string[] args ) {
+	internal static int Run( string[] args ) {
 		ArgumentNullException.ThrowIfNull( args );
 
 		if (
@@ -252,7 +252,7 @@ internal static class Program {
 		}
 	}
 
-	private static string CreateManifest(
+	internal static string CreateManifest(
 		Assembly assembly
 	) {
 		ArgumentNullException.ThrowIfNull( assembly );
