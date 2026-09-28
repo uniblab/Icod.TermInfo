@@ -36,8 +36,8 @@ the [1.17 roadmap](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadma
 records the exact commit and workflow runs.
 
 UC07 freezes the complete [Catalogs, Inspection, and BerkeleyDb public APIs](docs/1.17.0-PUBLIC-API-FREEZE.md)
-and is qualifying a coordinated 1.17.0 stable candidate. The [release audit](docs/1.17.0-RELEASE-AUDIT.md)
-records candidate qualification as it completes. The candidate remains unpublished;
+and has qualified the coordinated 1.17.0 stable candidate. The [release audit](docs/1.17.0-RELEASE-AUDIT.md)
+records its exact code, workflows, and artifacts. The candidate remains unpublished;
 the installation examples below continue to reference 1.16.0.
 
 Version 1.16 adds deterministic, pure-managed Berkeley DB Hash-v9 publication

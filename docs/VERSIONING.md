@@ -28,7 +28,7 @@ UC06 is accepted: it adds a two-format sample, an isolated package consumer
 and the [unified catalog guide](1.17.0-UNIFIED-CATALOG-GUIDE.md) without a new
 Catalogs public type. Full Alpha-6 package qualification passed; the stable
 published version remains 1.16.0. UC07 pins the [complete public API](1.17.0-PUBLIC-API-FREEZE.md)
-and tracks qualification in the [candidate audit](1.17.0-RELEASE-AUDIT.md).
+and records the qualified, unpublished candidate in the [release audit](1.17.0-RELEASE-AUDIT.md).
 
 ## 1.16 release line
 

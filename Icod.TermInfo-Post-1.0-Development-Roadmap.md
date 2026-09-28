@@ -16,11 +16,11 @@
 **Latest completed line:** `1.16.0` - Berkeley DB Hash-v9 Writer
 **Latest completed prerelease:** `1.17.0-Alpha-6`
 **Active development line:** `1.17.0` - Unified directory/hashed catalogs
-**Status:** stable `1.16.0` is published; UC00 through UC06 are accepted; UC07 qualification in progress
+**Status:** stable `1.16.0` is published; UC00–UC07 are accepted and the `1.17.0` stable candidate is qualified, unpublished
 **Active release roadmap:** [1.17.0 — Unified directory/hashed catalogs](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadmap.md)
-**Release audit:** [1.17 stable candidate audit](docs/1.17.0-RELEASE-AUDIT.md) (qualification in progress)
+**Release audit:** [accepted 1.17 stable candidate audit](docs/1.17.0-RELEASE-AUDIT.md)
 **Latest completed release audit:** `docs/1.16.0-RELEASE-AUDIT.md`
-**Next gate:** Qualify the approved [UC07 API freeze and stable release-audit plan](docs/superpowers/plans/2026-09-27-uc07-stable-freeze-and-release-audit.md) under the [1.17 roadmap](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadmap.md)
+**Next gate:** Maintainer review of the qualified draft PR before separately authorized merge, tag and publication; see the [1.17 roadmap](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadmap.md)
 
 The approved UC00 contract fixes `Icod.TermInfo.Catalogs` above Runtime,
 Inspection, and BerkeleyDb. UC01 introduces the ten model types and bounded
@@ -125,7 +125,8 @@ is complete and accepted at `656acf952c286ccd24b3819e85faf2bc598e2bcd`.
 
 UC00–UC07 cover contract design, package/model foundation, directory and hashed
 adapters, unified acquisition, adversarial qualification, samples/package
-consumers, and stable closure. UC01 through UC06 are accepted; UC07 qualification is in progress.
+consumers, and stable closure. UC01 through UC07 are accepted at the exact
+candidate code/tree recorded in the [1.17 audit](docs/1.17.0-RELEASE-AUDIT.md).
 UC02 code head `965c8d2ee91a6b3515a33c64cb9f702566f3943a` passed 7,284 local
 tests, all 12 PR workflow jobs, and all three interoperability jobs; see the
 active roadmap for commands, artifact checks, and CI links.
@@ -161,7 +162,12 @@ and all three native/managed jobs passed in
 Linux ran the Staging/Release package steps; Windows/macOS intentionally skip
 them. The Inspection PowerShell step ran on Windows and skipped Linux/macOS.
 The active roadmap records the sample fixture nuance and remaining limits.
-The draft PR is unmerged, untagged and unpublished. **UC07 candidate qualification is in progress.**
+UC07 candidate `b69534d58899fc3c5b0b81b974ec9eb34d44dde0`, tree
+`273f470e9717ce700814936efe3c6c9a9e738c4c`, passed
+[12/12 PR jobs](https://github.com/uniblab/Icod.TermInfo/actions/runs/36366894647)
+and [3/3 native/managed jobs](https://github.com/uniblab/Icod.TermInfo/actions/runs/36366894688).
+The draft PR remains unmerged, untagged and unpublished. The next boundary is
+maintainer review and separately authorized publication.
 
 The earlier broad assignment of migration and catalog automation to 1.17 is
 superseded. Mixed-source database sets, precedence, cross-container comparison,

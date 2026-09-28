@@ -4,13 +4,13 @@
 
 **Theme:** Unified directory/hashed catalogs
 
-**Status:** DEVELOPING — UC00 through UC06 accepted; UC07 stable candidate qualification in progress
+**Status:** UC00–UC07 accepted; `1.17.0` stable candidate qualified, unpublished
 
 **Stable predecessor:** `1.16.0` (published)
 
 **Initial implementation version:** `1.17.0-Alpha-1`
 
-**Current coordinated version:** `1.17.0-Alpha-6`
+**Current coordinated version:** `1.17.0` stable candidate (unpublished)
 
 **Language / targets:** C# 13; `net8.0`, `net9.0`, `net10.0`
 
@@ -182,7 +182,7 @@ accepted based only on a plan or an unobserved CI run.
 | UC04 | `1.17.0-Alpha-4` | Unified reader and cross-format behavioral qualification | UC02, UC03 | Accepted at `168862e` |
 | UC05 | `1.17.0-Alpha-5` | Resource, failure, cancellation, and compatibility hardening | UC04 | Accepted at `09f6920` |
 | UC06 | `1.17.0-Alpha-6` | Samples, package consumers, distribution and guide | UC05 | Accepted at `3327871` |
-| UC07 | `1.17.0` after accepted Alpha-6 | Exact API freeze and stable release audit | UC06 | Approved; qualification in progress |
+| UC07 | `1.17.0` after accepted Alpha-6 | Exact API freeze and stable release audit | UC06 | Accepted at `b69534d`, tree `273f470` |
 
 ### UC00 — contract and architecture decision
 
@@ -321,20 +321,45 @@ three TFMs; published-artifact composition matches the approved dependency graph
 ### UC07 — freeze and stable closure
 
 The [UC07 implementation plan](docs/superpowers/plans/2026-09-27-uc07-stable-freeze-and-release-audit.md)
-is approved. The complete API freeze is committed and stable candidate qualification is in progress; see the [release audit](docs/1.17.0-RELEASE-AUDIT.md).
+is complete. The exact candidate qualification and complete API fingerprints are in the [release audit](docs/1.17.0-RELEASE-AUDIT.md).
 
-- [ ] Freeze the complete new API and reviewed Inspection delta; retain historical
+- [x] Freeze the complete new API and reviewed Inspection delta; retain historical
   reconstructions and unchanged JSON schema fingerprints.
-- [ ] Produce `docs/1.17.0-RELEASE-AUDIT.md` with exact accepted commit/tree,
+- [x] Produce `docs/1.17.0-RELEASE-AUDIT.md` with exact accepted commit/tree,
   qualification runs, test counts, packages/consumers, and known limitations.
-- [ ] Promote only the accepted feature/API source to stable `1.17.0`; verify
+- [x] Promote only the accepted feature/API source to stable `1.17.0`; verify
   release metadata, warnings-as-errors builds, all frameworks/platforms, exact
   package consumers, and existing command archives.
-- [ ] Update both roadmaps to accepted status only after evidence is recorded.
+- [x] Update both roadmaps to accepted status only after evidence is recorded.
   Maintainer merge, tag, and NuGet publication remain separate authorized actions.
 
 **Exit:** Stable artifacts are reviewable and qualified. Stable promotion does
 not add behavior or enlarge the catalog scope.
+
+### Accepted UC07 evidence
+
+Exact draft-PR code `b69534d58899fc3c5b0b81b974ec9eb34d44dde0`, tree
+`273f470e9717ce700814936efe3c6c9a9e738c4c`, matches the locally verified
+source tree at `238a8c01d6cbbd3532e1669ca21f15a04609a53f`. Local Release
+rebuilds had no warnings or errors; 5,736 solution and 1,995 BerkeleyDb tests
+passed, all 8 nupkg/7 snupkg passed package and isolated-consumer checks, and
+six tool archives passed composition checks. The complete Catalogs (11),
+Inspection (108), and BerkeleyDb (14) public APIs are frozen on all three TFMs;
+older reconstructions and JSON v1–v6 remain pinned. All five Linux x64 archive
+commands ran successfully.
+
+[PR workflow 36366894647](https://github.com/uniblab/Icod.TermInfo/actions/runs/36366894647)
+passed all 12 jobs: three host builds/tests, Staging and Release package gates
+on Linux, three installed-tool consumers, and six matching-host archive smokes.
+Windows PowerShell Inspection verification ran on Windows; Windows/macOS
+package gates and Linux/macOS Windows PowerShell steps were explicitly skipped.
+[Native workflow 36366894688](https://github.com/uniblab/Icod.TermInfo/actions/runs/36366894688)
+passed all three jobs, including executed Linux/macOS Berkeley DB/ncurses
+probes and Windows managed readback of Linux fixtures. The [audit](docs/1.17.0-RELEASE-AUDIT.md)
+records step conclusions, artifact IDs and SHA-256 digests, scope and limits.
+This is a qualified **candidate**, with the PR still draft, unmerged,
+untagged, and unpublished; the documented 1.16.0 installation commands remain
+the published ones.
 
 ## 5. Progress and change control
 
