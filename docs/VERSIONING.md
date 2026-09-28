@@ -24,10 +24,10 @@ retains the ten public model types and adds one public reader in UC04. Migration
 mixed-source precedence, and broader automation have no assigned release.
 UC05 hardens existing directory and hashed acquisition boundaries and verifies
 old readers and frozen surfaces without another public addition.
-UC06 is in progress: it adds a two-format sample, an isolated package consumer
+UC06 is accepted: it adds a two-format sample, an isolated package consumer
 and the [unified catalog guide](1.17.0-UNIFIED-CATALOG-GUIDE.md) without a new
-Catalogs public type. Full Alpha-6 package qualification is in progress;
-the stable published version remains 1.16.0.
+Catalogs public type. Full Alpha-6 package qualification passed; the stable
+published version remains 1.16.0. UC07 stable freeze and audit are next.
 
 ## 1.16 release line
 
