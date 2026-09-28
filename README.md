@@ -30,8 +30,10 @@ installation examples below use that published version.
 
 Alpha-6 adds the [two-format Catalogs sample](samples/Icod.TermInfo.Catalogs.Sample/README.md),
 the [unified usage guide](docs/1.17.0-UNIFIED-CATALOG-GUIDE.md), and an
-isolated package-only consumer on .NET 8/9/10. Distribution qualification is
-in progress on the draft PR.
+isolated package-only consumer on .NET 8/9/10. Alpha-6 distribution and
+interoperability qualification passed on the [draft PR](https://github.com/uniblab/Icod.TermInfo/pull/48);
+the [1.17 roadmap](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadmap.md)
+records the exact commit and workflow runs.
 
 Version 1.16 adds deterministic, pure-managed Berkeley DB Hash-v9 publication
 to `Icod.TermInfo.BerkeleyDb`, alongside exact lookup, logical catalogs, and

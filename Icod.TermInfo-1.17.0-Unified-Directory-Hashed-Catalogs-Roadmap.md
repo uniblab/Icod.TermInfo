@@ -4,7 +4,7 @@
 
 **Theme:** Unified directory/hashed catalogs
 
-**Status:** DEVELOPING — UC00 through UC05 accepted; UC06 in progress
+**Status:** DEVELOPING — UC00 through UC06 accepted; UC07 next
 
 **Stable predecessor:** `1.16.0` (published)
 
@@ -181,7 +181,7 @@ accepted based only on a plan or an unobserved CI run.
 | UC03 | `1.17.0-Alpha-3` | Hash-v9 adapter | UC01, UC02 contract fixtures | Accepted at `e4dcf7e` |
 | UC04 | `1.17.0-Alpha-4` | Unified reader and cross-format behavioral qualification | UC02, UC03 | Accepted at `168862e` |
 | UC05 | `1.17.0-Alpha-5` | Resource, failure, cancellation, and compatibility hardening | UC04 | Accepted at `09f6920` |
-| UC06 | `1.17.0-Alpha-6` | Samples, package consumers, distribution and guide | UC05 | In progress |
+| UC06 | `1.17.0-Alpha-6` | Samples, package consumers, distribution and guide | UC05 | Accepted at `3327871` |
 | UC07 | `1.17.0` after accepted Alpha-6 | Exact API freeze and stable release audit | UC06 | Pending |
 
 ### UC00 — contract and architecture decision
@@ -297,22 +297,22 @@ commits, commands, outcomes, and any remaining limitations.
 ### UC06 — usable package, sample, and documentation
 
 The [UC06 implementation plan](docs/superpowers/plans/2026-09-27-uc06-catalog-consumer-guide.md)
-was approved for inline implementation. The sample and package consumer are
-implemented; full Alpha-6 distribution qualification remains in progress.
+was approved for inline implementation. The sample, package consumer, guide,
+and full Alpha-6 distribution qualification are accepted at `3327871`.
 
-- [ ] Add `samples/Icod.TermInfo.Catalogs.Sample/` (or the UC00-approved name)
+- [x] Add `samples/Icod.TermInfo.Catalogs.Sample/` (or the UC00-approved name)
   showing the same read/print workflow for a directory and hashed file, including
   aliases, provenance, issues, cancellation, and custom limits.
-- [ ] Add `docs/1.17.0-UNIFIED-CATALOG-GUIDE.md`; explain publication names versus
+- [x] Add `docs/1.17.0-UNIFIED-CATALOG-GUIDE.md`; explain publication names versus
   declarations, skipped links, partial results, duplicate handling, fresh reads,
   and why unified catalogs do not yet imply migration or mixed-source sets.
-- [ ] Add a package-reference-only consumer and verifier. Update the solution,
+- [x] Add a package-reference-only consumer and verifier. Update the solution,
   package inventory, restore/dependency checks, symbol/license checks, and release
   scripts. If the new package is accepted, the family grows from seven nupkg/six
   library snupkg to eight nupkg/seven library snupkg; record this explicitly.
-- [ ] Update root/package/sample READMEs, changelog, versioning/compatibility
+- [x] Update root/package/sample READMEs, changelog, versioning/compatibility
   documentation, and roadmap status using actual supported behavior.
-- [ ] Verify Tools and all six existing platform archives remain valid; do not
+- [x] Verify Tools and all six existing platform archives remain valid; do not
   ship the new library in Tools merely because it exists.
 
 **Exit:** A clean package-only consumer and the documented sample work on all
@@ -334,6 +334,47 @@ three TFMs; published-artifact composition matches the approved dependency graph
 not add behavior or enlarge the catalog scope.
 
 ## 5. Progress and change control
+
+### Accepted UC06 evidence
+
+The implementation commit `3327871eb22524fd38c9337b9dd41a41b232b814`
+(tree `6abac5dc1700e34c62d7fc75aeaac65f47abcbd5`) adds a deterministic
+two-format sample, an isolated Catalogs package-only consumer, its complete
+usage guide and coordinated `1.17.0-Alpha-6` metadata. Production catalog
+APIs and the eleven-type surface remain unchanged. The sample and consumer
+check actual canonical and alias publications, declared but unpublished names,
+directory versus hashed provenance, malformed input, limits and fresh reads.
+The sample also checks cancellation and inclusive limits. Its directory
+fixture removes a writer-published alias file to demonstrate an unpublished
+declaration; the public Hash-v9 writer requires all declared aliases to be
+published, so that fixture declares only its published alias.
+
+- A fresh serial Release solution rebuild with warnings as errors produced
+  **zero warnings and zero errors**. The exact source tree passed **5,712**
+  solution tests in 22 runs and **1,995** separately rebuilt BerkeleyDb tests
+  in three runs: **7,707 passed**, zero failures. .NET 8, 9 and 10 each ran
+  the sample and the isolated installed-package consumer.
+- The full Release artifact gate passed for **eight nupkg and seven snupkg**,
+  including Catalogs package dependency closure, historical API reconstruction,
+  license, managed-only payload, symbols and Source Link. The existing Tools
+  package retains its command inventory without Catalogs. The pre-existing
+  RE07 package consumer emits CS8321 for an unused helper, but its three
+  framework runs passed; the fresh solution rebuild itself had no warnings.
+- [PR workflow 36360352597](https://github.com/uniblab/Icod.TermInfo/actions/runs/36360352597)
+  completed `success` on the implementation commit: **all 12 jobs passed**,
+  covering Windows/Linux/macOS builds and tests, all three installed Tools
+  package checks and six archive RIDs. Linux ran Staging and Release package
+  verification; those package steps deliberately skip Windows/macOS. Windows
+  ran the Inspection Windows PowerShell check; Linux/macOS skip that step.
+- [Interoperability workflow 36360352573](https://github.com/uniblab/Icod.TermInfo/actions/runs/36360352573)
+  completed `success` on the same commit: **all three jobs passed**, with native
+  Berkeley DB/ncurses producer comparisons on Linux/macOS and managed readback
+  of the Linux Hash-v9 fixture on Windows. None was filtered out.
+
+Author self-review was inline without subagents; no UC06 blocking finding
+remains. Reads still lack atomic replacement snapshots, and cancellation cannot
+interrupt a blocked synchronous OS call. The PR stays draft, unmerged,
+untagged and unpublished. **UC07 API freeze and stable audit are next.**
 
 ### Accepted UC05 evidence
 

@@ -1,7 +1,7 @@
 # UC06 Unified Catalog Consumer and Guide Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:executing-plans` inline, task by task; do not use subagents. Steps use checkbox (`- [ ]`) syntax for tracking.
-> **Status:** Proposed for review. UC05 accepted at implementation commit `09f69208d9240c755e4015cf20364a386963703b`; documentation head `fc3b43195762471e00bc66e037853974e86aa189`.
+> **Status:** Approved and completed. UC06 accepted at implementation commit `3327871eb22524fd38c9337b9dd41a41b232b814` (tree `6abac5dc1700e34c62d7fc75aeaac65f47abcbd5`); PR and interoperability workflows `36360352597` and `36360352573` passed. UC07 is next.
 
 **Goal:** Make the existing bounded directory/Hash-v9 catalog reader usable from a documented, runnable sample and an isolated package-only consumer, then qualify the coordinated `1.17.0-Alpha-6` distribution.
 

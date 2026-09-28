@@ -14,13 +14,13 @@
 **Frozen runtime contract:** `1.0.0`  
 **Current coordinated version:** `1.17.0-Alpha-6`
 **Latest completed line:** `1.16.0` - Berkeley DB Hash-v9 Writer
-**Latest completed prerelease:** `1.17.0-Alpha-5`
+**Latest completed prerelease:** `1.17.0-Alpha-6`
 **Active development line:** `1.17.0` - Unified directory/hashed catalogs
-**Status:** stable `1.16.0` is published; UC00 through UC05 are accepted; UC06 in progress
+**Status:** stable `1.16.0` is published; UC00 through UC06 are accepted; UC07 next
 **Active release roadmap:** [1.17.0 — Unified directory/hashed catalogs](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadmap.md)
 **Release audit:** planned for UC07; UC01 through UC03 evidence is tracked in the active roadmap
 **Latest completed release audit:** `docs/1.16.0-RELEASE-AUDIT.md`
-**Next gate:** Finish UC06 samples, package consumers, distribution, and guide under the [1.17 roadmap](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadmap.md)
+**Next gate:** Review the UC07 API freeze and stable release-audit plan under the [1.17 roadmap](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadmap.md)
 
 The approved UC00 contract fixes `Icod.TermInfo.Catalogs` above Runtime,
 Inspection, and BerkeleyDb. UC01 introduces the ten model types and bounded
@@ -125,7 +125,7 @@ is complete and accepted at `656acf952c286ccd24b3819e85faf2bc598e2bcd`.
 
 UC00–UC07 cover contract design, package/model foundation, directory and hashed
 adapters, unified acquisition, adversarial qualification, samples/package
-consumers, and stable closure. UC01 through UC05 are accepted; UC06–UC07 are pending.
+consumers, and stable closure. UC01 through UC06 are accepted; UC07 is pending.
 UC02 code head `965c8d2ee91a6b3515a33c64cb9f702566f3943a` passed 7,284 local
 tests, all 12 PR workflow jobs, and all three interoperability jobs; see the
 active roadmap for commands, artifact checks, and CI links.
@@ -151,7 +151,17 @@ at the exact implementation code. Package gates run on Linux and intentionally
 skip Windows/macOS; the Inspection PowerShell step runs on Windows and skips
 Linux/macOS. Reads still lack atomic replacement snapshots and cancellation
 cannot interrupt a synchronous OS call. The active roadmap has the full
-boundary matrix. UC06 is next.
+boundary matrix. UC06 sample, isolated package consumer, guide and coordinated
+Alpha-6 distribution are accepted at `3327871eb22524fd38c9337b9dd41a41b232b814`
+(tree `6abac5dc1700e34c62d7fc75aeaac65f47abcbd5`): 7,707 local tests
+passed; eight nupkg and seven snupkg passed full verification; all 12 jobs
+passed in [PR workflow 36360352597](https://github.com/uniblab/Icod.TermInfo/actions/runs/36360352597)
+and all three native/managed jobs passed in
+[interoperability workflow 36360352573](https://github.com/uniblab/Icod.TermInfo/actions/runs/36360352573).
+Linux ran the Staging/Release package steps; Windows/macOS intentionally skip
+them. The Inspection PowerShell step ran on Windows and skipped Linux/macOS.
+The active roadmap records the sample fixture nuance and remaining limits.
+The draft PR is unmerged, untagged and unpublished. **UC07 is next.**
 
 The earlier broad assignment of migration and catalog automation to 1.17 is
 superseded. Mixed-source database sets, precedence, cross-container comparison,

@@ -3,7 +3,7 @@
 This file records release-level product changes. Exact qualification evidence,
 API fingerprints, and preserved boundaries live in the linked release audits.
 
-## 1.17.0-Alpha-6 (in development)
+## 1.17.0-Alpha-6
 
 - Adds a controlled unified directory/Hash-v9 sample, an isolated Catalogs
   package consumer and a usage guide, while retaining the existing reader API.
