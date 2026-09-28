@@ -10,7 +10,8 @@
 ## Status
 
 The 1.17.0 release adds unified directory/hashed catalogs. Installation commands
-below target 1.17.0 and become available when that version is published.
+below use the published 1.16.0 package family; see the unified catalog guide for
+the 1.17.0 package after publication.
 
 The 1.17 branch delivers **Unified directory/hashed catalogs**.
 Alpha-4 added `TerminalCatalogReader` in `Icod.TermInfo.Catalogs`: choose a
@@ -118,7 +119,7 @@ and BerkeleyDb. Existing libraries and command tools do not reference it.
 Install the runtime package:
 
 ```text
-dotnet add package Icod.TermInfo --version 1.17.0
+dotnet add package Icod.TermInfo --version 1.16.0
 ```
 
 Resolve the current terminal through conventional system discovery with immutable built-in fallback:
@@ -151,7 +152,7 @@ Applications that only need compiled terminfo acquisition, immutable `TerminalDe
 For explicit ncurses-compatible hashed acquisition:
 
 ```text
-dotnet add package Icod.TermInfo.BerkeleyDb --version 1.17.0
+dotnet add package Icod.TermInfo.BerkeleyDb --version 1.16.0
 ```
 
 ```csharp
@@ -208,24 +209,20 @@ The root README describes the current product by capability rather than by the r
 Install an optional package only when its capability is needed:
 
 ```text
-dotnet add package Icod.TermInfo.Source --version 1.17.0
-dotnet add package Icod.TermInfo.Termcap --version 1.17.0
-dotnet add package Icod.TermInfo.Compiler --version 1.17.0
-dotnet add package Icod.TermInfo.Inspection --version 1.17.0
+dotnet add package Icod.TermInfo.Source --version 1.16.0
+dotnet add package Icod.TermInfo.Termcap --version 1.16.0
+dotnet add package Icod.TermInfo.Compiler --version 1.16.0
+dotnet add package Icod.TermInfo.Inspection --version 1.16.0
 ```
 
-For the new unified reader, install `Icod.TermInfo.Catalogs` after publication:
-
-```text
-dotnet add package Icod.TermInfo.Catalogs --version 1.17.0
-```
-
-See the [unified catalog guide](docs/1.17.0-UNIFIED-CATALOG-GUIDE.md) for its read API.
+For the new unified reader, see the
+[unified catalog guide](docs/1.17.0-UNIFIED-CATALOG-GUIDE.md) for its 1.17.0
+installation command and read API.
 
 Install the command router with:
 
 ```text
-dotnet tool install --global Icod.TermInfo.Tools --version 1.17.0
+dotnet tool install --global Icod.TermInfo.Tools --version 1.16.0
 
 icod-terminfo tic -V
 icod-terminfo infocmp -V
