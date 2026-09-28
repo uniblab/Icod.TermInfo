@@ -245,7 +245,11 @@ internal static class Program {
 			var context = new System.Runtime.Loader.AssemblyLoadContext( "berkeleydb-api-" + Guid.NewGuid(), isCollectible: true );
 			try {
 				Assembly assembly = context.LoadFromStream( assemblyBytes );
-				ReconstructUc03( FindRepositoryRoot(), Icod.TermInfo.PublicApiSnapshot.Program.CreateManifest( assembly ) );
+				string actual = Icod.TermInfo.PublicApiSnapshot.Program.CreateManifest( assembly );
+				string complete = File.ReadAllText( Path.Combine( FindRepositoryRoot(), "docs/1.17.0-BERKELEYDB-PUBLIC-API-BASELINE.txt" ) )
+					.Replace( "\r\n", "\n", StringComparison.Ordinal ).Replace( '\r', '\n' );
+				Require( actual == complete, $"BerkeleyDb packaged {targetFramework} public API differs from the complete 1.17 freeze." );
+				ReconstructUc03( FindRepositoryRoot(), actual );
 			} finally { context.Unload(); }
 			VerifyDocumentation( package, targetFramework );
 		}

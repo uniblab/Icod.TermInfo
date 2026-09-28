@@ -9,9 +9,9 @@
 
 ## Status
 
-Current release line: `Icod.TermInfo 1.17.0-Alpha-6`.
+Current build line: `Icod.TermInfo 1.17.0` stable candidate. The latest published stable release is `1.16.0`.
 
-The 1.17 development branch is building **Unified directory/hashed catalogs**.
+The 1.17 branch delivers **Unified directory/hashed catalogs**.
 Alpha-4 added `TerminalCatalogReader` in `Icod.TermInfo.Catalogs`: choose a
 conventional directory or Hash-v9 file explicitly, then read actual publications
 through one bounded, read-only result model. Directory and hashed adapters retain
@@ -34,6 +34,11 @@ isolated package-only consumer on .NET 8/9/10. Alpha-6 distribution and
 interoperability qualification passed on the [draft PR](https://github.com/uniblab/Icod.TermInfo/pull/48);
 the [1.17 roadmap](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadmap.md)
 records the exact commit and workflow runs.
+
+UC07 freezes the complete [Catalogs, Inspection, and BerkeleyDb public APIs](docs/1.17.0-PUBLIC-API-FREEZE.md)
+and is qualifying a coordinated 1.17.0 stable candidate. The [release audit](docs/1.17.0-RELEASE-AUDIT.md)
+records candidate qualification as it completes. The candidate remains unpublished;
+the installation examples below continue to reference 1.16.0.
 
 Version 1.16 adds deterministic, pure-managed Berkeley DB Hash-v9 publication
 to `Icod.TermInfo.BerkeleyDb`, alongside exact lookup, logical catalogs, and

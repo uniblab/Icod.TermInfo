@@ -237,6 +237,9 @@ internal static class Program {
 			try {
 				Assembly assembly = context.LoadFromStream( assemblyBytes );
 				string actual = Icod.TermInfo.PublicApiSnapshot.Program.CreateManifest( assembly );
+				string complete = File.ReadAllText( Path.Combine( FindRepositoryRoot(), "docs/1.17.0-CATALOGS-PUBLIC-API-BASELINE.txt" ) )
+					.Replace( "\r\n", "\n", StringComparison.Ordinal ).Replace( '\r', '\n' );
+				Require( actual == complete, $"Catalogs packaged {targetFramework} public API differs from the complete 1.17 freeze." );
 				string additionPath = Path.Combine( FindRepositoryRoot(), "docs/1.17.0-UC04-CATALOGS-PUBLIC-API-ADDITIONS.txt" );
 				string reconstructed = CatalogsUc04Compatibility.Reconstruct(
 					actual, File.ReadAllText( additionPath )

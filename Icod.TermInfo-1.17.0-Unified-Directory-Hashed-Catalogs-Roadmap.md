@@ -4,7 +4,7 @@
 
 **Theme:** Unified directory/hashed catalogs
 
-**Status:** DEVELOPING — UC00 through UC06 accepted; UC07 next
+**Status:** DEVELOPING — UC00 through UC06 accepted; UC07 stable candidate qualification in progress
 
 **Stable predecessor:** `1.16.0` (published)
 
@@ -182,7 +182,7 @@ accepted based only on a plan or an unobserved CI run.
 | UC04 | `1.17.0-Alpha-4` | Unified reader and cross-format behavioral qualification | UC02, UC03 | Accepted at `168862e` |
 | UC05 | `1.17.0-Alpha-5` | Resource, failure, cancellation, and compatibility hardening | UC04 | Accepted at `09f6920` |
 | UC06 | `1.17.0-Alpha-6` | Samples, package consumers, distribution and guide | UC05 | Accepted at `3327871` |
-| UC07 | `1.17.0` after accepted Alpha-6 | Exact API freeze and stable release audit | UC06 | Plan proposed for review |
+| UC07 | `1.17.0` after accepted Alpha-6 | Exact API freeze and stable release audit | UC06 | Approved; qualification in progress |
 
 ### UC00 — contract and architecture decision
 
@@ -321,7 +321,7 @@ three TFMs; published-artifact composition matches the approved dependency graph
 ### UC07 — freeze and stable closure
 
 The [UC07 implementation plan](docs/superpowers/plans/2026-09-27-uc07-stable-freeze-and-release-audit.md)
-is proposed for review. Stable promotion has not begun.
+is approved. The complete API freeze is committed and stable candidate qualification is in progress; see the [release audit](docs/1.17.0-RELEASE-AUDIT.md).
 
 - [ ] Freeze the complete new API and reviewed Inspection delta; retain historical
   reconstructions and unchanged JSON schema fingerprints.

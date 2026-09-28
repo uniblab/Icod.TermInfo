@@ -10,7 +10,7 @@ public sealed class UC04DevelopmentMetadataTests {
 	public void ReaderAndBothLowerLayersCarryCoordinatedAlphaFourMetadata() {
 		foreach ( Assembly assembly in new[] { typeof( TerminalCatalogReader ).Assembly,
 			typeof( BerkeleyDbTerminalCatalogReader ).Assembly, typeof( TermInfoDatabaseInspector ).Assembly } ) {
-			Assert.Equal( "1.17.0-Alpha-6", assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion.Split( '+' )[0] );
+			Assert.Equal( "1.17.0", assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion.Split( '+' )[0] );
 			Assert.Equal( new Version( 1, 0, 0, 0 ), assembly.GetName().Version );
 		}
 		Assembly catalogs = typeof( TerminalCatalogReader ).Assembly;

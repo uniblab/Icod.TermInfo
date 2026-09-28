@@ -5,9 +5,9 @@ package contracts. Version-specific roadmaps, API freezes, schema fingerprints,
 and release audits remain the authoritative historical evidence for completed
 releases; this document defines the current cross-release policy.
 
-## 1.17 development line
+## 1.17 stable candidate
 
-The current coordinated build identity is `1.17.0-Alpha-6`, set through
+The current coordinated build identity is `1.17.0`, a stable candidate set through
 `Directory.Build.props` for eight packages. The new optional
 `Icod.TermInfo.Catalogs` foundation brings the family to seven reusable libraries
 and seven symbol packages. All reusable assemblies retain `1.0.0.0` identity
@@ -27,7 +27,8 @@ old readers and frozen surfaces without another public addition.
 UC06 is accepted: it adds a two-format sample, an isolated package consumer
 and the [unified catalog guide](1.17.0-UNIFIED-CATALOG-GUIDE.md) without a new
 Catalogs public type. Full Alpha-6 package qualification passed; the stable
-published version remains 1.16.0. UC07 stable freeze and audit are next.
+published version remains 1.16.0. UC07 pins the [complete public API](1.17.0-PUBLIC-API-FREEZE.md)
+and tracks qualification in the [candidate audit](1.17.0-RELEASE-AUDIT.md).
 
 ## 1.16 release line
 

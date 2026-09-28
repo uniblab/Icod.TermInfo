@@ -10,7 +10,7 @@ namespace Icod.TermInfo.Catalogs.Tests;
 public sealed class UC06DevelopmentMetadataTests {
 	[Fact]
 	public void AlphaSixCoordinatesEightPackagesWithoutChangingCatalogSurface() {
-		const string version = "1.17.0-Alpha-6";
+		const string version = "1.17.0";
 		Assembly[] assemblies = [typeof( TerminalDescription ).Assembly,
 			typeof( TerminalCatalogReader ).Assembly, typeof( TermInfoDatabaseInspector ).Assembly,
 			typeof( BerkeleyDbTerminalCatalogReader ).Assembly];

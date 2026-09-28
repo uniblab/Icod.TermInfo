@@ -28,6 +28,12 @@ try {
     }
 
     $publicApiProject = 'tools/public-api-snapshot/Icod.TermInfo.PublicApiSnapshot.csproj'
+    foreach ($framework in @('net8.0', 'net9.0', 'net10.0')) {
+        & dotnet run --project $publicApiProject -c $Configuration --no-build -- --check `
+            'docs/1.17.0-BERKELEYDB-PUBLIC-API-BASELINE.txt' `
+            "Icod.TermInfo.BerkeleyDb/bin/$Configuration/$framework/Icod.TermInfo.BerkeleyDb.dll"
+        if (0 -ne $LASTEXITCODE) { throw "UC07 BerkeleyDb $framework complete API freeze failed." }
+    }
     & dotnet run `
         --project $publicApiProject `
         -c $Configuration `

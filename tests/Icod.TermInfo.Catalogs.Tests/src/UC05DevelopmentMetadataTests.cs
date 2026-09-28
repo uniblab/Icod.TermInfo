@@ -14,7 +14,7 @@ public sealed class UC05DevelopmentMetadataTests {
 			typeof( TerminalCatalogReader ).Assembly, typeof( TermInfoDatabaseInspector ).Assembly,
 			typeof( BerkeleyDbTerminalCatalogReader ).Assembly];
 		foreach ( Assembly assembly in assemblies ) {
-			Assert.Equal( "1.17.0-Alpha-6", assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!
+			Assert.Equal( "1.17.0", assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!
 				.InformationalVersion.Split( '+' )[0]
 			);
 			Assert.Equal( new Version( 1, 0, 0, 0 ), assembly.GetName().Version );
@@ -26,7 +26,7 @@ public sealed class UC05DevelopmentMetadataTests {
 				.OrderBy( name => name, StringComparer.Ordinal )
 		);
 		string root = UC01CatalogPackageContractTests.FindRoot();
-		Assert.Equal( "1.17.0-Alpha-6", XDocument.Load( Path.Combine( root, "Directory.Build.props" ) )
+		Assert.Equal( "1.17.0", XDocument.Load( Path.Combine( root, "Directory.Build.props" ) )
 			.Descendants( "IcodTermInfoSuiteVersion" ).Single().Value
 		);
 	}

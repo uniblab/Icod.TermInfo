@@ -7,20 +7,20 @@
 **Optional inspection package:** `Icod.TermInfo.Inspection`  
 **Optional termcap package:** `Icod.TermInfo.Termcap`  
 **Optional hashed-store package:** `Icod.TermInfo.BerkeleyDb`  
-**Optional catalog package (1.17 development):** `Icod.TermInfo.Catalogs`
+**Optional catalog package (1.17 candidate):** `Icod.TermInfo.Catalogs`
 **Installable tool package:** `Icod.TermInfo.Tools`  
 **Language:** C# 13  
 **Target frameworks:** `net8.0`; `net9.0`; `net10.0`  
 **Frozen runtime contract:** `1.0.0`  
-**Current coordinated version:** `1.17.0-Alpha-6`
+**Current coordinated version:** `1.17.0` stable candidate (unpublished)
 **Latest completed line:** `1.16.0` - Berkeley DB Hash-v9 Writer
 **Latest completed prerelease:** `1.17.0-Alpha-6`
 **Active development line:** `1.17.0` - Unified directory/hashed catalogs
-**Status:** stable `1.16.0` is published; UC00 through UC06 are accepted; UC07 next
+**Status:** stable `1.16.0` is published; UC00 through UC06 are accepted; UC07 qualification in progress
 **Active release roadmap:** [1.17.0 — Unified directory/hashed catalogs](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadmap.md)
-**Release audit:** planned for UC07; UC01 through UC03 evidence is tracked in the active roadmap
+**Release audit:** [1.17 stable candidate audit](docs/1.17.0-RELEASE-AUDIT.md) (qualification in progress)
 **Latest completed release audit:** `docs/1.16.0-RELEASE-AUDIT.md`
-**Next gate:** Review the [UC07 API freeze and stable release-audit plan](docs/superpowers/plans/2026-09-27-uc07-stable-freeze-and-release-audit.md) under the [1.17 roadmap](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadmap.md)
+**Next gate:** Qualify the approved [UC07 API freeze and stable release-audit plan](docs/superpowers/plans/2026-09-27-uc07-stable-freeze-and-release-audit.md) under the [1.17 roadmap](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadmap.md)
 
 The approved UC00 contract fixes `Icod.TermInfo.Catalogs` above Runtime,
 Inspection, and BerkeleyDb. UC01 introduces the ten model types and bounded
@@ -125,7 +125,7 @@ is complete and accepted at `656acf952c286ccd24b3819e85faf2bc598e2bcd`.
 
 UC00–UC07 cover contract design, package/model foundation, directory and hashed
 adapters, unified acquisition, adversarial qualification, samples/package
-consumers, and stable closure. UC01 through UC06 are accepted; UC07 is pending.
+consumers, and stable closure. UC01 through UC06 are accepted; UC07 qualification is in progress.
 UC02 code head `965c8d2ee91a6b3515a33c64cb9f702566f3943a` passed 7,284 local
 tests, all 12 PR workflow jobs, and all three interoperability jobs; see the
 active roadmap for commands, artifact checks, and CI links.
@@ -161,7 +161,7 @@ and all three native/managed jobs passed in
 Linux ran the Staging/Release package steps; Windows/macOS intentionally skip
 them. The Inspection PowerShell step ran on Windows and skipped Linux/macOS.
 The active roadmap records the sample fixture nuance and remaining limits.
-The draft PR is unmerged, untagged and unpublished. **UC07 is next.**
+The draft PR is unmerged, untagged and unpublished. **UC07 candidate qualification is in progress.**
 
 The earlier broad assignment of migration and catalog automation to 1.17 is
 superseded. Mixed-source database sets, precedence, cross-container comparison,
