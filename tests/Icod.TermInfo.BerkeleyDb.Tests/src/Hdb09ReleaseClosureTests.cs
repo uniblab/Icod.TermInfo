@@ -334,7 +334,7 @@ public sealed class Hdb09ReleaseClosureTests {
 	public void StableHistoryAndCurrentPackageNotesRemainCoordinated() {
 		AssertContainsAll(
 			"README.md",
-			"Current build line: `Icod.TermInfo 1.17.0` stable candidate.",
+			"The 1.17.0 release adds unified directory/hashed catalogs.",
 			"Icod.TermInfo.BerkeleyDb --version 1.16.0"
 		);
 		Assert.DoesNotContain(
