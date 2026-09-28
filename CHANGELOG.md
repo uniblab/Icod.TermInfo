@@ -3,13 +3,13 @@
 This file records release-level product changes. Exact qualification evidence,
 API fingerprints, and preserved boundaries live in the linked release audits.
 
-## 1.17.0 (stable candidate; unpublished)
+## 1.17.0
 
 - Freezes the complete eleven-type Catalogs, 108-type Inspection, and fourteen-type
-  BerkeleyDb public surfaces for the coordinated eight-package 1.17.0 candidate.
+  BerkeleyDb public surfaces for the coordinated eight-package 1.17.0 release.
 - Preserves Runtime/Source/Compiler/Termcap APIs, JSON v1–v6, assembly identities,
   package dependency topology, and the established five commands and six archives.
-- Candidate qualification is tracked in the [1.17 release audit](docs/1.17.0-RELEASE-AUDIT.md).
+- Pre-release qualification is recorded in the [1.17 release audit](docs/1.17.0-RELEASE-AUDIT.md).
 
 ## 1.17.0-Alpha-6
 

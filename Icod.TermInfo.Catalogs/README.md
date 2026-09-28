@@ -1,8 +1,7 @@
 # Icod.TermInfo.Catalogs
 
-The optional composition package for the Icod.TermInfo 1.17 unified
-directory/hashed catalog release. Current build: **1.17.0 stable candidate**;
-the package has not yet been published.
+The optional composition package for the Icod.TermInfo 1.17.0 unified
+directory/hashed catalog release.
 Targets .NET 8, 9, and 10; licensed LGPL-3.0-or-later.
 
 UC01 supplies immutable source descriptors, read options, publication/result

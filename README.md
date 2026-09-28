@@ -9,7 +9,8 @@
 
 ## Status
 
-Current build line: `Icod.TermInfo 1.17.0` stable candidate. The latest published stable release is `1.16.0`.
+The 1.17.0 release adds unified directory/hashed catalogs. Installation commands
+below target 1.17.0 and become available when that version is published.
 
 The 1.17 branch delivers **Unified directory/hashed catalogs**.
 Alpha-4 added `TerminalCatalogReader` in `Icod.TermInfo.Catalogs`: choose a
@@ -25,8 +26,7 @@ and [approved contract](docs/1.17.0-UC00-UNIFIED-CATALOG-CONTRACT.md).
 Alpha-5 tests aggregate resource limits, interrupted acquisition, source
 replacement, links, and legacy compatibility. Reads remain fresh and bounded;
 filesystem observations are not atomic and a blocking OS call cannot be
-interrupted synchronously. The published stable release is **1.16.0**;
-installation examples below use that published version.
+interrupted synchronously.
 
 Alpha-6 adds the [two-format Catalogs sample](samples/Icod.TermInfo.Catalogs.Sample/README.md),
 the [unified usage guide](docs/1.17.0-UNIFIED-CATALOG-GUIDE.md), and an
@@ -36,9 +36,8 @@ the [1.17 roadmap](Icod.TermInfo-1.17.0-Unified-Directory-Hashed-Catalogs-Roadma
 records the exact commit and workflow runs.
 
 UC07 freezes the complete [Catalogs, Inspection, and BerkeleyDb public APIs](docs/1.17.0-PUBLIC-API-FREEZE.md)
-and has qualified the coordinated 1.17.0 stable candidate. The [release audit](docs/1.17.0-RELEASE-AUDIT.md)
-records its exact code, workflows, and artifacts. The candidate remains unpublished;
-the installation examples below continue to reference 1.16.0.
+and qualified the coordinated 1.17.0 release candidate. The [release audit](docs/1.17.0-RELEASE-AUDIT.md)
+records its exact code, workflows, and artifacts.
 
 Version 1.16 adds deterministic, pure-managed Berkeley DB Hash-v9 publication
 to `Icod.TermInfo.BerkeleyDb`, alongside exact lookup, logical catalogs, and
@@ -119,7 +118,7 @@ and BerkeleyDb. Existing libraries and command tools do not reference it.
 Install the runtime package:
 
 ```text
-dotnet add package Icod.TermInfo --version 1.16.0
+dotnet add package Icod.TermInfo --version 1.17.0
 ```
 
 Resolve the current terminal through conventional system discovery with immutable built-in fallback:
@@ -152,7 +151,7 @@ Applications that only need compiled terminfo acquisition, immutable `TerminalDe
 For explicit ncurses-compatible hashed acquisition:
 
 ```text
-dotnet add package Icod.TermInfo.BerkeleyDb --version 1.16.0
+dotnet add package Icod.TermInfo.BerkeleyDb --version 1.17.0
 ```
 
 ```csharp
@@ -203,25 +202,30 @@ The root README describes the current product by capability rather than by the r
 | `Icod.TermInfo.Compiler` | Deterministic compiled terminfo writing and database publication |
 | `Icod.TermInfo.Inspection` | Rendering, comparison, database analysis, planning, and JSON automation |
 | `Icod.TermInfo.BerkeleyDb` | Optional pure-managed Hash-v9 acquisition, catalog enumeration, and deterministic publication |
-| `Icod.TermInfo.Catalogs` | Explicit bounded reads of conventional directory or Hash-v9 catalogs (1.17 candidate) |
+| `Icod.TermInfo.Catalogs` | Explicit bounded reads of conventional directory or Hash-v9 catalogs (since 1.17.0) |
 | `Icod.TermInfo.Tools` | Installable `icod-terminfo` multi-command router |
 
 Install an optional package only when its capability is needed:
 
 ```text
-dotnet add package Icod.TermInfo.Source --version 1.16.0
-dotnet add package Icod.TermInfo.Termcap --version 1.16.0
-dotnet add package Icod.TermInfo.Compiler --version 1.16.0
-dotnet add package Icod.TermInfo.Inspection --version 1.16.0
+dotnet add package Icod.TermInfo.Source --version 1.17.0
+dotnet add package Icod.TermInfo.Termcap --version 1.17.0
+dotnet add package Icod.TermInfo.Compiler --version 1.17.0
+dotnet add package Icod.TermInfo.Inspection --version 1.17.0
 ```
 
-`Icod.TermInfo.Catalogs` is part of the unpublished 1.17.0 candidate; see the
-[unified catalog guide](docs/1.17.0-UNIFIED-CATALOG-GUIDE.md) for its read API.
+For the new unified reader, install `Icod.TermInfo.Catalogs` after publication:
+
+```text
+dotnet add package Icod.TermInfo.Catalogs --version 1.17.0
+```
+
+See the [unified catalog guide](docs/1.17.0-UNIFIED-CATALOG-GUIDE.md) for its read API.
 
 Install the command router with:
 
 ```text
-dotnet tool install --global Icod.TermInfo.Tools --version 1.16.0
+dotnet tool install --global Icod.TermInfo.Tools --version 1.17.0
 
 icod-terminfo tic -V
 icod-terminfo infocmp -V
